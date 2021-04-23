@@ -1,0 +1,23 @@
+.inspection-metrics-wrapper {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (max-width: 1199px) {
+  .inspection-metrics-wrapper {
+    grid: auto auto auto / auto;
+    grid-template-areas:
+      "accuracy"
+      "pr-curve"
+      "roc-curve";
+  }
+}
+
+@media (min-width: 1200px) {
+  .inspection-metrics-wrapper {
+    grid: auto auto / minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "accuracy accuracy"
+      "pr-curve roc-curve";
+  }
+}

@@ -1,0 +1,46 @@
+.alert-icon-wrapper {
+  cursor: pointer;
+  position: relative;
+}
+
+.alert-icon-message {
+  border-radius: var(--border-radius);
+  bottom: 1rem;
+  color: var(--fun-text-color);
+  left: 1rem;
+  padding: 0.5rem;
+  position: absolute;
+  visibility: hidden;
+}
+
+.alert-wrapper:hover .alert-icon-message {
+  visibility: visible;
+}
+
+.alert-icon {
+  align-content: center;
+  border-radius: 0.5rem;
+  color: var(--fun-text-color);
+  display: inline-grid;
+  font-size: 0.8rem;
+  height: 1rem;
+  justify-content: center;
+  user-select: none;
+  width: 1rem;
+}
+
+.alert-icon-level-info {
+  background-color: var(--blue);
+}
+
+.alert-icon-level-success {
+  background-color: var(--green);
+}
+
+.alert-icon-level-warning {
+  background-color: var(--yellow);
+}
+
+.alert-icon-level-danger {
+  background-color: var(--red);
+}

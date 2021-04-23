@@ -1,0 +1,32 @@
+.form-select-field {
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	-webkit-text-fill-color: inherit;
+	appearance: none;
+	background-color: var(--surface-color);
+	border-radius: var(--border-radius);
+	border: var(--border);
+	box-sizing: border-box;
+	color: var(--text-color);
+	cursor: pointer;
+	font-size: 1rem;
+	font: inherit;
+	height: 2.5rem;
+	outline: none;
+	padding: calc(0.5rem - var(--border-width)) 1rem;
+	user-select: text;
+	width: 100%;
+}
+
+.form-select-field:hover {
+	border-color: var(--hover-color);
+}
+
+.form-select-field:focus {
+	border-color: var(--accent-color);
+}
+
+.form-select-field::-webkit-input-placeholder {
+	-webkit-text-fill-color: var(--muted-text-color);
+	color: var(--muted-text-color);
+}

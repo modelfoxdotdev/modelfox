@@ -1,0 +1,19 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_serialize"
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[features]
+ndarray_0_15 = ["ndarray"]
+bitvec_0_19 = ["bitvec"]
+
+[dependencies]
+bitvec = {version = "0.19", optional = true }
+derive_deref = "1"
+ndarray = { version = "0.15", optional = true }
+num = "0.4"
+tangram_serialize_macro = { path = "macro" }

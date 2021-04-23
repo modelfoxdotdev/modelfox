@@ -1,0 +1,3 @@
+cargo build -p libtangram
+install -D ../../target/debug/libtangram.a libtangram/x86_64-unknown-linux-musl/libtangram.a
+cbindgen ../c > libtangram/x86_64-unknown-linux-musl/tangram.h

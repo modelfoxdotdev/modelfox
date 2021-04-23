@@ -1,0 +1,4 @@
+cargo build -p libtangram
+install -D ../../target/debug/libtangram.so lib/tangram/libtangram/x86_64-unknown-linux-gnu/libtangram.so
+scripts/build
+gem install dist/*

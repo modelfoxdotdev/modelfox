@@ -1,0 +1,11 @@
+.layout {
+	background-color: var(--background-color);
+	color: var(--text-color);
+	display: grid;
+	grid: auto 1fr auto / auto;
+	min-height: 100vh;
+}
+
+.github-icon:hover {
+	filter: brightness(90%);
+}

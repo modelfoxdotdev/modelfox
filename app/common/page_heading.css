@@ -1,0 +1,37 @@
+.page-heading {
+  align-items: center;
+  display: grid;
+}
+
+@media (max-width: 1199px) {
+  .page-heading {
+    grid-auto-flow: row;
+    row-gap: 1rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .page-heading {
+    justify-content: space-between;
+    min-height: 2.5rem;
+    grid-auto-flow: column;
+  }
+}
+
+.page-heading-buttons {
+  display: grid;
+}
+
+@media (max-width: 1199px) {
+  .page-heading-buttons {
+    grid-auto-flow: row;
+    row-gap: 1rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .page-heading-buttons {
+    grid-auto-flow: column;
+    column-gap: 1rem;
+  }
+}

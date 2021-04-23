@@ -1,0 +1,6 @@
+.field-label {
+	color: var(--heading-text-color);
+	display: grid;
+	gap: 0.5rem;
+	user-select: none;
+}

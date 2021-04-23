@@ -1,0 +1,2 @@
+scp target/release/tangram tangram@router.tangram.xyz:/home/tangram/tangram
+ssh -t tangram@router.tangram.xyz "sudo systemctl restart tangram"

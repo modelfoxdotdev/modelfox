@@ -1,0 +1,97 @@
+.number-comparison-card-wrapper {
+  display: grid;
+  grid: auto auto auto auto / auto auto;
+  grid-template-areas:
+    "title title"
+    "difference difference"
+    "value-a value-b"
+    "title-a title-b";
+  justify-content: center;
+  overflow: auto;
+}
+
+@media (max-width: 1199px) {
+  .number-comparison-card-wrapper {
+    column-gap: 1rem;
+    row-gap: 0.5rem;
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .number-comparison-card-wrapper {
+    column-gap: 2rem;
+    row-gap: 0.5rem;
+    font-size: 1rem;
+  }
+}
+
+.number-comparison-card-title {
+  grid-area: title;
+  justify-self: center;
+}
+
+@media (max-width: 1199px) {
+  .number-comparison-card-title {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .number-comparison-card-title {
+    font-size: 1.25rem;
+  }
+}
+
+.number-comparison-card-difference {
+  grid-area: difference;
+  justify-self: center;
+}
+
+.number-comparison-card-equal {
+  color: var(--gray);
+}
+
+.number-comparison-card-negative {
+  color: var(--red);
+}
+
+.number-comparison-card-positive {
+  color: var(--green);
+}
+
+.number-comparison-card-value {
+  justify-self: center;
+}
+
+.number-comparison-card-value .a {
+  grid-area: value-a;
+}
+
+.number-comparison-card-value .b {
+  grid-area: value-b;
+}
+
+@media (max-width: 1199px) {
+  .number-comparison-card-value {
+    font-size: 1.5rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .number-comparison-card-value {
+    font-size: 2rem;
+  }
+}
+
+.number-comparison-card-value-title {
+  justify-self: center;
+}
+
+.number-comparison-card-value-title .a {
+  grid-area: title-a;
+}
+
+.number-comparison-card-value-title .b {
+  grid-area: title-b;
+}

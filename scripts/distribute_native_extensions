@@ -1,0 +1,1 @@
+cargo run --release --bin tangram_script_distribute_native_extensions -- $@

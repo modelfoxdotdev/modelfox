@@ -1,0 +1,37 @@
+.callout-wrapper {
+	border-left-style: solid;
+	border-left-width: 4px;
+	display: grid;
+	gap: 0.5rem;
+	padding: 1rem;
+}
+
+.callout-wrapper-success {
+	background-color: var(--surface-color);
+	border-left-color: var(--green);
+}
+
+.callout-wrapper-info {
+	background-color: var(--surface-color);
+	border-left-color: var(--blue);
+}
+
+.callout-wrapper-warning {
+	background-color: var(--surface-color);
+	border-left-color: var(--yellow);
+}
+
+.callout-wrapper-danger {
+	background-color: var(--surface-color);
+	border-left-color: var(--red);
+}
+
+.callout-title {
+	color: var(--text);
+	font-weight: bold;
+}
+
+.callout-inner {
+	color: var(--text);
+	line-height: 1.5;
+}

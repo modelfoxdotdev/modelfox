@@ -1,0 +1,14 @@
+.search-bar-wrapper {
+	display: grid;
+	grid: auto / 1fr auto;
+	gap: 2rem;
+	align-items: end;
+}
+
+.pagination-buttons {
+	display: grid;
+	grid: auto / auto auto auto;
+	justify-content: center;
+	align-items: center;
+	gap: 2rem;
+}

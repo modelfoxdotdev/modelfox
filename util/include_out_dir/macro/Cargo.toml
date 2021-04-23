@@ -1,0 +1,14 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "include_out_dir_macro"
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1"
+quote = "1"
+walkdir = "2"

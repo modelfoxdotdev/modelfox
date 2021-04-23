@@ -1,0 +1,29 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_rust"
+readme = "README.md"
+version = "0.3.0"
+
+[lib]
+path = "lib.rs"
+
+[features]
+default = []
+tokio_1 = ["tokio"]
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+memmap = "0.7"
+reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tangram_core = { path = "../../core" }
+tangram_error = { path = "../../util/error" }
+tangram_model = { path = "../../model" }
+tangram_rust_macro = { path = "macro" }
+tokio = { version = "1", features = [], optional = true }
+url = "2"

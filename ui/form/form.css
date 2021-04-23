@@ -1,0 +1,9 @@
+.form-title {
+	text-align: center;
+}
+
+.form {
+	display: grid;
+	row-gap: 1rem;
+	margin: 0;
+}

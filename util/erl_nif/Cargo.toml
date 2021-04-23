@@ -1,0 +1,19 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "erl_nif"
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[features]
+default = []
+serde_1 = ["serde"]
+
+[dependencies]
+erl_nif_macro = { path = "macro" }
+erl_nif_sys = { path = "sys" }
+num = "0.4"
+serde = { version = "1", optional = true }
+tangram_error = { path = "../error" }

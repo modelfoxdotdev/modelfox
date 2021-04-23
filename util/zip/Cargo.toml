@@ -1,0 +1,8 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_zip"
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"

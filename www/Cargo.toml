@@ -1,0 +1,42 @@
+[package]
+edition = "2018"
+name = "tangram_www"
+version = "0.0.0"
+
+[[bin]]
+name = "tangram_www"
+path = "main.rs"
+
+[build-dependencies]
+tangram_error = { path = "../util/error" }
+tangram_serve = { path = "../util/serve" }
+
+[dependencies]
+clap = { version = "3.0.0-beta.2", features = ["color"] }
+html = { path = "../util/html" }
+http = "0.2"
+hyper = { version = "0.14", features = ["server"] }
+include_out_dir = { path = "../util/include_out_dir" }
+tangram_error = { path = "../util/error" }
+tangram_serve = { path = "../util/serve" }
+tangram_www_docs_index_server = { path = "pages/docs/index/server" }
+tangram_www_docs_install_server = { path = "pages/docs/install/server" }
+tangram_www_docs_getting_started_index_server = { path = "pages/docs/getting_started/index/server" }
+tangram_www_docs_getting_started_predict_index_server = { path = "pages/docs/getting_started/predict/index/server" }
+tangram_www_docs_getting_started_predict_elixir_server = { path = "pages/docs/getting_started/predict/elixir/server" }
+tangram_www_docs_getting_started_predict_go_server = { path = "pages/docs/getting_started/predict/go/server" }
+tangram_www_docs_getting_started_predict_node_server = { path = "pages/docs/getting_started/predict/node/server" }
+tangram_www_docs_getting_started_predict_python_server = { path = "pages/docs/getting_started/predict/python/server" }
+tangram_www_docs_getting_started_predict_ruby_server = { path = "pages/docs/getting_started/predict/ruby/server" }
+tangram_www_docs_getting_started_predict_rust_server = { path = "pages/docs/getting_started/predict/rust/server" }
+tangram_www_docs_getting_started_train_server = { path = "pages/docs/getting_started/train/server" }
+tangram_www_docs_getting_started_inspect_server = { path = "pages/docs/getting_started/inspect/server" }
+tangram_www_docs_getting_started_monitor_server = { path = "pages/docs/getting_started/monitor/server" }
+tangram_www_docs_train_configuration_server = { path = "pages/docs/train/configuration/server" }
+tangram_www_index_server = { path = "pages/index/server" }
+tokio = { version = "1", features = ["full"] }
+
+[target.wasm32-unknown-unknown.dependencies]
+tangram_www_index_client = { path = "pages/index/client" }
+tangram_www_docs_inspect_client = {path = "pages/docs/getting_started/inspect/client"}
+tangram_www_docs_monitor_client = {path = "pages/docs/getting_started/monitor/client"}

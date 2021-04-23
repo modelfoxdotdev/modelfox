@@ -1,0 +1,23 @@
+.number-wrapper {
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+.number-value {
+  color: var(--heading-text-color);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 1199px) {
+  .number-value {
+    font-size: 1.5rem;
+  }
+}
+
+.number-title {
+  color: var(--text-color);
+}

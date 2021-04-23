@@ -1,0 +1,16 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_script_dev"
+version = "0.0.0"
+
+[[bin]]
+name = "tangram_script_dev"
+path = "main.rs"
+
+[dependencies]
+clap = { version = "3.0.0-beta.2", features = ["color"] }
+notify = "4"
+serde = { version = "1", features = ["derive"] }
+tangram_error = { path = "../../../util/error" }
+which = "4"

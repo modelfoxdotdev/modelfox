@@ -1,0 +1,24 @@
+[package]
+edition = "2018"
+name = "tangram_app_production_class_metrics_server"
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+html = { path = "../../../../../../../../../util/html" }
+http = "0.2"
+hyper = { version = "0.14", features = ["server"] }
+num = "0.4"
+tangram_app_common = { path = "../../../../../../../../common" }
+tangram_app_layouts = { path = "../../../../../../../../layouts" }
+tangram_charts = { path = "../../../../../../../../../charts" }
+tangram_core = { path = "../../../../../../../../../core" }
+tangram_error = { path = "../../../../../../../../../util/error" }
+tangram_finite = { path = "../../../../../../../../../util/finite" }
+tangram_id = { path = "../../../../../../../../../util/id" }
+tangram_model = { path = "../../../../../../../../../model" }
+tangram_serve = { path = "../../../../../../../../../util/serve" }
+tangram_ui = { path = "../../../../../../../../../ui" }
+tangram_zip = { path = "../../../../../../../../../util/zip" }

@@ -1,0 +1,9 @@
+/.mypy_cache
+/build
+/dist
+/docs
+/tangram.egg-info
+/tangram/*.dll
+/tangram/*.dylib
+/tangram/*.so
+__pycache__

@@ -1,0 +1,15 @@
+[package]
+edition = "2018"
+name = "tangram_www_docs_getting_started_predict_index_server"
+version = "0.0.0"
+
+[lib]
+path = "page.rs"
+
+[dependencies]
+html = { path = "../../../../../../../util/html" }
+indoc = "1"
+tangram_www_common = { path = "../../../../../../common" }
+tangram_www_layouts = { path = "../../../../../../layouts" }
+tangram_serve = { path = "../../../../../../../util/serve" }
+tangram_ui = { path = "../../../../../../../ui" }

@@ -1,0 +1,2 @@
+cargo build -p tangram_elixir
+install -D ../../target/debug/libtangram_elixir.so priv/x86_64-unknown-linux-gnu/libtangram_elixir.so

@@ -1,0 +1,12 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_finite"
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+num = "0.4"
+serde= { version = "1", features = ["derive"] }

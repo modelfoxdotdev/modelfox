@@ -1,0 +1,9 @@
+.asciicast {
+	background-color: var(--header-color);
+	border-radius: var(--border-radius);
+	color: var(--text-color);
+	font-size: 1rem;
+	line-height: 1.5;
+	overflow: auto;
+	padding: 1rem;
+}

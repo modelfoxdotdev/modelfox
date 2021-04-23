@@ -1,0 +1,13 @@
+[package]
+edition = "2018"
+name = "tangram_app_training_class_metrics_client"
+version = "0.0.0"
+
+[lib]
+crate-type = ["cdylib"]
+path = "lib.rs"
+
+[dependencies]
+console_error_panic_hook = "0.1"
+tangram_ui = { path = "../../../../../../../../../ui" }
+wasm-bindgen = "0.2.69"

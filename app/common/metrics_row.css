@@ -1,0 +1,16 @@
+.metrics-row {
+	display: grid;
+	gap: 1rem;
+}
+
+@media (min-width: 1200px) {
+	.metrics-row {
+		grid-auto-flow: column;
+	}
+}
+
+@media (max-width: 1199px) {
+	.metrics-row {
+		grid-auto-flow: row;
+	}
+}

@@ -1,0 +1,7 @@
+.offset-pagination-buttons {
+	display: grid;
+	grid: auto / auto auto auto auto;
+	justify-content: center;
+	align-items: center;
+	gap: 2rem;
+}

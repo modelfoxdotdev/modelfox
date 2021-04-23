@@ -1,0 +1,15 @@
+.app-layout-topbar-grid {
+  color: var(--text-color);
+  display: grid;
+  grid: auto 1fr / auto;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.app-layout {
+  box-sizing: border-box;
+  margin: 0 auto;
+  max-width: var(--max-width);
+  padding: 2rem;
+  width: 100%;
+}

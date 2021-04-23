@@ -1,0 +1,36 @@
+.form-checkbox-field {
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	align-items: center;
+	border: var(--border);
+	border-radius: var(--border-radius);
+	color: var(--text-color);
+	display: grid;
+	height: 2.5rem;
+	justify-items: center;
+	width: 2.5rem;
+}
+
+.form-checkbox-field:checked {
+	background-color: var(--accent-color);
+	border-color: var(--accent-color);
+}
+
+.form-checkbox-field:checked::after {
+	color: var(--fun-text-color);
+	font-size: 1.5rem;
+	content: "✓";
+}
+
+.form-checkbox-field:not(:checked):hover {
+	border-color: var(--hover-color);
+}
+
+.form-checkbox-field:focus {
+	outline: none;
+}
+
+.form-checkbox-field::-webkit-input-placeholder {
+	-webkit-text-fill-color: var(--muted-text-color);
+	color: var(--muted-text-color);
+}

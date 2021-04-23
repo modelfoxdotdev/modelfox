@@ -1,0 +1,5 @@
+.tuning-metrics-grid {
+  display: grid;
+  grid: auto auto / 1fr 1fr;
+  gap: 1rem;
+}

@@ -1,0 +1,25 @@
+[package]
+edition = "2018"
+name = "tangram_app_login_server"
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+html = { path = "../../../../util/html" }
+http = "0.2"
+hyper = { version = "0.14", features = ["server"] }
+rand = "0.8"
+reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_urlencoded = "0.7"
+sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }
+tangram_app_common = { path = "../../../common" }
+tangram_app_layouts = { path = "../../../layouts" }
+tangram_error = { path = "../../../../util/error" }
+tangram_id = { path = "../../../../util/id" }
+tangram_ui = { path = "../../../../ui" }
+url = "2"

@@ -1,0 +1,19 @@
+$ tangram train --file heart_disease.csv --target diagnosis
+✅ Loading train data.
+✅ Loading test data.
+✅ Shuffling train data.
+✅ Shuffling test data.
+✅ Inferring column types.
+✅ Computing train stats.
+✅ Computing test stats.
+✅ Computing baseline metrics.
+✅ Computing features.
+<span style="font-weight: bold; color: var(--blue)">info</span>: Press ctrl-c to stop early and save the best model trained so far.
+✅ Training model 1 of 8.
+✅ Training model 2 of 8.
+✅ Training model 3 of 8.
+✅ Computing model comparison features.
+✅ Computing model comparison metric.
+✅ Computing features.
+🚂 Training model 4 of 8.
+[==========================================>                         ]

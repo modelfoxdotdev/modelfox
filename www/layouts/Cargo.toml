@@ -1,0 +1,12 @@
+[package]
+edition = "2018"
+name = "tangram_www_layouts"
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+html = { path = "../../util/html" }
+tangram_www_common = { path = "../common" }
+tangram_ui = { path = "../../ui" }

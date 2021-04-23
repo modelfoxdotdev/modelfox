@@ -1,0 +1,63 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_tree"
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[features]
+default = []
+timing = []
+
+[[bin]]
+name = "tangram_tree_benchmarks"
+path = "benchmarks/main.rs"
+
+[[bin]]
+name = "tangram_tree_benchmark_allstate"
+path = "benchmarks/allstate.rs"
+
+[[bin]]
+name = "tangram_tree_benchmark_boston"
+path = "benchmarks/boston.rs"
+
+[[bin]]
+name = "tangram_tree_benchmark_census"
+path = "benchmarks/census.rs"
+
+[[bin]]
+name = "tangram_tree_benchmark_flights"
+path = "benchmarks/flights.rs"
+
+[[bin]]
+name = "tangram_tree_benchmark_heart_disease"
+path = "benchmarks/heart_disease.rs"
+
+[[bin]]
+name = "tangram_tree_benchmark_higgs"
+path = "benchmarks/higgs.rs"
+
+[[bin]]
+name = "tangram_tree_benchmark_iris"
+path = "benchmarks/iris.rs"
+
+[dependencies]
+bitvec = "0.19"
+clap = { version = "3.0.0-beta.2", features = ["color"] }
+itertools = "0.10"
+maplit = "1"
+ndarray = { version = "0.15", features = ["rayon"] }
+num = "0.4"
+rayon = "1.5"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tangram_finite = { path = "../util/finite" }
+tangram_kill_chip = { path = "../util/kill_chip" }
+tangram_metrics = { path = "../metrics" }
+tangram_progress_counter = { path = "../util/progress_counter" }
+tangram_serialize = { path = "../util/serialize", features = ["ndarray_0_15", "bitvec_0_19"] }
+tangram_super_unsafe = { path = "../util/super_unsafe" }
+tangram_table = { path = "../table" }
+tangram_zip = { path = "../util/zip" }

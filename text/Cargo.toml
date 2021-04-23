@@ -1,0 +1,13 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_text"
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+fnv = "1"
+indexmap = { version = "1.6", features = ["serde-1"] }
+serde = { version = "1", features = ["derive"] }

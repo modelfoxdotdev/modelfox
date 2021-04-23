@@ -1,0 +1,34 @@
+.form-file-wrapper {
+	background-color: var(--surface-color);
+	border: var(--border);
+	border-radius: var(--border-radius);
+	box-sizing: border-box;
+	color: var(--text-color);
+	cursor: pointer;
+	font-size: 1rem;
+	height: 2.5rem;
+	line-height: 1.5;
+	outline: none;
+	padding: calc(0.5rem - var(--border-width)) 1rem;
+	position: relative;
+	user-select: text;
+	width: 100%;
+}
+
+.form-file-wrapper:hover {
+	border-color: var(--hover-color);
+}
+
+.form-file-wrapper:focus-within {
+	border-color: var(--accent-color);
+}
+
+.form-file-input {
+	bottom: 0;
+	left: 0;
+	opacity: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 100%;
+}

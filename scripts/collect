@@ -1,0 +1,3 @@
+for MACHINE in mba win; do
+  rsync --archive --compress --delete --progress $MACHINE:tangram/dist/* dist
+done

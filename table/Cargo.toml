@@ -1,0 +1,21 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_table"
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dev-dependencies]
+insta = "1"
+
+[dependencies]
+csv = "1"
+fast-float = "0.2"
+fnv = "1"
+ndarray = { version = "0.15", features = ["rayon"] }
+num = "0.4"
+tangram_error = { path = "../util/error" }
+tangram_progress_counter = { path = "../util/progress_counter" }
+tangram_zip = { path = "../util/zip" }

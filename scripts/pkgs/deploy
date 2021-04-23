@@ -1,0 +1,1 @@
+rsync --archive --compress --delete --progress dist/pkgs/ tangram@router.tangram.xyz:/var/pkgs/

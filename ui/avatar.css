@@ -1,0 +1,24 @@
+.avatar {
+	background-color: var(--surface-color);
+	border-radius: 50%;
+	height: 2rem;
+	overflow: hidden;
+	width: 2rem;
+}
+
+.avatar:hover {
+	filter: brightness(90%);
+}
+
+.avatar-img {
+	border: none;
+	height: 100%;
+	outline: none;
+	width: 100%;
+}
+
+.avatar-placeholder {
+	background-color: var(--surface-color);
+	height: 100%;
+	width: 100%;
+}

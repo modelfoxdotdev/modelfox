@@ -1,0 +1,21 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_features"
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+fnv = "1"
+indexmap = { version = "1.6", features = ["serde-1"] }
+itertools = "0.10"
+ndarray = { version = "0.15", features = ["rayon"] }
+num = "0.4"
+serde = { version = "1", features = ["derive"] }
+tangram_metrics = { path = "../metrics" }
+tangram_table = { path = "../table" }
+tangram_text = { path = "../text" }
+tangram_error = { path = "../util/error" }
+tangram_zip = { path = "../util/zip" }

@@ -1,0 +1,16 @@
+.auth-layout {
+	display: grid;
+	row-gap: 1rem;
+	justify-content: center;
+	justify-items: center;
+	padding-top: 1rem;
+}
+
+.auth-layout-logo-wrapper {
+	height: 5rem;
+	width: 5rem;
+}
+
+.auth-layout-card-wrapper {
+	width: 300px;
+}

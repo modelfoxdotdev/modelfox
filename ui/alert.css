@@ -1,0 +1,31 @@
+.alert-wrapper {
+	border-radius: var(--border-radius);
+	color: var(--fun-text-color);
+	padding: 1rem;
+}
+
+.alert-level-info {
+	background-color: var(--blue);
+}
+
+.alert-level-success {
+	background-color: var(--green);
+}
+
+.alert-level-warning {
+	background-color: var(--yellow);
+}
+
+.alert-level-danger {
+	background-color: var(--red);
+}
+
+.alert-title {
+	color: var(--fun-text-color);
+	font-weight: bold;
+	margin-bottom: 1rem;
+}
+
+.alert-text {
+	line-height: 1.5;
+}

@@ -1,0 +1,94 @@
+.slider-wrapper {
+  height: 1rem;
+  position: relative;
+}
+
+.slider-input {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  box-sizing: border-box;
+  height: 1rem;
+  left: 0;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.slider-input:focus {
+  outline: none;
+}
+
+.slider-input::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: var(--border-color);
+  border-radius: var(--border-radius);
+  box-sizing: border-box;
+  height: 4px;
+}
+
+.slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: var(--blue);
+  border-radius: 0.5rem;
+  border: none;
+  box-sizing: border-box;
+  height: 1rem;
+  margin-top: calc(-0.5rem + 2px);
+  position: relative;
+  width: 1rem;
+}
+
+.slider-input::-moz-range-track {
+  background-color: var(--border-color);
+  border-radius: var(--border-radius);
+  box-sizing: border-box;
+  height: 4px;
+}
+
+.slider-input::-moz-range-progress {
+  background-color: var(--accent-color);
+  border-radius: var(--border-radius);
+  box-sizing: border-box;
+  height: 4px;
+}
+
+.slider-input::-moz-range-thumb {
+  background-color: var(--accent-color);
+  border: none;
+  border-radius: 0.5rem;
+  display: none;
+  height: 1rem;
+  position: relative;
+  width: 1rem;
+}
+
+.slider-tooltip {
+  background-color: var(--surface-color);
+  border: var(--border);
+  border-radius: var(--border-radius);
+  display: none;
+  padding: 0.5rem;
+  position: absolute;
+  text-align: center;
+  top: -0.5rem;
+  transform: translateX(-50%) translateY(-100%);
+  user-select: none;
+}
+
+.slider-wrapper:hover > .slider-tooltip {
+  display: block;
+}
+
+.slider-progress {
+  background-color: var(--accent-color);
+  border-radius: var(--border-radius);
+  height: 4px;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: calc(0.5rem - 2px);
+}

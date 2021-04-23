@@ -1,0 +1,44 @@
+.tab-bar {
+	border-bottom: var(--border);
+	box-sizing: border-box;
+	column-gap: 2rem;
+	display: grid;
+	grid-auto-flow: column;
+	height: 1.5rem;
+	justify-content: start;
+}
+
+.tab-bar-tab {
+	border-bottom: var(--border);
+	box-sizing: border-box;
+	color: var(--text-color);
+	cursor: pointer;
+	height: 1.5rem;
+	margin-bottom: -var(--border-width);
+	position: relative;
+	user-select: none;
+}
+
+.tab-bar-tab:hover {
+	filter: brightness(90%);
+}
+
+.tab-bar-tab-selected {
+	border-bottom-color: var(--accent-color);
+	color: var(--accent-color);
+}
+
+.tab-bar-tab-selected:hover {
+	filter: none;
+}
+
+.tab-bar-tab-disabled {
+	cursor: not-allowed;
+}
+
+.tab-bar-tab-link {
+	color: inherit;
+	display: block;
+	height: 100%;
+	text-decoration: none;
+}

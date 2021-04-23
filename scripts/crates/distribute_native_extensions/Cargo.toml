@@ -1,0 +1,15 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_script_distribute_native_extensions"
+version = "0.0.0"
+
+[[bin]]
+name = "tangram_script_distribute_native_extensions"
+path = "main.rs"
+
+[dependencies]
+env_logger = "0.8"
+log = "0.4"
+tangram_error = { path = "../../../util/error" }
+tangram_script_build = { path = "../build" }

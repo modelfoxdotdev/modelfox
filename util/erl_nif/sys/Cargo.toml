@@ -1,0 +1,11 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "erl_nif_sys"
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+erl_nif_macro = { path = "../macro" }

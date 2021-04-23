@@ -1,0 +1,2 @@
+npx typedoc src/index.ts
+# rsync --archive --compress --delete --progress docs/ tangram@router.tangram.xyz:/var/www/docs/languages/node/

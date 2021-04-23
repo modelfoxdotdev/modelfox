@@ -1,0 +1,13 @@
+name: tangram_tree_benchmarks
+channels:
+  - conda-forge
+  - h2oai
+dependencies:
+  - catboost
+  - h2o
+  - lightgbm
+  - numpy
+  - openjdk
+  - pandas
+  - scikit-learn
+  - xgboost

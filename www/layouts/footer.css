@@ -1,0 +1,21 @@
+.footer-wrapper {
+  align-content: center;
+  display: grid;
+  grid: auto auto / auto;
+  gap: 1rem;
+  justify-items: center;
+  margin: 0 auto;
+  max-width: var(--max-width);
+  padding: 1rem;
+}
+
+.footer-logo {
+  height: 4rem;
+  width: 4rem;
+}
+
+.footer-copyright {
+  color: gray;
+  font-size: 0.9rem;
+  margin: 0;
+}

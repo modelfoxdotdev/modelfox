@@ -1,0 +1,11 @@
+/_build
+/.elixir_ls
+/.fetch
+/*.ez
+/cover
+/deps
+/docs
+/erl_crash.dump
+/priv
+/tangram-*.tar
+/tmp

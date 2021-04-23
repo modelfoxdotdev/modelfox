@@ -1,0 +1,22 @@
+[package]
+name = "tangram_term"
+version = "0.0.0"
+edition = "2018"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+bitflags = "1"
+once_cell = "1"
+ndarray = { version = "0.15", features = ["rayon"] }
+num = "0.4"
+regex = "1"
+tangram_error = { path = "../error" }
+tangram_zip = { path = "../zip" }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["consoleapi", "handleapi", "processenv", "winbase", "wincon"] }

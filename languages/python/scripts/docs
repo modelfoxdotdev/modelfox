@@ -1,0 +1,3 @@
+scripts/dev
+pdoc -d google -t . -o docs tangram
+cp ../../tangram.svg docs
