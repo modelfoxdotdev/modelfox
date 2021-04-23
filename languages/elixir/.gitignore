@@ -4,6 +4,7 @@
 /*.ez
 /cover
 /deps
+/doc
 /docs
 /erl_crash.dump
 /priv

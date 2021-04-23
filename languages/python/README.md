@@ -14,7 +14,7 @@ $ pip install tangram
 ```python
 import tangram
 
-model = tangram.Model.from_file('./heart_disease.tangram')
+model = tangram.Model.from_path('./heart_disease.tangram')
 
 input = {
   'age': 63,

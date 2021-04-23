@@ -476,7 +476,7 @@ where
 {
 	/// This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
 	pub identifier: NumberOrString,
-	/// This is the same [`PredictInput`] value that you passed to [`Model::predict`].
+	/// This is the same [`struct@PredictInput`] value that you passed to [`Model::predict`].
 	pub input: Input,
 	/// This is the same `PredictOptions` value that you passed to [`Model::predict`].
 	pub options: Option<PredictOptions>,

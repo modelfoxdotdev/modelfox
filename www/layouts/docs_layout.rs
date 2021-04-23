@@ -158,7 +158,7 @@ pub fn PageNav(props: PageNavProps) {
 			<ui::NavSection title="Languages">
 				<ui::NavItem
 					title="Elixir"
-					href="https://hex.pm/packages/tangram"
+					href="/docs/languages/elixir"
 					selected={Some(false)}
 				/>
 				<ui::NavItem
@@ -168,22 +168,22 @@ pub fn PageNav(props: PageNavProps) {
 				/>
 				<ui::NavItem
 					title="Node.js"
-					href="https://www.npmjs.com/package/@tangramxyz/tangram-node"
+					href="/docs/languages/node"
 					selected={Some(false)}
 				/>
 				<ui::NavItem
 				  title="Python"
-					href="https://pypi.org/project/tangram"
+					href="/docs/languages/python"
 					selected={Some(false)}
 				/>
 				<ui::NavItem
 					title="Ruby"
-					href="https://rubygems.org/gems/tangram"
+					href="/docs/languages/ruby"
 					selected={Some(false)}
 				/>
 				<ui::NavItem
 					title="Rust"
-					href="https://lib.rs/tangram_rust"
+					href="/docs/languages/rust"
 					selected={Some(false)}
 				/>
 			</ui::NavSection>

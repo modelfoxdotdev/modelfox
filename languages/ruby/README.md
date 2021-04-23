@@ -14,7 +14,7 @@ $ gem install tangram
 ```ruby
 require 'tangram'
 
-model = Tangram::Model.from_file('./heart_disease.tangram')
+model = Tangram::Model.from_path('./heart_disease.tangram')
 
 input = {
   age: 63,

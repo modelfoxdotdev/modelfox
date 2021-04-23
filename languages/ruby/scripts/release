@@ -1,1 +1,1 @@
-gem publish dist/*
+gem push dist/*

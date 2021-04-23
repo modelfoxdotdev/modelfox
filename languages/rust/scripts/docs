@@ -1,0 +1,2 @@
+cargo doc -p tangram_rust --no-deps --target-dir target_docs
+cp -r target_docs/doc docs

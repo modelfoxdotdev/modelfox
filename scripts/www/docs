@@ -1,0 +1,4 @@
+for LANG in elixir node python ruby rust; do
+	ssh tangram@router.tangram.xyz mkdir -p /var/www/docs/languages/$LANG
+	rsync --archive --compress --delete --progress languages/$LANG/docs/ tangram@router.tangram.xyz:/var/www/docs/languages/$LANG/
+done
