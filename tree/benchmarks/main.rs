@@ -197,7 +197,7 @@ fn run_benchmarks(libraries: &[Library], datasets: &[Dataset]) {
 fn run_benchmark(dataset: &Dataset, library: &Library) -> BenchmarkOutput {
 	if *library == Library::Tangram {
 		let output = std::process::Command::new(format!(
-			"build/cargo/release/tangram_tree_benchmark_{}",
+			"target/release/tangram_tree_benchmark_{}",
 			dataset
 		))
 		.output()
