@@ -96,6 +96,7 @@ elif args.library == 'xgboost':
 	import xgboost as xgb
 	model = xgb.XGBClassifier(
 		eta=0.1,
+		eval_metric='logloss',
 		grow_policy='lossguide',
 		n_estimators=100,
 		tree_method='hist',

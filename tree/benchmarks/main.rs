@@ -96,19 +96,19 @@ pub enum BenchmarkOutput {
 #[derive(serde::Deserialize, Debug)]
 pub struct RegressionBenchmarkOutput {
 	mse: f32,
-	memory: Option<String>,
+	memory: String,
 }
 
 #[derive(serde::Deserialize, Debug)]
 pub struct BinaryClassificationBenchmarkOutput {
 	auc_roc: f32,
-	memory: Option<String>,
+	memory: String,
 }
 
 #[derive(serde::Deserialize, Debug)]
 pub struct MulticlassClassificationBenchmarkOutput {
 	accuracy: f32,
-	memory: Option<String>,
+	memory: String,
 }
 
 fn main() {
@@ -172,6 +172,7 @@ fn build_tangram_benchmark(dataset: &Dataset) {
 
 fn run_benchmarks(libraries: &[Library], datasets: &[Dataset]) {
 	for dataset in datasets.iter() {
+		println!("## {}", dataset);
 		for library in libraries.iter() {
 			let start = std::time::Instant::now();
 			let output = run_benchmark(dataset, library);

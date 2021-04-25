@@ -16,7 +16,7 @@ path_train = 'data/higgs_train.csv'
 path_test = 'data/higgs_test.csv'
 target_column_name = "signal"
 dtype = {
-	'signal': np.bool,
+	'signal': bool,
 	'lepton_pt': np.float64,
 	'lepton_eta': np.float64,
 	'lepton_phi': np.float64,
@@ -98,6 +98,7 @@ elif args.library == 'xgboost':
 	model = xgb.XGBClassifier(
 		max_leaves=255,
 		eta=0.1,
+		eval_metric='logloss',
 		grow_policy='lossguide',
 		n_estimators=100,
 		tree_method='hist',

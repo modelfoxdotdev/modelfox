@@ -150,11 +150,12 @@ elif args.library == 'xgboost':
 	import xgboost as xgb
 	model = xgb.XGBClassifier(
 		eta=0.1,
+		eval_metric='logloss',
 		grow_policy='lossguide',
 		n_estimators=100,
 		tree_method='hist',
 		max_depth=0,
-		max_leaves=255
+		max_leaves=255,
 	)
 	model.fit(features_train, labels_train)
 elif args.library == 'catboost':

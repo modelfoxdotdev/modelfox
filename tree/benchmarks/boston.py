@@ -82,6 +82,7 @@ elif args.library == 'xgboost':
 	import xgboost as xgb
 	model = xgb.XGBRegressor(
 		eta=0.1,
+		eval_metric='logloss',
 		grow_policy='lossguide',
 		max_leaves=255,
 		n_estimators=100,

@@ -40,12 +40,15 @@ pub fn TableBody() {
 pub struct TableRowProps {
 	#[optional]
 	pub color: Option<String>,
+	#[optional]
+	pub text_color: Option<String>,
 }
 
 #[component]
 pub fn TableRow(props: TableRowProps) {
 	let style = style! {
 		"background-color" => props.color,
+		"color" => props.text_color,
 	};
 	html! {
 		<tr style={style}>
