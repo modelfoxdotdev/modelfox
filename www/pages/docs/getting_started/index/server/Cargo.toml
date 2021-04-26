@@ -1,13 +1,14 @@
 [package]
 edition = "2018"
 name = "tangram_www_docs_getting_started_index_server"
+publish = false
 version = "0.0.0"
 
 [lib]
 path = "page.rs"
 
 [dependencies]
-html = { path = "../../../../../../util/html" }
+html = { path = "../../../../../../html" }
 tangram_www_layouts = { path = "../../../../../layouts" }
-tangram_serve = { path = "../../../../../../util/serve" }
+tangram_serve = { path = "../../../../../../serve" }
 tangram_ui = { path = "../../../../../../ui" }

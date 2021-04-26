@@ -2,6 +2,7 @@
 edition = "2018"
 license = "MIT"
 name = "tangram_script_generate_license"
+publish = false
 version = "0.0.0"
 
 [[bin]]
@@ -17,5 +18,5 @@ rsa = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.9"
-tangram_error = { path = "../../../util/error" }
-tangram_id = { path = "../../../util/id" }
+tangram_error = { path = "../../../error" }
+tangram_id = { path = "../../../id" }

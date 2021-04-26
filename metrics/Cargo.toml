@@ -2,6 +2,7 @@
 edition = "2018"
 license = "MIT"
 name = "tangram_metrics"
+publish = true
 version = "0.0.0"
 
 [lib]
@@ -14,4 +15,4 @@ insta = "1"
 itertools = "0.10"
 ndarray = { version = "0.15", features = ["rayon"] }
 num = "0.4"
-tangram_zip = { path = "../util/zip" }
+tangram_zip = { path = "../zip" }

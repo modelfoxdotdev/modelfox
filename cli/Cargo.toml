@@ -3,6 +3,7 @@ default-run = "tangram"
 edition = "2018"
 license = "MIT"
 name = "tangram_cli"
+publish = false
 version = "0.3.0"
 
 [[bin]]
@@ -30,14 +31,14 @@ rayon = "1.5"
 sha2 = "0.9"
 tangram_app = { path = "../app", optional = true }
 tangram_core = { path = "../core" }
-tangram_error = { path = "../util/error" }
-tangram_id = { path = "../util/id" }
-tangram_kill_chip = { path = "../util/kill_chip" }
+tangram_error = { path = "../error" }
+tangram_id = { path = "../id" }
+tangram_kill_chip = { path = "../kill_chip" }
 tangram_model = { path = "../model" }
-tangram_progress_counter = { path = "../util/progress_counter" }
+tangram_progress_counter = { path = "../progress_counter" }
 tangram_table = { path = "../table" }
-tangram_term = { path = "../util/term" }
-tangram_zip = { path = "../util/zip" }
+tangram_term = { path = "../term" }
+tangram_zip = { path = "../zip" }
 tracing = "0.1"
 url = "2"
 

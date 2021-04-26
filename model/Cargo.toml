@@ -2,6 +2,7 @@
 edition = "2018"
 license = "MIT"
 name = "tangram_model"
+publish = true
 version = "0.0.0"
 
 [lib]
@@ -10,8 +11,8 @@ path = "lib.rs"
 [dependencies]
 fnv = "1"
 num = "0.4"
-tangram_error = { path = "../util/error" }
+tangram_error = { path = "../error" }
 tangram_linear = { path = "../linear" }
-tangram_serialize = { path = "../util/serialize" }
+tangram_serialize = { path = "../serialize" }
 tangram_text = { path = "../text" }
 tangram_tree = { path = "../tree" }

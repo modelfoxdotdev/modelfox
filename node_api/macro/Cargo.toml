@@ -1,0 +1,15 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "node_api_macro"
+publish = true
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1"
+quote = "1"
+syn = { version = "1", features = ["full"] }

@@ -2,6 +2,7 @@
 edition = "2018"
 license = "MIT"
 name = "tangram_tree"
+publish = true
 version = "0.0.0"
 
 [lib]
@@ -53,10 +54,10 @@ num = "0.4"
 rayon = "1.5"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tangram_finite = { path = "../util/finite" }
-tangram_kill_chip = { path = "../util/kill_chip" }
+tangram_finite = { path = "../finite" }
+tangram_kill_chip = { path = "../kill_chip" }
 tangram_metrics = { path = "../metrics" }
-tangram_progress_counter = { path = "../util/progress_counter" }
-tangram_serialize = { path = "../util/serialize", features = ["ndarray_0_15", "bitvec_0_19"] }
+tangram_progress_counter = { path = "../progress_counter" }
+tangram_serialize = { path = "../serialize", features = ["ndarray_0_15", "bitvec_0_19"] }
 tangram_table = { path = "../table" }
-tangram_zip = { path = "../util/zip" }
+tangram_zip = { path = "../zip" }

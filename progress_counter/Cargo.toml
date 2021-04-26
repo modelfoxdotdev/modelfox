@@ -1,0 +1,12 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_progress_counter"
+publish = true
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dev-dependencies]
+rayon = "1.5"

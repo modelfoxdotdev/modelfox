@@ -2,20 +2,21 @@
 edition = "2018"
 license = "UNLICENSED"
 name = "tangram_app"
+publish = false
 version = "0.0.0"
 
 [lib]
 path = "lib.rs"
 
 [build-dependencies]
-tangram_error = { path = "../util/error" }
-tangram_serve = { path = "../util/serve" }
+tangram_error = { path = "../error" }
+tangram_serve = { path = "../serve" }
 
 [dependencies]
 futures = "0.3"
 http = "0.2"
 hyper = { version = "0.14", features = ["server", "stream"] }
-include_out_dir = { path = "../util/include_out_dir" }
+include_out_dir = { path = "../include_out_dir" }
 num = "0.4"
 once_cell = "1"
 sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }
@@ -53,11 +54,11 @@ tangram_app_tuning_server = { path = "pages/repos/_/models/_/tuning/server" }
 tangram_app_user_server = { path = "pages/user/server" }
 tangram_charts = { path = "../charts" }
 tangram_core = { path = "../core" }
-tangram_error = { path = "../util/error" }
+tangram_error = { path = "../error" }
 tangram_metrics = { path = "../metrics" }
-tangram_serve = { path = "../util/serve" }
+tangram_serve = { path = "../serve" }
 tangram_ui = { path = "../ui" }
-tangram_zip = { path = "../util/zip" }
+tangram_zip = { path = "../zip" }
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 url = "2"

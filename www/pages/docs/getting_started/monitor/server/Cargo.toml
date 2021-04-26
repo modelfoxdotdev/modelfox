@@ -1,13 +1,14 @@
 [package]
 edition = "2018"
 name = "tangram_www_docs_getting_started_monitor_server"
+publish = false
 version = "0.0.0"
 
 [lib]
 path = "page.rs"
 
 [dependencies]
-html = { path = "../../../../../../util/html" }
+html = { path = "../../../../../../html" }
 indoc = "1"
 tangram_charts = { path = "../../../../../../charts" }
 tangram_www_common = { path = "../../../../../common" }
@@ -15,5 +16,5 @@ tangram_www_layouts = { path = "../../../../../layouts" }
 tangram_app_common = { path = "../../../../../../app/common" }
 tangram_app_production_stats_column_server = { path = "../../../../../../app/pages/repos/_/models/_/production_stats/columns/_/server"}
 tangram_app_production_stats_index_server = { path = "../../../../../../app/pages/repos/_/models/_/production_stats/index/server"}
-tangram_serve = { path = "../../../../../../util/serve" }
+tangram_serve = { path = "../../../../../../serve" }
 tangram_ui = { path = "../../../../../../ui" }

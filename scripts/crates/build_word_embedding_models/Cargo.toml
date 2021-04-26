@@ -2,6 +2,7 @@
 edition = "2018"
 license = "MIT"
 name = "tangram_script_build_word_embedding_models"
+publish = false
 version = "0.0.0"
 
 [[bin]]
@@ -21,6 +22,6 @@ rayon = "1.5"
 rmp-serde = "0.15"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tangram_error = { path = "../../../util/error" }
+tangram_error = { path = "../../../error" }
 tangram_model = { path = "../../../model" }
-tangram_serialize = { path = "../../../util/serialize" }
+tangram_serialize = { path = "../../../serialize" }

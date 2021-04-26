@@ -1,6 +1,7 @@
 [package]
 edition = "2018"
 name = "tangram_www"
+publish = false
 version = "0.0.0"
 
 [[bin]]
@@ -8,17 +9,17 @@ name = "tangram_www"
 path = "main.rs"
 
 [build-dependencies]
-tangram_error = { path = "../util/error" }
-tangram_serve = { path = "../util/serve" }
+tangram_error = { path = "../error" }
+tangram_serve = { path = "../serve" }
 
 [dependencies]
 clap = { version = "3.0.0-beta.2", features = ["color"] }
-html = { path = "../util/html" }
+html = { path = "../html" }
 http = "0.2"
 hyper = { version = "0.14", features = ["server"] }
-include_out_dir = { path = "../util/include_out_dir" }
-tangram_error = { path = "../util/error" }
-tangram_serve = { path = "../util/serve" }
+include_out_dir = { path = "../include_out_dir" }
+tangram_error = { path = "../error" }
+tangram_serve = { path = "../serve" }
 tangram_www_docs_index_server = { path = "pages/docs/index/server" }
 tangram_www_docs_install_server = { path = "pages/docs/install/server" }
 tangram_www_docs_getting_started_index_server = { path = "pages/docs/getting_started/index/server" }

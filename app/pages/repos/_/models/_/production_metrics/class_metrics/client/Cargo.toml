@@ -1,6 +1,7 @@
 [package]
 edition = "2018"
 name = "tangram_app_production_class_metrics_client"
+publish = false
 version = "0.0.0"
 
 [lib]

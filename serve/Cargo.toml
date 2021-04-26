@@ -1,0 +1,26 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_serve"
+publish = false
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+backtrace = "0.3"
+futures = "0.3"
+hex = "0.4"
+http = "0.2"
+hyper = { version = "0.14", features = ["server"] }
+ignore = "0.4"
+include_out_dir = { path = "../include_out_dir" }
+rayon = "1.5"
+sha2 = "0.9"
+tangram_error = { path = "../error" }
+tangram_zip = { path = "../zip" }
+tokio = { version = "1", features = ["full"] }
+toml = "0.5"
+wasm-bindgen-cli-support = "0.2.69"
+which = "4"

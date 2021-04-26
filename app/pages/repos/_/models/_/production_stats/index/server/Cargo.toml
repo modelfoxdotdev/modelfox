@@ -1,6 +1,7 @@
 [package]
 edition = "2018"
 name = "tangram_app_production_stats_index_server"
+publish = false
 version = "0.0.0"
 
 [lib]
@@ -9,7 +10,7 @@ path = "lib.rs"
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.5", features = ["serde"] }
-html = { path = "../../../../../../../../../util/html" }
+html = { path = "../../../../../../../../../html" }
 http = "0.2"
 hyper = { version = "0.14", features = ["server"] }
 num = "0.4"
@@ -18,9 +19,9 @@ tangram_app_common = { path = "../../../../../../../../common" }
 tangram_app_layouts = { path = "../../../../../../../../layouts" }
 tangram_charts = { path = "../../../../../../../../../charts" }
 tangram_core = { path = "../../../../../../../../../core" }
-tangram_error = { path = "../../../../../../../../../util/error" }
-tangram_id = { path = "../../../../../../../../../util/id" }
+tangram_error = { path = "../../../../../../../../../error" }
+tangram_id = { path = "../../../../../../../../../id" }
 tangram_model = { path = "../../../../../../../../../model" }
-tangram_serve = { path = "../../../../../../../../../util/serve" }
+tangram_serve = { path = "../../../../../../../../../serve" }
 tangram_ui = { path = "../../../../../../../../../ui" }
-tangram_zip = { path = "../../../../../../../../../util/zip" }
+tangram_zip = { path = "../../../../../../../../../zip" }

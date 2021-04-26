@@ -1,13 +1,14 @@
 [package]
 edition = "2018"
 name = "tangram_app_new_model_server"
+publish = false
 version = "0.0.0"
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
-html = { path = "../../../../../../../util/html" }
+html = { path = "../../../../../../../html" }
 http = "0.2"
 hyper = { version = "0.14", features = ["server"] }
 multer = { git = "https://github.com/rousan/multer-rs" }
@@ -17,8 +18,8 @@ serde_json = "1"
 tangram_app_common = { path = "../../../../../../common" }
 tangram_app_layouts = { path = "../../../../../../layouts" }
 tangram_core = { path = "../../../../../../../core" }
-tangram_error = { path = "../../../../../../../util/error" }
-tangram_id = { path = "../../../../../../../util/id" }
+tangram_error = { path = "../../../../../../../error" }
+tangram_id = { path = "../../../../../../../id" }
 tangram_model = { path = "../../../../../../../model" }
-tangram_serve = { path = "../../../../../../../util/serve" }
+tangram_serve = { path = "../../../../../../../serve" }
 tangram_ui = { path = "../../../../../../../ui" }

@@ -2,6 +2,7 @@
 edition = "2018"
 license = "MIT"
 name = "tangram_script_distribute_native_extensions"
+publish = false
 version = "0.0.0"
 
 [[bin]]
@@ -11,5 +12,5 @@ path = "main.rs"
 [dependencies]
 env_logger = "0.8"
 log = "0.4"
-tangram_error = { path = "../../../util/error" }
+tangram_error = { path = "../../../error" }
 tangram_script_build = { path = "../build" }

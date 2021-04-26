@@ -2,6 +2,7 @@
 edition = "2018"
 license = "MIT"
 name = "tangram_script_build"
+publish = false
 version = "0.0.0"
 
 [lib]
@@ -20,6 +21,6 @@ duct = "0.13"
 env_logger = "0.8"
 flate2 = "1"
 log = "0.4"
-tangram_error = { path = "../../../util/error" }
+tangram_error = { path = "../../../error" }
 tar = "0.4"
 which = "4"

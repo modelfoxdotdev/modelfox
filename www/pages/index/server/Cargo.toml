@@ -1,17 +1,18 @@
 [package]
 edition = "2018"
 name = "tangram_www_index_server"
+publish = false
 version = "0.0.0"
 
 [lib]
 path = "page.rs"
 
 [dependencies]
-html = { path = "../../../../util/html" }
+html = { path = "../../../../html" }
 indoc = "1"
 tangram_charts = { path = "../../../../charts" }
-tangram_serve = { path = "../../../../util/serve" }
+tangram_serve = { path = "../../../../serve" }
 tangram_ui = { path = "../../../../ui" }
-tangram_finite = { path = "../../../../util/finite" }
+tangram_finite = { path = "../../../../finite" }
 tangram_www_common = { path = "../../../common" }
 tangram_www_layouts = { path = "../../../layouts" }

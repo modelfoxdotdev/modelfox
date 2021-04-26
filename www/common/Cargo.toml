@@ -1,11 +1,12 @@
 [package]
 edition = "2018"
 name = "tangram_www_common"
+publish = false
 version = "0.0.0"
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
-html = { path = "../../util/html" }
+html = { path = "../../html" }
 tangram_ui = { path = "../../ui" }
