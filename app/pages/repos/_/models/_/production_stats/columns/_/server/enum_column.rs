@@ -40,6 +40,7 @@ pub fn EnumColumn(props: EnumColumnProps) {
 			<EnumStatsSection {props.stats_section_props} />
 			<EnumCountsSection {props.counts_section_props} />
 			<EnumUniqueValuesSection {props.unique_values_section_props} />
+			<EnumInvalidValuesSection {props.invalid_values_section_props} />
 		</>
 	}
 }
@@ -234,6 +235,7 @@ pub struct EnumInvalidValuesTableProps {
 pub struct EnumInvalidValuesTableRow {
 	pub name: String,
 	pub count: usize,
+	pub production_fraction: f32,
 }
 
 #[component]
@@ -248,6 +250,9 @@ pub fn EnumInvalidValuesTable(props: EnumInvalidValuesTableProps) {
 					<ui::TableHeaderCell>
 						{"Count"}
 					</ui::TableHeaderCell>
+					<ui::TableHeaderCell>
+						{"Production Fraction"}
+					</ui::TableHeaderCell>
 				</ui::TableRow>
 			</ui::TableHeader>
 			<ui::TableBody>
@@ -258,6 +263,9 @@ pub fn EnumInvalidValuesTable(props: EnumInvalidValuesTableProps) {
 					</ui::TableCell>
 					<ui::TableCell>
 						{row.count.to_string()}
+					</ui::TableCell>
+					<ui::TableCell>
+						{ui::format_percent(row.production_fraction)}
 					</ui::TableCell>
 				</ui::TableRow>
 			}).collect::<Vec<_>>()}

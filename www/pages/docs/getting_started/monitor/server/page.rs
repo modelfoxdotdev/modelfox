@@ -332,10 +332,10 @@ pub fn ProductionMetrics() {
 pub fn ProductionColumnStats() {
 	let chart_data = vec![
 		(
-			"typical angina".to_owned(),
+			"asymptomatic".to_owned(),
 			EnumColumnOverallHistogramEntry {
-				production_count: 0,
-				production_fraction: None,
+				production_count: 95,
+				production_fraction: Some(0.2311),
 				training_count: 133,
 				training_fraction: 0.4872,
 			},
@@ -343,8 +343,8 @@ pub fn ProductionColumnStats() {
 		(
 			"atypical angina".to_owned(),
 			EnumColumnOverallHistogramEntry {
-				production_count: 0,
-				production_fraction: None,
+				production_count: 76,
+				production_fraction: Some(0.1849),
 				training_count: 43,
 				training_fraction: 0.1575,
 			},
@@ -353,18 +353,18 @@ pub fn ProductionColumnStats() {
 			"non-angina pain".to_owned(),
 			EnumColumnOverallHistogramEntry {
 				training_count: 76,
-				production_count: 0,
+				production_count: 122,
 				training_fraction: 0.2784,
-				production_fraction: None,
+				production_fraction: Some(0.2968),
 			},
 		),
 		(
-			"asymptomatic".to_owned(),
+			"typical angina".to_owned(),
 			EnumColumnOverallHistogramEntry {
 				training_count: 21,
-				production_count: 0,
+				production_count: 25,
 				training_fraction: 0.0769,
-				production_fraction: None,
+				production_fraction: Some(0.0608),
 			},
 		),
 	];
@@ -372,39 +372,40 @@ pub fn ProductionColumnStats() {
 	let enum_unique_values_table_props = EnumUniqueValuesTableProps {
 		rows: vec![
 			EnumUniqueValuesTableRow {
-				name: "typical angina".to_owned(),
+				name: "asymptomatic".to_owned(),
+				production_count: 95,
+				production_fraction: Some(0.2311),
 				training_count: 133,
-				production_count: 0,
 				training_fraction: 0.4872,
-				production_fraction: None,
 			},
 			EnumUniqueValuesTableRow {
 				name: "atypical angina".to_owned(),
+				production_count: 76,
+				production_fraction: Some(0.1849),
 				training_count: 43,
-				production_count: 0,
 				training_fraction: 0.1575,
-				production_fraction: None,
 			},
 			EnumUniqueValuesTableRow {
 				name: "non-angina pain".to_owned(),
 				training_count: 76,
-				production_count: 0,
+				production_count: 122,
 				training_fraction: 0.2784,
-				production_fraction: None,
+				production_fraction: Some(0.2968),
 			},
 			EnumUniqueValuesTableRow {
-				name: "asymptomatic".to_owned(),
+				name: "typical angina".to_owned(),
 				training_count: 21,
-				production_count: 0,
+				production_count: 25,
 				training_fraction: 0.0769,
-				production_fraction: None,
+				production_fraction: Some(0.0608),
 			},
 		],
 	};
 	let enum_invalid_values_table_props = EnumInvalidValuesTableProps {
 		rows: vec![EnumInvalidValuesTableRow {
 			name: "asx".to_owned(),
-			count: 38,
+			count: 93,
+			production_fraction: 0.2263,
 		}],
 	};
 	html! {

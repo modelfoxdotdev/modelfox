@@ -30,7 +30,6 @@ use tangram_app_common::{
 use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
 use tangram_error::Result;
 use tangram_id::Id;
-use tangram_zip::zip;
 
 pub async fn get(
 	context: &Context,
@@ -267,7 +266,7 @@ fn enum_props(
 	let overall = get_production_stats_output
 		.overall
 		.column_stats
-		.iter()
+		.into_iter()
 		.find(|production_column_stats| {
 			production_column_stats.column_name() == train_column_stats.column_name()
 		})
@@ -277,19 +276,19 @@ fn enum_props(
 		_ => unreachable!(),
 	};
 	let production_row_count = get_production_stats_output.overall.row_count;
-	let overall_chart_data = zip!(
-		overall.histogram.iter(),
-		train_column_stats.histogram().iter(),
-	)
-	.map(
-		|((production_enum_option, production_count), (_, training_count))| {
+	let production_histogram = overall.histogram.into_iter().collect::<BTreeMap<_, _>>();
+	let overall_chart_data = train_column_stats
+		.histogram()
+		.iter()
+		.map(|(training_enum_option, training_count)| {
+			let production_count = production_histogram.get(training_enum_option).unwrap_or(&0);
 			let production_fraction = if production_row_count > 0 {
 				Some(production_count.to_f32().unwrap() / production_row_count.to_f32().unwrap())
 			} else {
 				None
 			};
 			(
-				production_enum_option.clone(),
+				training_enum_option.to_owned(),
 				EnumColumnOverallHistogramEntry {
 					production_count: *production_count,
 					training_count,
@@ -298,9 +297,8 @@ fn enum_props(
 						/ overall_train_row_count.to_f32().unwrap(),
 				},
 			)
-		},
-	)
-	.collect::<Vec<_>>();
+		})
+		.collect::<Vec<_>>();
 	let enum_unique_values_table_rows = overall_chart_data
 		.iter()
 		.map(|(name, histogram_entry)| EnumUniqueValuesTableRow {
@@ -321,6 +319,8 @@ fn enum_props(
 					.map(|(name, count)| EnumInvalidValuesTableRow {
 						name: name.to_owned(),
 						count: count.to_usize().unwrap(),
+						production_fraction: count.to_f32().unwrap()
+							/ production_row_count.to_f32().unwrap(),
 					})
 					.collect(),
 			});
@@ -333,7 +333,7 @@ fn enum_props(
 		},
 		stats_section_props: EnumColumnStatsSectionProps {
 			overall_chart_data,
-			column_name: overall.column_name.clone(),
+			column_name: overall.column_name,
 			date_window,
 		},
 		unique_values_section_props: EnumColumnUniqueValuesSectionProps {
