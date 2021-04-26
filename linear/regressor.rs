@@ -9,7 +9,6 @@ use num::ToPrimitive;
 use rayon::{self, prelude::*};
 use tangram_metrics::MeanSquaredError;
 use tangram_progress_counter::ProgressCounter;
-use tangram_super_unsafe::SuperUnsafe;
 use tangram_table::prelude::*;
 use tangram_zip::{pzip, zip};
 
@@ -83,14 +82,17 @@ impl Regressor {
 		for _ in 0..train_options.max_epochs {
 			progress_counter.inc(1);
 			let n_examples_per_batch = train_options.n_examples_per_batch;
-			let model_cell = SuperUnsafe::new(model);
+			struct RegressorPtr(*mut Regressor);
+			unsafe impl Send for RegressorPtr {}
+			unsafe impl Sync for RegressorPtr {}
+			let model_ptr = RegressorPtr(&mut model);
 			pzip!(
 				features_train.axis_chunks_iter(Axis(0), n_examples_per_batch),
 				labels_train.axis_chunks_iter(Axis(0), n_examples_per_batch),
 				predictions_buffer.axis_chunks_iter_mut(Axis(0), n_examples_per_batch),
 			)
 			.for_each(|(features, labels, predictions)| {
-				let model = unsafe { model_cell.get() };
+				let model = unsafe { &mut *model_ptr.0 };
 				Regressor::train_batch(
 					model,
 					features,
@@ -100,7 +102,6 @@ impl Regressor {
 					kill_chip,
 				);
 			});
-			model = model_cell.into_inner();
 			if let Some(losses) = &mut losses {
 				let loss = Regressor::compute_loss(predictions_buffer.view(), labels_train);
 				losses.push(loss);

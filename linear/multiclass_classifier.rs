@@ -10,7 +10,6 @@ use rayon::{self, prelude::*};
 use std::num::NonZeroUsize;
 use tangram_metrics::{CrossEntropy, CrossEntropyInput};
 use tangram_progress_counter::ProgressCounter;
-use tangram_super_unsafe::SuperUnsafe;
 use tangram_table::prelude::*;
 use tangram_zip::{pzip, zip};
 
@@ -85,14 +84,17 @@ impl MulticlassClassifier {
 		for _ in 0..train_options.max_epochs {
 			progress_counter.inc(1);
 			let n_examples_per_batch = train_options.n_examples_per_batch;
-			let model_cell = SuperUnsafe::new(model);
+			struct MulticlassClassifierPtr(*mut MulticlassClassifier);
+			unsafe impl Send for MulticlassClassifierPtr {}
+			unsafe impl Sync for MulticlassClassifierPtr {}
+			let model_ptr = MulticlassClassifierPtr(&mut model);
 			pzip!(
 				features_train.axis_chunks_iter(Axis(0), n_examples_per_batch),
 				labels_train.axis_chunks_iter(Axis(0), n_examples_per_batch),
 				probabilities_buffer.axis_chunks_iter_mut(Axis(0), n_examples_per_batch),
 			)
 			.for_each(|(features, labels, probabilities)| {
-				let model = unsafe { model_cell.get() };
+				let model = unsafe { &mut *model_ptr.0 };
 				MulticlassClassifier::train_batch(
 					model,
 					features,
@@ -102,7 +104,6 @@ impl MulticlassClassifier {
 					kill_chip,
 				);
 			});
-			model = model_cell.into_inner();
 			if let Some(losses) = &mut losses {
 				let loss =
 					MulticlassClassifier::compute_loss(probabilities_buffer.view(), labels_train);

@@ -17,7 +17,6 @@ use crate::{
 use bitvec::prelude::*;
 use num::{NumCast, ToPrimitive};
 use rayon::prelude::*;
-use tangram_super_unsafe::SuperUnsafe;
 use tangram_zip::{pzip, zip};
 
 pub struct ChooseBestSplitRootOptions<'a> {
@@ -396,7 +395,7 @@ where
 		sum_hessians,
 		train_options,
 	} = options;
-	let bin_stats = SuperUnsafe::new(bin_stats);
+	let bin_stats = BinStatsPtr(bin_stats);
 	let mut splittable_features =
 		vec![false; binned_features_row_major_inner.values_with_offsets.ncols()];
 	let best_split = pzip!(
@@ -407,9 +406,10 @@ where
 	.enumerate()
 	.map(
 		|(feature_index, (binning_instructions, offset, is_feature_splittable))| {
+			let bin_stats = unsafe { &mut *bin_stats.0 };
 			let offset = offset.to_usize().unwrap();
 			let bin_stats_range = offset..offset + binning_instructions.n_bins();
-			let bin_stats_for_feature = unsafe { &mut bin_stats.get()[bin_stats_range] };
+			let bin_stats_for_feature = &mut bin_stats[bin_stats_range];
 			let best_split_for_feature = choose_best_split_for_feature(
 				feature_index,
 				binning_instructions,
@@ -946,8 +946,8 @@ where
 		splittable_features,
 		train_options,
 	} = options;
-	let smaller_child_bin_stats = SuperUnsafe::new(smaller_child_bin_stats);
-	let larger_child_bin_stats = SuperUnsafe::new(larger_child_bin_stats);
+	let smaller_child_bin_stats = BinStatsPtr(smaller_child_bin_stats);
+	let larger_child_bin_stats = BinStatsPtr(larger_child_bin_stats);
 	pzip!(
 		binning_instructions,
 		&binned_features_row_major_inner.offsets,
@@ -960,11 +960,11 @@ where
 				return (None, None);
 			}
 			let smaller_child_bin_stats_for_feature = unsafe {
-				&mut smaller_child_bin_stats.get()[offset.to_usize().unwrap()
+				&mut (&mut *smaller_child_bin_stats.0)[offset.to_usize().unwrap()
 					..offset.to_usize().unwrap() + binning_instructions.n_bins()]
 			};
 			let larger_child_bin_stats_for_feature = unsafe {
-				&mut larger_child_bin_stats.get()[offset.to_usize().unwrap()
+				&mut (&mut *larger_child_bin_stats.0)[offset.to_usize().unwrap()
 					..offset.to_usize().unwrap() + binning_instructions.n_bins()]
 			};
 			// Compute the larger child bin stats by subtraction.
@@ -1431,3 +1431,7 @@ fn compute_splittable_features_for_children(
 		right_child_splittable_features,
 	)
 }
+
+struct BinStatsPtr(*mut Vec<BinStatsEntry>);
+unsafe impl Send for BinStatsPtr {}
+unsafe impl Sync for BinStatsPtr {}

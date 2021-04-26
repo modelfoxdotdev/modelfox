@@ -8,7 +8,6 @@ use rayon::{self, prelude::*};
 use std::{num::NonZeroUsize, ops::Neg};
 use tangram_metrics::{BinaryCrossEntropy, BinaryCrossEntropyInput};
 use tangram_progress_counter::ProgressCounter;
-use tangram_super_unsafe::SuperUnsafe;
 use tangram_table::prelude::*;
 use tangram_zip::{pzip, zip};
 
@@ -82,14 +81,17 @@ impl BinaryClassifier {
 		for _ in 0..train_options.max_epochs {
 			progress_counter.inc(1);
 			let n_examples_per_batch = train_options.n_examples_per_batch;
-			let model_cell = SuperUnsafe::new(model);
+			struct BinaryClassifierPtr(*mut BinaryClassifier);
+			unsafe impl Send for BinaryClassifierPtr {}
+			unsafe impl Sync for BinaryClassifierPtr {}
+			let model_ptr = BinaryClassifierPtr(&mut model);
 			pzip!(
 				features_train.axis_chunks_iter(Axis(0), n_examples_per_batch),
 				labels_train.axis_chunks_iter(Axis(0), n_examples_per_batch),
 				probabilities_buffer.axis_chunks_iter_mut(Axis(0), n_examples_per_batch),
 			)
 			.for_each(|(features, labels, probabilities)| {
-				let model = unsafe { model_cell.get() };
+				let model = unsafe { &mut *model_ptr.0 };
 				BinaryClassifier::train_batch(
 					model,
 					features,
@@ -99,7 +101,6 @@ impl BinaryClassifier {
 					kill_chip,
 				);
 			});
-			model = model_cell.into_inner();
 			if let Some(losses) = &mut losses {
 				let loss =
 					BinaryClassifier::compute_loss(probabilities_buffer.view(), labels_train);

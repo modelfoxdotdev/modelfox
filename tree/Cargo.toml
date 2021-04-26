@@ -58,6 +58,5 @@ tangram_kill_chip = { path = "../util/kill_chip" }
 tangram_metrics = { path = "../metrics" }
 tangram_progress_counter = { path = "../util/progress_counter" }
 tangram_serialize = { path = "../util/serialize", features = ["ndarray_0_15", "bitvec_0_19"] }
-tangram_super_unsafe = { path = "../util/super_unsafe" }
 tangram_table = { path = "../table" }
 tangram_zip = { path = "../util/zip" }

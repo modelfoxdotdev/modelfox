@@ -22,7 +22,6 @@ use ndarray::prelude::*;
 use num::ToPrimitive;
 use rayon::prelude::*;
 use tangram_progress_counter::ProgressCounter;
-use tangram_super_unsafe::SuperUnsafe;
 use tangram_table::prelude::*;
 
 /// This enum is used by the common `train` function below to customize the training code slightly for each task.
@@ -434,13 +433,17 @@ fn update_predictions_with_tree(
 ) {
 	#[cfg(feature = "timing")]
 	let start = std::time::Instant::now();
-	let predictions_cell = SuperUnsafe::new(predictions);
+	struct PredictionsPtr(*mut [f32]);
+	unsafe impl Send for PredictionsPtr {}
+	unsafe impl Sync for PredictionsPtr {}
+	let predictions_ptr = PredictionsPtr(predictions);
 	tree.leaf_values.par_iter().for_each(|(range, value)| {
 		examples_index[range.clone()]
 			.iter()
 			.for_each(|example_index| unsafe {
+				let predictions = &mut *predictions_ptr.0;
 				let example_index = example_index.to_usize().unwrap();
-				*predictions_cell.get().get_unchecked_mut(example_index) += *value as f32;
+				*predictions.get_unchecked_mut(example_index) += *value as f32;
 			});
 	});
 	#[cfg(feature = "timing")]

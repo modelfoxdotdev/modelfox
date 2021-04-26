@@ -3635,7 +3635,6 @@ dependencies = [
  "tangram_metrics",
  "tangram_progress_counter",
  "tangram_serialize",
- "tangram_super_unsafe",
  "tangram_table",
  "tangram_zip",
 ]
@@ -3929,10 +3928,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tangram_super_unsafe"
-version = "0.0.0"
-
-[[package]]
 name = "tangram_table"
 version = "0.0.0"
 dependencies = [
@@ -3989,7 +3984,6 @@ dependencies = [
  "tangram_metrics",
  "tangram_progress_counter",
  "tangram_serialize",
- "tangram_super_unsafe",
  "tangram_table",
  "tangram_zip",
 ]
