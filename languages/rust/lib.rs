@@ -5,7 +5,7 @@ The Tangram Rust crate makes it easy to make predictions with your Tangram machi
 
 ```toml
 [dependencies]
-tangram_rust = "*"
+tangram_rust = { git = "https://github.com/tangramxyz/tangram" }
 ```
 
 ```rust

@@ -39,7 +39,7 @@ pub fn Install() {
 	let code = indoc! {
 		r#"
 			[dependencies]
-			tangram_rust = "*"
+			tangram_rust = { git = "https://github.com/tangramxyz/tangram" }
 		"#
 	};
 	let code = ui::highlight(code, ui::Language::Rust);
