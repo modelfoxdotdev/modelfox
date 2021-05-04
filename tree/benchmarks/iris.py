@@ -14,10 +14,10 @@ path_test = 'data/iris_test.csv'
 target_column_name = "species"
 data_train = pd.read_csv(path_train)
 data_test = pd.read_csv(path_test)
-features_train = data_train.loc[:, data_train.columns != target_column_name]
-labels_train = data_train[target_column_name]
-features_test = data_test.loc[:, data_test.columns != target_column_name]
-labels_test = data_test[target_column_name]
+labels_train = data_train.pop(target_column_name)
+features_train = data_train
+labels_test = data_test.pop(target_column_name)
+features_test = data_test
 
 # Train the model.
 if args.library == 'h2o':
@@ -65,6 +65,7 @@ elif args.library == 'xgboost':
 		grow_policy='lossguide',
 		n_estimators=100,
 		tree_method='hist'
+		use_label_encoder=False,
 	)
 	model.fit(features_train, labels_train)
 elif args.library == 'catboost':
@@ -88,13 +89,6 @@ else:
 # Compute metrics.
 accuracy = accuracy_score(predictions, labels_test)
 
-# Compute memory usage.
-f = open("/proc/self/status", "r")
-for line in f.readlines():
-	if line.startswith("VmHWM"):
-		memory = line.split(":")[1].strip()
-
 print(json.dumps({
 	'accuracy': accuracy,
-	'memory': memory,
 }))

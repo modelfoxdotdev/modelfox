@@ -43,6 +43,9 @@ fn route_map() -> RouteMap {
 	route_map.insert("/", &|| {
 		html!(<tangram_www_index_server::Page />).render_to_string()
 	});
+	route_map.insert("/benchmarks", &|| {
+		html!(<tangram_www_benchmarks_server::Page />).render_to_string()
+	});
 	route_map.insert("/docs/", &|| {
 		html!(<tangram_www_docs_index_server::Page />).render_to_string()
 	});

@@ -35,9 +35,11 @@ tangram_www_docs_getting_started_inspect_server = { path = "pages/docs/getting_s
 tangram_www_docs_getting_started_monitor_server = { path = "pages/docs/getting_started/monitor/server" }
 tangram_www_docs_train_configuration_server = { path = "pages/docs/train/configuration/server" }
 tangram_www_index_server = { path = "pages/index/server" }
+tangram_www_benchmarks_server = { path = "pages/benchmarks/server" }
 tokio = { version = "1", features = ["full"] }
 
 [target.wasm32-unknown-unknown.dependencies]
+tangram_www_benchmarks_client = { path = "pages/benchmarks/client" }
 tangram_www_index_client = { path = "pages/index/client" }
 tangram_www_docs_inspect_client = {path = "pages/docs/getting_started/inspect/client"}
 tangram_www_docs_monitor_client = {path = "pages/docs/getting_started/monitor/client"}

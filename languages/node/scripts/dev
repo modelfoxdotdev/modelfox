@@ -1,3 +1,4 @@
+npm install
 cargo build -p tangram_node
 install -D ../../target/debug/libtangram_node.so native/dist/x86_64-unknown-linux-gnu/tangram.node
 npm run build

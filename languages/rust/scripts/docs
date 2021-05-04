@@ -1,2 +1,3 @@
 cargo doc -p tangram_rust --no-deps --target-dir target_docs
 cp -r target_docs/doc docs
+echo '<html><head><meta http-equiv="refresh" content="0; URL=tangram_rust" /></head></html>' > docs/index.html

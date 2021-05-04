@@ -635,18 +635,8 @@ fn main() {
 	});
 	let metrics = metrics.finalize();
 
-	// Compute memory usage.
-	let mut memory = None;
-	let file = std::fs::read_to_string("/proc/self/status").unwrap();
-	for line in file.lines() {
-		if line.starts_with("VmHWM") {
-			memory = Some(line.split(':').nth(1).map(|x| x.trim().to_owned()).unwrap());
-		}
-	}
-
 	let output = json!({
 		"mse": metrics.mse,
-		"memory": memory,
 	});
 	println!("{}", output);
 }

@@ -97,11 +97,10 @@ if args.library == 'xgboost' or args.library == 'sklearn' or args.library == 'ca
 	categorical_columns = data_train.select_dtypes(['category']).columns
 	data_train.loc[:, categorical_columns] = data_train.loc[:, categorical_columns].apply(lambda x: x.cat.codes)
 	data_test.loc[:, categorical_columns] = data_test.loc[:, categorical_columns].apply(lambda x: x.cat.codes)
-features_train = data_train.loc[:, data_train.columns != target_column_name]
-labels_train = data_train[target_column_name]
-features_test = data_test.loc[:, data_test.columns != target_column_name]
-labels_test = data_test[target_column_name]
-
+labels_train = data_train.pop(target_column_name)
+features_train = data_train
+labels_test = data_test.pop(target_column_name)
+features_test = data_test
 
 # Train the model.
 if args.library == 'h2o':
@@ -156,6 +155,7 @@ elif args.library == 'xgboost':
 		tree_method='hist',
 		max_depth=0,
 		max_leaves=255,
+		use_label_encoder=False
 	)
 	model.fit(features_train, labels_train)
 elif args.library == 'catboost':
@@ -181,13 +181,6 @@ else:
 # Compute metrics.
 auc_roc = roc_auc_score(labels_test, predictions_proba)
 
-# Compute memory usage.
-f = open("/proc/self/status", "r")
-for line in f.readlines():
-	if line.startswith("VmHWM"):
-		memory = line.split(":")[1].strip()
-
 print(json.dumps({
 	'auc_roc': auc_roc,
-	'memory': memory,
 }))

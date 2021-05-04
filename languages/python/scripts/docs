@@ -1,3 +1,4 @@
 scripts/dev
 pdoc -d google -t . -o docs tangram
 cp ../../tangram.svg docs
+echo '<html><head><meta http-equiv="refresh" content="0; URL=tangram.html" /></head></html>' > docs/index.html

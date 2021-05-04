@@ -93,22 +93,38 @@ pub enum BenchmarkOutput {
 	MulticlassClassification(MulticlassClassificationBenchmarkOutput),
 }
 
+impl BenchmarkOutput {
+	fn memory(&mut self, memory: String) {
+		match self {
+			BenchmarkOutput::Regression(output) => {
+				output.memory = Some(memory);
+			}
+			BenchmarkOutput::BinaryClassification(output) => {
+				output.memory = Some(memory);
+			}
+			BenchmarkOutput::MulticlassClassification(output) => {
+				output.memory = Some(memory);
+			}
+		}
+	}
+}
+
 #[derive(serde::Deserialize, Debug)]
 pub struct RegressionBenchmarkOutput {
 	mse: f32,
-	memory: String,
+	memory: Option<String>,
 }
 
 #[derive(serde::Deserialize, Debug)]
 pub struct BinaryClassificationBenchmarkOutput {
 	auc_roc: f32,
-	memory: String,
+	memory: Option<String>,
 }
 
 #[derive(serde::Deserialize, Debug)]
 pub struct MulticlassClassificationBenchmarkOutput {
 	accuracy: f32,
-	memory: String,
+	memory: Option<String>,
 }
 
 fn main() {
@@ -180,15 +196,24 @@ fn run_benchmarks(libraries: &[Library], datasets: &[Dataset]) {
 			match output {
 				BenchmarkOutput::Regression(output) => println!(
 					"library {} mse {} duration {:?} memory {:?}",
-					library, output.mse, duration, output.memory
+					library,
+					output.mse,
+					duration,
+					output.memory.unwrap()
 				),
 				BenchmarkOutput::BinaryClassification(output) => println!(
 					"library {} auc_roc {} duration {:?} memory {:?}",
-					library, output.auc_roc, duration, output.memory
+					library,
+					output.auc_roc,
+					duration,
+					output.memory.unwrap()
 				),
 				BenchmarkOutput::MulticlassClassification(output) => println!(
 					"library {} accuracy {} duration {:?} memory {:?}",
-					library, output.accuracy, duration, output.memory
+					library,
+					output.accuracy,
+					duration,
+					output.memory.unwrap()
 				),
 			};
 		}
@@ -196,25 +221,57 @@ fn run_benchmarks(libraries: &[Library], datasets: &[Dataset]) {
 }
 
 fn run_benchmark(dataset: &Dataset, library: &Library) -> BenchmarkOutput {
-	if *library == Library::Tangram {
-		let output = std::process::Command::new(format!(
-			"target/release/tangram_tree_benchmark_{}",
-			dataset
-		))
-		.output()
-		.unwrap();
-		assert!(output.status.success());
-		let output = serde_json::from_slice(output.stdout.as_slice()).unwrap();
-		output
-	} else {
-		let output = std::process::Command::new("python")
-			.arg(format!("tree/benchmarks/{}.py", dataset))
-			.arg("--library")
-			.arg(format!("{}", library))
-			.output()
-			.unwrap();
-		assert!(output.status.success());
-		let output = serde_json::from_slice(output.stdout.as_slice()).unwrap();
-		output
-	}
+	let output = match library {
+		Library::Tangram => {
+			if cfg!(target_os = "linux") {
+				std::process::Command::new("/usr/bin/time")
+					.arg("-f")
+					.arg("%M")
+					.arg(format!("target/release/tangram_tree_benchmark_{}", dataset))
+					.output()
+					.unwrap()
+			} else if cfg!(target_os = "macos") {
+				std::process::Command::new("gtime")
+					.arg("-f")
+					.arg("%M")
+					.arg(format!("target/release/tangram_tree_benchmark_{}", dataset))
+					.output()
+					.unwrap()
+			} else {
+				panic!("unsupported OS");
+			}
+		}
+		_ => {
+			if cfg!(target_os = "linux") {
+				std::process::Command::new("/usr/bin/time")
+					.arg("-f")
+					.arg("%M")
+					.arg("python")
+					.arg(format!("tree/benchmarks/{}.py", dataset))
+					.arg("--library")
+					.arg(format!("{}", library))
+					.output()
+					.unwrap()
+			} else if cfg!(target_os = "macos") {
+				std::process::Command::new("gtime")
+					.arg("-f")
+					.arg("%M")
+					.arg("python")
+					.arg(format!("tree/benchmarks/{}.py", dataset))
+					.arg("--library")
+					.arg(format!("{}", library))
+					.output()
+					.unwrap()
+			} else {
+				panic!("unsupported OS");
+			}
+		}
+	};
+	assert!(output.status.success());
+	let stderr = String::from_utf8(output.stderr).unwrap();
+	let memory = stderr.lines().last().unwrap().to_owned();
+	let stdout = String::from_utf8(output.stdout).unwrap();
+	let mut output: BenchmarkOutput = serde_json::from_str(stdout.lines().last().unwrap()).unwrap();
+	output.memory(memory);
+	output
 }

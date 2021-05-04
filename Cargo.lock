@@ -4019,6 +4019,8 @@ dependencies = [
  "include_out_dir",
  "tangram_error",
  "tangram_serve",
+ "tangram_www_benchmarks_client",
+ "tangram_www_benchmarks_server",
  "tangram_www_docs_getting_started_index_server",
  "tangram_www_docs_getting_started_inspect_server",
  "tangram_www_docs_getting_started_monitor_server",
@@ -4038,6 +4040,29 @@ dependencies = [
  "tangram_www_index_client",
  "tangram_www_index_server",
  "tokio",
+]
+
+[[package]]
+name = "tangram_www_benchmarks_client"
+version = "0.0.0"
+dependencies = [
+ "console_error_panic_hook",
+ "tangram_charts",
+ "tangram_ui",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "tangram_www_benchmarks_server"
+version = "0.0.0"
+dependencies = [
+ "html",
+ "num",
+ "tangram_charts",
+ "tangram_serve",
+ "tangram_ui",
+ "tangram_www_layouts",
 ]
 
 [[package]]

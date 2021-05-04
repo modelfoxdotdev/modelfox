@@ -1,0 +1,15 @@
+[package]
+edition = "2018"
+name = "tangram_www_benchmarks_server"
+version = "0.0.0"
+
+[lib]
+path = "page.rs"
+
+[dependencies]
+num = "0.4"
+html = { path = "../../../../html" }
+tangram_www_layouts = { path = "../../../layouts" }
+tangram_serve = { path = "../../../../serve" }
+tangram_ui = { path = "../../../../ui" }
+tangram_charts = { path = "../../../../charts" }
