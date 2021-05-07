@@ -53,11 +53,7 @@ impl<'a> List<'a> {
 		Ok(List(Term::from_raw(env, term)))
 	}
 
-	pub fn is_empty(&self) -> Result<bool> {
-		Ok(self.len()? == 0)
-	}
-
-	pub fn len(&self) -> Result<usize> {
+	pub fn size(&self) -> Result<usize> {
 		let len = unsafe {
 			let mut len = MaybeUninit::uninit();
 			let success =

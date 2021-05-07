@@ -104,14 +104,14 @@ fn draw_bar_chart(
 		series
 			.iter()
 			.flat_map(|series| series.data.iter().map(|p| p.y))
-			.filter_map(|p| p)
+			.flatten()
 			.min_by(|a, b| a.partial_cmp(b).unwrap())
 	});
 	let y_max = options.y_max.or_else(|| {
 		series
 			.iter()
 			.flat_map(|series| series.data.iter().map(|p| p.y))
-			.filter_map(|p| p)
+			.flatten()
 			.max_by(|a, b| a.partial_cmp(b).unwrap())
 	});
 	let (y_min, y_max) = match (y_min, y_max) {

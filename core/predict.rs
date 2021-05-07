@@ -358,10 +358,10 @@ fn deserialize_model_inner(model_inner: tangram_model::ModelInnerReader) -> Mode
 			};
 			ModelInner::BinaryClassifier(BinaryClassifier {
 				columns,
-				feature_groups,
-				model,
 				negative_class,
 				positive_class,
+				feature_groups,
+				model,
 			})
 		}
 		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
@@ -404,9 +404,9 @@ fn deserialize_model_inner(model_inner: tangram_model::ModelInnerReader) -> Mode
 			};
 			ModelInner::MulticlassClassifier(MulticlassClassifier {
 				columns,
+				classes,
 				feature_groups,
 				model,
-				classes,
 			})
 		}
 	}
@@ -501,8 +501,8 @@ fn deserialize_feature_group(feature_group: tangram_model::FeatureGroupReader) -
 				source_column_name,
 				strategy,
 				tokenizer,
-				ngrams,
 				ngram_types,
+				ngrams,
 			})
 		}
 		tangram_model::FeatureGroupReader::WordEmbedding(feature_group) => {

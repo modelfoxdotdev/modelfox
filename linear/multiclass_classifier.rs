@@ -64,14 +64,15 @@ impl MulticlassClassifier {
 			means,
 		};
 		let mut early_stopping_monitor =
-			if let Some(early_stopping_options) = &train_options.early_stopping_options {
-				Some(EarlyStoppingMonitor::new(
-					early_stopping_options.min_decrease_in_loss_for_significant_change,
-					early_stopping_options.n_rounds_without_improvement_to_stop,
-				))
-			} else {
-				None
-			};
+			train_options
+				.early_stopping_options
+				.as_ref()
+				.map(|early_stopping_options| {
+					EarlyStoppingMonitor::new(
+						early_stopping_options.min_decrease_in_loss_for_significant_change,
+						early_stopping_options.n_rounds_without_improvement_to_stop,
+					)
+				});
 		let progress_counter = ProgressCounter::new(train_options.max_epochs.to_u64().unwrap());
 		(progress.handle_progress_event)(TrainProgressEvent::Train(progress_counter.clone()));
 		let mut probabilities_buffer: Array2<f32> = Array2::zeros((labels.len(), n_classes));

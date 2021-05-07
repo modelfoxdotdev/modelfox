@@ -311,8 +311,8 @@ impl Trainer {
 						..
 					}) => RegressionModel::Tree(TreeRegressionModel {
 						model,
-						feature_groups,
 						train_options,
+						feature_groups,
 						losses,
 						feature_importances,
 					}),
@@ -363,9 +363,9 @@ impl Trainer {
 						},
 					) => BinaryClassificationModel::Linear(LinearBinaryClassificationModel {
 						model,
+						train_options,
 						feature_groups,
 						losses,
-						train_options,
 						feature_importances,
 					}),
 					TrainModelOutput::TreeBinaryClassifier(

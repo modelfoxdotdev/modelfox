@@ -115,17 +115,16 @@ fn compute_production_training_quantiles(
 	prediction_stats: &RegressionProductionPredictionStatsOutput,
 ) -> ProductionTrainingQuantiles {
 	ProductionTrainingQuantiles {
-		production: if let Some(prediction_stats) = &prediction_stats.stats {
-			Some(Quantiles {
+		production: prediction_stats
+			.stats
+			.as_ref()
+			.map(|prediction_stats| Quantiles {
 				max: prediction_stats.max,
 				p25: prediction_stats.p25,
 				p50: prediction_stats.p50,
 				p75: prediction_stats.p75,
 				min: prediction_stats.min,
-			})
-		} else {
-			None
-		},
+			}),
 		training: Quantiles {
 			max: target_column_stats.max(),
 			min: target_column_stats.min(),

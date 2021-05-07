@@ -150,7 +150,7 @@ where
 {
 	fn from_node_api(value: Value<'a>) -> Result<Self> {
 		let value = value.as_array()?;
-		let mut vec = Vec::with_capacity(value.len()?);
+		let mut vec = Vec::with_capacity(value.size()?);
 		for value in value.iter()? {
 			vec.push(T::from_node_api(value?)?);
 		}

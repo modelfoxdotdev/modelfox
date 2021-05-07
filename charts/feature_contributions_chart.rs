@@ -406,6 +406,7 @@ fn draw_feature_contributions_chart(
 					* series_index.to_f64().unwrap(),
 		};
 		let output = draw_feature_contribution_series(DrawFeatureContributionSeriesOptions {
+			chart_config,
 			rect,
 			box_height,
 			ctx,
@@ -413,7 +414,6 @@ fn draw_feature_contributions_chart(
 			positive_color,
 			series,
 			value_width_multiplier,
-			chart_config,
 		});
 		hover_regions.extend(output.hover_regions);
 	}
@@ -680,10 +680,10 @@ fn draw_feature_contributions_chart_overlay(
 		..
 	} = options;
 	draw_feature_contribution_tooltips(DrawFeatureContributionTooltipsOptions {
-		active_hover_regions,
-		overlay_div,
 		chart_colors,
 		chart_config,
+		active_hover_regions,
+		overlay_div,
 	});
 	for active_hover_region in active_hover_regions {
 		draw_feature_contribution_box(DrawFeatureContributionBoxOptions {

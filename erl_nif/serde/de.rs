@@ -329,7 +329,7 @@ struct MapDeserializer<'de> {
 
 impl<'de> MapDeserializer<'de> {
 	pub fn new(map: Map<'de>) -> Result<MapDeserializer<'de>> {
-		let len = map.len()?;
+		let len = map.size()?;
 		let iter = map.iter()?;
 		Ok(MapDeserializer {
 			len,

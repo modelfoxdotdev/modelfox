@@ -172,7 +172,7 @@ fn draw_line_chart(
 				.series
 				.iter()
 				.flat_map(|series| series.data.iter().map(|point| point.y))
-				.filter_map(|value| value)
+				.flatten()
 				.min_by(|a, b| a.partial_cmp(b).unwrap())
 				.unwrap()
 		})
@@ -184,7 +184,7 @@ fn draw_line_chart(
 				.series
 				.iter()
 				.flat_map(|series| series.data.iter().map(|point| point.y))
-				.filter_map(|value| value)
+				.flatten()
 				.max_by(|a, b| a.partial_cmp(b).unwrap())
 				.unwrap()
 		})
@@ -315,8 +315,8 @@ fn draw_line_chart(
 	// Draw the lines.
 	for series in series.iter() {
 		draw_line(DrawLineOptions {
-			chart_config,
 			chart_rect,
+			chart_config,
 			ctx,
 			series,
 			x_max,
@@ -743,34 +743,35 @@ fn draw_line_chart_overlay(
 			origin: tooltip_origin,
 		});
 	}
-	for active_hover_region in closest_active_hover_region_for_series.iter() {
-		if let Some(active_hover_region) = active_hover_region {
-			let point = active_hover_region.info.point;
-			draw_point(DrawPointOptions {
-				chart_rect: *chart_rect,
-				color: &active_hover_region.info.color,
-				ctx,
-				point,
-				point_style: PointStyle::Circle,
-				radius: chart_config.point_radius,
-				x_max: *x_max,
-				x_min: *x_min,
-				y_max: *y_max,
-				y_min: *y_min,
-			});
-			draw_point(DrawPointOptions {
-				chart_rect: *chart_rect,
-				color: "#00000022",
-				ctx,
-				point,
-				point_style: PointStyle::Circle,
-				radius: chart_config.point_radius,
-				x_max: *x_max,
-				x_min: *x_min,
-				y_max: *y_max,
-				y_min: *y_min,
-			});
-		}
+	for active_hover_region in closest_active_hover_region_for_series
+		.iter()
+		.filter_map(|r| r.as_ref())
+	{
+		let point = active_hover_region.info.point;
+		draw_point(DrawPointOptions {
+			chart_rect: *chart_rect,
+			color: &active_hover_region.info.color,
+			ctx,
+			point,
+			point_style: PointStyle::Circle,
+			radius: chart_config.point_radius,
+			x_max: *x_max,
+			x_min: *x_min,
+			y_max: *y_max,
+			y_min: *y_min,
+		});
+		draw_point(DrawPointOptions {
+			chart_rect: *chart_rect,
+			color: "#00000022",
+			ctx,
+			point,
+			point_style: PointStyle::Circle,
+			radius: chart_config.point_radius,
+			x_max: *x_max,
+			x_min: *x_min,
+			y_max: *y_max,
+			y_min: *y_min,
+		});
 	}
 }
 

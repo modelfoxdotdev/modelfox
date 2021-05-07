@@ -174,7 +174,7 @@ pub async fn get(
 										unreachable!()
 									}
 								});
-						AccuracyChartEntry { label, accuracy }
+						AccuracyChartEntry { accuracy, label }
 					})
 					.collect();
 				let test_metrics = binary_classifier.test_metrics();
@@ -270,7 +270,7 @@ pub async fn get(
 										unreachable!()
 									}
 								});
-						AccuracyChartEntry { label, accuracy }
+						AccuracyChartEntry { accuracy, label }
 					})
 					.collect();
 				AccuracyChart {

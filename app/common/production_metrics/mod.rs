@@ -148,20 +148,15 @@ impl ProductionPredictionMetrics {
 
 	pub fn finalize(self) -> Option<ProductionPredictionMetricsOutput> {
 		match self {
-			ProductionPredictionMetrics::Regression(s) => match s.finalize() {
-				Some(s) => Some(ProductionPredictionMetricsOutput::Regression(s)),
-				None => None,
-			},
-			ProductionPredictionMetrics::BinaryClassification(s) => match s.finalize() {
-				Some(s) => Some(ProductionPredictionMetricsOutput::BinaryClassification(s)),
-				None => None,
-			},
-			ProductionPredictionMetrics::MulticlassClassification(s) => match s.finalize() {
-				Some(s) => Some(ProductionPredictionMetricsOutput::MulticlassClassification(
-					s,
-				)),
-				None => None,
-			},
+			ProductionPredictionMetrics::Regression(s) => s
+				.finalize()
+				.map(ProductionPredictionMetricsOutput::Regression),
+			ProductionPredictionMetrics::BinaryClassification(s) => s
+				.finalize()
+				.map(ProductionPredictionMetricsOutput::BinaryClassification),
+			ProductionPredictionMetrics::MulticlassClassification(s) => s
+				.finalize()
+				.map(ProductionPredictionMetricsOutput::MulticlassClassification),
 		}
 	}
 }

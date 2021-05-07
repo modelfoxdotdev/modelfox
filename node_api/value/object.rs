@@ -53,13 +53,9 @@ impl<'a> Object<'a> {
 		Ok(properties)
 	}
 
-	pub fn is_empty(&self) -> Result<bool> {
-		Ok(self.properties()?.len()? == 0)
-	}
-
-	pub fn len(&self) -> Result<usize> {
+	pub fn size(&self) -> Result<usize> {
 		let properties = self.properties()?;
-		let len = properties.len()?;
+		let len = properties.size()?;
 		Ok(len)
 	}
 

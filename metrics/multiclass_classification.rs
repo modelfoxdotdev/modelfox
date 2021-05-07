@@ -152,13 +152,13 @@ impl MulticlassClassificationMetrics {
 			})
 			.unwrap() / n_examples.to_f32().unwrap();
 		MulticlassClassificationMetricsOutput {
-			accuracy,
-			baseline_accuracy,
 			class_metrics,
+			accuracy,
 			precision_unweighted,
 			precision_weighted,
 			recall_unweighted,
 			recall_weighted,
+			baseline_accuracy,
 		}
 	}
 }

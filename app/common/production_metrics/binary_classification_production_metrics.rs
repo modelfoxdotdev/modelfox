@@ -49,9 +49,9 @@ impl BinaryClassificationProductionPredictionMetrics {
 	) -> BinaryClassificationProductionPredictionMetrics {
 		let confusion_matrix = BinaryConfusionMatrix::new();
 		BinaryClassificationProductionPredictionMetrics {
-			confusion_matrix,
 			negative_class,
 			positive_class,
+			confusion_matrix,
 		}
 	}
 
@@ -111,11 +111,11 @@ impl BinaryClassificationProductionPredictionMetrics {
 		} else {
 			Some(BinaryClassificationProductionPredictionMetricsOutput {
 				accuracy,
-				precision,
-				recall,
 				f1_score,
 				false_negatives,
 				false_positives,
+				precision,
+				recall,
 				true_negatives,
 				true_positives,
 			})

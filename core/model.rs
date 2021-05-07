@@ -513,10 +513,7 @@ fn serialize_number_column_stats_output(
 				.map(|(key, value)| (key.get(), value.to_u64().unwrap()))
 				.collect::<Vec<_>>()
 		});
-	let histogram = match histogram {
-		Some(histogram) => Some(writer.write(histogram.as_slice())),
-		None => None,
-	};
+	let histogram = histogram.map(|histogram| writer.write(histogram.as_slice()));
 	let number_column_stats = tangram_model::NumberColumnStatsWriter {
 		column_name,
 		invalid_count: number_column_stats_output.invalid_count.to_u64().unwrap(),
@@ -993,10 +990,10 @@ fn serialize_bag_of_words_feature_group(
 		serialize_bag_of_words_feature_group_strategy(&bag_of_words_feature_group.strategy, writer);
 	let feature_group = tangram_model::BagOfWordsFeatureGroupWriter {
 		source_column_name,
-		strategy,
 		tokenizer,
-		ngrams,
+		strategy,
 		ngram_types,
+		ngrams,
 	};
 	writer.write(&feature_group)
 }

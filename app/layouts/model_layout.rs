@@ -67,6 +67,7 @@ pub async fn get_model_layout_props(
 	let owner_organization_name: Option<String> = row.get(4);
 	let owner_user_id: Option<String> = row.get(5);
 	let owner_user_email: Option<String> = row.get(6);
+	#[allow(clippy::manual_map)]
 	let owner = if let Some(owner_user_id) = owner_user_id {
 		Some(Owner::User {
 			id: owner_user_id.parse().unwrap(),

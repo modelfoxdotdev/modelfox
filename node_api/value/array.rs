@@ -35,11 +35,7 @@ impl<'a> Array<'a> {
 		Ok(Array(Value::from_raw(env, value)))
 	}
 
-	pub fn is_empty(&self) -> Result<bool> {
-		Ok(self.len()? == 0)
-	}
-
-	pub fn len(&self) -> Result<usize> {
+	pub fn size(&self) -> Result<usize> {
 		let len = unsafe {
 			let mut result = MaybeUninit::uninit();
 			let status =
@@ -91,7 +87,7 @@ impl<'a> Array<'a> {
 	}
 
 	pub fn push(&mut self, value: impl Into<Value<'a>>) -> Result<()> {
-		let len = self.len()?;
+		let len = self.size()?;
 		self.set(len, value)?;
 		Ok(())
 	}
@@ -99,7 +95,7 @@ impl<'a> Array<'a> {
 	pub fn iter(&self) -> Result<ArrayIterator<'a>> {
 		Ok(ArrayIterator {
 			array: *self,
-			len: self.len()?,
+			len: self.size()?,
 			i: 0,
 		})
 	}

@@ -545,25 +545,25 @@ pub fn choose_best_splits_not_root(
 			let larger_child_bin_stats = larger_child_bin_stats.as_column_major_mut().unwrap();
 			compute_bin_stats_and_choose_best_splits_not_root_column_major(
 				ComputeBinStatsAndChooseBestSplitsNotRootColumnMajorOptions {
-					should_try_to_split_right_child,
-					smaller_child_bin_stats,
-					larger_child_bin_stats,
 					binned_features_column_major,
 					binning_instructions,
 					gradients_ordered_buffer,
 					hessians_are_constant,
 					hessians_ordered_buffer,
-					train_options,
+					larger_child_bin_stats,
 					left_child_n_examples,
 					left_child_sum_gradients,
 					left_child_sum_hessians,
 					right_child_n_examples,
 					right_child_sum_gradients,
 					right_child_sum_hessians,
-					smaller_child_examples_index,
 					should_try_to_split_left_child,
+					should_try_to_split_right_child,
+					smaller_child_bin_stats,
 					smaller_child_direction,
+					smaller_child_examples_index,
 					splittable_features,
+					train_options,
 				},
 			)
 		}
@@ -879,6 +879,7 @@ fn compute_bin_stats_and_choose_best_splits_not_root_row_major(
 		}
 		BinnedFeaturesRowMajor::U32(binned_features_row_major_inner) => {
 			choose_best_splits_not_root_row_major(ChooseBestSplitsNotRootRowMajorOptions {
+				binned_features_row_major_inner,
 				binning_instructions,
 				larger_child_bin_stats,
 				left_child_n_examples,
@@ -891,7 +892,6 @@ fn compute_bin_stats_and_choose_best_splits_not_root_row_major(
 				should_try_to_split_right_child,
 				smaller_child_bin_stats,
 				smaller_child_direction,
-				binned_features_row_major_inner,
 				splittable_features,
 				train_options,
 			})

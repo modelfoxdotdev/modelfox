@@ -307,8 +307,8 @@ fn compute_feature_importances_section_props(
 					zip!(feature_names, inner_model.feature_importances().iter())
 						.map(
 							|(feature_name, feature_importance_value)| FeatureImportance {
-								feature_name,
 								feature_importance_value,
+								feature_name,
 							},
 						)
 						.collect::<Vec<_>>();
@@ -328,8 +328,8 @@ fn compute_feature_importances_section_props(
 					zip!(feature_names, inner_model.feature_importances().iter())
 						.map(
 							|(feature_name, feature_importance_value)| FeatureImportance {
-								feature_name,
 								feature_importance_value,
+								feature_name,
 							},
 						)
 						.collect::<Vec<_>>();
@@ -352,8 +352,8 @@ fn compute_feature_importances_section_props(
 						zip!(feature_names, inner_model.feature_importances().iter())
 							.map(
 								|(feature_name, feature_importance_value)| FeatureImportance {
-									feature_name,
 									feature_importance_value,
+									feature_name,
 								},
 							)
 							.collect::<Vec<_>>();
@@ -373,8 +373,8 @@ fn compute_feature_importances_section_props(
 						zip!(feature_names, inner_model.feature_importances().iter())
 							.map(
 								|(feature_name, feature_importance_value)| FeatureImportance {
-									feature_name,
 									feature_importance_value,
+									feature_name,
 								},
 							)
 							.collect::<Vec<_>>();
@@ -398,8 +398,8 @@ fn compute_feature_importances_section_props(
 						zip!(feature_names, inner_model.feature_importances().iter())
 							.map(
 								|(feature_name, feature_importance_value)| FeatureImportance {
-									feature_name,
 									feature_importance_value,
+									feature_name,
 								},
 							)
 							.collect::<Vec<_>>();
@@ -419,8 +419,8 @@ fn compute_feature_importances_section_props(
 						zip!(feature_names, inner_model.feature_importances().iter())
 							.map(
 								|(feature_name, feature_importance_value)| FeatureImportance {
-									feature_name,
 									feature_importance_value,
+									feature_name,
 								},
 							)
 							.collect::<Vec<_>>();

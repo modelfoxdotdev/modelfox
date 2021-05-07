@@ -79,10 +79,10 @@ impl RegressionProductionPredictionMetrics {
 				let baseline_mse = variance;
 				let baseline_rmse = baseline_mse.sqrt();
 				Some(RegressionProductionPredictionMetricsOutput {
-					mae,
 					mse,
-					r2,
 					rmse,
+					mae,
+					r2,
 					baseline_mse,
 					baseline_rmse,
 				})

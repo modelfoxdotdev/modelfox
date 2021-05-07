@@ -220,9 +220,9 @@ impl MulticlassClassificationProductionPredictionMetrics {
 			None
 		} else {
 			Some(MulticlassClassificationProductionPredictionMetricsOutput {
+				class_metrics,
 				accuracy,
 				baseline_accuracy,
-				class_metrics,
 				precision_unweighted,
 				precision_weighted,
 				recall_unweighted,

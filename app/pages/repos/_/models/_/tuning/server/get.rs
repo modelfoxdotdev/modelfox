@@ -89,8 +89,8 @@ pub async fn get(
 	let model_layout_props =
 		get_model_layout_props(&mut db, context, model_id, ModelNavItem::Tuning).await?;
 	let props = PageProps {
-		tuning,
 		model_layout_props,
+		tuning,
 	};
 	let html = html!(<Page {props} />).render_to_string();
 	let response = http::Response::builder()

@@ -34,6 +34,7 @@ pub fn app(args: AppArgs) -> Result<()> {
 		Some(database_url) => database_url.parse()?,
 		None => default_database_url()?,
 	};
+	#[allow(clippy::manual_map)]
 	let data_storage = if let Some(data_s3_url) = args.data_s3_url {
 		let cache_dir = cache_dir()?;
 		Some(tangram_app::DataStorage::S3(
