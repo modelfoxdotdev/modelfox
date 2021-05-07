@@ -7,7 +7,7 @@ use url::Url;
 
 mod migrations;
 
-pub use tangram_app_common::{data_storage::DataStorage, Options};
+pub use tangram_app_common::{data_storage::DataStorage, Options, SmtpOptions};
 
 pub fn run(options: Options) -> Result<()> {
 	tokio::runtime::Builder::new_multi_thread()

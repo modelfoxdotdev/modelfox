@@ -93,7 +93,7 @@ fn Header() {
 					type="hidden"
 					value="logout"
 				/>
-				<ui::Button color?="var(--red)">
+				<ui::Button color?="var(--red)" button_type?={Some(ui::ButtonType::Submit)}>
 					{"Logout"}
 				</ui::Button>
 			</ui::Form>

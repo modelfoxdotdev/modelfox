@@ -35,10 +35,17 @@ pub struct Options {
 	pub database_url: Url,
 	pub host: IpAddr,
 	pub port: u16,
-	pub sendgrid_api_token: Option<String>,
+	pub smtp_options: Option<SmtpOptions>,
 	pub stripe_publishable_key: Option<String>,
 	pub stripe_secret_key: Option<String>,
 	pub url: Option<Url>,
+}
+
+#[derive(Clone)]
+pub struct SmtpOptions {
+	pub host: String,
+	pub username: String,
+	pub password: String,
 }
 
 pub struct Context {

@@ -135,8 +135,12 @@ pub struct AppArgs {
 	license: Option<PathBuf>,
 	#[clap(long, env = "PORT", default_value = "8080")]
 	port: u16,
-	#[clap(long, env = "SENDGRID_API_TOKEN")]
-	sendgrid_api_token: Option<String>,
+	#[clap(long, env = "SMTP_HOST", requires_all = &["smtp-username", "smtp-password"])]
+	smtp_host: Option<String>,
+	#[clap(long, env = "SMTP_USERNAME", requires_all = &["smtp-host", "smtp-password"])]
+	smtp_username: Option<String>,
+	#[clap(long, env = "SMTP_PASSWORD", requires_all = &["smtp-host", "smtp-username"])]
+	smtp_password: Option<String>,
 	#[clap(hidden = true, long, env = "STRIPE_PUBLISHABLE_KEY")]
 	stripe_publishable_key: Option<String>,
 	#[clap(hidden = true, long, env = "STRIPE_SECRET_KEY")]

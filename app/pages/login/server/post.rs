@@ -1,14 +1,14 @@
 use crate::page::{Page, PageProps};
 use chrono::prelude::*;
 use html::html;
+use lettre::AsyncTransport;
 use rand::Rng;
-use serde_json::json;
 use sqlx::prelude::*;
 use tangram_app_common::{
 	error::{bad_request, service_unavailable},
-	Context,
+	Context, SmtpOptions,
 };
-use tangram_error::{err, Result};
+use tangram_error::Result;
 use tangram_id::Id;
 
 #[derive(serde::Deserialize)]
@@ -144,8 +144,8 @@ pub async fn post(
 			.bind(&code)
 			.execute(&mut *db)
 			.await?;
-			if let Some(sendgrid_api_token) = context.options.sendgrid_api_token.clone() {
-				send_code_email(email.clone(), code, sendgrid_api_token).await?;
+			if let Some(smtp_options) = context.options.smtp_options.clone() {
+				send_code_email(email.clone(), code, smtp_options).await?;
 			}
 			db.commit().await?;
 			let response = http::Response::builder()
@@ -211,49 +211,16 @@ fn set_cookie_header_value(token: Id, domain: Option<&str>) -> String {
 	)
 }
 
-async fn send_code_email(email: String, code: String, sendgrid_api_token: String) -> Result<()> {
-	let json = json!({
-		"personalizations": [
-			{
-				"to": [
-					{
-						"email": email,
-					}
-				]
-			}
-		],
-		"from": {
-			"email": "noreply@tangram.xyz",
-			"name": "Tangram"
-		},
-		"subject": "Tangram Login Code",
-		"tracking_settings": {
-			"click_tracking": {
-				"enable": false
-			}
-		},
-		"content": [
-			{
-				"type": "text/plain",
-				"value": format!("Your Tangram login code is {}.", code),
-			}
-		]
-	});
-	let client = reqwest::Client::new();
-	let response = client
-		.post("https://api.sendgrid.com/v3/mail/send")
-		.header(
-			http::header::AUTHORIZATION,
-			format!("Bearer {}", sendgrid_api_token),
-		)
-		.json(&json)
-		.send()
-		.await?;
-	if !response.status().is_success() {
-		return Err(err!(
-			"Non-2xx response from SendGrid: {:?}",
-			response.text().await?
-		));
-	}
+async fn send_code_email(email: String, code: String, smtp_options: SmtpOptions) -> Result<()> {
+	let email = lettre::Message::builder()
+		.from("Tangram <noreply@tangram.xyz>".parse()?)
+		.to(email.parse()?)
+		.subject("Tangram Login Code")
+		.body(format!("Your Tangram login code is {}.", code))?;
+	let transport: lettre::AsyncSmtpTransport<lettre::Tokio1Executor> =
+		lettre::AsyncSmtpTransport::<lettre::Tokio1Executor>::relay(&smtp_options.host)?
+			.credentials((smtp_options.username, smtp_options.password).into())
+			.build();
+	transport.send(email).await?;
 	Ok(())
 }

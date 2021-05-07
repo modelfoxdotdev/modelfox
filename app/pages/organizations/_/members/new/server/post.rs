@@ -1,13 +1,14 @@
-use serde_json::json;
+use lettre::AsyncTransport;
 use sqlx::prelude::*;
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
 	user::NormalUser,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
-	Context,
+	Context, SmtpOptions,
 };
 use tangram_error::{err, Result};
 use tangram_id::Id;
+use url::Url;
 
 #[derive(serde::Deserialize)]
 struct Action {
@@ -107,8 +108,18 @@ async fn add_member(
 	.execute(&mut *db)
 	.await?;
 	// Send the new user an invitation email.
-	if let Some(sendgrid_api_token) = context.options.sendgrid_api_token.clone() {
-		send_invitation_email(action.email.clone(), user.email.clone(), sendgrid_api_token).await?;
+	if let Some(smtp_options) = context.options.smtp_options.clone() {
+		let url = context
+			.options
+			.url
+			.clone()
+			.ok_or_else(|| err!("url option is required when smtp is enabled"))?;
+		tokio::spawn(send_invitation_email(
+			action.email.clone(),
+			user.email.clone(),
+			smtp_options,
+			url,
+		));
 	}
 	let response = http::Response::builder()
 		.status(http::StatusCode::SEE_OTHER)
@@ -122,50 +133,27 @@ async fn add_member(
 }
 
 async fn send_invitation_email(
-	email: String,
+	invitee_email: String,
 	inviter_email: String,
-	sendgrid_api_token: String,
+	smtp_options: SmtpOptions,
+	url: Url,
 ) -> Result<()> {
-	let json = json!({
-		"personalizations": [
-			{
-				"to": [
-					{
-						"email": email,
-					}
-				]
-			}
-		],
-		"from": {
-			"email": "noreply@tangram.xyz",
-			"name": "Tangram"
-		},
-		"subject": "Tangram Invite",
-		"tracking_settings": {
-			"click_tracking": {
-				"enable": false
-			}
-		},
-		"content": [
-			{
-				"type": "text/html",
-				"value": format!("{} invited you to join their team on Tangram. <a href='https://app.tangram.xyz/login?email={}'>Accept Invitation</a>.", inviter_email, email),
-			}
-		]
-	});
-	let client = reqwest::Client::new();
-	let response = client
-		.post("https://api.sendgrid.com/v3/mail/send")
-		.header(
-			http::header::AUTHORIZATION,
-			format!("Bearer {}", sendgrid_api_token),
-		)
-		.json(&json)
-		.send()
-		.await?;
-	if !response.status().is_success() {
-		let text = response.text().await?;
-		return Err(err!("Non-2xx response from sengrid: {:?}", text));
-	}
+	let mut href = url;
+	href.set_path("/login");
+	href.set_query(Some(&format!("email={}", invitee_email)));
+	let email = lettre::Message::builder()
+		.from("Tangram <noreply@tangram.xyz>".parse()?)
+		.to(invitee_email.parse()?)
+		.subject("Tangram Invitation")
+		.header(lettre::message::header::ContentType::TEXT_HTML)
+		.body(format!(
+			"{} invited you to join their team on Tangram. <a href=\"{}\">Accept Invitation</a>.",
+			inviter_email, href
+		))?;
+	let transport: lettre::AsyncSmtpTransport<lettre::Tokio1Executor> =
+		lettre::AsyncSmtpTransport::<lettre::Tokio1Executor>::relay(&smtp_options.host)?
+			.credentials((smtp_options.username, smtp_options.password).into())
+			.build();
+	transport.send(email).await?;
 	Ok(())
 }

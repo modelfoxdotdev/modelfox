@@ -50,6 +50,21 @@ pub fn app(args: AppArgs) -> Result<()> {
 	} else {
 		tangram_app::DataStorage::Local(local_data_dir()?.join("data"))
 	};
+	let smtp_options = if let Some(smtp_host) = args.smtp_host {
+		let smtp_username = args
+			.smtp_username
+			.ok_or_else(|| err!("smtp username is required if smtp host is provided"))?;
+		let smtp_password = args
+			.smtp_password
+			.ok_or_else(|| err!("smtp password is required if smtp host is provided"))?;
+		Some(tangram_app::SmtpOptions {
+			host: smtp_host,
+			username: smtp_username,
+			password: smtp_password,
+		})
+	} else {
+		None
+	};
 	tangram_app::run(tangram_app::Options {
 		auth_enabled: args.auth_enabled,
 		cookie_domain: args.cookie_domain,
@@ -58,7 +73,7 @@ pub fn app(args: AppArgs) -> Result<()> {
 		database_url,
 		host: args.host,
 		port: args.port,
-		sendgrid_api_token: args.sendgrid_api_token,
+		smtp_options,
 		stripe_publishable_key: args.stripe_publishable_key,
 		stripe_secret_key: args.stripe_secret_key,
 		url,
