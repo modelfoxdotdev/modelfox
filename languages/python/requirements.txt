@@ -1,0 +1,5 @@
+pip
+wheel
+setuptools
+setuptools-rust
+pdoc

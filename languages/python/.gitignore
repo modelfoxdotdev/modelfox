@@ -1,4 +1,5 @@
 /.mypy_cache
+/.venv
 /build
 /dist
 /docs

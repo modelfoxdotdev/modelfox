@@ -1,3 +1,5 @@
+/.direnv
 /data
 /dist
+/secrets
 /target*

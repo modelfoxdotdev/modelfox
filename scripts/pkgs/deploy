@@ -1,1 +1,3 @@
-rsync --archive --compress --delete --progress dist/pkgs/ tangram@router.tangram.xyz:/var/pkgs/
+ssh root@router-us-east-1.tangram.xyz mkdir -p /srv/pkgs
+rsync --archive --compress --delete --progress dist/pkgs/ root@router-us-east-1.tangram.xyz:/srv/pkgs/
+ssh root@router-us-east-1.tangram.xyz "chown -R root:root /srv/pkgs && chmod -R 755 /srv/pkgs"

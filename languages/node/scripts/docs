@@ -1,2 +1,1 @@
-scripts/dev
 npx typedoc src/index.ts

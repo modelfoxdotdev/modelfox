@@ -1,1 +1,2 @@
-yard -m markdown -o docs
+bundle
+bundle exec yard -m markdown -o docs

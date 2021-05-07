@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    redcarpet (3.5.1)
+    yard (0.9.26)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  redcarpet
+  yard
+
+BUNDLED WITH
+   1.17.2
