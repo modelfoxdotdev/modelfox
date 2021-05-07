@@ -40,6 +40,11 @@ pub struct LocalStorageOptions {
 
 #[derive(Clone)]
 pub struct S3StorageOptions {
+	pub access_key: String,
+	pub secret_key: String,
+	pub endpoint: String,
+	pub bucket: String,
+	pub region: String,
 	pub cache_path: PathBuf,
 }
 

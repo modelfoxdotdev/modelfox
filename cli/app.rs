@@ -49,7 +49,14 @@ struct LocalStorageConfig {
 }
 
 #[derive(Clone, serde::Deserialize)]
-struct S3StorageConfig {}
+struct S3StorageConfig {
+	pub access_key: String,
+	pub secret_key: String,
+	pub endpoint: String,
+	pub bucket: String,
+	pub region: String,
+	pub cache_path: Option<PathBuf>,
+}
 
 #[cfg(feature = "app")]
 pub fn app(args: AppArgs) -> Result<()> {
@@ -77,9 +84,18 @@ pub fn app(args: AppArgs) -> Result<()> {
 					path: storage.path.clone(),
 				},
 			),
-			StorageConfig::S3(_) => {
+			StorageConfig::S3(storage) => {
+				let cache_path = storage
+					.cache_path
+					.clone()
+					.unwrap_or_else(|| cache_path().unwrap());
 				tangram_app::options::StorageOptions::S3(tangram_app::options::S3StorageOptions {
-					cache_path: cache_path()?,
+					access_key: storage.access_key.clone(),
+					secret_key: storage.secret_key.clone(),
+					endpoint: storage.endpoint.clone(),
+					bucket: storage.bucket.clone(),
+					region: storage.region.clone(),
+					cache_path,
 				})
 			}
 		}

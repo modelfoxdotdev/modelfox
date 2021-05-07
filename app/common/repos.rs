@@ -214,7 +214,7 @@ pub async fn add_model_version(
 	.execute(&mut *db)
 	.await?;
 	data_storage
-		.write(StorageEntity::Model, model_id, bytes)
+		.set(StorageEntity::Model, model_id, bytes)
 		.await?;
 	db.commit().await?;
 	Ok(())

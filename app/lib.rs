@@ -48,6 +48,11 @@ async fn run_inner(options: Options) -> Result<()> {
 	let storage = match options.storage.clone() {
 		StorageOptions::Local(options) => Storage::Local(LocalStorage { path: options.path }),
 		StorageOptions::S3(options) => Storage::S3(S3Storage {
+			access_key: options.access_key,
+			secret_key: options.secret_key,
+			endpoint: options.endpoint,
+			bucket: options.bucket,
+			region: options.region,
 			cache_path: options.cache_path,
 		}),
 	};
