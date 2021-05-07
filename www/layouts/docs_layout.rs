@@ -163,7 +163,7 @@ pub fn PageNav(props: PageNavProps) {
 				/>
 				<ui::NavItem
 					title="Go"
-					href="https://pkg.go.dev/github.com/tangramxyz/tangram-go"
+					href="/docs/languages/go"
 					selected={Some(false)}
 				/>
 				<ui::NavItem
