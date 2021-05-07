@@ -19,14 +19,14 @@ pub async fn get(
 	context: &Context,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	if !context.options.auth_enabled {
+	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(&request, &mut db, context.options.auth_enabled).await? {
+	let user = match authorize_user(&request, &mut db, context.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};

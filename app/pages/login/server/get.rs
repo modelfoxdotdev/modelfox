@@ -9,7 +9,7 @@ pub async fn get(
 	_request: http::Request<hyper::Body>,
 	search_params: Option<BTreeMap<String, String>>,
 ) -> Result<http::Response<hyper::Body>> {
-	if !context.options.auth_enabled {
+	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
 	let email = search_params.as_ref().and_then(|s| s.get("email").cloned());

@@ -15,7 +15,7 @@ pub async fn post(
 	context: &Context,
 	mut request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	if !context.options.auth_enabled {
+	if !context.options.auth_enabled() {
 		return Ok(bad_request());
 	}
 	let data = match hyper::body::to_bytes(request.body_mut()).await {

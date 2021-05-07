@@ -1,27 +1,55 @@
 use crate::AppArgs;
 use rsa::PublicKey;
 use sha2::Digest;
-use std::path::Path;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use tangram_error::{err, Result};
 use url::Url;
 
-#[derive(serde::Deserialize)]
+#[derive(Clone, serde::Deserialize)]
 struct AppConfig {
-	auth_enabled: Option<bool>,
+	auth: Option<AuthConfig>,
 	cookie_domain: Option<String>,
-	data_dir: Option<PathBuf>,
-	database_max_connections: Option<u32>,
-	database_url: Option<String>,
+	database: Option<DatabaseConfig>,
 	host: Option<std::net::IpAddr>,
 	license: Option<PathBuf>,
 	port: Option<u16>,
-	s3_url: Option<String>,
-	smtp_host: Option<String>,
-	smtp_password: Option<String>,
-	smtp_username: Option<String>,
+	smtp: Option<SmtpConfig>,
+	storage: Option<StorageConfig>,
 	url: Option<String>,
 }
+
+#[derive(Clone, serde::Deserialize)]
+struct AuthConfig {
+	enable: bool,
+}
+
+#[derive(Clone, serde::Deserialize)]
+struct DatabaseConfig {
+	max_connections: Option<u32>,
+	url: Url,
+}
+
+#[derive(Clone, serde::Deserialize)]
+struct SmtpConfig {
+	host: String,
+	password: String,
+	username: String,
+}
+
+#[derive(Clone, serde::Deserialize)]
+#[serde(tag = "type")]
+enum StorageConfig {
+	Local(LocalStorageConfig),
+	S3(S3StorageConfig),
+}
+
+#[derive(Clone, serde::Deserialize)]
+struct LocalStorageConfig {
+	path: PathBuf,
+}
+
+#[derive(Clone, serde::Deserialize)]
+struct S3StorageConfig {}
 
 #[cfg(feature = "app")]
 pub fn app(args: AppArgs) -> Result<()> {
@@ -31,24 +59,46 @@ pub fn app(args: AppArgs) -> Result<()> {
 	} else {
 		None
 	};
-	let auth_enabled = config
+	let auth = config
 		.as_ref()
-		.and_then(|c| c.auth_enabled)
-		.unwrap_or(false);
+		.and_then(|c| c.auth.as_ref())
+		.and_then(|auth| {
+			if auth.enable {
+				Some(tangram_app::options::AuthOptions {})
+			} else {
+				None
+			}
+		});
 	let cookie_domain = config.as_ref().and_then(|c| c.cookie_domain.clone());
-	let data_storage = if let Some(data_s3_url) = config.as_ref().and_then(|c| c.s3_url.clone()) {
-		let cache_dir = cache_dir()?;
-		tangram_app::DataStorage::S3(data_s3_url.parse()?, cache_dir)
-	} else if let Some(data_dir) = config.as_ref().and_then(|c| c.data_dir.clone()) {
-		tangram_app::DataStorage::Local(data_dir)
+	let storage = if let Some(storage) = config.as_ref().and_then(|c| c.storage.as_ref()) {
+		match storage {
+			StorageConfig::Local(storage) => tangram_app::options::StorageOptions::Local(
+				tangram_app::options::LocalStorageOptions {
+					path: storage.path.clone(),
+				},
+			),
+			StorageConfig::S3(_) => {
+				tangram_app::options::StorageOptions::S3(tangram_app::options::S3StorageOptions {
+					cache_path: cache_path()?,
+				})
+			}
+		}
 	} else {
-		tangram_app::DataStorage::Local(data_dir()?.join("data"))
+		tangram_app::options::StorageOptions::Local(tangram_app::options::LocalStorageOptions {
+			path: data_path()?.join("data"),
+		})
 	};
-	let database_max_connections = config.as_ref().and_then(|c| c.database_max_connections);
-	let database_url = match config.as_ref().and_then(|c| c.database_url.clone()) {
-		Some(database_url) => database_url.parse()?,
-		None => default_database_url()?,
-	};
+	let database = config
+		.as_ref()
+		.and_then(|c| c.database.as_ref())
+		.map(|database| tangram_app::options::DatabaseOptions {
+			max_connections: database.max_connections,
+			url: database.url.clone(),
+		})
+		.unwrap_or_else(|| tangram_app::options::DatabaseOptions {
+			max_connections: None,
+			url: default_database_url(),
+		});
 	let host = config
 		.as_ref()
 		.and_then(|c| c.host)
@@ -62,7 +112,7 @@ pub fn app(args: AppArgs) -> Result<()> {
 			None
 		};
 	// Require a verified license if auth is enabled.
-	if auth_enabled {
+	if auth.is_some() {
 		match license_verified {
 			#[cfg(debug_assertions)]
 			None => {}
@@ -72,23 +122,11 @@ pub fn app(args: AppArgs) -> Result<()> {
 			Some(true) => {}
 		}
 	}
-	let smtp_options = if let Some(smtp_host) = config.as_ref().and_then(|c| c.smtp_host.clone()) {
-		let smtp_username = config
-			.as_ref()
-			.ok_or_else(|| err!("smtp username is required if smtp host is provided"))?
-			.smtp_username
-			.clone()
-			.ok_or_else(|| err!("smtp username is required if smtp host is provided"))?;
-		let smtp_password = config
-			.as_ref()
-			.ok_or_else(|| err!("smtp password is required if smtp host is provided"))?
-			.smtp_password
-			.clone()
-			.ok_or_else(|| err!("smtp password is required if smtp host is provided"))?;
-		Some(tangram_app::SmtpOptions {
-			host: smtp_host,
-			username: smtp_username,
-			password: smtp_password,
+	let smtp = if let Some(smtp) = config.as_ref().and_then(|c| c.smtp.clone()) {
+		Some(tangram_app::options::SmtpOptions {
+			host: smtp.host,
+			username: smtp.username,
+			password: smtp.password,
 		})
 	} else {
 		None
@@ -98,15 +136,14 @@ pub fn app(args: AppArgs) -> Result<()> {
 	} else {
 		None
 	};
-	let options = tangram_app::Options {
-		auth_enabled,
+	let options = tangram_app::options::Options {
+		auth,
 		cookie_domain,
-		data_storage,
-		database_max_connections,
-		database_url,
+		database,
 		host,
 		port,
-		smtp_options,
+		smtp,
+		storage,
 		url,
 	};
 	tangram_app::run(options)
@@ -114,7 +151,7 @@ pub fn app(args: AppArgs) -> Result<()> {
 
 /// Retrieve the user cache directory using the `dirs` crate.
 #[cfg(feature = "app")]
-fn cache_dir() -> Result<PathBuf> {
+fn cache_path() -> Result<PathBuf> {
 	let cache_dir = dirs::cache_dir().ok_or_else(|| err!("failed to find user cache directory"))?;
 	let tangram_cache_dir = cache_dir.join("tangram");
 	std::fs::create_dir_all(&tangram_cache_dir).map_err(|_| {
@@ -128,7 +165,7 @@ fn cache_dir() -> Result<PathBuf> {
 
 /// Retrieve the user data directory using the `dirs` crate.
 #[cfg(feature = "app")]
-fn data_dir() -> Result<PathBuf> {
+fn data_path() -> Result<PathBuf> {
 	let data_dir = dirs::data_dir().ok_or_else(|| err!("failed to find user data directory"))?;
 	let tangram_data_dir = data_dir.join("tangram");
 	std::fs::create_dir_all(&tangram_data_dir).map_err(|_| {
@@ -142,15 +179,14 @@ fn data_dir() -> Result<PathBuf> {
 
 /// Retrieve the default database url, which is a sqlite database in the user data directory.
 #[cfg(feature = "app")]
-pub fn default_database_url() -> Result<Url> {
-	let tangram_database_path = data_dir()?.join("db").join("tangram.db");
-	std::fs::create_dir_all(tangram_database_path.parent().unwrap())?;
+pub fn default_database_url() -> Url {
+	let tangram_database_path = data_path().unwrap().join("db").join("tangram.db");
+	std::fs::create_dir_all(tangram_database_path.parent().unwrap()).unwrap();
 	let url = format!(
 		"sqlite:{}",
 		tangram_database_path.to_str().unwrap().to_owned()
 	);
-	let url = Url::parse(&url)?;
-	Ok(url)
+	Url::parse(&url).unwrap()
 }
 
 pub fn verify_license(license_file_path: &Path) -> Result<bool> {

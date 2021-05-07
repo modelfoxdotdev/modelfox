@@ -21,7 +21,7 @@ pub async fn get(
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(&request, &mut db, context.options.auth_enabled).await? {
+	let user = match authorize_user(&request, &mut db, context.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -32,7 +32,7 @@ pub async fn get(
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
-	let bytes = get_model_bytes(&context.options.data_storage, model_id).await?;
+	let bytes = get_model_bytes(&context.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
 	let grid_item_index = grid_item_identifier.parse::<usize>().unwrap();
 	let grid_item = match model.inner() {

@@ -4,7 +4,7 @@ use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
 	user::NormalUser,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
-	Context, SmtpOptions,
+	Context,
 };
 use tangram_error::{err, Result};
 use tangram_id::Id;
@@ -21,7 +21,7 @@ pub async fn post(
 	mut request: http::Request<hyper::Body>,
 	organization_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
-	if !context.options.auth_enabled {
+	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
 	let mut db = match context.database_pool.begin().await {
@@ -108,16 +108,16 @@ async fn add_member(
 	.execute(&mut *db)
 	.await?;
 	// Send the new user an invitation email.
-	if let Some(smtp_options) = context.options.smtp_options.clone() {
+	if let Some(smtp_transport) = context.smtp_transport.clone() {
 		let url = context
 			.options
 			.url
 			.clone()
 			.ok_or_else(|| err!("url option is required when smtp is enabled"))?;
 		tokio::spawn(send_invitation_email(
+			smtp_transport,
 			action.email.clone(),
 			user.email.clone(),
-			smtp_options,
 			url,
 		));
 	}
@@ -133,9 +133,9 @@ async fn add_member(
 }
 
 async fn send_invitation_email(
+	smtp_transport: lettre::AsyncSmtpTransport<lettre::Tokio1Executor>,
 	invitee_email: String,
 	inviter_email: String,
-	smtp_options: SmtpOptions,
 	url: Url,
 ) -> Result<()> {
 	let mut href = url;
@@ -149,10 +149,6 @@ async fn send_invitation_email(
 			"{} invited you to join their team on Tangram. Click the link below to accept the invitation.\n\n{}",
 			inviter_email, href
 		))?;
-	let transport: lettre::AsyncSmtpTransport<lettre::Tokio1Executor> =
-		lettre::AsyncSmtpTransport::<lettre::Tokio1Executor>::relay(&smtp_options.host)?
-			.credentials((smtp_options.username, smtp_options.password).into())
-			.build();
-	transport.send(email).await?;
+	smtp_transport.send(email).await?;
 	Ok(())
 }

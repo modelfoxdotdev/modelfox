@@ -31,7 +31,7 @@ pub async fn get(
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(&request, &mut db, context.options.auth_enabled).await? {
+	let user = match authorize_user(&request, &mut db, context.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -39,7 +39,7 @@ pub async fn get(
 		Ok(model_id) => model_id,
 		Err(_) => return Ok(bad_request()),
 	};
-	let bytes = get_model_bytes(&context.options.data_storage, model_id).await?;
+	let bytes = get_model_bytes(&context.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
@@ -77,7 +77,7 @@ pub async fn get(
 			let input: String = row.get(2);
 			let input: PredictInput = serde_json::from_str(&input)?;
 			let input_table = compute_input_table_props(model, &input);
-			let bytes = get_model_bytes(&context.options.data_storage, model_id).await?;
+			let bytes = get_model_bytes(&context.storage, model_id).await?;
 			let model = tangram_model::from_bytes(&bytes)?;
 			let predict_model = tangram_core::predict::Model::from(model);
 			let options = PredictOptions {

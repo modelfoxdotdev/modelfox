@@ -4,7 +4,6 @@ use num::ToPrimitive;
 use sqlx::prelude::*;
 use std::collections::BTreeMap;
 use tangram_app_common::{
-	data_storage::DataStorage,
 	error::{bad_request, service_unavailable},
 	model::get_model_bytes,
 	monitor_event::{
@@ -14,6 +13,7 @@ use tangram_app_common::{
 	},
 	production_metrics::ProductionMetrics,
 	production_stats::ProductionStats,
+	storage::Storage,
 	Context,
 };
 use tangram_error::{err, Result};
@@ -52,7 +52,7 @@ pub async fn post(
 			MonitorEvent::Prediction(monitor_event) => {
 				let handle_prediction_result = handle_prediction_monitor_event(
 					&mut db,
-					&context.options.data_storage,
+					&context.storage,
 					&mut model_cache,
 					monitor_event,
 				)
@@ -64,7 +64,7 @@ pub async fn post(
 			MonitorEvent::TrueValue(monitor_event) => {
 				let handle_true_value_result = handle_true_value_monitor_event(
 					&mut db,
-					&context.options.data_storage,
+					&context.storage,
 					&mut model_cache,
 					monitor_event,
 				)
@@ -85,7 +85,7 @@ pub async fn post(
 
 async fn handle_prediction_monitor_event(
 	mut db: &mut sqlx::Transaction<'_, sqlx::Any>,
-	data_storage: &DataStorage,
+	data_storage: &Storage,
 	model_cache: &mut BTreeMap<Id, Mmap>,
 	monitor_event: PredictionMonitorEvent,
 ) -> Result<()> {
@@ -107,7 +107,7 @@ async fn handle_prediction_monitor_event(
 
 async fn handle_true_value_monitor_event(
 	mut db: &mut sqlx::Transaction<'_, sqlx::Any>,
-	data_storage: &DataStorage,
+	data_storage: &Storage,
 	model_cache: &mut BTreeMap<Id, Mmap>,
 	monitor_event: TrueValueMonitorEvent,
 ) -> Result<()> {

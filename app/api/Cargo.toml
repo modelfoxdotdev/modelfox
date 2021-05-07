@@ -22,4 +22,4 @@ tangram_error = { path = "../../error" }
 tangram_id = { path = "../../id" }
 tangram_metrics = { path = "../../metrics" }
 tangram_model = { path = "../../model" }
-url = "2"
+url = { version = "2", features = ["serde"] }

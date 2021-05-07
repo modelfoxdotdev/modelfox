@@ -16,7 +16,7 @@ pub async fn post(
 	mut request: http::Request<hyper::Body>,
 	organization_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
-	if !context.options.auth_enabled {
+	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
 	let data = match hyper::body::to_bytes(request.body_mut()).await {
@@ -31,7 +31,7 @@ pub async fn post(
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(&request, &mut db, context.options.auth_enabled).await? {
+	let user = match authorize_user(&request, &mut db, context.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};

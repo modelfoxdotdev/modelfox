@@ -23,4 +23,4 @@ tangram_error = { path = "../../../../../../../error" }
 tangram_id = { path = "../../../../../../../id" }
 tangram_ui = { path = "../../../../../../../ui" }
 tokio = { version = "1", features = ["full"] }
-url = "2"
+url = { version = "2", features = ["serde"] }

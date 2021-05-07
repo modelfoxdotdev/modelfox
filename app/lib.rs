@@ -1,13 +1,17 @@
 use futures::FutureExt;
 use std::{collections::BTreeMap, sync::Arc};
-use tangram_app_common::Context;
+use tangram_app_common::{
+	options::{Options, StorageOptions},
+	storage::{LocalStorage, S3Storage, Storage},
+	Context,
+};
 use tangram_error::{err, Result};
 use tangram_serve::serve;
 use url::Url;
 
 mod migrations;
 
-pub use tangram_app_common::{data_storage::DataStorage, Options, SmtpOptions};
+pub use tangram_app_common::options;
 
 pub fn run(options: Options) -> Result<()> {
 	tokio::runtime::Builder::new_multi_thread()
@@ -20,8 +24,8 @@ pub fn run(options: Options) -> Result<()> {
 async fn run_inner(options: Options) -> Result<()> {
 	// Create the database pool.
 	let database_pool = create_database_pool(CreateDatabasePoolOptions {
-		database_max_connections: options.database_max_connections,
-		database_url: options.database_url.clone(),
+		database_max_connections: options.database.max_connections,
+		database_url: options.database.url.clone(),
 	})
 	.await?;
 	if self::migrations::empty(&database_pool).await? {
@@ -31,12 +35,30 @@ async fn run_inner(options: Options) -> Result<()> {
 		// If the database is not empty, verify that all migrations have already been run.
 		self::migrations::verify(&database_pool).await?;
 	}
+	// Create the smtp transport.
+	let smtp_transport = if let Some(smtp) = options.smtp.as_ref() {
+		Some(
+			lettre::AsyncSmtpTransport::<lettre::Tokio1Executor>::relay(&smtp.host)?
+				.credentials((&smtp.username, &smtp.password).into())
+				.build(),
+		)
+	} else {
+		None
+	};
+	let storage = match options.storage.clone() {
+		StorageOptions::Local(options) => Storage::Local(LocalStorage { path: options.path }),
+		StorageOptions::S3(options) => Storage::S3(S3Storage {
+			cache_path: options.cache_path,
+		}),
+	};
 	// Start the server.
 	let host = options.host;
 	let port = options.port;
 	let context = Context {
-		options,
 		database_pool,
+		options,
+		smtp_transport,
+		storage,
 	};
 	serve(host, port, context, request_handler).await?;
 	Ok(())

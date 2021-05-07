@@ -24,7 +24,7 @@ pub fn AppLayout(props: AppLayoutProps) {
 }
 
 pub async fn get_app_layout_props(context: &Context) -> Result<AppLayoutProps> {
-	let topbar_avatar = if context.options.auth_enabled {
+	let topbar_avatar = if context.options.auth_enabled() {
 		Some(TopbarAvatar { avatar_url: None })
 	} else {
 		None

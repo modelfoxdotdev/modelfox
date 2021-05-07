@@ -6,7 +6,7 @@ use rand::Rng;
 use sqlx::prelude::*;
 use tangram_app_common::{
 	error::{bad_request, service_unavailable},
-	Context, SmtpOptions,
+	Context,
 };
 use tangram_error::Result;
 use tangram_id::Id;
@@ -68,7 +68,7 @@ pub async fn post(
 	.await?
 	.get(0);
 	let user_id: Id = user_id.parse()?;
-	if context.options.auth_enabled {
+	if context.options.auth_enabled() {
 		if let Some(code) = code {
 			// Verify the code.
 			let ten_minutes_in_seconds: i32 = 10 * 60;
@@ -144,8 +144,8 @@ pub async fn post(
 			.bind(&code)
 			.execute(&mut *db)
 			.await?;
-			if let Some(smtp_options) = context.options.smtp_options.clone() {
-				send_code_email(email.clone(), code, smtp_options).await?;
+			if let Some(smtp_transport) = context.smtp_transport.clone() {
+				send_code_email(smtp_transport, email.clone(), code).await?;
 			}
 			db.commit().await?;
 			let response = http::Response::builder()
@@ -211,16 +211,16 @@ fn set_cookie_header_value(token: Id, domain: Option<&str>) -> String {
 	)
 }
 
-async fn send_code_email(email: String, code: String, smtp_options: SmtpOptions) -> Result<()> {
+async fn send_code_email(
+	smtp_transport: lettre::AsyncSmtpTransport<lettre::Tokio1Executor>,
+	email: String,
+	code: String,
+) -> Result<()> {
 	let email = lettre::Message::builder()
 		.from("Tangram <noreply@tangram.xyz>".parse()?)
 		.to(email.parse()?)
 		.subject("Tangram Login Code")
 		.body(format!("Your Tangram login code is {}.", code))?;
-	let transport: lettre::AsyncSmtpTransport<lettre::Tokio1Executor> =
-		lettre::AsyncSmtpTransport::<lettre::Tokio1Executor>::relay(&smtp_options.host)?
-			.credentials((smtp_options.username, smtp_options.password).into())
-			.build();
-	transport.send(email).await?;
+	smtp_transport.send(email).await?;
 	Ok(())
 }

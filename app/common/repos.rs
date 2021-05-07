@@ -1,4 +1,7 @@
-use crate::{data_storage::DataStorageEntity, user::NormalUser, DataStorage};
+use crate::{
+	storage::{Storage, StorageEntity},
+	user::NormalUser,
+};
 use chrono::prelude::*;
 use sqlx::prelude::*;
 use tangram_error::Result;
@@ -190,7 +193,7 @@ pub async fn create_org_repo(
 
 pub async fn add_model_version(
 	db: &mut sqlx::Transaction<'_, sqlx::Any>,
-	data_storage: &DataStorage,
+	data_storage: &Storage,
 	repo_id: Id,
 	model_id: Id,
 	bytes: &[u8],
@@ -211,7 +214,7 @@ pub async fn add_model_version(
 	.execute(&mut *db)
 	.await?;
 	data_storage
-		.write(DataStorageEntity::Model, model_id, bytes)
+		.write(StorageEntity::Model, model_id, bytes)
 		.await?;
 	db.commit().await?;
 	Ok(())

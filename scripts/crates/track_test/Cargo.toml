@@ -28,4 +28,4 @@ tangram_id = { path = "../../../id" }
 tangram_model = { path = "../../../model" }
 tangram_serialize = { path = "../../../serialize" }
 tangram_table = { path = "../../../table" }
-url = "2"
+url = { version = "2", features = ["serde"] }

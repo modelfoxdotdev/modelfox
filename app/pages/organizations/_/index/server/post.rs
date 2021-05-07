@@ -25,7 +25,7 @@ pub async fn post(
 	mut request: http::Request<hyper::Body>,
 	organization_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
-	if !context.options.auth_enabled {
+	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
 	let data = match hyper::body::to_bytes(request.body_mut()).await {

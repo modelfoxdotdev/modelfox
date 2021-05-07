@@ -27,4 +27,4 @@ tangram_error = { path = "../../error" }
 tangram_model = { path = "../../model" }
 tangram_rust_macro = { path = "macro" }
 tokio = { version = "1", features = [], optional = true }
-url = "2"
+url = { version = "2", features = ["serde"] }

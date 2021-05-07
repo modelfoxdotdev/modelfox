@@ -9,7 +9,7 @@ pub async fn get(
 	_request: http::Request<hyper::Body>,
 	_organization_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
-	if !context.options.auth_enabled {
+	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
 	let app_layout_props = get_app_layout_props(context).await?;

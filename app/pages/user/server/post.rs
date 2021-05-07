@@ -16,7 +16,7 @@ pub async fn post(
 	context: &Context,
 	mut request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	if !context.options.auth_enabled {
+	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
 	let mut db = match context.database_pool.begin().await {

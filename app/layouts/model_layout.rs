@@ -81,7 +81,7 @@ pub async fn get_model_layout_props(
 	} else {
 		None
 	};
-	let topbar_avatar = if context.options.auth_enabled {
+	let topbar_avatar = if context.options.auth_enabled() {
 		Some(TopbarAvatar { avatar_url: None })
 	} else {
 		None
@@ -116,7 +116,7 @@ pub async fn post(
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(&request, &mut db, context.options.auth_enabled).await? {
+	let user = match authorize_user(&request, &mut db, context.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -163,7 +163,7 @@ pub async fn download(
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(&request, &mut db, context.options.auth_enabled).await? {
+	let user = match authorize_user(&request, &mut db, context.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -174,7 +174,7 @@ pub async fn download(
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
-	let bytes = get_model_bytes(&context.options.data_storage, model_id).await?;
+	let bytes = get_model_bytes(&context.storage, model_id).await?;
 	let bytes = bytes.to_owned();
 	db.commit().await?;
 	let response = http::Response::builder()

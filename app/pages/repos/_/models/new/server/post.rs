@@ -20,7 +20,7 @@ pub async fn post(
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(&request, &mut db, context.options.auth_enabled).await? {
+	let user = match authorize_user(&request, &mut db, context.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -131,7 +131,7 @@ pub async fn post(
 	};
 	let result = add_model_version(
 		&mut db,
-		&context.options.data_storage,
+		&context.storage,
 		repo_id,
 		model.id().parse().unwrap(),
 		&bytes,
