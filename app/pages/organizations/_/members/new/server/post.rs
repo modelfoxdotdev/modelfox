@@ -145,9 +145,8 @@ async fn send_invitation_email(
 		.from("Tangram <noreply@tangram.xyz>".parse()?)
 		.to(invitee_email.parse()?)
 		.subject("Tangram Invitation")
-		.header(lettre::message::header::ContentType::TEXT_HTML)
 		.body(format!(
-			"{} invited you to join their team on Tangram. <a href=\"{}\">Accept Invitation</a>.",
+			"{} invited you to join their team on Tangram. Click the link below to accept the invitation.\n\n{}",
 			inviter_email, href
 		))?;
 	let transport: lettre::AsyncSmtpTransport<lettre::Tokio1Executor> =
