@@ -3591,6 +3591,8 @@ dependencies = [
  "once_cell",
  "rayon",
  "rsa",
+ "serde",
+ "serde_json",
  "sha2",
  "tangram_app",
  "tangram_core",

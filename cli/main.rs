@@ -107,46 +107,8 @@ pub struct PredictArgs {
 #[derive(Clap)]
 #[clap(about = "Run the app.", long_about = "Run the app.")]
 pub struct AppArgs {
-	#[clap(long = "auth", env = "AUTH", takes_value = false)]
-	auth_enabled: bool,
-	#[clap(long, env = "COOKIE_DOMAIN")]
-	cookie_domain: Option<String>,
-	#[clap(
-		long,
-		env = "DATA_S3_URL",
-		conflicts_with = "data-dir",
-		about = "url of an S3 bucket to store data including uploaded models"
-	)]
-	data_s3_url: Option<String>,
-	#[clap(
-		long,
-		env = "DATA_DIR",
-		conflicts_with = "data-s3-url",
-		about = "the path to store data including uploaded models"
-	)]
-	data_dir: Option<PathBuf>,
-	#[clap(long, env = "DATABASE_MAX_CONNECTIONS")]
-	database_max_connections: Option<u32>,
-	#[clap(long, env = "DATABASE_URL")]
-	database_url: Option<String>,
-	#[clap(long, default_value = "0.0.0.0")]
-	host: std::net::IpAddr,
-	#[clap(long, env = "LICENSE")]
-	license: Option<PathBuf>,
-	#[clap(long, env = "PORT", default_value = "8080")]
-	port: u16,
-	#[clap(long, env = "SMTP_HOST", requires_all = &["smtp-username", "smtp-password"])]
-	smtp_host: Option<String>,
-	#[clap(long, env = "SMTP_USERNAME", requires_all = &["smtp-host", "smtp-password"])]
-	smtp_username: Option<String>,
-	#[clap(long, env = "SMTP_PASSWORD", requires_all = &["smtp-host", "smtp-username"])]
-	smtp_password: Option<String>,
-	#[clap(hidden = true, long, env = "STRIPE_PUBLISHABLE_KEY")]
-	stripe_publishable_key: Option<String>,
-	#[clap(hidden = true, long, env = "STRIPE_SECRET_KEY")]
-	stripe_secret_key: Option<String>,
-	#[clap(hidden = true, long, env = "URL")]
-	url: Option<String>,
+	#[clap(short, long = "config")]
+	config: Option<PathBuf>,
 }
 
 #[cfg(feature = "app")]

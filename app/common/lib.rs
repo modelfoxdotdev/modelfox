@@ -36,8 +36,6 @@ pub struct Options {
 	pub host: IpAddr,
 	pub port: u16,
 	pub smtp_options: Option<SmtpOptions>,
-	pub stripe_publishable_key: Option<String>,
-	pub stripe_secret_key: Option<String>,
 	pub url: Option<Url>,
 }
 

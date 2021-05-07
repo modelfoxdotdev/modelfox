@@ -6,21 +6,63 @@ use std::path::PathBuf;
 use tangram_error::{err, Result};
 use url::Url;
 
+#[derive(serde::Deserialize)]
+struct AppConfig {
+	auth_enabled: Option<bool>,
+	cookie_domain: Option<String>,
+	data_dir: Option<PathBuf>,
+	database_max_connections: Option<u32>,
+	database_url: Option<String>,
+	host: Option<std::net::IpAddr>,
+	license: Option<PathBuf>,
+	port: Option<u16>,
+	s3_url: Option<String>,
+	smtp_host: Option<String>,
+	smtp_password: Option<String>,
+	smtp_username: Option<String>,
+	url: Option<String>,
+}
+
 #[cfg(feature = "app")]
 pub fn app(args: AppArgs) -> Result<()> {
-	let url = if let Some(url) = args.url {
-		Some(url.parse()?)
+	let config: Option<AppConfig> = if let Some(config_path) = args.config {
+		let config = std::fs::read(config_path)?;
+		Some(serde_json::from_slice(&config)?)
 	} else {
 		None
 	};
+	let auth_enabled = config
+		.as_ref()
+		.and_then(|c| c.auth_enabled)
+		.unwrap_or(false);
+	let cookie_domain = config.as_ref().and_then(|c| c.cookie_domain.clone());
+	let data_storage = if let Some(data_s3_url) = config.as_ref().and_then(|c| c.s3_url.clone()) {
+		let cache_dir = cache_dir()?;
+		tangram_app::DataStorage::S3(data_s3_url.parse()?, cache_dir)
+	} else if let Some(data_dir) = config.as_ref().and_then(|c| c.data_dir.clone()) {
+		tangram_app::DataStorage::Local(data_dir)
+	} else {
+		tangram_app::DataStorage::Local(data_dir()?.join("data"))
+	};
+	let database_max_connections = config.as_ref().and_then(|c| c.database_max_connections);
+	let database_url = match config.as_ref().and_then(|c| c.database_url.clone()) {
+		Some(database_url) => database_url.parse()?,
+		None => default_database_url()?,
+	};
+	let host = config
+		.as_ref()
+		.and_then(|c| c.host)
+		.unwrap_or_else(|| "0.0.0.0".parse().unwrap());
+	let port = config.as_ref().and_then(|c| c.port).unwrap_or(8080);
 	// Verify the license if one was provided.
-	let license_verified: Option<bool> = if let Some(license_file_path) = args.license {
-		Some(verify_license(&license_file_path)?)
-	} else {
-		None
-	};
+	let license_verified: Option<bool> =
+		if let Some(license_file_path) = config.as_ref().and_then(|c| c.license.clone()) {
+			Some(verify_license(&license_file_path)?)
+		} else {
+			None
+		};
 	// Require a verified license if auth is enabled.
-	if args.auth_enabled {
+	if auth_enabled {
 		match license_verified {
 			#[cfg(debug_assertions)]
 			None => {}
@@ -30,33 +72,18 @@ pub fn app(args: AppArgs) -> Result<()> {
 			Some(true) => {}
 		}
 	}
-	let database_url = match args.database_url {
-		Some(database_url) => database_url.parse()?,
-		None => default_database_url()?,
-	};
-	#[allow(clippy::manual_map)]
-	let data_storage = if let Some(data_s3_url) = args.data_s3_url {
-		let cache_dir = cache_dir()?;
-		Some(tangram_app::DataStorage::S3(
-			data_s3_url.parse()?,
-			cache_dir,
-		))
-	} else if let Some(data_dir) = args.data_dir {
-		Some(tangram_app::DataStorage::Local(data_dir))
-	} else {
-		None
-	};
-	let data_storage = if let Some(data_storage) = data_storage {
-		data_storage
-	} else {
-		tangram_app::DataStorage::Local(local_data_dir()?.join("data"))
-	};
-	let smtp_options = if let Some(smtp_host) = args.smtp_host {
-		let smtp_username = args
+	let smtp_options = if let Some(smtp_host) = config.as_ref().and_then(|c| c.smtp_host.clone()) {
+		let smtp_username = config
+			.as_ref()
+			.ok_or_else(|| err!("smtp username is required if smtp host is provided"))?
 			.smtp_username
+			.clone()
 			.ok_or_else(|| err!("smtp username is required if smtp host is provided"))?;
-		let smtp_password = args
+		let smtp_password = config
+			.as_ref()
+			.ok_or_else(|| err!("smtp password is required if smtp host is provided"))?
 			.smtp_password
+			.clone()
 			.ok_or_else(|| err!("smtp password is required if smtp host is provided"))?;
 		Some(tangram_app::SmtpOptions {
 			host: smtp_host,
@@ -66,36 +93,26 @@ pub fn app(args: AppArgs) -> Result<()> {
 	} else {
 		None
 	};
-	tangram_app::run(tangram_app::Options {
-		auth_enabled: args.auth_enabled,
-		cookie_domain: args.cookie_domain,
+	let url = if let Some(url) = config.as_ref().and_then(|c| c.url.clone()) {
+		Some(url.parse()?)
+	} else {
+		None
+	};
+	let options = tangram_app::Options {
+		auth_enabled,
+		cookie_domain,
 		data_storage,
-		database_max_connections: args.database_max_connections,
+		database_max_connections,
 		database_url,
-		host: args.host,
-		port: args.port,
+		host,
+		port,
 		smtp_options,
-		stripe_publishable_key: args.stripe_publishable_key,
-		stripe_secret_key: args.stripe_secret_key,
 		url,
-	})
+	};
+	tangram_app::run(options)
 }
 
-/// Retrieve the user data directory using the `dirs` crate.
-#[cfg(feature = "app")]
-fn local_data_dir() -> Result<PathBuf> {
-	let data_dir = dirs::data_dir().ok_or_else(|| err!("failed to find user data directory"))?;
-	let tangram_data_dir = data_dir.join("tangram");
-	std::fs::create_dir_all(&tangram_data_dir).map_err(|_| {
-		err!(
-			"failed to create tangram data directory in {}",
-			tangram_data_dir.display()
-		)
-	})?;
-	Ok(tangram_data_dir)
-}
-
-/// Retrieve the user data directory using the `dirs` crate.
+/// Retrieve the user cache directory using the `dirs` crate.
 #[cfg(feature = "app")]
 fn cache_dir() -> Result<PathBuf> {
 	let cache_dir = dirs::cache_dir().ok_or_else(|| err!("failed to find user cache directory"))?;
@@ -109,10 +126,24 @@ fn cache_dir() -> Result<PathBuf> {
 	Ok(tangram_cache_dir)
 }
 
+/// Retrieve the user data directory using the `dirs` crate.
+#[cfg(feature = "app")]
+fn data_dir() -> Result<PathBuf> {
+	let data_dir = dirs::data_dir().ok_or_else(|| err!("failed to find user data directory"))?;
+	let tangram_data_dir = data_dir.join("tangram");
+	std::fs::create_dir_all(&tangram_data_dir).map_err(|_| {
+		err!(
+			"failed to create tangram data directory in {}",
+			tangram_data_dir.display()
+		)
+	})?;
+	Ok(tangram_data_dir)
+}
+
 /// Retrieve the default database url, which is a sqlite database in the user data directory.
 #[cfg(feature = "app")]
 pub fn default_database_url() -> Result<Url> {
-	let tangram_database_path = local_data_dir()?.join("db").join("tangram.db");
+	let tangram_database_path = data_dir()?.join("db").join("tangram.db");
 	std::fs::create_dir_all(tangram_database_path.parent().unwrap())?;
 	let url = format!(
 		"sqlite:{}",
