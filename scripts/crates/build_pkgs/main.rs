@@ -93,12 +93,11 @@ fn alpine(args: &Args, pkgs_path: &Path) -> Result<()> {
 	std::fs::copy(&args.tangram_cli_path, &tangram_cli_path)?;
 	let script = r#"
 		apk add build-base abuild
-		echo "PACKAGER_PUBKEY=tangram.rsa" >> /etc/abuild.conf
+		echo "PACKAGER_PUBKEY=/tangram.public.rsa" >> /etc/abuild.conf
 		echo "PACKAGER_PRIVKEY=/tangram.private.rsa" >> /etc/abuild.conf
 		abuild -F checksum
 		abuild -F -P $PWD
 		rm -rf src pkg
-		# abuild-sign --private tangram.rsa --private /alpine.private.rsa  x86_64/APKINDEX.tar.gz
 	"#;
 	cmd!(
 		"podman",
@@ -114,8 +113,8 @@ fn alpine(args: &Args, pkgs_path: &Path) -> Result<()> {
 		"-v",
 		format!(
 			"{}:{}",
-			args.alpine_private_key.canonicalize().unwrap().display(),
-			"/tangram.rsa"
+			args.alpine_public_key.canonicalize().unwrap().display(),
+			"/tangram.public.rsa"
 		),
 		"-v",
 		format!(
@@ -125,7 +124,7 @@ fn alpine(args: &Args, pkgs_path: &Path) -> Result<()> {
 		),
 		"-w",
 		"/tangram",
-		"alpine",
+		"alpine:3.13",
 	)
 	.stdin_bytes(script)
 	.run()?;

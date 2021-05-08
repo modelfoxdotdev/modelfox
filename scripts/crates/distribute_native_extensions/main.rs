@@ -17,7 +17,9 @@ fn main() -> Result<()> {
 	std::fs::remove_dir_all(&elixir_priv_path)?;
 	for target in &[
 		Target::X8664UnknownLinuxGnu,
+		Target::AArch64UnknownLinuxGnu,
 		Target::X8664UnknownLinuxMusl,
+		Target::AArch64UnknownLinuxMusl,
 		Target::X8664AppleDarwin,
 		Target::AArch64AppleDarwin,
 		Target::X8664PcWindowsMsvc,
@@ -38,6 +40,7 @@ fn main() -> Result<()> {
 	std::fs::remove_dir_all(&go_libtangram_path)?;
 	for target in &[
 		Target::X8664UnknownLinuxMusl,
+		Target::AArch64UnknownLinuxMusl,
 		Target::X8664AppleDarwin,
 		Target::AArch64AppleDarwin,
 		Target::X8664PcWindowsGnu,
@@ -66,7 +69,9 @@ fn main() -> Result<()> {
 	std::fs::remove_dir_all(&node_dist_path)?;
 	for target in &[
 		Target::X8664UnknownLinuxGnu,
+		Target::AArch64UnknownLinuxGnu,
 		Target::X8664UnknownLinuxMusl,
+		Target::AArch64UnknownLinuxMusl,
 		Target::X8664AppleDarwin,
 		Target::AArch64AppleDarwin,
 		Target::X8664PcWindowsMsvc,
@@ -85,7 +90,7 @@ fn main() -> Result<()> {
 	std::fs::remove_dir_all(&python_dist_path)?;
 	for target in &[
 		Target::X8664UnknownLinuxGnu,
-		Target::X8664UnknownLinuxMusl,
+		Target::AArch64UnknownLinuxGnu,
 		Target::X8664AppleDarwin,
 		Target::AArch64AppleDarwin,
 		Target::X8664PcWindowsMsvc,
@@ -109,7 +114,9 @@ fn main() -> Result<()> {
 	std::fs::remove_dir_all(&ruby_libtangram_path)?;
 	for target in &[
 		Target::X8664UnknownLinuxGnu,
+		Target::AArch64UnknownLinuxGnu,
 		Target::X8664UnknownLinuxMusl,
+		Target::AArch64UnknownLinuxMusl,
 		Target::X8664AppleDarwin,
 		Target::AArch64AppleDarwin,
 		Target::X8664PcWindowsMsvc,

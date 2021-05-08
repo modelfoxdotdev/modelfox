@@ -33,7 +33,9 @@ pub fn main() -> Result<()> {
 	info!("tangram_cli");
 	for target in &[
 		Target::X8664UnknownLinuxGnu,
+		Target::AArch64UnknownLinuxGnu,
 		Target::X8664UnknownLinuxMusl,
+		Target::AArch64UnknownLinuxMusl,
 		Target::X8664AppleDarwin,
 		Target::AArch64AppleDarwin,
 		Target::X8664PcWindowsMsvc,
@@ -52,7 +54,7 @@ pub fn main() -> Result<()> {
 
 	info!("deb");
 	#[allow(clippy::single_element_loop)]
-	for target in &[Target::X8664UnknownLinuxMusl] {
+	for target in &[Target::X8664UnknownLinuxGnu, Target::AArch64UnknownLinuxGnu] {
 		// Create the deb directory.
 		let deb_path = dist_path.join("deb");
 		clean_and_create(&deb_path)?;
@@ -68,7 +70,8 @@ pub fn main() -> Result<()> {
 		std::fs::create_dir_all(&debian_path)?;
 		let control_path = debian_path.join("control");
 		let architecture = match target {
-			Target::X8664UnknownLinuxMusl => "amd64",
+			Target::X8664UnknownLinuxGnu => "amd64",
+			Target::AArch64UnknownLinuxGnu => "arm64",
 			_ => unreachable!(),
 		};
 		let control = formatdoc! {
@@ -93,7 +96,7 @@ pub fn main() -> Result<()> {
 
 	info!("rpm");
 	#[allow(clippy::single_element_loop)]
-	for target in &[Target::X8664UnknownLinuxMusl] {
+	for target in &[Target::X8664UnknownLinuxGnu, Target::AArch64UnknownLinuxGnu] {
 		// Create the rpm directory.
 		let rpm_path = dist_path.join("rpm");
 		clean_and_create(&rpm_path)?;
@@ -136,7 +139,8 @@ pub fn main() -> Result<()> {
 		std::fs::write(&spec_path, spec)?;
 		// Run rpmbuild.
 		let target = match target {
-			Target::X8664UnknownLinuxMusl => "x86_64",
+			Target::X8664UnknownLinuxGnu => "x86_64",
+			Target::AArch64UnknownLinuxGnu => "aarch64",
 			_ => unreachable!(),
 		};
 		cmd!(
@@ -185,7 +189,9 @@ pub fn main() -> Result<()> {
 	info!("libtangram");
 	for target in &[
 		Target::X8664UnknownLinuxGnu,
+		Target::AArch64UnknownLinuxGnu,
 		Target::X8664UnknownLinuxMusl,
+		Target::AArch64UnknownLinuxMusl,
 		Target::X8664AppleDarwin,
 		Target::AArch64AppleDarwin,
 		Target::X8664PcWindowsMsvc,

@@ -3,7 +3,7 @@ use duct::cmd;
 use log::info;
 use std::{fs::File, io::prelude::*};
 use tangram_error::{err, Result};
-use tangram_script_build::{target_file_names, Target};
+use tangram_script_build::{target_file_names, Arch, Target};
 use which::which;
 
 #[derive(Clap)]
@@ -38,11 +38,17 @@ pub fn main() -> Result<()> {
 
 	info!("building");
 	match target {
+		Target::X8664UnknownLinuxGnu => {
+			build_gnu(target, None)?;
+		}
+		Target::AArch64UnknownLinuxGnu => {
+			build_gnu(target, None)?;
+		}
 		Target::X8664UnknownLinuxMusl => {
 			build_musl(target)?;
 		}
-		Target::X8664UnknownLinuxGnu => {
-			build_local(target)?;
+		Target::AArch64UnknownLinuxMusl => {
+			build_musl(target)?;
 		}
 		Target::X8664AppleDarwin => {
 			build_local(target)?;
@@ -54,7 +60,7 @@ pub fn main() -> Result<()> {
 			build_local(target)?;
 		}
 		Target::X8664PcWindowsGnu => {
-			build_local(target)?;
+			build_gnu(target, Some(vec!["g++-mingw-w64-x86-64".to_owned()]))?;
 		}
 	}
 
@@ -71,6 +77,7 @@ pub fn main() -> Result<()> {
 		tangram_node_artifact_path,
 	) = match target {
 		Target::X8664UnknownLinuxGnu
+		| Target::AArch64UnknownLinuxGnu
 		| Target::X8664AppleDarwin
 		| Target::AArch64AppleDarwin
 		| Target::X8664PcWindowsMsvc
@@ -87,7 +94,7 @@ pub fn main() -> Result<()> {
 				cargo_artifact_path.join(target_file_names.tangram_node_file_name),
 			)
 		}
-		Target::X8664UnknownLinuxMusl => {
+		Target::X8664UnknownLinuxMusl | Target::AArch64UnknownLinuxMusl => {
 			let cargo_artifact_path_dynamic = tangram_path
 				.join("target_musl_dynamic")
 				.join(target.as_str())
@@ -128,8 +135,10 @@ pub fn main() -> Result<()> {
 
 	// Build the python wheels.
 	match target {
-		Target::X8664UnknownLinuxGnu => build_python_manylinux()?,
+		Target::X8664UnknownLinuxGnu => build_python_manylinux(Arch::X8664)?,
+		Target::AArch64UnknownLinuxGnu => build_python_manylinux(Arch::AArch64)?,
 		Target::X8664UnknownLinuxMusl => {}
+		Target::AArch64UnknownLinuxMusl => {}
 		Target::X8664AppleDarwin => {}
 		Target::AArch64AppleDarwin => build_python_macos()?,
 		Target::X8664PcWindowsMsvc => build_python_windows()?,
@@ -139,6 +148,7 @@ pub fn main() -> Result<()> {
 	// Move the python wheels to the dist target path.
 	match target {
 		Target::X8664UnknownLinuxGnu
+		| Target::AArch64UnknownLinuxGnu
 		| Target::X8664AppleDarwin
 		| Target::AArch64AppleDarwin
 		| Target::X8664PcWindowsMsvc => {
@@ -152,7 +162,9 @@ pub fn main() -> Result<()> {
 				std::fs::remove_file(wheel_path.path())?;
 			}
 		}
-		Target::X8664UnknownLinuxMusl | Target::X8664PcWindowsGnu => {}
+		Target::X8664UnknownLinuxMusl
+		| Target::AArch64UnknownLinuxMusl
+		| Target::X8664PcWindowsGnu => {}
 	}
 
 	Ok(())
@@ -174,6 +186,59 @@ fn build_local(target: Target) -> Result<()> {
 		"--package",
 		"tangram_node",
 	)
+	.run()?;
+	Ok(())
+}
+
+fn build_gnu(target: Target, apt_packages: Option<Vec<String>>) -> Result<()> {
+	let cwd = std::env::current_dir()?;
+	let home_dir = dirs::home_dir().ok_or_else(|| err!("could not get home dir"))?;
+	let apt_packages = apt_packages
+		.map(|apt_packages| apt_packages.join(" "))
+		.unwrap_or_else(|| "".to_owned());
+	let script = format!(
+		r#"
+			apt update
+			apt install -y curl build-essential {apt_packages}
+			curl -sSf https://sh.rustup.rs | sh -s -- -y
+			export PATH="$HOME/.cargo/bin:$PATH"
+			rustup target add {target}
+			cargo build \
+				--release \
+				--target {target} \
+				--package tangram_cli \
+				--package libtangram \
+				--package tangram_elixir \
+				--package tangram_node
+		"#,
+		apt_packages = apt_packages,
+		target = target,
+	);
+	cmd!(
+		"docker",
+		"run",
+		"-i",
+		"--rm",
+		"-v",
+		format!(
+			"{}:{}",
+			home_dir.join(".cargo/registry").display(),
+			"/root/.cargo/registry",
+		),
+		"-v",
+		format!(
+			"{}:{}",
+			home_dir.join(".cargo/git").display(),
+			"/root/.cargo/git",
+		),
+		"-v",
+		format!("{}:{}", cwd.display(), "/tangram"),
+		"-w",
+		"/tangram",
+		"debian:stretch",
+		"sh",
+	)
+	.stdin_bytes(script)
 	.run()?;
 	Ok(())
 }
@@ -206,7 +271,7 @@ fn build_musl(target: Target) -> Result<()> {
 		target = target,
 	);
 	cmd!(
-		"podman",
+		"docker",
 		"run",
 		"-i",
 		"--rm",
@@ -226,7 +291,7 @@ fn build_musl(target: Target) -> Result<()> {
 		format!("{}:{}", cwd.display(), "/tangram"),
 		"-w",
 		"/tangram",
-		"alpine",
+		"alpine:3.13",
 		"sh",
 	)
 	.stdin_bytes(script)
@@ -234,7 +299,7 @@ fn build_musl(target: Target) -> Result<()> {
 	Ok(())
 }
 
-fn build_python_manylinux() -> Result<()> {
+fn build_python_manylinux(arch: Arch) -> Result<()> {
 	let cwd = std::env::current_dir()?;
 	let home_dir = dirs::home_dir().ok_or_else(|| err!("could not get home dir"))?;
 	let script = r#"
@@ -251,7 +316,7 @@ fn build_python_manylinux() -> Result<()> {
 		rm -rf build tangram.egg-info
 	"#;
 	cmd!(
-		"podman",
+		"docker",
 		"run",
 		"-i",
 		"--rm",
@@ -271,7 +336,7 @@ fn build_python_manylinux() -> Result<()> {
 		format!("{}:{}", cwd.display(), "/tangram"),
 		"-w",
 		"/tangram/languages/python",
-		"quay.io/pypa/manylinux_2_24_x86_64",
+		format!("quay.io/pypa/manylinux_2_24_{}", arch.as_str()),
 		"bash",
 	)
 	.stdin_bytes(script)
