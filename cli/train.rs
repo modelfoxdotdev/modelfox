@@ -541,6 +541,8 @@ struct ProgressBar {
 	progress_counter: ProgressCounter,
 	formatter: ProgressValueFormatter,
 	start: Instant,
+	last_change: Instant,
+	last_value: u64,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -556,41 +558,48 @@ impl ProgressBar {
 		progress_counter: ProgressCounter,
 		formatter: ProgressValueFormatter,
 	) -> ProgressBar {
+		let start = Instant::now();
+		let value = progress_counter.get();
 		ProgressBar {
 			emoji,
 			title,
 			progress_counter,
 			formatter,
-			start: Instant::now(),
+			start,
+			last_change: start,
+			last_value: value,
 		}
 	}
 
 	fn draw(&mut self, terminal: &mut Terminal) -> Result<()> {
-		let current = self.progress_counter.get();
 		let total = self.progress_counter.total();
-		let fraction = current.to_f64().unwrap() / total.to_f64().unwrap();
+		let value = self.progress_counter.get();
+		if self.last_value != value {
+			self.last_value = value;
+			self.last_change = Instant::now();
+		}
+		let fraction = value.to_f64().unwrap() / total.to_f64().unwrap();
 		write!(terminal, "{} {}", self.emoji, self.title)?;
 		let elapsed = self.start.elapsed();
-		// TODO fix eta.
-		let eta = None;
-		// let elapsed_secs = elapsed.as_secs().to_f64().unwrap()
-		// 	+ elapsed.subsec_nanos().to_f64().unwrap() / 1_000_000_000f64;
-		// let eta = if fraction > std::f64::EPSILON {
-		// 	let duration = ((elapsed_secs / fraction) - elapsed_secs).floor();
-		// 	let duration = duration.to_u64().unwrap();
-		// 	Some(Duration::from_secs(duration))
-		// } else {
-		// 	None
-		// };
+		let eta = if fraction > std::f64::EPSILON {
+			let current_elapsed = self.last_change.duration_since(self.start);
+			let current_elapsed_secs = current_elapsed.as_secs().to_f64().unwrap()
+				+ current_elapsed.subsec_nanos().to_f64().unwrap() / 1_000_000_000f64;
+			let eta = ((current_elapsed_secs / fraction) - current_elapsed_secs).floor();
+			let eta = eta.to_u64().unwrap();
+			Some(Duration::from_secs(eta))
+		} else {
+			None
+		};
 		write!(terminal, " ")?;
 		match &self.formatter {
 			ProgressValueFormatter::Normal => {
-				write!(terminal, "{} / {}", current, total)?;
+				write!(terminal, "{} / {}", value, total)?;
 			}
 			ProgressValueFormatter::Bytes => {
-				let current = DisplayBytes(current);
+				let value = DisplayBytes(value);
 				let total = DisplayBytes(total);
-				write!(terminal, "{} / {}", current, total)?;
+				write!(terminal, "{} / {}", value, total)?;
 			}
 		};
 		write!(terminal, " {:.0}%", fraction * 100.0)?;
