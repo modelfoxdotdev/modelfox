@@ -39,7 +39,9 @@ struct SmtpConfig {
 #[derive(Clone, serde::Deserialize)]
 #[serde(tag = "type")]
 enum StorageConfig {
+	#[serde(rename = "local")]
 	Local(LocalStorageConfig),
+	#[serde(rename = "s3")]
 	S3(S3StorageConfig),
 }
 
