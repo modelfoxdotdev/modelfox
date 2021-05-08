@@ -244,6 +244,8 @@ pub struct BuildOptions {
 }
 
 pub fn build(options: BuildOptions) -> Result<()> {
+	let client_release =
+		option_env!("TANGRAM_SERVE_RELEASE") == Some("1") || cfg!(not(debug_assertions));
 	std::fs::create_dir_all(options.crate_out_dir.join("assets")).unwrap();
 	std::fs::create_dir_all(options.crate_out_dir.join("js")).unwrap();
 	// Build client crates.
@@ -286,7 +288,7 @@ pub fn build(options: BuildOptions) -> Result<()> {
 			"--target-dir".to_owned(),
 			options.cargo_target_wasm_dir.to_str().unwrap().to_owned(),
 		];
-		if cfg!(not(debug_assertions)) {
+		if client_release {
 			args.push("--release".to_owned())
 		}
 		for client_crate_package_name in client_crate_package_names.iter() {
@@ -305,11 +307,7 @@ pub fn build(options: BuildOptions) -> Result<()> {
 			let input_path = format!(
 				"{}/wasm32-unknown-unknown/{}/{}.wasm",
 				options.cargo_target_wasm_dir.to_str().unwrap(),
-				if cfg!(debug_assertions) {
-					"debug"
-				} else {
-					"release"
-				},
+				if client_release { "release" } else { "debug" },
 				client_crate_package_name,
 			);
 			let output_path = options
@@ -328,7 +326,7 @@ pub fn build(options: BuildOptions) -> Result<()> {
 			wasm_bindgen_cli_support::Bindgen::new()
 				.web(true)
 				.unwrap()
-				.keep_debug(cfg!(debug_assertions))
+				.keep_debug(!client_release)
 				.remove_producers_section(true)
 				.remove_name_section(true)
 				.input_path(input_path)

@@ -5,5 +5,5 @@ for LANG in go elixir node python ruby rust; do
 	popd
 	ssh root@router-us-east-1.tangram.xyz mkdir -p /srv/www/docs/languages/$LANG
 	rsync --archive --compress --delete --progress languages/$LANG/docs/ root@router-us-east-1.tangram.xyz:/srv/www/docs/languages/$LANG/
-	ssh root@router-us-east-1.tangram.xyz "chown -R root:root /srv/www/docs/languages/$LANG && chmod -R 644 /srv/www/docs/languages/$LANG"
+	ssh root@router-us-east-1.tangram.xyz "chown -R root:root /srv/www/docs/languages/$LANG && chmod -R u=rwX,go=rX /srv/www/docs/languages/$LANG"
 done
