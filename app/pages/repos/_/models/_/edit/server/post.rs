@@ -1,5 +1,6 @@
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
+	repos::delete_model_version,
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
@@ -51,15 +52,7 @@ pub async fn post(
 			if !authorize_user_for_model(&mut db, &user, model_id).await? {
 				return Ok(not_found());
 			};
-			sqlx::query(
-				"
-					delete from models
-					where id = $1
-				",
-			)
-			.bind(&model_id.to_string())
-			.execute(&mut *db)
-			.await?;
+			delete_model_version(&mut db, &context.storage, model_id).await?;
 			db.commit().await?;
 			http::Response::builder()
 				.status(http::StatusCode::SEE_OTHER)

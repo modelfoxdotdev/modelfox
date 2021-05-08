@@ -22,7 +22,7 @@
 	content: "✓";
 }
 
-.form-checkbox-field:not(:checked):hover {
+.form-checkbox-field:not(:checked):not(:disabled):hover {
 	border-color: var(--hover-color);
 }
 

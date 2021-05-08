@@ -10,7 +10,7 @@ pub struct CheckboxFieldProps {
 	#[optional]
 	pub placeholder: Option<String>,
 	#[optional]
-	pub readonly: Option<bool>,
+	pub disabled: Option<bool>,
 	#[optional]
 	pub value: Option<String>,
 }
@@ -24,7 +24,7 @@ pub fn CheckboxField(props: CheckboxFieldProps) {
 				class="form-checkbox-field"
 				name={props.name}
 				placeholder={props.placeholder}
-				readonly={props.readonly}
+				disabled={props.disabled}
 				type="checkbox"
 				value={props.value}
 			/>

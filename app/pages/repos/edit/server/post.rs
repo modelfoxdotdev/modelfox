@@ -1,5 +1,6 @@
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
+	repos::delete_repo,
 	user::{authorize_user, authorize_user_for_repo},
 	Context,
 };
@@ -50,15 +51,7 @@ pub async fn post(
 	}
 	match action {
 		Action::Delete => {
-			sqlx::query(
-				"
-					delete from repos
-					where id = $1
-				",
-			)
-			.bind(&repo_id.to_string())
-			.execute(&mut *db)
-			.await?;
+			delete_repo(&mut db, &context.storage, repo_id).await?;
 			db.commit().await?;
 			let response = http::Response::builder()
 				.status(http::StatusCode::SEE_OTHER)

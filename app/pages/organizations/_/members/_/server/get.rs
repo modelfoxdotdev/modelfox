@@ -1,34 +1,24 @@
+use crate::page::{Page, PageProps};
+use html::html;
+use sqlx::prelude::*;
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 	Context,
 };
+use tangram_app_layouts::app_layout::get_app_layout_props;
 use tangram_error::Result;
 use tangram_id::Id;
 
-#[derive(serde::Deserialize)]
-#[serde(tag = "action")]
-enum Action {
-	#[serde(rename = "delete_organization")]
-	DeleteOrganization,
-}
-
-pub async fn post(
+pub async fn get(
 	context: &Context,
-	mut request: http::Request<hyper::Body>,
+	request: http::Request<hyper::Body>,
 	organization_id: &str,
+	member_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
 	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
-	let data = match hyper::body::to_bytes(request.body_mut()).await {
-		Ok(data) => data,
-		Err(_) => return Ok(bad_request()),
-	};
-	let action: Action = match serde_urlencoded::from_bytes(&data) {
-		Ok(action) => action,
-		Err(_) => return Ok(bad_request()),
-	};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
@@ -44,31 +34,35 @@ pub async fn post(
 	if !authorize_normal_user_for_organization(&mut db, &user, organization_id).await? {
 		return Ok(not_found());
 	}
-	let response = match action {
-		Action::DeleteOrganization => delete_organization(&mut db, organization_id).await?,
-	};
-	db.commit().await?;
-	Ok(response)
-}
-
-async fn delete_organization(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
-	organization_id: Id,
-) -> Result<http::Response<hyper::Body>> {
-	sqlx::query(
+	let app_layout_props = get_app_layout_props(context).await?;
+	let row = sqlx::query(
 		"
-		delete from organizations
-		where
-			id = $1
-	",
+			select
+				users.id,
+				users.email,
+				organizations_users.is_admin
+			from users
+			join organizations_users
+				on organizations_users.organization_id = $1
+				and organizations_users.user_id = $2
+		",
 	)
 	.bind(&organization_id.to_string())
-	.execute(&mut *db)
+	.bind(&member_id.to_string())
+	.fetch_one(&mut *db)
 	.await?;
+	let member_email = row.get(1);
+	let is_admin =  row.get(2);
+	let props = PageProps {
+		app_layout_props,
+		member_email,
+		is_admin
+	};
+	db.commit().await?;
+	let html = html!(<Page {props} />).render_to_string();
 	let response = http::Response::builder()
-		.status(http::StatusCode::SEE_OTHER)
-		.header(http::header::LOCATION, "/user")
-		.body(hyper::Body::empty())
+		.status(http::StatusCode::OK)
+		.body(hyper::Body::from(html))
 		.unwrap();
 	Ok(response)
 }

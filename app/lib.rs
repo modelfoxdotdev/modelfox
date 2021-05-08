@@ -213,6 +213,12 @@ async fn request_handler(
 		(&http::Method::POST, &["organizations", organization_id, "members", "new"]) => {
 			tangram_app_new_member_server::post(&context, request, organization_id).boxed()
 		}
+		(&http::Method::GET, &["organizations", organization_id, "members", member_id]) => {
+			tangram_app_organization_member_server::get(&context, request, organization_id, member_id).boxed()
+		}
+		(&http::Method::POST, &["organizations", organization_id, "members", member_id]) => {
+			tangram_app_organization_member_server::post(&context, request, organization_id, member_id).boxed()
+		}
 		(&http::Method::POST, &["organizations", organization_id, "edit"]) => {
 			tangram_app_edit_organization_server::post(&context, request, organization_id).boxed()
 		}

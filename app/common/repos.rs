@@ -37,6 +37,27 @@ pub async fn get_repo(db: &mut sqlx::Transaction<'_, sqlx::Any>, id: Id) -> Resu
 	Ok(repo)
 }
 
+pub async fn delete_repo(
+	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	storage: &Storage,
+	repo_id: Id,
+) -> Result<()> {
+	sqlx::query(
+		"
+			delete from repos
+			where id = $1
+		",
+	)
+	.bind(&repo_id.to_string())
+	.execute(&mut *db)
+	.await?;
+	let model_version_ids = get_model_version_ids(db, repo_id).await?;
+	for model_id in model_version_ids.into_iter() {
+		storage.remove(StorageEntity::Model, model_id).await?;
+	}
+	Ok(())
+}
+
 pub async fn repos_for_root(db: &mut sqlx::Transaction<'_, sqlx::Any>) -> Result<Vec<Repo>> {
 	let rows = sqlx::query(
 		"
@@ -198,7 +219,6 @@ pub async fn add_model_version(
 	model_id: Id,
 	bytes: &[u8],
 ) -> Result<()> {
-	let mut db = db.begin().await?;
 	sqlx::query(
 		"
 			insert into models (
@@ -216,7 +236,24 @@ pub async fn add_model_version(
 	data_storage
 		.set(StorageEntity::Model, model_id, bytes)
 		.await?;
-	db.commit().await?;
+	Ok(())
+}
+
+pub async fn delete_model_version(
+	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	data_storage: &Storage,
+	model_id: Id,
+) -> Result<()> {
+	sqlx::query(
+		"
+			delete from models
+				where id = $1
+		",
+	)
+	.bind(&model_id.to_string())
+	.execute(&mut *db)
+	.await?;
+	data_storage.remove(StorageEntity::Model, model_id).await?;
 	Ok(())
 }
 

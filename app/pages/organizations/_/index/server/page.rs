@@ -111,29 +111,29 @@ fn MembersTable(props: MembersTableProps) {
 				<ui::TableHeaderCell>
 					{"Role"}
 				</ui::TableHeaderCell>
-				<ui::TableHeaderCell>
-					{"Remove"}
-				</ui::TableHeaderCell>
 				</ui::TableRow>
 			</ui::TableHeader>
 			<ui::TableBody>
 				{props.rows.into_iter().map(|row| html! {
 					<ui::TableRow>
 						<ui::TableCell>
-							{row.email.clone()}
+							{if row.id != user_id {
+								html! {
+									<ui::Link href={format!("members/{}", row.id)}>{row.email.clone()}</ui::Link>
+								}
+							} else {
+								html! {
+									<>
+										{row.email.clone()}
+									</>
+								}
+							}}
 						</ui::TableCell>
 						<ui::TableCell>
 							{if row.is_admin {
 								"Admin"
 							} else {
 								"Member"
-							}}
-						</ui::TableCell>
-						<ui::TableCell>
-							{if row.id != user_id {
-								Some(html! { <MemberDeleteForm member_id={row.id} /> })
-							} else {
-								None
 							}}
 						</ui::TableCell>
 					</ui::TableRow>

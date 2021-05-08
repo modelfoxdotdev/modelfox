@@ -30,6 +30,7 @@ tangram_app_login_server = { path = "pages/login/server" }
 tangram_app_model_index_server = { path = "pages/repos/_/models/_/index/server" }
 tangram_app_model_edit_server = { path = "pages/repos/_/models/_/edit/server" }
 tangram_app_new_member_server = { path = "pages/organizations/_/members/new/server" }
+tangram_app_organization_member_server = { path = "pages/organizations/_/members/_/server" }
 tangram_app_new_model_server = { path = "pages/repos/_/models/new/server" }
 tangram_app_new_organization_server = { path = "pages/organizations/new/server" }
 tangram_app_new_repo_server = { path = "pages/repos/new/server" }

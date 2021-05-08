@@ -17,7 +17,7 @@
 	width: 100%;
 }
 
-.form-text-field:hover {
+.form-text-field:not(:disabled):hover {
 	border-color: var(--hover-color);
 }
 
