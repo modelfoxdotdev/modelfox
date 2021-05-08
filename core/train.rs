@@ -269,7 +269,9 @@ impl Trainer {
 			choose_best_model(&train_grid_item_outputs, &comparison_metric);
 
 		// Test the best model.
-		let test_metrics = test_model(&train_model_output, &table_test, &mut |_| {});
+		let test_metrics = test_model(&train_model_output, &table_test, &mut |progress_event| {
+			handle_progress_event(ProgressEvent::Test(progress_event))
+		});
 
 		handle_progress_event(ProgressEvent::Finalize);
 		// Assemble the model.
