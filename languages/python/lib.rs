@@ -838,16 +838,16 @@ enum NumberOrString {
 
 fn predict_input(py: Python) -> PyResult<PyObject> {
 	let typing = py.import("typing")?;
-	let py_dict = typing.get("Dict")?;
+	let py_dict = typing.getattr("Dict")?;
 	let py_str = py.eval("str", None, None)?;
-	let py_any = typing.get("Any")?;
+	let py_any = typing.getattr("Any")?;
 	let predict_input = py_dict.get_item((py_str, py_any))?;
 	Ok(predict_input.into())
 }
 
 fn predict_output(py: Python) -> PyResult<PyObject> {
 	let typing = py.import("typing")?;
-	let py_union = typing.get("Union")?;
+	let py_union = typing.getattr("Union")?;
 	let predict_output = py_union.get_item((
 		RegressionPredictOutput::type_object(py),
 		BinaryClassificationPredictOutput::type_object(py),
@@ -858,7 +858,7 @@ fn predict_output(py: Python) -> PyResult<PyObject> {
 
 fn feature_contribution_entry(py: Python) -> PyResult<PyObject> {
 	let typing = py.import("typing")?;
-	let py_union = typing.get("Union")?;
+	let py_union = typing.getattr("Union")?;
 	let feature_contribution_entry = py_union.get_item((
 		IdentityFeatureContribution::type_object(py),
 		NormalizedFeatureContribution::type_object(py),
@@ -871,8 +871,8 @@ fn feature_contribution_entry(py: Python) -> PyResult<PyObject> {
 
 fn ngram(py: Python) -> PyResult<PyObject> {
 	let typing = py.import("typing")?;
-	let py_union = typing.get("Union")?;
-	let py_tuple = typing.get("Tuple")?;
+	let py_union = typing.getattr("Union")?;
+	let py_tuple = typing.getattr("Tuple")?;
 	let py_str = py.eval("str", None, None)?;
 	let tuple = py_tuple.get_item((py_str, py_str))?;
 	let ngram = py_union.get_item((tuple, py_str))?;

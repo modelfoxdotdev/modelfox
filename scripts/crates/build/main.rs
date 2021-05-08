@@ -41,8 +41,20 @@ pub fn main() -> Result<()> {
 		Target::X8664UnknownLinuxMusl => {
 			build_musl(target)?;
 		}
-		_ => {
-			build(target)?;
+		Target::X8664UnknownLinuxGnu => {
+			build_local(target)?;
+		}
+		Target::X8664AppleDarwin => {
+			build_local(target)?;
+		}
+		Target::AArch64AppleDarwin => {
+			build_local(target)?;
+		}
+		Target::X8664PcWindowsMsvc => {
+			build_local(target)?;
+		}
+		Target::X8664PcWindowsGnu => {
+			build_local(target)?;
 		}
 	}
 
@@ -146,7 +158,7 @@ pub fn main() -> Result<()> {
 	Ok(())
 }
 
-fn build(target: Target) -> Result<()> {
+fn build_local(target: Target) -> Result<()> {
 	cmd!(
 		which("cargo")?,
 		"build",

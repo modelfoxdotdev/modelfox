@@ -12,6 +12,8 @@
       pkgs = inputs.nixpkgs.legacyPackages.${system};
     in {
       devShell = pkgs.mkShell {
+        PYO3_NO_PYTHON = "1";
+        LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
         buildInputs = with pkgs; [
           createrepo_c
           dpkg
@@ -22,6 +24,7 @@
           rpm
           ruby
           sequoia
+          sqlite
         ];
       };
     }
