@@ -80,6 +80,19 @@ impl Target {
 			Target::X8664PcWindowsGnu => "x86_64-pc-windows-gnu",
 		}
 	}
+
+	pub fn arch(&self) -> Arch {
+		match self {
+			Target::X8664UnknownLinuxGnu
+			| Target::X8664UnknownLinuxMusl
+			| Target::X8664AppleDarwin
+			| Target::X8664PcWindowsMsvc
+			| Target::X8664PcWindowsGnu => Arch::X8664,
+			Target::AArch64UnknownLinuxGnu
+			| Target::AArch64UnknownLinuxMusl
+			| Target::AArch64AppleDarwin => Arch::AArch64,
+		}
+	}
 }
 
 impl std::fmt::Display for Target {

@@ -193,6 +193,11 @@ fn build_local(target: Target) -> Result<()> {
 fn build_gnu(target: Target, apt_packages: Option<Vec<String>>) -> Result<()> {
 	let cwd = std::env::current_dir()?;
 	let home_dir = dirs::home_dir().ok_or_else(|| err!("could not get home dir"))?;
+	let arch = target.arch();
+	let docker_platform = match arch {
+		Arch::X8664 => "linux/amd64",
+		Arch::AArch64 => "linux/arm64",
+	};
 	let apt_packages = apt_packages
 		.map(|apt_packages| apt_packages.join(" "))
 		.unwrap_or_else(|| "".to_owned());
@@ -217,6 +222,8 @@ fn build_gnu(target: Target, apt_packages: Option<Vec<String>>) -> Result<()> {
 	cmd!(
 		"docker",
 		"run",
+		"--platform",
+		docker_platform,
 		"-i",
 		"--rm",
 		"-v",
@@ -246,6 +253,11 @@ fn build_gnu(target: Target, apt_packages: Option<Vec<String>>) -> Result<()> {
 fn build_musl(target: Target) -> Result<()> {
 	let cwd = std::env::current_dir()?;
 	let home_dir = dirs::home_dir().ok_or_else(|| err!("could not get home dir"))?;
+	let arch = target.arch();
+	let docker_platform = match arch {
+		Arch::X8664 => "linux/amd64",
+		Arch::AArch64 => "linux/arm64",
+	};
 	let script = format!(
 		r#"
 			apk add build-base curl
@@ -273,6 +285,8 @@ fn build_musl(target: Target) -> Result<()> {
 	cmd!(
 		"docker",
 		"run",
+		"--platform",
+		docker_platform,
 		"-i",
 		"--rm",
 		"-v",
@@ -302,6 +316,10 @@ fn build_musl(target: Target) -> Result<()> {
 fn build_python_manylinux(arch: Arch) -> Result<()> {
 	let cwd = std::env::current_dir()?;
 	let home_dir = dirs::home_dir().ok_or_else(|| err!("could not get home dir"))?;
+	let docker_platform = match arch {
+		Arch::X8664 => "linux/amd64",
+		Arch::AArch64 => "linux/arm64",
+	};
 	let script = r#"
 		set -ex
 		curl -sSf https://sh.rustup.rs | sh -s -- -y
@@ -318,6 +336,8 @@ fn build_python_manylinux(arch: Arch) -> Result<()> {
 	cmd!(
 		"docker",
 		"run",
+		"--platform",
+		docker_platform,
 		"-i",
 		"--rm",
 		"-v",
