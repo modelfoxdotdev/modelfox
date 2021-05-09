@@ -726,8 +726,12 @@ module Tangram
     os = RbConfig::CONFIG['host_os']
     if (cpu == 'x86_64') && os =~ (/linux/)
       library_path = 'libtangram/x86_64-unknown-linux-gnu/libtangram.so'
+    elsif (cpu == 'aarch64') && os =~ (/linux/)
+      library_path = 'libtangram/aarch64-unknown-linux-gnu/libtangram.so'
     elsif (cpu == 'x86_64') && os =~ (/darwin/)
       library_path = 'libtangram/x86_64-apple-darwin/libtangram.dylib'
+    elsif (cpu == 'aarch64') && os =~ (/darwin/)
+      library_path = 'libtangram/aarch64-apple-darwin/libtangram.dylib'
     elsif (cpu == 'x86_64') && os =~ (/mingw/)
       library_path = 'libtangram/x86_64-pc-windows-msvc/tangram.dll'
     else

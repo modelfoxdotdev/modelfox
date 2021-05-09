@@ -424,8 +424,14 @@ defmodule Tangram do
         String.match?(sys_arch, ~r/x86_64-(pc|unknown)-linux-gnu/) ->
           "x86_64-unknown-linux-gnu/libtangram_elixir"
 
+        String.match?(sys_arch, ~r/(aarch64|arm)-(pc|unknown)-linux-gnu/) ->
+          "aarch64-unknown-linux-gnu/libtangram_elixir"
+
         String.match?(sys_arch, ~r/x86_64-(alpine|pc)-linux-musl/) ->
           "x86_64-unknown-linux-musl/libtangram_elixir"
+
+        String.match?(sys_arch, ~r/(aarch64|arm)-(alpine|pc)-linux-musl/) ->
+          "aarch64-unknown-linux-musl/libtangram_elixir"
 
         String.match?(sys_arch, ~r/x86_64-apple-darwin[0-9]+\.[0-9]+\.[0-9]+/) ->
           "x86_64-apple-darwin/libtangram_elixir"
