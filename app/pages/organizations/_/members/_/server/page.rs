@@ -10,6 +10,7 @@ pub struct PageProps {
 	pub app_layout_props: AppLayoutProps,
 	pub member_email: String,
 	pub is_admin: bool,
+	pub can_delete: bool,
 }
 
 #[component]
@@ -35,7 +36,14 @@ pub fn Page(props: PageProps) {
 							checked?={Some(props.is_admin)}
 						/>
 					</ui::S2>
-					<DangerZone />
+					{if props.can_delete {
+						Some(html! {
+							<DangerZone />
+						})
+					} else {
+							None
+						}
+					}
 				</ui::S1>
 			</AppLayout>
 		</Document>

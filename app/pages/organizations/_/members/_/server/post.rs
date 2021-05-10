@@ -1,8 +1,5 @@
-use num::ToPrimitive;
-use sqlx::prelude::*;
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
-	organizations::delete_organization,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 	Context,
 };
@@ -56,11 +53,6 @@ pub async fn post(
 	let response = match action {
 		Action::Delete => {
 			delete_member(&mut db, organization_id, member_id).await?;
-			// Delete the organzation if there are no more members.
-			let member_count = get_member_count(&mut db, organization_id).await?;
-			if member_count == 0 {
-				delete_organization(&mut db, organization_id).await?;
-			};
 			let redirect_location = if member_id == user.id {
 				"/".to_owned()
 			} else {
@@ -96,24 +88,4 @@ async fn delete_member(
 	.execute(&mut *db)
 	.await?;
 	Ok(())
-}
-
-async fn get_member_count(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
-	organization_id: Id,
-) -> Result<usize> {
-	let row = sqlx::query(
-		"
-			select count(*) from
-				organizations_users
-			where
-				organization_id = $1
-		",
-	)
-	.bind(&organization_id.to_string())
-	.fetch_one(&mut *db)
-	.await?;
-	let member_count: i64 = row.get(0);
-	let member_count = member_count.to_usize().unwrap();
-	Ok(member_count)
 }

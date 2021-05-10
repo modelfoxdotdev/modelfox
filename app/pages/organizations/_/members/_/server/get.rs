@@ -1,5 +1,6 @@
 use crate::page::{Page, PageProps};
 use html::html;
+use num::ToPrimitive;
 use sqlx::prelude::*;
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
@@ -53,11 +54,13 @@ pub async fn get(
 	.fetch_one(&mut *db)
 	.await?;
 	let member_email = row.get(1);
+	let member_count = get_member_count(&mut db, organization_id).await?;
 	let is_admin = row.get(2);
 	let props = PageProps {
 		app_layout_props,
 		member_email,
 		is_admin,
+		can_delete: member_count > 1,
 	};
 	db.commit().await?;
 	let html = html!(<Page {props} />).render_to_string();
@@ -66,4 +69,24 @@ pub async fn get(
 		.body(hyper::Body::from(html))
 		.unwrap();
 	Ok(response)
+}
+
+async fn get_member_count(
+	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	organization_id: Id,
+) -> Result<usize> {
+	let row = sqlx::query(
+		"
+			select count(*) from
+				organizations_users
+			where
+				organization_id = $1
+		",
+	)
+	.bind(&organization_id.to_string())
+	.fetch_one(&mut *db)
+	.await?;
+	let member_count: i64 = row.get(0);
+	let member_count = member_count.to_usize().unwrap();
+	Ok(member_count)
 }
