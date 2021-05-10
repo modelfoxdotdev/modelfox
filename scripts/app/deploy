@@ -1,3 +1,3 @@
 cargo build --release --bin tangram
-scp target/release/tangram root@router-us-east-1.tangram.xyz:/srv/app/tangram_new
-ssh -t root@router-us-east-1.tangram.xyz "sudo systemctl stop tangram && mv /srv/app/tangram_new /srv/app/tangram && sudo systemctl start tangram"
+scp target/release/tangram root@router-us-east-1.tangram.xyz:/srv/tangram/tangram_new
+ssh -t root@router-us-east-1.tangram.xyz "sudo systemctl stop tangram && mv /srv/tangram/tangram_new /srv/tangram/tangram && sudo systemctl start tangram"
