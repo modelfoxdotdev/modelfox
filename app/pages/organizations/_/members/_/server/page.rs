@@ -32,6 +32,7 @@ pub fn Page(props: PageProps) {
 							label?="Admin"
 							disabled?={Some(true)}
 							name?="is_admin"
+							checked?={Some(props.is_admin)}
 						/>
 					</ui::S2>
 					<DangerZone />
@@ -52,7 +53,7 @@ fn DangerZone() {
 					button_type?={Some(ui::ButtonType::Submit)}
 					color?={Some(ui::colors::RED.to_owned())}
 				>
-					{"Delete"}
+					{"Remove from Organization"}
 				</ui::Button>
 			</ui::Form>
 		</ui::S2>

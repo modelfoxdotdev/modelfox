@@ -1,5 +1,6 @@
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
+	organizations::delete_organization,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 	Context,
 };
@@ -45,30 +46,15 @@ pub async fn post(
 		return Ok(not_found());
 	}
 	let response = match action {
-		Action::DeleteOrganization => delete_organization(&mut db, organization_id).await?,
+		Action::DeleteOrganization => {
+			delete_organization(&mut db, organization_id).await?;
+			http::Response::builder()
+				.status(http::StatusCode::SEE_OTHER)
+				.header(http::header::LOCATION, "/user")
+				.body(hyper::Body::empty())
+				.unwrap()
+		}
 	};
 	db.commit().await?;
-	Ok(response)
-}
-
-async fn delete_organization(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
-	organization_id: Id,
-) -> Result<http::Response<hyper::Body>> {
-	sqlx::query(
-		"
-		delete from organizations
-		where
-			id = $1
-	",
-	)
-	.bind(&organization_id.to_string())
-	.execute(&mut *db)
-	.await?;
-	let response = http::Response::builder()
-		.status(http::StatusCode::SEE_OTHER)
-		.header(http::header::LOCATION, "/user")
-		.body(hyper::Body::empty())
-		.unwrap();
 	Ok(response)
 }

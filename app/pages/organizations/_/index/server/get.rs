@@ -6,7 +6,7 @@ use html::html;
 use sqlx::prelude::*;
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
-	organizations::get_organization,
+	organizations::{get_organization, get_organization_user},
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 	Context,
 };
@@ -42,9 +42,13 @@ pub async fn get(
 		Some(organization) => organization,
 		None => return Ok(not_found()),
 	};
+	let organization_user = get_organization_user(organization_id, user.id, &mut db)
+		.await?
+		.unwrap();
 	let details_props = DetailsSectionProps {
-		organization_id: organization.id.clone(),
+		organization_id: organization.id.to_string(),
 		organization_name: organization.name.clone(),
+		can_edit: organization_user.is_admin,
 	};
 	let rows = organization
 		.members
@@ -58,6 +62,7 @@ pub async fn get(
 	let members_table_props = MembersTableProps {
 		user_id: user.id.to_string(),
 		rows,
+		can_edit: organization_user.is_admin,
 	};
 	let members_props = MembersSectionProps {
 		organization_id: organization.id,
@@ -96,6 +101,7 @@ pub async fn get(
 		members_props,
 		name: organization.name,
 		repos_props,
+		can_delete: organization_user.is_admin,
 	};
 	let html = html!(<Page {props} />).render_to_string();
 	let response = http::Response::builder()

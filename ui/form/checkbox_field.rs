@@ -13,6 +13,8 @@ pub struct CheckboxFieldProps {
 	pub disabled: Option<bool>,
 	#[optional]
 	pub value: Option<String>,
+	#[optional]
+	pub checked: Option<bool>,
 }
 
 #[component]
@@ -27,6 +29,7 @@ pub fn CheckboxField(props: CheckboxFieldProps) {
 				disabled={props.disabled}
 				type="checkbox"
 				value={props.value}
+				checked={props.checked}
 			/>
 		</FieldLabel>
 	}

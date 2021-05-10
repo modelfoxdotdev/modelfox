@@ -3,6 +3,7 @@ use tangram_app_layouts::{
 	app_layout::{AppLayout, AppLayoutProps},
 	document::{Document, DocumentProps},
 };
+use tangram_id::Id;
 use tangram_ui as ui;
 
 #[derive(Props)]
@@ -13,6 +14,7 @@ pub struct PageProps {
 	pub members_props: MembersSectionProps,
 	pub name: String,
 	pub repos_props: ReposSectionProps,
+	pub can_delete: bool,
 }
 
 #[component]
@@ -28,7 +30,13 @@ pub fn Page(props: PageProps) {
 					<DetailsSection {props.details_props} />
 					<MembersSection {props.members_props}/>
 					<ReposSection {props.repos_props}/>
-					<DangerZoneSection />
+					{if props.can_delete {
+						Some(html! {
+							<DangerZoneSection />
+						})
+					} else {
+						None
+					}}
 				</ui::S1>
 			</AppLayout>
 		</Document>
@@ -39,6 +47,7 @@ pub fn Page(props: PageProps) {
 pub struct DetailsSectionProps {
 	pub organization_id: String,
 	pub organization_name: String,
+	pub can_edit: bool,
 }
 
 #[component]
@@ -67,12 +76,12 @@ fn DetailsSection(props: DetailsSectionProps) {
 
 #[derive(Props)]
 pub struct MembersSectionProps {
-	pub organization_id: String,
+	pub organization_id: Id,
 	pub members_table_props: MembersTableProps,
 }
 
 pub struct MembersTableRow {
-	pub id: String,
+	pub id: Id,
 	pub email: String,
 	pub is_admin: bool,
 }
@@ -95,12 +104,12 @@ fn MembersSection(props: MembersSectionProps) {
 #[derive(Props)]
 pub struct MembersTableProps {
 	pub user_id: String,
+	pub can_edit: bool,
 	pub rows: Vec<MembersTableRow>,
 }
 
 #[component]
 fn MembersTable(props: MembersTableProps) {
-	let user_id = props.user_id;
 	html! {
 		<ui::Table width?="100%">
 			<ui::TableHeader>
@@ -114,20 +123,18 @@ fn MembersTable(props: MembersTableProps) {
 				</ui::TableRow>
 			</ui::TableHeader>
 			<ui::TableBody>
-				{props.rows.into_iter().map(|row| html! {
+				{props.rows.iter().map(|row| html! {
 					<ui::TableRow>
 						<ui::TableCell>
-							{if row.id != user_id {
-								html! {
-									<ui::Link href={format!("members/{}", row.id)}>{row.email.clone()}</ui::Link>
-								}
-							} else {
-								html! {
-									<>
-										{row.email.clone()}
-									</>
-								}
-							}}
+						{if props.can_edit {
+							html! {
+								<ui::Link href={format!("members/{}", row.id)}>{row.email.clone()}</ui::Link>
+							}
+						} else {
+							html! {
+								<>{row.email.clone()}</>
+							}
+						}}
 						</ui::TableCell>
 						<ui::TableCell>
 							{if row.is_admin {
