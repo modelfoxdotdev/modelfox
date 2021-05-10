@@ -45,6 +45,7 @@ pub async fn get(
 			join organizations_users
 				on organizations_users.organization_id = $1
 				and organizations_users.user_id = $2
+			where users.id = $2
 		",
 	)
 	.bind(&organization_id.to_string())
@@ -52,11 +53,11 @@ pub async fn get(
 	.fetch_one(&mut *db)
 	.await?;
 	let member_email = row.get(1);
-	let is_admin =  row.get(2);
+	let is_admin = row.get(2);
 	let props = PageProps {
 		app_layout_props,
 		member_email,
-		is_admin
+		is_admin,
 	};
 	db.commit().await?;
 	let html = html!(<Page {props} />).render_to_string();
