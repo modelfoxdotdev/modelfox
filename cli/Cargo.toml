@@ -10,6 +10,9 @@ version = "0.3.0"
 name = "tangram"
 path = "main.rs"
 
+[build-dependencies]
+duct = "0.13"
+
 [features]
 default = ["train", "app"]
 train = []

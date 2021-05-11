@@ -15,7 +15,7 @@ mod train;
 
 #[derive(Clap)]
 #[clap(
-	version = env!("CARGO_PKG_VERSION"),
+	version = concat!(env!("CARGO_PKG_VERSION"), " ", env!("GIT_COMMIT")),
 	about = "Train and deploy a machine learning model in minutes.",
 	setting = clap::AppSettings::DisableHelpSubcommand,
 )]
