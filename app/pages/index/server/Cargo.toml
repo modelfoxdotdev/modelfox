@@ -19,4 +19,5 @@ tangram_app_layouts = { path = "../../../layouts" }
 tangram_error = { path = "../../../../error" }
 tangram_id = { path = "../../../../id" }
 tangram_ui = { path = "../../../../ui" }
+tracing = "0.1"
 url = { version = "2", features = ["serde"] }

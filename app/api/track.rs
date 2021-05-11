@@ -18,6 +18,7 @@ use tangram_app_common::{
 };
 use tangram_error::{err, Result};
 use tangram_id::Id;
+use tracing::error;
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(untagged)]
@@ -36,7 +37,10 @@ pub async fn post(
 	};
 	let monitor_events: MonitorEventSet = match serde_json::from_slice(&bytes) {
 		Ok(monitor_events) => monitor_events,
-		Err(_) => return Ok(bad_request()),
+		Err(e) => {
+			error!(%e);
+			return Ok(bad_request());
+		}
 	};
 	let monitor_events = match monitor_events {
 		MonitorEventSet::Single(monitor_event) => vec![monitor_event],

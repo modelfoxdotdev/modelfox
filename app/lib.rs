@@ -7,6 +7,8 @@ use tangram_app_common::{
 };
 use tangram_error::{err, Result};
 use tangram_serve::serve;
+use tracing::error;
+use tracing_subscriber::prelude::*;
 use url::Url;
 
 pub use tangram_app_common::options;
@@ -20,6 +22,8 @@ pub fn run(options: Options) -> Result<()> {
 }
 
 async fn run_inner(options: Options) -> Result<()> {
+	// Set up tracing.
+	tracing()?;
 	// Create the database pool.
 	let database_pool = create_database_pool(CreateDatabasePoolOptions {
 		database_max_connections: options.database.max_connections,
@@ -276,18 +280,12 @@ async fn request_handler(
 	}
 	.await
 	.unwrap_or_else(|error| {
-		eprintln!("{}", error);
-		let body = if cfg!(debug_assertions) {
-			format!("{}", error)
-		} else {
-			"internal server error".to_owned()
-		};
+		error!(%error);
 		http::Response::builder()
 			.status(http::StatusCode::INTERNAL_SERVER_ERROR)
-			.body(hyper::Body::from(body))
+			.body(hyper::Body::from("internal server error"))
 			.unwrap()
 	});
-	eprintln!("{} {} {}", method, path, response.status());
 	response
 }
 
@@ -342,4 +340,29 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 		.connect_with(pool_options)
 		.await?;
 	Ok(pool)
+}
+
+fn tracing() -> Result<()> {
+	let env_layer = tracing_subscriber::EnvFilter::try_from_env("TANGRAM_APP_TRACING");
+	let env_layer = if cfg!(debug_assertions) {
+		Some(env_layer.unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("[]=info")))
+	} else {
+		env_layer.ok()
+	};
+	if let Some(env_layer) = env_layer {
+		if cfg!(debug_assertions) {
+			let format_layer = tracing_subscriber::fmt::layer().pretty();
+			let subscriber = tracing_subscriber::registry()
+				.with(env_layer)
+				.with(format_layer);
+			subscriber.init();
+		} else {
+			let journald_layer = tracing_subscriber::fmt::layer().json();
+			let subscriber = tracing_subscriber::registry()
+				.with(env_layer)
+				.with(journald_layer);
+			subscriber.init();
+		}
+	}
+	Ok(())
 }

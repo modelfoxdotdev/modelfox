@@ -18,7 +18,7 @@ where
 
 impl std::fmt::Debug for Error {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-		write!(f, "{}", self)
+		write!(f, "{}\n{:?}", self.error, self.backtrace)
 	}
 }
 
@@ -33,10 +33,9 @@ impl Error {
 	where
 		E: std::error::Error + Send + Sync + 'static,
 	{
-		let backtrace = Backtrace::new();
 		Error {
 			error: Box::new(error),
-			backtrace,
+			backtrace: Backtrace::new(),
 		}
 	}
 

@@ -14,7 +14,9 @@ use std::{
 	sync::Arc,
 };
 use tangram_error::{err, Result};
+use tangram_id::Id;
 use tangram_zip::pzip;
+use tracing::{error, info, trace_span, Instrument};
 use which::which;
 
 pub async fn serve<C, H, F>(
@@ -43,22 +45,28 @@ where
 		F: Future<Output = http::Response<hyper::Body>> + Send,
 	{
 		let method = request.method().clone();
-		let path = request.uri().path_and_query().unwrap().path().to_owned();
+		let path_and_query = request.uri().path_and_query().unwrap();
+		let path = path_and_query.path();
+		let query = path_and_query.query();
+		info!(%method, %path, ?query, "request");
 		let result = AssertUnwindSafe(request_handler(request_handler_context, request))
 			.catch_unwind()
 			.await;
-		let response = result.unwrap_or_else(|_| {
-			eprintln!("{} {} 500", method, path);
-			let body = PANIC_MESSAGE_AND_BACKTRACE.with(|panic_message_and_backtrace| {
+		if result.is_err() {
+			let message = PANIC_MESSAGE_AND_BACKTRACE.with(|panic_message_and_backtrace| {
 				let panic_message_and_backtrace = panic_message_and_backtrace.borrow();
-				let (message, backtrace) = panic_message_and_backtrace.as_ref().unwrap();
-				format!("{}\n{:?}", message, backtrace)
+				let (message, _) = panic_message_and_backtrace.as_ref().unwrap();
+				message.to_owned()
 			});
+			error!(%message, "panic!");
+		}
+		let response = result.unwrap_or_else(|_| {
 			http::Response::builder()
 				.status(http::StatusCode::INTERNAL_SERVER_ERROR)
-				.body(hyper::Body::from(body))
+				.body(hyper::Body::from("internal server error"))
 				.unwrap()
 		});
+		info!(status = %response.status(), "response");
 		Ok(response)
 	}
 	// Install a panic hook that will record the panic message and backtrace if a panic occurs.
@@ -80,7 +88,11 @@ where
 				let request_handler = request_handler.clone();
 				let request_handler_context = request_handler_context.clone();
 				PANIC_MESSAGE_AND_BACKTRACE.scope(RefCell::new(None), async move {
-					service(request_handler, request_handler_context, request).await
+					let request_id = Id::generate();
+					let request_span = trace_span!("request", id = %request_id);
+					service(request_handler, request_handler_context, request)
+						.instrument(request_span)
+						.await
 				})
 			}))
 		}

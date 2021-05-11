@@ -92,12 +92,14 @@ tangram_app_migrations = { path = "migrations" }
 tangram_charts = { path = "../charts" }
 tangram_core = { path = "../core" }
 tangram_error = { path = "../error" }
+tangram_id = { path = "../id" }
 tangram_metrics = { path = "../metrics" }
 tangram_serve = { path = "../serve" }
 tangram_ui = { path = "../ui" }
 tangram_zip = { path = "../zip" }
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
+tracing-subscriber = "0.2"
 url = { version = "2", features = ["serde"] }
 
 tangram_app_edit_organization_server = { path = "pages/organizations/_/edit/server", optional = true }

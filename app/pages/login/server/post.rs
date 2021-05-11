@@ -28,10 +28,7 @@ pub async fn post(
 	};
 	let Action { email, code } = match serde_urlencoded::from_bytes(&data) {
 		Ok(data) => data,
-		Err(e) => {
-			println!("{:?}", e);
-			return Ok(bad_request());
-		}
+		Err(_) => return Ok(bad_request()),
 	};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,

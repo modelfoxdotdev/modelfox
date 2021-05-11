@@ -512,12 +512,7 @@ impl Trainer {
 
 fn load_config(config_path: Option<&Path>) -> Result<Option<Config>> {
 	if let Some(config_path) = config_path {
-		let config = std::fs::read_to_string(config_path).map_err(|_| {
-			err!(format!(
-				"Could not find a config file at path: {:?}",
-				config_path.to_str().unwrap()
-			))
-		})?;
+		let config = std::fs::read_to_string(config_path)?;
 		let config = serde_json::from_str(&config)?;
 		Ok(Some(config))
 	} else {
@@ -601,13 +596,7 @@ fn load_and_shuffle_dataset_train(
 				progress_event,
 			)))
 		},
-	)
-	.map_err(|_| {
-		err!(format!(
-			"Could not find a train file at path: {:?}",
-			file_path.to_str().unwrap()
-		))
-	})?;
+	)?;
 	// Shuffle the table if enabled.
 	shuffle_table(&mut table, config, handle_progress_event);
 	// Split the table into train and test tables.
@@ -646,13 +635,7 @@ fn load_and_shuffle_dataset_train_and_test(
 				progress_event,
 			)))
 		},
-	)
-	.map_err(|_| {
-		err!(format!(
-			"Could not find a train file at path: {:?}",
-			file_path_train.to_str().unwrap()
-		))
-	})?;
+	)?;
 	// Force the column types for table_test to be the same as table_train.
 	let column_types = table_train
 		.columns()
@@ -683,13 +666,7 @@ fn load_and_shuffle_dataset_train_and_test(
 		&mut |progress_event| {
 			handle_progress_event(ProgressEvent::Load(LoadProgressEvent::Test(progress_event)))
 		},
-	)
-	.map_err(|_| {
-		err!(format!(
-			"Could not find a test file at path: {:?}",
-			file_path_test.to_str().unwrap()
-		))
-	})?;
+	)?;
 	let comparison_fraction = config
 		.as_ref()
 		.and_then(|config| config.comparison_fraction)
