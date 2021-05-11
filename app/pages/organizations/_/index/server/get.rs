@@ -42,7 +42,7 @@ pub async fn get(
 		Some(organization) => organization,
 		None => return Ok(not_found()),
 	};
-	let organization_user = get_organization_user(organization_id, user.id, &mut db)
+	let organization_user = get_organization_user(&mut db, organization_id, user.id)
 		.await?
 		.unwrap();
 	let details_props = DetailsSectionProps {
@@ -103,6 +103,7 @@ pub async fn get(
 		repos_props,
 		can_delete: organization_user.is_admin,
 	};
+
 	let html = html!(<Page {props} />).render_to_string();
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)

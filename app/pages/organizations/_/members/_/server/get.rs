@@ -4,6 +4,7 @@ use num::ToPrimitive;
 use sqlx::prelude::*;
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
+	organizations::get_organization_user,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 	Context,
 };
@@ -54,13 +55,35 @@ pub async fn get(
 	.fetch_one(&mut *db)
 	.await?;
 	let member_email = row.get(1);
-	let member_count = get_member_count(&mut db, organization_id).await?;
-	let is_admin = row.get(2);
+	let admin_member_count = get_admin_member_count(&mut db, organization_id).await?;
+	let member_id = member_id.parse().unwrap();
+	let member_is_admin = row.get(2);
+	let user_is_admin = get_organization_user(&mut db, organization_id, user.id)
+		.await?
+		.unwrap()
+		.is_admin;
+	let can_delete = if user_is_admin {
+		if user.id == member_id {
+			// Can not remove yourself if you are the last admin.
+			admin_member_count > 1
+		} else {
+			// Can always delete other members as an admin.
+			true
+		}
+	} else {
+		false
+	};
+	let remove_button_text = if user.id == member_id {
+		"Leave Organization".to_owned()
+	} else {
+		"Remove from Organzation".to_owned()
+	};
 	let props = PageProps {
 		app_layout_props,
 		member_email,
-		is_admin,
-		can_delete: member_count > 1,
+		is_admin: member_is_admin,
+		can_delete,
+		remove_button_text,
 	};
 	db.commit().await?;
 	let html = html!(<Page {props} />).render_to_string();
@@ -71,7 +94,7 @@ pub async fn get(
 	Ok(response)
 }
 
-async fn get_member_count(
+async fn get_admin_member_count(
 	db: &mut sqlx::Transaction<'_, sqlx::Any>,
 	organization_id: Id,
 ) -> Result<usize> {
@@ -81,6 +104,7 @@ async fn get_member_count(
 				organizations_users
 			where
 				organization_id = $1
+			and is_admin = true
 		",
 	)
 	.bind(&organization_id.to_string())

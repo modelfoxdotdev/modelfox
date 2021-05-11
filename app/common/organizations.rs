@@ -64,9 +64,9 @@ pub async fn get_organization(
 }
 
 pub async fn get_organization_user(
+	db: &mut sqlx::Transaction<'_, sqlx::Any>,
 	organization_id: Id,
 	user_id: Id,
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
 ) -> Result<Option<Member>> {
 	let member_row = sqlx::query(
 		"

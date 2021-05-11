@@ -11,6 +11,7 @@ pub struct PageProps {
 	pub member_email: String,
 	pub is_admin: bool,
 	pub can_delete: bool,
+	pub remove_button_text: String,
 }
 
 #[component]
@@ -38,7 +39,7 @@ pub fn Page(props: PageProps) {
 					</ui::S2>
 					{if props.can_delete {
 						Some(html! {
-							<DangerZone />
+							<DangerZone remove_button_text={props.remove_button_text} />
 						})
 					} else {
 							None
@@ -50,8 +51,13 @@ pub fn Page(props: PageProps) {
 	}
 }
 
+#[derive(Props)]
+struct DangerZoneProps {
+	remove_button_text: String,
+}
+
 #[component]
-fn DangerZone() {
+fn DangerZone(props: DangerZoneProps) {
 	html! {
 		<ui::S2>
 			<ui::H2>{"Danger Zone"}</ui::H2>
@@ -61,7 +67,7 @@ fn DangerZone() {
 					button_type?={Some(ui::ButtonType::Submit)}
 					color?={Some(ui::colors::RED.to_owned())}
 				>
-					{"Remove from Organization"}
+					{props.remove_button_text}
 				</ui::Button>
 			</ui::Form>
 		</ui::S2>

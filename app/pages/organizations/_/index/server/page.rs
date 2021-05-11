@@ -28,12 +28,10 @@ pub fn Page(props: PageProps) {
 				<ui::S1>
 					<ui::H1>{props.name}</ui::H1>
 					<DetailsSection {props.details_props} />
-					<MembersSection {props.members_props}/>
-					<ReposSection {props.repos_props}/>
+					<MembersSection {props.members_props} />
+					<ReposSection {props.repos_props} />
 					{if props.can_delete {
-						Some(html! {
-							<DangerZoneSection />
-						})
+						Some(html! { <DangerZoneSection /> })
 					} else {
 						None
 					}}
@@ -114,12 +112,12 @@ fn MembersTable(props: MembersTableProps) {
 		<ui::Table width?="100%">
 			<ui::TableHeader>
 				<ui::TableRow>
-				<ui::TableHeaderCell>
-					{"Email"}
-				</ui::TableHeaderCell>
-				<ui::TableHeaderCell>
-					{"Role"}
-				</ui::TableHeaderCell>
+					<ui::TableHeaderCell>
+						{"Email"}
+					</ui::TableHeaderCell>
+					<ui::TableHeaderCell>
+						{"Role"}
+					</ui::TableHeaderCell>
 				</ui::TableRow>
 			</ui::TableHeader>
 			<ui::TableBody>
@@ -128,12 +126,12 @@ fn MembersTable(props: MembersTableProps) {
 						<ui::TableCell>
 						{if props.can_edit {
 							html! {
-								<ui::Link href={format!("members/{}", row.id)}>{row.email.clone()}</ui::Link>
+								<ui::Link href={format!("members/{}", row.id)}>
+									{row.email.clone()}
+								</ui::Link>
 							}
 						} else {
-							html! {
-								<>{row.email.clone()}</>
-							}
+							html! { <>{row.email.clone()}</> }
 						}}
 						</ui::TableCell>
 						<ui::TableCell>
