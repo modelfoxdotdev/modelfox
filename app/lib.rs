@@ -9,8 +9,6 @@ use tangram_error::{err, Result};
 use tangram_serve::serve;
 use url::Url;
 
-mod migrations;
-
 pub use tangram_app_common::options;
 
 pub fn run(options: Options) -> Result<()> {
@@ -28,12 +26,12 @@ async fn run_inner(options: Options) -> Result<()> {
 		database_url: options.database.url.clone(),
 	})
 	.await?;
-	if self::migrations::empty(&database_pool).await? {
+	if tangram_app_migrations::empty(&database_pool).await? {
 		// Run all migrations if the database is empty.
-		self::migrations::run(&database_pool).await?;
+		tangram_app_migrations::run(&database_pool).await?;
 	} else {
 		// If the database is not empty, verify that all migrations have already been run.
-		self::migrations::verify(&database_pool).await?;
+		tangram_app_migrations::verify(&database_pool).await?;
 	}
 	// Create the smtp transport.
 	let smtp_transport = if let Some(smtp) = options.smtp.as_ref() {
@@ -92,133 +90,174 @@ async fn request_handler(
 		(&http::Method::POST, &["track"]) => {
 			tangram_api::track::post(&context, request).boxed()
 		},
+		#[cfg(feature = "tangram_app_login")]
 		(&http::Method::GET, &["login"]) => {
 			tangram_app_login_server::get(&context, request, search_params).boxed()
 		}
+		#[cfg(feature = "tangram_app_login")]
 		(&http::Method::POST, &["login"]) => {
 			tangram_app_login_server::post(&context, request).boxed()
 		}
+		#[cfg(feature = "tangram_app_index")]
 		(&http::Method::GET, &[""]) => {
 			tangram_app_index_server::get(&context, request).boxed()
 		},
+		#[cfg(feature = "tangram_app_new_repo")]
 		(&http::Method::GET, &["repos", "new"]) => {
 			tangram_app_new_repo_server::get(&context, request).boxed()
 		}
+		#[cfg(feature = "tangram_app_new_repo")]
 		(&http::Method::POST, &["repos", "new"]) => {
 			tangram_app_new_repo_server::post(&context, request).boxed()
 		}
+		#[cfg(feature = "tangram_app_repo_index")]
 		(&http::Method::GET, &["repos", repo_id, ""]) => {
 			tangram_app_repo_index_server::get(&context, request, repo_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_repo_edit")]
 		(&http::Method::GET, &["repos", repo_id, "edit"]) => {
 			tangram_app_repo_edit_server::get(&context, request, repo_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_repo_edit")]
 		(&http::Method::POST, &["repos", repo_id, "edit"]) => {
 			tangram_app_repo_edit_server::post(&context, request, repo_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_new_model")]
 		(&http::Method::GET, &["repos", repo_id, "models", "new"]) => {
 			tangram_app_new_model_server::get(&context, request, repo_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_new_model")]
 		(&http::Method::POST, &["repos", repo_id, "models", "new"]) => {
 			tangram_app_new_model_server::post(&context, request, repo_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_model_index")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, ""]) => {
 			tangram_app_model_index_server::get(&context, request, model_id).boxed()
 		}
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "download"]) => {
 			tangram_app_layouts::model_layout::download(&context, request, model_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_training_grid_index")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "training_grid", ""]) => {
 			tangram_app_training_grid_index_server::get(&context, request, model_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_training_grid_item")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "training_grid", "grid_item", grid_item_id]) => {
 			tangram_app_training_grid_item_server::get(&context, request, model_id, grid_item_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_training_stats_index")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "training_stats", ""]) => {
 			tangram_app_training_stats_index_server::get(&context, request, model_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_training_stats_column")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "training_stats", "columns", column_name]) => {
 			tangram_app_training_stats_column_server::get(&context, request, model_id, column_name).boxed()
 		}
+		#[cfg(feature = "tangram_app_playground")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "playground"]) => {
 			tangram_app_playground_server::get(&context, request, model_id, search_params).boxed()
 		}
+		#[cfg(feature = "tangram_app_training_metrics_index")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "training_metrics", ""]) => {
 			tangram_app_training_metrics_index_server::get(&context, request, model_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_training_class_metrics")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "training_metrics", "class_metrics"]) => {
 			tangram_app_training_class_metrics_server::get(&context, request, model_id, search_params).boxed()
 		}
+		#[cfg(feature = "tangram_app_training_metrics_precision_recall")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "training_metrics", "precision_recall"]) => {
 			tangram_app_training_metrics_precision_recall_server::get(&context, request, model_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_training_metrics_roc")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "training_metrics", "roc"]) => {
 			tangram_app_training_metrics_roc_server::get(&context, request, model_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_tuning")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "tuning"]) => {
 			tangram_app_tuning_server::get(&context, request, model_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_production_predictions_index")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "production_predictions", ""]) => {
 			tangram_app_production_predictions_index_server::get(&context, request, model_id, search_params).boxed()
 		}
+		#[cfg(feature = "tangram_app_production_predictions_index")]
 		(&http::Method::POST, &["repos", _repo_id, "models", model_id, "production_predictions", ""]) => {
 			tangram_app_production_predictions_index_server::post(&context, request, model_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_production_prediction")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "production_predictions", "predictions", identifier]) => {
 			tangram_app_production_prediction_server::get(&context, request, model_id, identifier).boxed()
 		}
+		#[cfg(feature = "tangram_app_production_stats_index")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "production_stats", ""]) => {
 			tangram_app_production_stats_index_server::get(&context, request, model_id, search_params).boxed()
 		}
-		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "production_stats", "columns", column_name],
-		) => {
+		#[cfg(feature = "tangram_app_production_stats_column")]
+		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "production_stats", "columns", column_name]) => {
 			tangram_app_production_stats_column_server::get(&context, request, model_id, column_name, search_params).boxed()
 		}
+		#[cfg(feature = "tangram_app_production_metrics_index")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "production_metrics", ""]) => {
 			tangram_app_production_metrics_index_server::get(&context, request, model_id, search_params).boxed()
 		}
+		#[cfg(feature = "tangram_app_production_class_metrics")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "production_metrics", "class_metrics"]) => {
 			tangram_app_production_class_metrics_server::get(&context, request, model_id, search_params).boxed()
 		}
+		#[cfg(feature = "tangram_app_model_edit")]
 		(&http::Method::GET, &["repos", _repo_id, "models", model_id, "edit"]) => {
 			tangram_app_model_edit_server::get(&context, request, model_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_model_edit")]
 		(&http::Method::POST, &["repos", repo_id, "models", model_id, "edit"]) => {
 			tangram_app_model_edit_server::post(&context, request, repo_id, model_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_user")]
 		(&http::Method::GET, &["user"]) => {
 			tangram_app_user_server::get(&context, request).boxed()
 		},
+		#[cfg(feature = "tangram_app_user")]
 		(&http::Method::POST, &["user"]) => {
 			tangram_app_user_server::post(&context, request).boxed()
 		}
+		#[cfg(feature = "tangram_app_new_organization")]
 		(&http::Method::GET, &["organizations", "new"]) => {
 			tangram_app_new_organization_server::get(&context, request).boxed()
 		}
+		#[cfg(feature = "tangram_app_new_organization")]
 		(&http::Method::POST, &["organizations", "new"]) => {
 			tangram_app_new_organization_server::post(&context, request).boxed()
 		}
+		#[cfg(feature = "tangram_app_organization_index")]
 		(&http::Method::GET, &["organizations", organization_id, ""]) => {
 			tangram_app_organization_index_server::get(&context, request, organization_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_organization_index")]
 		(&http::Method::POST, &["organizations", organization_id, ""]) => {
 			tangram_app_organization_index_server::post(&context, request, organization_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_edit_organization")]
 		(&http::Method::GET, &["organizations", organization_id, "edit"]) => {
 			tangram_app_edit_organization_server::get(&context, request, organization_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_new_member")]
 		(&http::Method::GET, &["organizations", organization_id, "members", "new"]) => {
 			tangram_app_new_member_server::get(&context, request, organization_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_new_member")]
 		(&http::Method::POST, &["organizations", organization_id, "members", "new"]) => {
 			tangram_app_new_member_server::post(&context, request, organization_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_organization_member")]
 		(&http::Method::GET, &["organizations", organization_id, "members", member_id]) => {
 			tangram_app_organization_member_server::get(&context, request, organization_id, member_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_organization_member")]
 		(&http::Method::POST, &["organizations", organization_id, "members", member_id]) => {
 			tangram_app_organization_member_server::post(&context, request, organization_id, member_id).boxed()
 		}
+		#[cfg(feature = "tangram_app_edit_organization")]
 		(&http::Method::POST, &["organizations", organization_id, "edit"]) => {
 			tangram_app_edit_organization_server::post(&context, request, organization_id).boxed()
 		}
@@ -266,7 +305,7 @@ pub async fn migrate_inner(database_url: Url) -> Result<()> {
 		database_url,
 	})
 	.await?;
-	migrations::run(&database_pool).await?;
+	tangram_app_migrations::run(&database_pool).await?;
 	Ok(())
 }
 

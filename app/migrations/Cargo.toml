@@ -1,0 +1,17 @@
+[package]
+edition = "2018"
+license = "UNLICENSED"
+name = "tangram_app_migrations"
+publish = false
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+futures = "0.3"
+once_cell = "1"
+sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }
+tangram_error = { path = "../../error" }
+tangram_zip = { path = "../../zip" }
+

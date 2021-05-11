@@ -2840,6 +2840,7 @@ dependencies = [
  "tangram_app_index_server",
  "tangram_app_layouts",
  "tangram_app_login_server",
+ "tangram_app_migrations",
  "tangram_app_model_edit_server",
  "tangram_app_model_index_client",
  "tangram_app_model_index_server",
@@ -2999,6 +3000,17 @@ dependencies = [
  "tangram_id",
  "tangram_ui",
  "url",
+]
+
+[[package]]
+name = "tangram_app_migrations"
+version = "0.0.0"
+dependencies = [
+ "futures",
+ "once_cell",
+ "sqlx",
+ "tangram_error",
+ "tangram_zip",
 ]
 
 [[package]]
