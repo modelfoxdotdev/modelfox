@@ -10,8 +10,9 @@ members = [
 	"www",
 ]
 
-[profile.dev]
-opt-level = 1
+[profile.dev.build-override]
+debug-assertions = false
+opt-level = 3
 overflow-checks = false
 
 [profile.release]
