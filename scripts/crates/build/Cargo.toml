@@ -18,9 +18,7 @@ cbindgen = "0.19"
 clap = { version = "3.0.0-beta.2", features = ["color"] }
 dirs = "3"
 duct = "0.13"
-env_logger = "0.8"
 flate2 = "1"
-log = "0.4"
 tangram_error = { path = "../../../error" }
 tar = "0.4"
 which = "4"

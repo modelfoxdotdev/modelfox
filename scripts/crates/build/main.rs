@@ -1,9 +1,8 @@
 use clap::Clap;
 use duct::cmd;
-use log::info;
-use std::{fs::File, io::prelude::*};
+use std::fs::File;
 use tangram_error::{err, Result};
-use tangram_script_build::{target_file_names, Arch, Target};
+use tangram_script_build::{Arch, Target, TargetFileNames};
 use which::which;
 
 #[derive(Clap)]
@@ -13,11 +12,6 @@ pub struct Args {
 }
 
 pub fn main() -> Result<()> {
-	let env = env_logger::Env::new().filter_or("LOG", "info");
-	env_logger::Builder::from_env(env)
-		.format(|buf, record| writeln!(buf, "{}", record.args()))
-		.init();
-
 	let args = Args::parse();
 	let Args { target } = args;
 
@@ -34,9 +28,9 @@ pub fn main() -> Result<()> {
 	}
 	std::fs::create_dir_all(&dist_target_path)?;
 
-	let target_file_names = target_file_names(target);
+	let target_file_names = TargetFileNames::for_target(target);
 
-	info!("building");
+	eprintln!("building");
 	match target {
 		Target::X8664UnknownLinuxGnu => {
 			build_gnu(target, None)?;
@@ -64,11 +58,11 @@ pub fn main() -> Result<()> {
 		}
 	}
 
-	info!("generating tangram.h");
+	eprintln!("generating tangram.h");
 	cbindgen::generate(tangram_path.join("languages/c"))?
 		.write(File::create(dist_target_path.join("tangram.h"))?);
 
-	info!("copying artifacts");
+	eprintln!("copying artifacts");
 	let (
 		tangram_cli_artifact_path,
 		libtangram_dynamic_artifact_path,

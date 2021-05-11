@@ -1,18 +1,12 @@
-use log::info;
-use std::{io::prelude::*, path::Path};
+use std::path::Path;
 use tangram_error::Result;
-use tangram_script_build::{target_file_names, Target};
+use tangram_script_build::{Target, TargetFileNames};
 
 fn main() -> Result<()> {
-	let env = env_logger::Env::new().filter_or("LOG", "info");
-	env_logger::Builder::from_env(env)
-		.format(|buf, record| writeln!(buf, "{}", record.args()))
-		.init();
-
 	let tangram_path = std::env::current_dir()?;
 	let dist_path = tangram_path.join("dist");
 
-	info!("elixir");
+	eprintln!("elixir");
 	let elixir_priv_path = tangram_path.join("languages/elixir/priv");
 	std::fs::remove_dir_all(&elixir_priv_path)?;
 	for target in &[
@@ -24,7 +18,7 @@ fn main() -> Result<()> {
 		Target::AArch64AppleDarwin,
 		Target::X8664PcWindowsMsvc,
 	] {
-		let target_file_names = target_file_names(*target);
+		let target_file_names = TargetFileNames::for_target(*target);
 		install(
 			&dist_path
 				.join(target.as_str())
@@ -35,7 +29,7 @@ fn main() -> Result<()> {
 		)?;
 	}
 
-	info!("go");
+	eprintln!("go");
 	let go_libtangram_path = tangram_path.join("languages/go/libtangram");
 	std::fs::remove_dir_all(&go_libtangram_path)?;
 	for target in &[
@@ -45,7 +39,7 @@ fn main() -> Result<()> {
 		Target::AArch64AppleDarwin,
 		Target::X8664PcWindowsGnu,
 	] {
-		let target_file_names = target_file_names(*target);
+		let target_file_names = TargetFileNames::for_target(*target);
 		install(
 			&dist_path
 				.join(target.as_str())
@@ -64,7 +58,7 @@ fn main() -> Result<()> {
 		)?;
 	}
 
-	info!("node");
+	eprintln!("node");
 	let node_dist_path = tangram_path.join("languages/node/native/dist");
 	std::fs::remove_dir_all(&node_dist_path)?;
 	for target in &[
@@ -76,7 +70,7 @@ fn main() -> Result<()> {
 		Target::AArch64AppleDarwin,
 		Target::X8664PcWindowsMsvc,
 	] {
-		let target_file_names = target_file_names(*target);
+		let target_file_names = TargetFileNames::for_target(*target);
 		install(
 			&dist_path
 				.join(target.as_str())
@@ -85,7 +79,7 @@ fn main() -> Result<()> {
 		)?;
 	}
 
-	info!("python");
+	eprintln!("python");
 	let python_dist_path = tangram_path.join("languages/python/dist");
 	std::fs::remove_dir_all(&python_dist_path)?;
 	for target in &[
@@ -109,7 +103,7 @@ fn main() -> Result<()> {
 		}
 	}
 
-	info!("ruby");
+	eprintln!("ruby");
 	let ruby_libtangram_path = tangram_path.join("languages/ruby/lib/tangram/libtangram");
 	std::fs::remove_dir_all(&ruby_libtangram_path)?;
 	for target in &[
@@ -121,7 +115,7 @@ fn main() -> Result<()> {
 		Target::AArch64AppleDarwin,
 		Target::X8664PcWindowsMsvc,
 	] {
-		let target_file_names = target_file_names(*target);
+		let target_file_names = TargetFileNames::for_target(*target);
 		install(
 			&dist_path
 				.join(target.as_str())

@@ -10,7 +10,5 @@ name = "tangram_script_distribute_native_extensions"
 path = "main.rs"
 
 [dependencies]
-env_logger = "0.8"
-log = "0.4"
 tangram_error = { path = "../../../error" }
 tangram_script_build = { path = "../build" }

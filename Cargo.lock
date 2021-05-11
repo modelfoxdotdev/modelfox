@@ -647,19 +647,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "env_logger"
-version = "0.8.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17392a012ea30ef05a610aa97dfb49496e71c9f676b27879922ea5bdf60d9d3f"
-dependencies = [
- "atty",
- "humantime",
- "log",
- "regex",
- "termcolor",
-]
-
-[[package]]
 name = "erl_nif"
 version = "0.0.0"
 dependencies = [
@@ -1062,12 +1049,6 @@ name = "httpdate"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "05842d0d43232b23ccb7060ecb0f0626922c21f30012e97b767b30afd4a5d4b9"
-
-[[package]]
-name = "humantime"
-version = "2.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a3a5bfb195931eeb336b2a7b4d761daec841b97f947d34394601737a7bba5e4"
 
 [[package]]
 name = "hyper"
@@ -4012,9 +3993,7 @@ dependencies = [
  "clap 3.0.0-beta.2",
  "dirs",
  "duct",
- "env_logger",
  "flate2",
- "log",
  "tangram_error",
  "tar",
  "which",
@@ -4029,11 +4008,9 @@ dependencies = [
  "digest 0.9.0",
  "dirs",
  "duct",
- "env_logger",
  "flate2",
  "hex",
  "indoc 1.0.3",
- "log",
  "md-5",
  "rayon",
  "reqwest",
@@ -4044,6 +4021,7 @@ dependencies = [
  "tangram_error",
  "tangram_script_build",
  "tar",
+ "tempfile",
  "url",
  "which",
 ]
@@ -4057,11 +4035,9 @@ dependencies = [
  "digest 0.9.0",
  "dirs",
  "duct",
- "env_logger",
  "flate2",
  "hex",
  "indoc 1.0.3",
- "log",
  "md-5",
  "rayon",
  "reqwest",
@@ -4110,8 +4086,6 @@ dependencies = [
 name = "tangram_script_distribute_native_extensions"
 version = "0.0.0"
 dependencies = [
- "env_logger",
- "log",
  "tangram_error",
  "tangram_script_build",
 ]

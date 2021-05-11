@@ -7,6 +7,7 @@ use sha1::Sha1;
 use sha2::Sha256;
 use std::path::{Path, PathBuf};
 use tangram_error::Result;
+use tangram_script_build::{Arch, Target, TargetFileNames};
 
 #[derive(Clap)]
 pub struct Args {
@@ -14,27 +15,6 @@ pub struct Args {
 	version: String,
 	#[clap(long, env, default_value = "https://pkgs.tangram.xyz")]
 	url: String,
-
-	#[clap(long, env)]
-	debs_path: PathBuf,
-	#[clap(long, env)]
-	deb_public_key: PathBuf,
-	#[clap(long, env)]
-	deb_private_key: PathBuf,
-
-	#[clap(long, env)]
-	rpms_path: PathBuf,
-	#[clap(long, env)]
-	rpm_public_key: PathBuf,
-	#[clap(long, env)]
-	rpm_private_key: PathBuf,
-
-	#[clap(long, env)]
-	tangram_cli_path: PathBuf,
-	#[clap(long, env)]
-	alpine_public_key: PathBuf,
-	#[clap(long, env)]
-	alpine_private_key: PathBuf,
 }
 
 pub fn main() -> Result<()> {
@@ -42,6 +22,27 @@ pub fn main() -> Result<()> {
 
 	let tangram_path = std::env::current_dir()?;
 	let dist_path = tangram_path.join("dist");
+
+	// Retrieve the keys from the password store.
+	let alpine_public_key = cmd!("pass", "tangram/keys/alpine.public.rsa").run()?.stdout;
+	let alpine_private_key = cmd!("pass", "tangram/keys/alpine.public.rsa").run()?.stdout;
+	let deb_public_key = cmd!("pass", "tangram/keys/deb.public.gpg").run()?.stdout;
+	let deb_private_key = cmd!("pass", "tangram/keys/deb.private.gpg").run()?.stdout;
+	let rpm_public_key = cmd!("pass", "tangram/keys/rpm.public.gpg").run()?.stdout;
+	let rpm_private_key = cmd!("pass", "tangram/keys/rpm.private.gpg").run()?.stdout;
+
+	let alpine_public_key_path = tempfile::NamedTempFile::new()?.into_temp_path();
+	std::fs::write(&alpine_public_key_path, alpine_public_key)?;
+	let alpine_private_key_path = tempfile::NamedTempFile::new()?.into_temp_path();
+	std::fs::write(&alpine_private_key_path, alpine_private_key)?;
+	let deb_public_key_path = tempfile::NamedTempFile::new()?.into_temp_path();
+	std::fs::write(&deb_public_key_path, deb_public_key)?;
+	let deb_private_key_path = tempfile::NamedTempFile::new()?.into_temp_path();
+	std::fs::write(&deb_private_key_path, deb_private_key)?;
+	let rpm_public_key_path = tempfile::NamedTempFile::new()?.into_temp_path();
+	std::fs::write(&rpm_public_key_path, rpm_public_key)?;
+	let rpm_private_key_path = tempfile::NamedTempFile::new()?.into_temp_path();
+	std::fs::write(&rpm_private_key_path, rpm_private_key)?;
 
 	// Clean and create pkgs_path.
 	let pkgs_path = dist_path.join("pkgs");
@@ -53,20 +54,45 @@ pub fn main() -> Result<()> {
 	}
 	std::fs::create_dir_all(&pkgs_path)?;
 
-	alpine(&args, &pkgs_path)?;
-	deb(&args, &pkgs_path)?;
-	rpm(&args, &pkgs_path)?;
+	alpine(
+		&args,
+		&dist_path,
+		&pkgs_path,
+		&alpine_public_key_path,
+		&alpine_private_key_path,
+	)?;
+	deb(
+		&args,
+		&dist_path,
+		&pkgs_path,
+		&deb_public_key_path,
+		&deb_private_key_path,
+	)?;
+	rpm(
+		&args,
+		&dist_path,
+		&pkgs_path,
+		&rpm_public_key_path,
+		&rpm_private_key_path,
+	)?;
 
 	Ok(())
 }
 
-fn alpine(args: &Args, pkgs_path: &Path) -> Result<()> {
-	let repo_path = pkgs_path.join("stable").join("alpine");
-	std::fs::create_dir_all(&repo_path)?;
-	std::fs::copy(&args.alpine_public_key, repo_path.join("tangram.rsa"))?;
-	let apkbuild_path = repo_path.join("APKBUILD");
-	let apkbuild = formatdoc! {
-		r#"
+fn alpine(
+	args: &Args,
+	dist_path: &Path,
+	pkgs_path: &Path,
+	alpine_public_key_path: &Path,
+	alpine_private_key_path: &Path,
+) -> Result<()> {
+	for arch in &[Arch::X8664, Arch::AArch64] {
+		let repo_path = pkgs_path.join("stable").join("alpine");
+		std::fs::create_dir_all(&repo_path)?;
+		std::fs::copy(alpine_public_key_path, repo_path.join("tangram.rsa"))?;
+		let apkbuild_path = repo_path.join("APKBUILD");
+		let apkbuild = formatdoc! {
+			r#"
 			# Contributor: Tangram <root@tangram.xyz>
 			# Maintainer: Tangram <root@tangram.xyz>
 			pkgname=tangram
@@ -74,24 +100,35 @@ fn alpine(args: &Args, pkgs_path: &Path) -> Result<()> {
 			pkgrel=1
 			pkgdesc="Tangram is an automated machine learning framework designed for programmers."
 			url="https://www.tangram.xyz"
-			arch="x86_64"
+			arch={arch}
 			license="MIT"
 			source="tangram"
-
+			\n
 			check() {{
 				:
 			}}
-
+			\n
 			package() {{
 				install -D -m 755 "$srcdir"/tangram "$pkgdir"/usr/bin/tangram
 			}}
 		"#,
-		version = args.version,
-	};
-	std::fs::write(&apkbuild_path, &apkbuild)?;
-	let tangram_cli_path = repo_path.join("tangram");
-	std::fs::copy(&args.tangram_cli_path, &tangram_cli_path)?;
-	let script = r#"
+			version = args.version,
+			arch = match arch {
+				Arch::X8664 => "x86_64",
+				Arch::AArch64 => "aarch64",
+			},
+		};
+		std::fs::write(&apkbuild_path, &apkbuild)?;
+		let tangram_cli_dst_path = repo_path.join("tangram");
+		let target = match arch {
+			Arch::X8664 => Target::X8664UnknownLinuxGnu,
+			Arch::AArch64 => Target::AArch64UnknownLinuxGnu,
+		};
+		let tangram_cli_path = dist_path
+			.join(target.as_str())
+			.join(TargetFileNames::for_target(target).tangram_cli_file_name);
+		std::fs::copy(tangram_cli_path, &tangram_cli_dst_path)?;
+		let script = r#"
 		apk add build-base abuild
 		echo "PACKAGER_PUBKEY=/tangram.public.rsa" >> /etc/abuild.conf
 		echo "PACKAGER_PRIVKEY=/tangram.private.rsa" >> /etc/abuild.conf
@@ -99,48 +136,55 @@ fn alpine(args: &Args, pkgs_path: &Path) -> Result<()> {
 		abuild -F -P $PWD
 		rm -rf src pkg
 	"#;
-	cmd!(
-		"podman",
-		"run",
-		"-i",
-		"--rm",
-		"-v",
-		format!(
-			"{}:{}",
-			repo_path.canonicalize().unwrap().display(),
-			"/tangram"
-		),
-		"-v",
-		format!(
-			"{}:{}",
-			args.alpine_public_key.canonicalize().unwrap().display(),
-			"/tangram.public.rsa"
-		),
-		"-v",
-		format!(
-			"{}:{}",
-			args.alpine_private_key.canonicalize().unwrap().display(),
-			"/tangram.private.rsa"
-		),
-		"-w",
-		"/tangram",
-		"alpine:3.13",
-	)
-	.stdin_bytes(script)
-	.run()?;
-	std::fs::remove_file(&apkbuild_path)?;
-	std::fs::remove_file(&tangram_cli_path)?;
+		cmd!(
+			"podman",
+			"run",
+			"-i",
+			"--rm",
+			"-v",
+			format!(
+				"{}:{}",
+				repo_path.canonicalize().unwrap().display(),
+				"/tangram"
+			),
+			"-v",
+			format!(
+				"{}:{}",
+				alpine_public_key_path.canonicalize().unwrap().display(),
+				"/tangram.public.rsa"
+			),
+			"-v",
+			format!(
+				"{}:{}",
+				alpine_private_key_path.canonicalize().unwrap().display(),
+				"/tangram.private.rsa"
+			),
+			"-w",
+			"/tangram",
+			"alpine:3.13",
+		)
+		.stdin_bytes(script)
+		.run()?;
+		std::fs::remove_file(&apkbuild_path)?;
+		std::fs::remove_file(&tangram_cli_dst_path)?;
+	}
 	Ok(())
 }
 
-fn deb(args: &Args, pkgs_path: &Path) -> Result<()> {
+fn deb(
+	args: &Args,
+	dist_path: &Path,
+	pkgs_path: &Path,
+	deb_public_key_path: &Path,
+	deb_private_key_path: &Path,
+) -> Result<()> {
 	// Find all the .debs in args.debs.
 	struct Deb {
 		version: String,
 		path: PathBuf,
 	}
 	let mut debs = Vec::new();
-	for entry in std::fs::read_dir(&args.debs_path)? {
+	for entry in std::fs::read_dir(dist_path.join("release"))? {
 		let path = entry?.path();
 		let is_deb = path
 			.extension()
@@ -160,7 +204,7 @@ fn deb(args: &Args, pkgs_path: &Path) -> Result<()> {
 	let distributions = &["debian", "ubuntu"];
 	let debian_versions = vec!["sid", "bullseye", "buster", "stretch"];
 	let ubuntu_versions = vec!["groovy", "focal", "bionic"];
-	let archs = vec!["amd64"];
+	let archs = vec!["amd64", "arm64"];
 	for distribution in distributions {
 		let repo_path = pkgs_path.join("stable").join(distribution);
 		std::fs::create_dir_all(&repo_path)?;
@@ -185,7 +229,7 @@ fn deb(args: &Args, pkgs_path: &Path) -> Result<()> {
 			std::fs::write(list_path, list_file)?;
 			// Copy the public key.
 			let public_key_path = repo_path.join(format!("{}.gpg", distribution_version));
-			std::fs::copy(&args.deb_public_key, public_key_path)?;
+			std::fs::copy(deb_public_key_path, public_key_path)?;
 		}
 		let pool_path = repo_path.join("pool");
 		std::fs::create_dir(&pool_path)?;
@@ -283,7 +327,7 @@ fn deb(args: &Args, pkgs_path: &Path) -> Result<()> {
 				"sign",
 				"--detached",
 				"--signer-key",
-				&args.deb_private_key
+				deb_private_key_path
 			)
 			.stdin_path(&release_file_path)
 			.stdout_path(distribution_path.join("Release.gpg"))
@@ -294,7 +338,7 @@ fn deb(args: &Args, pkgs_path: &Path) -> Result<()> {
 				"sign",
 				"--cleartext-signature",
 				"--signer-key",
-				&args.deb_private_key
+				deb_private_key_path
 			)
 			.stdin_path(&release_file_path)
 			.stdout_path(distribution_path.join("InRelease"))
@@ -304,14 +348,20 @@ fn deb(args: &Args, pkgs_path: &Path) -> Result<()> {
 	Ok(())
 }
 
-fn rpm(args: &Args, pkgs_path: &Path) -> Result<()> {
+fn rpm(
+	args: &Args,
+	dist_path: &Path,
+	pkgs_path: &Path,
+	rpm_public_key_path: &Path,
+	rpm_private_key_path: &Path,
+) -> Result<()> {
 	// Find all the .rpms in args.rpms.
 	struct Rpm {
 		target: String,
 		path: PathBuf,
 	}
 	let mut rpms = Vec::new();
-	for entry in std::fs::read_dir(&args.rpms_path)? {
+	for entry in std::fs::read_dir(dist_path.join("release"))? {
 		let path = entry?.path();
 		let is_rpm = path
 			.extension()
@@ -328,8 +378,7 @@ fn rpm(args: &Args, pkgs_path: &Path) -> Result<()> {
 		let target = components.next().unwrap().to_owned();
 		rpms.push(Rpm { target, path });
 	}
-
-	let targets = &["x86_64"];
+	let targets = &["x86_64", "aarch64"];
 	for (distribution, distribution_version) in &[
 		("amazon-linux", Some("2")),
 		("centos", Some("8")),
@@ -363,8 +412,8 @@ fn rpm(args: &Args, pkgs_path: &Path) -> Result<()> {
 			distribution_version_with_leading_slash,
 		};
 		std::fs::write(repo_file_path, repo_file)?;
-		// Copy the gpg key.
-		std::fs::copy(&args.rpm_public_key, repo_path.join("repo.gpg"))?;
+		// Copy the rpm public key.
+		std::fs::copy(rpm_public_key_path, repo_path.join("repo.gpg"))?;
 		#[allow(clippy::single_element_loop)]
 		for target in targets {
 			// Create the target dir.
@@ -387,7 +436,7 @@ fn rpm(args: &Args, pkgs_path: &Path) -> Result<()> {
 				"sign",
 				"--detached",
 				"--signer-key",
-				&args.rpm_private_key
+				rpm_private_key_path
 			)
 			.stdin_path(repo_target_path.join("repodata/repomd.xml"))
 			.stdout_path(repo_target_path.join("repodata/repomd.xml.asc"))

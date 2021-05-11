@@ -110,42 +110,44 @@ pub struct TargetFileNames {
 	pub tangram_node_file_name: &'static str,
 }
 
-pub fn target_file_names(target: Target) -> TargetFileNames {
-	match target {
-		Target::X8664UnknownLinuxGnu
-		| Target::AArch64UnknownLinuxGnu
-		| Target::X8664UnknownLinuxMusl
-		| Target::AArch64UnknownLinuxMusl => TargetFileNames {
-			tangram_cli_file_name: "tangram",
-			tangram_h_file_name: "tangram.h",
-			libtangram_dynamic_file_name: "libtangram.so",
-			libtangram_static_file_name: "libtangram.a",
-			tangram_elixir_file_name: "libtangram_elixir.so",
-			tangram_node_file_name: "libtangram_node.so",
-		},
-		Target::X8664AppleDarwin | Target::AArch64AppleDarwin => TargetFileNames {
-			tangram_cli_file_name: "tangram",
-			tangram_h_file_name: "tangram.h",
-			libtangram_dynamic_file_name: "libtangram.dylib",
-			libtangram_static_file_name: "libtangram.a",
-			tangram_elixir_file_name: "libtangram_elixir.dylib",
-			tangram_node_file_name: "libtangram_node.dylib",
-		},
-		Target::X8664PcWindowsMsvc => TargetFileNames {
-			tangram_cli_file_name: "tangram.exe",
-			tangram_h_file_name: "tangram.h",
-			libtangram_dynamic_file_name: "tangram.dll",
-			libtangram_static_file_name: "tangram.lib",
-			tangram_elixir_file_name: "tangram_elixir.dll",
-			tangram_node_file_name: "tangram_node.dll",
-		},
-		Target::X8664PcWindowsGnu => TargetFileNames {
-			tangram_cli_file_name: "tangram.exe",
-			tangram_h_file_name: "tangram.h",
-			libtangram_dynamic_file_name: "tangram.dll",
-			libtangram_static_file_name: "libtangram.a",
-			tangram_elixir_file_name: "tangram_elixir.dll",
-			tangram_node_file_name: "tangram_node.dll",
-		},
+impl TargetFileNames {
+	pub fn for_target(target: Target) -> TargetFileNames {
+		match target {
+			Target::X8664UnknownLinuxGnu
+			| Target::AArch64UnknownLinuxGnu
+			| Target::X8664UnknownLinuxMusl
+			| Target::AArch64UnknownLinuxMusl => TargetFileNames {
+				tangram_cli_file_name: "tangram",
+				tangram_h_file_name: "tangram.h",
+				libtangram_dynamic_file_name: "libtangram.so",
+				libtangram_static_file_name: "libtangram.a",
+				tangram_elixir_file_name: "libtangram_elixir.so",
+				tangram_node_file_name: "libtangram_node.so",
+			},
+			Target::X8664AppleDarwin | Target::AArch64AppleDarwin => TargetFileNames {
+				tangram_cli_file_name: "tangram",
+				tangram_h_file_name: "tangram.h",
+				libtangram_dynamic_file_name: "libtangram.dylib",
+				libtangram_static_file_name: "libtangram.a",
+				tangram_elixir_file_name: "libtangram_elixir.dylib",
+				tangram_node_file_name: "libtangram_node.dylib",
+			},
+			Target::X8664PcWindowsMsvc => TargetFileNames {
+				tangram_cli_file_name: "tangram.exe",
+				tangram_h_file_name: "tangram.h",
+				libtangram_dynamic_file_name: "tangram.dll",
+				libtangram_static_file_name: "tangram.lib",
+				tangram_elixir_file_name: "tangram_elixir.dll",
+				tangram_node_file_name: "tangram_node.dll",
+			},
+			Target::X8664PcWindowsGnu => TargetFileNames {
+				tangram_cli_file_name: "tangram.exe",
+				tangram_h_file_name: "tangram.h",
+				libtangram_dynamic_file_name: "tangram.dll",
+				libtangram_static_file_name: "libtangram.a",
+				tangram_elixir_file_name: "tangram_elixir.dll",
+				tangram_node_file_name: "tangram_node.dll",
+			},
+		}
 	}
 }
