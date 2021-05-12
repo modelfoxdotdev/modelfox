@@ -4057,7 +4057,6 @@ dependencies = [
 name = "tangram_script_build_word_embedding_models"
 version = "0.0.0"
 dependencies = [
- "cc",
  "duct",
  "ndarray",
  "ndarray-npy",

@@ -7,11 +7,6 @@ use std::{
 };
 use tangram_error::Result;
 
-#[cfg(all(target_pointer_width = "64", target_endian = "little"))]
-extern "C" {
-	fn murmur2(key: *const u8, len: u64, seed: u64) -> u64;
-}
-
 pub fn main() -> Result<()> {
 	let spacy_model_name = "en_core_web_md";
 	let spacy_model_version = "3.0.0";
@@ -74,4 +69,50 @@ pub fn main() -> Result<()> {
 	std::fs::remove_file(tar_path)?;
 	std::fs::remove_dir_all(untar_path)?;
 	Ok(())
+}
+
+#[cfg(all(target_pointer_width = "64", target_endian = "little"))]
+pub unsafe fn murmur2(key: *const u8, len: u64, seed: u64) -> u64 {
+	let m: u64 = 0xc6a4a7935bd1e995;
+	let r: u32 = 47;
+	let mut h: u64 = seed ^ len.wrapping_mul(m);
+	let mut data = key as *const u64;
+	let end = data.offset(len.wrapping_div(8) as isize);
+	while data != end {
+		let mut k = *data;
+		data = data.offset(1);
+		k = k.wrapping_mul(m);
+		k ^= k >> r;
+		k = k.wrapping_mul(m);
+		h ^= k;
+		h = h.wrapping_mul(m);
+	}
+	let data2 = data as *const u8;
+	let l = len & 7;
+	if l >= 7 {
+		h ^= (*data2.offset(6) as u64) << 48;
+	}
+	if l >= 6 {
+		h ^= (*data2.offset(5) as u64) << 40;
+	}
+	if l >= 5 {
+		h ^= (*data2.offset(4) as u64) << 32;
+	}
+	if l >= 4 {
+		h ^= (*data2.offset(3) as u64) << 24;
+	}
+	if l >= 3 {
+		h ^= (*data2.offset(2) as u64) << 16;
+	}
+	if l >= 2 {
+		h ^= (*data2.offset(1) as u64) << 8;
+	}
+	if l >= 1 {
+		h ^= *data2.offset(0) as u64;
+	}
+	h = h.wrapping_mul(m);
+	h ^= h >> r;
+	h = h.wrapping_mul(m);
+	h ^= h >> r;
+	return h;
 }

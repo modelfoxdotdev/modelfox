@@ -9,9 +9,6 @@ version = "0.0.0"
 name = "tangram_script_build_word_embedding_models"
 path = "main.rs"
 
-[build-dependencies]
-cc = "1"
-
 [dependencies]
 duct = "0.13"
 ndarray = { version = "0.15", features = ["rayon"] }
