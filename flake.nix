@@ -43,25 +43,3 @@
     }
   );
 }
-
-# (let python = python39; in python.withPackages (p: with p; [
-#   pip
-#   wheel
-#   setuptools
-#   setuptools-rust
-#   (python.pkgs.buildPythonPackage rec {
-#     pname = "pdoc";
-#     version = "6.6.0";
-#     format = "wheel";
-#     doCheck = false;
-#     propagatedBuildInputs = [
-#       jinja2
-#       pygments
-#     ];
-#     src = python.pkgs.fetchPypi {
-#       inherit pname version format;
-#       python = "py3";
-#       sha256 = "d0b8cfe21fbdd243feaad133a40c1af3e98c2333f5fc2f221144961ec2d2c491";
-#     };
-#   })
-# ]))
