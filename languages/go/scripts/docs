@@ -2,6 +2,7 @@ pushd /tmp
 go get golang.org/x/tools/cmd/godoc
 go get code.rocketnine.space/tslocum/godoc-static
 popd
+mkdir docs
 PATH=~/go/bin:$PATH godoc-static -destination=docs .
 rm docs/docs.zip
 echo '<html><head><meta http-equiv="refresh" content="0; URL=./github.com/tangramxyz/tangram-go" /></head></html>' > docs/index.html

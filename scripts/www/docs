@@ -1,5 +1,5 @@
 set -e
-for LANG in go elixir node python ruby rust; do
+for LANG in elixir go node python ruby rust; do
 	pushd languages/$LANG
 	scripts/docs
 	popd
