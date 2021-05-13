@@ -2811,28 +2811,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tangram_api"
-version = "0.0.0"
-dependencies = [
- "chrono",
- "http",
- "hyper",
- "memmap",
- "num",
- "serde",
- "serde_json",
- "sqlx",
- "tangram_app_common",
- "tangram_core",
- "tangram_error",
- "tangram_id",
- "tangram_metrics",
- "tangram_model",
- "tracing",
- "url",
-]
-
-[[package]]
 name = "tangram_app"
 version = "0.0.0"
 dependencies = [
@@ -2844,9 +2822,9 @@ dependencies = [
  "num",
  "once_cell",
  "sqlx",
- "tangram_api",
  "tangram_app_common",
  "tangram_app_edit_organization_server",
+ "tangram_app_health",
  "tangram_app_index_server",
  "tangram_app_layouts",
  "tangram_app_login_server",
@@ -2876,6 +2854,7 @@ dependencies = [
  "tangram_app_production_stats_index_server",
  "tangram_app_repo_edit_server",
  "tangram_app_repo_index_server",
+ "tangram_app_track",
  "tangram_app_training_class_metrics_client",
  "tangram_app_training_class_metrics_server",
  "tangram_app_training_grid_index_server",
@@ -2957,6 +2936,29 @@ dependencies = [
  "tangram_error",
  "tangram_id",
  "tangram_ui",
+]
+
+[[package]]
+name = "tangram_app_health"
+version = "0.0.0"
+dependencies = [
+ "chrono",
+ "futures",
+ "http",
+ "hyper",
+ "memmap",
+ "num",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "tangram_app_common",
+ "tangram_core",
+ "tangram_error",
+ "tangram_id",
+ "tangram_metrics",
+ "tangram_model",
+ "tracing",
+ "url",
 ]
 
 [[package]]
@@ -3468,6 +3470,29 @@ dependencies = [
  "tangram_id",
  "tangram_model",
  "tangram_ui",
+]
+
+[[package]]
+name = "tangram_app_track"
+version = "0.0.0"
+dependencies = [
+ "chrono",
+ "futures",
+ "http",
+ "hyper",
+ "memmap",
+ "num",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "tangram_app_common",
+ "tangram_core",
+ "tangram_error",
+ "tangram_id",
+ "tangram_metrics",
+ "tangram_model",
+ "tracing",
+ "url",
 ]
 
 [[package]]

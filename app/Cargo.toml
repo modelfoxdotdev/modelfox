@@ -85,10 +85,11 @@ lettre = { version = "0.10.0-beta.4", default-features = false, features = ["bui
 num = "0.4"
 once_cell = "1"
 sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }
-tangram_api = { path = "api" }
 tangram_app_common = { path = "common" }
+tangram_app_health = { path = "health" }
 tangram_app_layouts = { path = "layouts" }
 tangram_app_migrations = { path = "migrations" }
+tangram_app_track = { path = "track" }
 tangram_charts = { path = "../charts" }
 tangram_core = { path = "../core" }
 tangram_error = { path = "../error" }

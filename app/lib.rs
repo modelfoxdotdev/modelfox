@@ -89,10 +89,10 @@ async fn request_handler(
 	#[rustfmt::skip]
 	let response = match (&method, path_components.as_slice()) {
 		(&http::Method::GET, &["health"]) => {
-			tangram_api::health::get(&context, request).boxed()
+			tangram_app_health::get(&context, request).boxed()
 		},
 		(&http::Method::POST, &["track"]) => {
-			tangram_api::track::post(&context, request).boxed()
+			tangram_app_track::post(&context, request).boxed()
 		},
 		#[cfg(feature = "tangram_app_login")]
 		(&http::Method::GET, &["login"]) => {
@@ -332,7 +332,7 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 		(pool_options, pool_max_connections)
 	} else {
 		return Err(err!(
-			"DATABASE_URL must be a sqlite or postgres database url"
+			"The database url must start with sqlite: or postgres:."
 		));
 	};
 	let pool = sqlx::any::AnyPoolOptions::default()
