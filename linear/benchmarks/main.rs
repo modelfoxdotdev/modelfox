@@ -87,6 +87,22 @@ pub enum BenchmarkOutput {
 	MulticlassClassification(MulticlassClassificationBenchmarkOutput),
 }
 
+impl BenchmarkOutput {
+	fn memory(&mut self, memory: String) {
+		match self {
+			BenchmarkOutput::Regression(output) => {
+				output.memory = Some(memory);
+			}
+			BenchmarkOutput::BinaryClassification(output) => {
+				output.memory = Some(memory);
+			}
+			BenchmarkOutput::MulticlassClassification(output) => {
+				output.memory = Some(memory);
+			}
+		}
+	}
+}
+
 #[derive(serde::Deserialize, Debug)]
 pub struct RegressionBenchmarkOutput {
 	mse: f32,
@@ -168,6 +184,7 @@ fn build_tangram_benchmark(dataset: &Dataset) {
 
 fn run_benchmarks(libraries: &[Library], datasets: &[Dataset]) {
 	for dataset in datasets.iter() {
+		println!("## {}", dataset);
 		for library in libraries.iter() {
 			let start = std::time::Instant::now();
 			let output = run_benchmark(dataset, library);
@@ -191,25 +208,63 @@ fn run_benchmarks(libraries: &[Library], datasets: &[Dataset]) {
 }
 
 fn run_benchmark(dataset: &Dataset, library: &Library) -> BenchmarkOutput {
-	if *library == Library::Tangram {
-		let output = std::process::Command::new(format!(
-			"build/cargo/release/tangram_linear_benchmark_{}",
-			dataset
-		))
-		.output()
-		.unwrap();
-		assert!(output.status.success());
-		let output = serde_json::from_slice(output.stdout.as_slice()).unwrap();
-		output
-	} else {
-		let output = std::process::Command::new("python")
-			.arg(format!("linear/benchmarks/{}.py", dataset))
-			.arg("--library")
-			.arg(format!("{}", library))
-			.output()
-			.unwrap();
-		assert!(output.status.success());
-		let output = serde_json::from_slice(output.stdout.as_slice()).unwrap();
-		output
-	}
+	let output = match library {
+		Library::Tangram => {
+			if cfg!(target_os = "linux") {
+				std::process::Command::new("time")
+					.arg("-f")
+					.arg("%M")
+					.arg(format!(
+						"target/release/tangram_linear_benchmark_{}",
+						dataset
+					))
+					.output()
+					.unwrap()
+			} else if cfg!(target_os = "macos") {
+				std::process::Command::new("gtime")
+					.arg("-f")
+					.arg("%M")
+					.arg(format!(
+						"target/release/tangram_linear_benchmark_{}",
+						dataset
+					))
+					.output()
+					.unwrap()
+			} else {
+				panic!("unsupported OS");
+			}
+		}
+		_ => {
+			if cfg!(target_os = "linux") {
+				std::process::Command::new("time")
+					.arg("-f")
+					.arg("%M")
+					.arg("python")
+					.arg(format!("linear/benchmarks/{}.py", dataset))
+					.arg("--library")
+					.arg(format!("{}", library))
+					.output()
+					.unwrap()
+			} else if cfg!(target_os = "macos") {
+				std::process::Command::new("gtime")
+					.arg("-f")
+					.arg("%M")
+					.arg("python")
+					.arg(format!("linear/benchmarks/{}.py", dataset))
+					.arg("--library")
+					.arg(format!("{}", library))
+					.output()
+					.unwrap()
+			} else {
+				panic!("unsupported OS");
+			}
+		}
+	};
+	assert!(output.status.success());
+	let stderr = String::from_utf8(output.stderr).unwrap();
+	let memory = stderr.lines().last().unwrap().to_owned();
+	let stdout = String::from_utf8(output.stdout).unwrap();
+	let mut output: BenchmarkOutput = serde_json::from_str(stdout.lines().last().unwrap()).unwrap();
+	output.memory(memory);
+	output
 }

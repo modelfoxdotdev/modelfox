@@ -32,6 +32,22 @@ pub struct OneHotEncodedFeatureGroup {
 }
 
 impl OneHotEncodedFeatureGroup {
+	pub fn compute_for_column(column: TableColumnView) -> OneHotEncodedFeatureGroup {
+		match column {
+			TableColumnView::Enum(column) => Self::compute_for_enum_column(column),
+			_ => unimplemented!(),
+		}
+	}
+
+	fn compute_for_enum_column(column: EnumTableColumnView) -> Self {
+		Self {
+			source_column_name: column.name().unwrap().to_owned(),
+			variants: column.variants().to_owned(),
+		}
+	}
+}
+
+impl OneHotEncodedFeatureGroup {
 	pub fn compute_array_f32(
 		&self,
 		features: ArrayViewMut2<f32>,

@@ -1,4 +1,5 @@
 use num::ToPrimitive;
+use std::iter::IntoIterator;
 use std::num::NonZeroU64;
 
 pub struct MeanVariance(Option<MeanVarianceInner>);
@@ -22,10 +23,10 @@ pub struct MeanVarianceOutput {
 }
 
 impl MeanVariance {
-	pub fn compute(input: &[f32]) -> MeanVarianceOutput {
+	pub fn compute(input: impl IntoIterator<Item = f32>) -> MeanVarianceOutput {
 		let mut mean_variance = MeanVariance::default();
-		for input in input.iter() {
-			mean_variance.update(*input);
+		for input in input.into_iter() {
+			mean_variance.update(input);
 		}
 		mean_variance.finalize()
 	}

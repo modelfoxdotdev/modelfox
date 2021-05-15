@@ -43,12 +43,27 @@ impl NormalizedFeatureGroup {
 	pub fn compute_for_column(column: TableColumnView) -> NormalizedFeatureGroup {
 		match column {
 			TableColumnView::Number(column) => Self::compute_for_number_column(column),
+			TableColumnView::Enum(column) => Self::compute_for_enum_column(column),
 			_ => unimplemented!(),
 		}
 	}
 
 	fn compute_for_number_column(column: NumberTableColumnView) -> Self {
-		let mean_variance = tangram_metrics::MeanVariance::compute(column.view().as_slice());
+		let mean_variance =
+			tangram_metrics::MeanVariance::compute(column.view().as_slice().iter().cloned());
+		Self {
+			source_column_name: column.name().unwrap().to_owned(),
+			mean: mean_variance.mean,
+			variance: mean_variance.variance,
+		}
+	}
+
+	fn compute_for_enum_column(column: EnumTableColumnView) -> Self {
+		let values = column.view();
+		let values_iter = values
+			.iter()
+			.filter_map(|value| value.map(|value| value.get().to_f32().unwrap()));
+		let mean_variance = tangram_metrics::MeanVariance::compute(values_iter);
 		Self {
 			source_column_name: column.name().unwrap().to_owned(),
 			mean: mean_variance.mean,

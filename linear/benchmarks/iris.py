@@ -71,13 +71,6 @@ else:
 # Compute metrics.
 accuracy = accuracy_score(predictions, labels_test)
 
-# Compute memory usage.
-f = open("/proc/self/status", "r")
-for line in f.readlines():
-	if line.startswith("VmHWM"):
-		memory = line.split(":")[1].strip()
-
 print(json.dumps({
   'accuracy': accuracy,
-  'memory': memory,
 }))

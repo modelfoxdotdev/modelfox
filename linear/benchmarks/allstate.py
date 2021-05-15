@@ -106,6 +106,7 @@ if args.library == 'pytorch' or args.library == 'sklearn':
 	])
 	features_train = preprocessor.fit_transform(features_train)
 	features_test = preprocessor.transform(features_test)
+	print(features_train.shape)
 
 # Train the model.
 if args.library == 'pytorch':
@@ -128,13 +129,6 @@ predictions = model.predict(features_test)
 # Compute metrics.
 mse = mean_squared_error(predictions, labels_test)
 
-# Compute memory usage.
-f = open("/proc/self/status", "r")
-for line in f.readlines():
-	if line.startswith("VmHWM"):
-		memory = line.split(":")[1].strip()
-
 print(json.dumps({
 	'mse': mse,
-	'memory': memory,
 }))

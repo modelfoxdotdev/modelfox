@@ -224,7 +224,7 @@ fn run_benchmark(dataset: &Dataset, library: &Library) -> BenchmarkOutput {
 	let output = match library {
 		Library::Tangram => {
 			if cfg!(target_os = "linux") {
-				std::process::Command::new("/usr/bin/time")
+				std::process::Command::new("time")
 					.arg("-f")
 					.arg("%M")
 					.arg(format!("target/release/tangram_tree_benchmark_{}", dataset))
@@ -243,7 +243,7 @@ fn run_benchmark(dataset: &Dataset, library: &Library) -> BenchmarkOutput {
 		}
 		_ => {
 			if cfg!(target_os = "linux") {
-				std::process::Command::new("/usr/bin/time")
+				std::process::Command::new("time")
 					.arg("-f")
 					.arg("%M")
 					.arg("python")

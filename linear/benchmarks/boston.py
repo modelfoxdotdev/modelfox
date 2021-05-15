@@ -86,13 +86,6 @@ predictions = model.predict(features_test)
 # Compute metrics.
 mse = mean_squared_error(predictions, labels_test)
 
-# Compute memory usage.
-f = open("/proc/self/status", "r")
-for line in f.readlines():
-	if line.startswith("VmHWM"):
-		memory = line.split(":")[1].strip()
-
 print(json.dumps({
 	'mse': mse,
-	'memory': memory,
 }))

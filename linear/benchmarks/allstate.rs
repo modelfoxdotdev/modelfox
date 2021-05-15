@@ -597,10 +597,14 @@ fn main() {
 	let feature_groups: Vec<tangram_features::FeatureGroup> = features_train
 		.columns()
 		.iter()
-		.map(|column| {
-			tangram_features::FeatureGroup::Normalized(
+		.map(|column| match column {
+			TableColumn::Number(_) => tangram_features::FeatureGroup::Normalized(
 				tangram_features::NormalizedFeatureGroup::compute_for_column(column.view()),
-			)
+			),
+			TableColumn::Enum(_) => tangram_features::FeatureGroup::Normalized(
+				tangram_features::NormalizedFeatureGroup::compute_for_column(column.view()),
+			),
+			_ => unreachable!(),
 		})
 		.collect();
 	let features_train = tangram_features::compute_features_array_f32(
@@ -653,18 +657,8 @@ fn main() {
 	});
 	let metrics = metrics.finalize();
 
-	// Compute memory usage.
-	let mut memory = None;
-	let file = std::fs::read_to_string("/proc/self/status").unwrap();
-	for line in file.lines() {
-		if line.starts_with("VmHWM") {
-			memory = Some(line.split(':').nth(1).map(|x| x.trim().to_owned()).unwrap());
-		}
-	}
-
 	let output = json!({
 		"mse": metrics.mse,
-		"memory": memory,
 	});
 	println!("{}", output);
 }
