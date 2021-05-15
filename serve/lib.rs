@@ -26,8 +26,8 @@ pub async fn serve<C, H, F>(
 	request_handler: H,
 ) -> hyper::Result<()>
 where
-	C: Send + Sync + 'static,
-	H: Fn(Arc<C>, http::Request<hyper::Body>) -> F + Send + Sync + 'static,
+	C: 'static + Send + Sync,
+	H: 'static + Fn(Arc<C>, http::Request<hyper::Body>) -> F + Send + Sync,
 	F: Future<Output = http::Response<hyper::Body>> + Send,
 {
 	// Create a task local that will store the panic message and backtrace if a panic occurs.
@@ -40,8 +40,8 @@ where
 		request: http::Request<hyper::Body>,
 	) -> Result<http::Response<hyper::Body>, Infallible>
 	where
-		C: Send + Sync + 'static,
-		H: Fn(Arc<C>, http::Request<hyper::Body>) -> F + Send + Sync + 'static,
+		C: 'static + Send + Sync,
+		H: 'static + Fn(Arc<C>, http::Request<hyper::Body>) -> F + Send + Sync,
 		F: Future<Output = http::Response<hyper::Body>> + Send,
 	{
 		let method = request.method().clone();
@@ -419,7 +419,7 @@ pub fn build(options: BuildOptions) -> Result<()> {
 	Ok(())
 }
 
-pub type RouteMap = BTreeMap<&'static str, &'static (dyn Fn() -> String + Send + Sync + 'static)>;
+pub type RouteMap = BTreeMap<&'static str, &'static (dyn 'static + Fn() -> String + Send + Sync)>;
 
 pub fn export(out_dir: &Path, dist_path: &Path, route_map: RouteMap) -> Result<()> {
 	// Create a new directory at dist_path.

@@ -9,7 +9,7 @@ pub use self::get::get;
 // 	context: &Context,
 // 	request: http::Request<hyper::Body>,
 // ) -> std::pin::Pin<
-// 	Box<dyn std::future::Future<Output = Option<Result<http::Response<hyper::Body>>>> + '_>,
+// 	Box<dyn '_ + std::future::Future<Output = Option<Result<http::Response<hyper::Body>>>>>,
 // > {
 // 	match request.method() {
 // 		&http::Method::GET => self::get::get(context, request).map(Some).boxed(),
