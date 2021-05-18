@@ -1,6 +1,7 @@
 use crate::page::{Owner, Page, PageProps};
 use html::html;
 use sqlx::prelude::*;
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{redirect_to_login, service_unavailable},
 	user::{authorize_user, User},
@@ -10,7 +11,7 @@ use tangram_app_layouts::app_layout::get_app_layout_props;
 use tangram_error::Result;
 
 pub async fn get(
-	context: &Context,
+	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	let mut db = match context.database_pool.begin().await {
@@ -21,7 +22,7 @@ pub async fn get(
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
-	let app_layout_props = get_app_layout_props(context).await?;
+	let app_layout_props = get_app_layout_props(&context).await?;
 	let owners = match user {
 		User::Root => None,
 		User::Normal(user) => {

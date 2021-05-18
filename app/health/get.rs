@@ -1,8 +1,9 @@
+use std::sync::Arc;
 use tangram_app_common::Context;
 use tangram_error::Result;
 
 pub async fn get(
-	context: &Context,
+	context: Arc<Context>,
 	_request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	match context.database_pool.acquire().await {

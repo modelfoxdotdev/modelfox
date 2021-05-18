@@ -1,10 +1,11 @@
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
+	path_components,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 	Context,
 };
-
-use tangram_error::Result;
+use tangram_error::{err, Result};
 use tangram_id::Id;
 
 #[derive(serde::Deserialize)]
@@ -15,11 +16,16 @@ enum Action {
 }
 
 pub async fn post(
-	context: &Context,
+	context: Arc<Context>,
 	mut request: http::Request<hyper::Body>,
-	organization_id: &str,
-	member_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
+	let (organization_id, member_id) = if let &["organizations", organization_id, "members", member_id] =
+		path_components(&request).as_slice()
+	{
+		(organization_id.to_owned(), member_id.to_owned())
+	} else {
+		return Err(err!("unexpected path"));
+	};
 	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}

@@ -4,6 +4,7 @@ use html::html;
 use lettre::AsyncTransport;
 use rand::Rng;
 use sqlx::prelude::*;
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, service_unavailable},
 	Context,
@@ -18,7 +19,7 @@ struct Action {
 }
 
 pub async fn post(
-	context: &Context,
+	context: Arc<Context>,
 	mut request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	// Read the post data.

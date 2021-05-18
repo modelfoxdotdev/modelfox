@@ -5,6 +5,7 @@ use crate::page::{
 };
 use html::html;
 use sqlx::prelude::*;
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{not_found, redirect_to_login, service_unavailable},
 	organizations::get_organizations,
@@ -16,7 +17,7 @@ use tangram_error::Result;
 use tangram_id::Id;
 
 pub async fn get(
-	context: &Context,
+	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	if !context.options.auth_enabled() {
@@ -30,7 +31,7 @@ pub async fn get(
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
-	let app_layout_props = get_app_layout_props(context).await?;
+	let app_layout_props = get_app_layout_props(&context).await?;
 	let props = match user {
 		User::Root => {
 			let repos = get_root_user_repositories(&mut db).await?;

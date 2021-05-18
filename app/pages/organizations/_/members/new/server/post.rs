@@ -1,7 +1,9 @@
 use lettre::AsyncTransport;
 use sqlx::prelude::*;
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
+	path_components,
 	user::NormalUser,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 	Context,
@@ -17,10 +19,15 @@ struct Action {
 }
 
 pub async fn post(
-	context: &Context,
+	context: Arc<Context>,
 	mut request: http::Request<hyper::Body>,
-	organization_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
+	let organization_id =
+		if let &["organizations", organization_id, ""] = path_components(&request).as_slice() {
+			organization_id.to_owned()
+		} else {
+			return Err(err!("unexpected path"));
+		};
 	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
@@ -47,7 +54,7 @@ pub async fn post(
 		Ok(action) => action,
 		Err(_) => return Ok(bad_request()),
 	};
-	let response = add_member(action, user, &mut db, context, organization_id).await?;
+	let response = add_member(action, user, &mut db, &context, organization_id).await?;
 	db.commit().await?;
 	Ok(response)
 }

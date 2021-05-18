@@ -3,22 +3,30 @@ use crate::page::{
 };
 use html::html;
 use num::ToPrimitive;
+use std::sync::Arc;
 use tangram_app_common::{
 	column_type::ColumnType,
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
+	path_components,
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
 use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
-use tangram_error::Result;
+use tangram_error::{err, Result};
 use tangram_id::Id;
 
 pub async fn get(
-	context: &Context,
+	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
-	model_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
+	let model_id = if let &["repos", _, "models", model_id, "training_stats", ""] =
+		path_components(&request).as_slice()
+	{
+		model_id.to_owned()
+	} else {
+		return Err(err!("unexpected path"));
+	};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
@@ -37,7 +45,7 @@ pub async fn get(
 	let bytes = get_model_bytes(&context.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model_layout_props =
-		get_model_layout_props(&mut db, context, model_id, ModelNavItem::TrainingStats).await?;
+		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::TrainingStats).await?;
 	let props = match model.inner() {
 		tangram_model::ModelInnerReader::Regressor(regressor) => {
 			let regressor = regressor.read();

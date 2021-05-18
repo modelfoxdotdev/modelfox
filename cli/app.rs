@@ -117,11 +117,22 @@ pub fn app(args: AppArgs) -> Result<()> {
 			max_connections: None,
 			url: default_database_url(),
 		});
-	let host = config
-		.as_ref()
-		.and_then(|c| c.host)
+	let host_from_env = if let Ok(host) = std::env::var("HOST") {
+		Some(host.parse()?)
+	} else {
+		None
+	};
+	let host_from_config = config.as_ref().and_then(|c| c.host);
+	let host = host_from_env
+		.or(host_from_config)
 		.unwrap_or_else(|| "0.0.0.0".parse().unwrap());
-	let port = config.as_ref().and_then(|c| c.port).unwrap_or(8080);
+	let port_from_env = if let Ok(port) = std::env::var("PORT") {
+		Some(port.parse()?)
+	} else {
+		None
+	};
+	let port_from_config = config.as_ref().and_then(|c| c.port);
+	let port = port_from_env.or(port_from_config).unwrap_or(8080);
 	// Verify the license if one was provided.
 	let license_verified: Option<bool> =
 		if let Some(license_file_path) = config.as_ref().and_then(|c| c.license.clone()) {

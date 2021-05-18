@@ -8,9 +8,12 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
+futures = "0.3"
 html = { path = "../../../../../../../../../../html" }
 http = "0.2"
 hyper = { version = "0.14", features = ["server"] }
+serde = { version = "1", features = ["derive"] }
+serde_urlencoded = "0.7"
 num = "0.4"
 tangram_app_common = { path = "../../../../../../../../../common" }
 tangram_app_layouts = { path = "../../../../../../../../../layouts" }

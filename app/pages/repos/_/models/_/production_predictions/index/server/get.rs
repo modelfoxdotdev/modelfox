@@ -4,34 +4,42 @@ use chrono_tz::Tz;
 use html::html;
 use num::ToPrimitive;
 use sqlx::prelude::*;
-use std::collections::BTreeMap;
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	heuristics::PRODUCTION_PREDICTIONS_NUM_PREDICTIONS_PER_PAGE_TABLE,
 	monitor_event::PredictOutput,
+	path_components,
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
 use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
-use tangram_error::Result;
+use tangram_error::{err, Result};
 use tangram_id::Id;
 
 pub async fn get(
-	context: &Context,
+	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
-	model_id: &str,
-	search_params: Option<BTreeMap<String, String>>,
 ) -> Result<http::Response<hyper::Body>> {
+	let model_id = if let &["repos", _, "models", model_id, "production_predictions", ""] =
+		path_components(&request).as_slice()
+	{
+		model_id.to_owned()
+	} else {
+		return Err(err!("unexpected path"));
+	};
+	#[derive(serde::Deserialize, Default)]
+	struct SearchParams {
+		after: Option<i64>,
+		before: Option<i64>,
+	}
+	let search_params: Option<SearchParams> = if let Some(query) = request.uri().query() {
+		Some(serde_urlencoded::from_str(query)?)
+	} else {
+		None
+	};
 	let timezone = get_timezone(&request);
-	let after: Option<i64> = search_params
-		.as_ref()
-		.and_then(|s| s.get("after"))
-		.and_then(|t| t.parse().ok());
-	let before: Option<i64> = search_params
-		.as_ref()
-		.and_then(|s| s.get("before"))
-		.and_then(|t| t.parse().ok());
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
@@ -49,11 +57,13 @@ pub async fn get(
 	}
 	let model_layout_props = get_model_layout_props(
 		&mut db,
-		context,
+		&context,
 		model_id,
 		ModelNavItem::ProductionPredictions,
 	)
 	.await?;
+	let after = search_params.as_ref().and_then(|s| s.after);
+	let before = search_params.as_ref().and_then(|s| s.before);
 	let rows = match (after, before) {
 		(Some(after), None) => {
 			let rows = sqlx::query(

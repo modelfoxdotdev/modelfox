@@ -1,10 +1,12 @@
-use std::collections::BTreeMap;
 use std::fmt::Display;
 
-#[derive(Clone, Copy, Debug)]
+#[derive(serde::Deserialize, Clone, Copy, Debug)]
 pub enum DateWindow {
+	#[serde(rename = "today")]
 	Today,
+	#[serde(rename = "this_month")]
 	ThisMonth,
+	#[serde(rename = "this_year")]
 	ThisYear,
 }
 
@@ -26,18 +28,9 @@ pub enum DateWindowInterval {
 }
 
 pub fn get_date_window_and_interval(
-	search_params: &Option<BTreeMap<String, String>>,
+	date_window: &Option<DateWindow>,
 ) -> Option<(DateWindow, DateWindowInterval)> {
-	let date_window = search_params
-		.as_ref()
-		.and_then(|query| query.get("date_window"));
-	let date_window = date_window.map_or("this_month", |dw| dw.as_str());
-	let date_window = match date_window {
-		"today" => DateWindow::Today,
-		"this_month" => DateWindow::ThisMonth,
-		"this_year" => DateWindow::ThisYear,
-		_ => return None,
-	};
+	let date_window = date_window.unwrap_or(DateWindow::ThisMonth);
 	let date_window_interval = match date_window {
 		DateWindow::Today => DateWindowInterval::Hourly,
 		DateWindow::ThisMonth => DateWindowInterval::Daily,

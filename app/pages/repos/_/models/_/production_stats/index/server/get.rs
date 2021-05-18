@@ -9,7 +9,7 @@ use crate::{
 use chrono_tz::Tz;
 use html::html;
 use num::ToPrimitive;
-use std::collections::BTreeMap;
+use std::sync::Arc;
 use tangram_app_common::{
 	column_type::ColumnType,
 	date_window::DateWindow,
@@ -20,6 +20,7 @@ use tangram_app_common::{
 		PRODUCTION_STATS_LARGE_INVALID_RATIO_THRESHOLD_TO_TRIGGER_ALERT,
 	},
 	model::get_model_bytes,
+	path_components,
 	production_stats::get_production_stats,
 	production_stats::{
 		GetProductionStatsOutput, ProductionColumnStatsOutput, ProductionPredictionStatsOutput,
@@ -31,16 +32,35 @@ use tangram_app_common::{
 	Context,
 };
 use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
-use tangram_error::Result;
+use tangram_error::{err, Result};
 use tangram_id::Id;
 
+#[derive(serde::Deserialize, Default)]
+struct SearchParams {
+	date_window: Option<DateWindow>,
+	class: Option<String>,
+}
+
 pub async fn get(
-	context: &Context,
+	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
-	model_id: &str,
-	search_params: Option<BTreeMap<String, String>>,
 ) -> Result<http::Response<hyper::Body>> {
-	let (date_window, date_window_interval) = match get_date_window_and_interval(&search_params) {
+	let model_id = if let &["repos", _, "models", model_id, "production_stats", ""] =
+		path_components(&request).as_slice()
+	{
+		model_id.to_owned()
+	} else {
+		return Err(err!("unexpected path"));
+	};
+	let search_params: Option<SearchParams> = if let Some(query) = request.uri().query() {
+		Some(serde_urlencoded::from_str(query)?)
+	} else {
+		None
+	};
+	let date_window = search_params
+		.as_ref()
+		.and_then(|search_params| search_params.date_window);
+	let (date_window, date_window_interval) = match get_date_window_and_interval(&date_window) {
 		Some((date_window, date_window_interval)) => (date_window, date_window_interval),
 		None => return Ok(bad_request()),
 	};
@@ -81,7 +101,6 @@ pub async fn get(
 				date_window,
 				date_window_interval,
 				timezone,
-				search_params,
 			))
 		}
 		ProductionPredictionStatsOutput::MulticlassClassification(_) => {
@@ -96,7 +115,7 @@ pub async fn get(
 		}
 	};
 	let model_layout_props =
-		get_model_layout_props(&mut db, context, model_id, ModelNavItem::ProductionStats).await?;
+		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::ProductionStats).await?;
 	let props = PageProps {
 		model_id: model_id.to_string(),
 		model_layout_props,
@@ -212,7 +231,6 @@ fn compute_binary_classifier_props(
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
 	timezone: Tz,
-	_search_params: Option<BTreeMap<String, String>>,
 ) -> BinaryClassifierProps {
 	let model = model.inner().as_binary_classifier().unwrap();
 	let target_column_stats = model.overall_target_column_stats();
@@ -301,11 +319,11 @@ fn compute_multiclass_classifier_props(
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
 	timezone: Tz,
-	search_params: Option<BTreeMap<String, String>>,
+	search_params: Option<SearchParams>,
 ) -> MulticlassClassifierProps {
 	let model = model.inner().as_multiclass_classifier().unwrap();
+	let class = search_params.and_then(|s| s.class);
 	let classes = model.classes().to_owned();
-	let class = search_params.and_then(|s| s.get("class").map(|class| class.to_owned()));
 	let class_index = if let Some(class) = &class {
 		classes.iter().position(|c| c == class).unwrap()
 	} else {

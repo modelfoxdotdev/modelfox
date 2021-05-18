@@ -1,10 +1,12 @@
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
+	path_components,
 	repos::delete_model_version,
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_error::Result;
+use tangram_error::{err, Result};
 use tangram_id::Id;
 
 #[derive(serde::Deserialize)]
@@ -22,11 +24,16 @@ struct UpdateTagAction {
 }
 
 pub async fn post(
-	context: &Context,
+	context: Arc<Context>,
 	mut request: http::Request<hyper::Body>,
-	repo_id: &str,
-	model_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
+	let (repo_id, model_id) = if let &["repos", repo_id, "models", model_id, "edit"] =
+		path_components(&request).as_slice()
+	{
+		(repo_id.to_owned(), model_id.to_owned())
+	} else {
+		return Err(err!("unexpected path"));
+	};
 	let data = match hyper::body::to_bytes(request.body_mut()).await {
 		Ok(data) => data,
 		Err(_) => return Ok(bad_request()),

@@ -1,18 +1,26 @@
 use crate::page::{Page, PageProps};
 use html::html;
-use std::collections::BTreeMap;
+use std::sync::Arc;
 use tangram_app_common::{error::not_found, Context};
 use tangram_error::Result;
 
 pub async fn get(
-	context: &Context,
-	_request: http::Request<hyper::Body>,
-	search_params: Option<BTreeMap<String, String>>,
+	context: Arc<Context>,
+	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
-	let email = search_params.as_ref().and_then(|s| s.get("email").cloned());
+	#[derive(serde::Deserialize, Default)]
+	struct SearchParams {
+		email: String,
+	}
+	let search_params: Option<SearchParams> = if let Some(query) = request.uri().query() {
+		Some(serde_urlencoded::from_str(query)?)
+	} else {
+		None
+	};
+	let email = search_params.map(|search_params| search_params.email);
 	let props = PageProps {
 		code: email.is_some(),
 		error: None,

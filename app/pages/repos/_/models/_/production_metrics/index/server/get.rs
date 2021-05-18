@@ -6,11 +6,12 @@ use crate::page::{
 	RegressorProductionMetricsProps, TrainingProductionMetrics, TrueValuesCountChartEntry,
 };
 use html::html;
-use std::collections::BTreeMap;
+use std::sync::Arc;
 use tangram_app_common::{
-	date_window::get_date_window_and_interval,
+	date_window::{get_date_window_and_interval, DateWindow},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
+	path_components,
 	production_metrics::get_production_metrics,
 	production_metrics::ProductionPredictionMetricsOutput,
 	time::format_date_window_interval,
@@ -19,17 +20,34 @@ use tangram_app_common::{
 	Context,
 };
 use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
-use tangram_error::Result;
+use tangram_error::{err, Result};
 use tangram_id::Id;
 use tangram_zip::zip;
 
 pub async fn get(
-	context: &Context,
+	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
-	model_id: &str,
-	search_params: Option<BTreeMap<String, String>>,
 ) -> Result<http::Response<hyper::Body>> {
-	let (date_window, date_window_interval) = match get_date_window_and_interval(&search_params) {
+	let model_id = if let &["repos", _, "models", model_id, "production_metrics", ""] =
+		path_components(&request).as_slice()
+	{
+		model_id.to_owned()
+	} else {
+		return Err(err!("unexpected path"));
+	};
+	#[derive(serde::Deserialize, Default)]
+	struct SearchParams {
+		date_window: Option<DateWindow>,
+	}
+	let search_params: Option<SearchParams> = if let Some(query) = request.uri().query() {
+		Some(serde_urlencoded::from_str(query)?)
+	} else {
+		None
+	};
+	let date_window = search_params
+		.as_ref()
+		.and_then(|search_params| search_params.date_window);
+	let (date_window, date_window_interval) = match get_date_window_and_interval(&date_window) {
 		Some((date_window, date_window_interval)) => (date_window, date_window_interval),
 		None => return Ok(bad_request()),
 	};
@@ -329,7 +347,8 @@ pub async fn get(
 		}
 	};
 	let model_layout_props =
-		get_model_layout_props(&mut db, context, model_id, ModelNavItem::ProductionMetrics).await?;
+		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::ProductionMetrics)
+			.await?;
 	let props = PageProps {
 		id: model_id.to_string(),
 		inner,

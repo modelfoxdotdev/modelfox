@@ -8,6 +8,7 @@ use crate::{
 };
 use html::html;
 use num::ToPrimitive;
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	heuristics::{
@@ -15,19 +16,25 @@ use tangram_app_common::{
 		TRAINING_IMPORTANCES_MAX_FEATURE_IMPORTANCES_TO_SHOW_IN_TABLE,
 	},
 	model::get_model_bytes,
+	path_components,
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
 use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
-use tangram_error::Result;
+use tangram_error::{err, Result};
 use tangram_id::Id;
 use tangram_zip::zip;
 
 pub async fn get(
-	context: &Context,
+	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
-	model_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
+	let model_id =
+		if let &["repos", _, "models", model_id, ""] = path_components(&request).as_slice() {
+			model_id.to_owned()
+		} else {
+			return Err(err!("unexpected path"));
+		};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
@@ -161,7 +168,7 @@ pub async fn get(
 		}
 	};
 	let model_layout_props =
-		get_model_layout_props(&mut db, context, model_id, ModelNavItem::Overview).await?;
+		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::Overview).await?;
 	let props = PageProps {
 		id: model_id.to_string(),
 		inner,

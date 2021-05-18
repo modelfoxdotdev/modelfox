@@ -3,9 +3,11 @@ use chrono::prelude::*;
 use chrono_tz::Tz;
 use html::html;
 use sqlx::prelude::*;
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
+	path_components,
 	predict::{
 		compute_feature_contributions_chart_series, compute_input_table_props,
 		BinaryClassificationPredictOutputProps, MulticlassClassificationPredictOutputProps,
@@ -17,15 +19,20 @@ use tangram_app_common::{
 };
 use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
 use tangram_core::predict::{PredictInput, PredictOptions};
-use tangram_error::Result;
+use tangram_error::{err, Result};
 use tangram_id::Id;
 
 pub async fn get(
-	context: &Context,
+	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
-	model_id: &str,
-	identifier: &str,
 ) -> Result<http::Response<hyper::Body>> {
+	let (model_id, identifier) = if let &["repos", _, "models", model_id, "production_predictions", "predictions", identifier] =
+		path_components(&request).as_slice()
+	{
+		(model_id.to_owned(), identifier.to_owned())
+	} else {
+		return Err(err!("unexpected path"));
+	};
 	let timezone = get_timezone(&request);
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
@@ -46,7 +53,7 @@ pub async fn get(
 	}
 	let model_layout_props = get_model_layout_props(
 		&mut db,
-		context,
+		&context,
 		model_id,
 		ModelNavItem::ProductionPredictions,
 	)
@@ -67,7 +74,7 @@ pub async fn get(
 		",
 	)
 	.bind(&model_id.to_string())
-	.bind(identifier)
+	.bind(&identifier)
 	.fetch_optional(&mut *db)
 	.await?;
 	let inner = match row {

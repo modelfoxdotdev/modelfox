@@ -1,22 +1,37 @@
 use crate::page::{ConfusionMatrixSectionProps, Page, PageProps, PrecisionRecallSectionProps};
 use html::html;
-use std::collections::BTreeMap;
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
+	path_components,
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
 use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
-use tangram_error::Result;
+use tangram_error::{err, Result};
 use tangram_id::Id;
 
 pub async fn get(
-	context: &Context,
+	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
-	model_id: &str,
-	search_params: Option<BTreeMap<String, String>>,
 ) -> Result<http::Response<hyper::Body>> {
+	let model_id = if let &["repos", _, "models", model_id, "training_metrics", "class_metrics"] =
+		path_components(&request).as_slice()
+	{
+		model_id.to_owned()
+	} else {
+		return Err(err!("unexpected path"));
+	};
+	#[derive(serde::Deserialize, Default)]
+	struct SearchParams {
+		class: Option<String>,
+	}
+	let search_params: Option<SearchParams> = if let Some(query) = request.uri().query() {
+		Some(serde_urlencoded::from_str(query)?)
+	} else {
+		None
+	};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
@@ -40,7 +55,7 @@ pub async fn get(
 		}
 		_ => return Ok(bad_request()),
 	};
-	let class = search_params.map(|s| s.get("class").unwrap().clone());
+	let class = search_params.and_then(|s| s.class);
 	let classes: Vec<String> = multiclass_classifier
 		.classes()
 		.iter()
@@ -62,7 +77,7 @@ pub async fn get(
 	let false_negatives = class_metrics.false_negatives();
 	let false_positives = class_metrics.false_positives();
 	let model_layout_props =
-		get_model_layout_props(&mut db, context, model_id, ModelNavItem::TrainingMetrics).await?;
+		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::TrainingMetrics).await?;
 	let precision_recall_section_props = PrecisionRecallSectionProps {
 		f1_score,
 		precision,

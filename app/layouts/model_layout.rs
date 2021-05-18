@@ -1,14 +1,17 @@
+use futures::FutureExt;
 use html::{component, html, style, Props};
 use sqlx::prelude::*;
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
+	path_components,
 	repos::get_model_version_ids,
 	topbar::{Topbar, TopbarAvatar},
 	user::{authorize_user, authorize_user_for_model},
-	Context,
+	Context, HandleOutput,
 };
-use tangram_error::Result;
+use tangram_error::{err, Result};
 use tangram_id::Id;
 use tangram_ui as ui;
 
@@ -154,11 +157,21 @@ async fn delete_model(
 	Ok(response)
 }
 
-pub async fn download(
-	context: &Context,
+pub fn download(context: Arc<Context>, request: http::Request<hyper::Body>) -> HandleOutput {
+	download_inner(context, request).boxed()
+}
+
+pub async fn download_inner(
+	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
-	model_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
+	let model_id = if let &["repos", _, "models", model_id, "download"] =
+		path_components(&request).as_slice()
+	{
+		model_id.to_owned()
+	} else {
+		return Err(err!("unexpected path"));
+	};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),

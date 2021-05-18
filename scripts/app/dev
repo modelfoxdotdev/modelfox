@@ -1,1 +1,1 @@
-cargo run --release --bin tangram_script_dev -- app -- $@
+cargo run --bin tangram_script_dev -- app -- $@

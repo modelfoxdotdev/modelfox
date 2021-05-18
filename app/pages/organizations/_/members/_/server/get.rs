@@ -2,22 +2,29 @@ use crate::page::{Page, PageProps};
 use html::html;
 use num::ToPrimitive;
 use sqlx::prelude::*;
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
 	organizations::get_organization_user,
+	path_components,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 	Context,
 };
 use tangram_app_layouts::app_layout::get_app_layout_props;
-use tangram_error::Result;
+use tangram_error::{err, Result};
 use tangram_id::Id;
 
 pub async fn get(
-	context: &Context,
+	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
-	organization_id: &str,
-	member_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
+	let (organization_id, member_id) = if let &["organizations", organization_id, "members", member_id] =
+		path_components(&request).as_slice()
+	{
+		(organization_id.to_owned(), member_id.to_owned())
+	} else {
+		return Err(err!("unexpected path"));
+	};
 	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
@@ -36,7 +43,7 @@ pub async fn get(
 	if !authorize_normal_user_for_organization(&mut db, &user, organization_id).await? {
 		return Ok(not_found());
 	}
-	let app_layout_props = get_app_layout_props(context).await?;
+	let app_layout_props = get_app_layout_props(&context).await?;
 	let row = sqlx::query(
 		"
 			select

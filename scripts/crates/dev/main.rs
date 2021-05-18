@@ -1,13 +1,15 @@
 use clap::Clap;
+use futures_batch::ChunksTimeoutStreamExt;
 use notify::Watcher;
-use std::{path::PathBuf, sync::mpsc::channel, time::Duration};
-use tangram_error::Result;
+use std::{convert::Infallible, sync::Arc};
+use tokio::sync::{Mutex, Notify};
+use tokio_stream::StreamExt;
 use which::which;
 
 #[derive(Clap)]
 #[clap(
 	setting = clap::AppSettings::TrailingVarArg,
- )]
+)]
 pub struct Args {
 	#[clap(arg_enum)]
 	target: Target,
@@ -22,17 +24,41 @@ enum Target {
 	Www,
 }
 
-pub fn main() -> Result<()> {
+enum State {
+	Ground,
+	Building {
+		notify: Arc<Notify>,
+		child: Option<std::process::Child>,
+	},
+	Running {
+		child: Option<std::process::Child>,
+	},
+}
+
+#[tokio::main]
+pub async fn main() {
 	let args = Args::parse();
-	let workspace_dir = std::env::current_dir()?;
+	let host = "0.0.0.0";
+	let port = 8080;
+	let addr = std::net::SocketAddr::new(host.parse().unwrap(), port);
+	let child_host = "0.0.0.0";
+	let child_port = 8081;
+	let child_addr = std::net::SocketAddr::new(child_host.parse().unwrap(), child_port);
+	let workspace_dir = std::env::current_dir().unwrap();
 	let target_dir = workspace_dir.join("target");
 	let target_wasm_dir = workspace_dir.join("target_wasm");
 	let languages_dir = workspace_dir.join("languages");
 	let watch_paths = vec![workspace_dir];
 	let ignore_paths = vec![target_dir, target_wasm_dir, languages_dir];
+
 	let (cmd, cmd_args) = match args.target {
 		Target::App => {
-			let cmd = which("cargo")?.as_os_str().to_str().unwrap().to_owned();
+			let cmd = which("cargo")
+				.unwrap()
+				.as_os_str()
+				.to_str()
+				.unwrap()
+				.to_owned();
 			let mut cmd_args = vec![
 				"run".to_owned(),
 				"--bin".to_owned(),
@@ -44,7 +70,12 @@ pub fn main() -> Result<()> {
 			(cmd, cmd_args)
 		}
 		Target::Www => {
-			let cmd = which("cargo")?.as_os_str().to_str().unwrap().to_owned();
+			let cmd = which("cargo")
+				.unwrap()
+				.as_os_str()
+				.to_str()
+				.unwrap()
+				.to_owned();
 			let mut cmd_args = vec![
 				"run".to_owned(),
 				"--bin".to_owned(),
@@ -55,89 +86,119 @@ pub fn main() -> Result<()> {
 			(cmd, cmd_args)
 		}
 	};
-	watch(watch_paths, ignore_paths, cmd, cmd_args)?;
-	Ok(())
-}
 
-pub fn watch(
-	watch_paths: Vec<PathBuf>,
-	ignore_paths: Vec<PathBuf>,
-	cmd: String,
-	args: Vec<String>,
-) -> Result<()> {
-	let mut process = ChildProcess::new(cmd, args);
-	process.start()?;
-	let (tx, rx) = channel();
-	let mut watcher = notify::watcher(tx, Duration::from_secs_f32(0.1)).unwrap();
-	for path in watch_paths.iter() {
-		watcher.watch(path, notify::RecursiveMode::Recursive)?;
-	}
-	loop {
-		let event = rx.recv()?;
-		let paths = match event {
-			notify::DebouncedEvent::NoticeWrite(path) => vec![path],
-			notify::DebouncedEvent::NoticeRemove(path) => vec![path],
-			notify::DebouncedEvent::Create(path) => vec![path],
-			notify::DebouncedEvent::Write(path) => vec![path],
-			notify::DebouncedEvent::Chmod(path) => vec![path],
-			notify::DebouncedEvent::Remove(path) => vec![path],
-			notify::DebouncedEvent::Rename(path_a, path_b) => vec![path_a, path_b],
-			notify::DebouncedEvent::Rescan => Vec::new(),
-			notify::DebouncedEvent::Error(_, path) => {
-				path.map(|path| vec![path]).unwrap_or_else(Vec::new)
+	let state: Arc<Mutex<State>> = Arc::new(Mutex::new(State::Ground));
+
+	let (watch_events_tx, watch_events_rx) = tokio::sync::mpsc::unbounded_channel();
+	watch_events_tx.send(()).unwrap();
+
+	// Run the file watcher.
+	let mut watcher: notify::RecommendedWatcher =
+		notify::Watcher::new_immediate(move |result: notify::Result<notify::Event>| {
+			let event = result.unwrap();
+			let ignored = event.paths.iter().all(|path| {
+				ignore_paths
+					.iter()
+					.any(|ignore_path| path.starts_with(ignore_path))
+			});
+			if !ignored {
+				watch_events_tx.send(()).unwrap();
 			}
+		})
+		.unwrap();
+	for path in watch_paths.iter() {
+		watcher
+			.watch(path, notify::RecursiveMode::Recursive)
+			.unwrap();
+	}
+
+	tokio::spawn({
+		let state = state.clone();
+		async move {
+			let mut watch_events =
+				tokio_stream::wrappers::UnboundedReceiverStream::new(watch_events_rx)
+					.chunks_timeout(1_000_000, std::time::Duration::from_millis(10));
+			while watch_events.next().await.is_some() {
+				// Kill the previous child process if any.
+				if let State::Running { child } = &mut *state.lock().await {
+					let mut child = child.take().unwrap();
+					child.kill().ok();
+					child.wait().unwrap();
+				}
+				// // Start the new process.
+				let notify = Arc::new(Notify::new());
+				let child = std::process::Command::new(&cmd)
+					.args(&cmd_args)
+					.env("HOST", &child_host)
+					.env("PORT", &child_port.to_string())
+					.spawn()
+					.unwrap();
+				*state.lock().await = State::Building {
+					notify: notify.clone(),
+					child: Some(child),
+				};
+				loop {
+					tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+					if let State::Building { child, .. } = &mut *state.lock().await {
+						if let Ok(Some(_)) | Err(_) = child.as_mut().unwrap().try_wait() {
+							break;
+						}
+					}
+					if tokio::net::TcpStream::connect(&child_addr).await.is_ok() {
+						break;
+					}
+				}
+				let child = if let State::Building { child, .. } = &mut *state.lock().await {
+					child.take().unwrap()
+				} else {
+					panic!()
+				};
+				*state.lock().await = State::Running { child: Some(child) };
+				notify.notify_waiters();
+			}
+		}
+	});
+
+	// Handle requests by waiting for a build to finish if one is in progress, then proxying the request to the child process.
+	let handler = move |state: Arc<Mutex<State>>, mut request: http::Request<hyper::Body>| async move {
+		let notify = if let State::Building { notify, .. } = &mut *state.lock().await {
+			Some(notify.clone())
+		} else {
+			None
 		};
-		let should_restart = paths.iter().any(|path| {
-			!ignore_paths
-				.iter()
-				.any(|ignore_path| path.starts_with(ignore_path))
-		});
-		if should_restart {
-			process.restart()?;
+		if let Some(notify) = notify {
+			notify.notified().await;
 		}
-	}
-}
+		let child_authority = format!("{}:{}", child_host, child_port);
+		let child_authority = http::uri::Authority::from_maybe_shared(child_authority).unwrap();
+		*request.uri_mut() = http::Uri::builder()
+			.scheme("http")
+			.authority(child_authority)
+			.path_and_query(request.uri().path_and_query().unwrap().clone())
+			.build()
+			.unwrap();
+		hyper::Client::new()
+			.request(request)
+			.await
+			.unwrap_or_else(|_| {
+				http::Response::builder()
+					.status(http::StatusCode::SERVICE_UNAVAILABLE)
+					.body(hyper::Body::from("service unavailable"))
+					.unwrap()
+			})
+	};
 
-struct ChildProcess {
-	cmd: String,
-	args: Vec<String>,
-	process: Option<std::process::Child>,
-}
-
-impl ChildProcess {
-	pub fn new(cmd: String, args: Vec<String>) -> ChildProcess {
-		ChildProcess {
-			cmd,
-			args,
-			process: None,
+	// Start the server.
+	let service = hyper::service::make_service_fn(|_| {
+		let state = state.clone();
+		async move {
+			Ok::<_, Infallible>(hyper::service::service_fn(
+				move |request: http::Request<hyper::Body>| {
+					let state = state.clone();
+					async move { Ok::<_, Infallible>(handler(state, request).await) }
+				},
+			))
 		}
-	}
-
-	pub fn start(&mut self) -> Result<()> {
-		let process = std::process::Command::new(&self.cmd)
-			.args(&self.args)
-			.spawn()?;
-		self.process.replace(process);
-		Ok(())
-	}
-
-	pub fn stop(&mut self) -> Result<()> {
-		if let Some(mut process) = self.process.take() {
-			process.kill()?;
-			process.wait()?;
-		}
-		Ok(())
-	}
-
-	pub fn restart(&mut self) -> Result<()> {
-		self.stop()?;
-		self.start()?;
-		Ok(())
-	}
-}
-
-impl Drop for ChildProcess {
-	fn drop(&mut self) {
-		self.stop().unwrap();
-	}
+	});
+	hyper::Server::bind(&addr).serve(service).await.unwrap();
 }

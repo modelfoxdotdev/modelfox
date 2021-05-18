@@ -22,7 +22,7 @@ pub fn Page(props: PageProps) {
 			<AppLayout {props.app_layout_props}>
 				<ui::S1>
 					<PageHeading>
-						<ui::H1>{"Repositories"}</ui::H1>
+						<ui::H1>{"Suppositories"}</ui::H1>
 						<PageHeadingButtons>
 							<ui::Button href?="/repos/new">
 								{"Create Repo"}

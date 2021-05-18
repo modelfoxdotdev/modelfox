@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	repos::{create_org_repo, create_root_repo, create_user_repo},
@@ -14,7 +15,7 @@ struct Action {
 }
 
 pub async fn post(
-	context: &Context,
+	context: Arc<Context>,
 	mut request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	let mut db = match context.database_pool.begin().await {

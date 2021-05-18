@@ -3,6 +3,7 @@ use memmap::Mmap;
 use num::ToPrimitive;
 use sqlx::prelude::*;
 use std::collections::BTreeMap;
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, service_unavailable},
 	model::get_model_bytes,
@@ -28,7 +29,7 @@ enum MonitorEventSet {
 }
 
 pub async fn post(
-	context: &Context,
+	context: Arc<Context>,
 	mut request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	let bytes = match hyper::body::to_bytes(request.body_mut()).await {

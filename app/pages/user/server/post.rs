@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
 	user::{authorize_normal_user, NormalUser},
@@ -13,7 +14,7 @@ enum Action {
 }
 
 pub async fn post(
-	context: &Context,
+	context: Arc<Context>,
 	mut request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	if !context.options.auth_enabled() {

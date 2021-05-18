@@ -3,21 +3,28 @@ use chrono::prelude::*;
 use chrono_tz::Tz;
 use html::html;
 use sqlx::prelude::*;
+use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
+	path_components,
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
 use tangram_app_layouts::app_layout::get_app_layout_props;
-use tangram_error::Result;
+use tangram_error::{err, Result};
 use tangram_id::Id;
 
 pub async fn get(
-	context: &Context,
+	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
-	model_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
+	let model_id =
+		if let &["repos", _, "models", model_id, "edit"] = path_components(&request).as_slice() {
+			model_id.to_owned()
+		} else {
+			return Err(err!("unexpected path"));
+		};
 	let timezone = get_timezone(&request);
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
@@ -34,7 +41,7 @@ pub async fn get(
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
-	let app_layout_props = get_app_layout_props(context).await?;
+	let app_layout_props = get_app_layout_props(&context).await?;
 	let row = sqlx::query(
 		"
 			select

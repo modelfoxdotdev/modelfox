@@ -1,3 +1,6 @@
+use std::{future::Future, pin::Pin};
+use tangram_error::Result;
+
 pub mod class_select_field;
 pub mod column_type;
 pub mod cookies;
@@ -29,4 +32,10 @@ pub struct Context {
 	pub options: self::options::Options,
 	pub smtp_transport: Option<lettre::AsyncSmtpTransport<lettre::Tokio1Executor>>,
 	pub storage: self::storage::Storage,
+}
+
+pub type HandleOutput = Pin<Box<dyn Send + Future<Output = Result<http::Response<hyper::Body>>>>>;
+
+pub fn path_components(request: &http::Request<hyper::Body>) -> Vec<&str> {
+	request.uri().path().split('/').skip(1).collect::<Vec<_>>()
 }
