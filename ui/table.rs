@@ -1,122 +1,130 @@
-use html::{classes, component, html, style, Props};
+use pinwheel::prelude::*;
 
-#[derive(Props)]
-pub struct TableProps {
+#[derive(ComponentBuilder)]
+pub struct Table {
 	#[optional]
 	pub width: Option<String>,
+	#[children]
+	pub children: Vec<Node>,
 }
 
-#[component]
-pub fn Table(props: TableProps) {
-	let style = style! {
-		"width" => props.width.unwrap_or_else(|| "auto".into()),
-	};
-	html! {
-		<div class="table-wrapper" >
-			<table class="table" style={style}>
-				{children}
-			</table>
-		</div>
+impl Component for Table {
+	fn into_node(self) -> Node {
+		let table = table()
+			.style(
+				style::WIDTH,
+				self.width.unwrap_or_else(|| "auto".to_owned()),
+			)
+			.child(self.children);
+		div().class("table").child(table).into_node()
 	}
 }
 
-#[component]
-pub fn TableHeader() {
-	html! {
-		<thead class="table-header">
-			{children}
-		</thead>
+#[derive(ComponentBuilder)]
+pub struct TableHeader {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for TableHeader {
+	fn into_node(self) -> Node {
+		thead().child(self.children).into_node()
 	}
 }
 
-#[component]
-pub fn TableBody() {
-	html! {
-		<tbody>{children}</tbody>
+#[derive(ComponentBuilder)]
+pub struct TableBody {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for TableBody {
+	fn into_node(self) -> Node {
+		tbody().child(self.children).into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct TableRowProps {
+#[derive(ComponentBuilder)]
+pub struct TableRow {
 	#[optional]
 	pub color: Option<String>,
 	#[optional]
 	pub text_color: Option<String>,
+	#[children]
+	pub children: Vec<Node>,
 }
 
-#[component]
-pub fn TableRow(props: TableRowProps) {
-	let style = style! {
-		"background-color" => props.color,
-		"color" => props.text_color,
-	};
-	html! {
-		<tr style={style}>
-			{children}
-		</tr>
+impl Component for TableRow {
+	fn into_node(self) -> Node {
+		tr().style(style::BACKGROUND_COLOR, self.color)
+			.style(style::COLOR, self.text_color)
+			.child(self.children)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct TableHeaderCellProps {
+#[derive(ComponentBuilder)]
+pub struct TableHeaderCell {
 	#[optional]
 	pub color: Option<String>,
 	#[optional]
 	pub expand: Option<bool>,
 	#[optional]
-	pub text_align: Option<TextAlign>,
+	pub align: Option<Align>,
+	#[children]
+	pub children: Vec<Node>,
 }
 
-pub enum TextAlign {
+pub enum Align {
 	Left,
 	Center,
 	Right,
 }
 
-#[component]
-pub fn TableHeaderCell(props: TableHeaderCellProps) {
-	let style = style! {
-		"background-color" => props.color,
-	};
-	let text_align_class = props
-		.text_align
-		.map(|text_align| match text_align {
-			TextAlign::Left => "table-align-left",
-			TextAlign::Right => "table-align-right",
-			TextAlign::Center => "table-align-center",
-		})
-		.unwrap_or("table-align-left");
-	let expand = props
-		.expand
-		.and_then(|expand| if expand { Some("table-expand") } else { None });
-	let class = classes!("table-header-cell", text_align_class, expand);
-	html! {
-		<th class={class} style={style}>
-			{children}
-		</th>
+impl Component for TableHeaderCell {
+	fn into_node(self) -> Node {
+		let text_align = self.align.map(|text_align| match text_align {
+			Align::Left => "left",
+			Align::Center => "center",
+			Align::Right => "right",
+		});
+		let width = self
+			.expand
+			.and_then(|expand| if expand { Some("100%") } else { None });
+		th().style(style::TEXT_ALIGN, text_align)
+			.style(style::WIDTH, width)
+			.style(style::BACKGROUND_COLOR, self.color)
+			.child(self.children)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct TableCellProps {
+#[derive(ComponentBuilder)]
+pub struct TableCell {
 	#[optional]
 	pub color: Option<String>,
 	#[optional]
 	pub expand: Option<bool>,
+	#[optional]
+	pub align: Option<Align>,
+	#[children]
+	pub children: Vec<Node>,
 }
 
-#[component]
-pub fn TableCell(props: TableCellProps) {
-	let style = style! {
-		"background-color" => props.color,
-	};
-	let expand = props
-		.expand
-		.and_then(|expand| if expand { Some("table-expand") } else { None });
-	let class = classes!("table-cell", expand);
-	html! {
-		<td class={class} style={style}>
-			{children}
-		</td>
+impl Component for TableCell {
+	fn into_node(self) -> Node {
+		let text_align = self.align.map(|text_align| match text_align {
+			Align::Left => "left",
+			Align::Center => "center",
+			Align::Right => "right",
+		});
+		let width = self
+			.expand
+			.and_then(|expand| if expand { Some("100%") } else { None });
+		td().style(style::TEXT_ALIGN, text_align)
+			.style(style::WIDTH, width)
+			.style(style::BACKGROUND_COLOR, self.color)
+			.child(self.children)
+			.into_node()
 	}
 }

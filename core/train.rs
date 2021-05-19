@@ -64,20 +64,20 @@ impl Trainer {
 		handle_progress_event: &mut dyn FnMut(ProgressEvent),
 	) -> Result<Trainer> {
 		// Load the config from the config file, if provided.
-		let config: Option<Config> = load_config(config_path)?;
+		let config = load_config(config_path)?;
 
 		// Load the train and test tables from the csv file(s).
 		let dataset = match (file_path, file_path_train, file_path_test) {
 			(Some(file_path), None, None) => Dataset::Train(load_and_shuffle_dataset_train(
 				file_path,
-				config.as_ref(),
+				&config,
 				handle_progress_event,
 			)?),
 			(None, Some(file_path_train), Some(file_path_test)) => {
 				Dataset::TrainAndTest(load_and_shuffle_dataset_train_and_test(
 					file_path_train,
 					file_path_test,
-					config.as_ref(),
+					&config,
 					handle_progress_event,
 				)?)
 			}
@@ -167,9 +167,10 @@ impl Trainer {
 		));
 		let baseline_metrics = compute_baseline_metrics(
 			task,
-			&table_train,
+			&table_test,
 			target_column_index,
 			&train_target_column_stats,
+			&test_target_column_stats,
 			&|| progress_counter.inc(1),
 		);
 		handle_progress_event(ProgressEvent::ComputeBaselineMetricsDone);
@@ -178,12 +179,8 @@ impl Trainer {
 		let comparison_metric = choose_comparison_metric(&config, &task)?;
 
 		// Create the hyperparameter grid.
-		let grid = compute_hyperparameter_grid(
-			config.as_ref(),
-			&task,
-			target_column_index,
-			&train_column_stats,
-		);
+		let grid =
+			compute_hyperparameter_grid(&config, &task, target_column_index, &train_column_stats);
 
 		let trainer = Trainer {
 			id,
@@ -200,9 +197,9 @@ impl Trainer {
 			test_target_column_stats,
 			baseline_metrics,
 			comparison_metric,
+			dataset: Arc::new(dataset),
 			grid,
 			task,
-			dataset: Arc::new(dataset),
 		};
 		Ok(trainer)
 	}
@@ -510,13 +507,13 @@ impl Trainer {
 	}
 }
 
-fn load_config(config_path: Option<&Path>) -> Result<Option<Config>> {
+fn load_config(config_path: Option<&Path>) -> Result<Config> {
 	if let Some(config_path) = config_path {
 		let config = std::fs::read_to_string(config_path)?;
 		let config = serde_json::from_str(&config)?;
-		Ok(Some(config))
+		Ok(config)
 	} else {
-		Ok(None)
+		Ok(Config::default())
 	}
 }
 
@@ -579,15 +576,14 @@ impl Dataset {
 
 fn load_and_shuffle_dataset_train(
 	file_path: &Path,
-	config: Option<&Config>,
+	config: &Config,
 	handle_progress_event: &mut dyn FnMut(ProgressEvent),
 ) -> Result<DatasetTrain> {
 	// Get the column types from the config, if set.
-	let column_types = config.and_then(column_types_from_config);
 	let mut table = Table::from_path(
 		file_path,
 		tangram_table::FromCsvOptions {
-			column_types,
+			column_types: column_types_from_config(config),
 			infer_options: Default::default(),
 			..Default::default()
 		},
@@ -600,29 +596,21 @@ fn load_and_shuffle_dataset_train(
 	// Shuffle the table if enabled.
 	shuffle_table(&mut table, config, handle_progress_event);
 	// Split the table into train and test tables.
-	let test_fraction = config
-		.as_ref()
-		.and_then(|config| config.test_fraction)
-		.unwrap_or(config::DEFAULT_TEST_FRACTION);
-	let comparison_fraction = config
-		.as_ref()
-		.and_then(|config| config.comparison_fraction)
-		.unwrap_or(config::DEFAULT_COMPARISON_FRACTION);
 	Ok(DatasetTrain {
 		table,
-		comparison_fraction,
-		test_fraction,
+		comparison_fraction: config.dataset.comparison_fraction,
+		test_fraction: config.dataset.test_fraction,
 	})
 }
 
 fn load_and_shuffle_dataset_train_and_test(
 	file_path_train: &Path,
 	file_path_test: &Path,
-	config: Option<&Config>,
+	config: &Config,
 	handle_progress_event: &mut dyn FnMut(ProgressEvent),
 ) -> Result<DatasetTrainAndTest> {
 	// Get the column types from the config, if set.
-	let column_types = config.and_then(column_types_from_config);
+	let column_types = column_types_from_config(config);
 	let mut table_train = Table::from_path(
 		file_path_train,
 		tangram_table::FromCsvOptions {
@@ -667,64 +655,45 @@ fn load_and_shuffle_dataset_train_and_test(
 			handle_progress_event(ProgressEvent::Load(LoadProgressEvent::Test(progress_event)))
 		},
 	)?;
-	let comparison_fraction = config
-		.as_ref()
-		.and_then(|config| config.comparison_fraction)
-		.unwrap_or(config::DEFAULT_COMPARISON_FRACTION);
 	shuffle_table(&mut table_train, config, handle_progress_event);
 	Ok(DatasetTrainAndTest {
 		table_train,
 		table_test,
-		comparison_fraction,
+		comparison_fraction: config.dataset.comparison_fraction,
 	})
 }
 
 fn column_types_from_config(config: &Config) -> Option<BTreeMap<String, TableColumnType>> {
-	config.column_types.as_ref().map(|column_types| {
-		column_types
+	Some(
+		config
+			.dataset
+			.columns
 			.iter()
-			.map(|(column_name, column_type)| {
-				let column_type = match column_type {
-					config::ColumnType::Unknown => TableColumnType::Unknown,
-					config::ColumnType::Number => TableColumnType::Number,
-					config::ColumnType::Enum(column_type) => TableColumnType::Enum {
-						variants: column_type.variants.clone(),
+			.map(|column| match column {
+				config::Column::Unknown(column) => (column.name.clone(), TableColumnType::Unknown),
+				config::Column::Number(column) => (column.name.clone(), TableColumnType::Number),
+				config::Column::Enum(column) => (
+					column.name.clone(),
+					TableColumnType::Enum {
+						variants: column.variants.clone(),
 					},
-					config::ColumnType::Text => TableColumnType::Text,
-				};
-				(column_name.clone(), column_type)
+				),
+				config::Column::Text(column) => (column.name.clone(), TableColumnType::Text),
 			})
-			.collect()
-	})
+			.collect(),
+	)
 }
 
-const DEFAULT_SEED: u64 = 42;
-
+/// Shuffle the table.
 fn shuffle_table(
 	table: &mut Table,
-	config: Option<&Config>,
+	config: &Config,
 	handle_progress_event: &mut dyn FnMut(ProgressEvent),
 ) {
-	// Check if shuffling is enabled in the config. If it is, use the seed from the config.
-	let seed = config
-		.as_ref()
-		.and_then(|config| config.shuffle.as_ref())
-		.map(|shuffle| match shuffle {
-			config::Shuffle::Enabled(enabled) => {
-				if *enabled {
-					Some(DEFAULT_SEED)
-				} else {
-					None
-				}
-			}
-			config::Shuffle::Options { seed } => Some(*seed),
-		})
-		.unwrap_or(Some(DEFAULT_SEED));
-	// Shuffle the table.
-	if let Some(seed) = seed {
+	if config.dataset.shuffle.enable {
 		handle_progress_event(ProgressEvent::Load(LoadProgressEvent::Shuffle));
 		for column in table.columns_mut().iter_mut() {
-			let mut rng = Xoshiro256Plus::seed_from_u64(seed);
+			let mut rng = Xoshiro256Plus::seed_from_u64(config.dataset.shuffle.seed);
 			match column {
 				TableColumn::Unknown(_) => {}
 				TableColumn::Number(column) => column.data_mut().shuffle(&mut rng),
@@ -737,30 +706,34 @@ fn shuffle_table(
 }
 
 fn compute_hyperparameter_grid(
-	config: Option<&Config>,
+	config: &Config,
 	task: &Task,
 	target_column_index: usize,
 	train_column_stats: &[ColumnStatsOutput],
 ) -> Vec<grid::GridItem> {
 	config
+		.train
+		.grid
 		.as_ref()
-		.and_then(|config| config.grid.as_ref())
 		.map(|grid| match &task {
 			Task::Regression => grid::compute_regression_hyperparameter_grid(
 				grid,
 				target_column_index,
 				&train_column_stats,
+				config,
 			),
 			Task::BinaryClassification => grid::compute_binary_classification_hyperparameter_grid(
 				grid,
 				target_column_index,
 				&train_column_stats,
+				config,
 			),
 			Task::MulticlassClassification { .. } => {
 				grid::compute_multiclass_classification_hyperparameter_grid(
 					grid,
 					target_column_index,
 					&train_column_stats,
+					config,
 				)
 			}
 		})
@@ -768,15 +741,18 @@ fn compute_hyperparameter_grid(
 			Task::Regression => grid::default_regression_hyperparameter_grid(
 				target_column_index,
 				&train_column_stats,
+				config,
 			),
 			Task::BinaryClassification => grid::default_binary_classification_hyperparameter_grid(
 				target_column_index,
 				&train_column_stats,
+				config,
 			),
 			Task::MulticlassClassification { .. } => {
 				grid::default_multiclass_classification_hyperparameter_grid(
 					target_column_index,
 					&train_column_stats,
+					config,
 				)
 			}
 		})
@@ -784,14 +760,15 @@ fn compute_hyperparameter_grid(
 
 fn compute_baseline_metrics(
 	task: Task,
-	table_train: &TableView,
+	table_test: &TableView,
 	target_column_index: usize,
 	train_target_column_stats: &ColumnStatsOutput,
+	test_target_column_stats: &ColumnStatsOutput,
 	progress: &impl Fn(),
 ) -> Metrics {
 	match task {
 		Task::Regression => {
-			let labels = table_train.columns().get(target_column_index).unwrap();
+			let labels = table_test.columns().get(target_column_index).unwrap();
 			let labels = labels.as_number().unwrap();
 			let train_target_column_stats = match &train_target_column_stats {
 				ColumnStatsOutput::Number(train_target_column_stats) => train_target_column_stats,
@@ -809,7 +786,7 @@ fn compute_baseline_metrics(
 			Metrics::Regression(metrics.finalize())
 		}
 		Task::BinaryClassification => {
-			let labels = table_train.columns().get(target_column_index).unwrap();
+			let labels = table_test.columns().get(target_column_index).unwrap();
 			let labels = labels.as_enum().unwrap();
 			let train_target_column_stats = match &train_target_column_stats {
 				ColumnStatsOutput::Enum(train_target_column_stats) => train_target_column_stats,
@@ -835,10 +812,14 @@ fn compute_baseline_metrics(
 			Metrics::BinaryClassification(metrics.finalize())
 		}
 		Task::MulticlassClassification => {
-			let labels = table_train.columns().get(target_column_index).unwrap();
+			let labels = table_test.columns().get(target_column_index).unwrap();
 			let labels = labels.as_enum().unwrap();
 			let train_target_column_stats = match &train_target_column_stats {
 				ColumnStatsOutput::Enum(train_target_column_stats) => train_target_column_stats,
+				_ => unreachable!(),
+			};
+			let test_target_column_stats = match &test_target_column_stats {
+				ColumnStatsOutput::Enum(test_target_column_stats) => test_target_column_stats,
 				_ => unreachable!(),
 			};
 			let total_count = train_target_column_stats.count.to_f32().unwrap();
@@ -848,7 +829,7 @@ fn compute_baseline_metrics(
 				.map(|(_, count)| count.to_f32().unwrap() / total_count)
 				.collect::<Vec<_>>();
 			let mut metrics = tangram_metrics::MulticlassClassificationMetrics::new(
-				train_target_column_stats.histogram.len(),
+				test_target_column_stats.histogram.len(),
 			);
 			for label in labels.iter() {
 				metrics.update(tangram_metrics::MulticlassClassificationMetricsInput {
@@ -1476,14 +1457,11 @@ fn compute_tree_options(options: &grid::TreeModelTrainOptions) -> tangram_tree::
 	tree_options
 }
 
-fn choose_comparison_metric(config: &Option<Config>, task: &Task) -> Result<ComparisonMetric> {
+fn choose_comparison_metric(config: &Config, task: &Task) -> Result<ComparisonMetric> {
 	match task {
 		Task::Regression => {
-			if let Some(metric) = config
-				.as_ref()
-				.and_then(|config| config.comparison_metric.as_ref())
-			{
-				match metric {
+			if let Some(comparison_metric) = &config.train.comparison_metric {
+				match comparison_metric {
 					config::ComparisonMetric::Mae => Ok(ComparisonMetric::Regression(
 						RegressionComparisonMetric::MeanAbsoluteError,
 					)),
@@ -1508,11 +1486,8 @@ fn choose_comparison_metric(config: &Option<Config>, task: &Task) -> Result<Comp
 			}
 		}
 		Task::BinaryClassification => {
-			if let Some(metric) = config
-				.as_ref()
-				.and_then(|config| config.comparison_metric.as_ref())
-			{
-				match metric {
+			if let Some(comparison_metric) = &config.train.comparison_metric {
+				match comparison_metric {
 					config::ComparisonMetric::Accuracy => {
 						Ok(ComparisonMetric::BinaryClassification(
 							BinaryClassificationComparisonMetric::AucRoc,
@@ -1530,11 +1505,8 @@ fn choose_comparison_metric(config: &Option<Config>, task: &Task) -> Result<Comp
 			}
 		}
 		Task::MulticlassClassification { .. } => {
-			if let Some(metric) = config
-				.as_ref()
-				.and_then(|config| config.comparison_metric.as_ref())
-			{
-				match metric {
+			if let Some(comparison_metric) = &config.train.comparison_metric {
+				match comparison_metric {
 					config::ComparisonMetric::Accuracy => {
 						Ok(ComparisonMetric::MulticlassClassification(
 							MulticlassClassificationComparisonMetric::Accuracy,

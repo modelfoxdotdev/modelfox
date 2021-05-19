@@ -14,12 +14,12 @@ insta = "1"
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.5", features = ["serde"] }
 fnv = "1"
-html = { path = "../../html" }
+pinwheel = { path = "../../pinwheel" }
 http = "0.2"
-hyper = { version = "0.14", features = ["server"] }
+hyper = { version = "0.14", features = ["full"] }
 indexmap = { version = "1.6", features = ["serde-1"] }
 itertools = "0.10"
-lettre = { version = "0.10.0-beta.4", default-features = false, features = ["builder", "hostname", "smtp-transport", "tokio1-rustls-tls"] }
+lettre = { version = "0.10.0-rc.2", default-features = false, features = ["builder", "hostname", "smtp-transport", "tokio1-rustls-tls"] }
 memmap = "0.7"
 ndarray = { version = "0.15", features = ["rayon"] }
 num = "0.4"
@@ -32,9 +32,9 @@ tangram_charts = { path = "../../charts" }
 tangram_core = { path = "../../core" }
 tangram_error = { path = "../../error" }
 tangram_finite = { path = "../../finite" }
+tangram_app_ui = { path = "../../app/ui" }
 tangram_id = { path = "../../id" }
 tangram_model = { path = "../../model" }
-tangram_metrics = { path = "../../metrics" }
 tangram_text = { path = "../../text" }
 tangram_ui = { path = "../../ui" }
 tangram_zip = { path = "../../zip" }

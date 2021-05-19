@@ -1,19 +1,16 @@
 use crate::{
-	common::{ColumnStatsTableProps, ColumnStatsTableRow},
+	common::{ColumnStatsTable, ColumnStatsTableRow},
 	page::{
-		BinaryClassifierProps, ClassifierChartEntry, InnerProps, MulticlassClassifierProps, Page,
-		PageProps, PredictionCountChartEntry, ProductionTrainingHistogram,
-		ProductionTrainingQuantiles, Quantiles, RegressorChartEntry, RegressorProps,
+		BinaryClassifier, ClassifierChartEntry, Inner, MulticlassClassifier, Page,
+		PredictionCountChartEntry, ProductionTrainingHistogram, ProductionTrainingQuantiles,
+		Quantiles, Regressor, RegressorChartEntry,
 	},
 };
 use chrono_tz::Tz;
-use html::html;
 use num::ToPrimitive;
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
-	column_type::ColumnType,
-	date_window::DateWindow,
-	date_window::{get_date_window_and_interval, DateWindowInterval},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	heuristics::{
 		PRODUCTION_STATS_LARGE_ABSENT_RATIO_THRESHOLD_TO_TRIGGER_ALERT,
@@ -21,17 +18,21 @@ use tangram_app_common::{
 	},
 	model::get_model_bytes,
 	path_components,
-	production_stats::get_production_stats,
-	production_stats::{
-		GetProductionStatsOutput, ProductionColumnStatsOutput, ProductionPredictionStatsOutput,
-		RegressionProductionPredictionStatsOutput,
-	},
-	time::{format_date_window, format_date_window_interval},
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
+use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use tangram_app_production_stats::{
+	get_production_stats, GetProductionStatsOutput, ProductionColumnStatsOutput,
+	ProductionPredictionStatsOutput, RegressionProductionPredictionStatsOutput,
+};
+use tangram_app_ui::time::{format_date_window, format_date_window_interval};
+use tangram_app_ui::{
+	column_type::ColumnType,
+	date_window::DateWindow,
+	date_window::{get_date_window_and_interval, DateWindowInterval},
+};
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
@@ -45,7 +46,7 @@ pub async fn get(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let model_id = if let &["repos", _, "models", model_id, "production_stats", ""] =
+	let model_id = if let ["repos", _, "models", model_id, "production_stats", ""] =
 		path_components(&request).as_slice()
 	{
 		model_id.to_owned()
@@ -85,17 +86,15 @@ pub async fn get(
 	let production_stats =
 		get_production_stats(&mut db, model, date_window, date_window_interval, timezone).await?;
 	let inner = match production_stats.overall.prediction_stats {
-		ProductionPredictionStatsOutput::Regression(_) => {
-			InnerProps::Regressor(compute_regressor_props(
-				model,
-				production_stats,
-				date_window,
-				date_window_interval,
-				timezone,
-			))
-		}
+		ProductionPredictionStatsOutput::Regression(_) => Inner::Regressor(compute_regressor(
+			model,
+			production_stats,
+			date_window,
+			date_window_interval,
+			timezone,
+		)),
 		ProductionPredictionStatsOutput::BinaryClassification(_) => {
-			InnerProps::BinaryClassifier(compute_binary_classifier_props(
+			Inner::BinaryClassifier(compute_binary_classifier(
 				model,
 				production_stats,
 				date_window,
@@ -104,7 +103,7 @@ pub async fn get(
 			))
 		}
 		ProductionPredictionStatsOutput::MulticlassClassification(_) => {
-			InnerProps::MulticlassClassifier(compute_multiclass_classifier_props(
+			Inner::MulticlassClassifier(compute_multiclass_classifier(
 				model,
 				production_stats,
 				date_window,
@@ -114,14 +113,14 @@ pub async fn get(
 			))
 		}
 	};
-	let model_layout_props =
-		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::ProductionStats).await?;
-	let props = PageProps {
+	let model_layout_info =
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionStats).await?;
+	let page = Page {
 		model_id: model_id.to_string(),
-		model_layout_props,
+		model_layout_info,
 		inner,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))
@@ -154,16 +153,16 @@ fn compute_production_training_quantiles(
 	}
 }
 
-fn compute_regressor_props(
+fn compute_regressor(
 	model: tangram_model::ModelReader,
 	production_stats: GetProductionStatsOutput,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
 	timezone: Tz,
-) -> RegressorProps {
+) -> Regressor {
 	let model = model.inner().as_regressor().unwrap();
 	let target_column_stats = model.overall_target_column_stats();
-	let overall_column_stats_table_props = compute_overall_column_stats_table_props(
+	let overall_column_stats_table = compute_overall_column_stats_table(
 		production_stats.overall.column_stats,
 		production_stats.overall.row_count,
 	);
@@ -215,23 +214,23 @@ fn compute_regressor_props(
 			.collect::<Vec<_>>(),
 		_ => panic!(),
 	};
-	RegressorProps {
+	Regressor {
 		date_window,
 		date_window_interval,
 		prediction_count_chart,
 		prediction_stats_chart,
 		prediction_stats_interval_chart,
-		overall_column_stats_table_props,
+		overall_column_stats_table,
 	}
 }
 
-fn compute_binary_classifier_props(
+fn compute_binary_classifier(
 	model: tangram_model::ModelReader,
 	production_stats: GetProductionStatsOutput,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
 	timezone: Tz,
-) -> BinaryClassifierProps {
+) -> BinaryClassifier {
 	let model = model.inner().as_binary_classifier().unwrap();
 	let target_column_stats = model.overall_target_column_stats();
 	let prediction_count_chart = production_stats
@@ -299,28 +298,28 @@ fn compute_binary_classifier_props(
 			.collect::<Vec<_>>(),
 		_ => panic!(),
 	};
-	let overall_column_stats_table_props = compute_overall_column_stats_table_props(
+	let overall_column_stats_table = compute_overall_column_stats_table(
 		production_stats.overall.column_stats,
 		production_stats.overall.row_count,
 	);
-	BinaryClassifierProps {
+	BinaryClassifier {
 		date_window,
 		date_window_interval,
 		prediction_count_chart,
 		prediction_stats_chart,
 		prediction_stats_interval_chart,
-		overall_column_stats_table_props,
+		overall_column_stats_table,
 	}
 }
 
-fn compute_multiclass_classifier_props(
+fn compute_multiclass_classifier(
 	model: tangram_model::ModelReader,
 	production_stats: GetProductionStatsOutput,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
 	timezone: Tz,
 	search_params: Option<SearchParams>,
-) -> MulticlassClassifierProps {
+) -> MulticlassClassifier {
 	let model = model.inner().as_multiclass_classifier().unwrap();
 	let class = search_params.and_then(|s| s.class);
 	let classes = model.classes().to_owned();
@@ -403,7 +402,7 @@ fn compute_multiclass_classifier_props(
 			.collect::<Vec<_>>(),
 		_ => panic!(),
 	};
-	let overall_column_stats_table_props = compute_overall_column_stats_table_props(
+	let overall_column_stats_table = compute_overall_column_stats_table(
 		production_stats.overall.column_stats,
 		production_stats.overall.row_count,
 	);
@@ -412,7 +411,7 @@ fn compute_multiclass_classifier_props(
 		.iter()
 		.map(|class| class.to_owned())
 		.collect::<Vec<_>>();
-	MulticlassClassifierProps {
+	MulticlassClassifier {
 		date_window,
 		date_window_interval,
 		class: selected_class,
@@ -420,7 +419,7 @@ fn compute_multiclass_classifier_props(
 		prediction_count_chart,
 		prediction_stats_chart,
 		prediction_stats_interval_chart,
-		overall_column_stats_table_props,
+		overall_column_stats_table,
 	}
 }
 
@@ -440,10 +439,10 @@ fn alert_message(count: u64, absent_count: u64, invalid_count: u64) -> Option<St
 	}
 }
 
-fn compute_overall_column_stats_table_props(
+fn compute_overall_column_stats_table(
 	overall_production_column_stats: Vec<ProductionColumnStatsOutput>,
 	overall_production_stats_row_count: u64,
-) -> ColumnStatsTableProps {
+) -> ColumnStatsTable {
 	let rows = overall_production_column_stats
 		.iter()
 		.map(|column_stats| match column_stats {
@@ -497,5 +496,5 @@ fn compute_overall_column_stats_table_props(
 			},
 		})
 		.collect::<Vec<_>>();
-	ColumnStatsTableProps { rows }
+	ColumnStatsTable { rows }
 }

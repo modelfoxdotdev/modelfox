@@ -1,8 +1,8 @@
 use super::FieldLabel;
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 
-#[derive(Props)]
-pub struct TextFieldProps {
+#[derive(ComponentBuilder)]
+pub struct TextField {
 	#[optional]
 	pub autocomplete: Option<String>,
 	#[optional]
@@ -23,23 +23,23 @@ pub struct TextFieldProps {
 	pub value: Option<String>,
 }
 
-#[component]
-pub fn TextField(props: TextFieldProps) {
-	html! {
-		<FieldLabel html_for={None}>
-			{props.label}
-			<input
-				id={props.id}
-				autocomplete={props.autocomplete}
-				class="form-text-field"
-				disabled={props.disabled}
-				name={props.name}
-				placeholder={props.placeholder}
-				readonly={props.readonly}
-				required={props.required}
-				spellcheck={false}
-				value={props.value}
-			/>
-		</FieldLabel>
+impl Component for TextField {
+	fn into_node(self) -> Node {
+		FieldLabel::new(None)
+			.child(self.label)
+			.child(
+				input()
+					.attribute("id", self.id)
+					.attribute("autocomplete", self.autocomplete)
+					.class("form-text-field")
+					.attribute("disabled", self.disabled)
+					.attribute("name", self.name)
+					.attribute("placeholder", self.placeholder)
+					.attribute("readonly", self.readonly)
+					.attribute("required", self.required)
+					.attribute("spellcheck", false)
+					.attribute("value", self.value),
+			)
+			.into_node()
 	}
 }

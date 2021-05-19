@@ -915,6 +915,11 @@ fn serialize_feature_group(
 			let feature_group = serialize_bag_of_words_feature_group(feature_group, writer);
 			tangram_model::FeatureGroupWriter::BagOfWords(feature_group)
 		}
+		tangram_features::FeatureGroup::BagOfWordsCosineSimilarity(feature_group) => {
+			let feature_group =
+				serialize_bag_of_words_cosine_similarity_feature_group(feature_group, writer);
+			tangram_model::FeatureGroupWriter::BagOfWordsCosineSimilarity(feature_group)
+		}
 		tangram_features::FeatureGroup::WordEmbedding(feature_group) => {
 			let feature_group = serialize_word_embedding_feature_group(feature_group, writer);
 			tangram_model::FeatureGroupWriter::WordEmbedding(feature_group)
@@ -1059,6 +1064,56 @@ fn serialize_word_embedding_model(
 		words,
 		values,
 	})
+}
+
+fn serialize_bag_of_words_cosine_similarity_feature_group(
+	bag_of_words_cosine_similarity_feature_group: &tangram_features::BagOfWordsCosineSimilarityFeatureGroup,
+	writer: &mut tangram_serialize::Writer,
+) -> tangram_serialize::Position<tangram_model::BagOfWordsCosineSimilarityFeatureGroupWriter> {
+	let source_column_name_a = writer.write(
+		bag_of_words_cosine_similarity_feature_group
+			.source_column_name_a
+			.as_str(),
+	);
+	let source_column_name_b = writer.write(
+		bag_of_words_cosine_similarity_feature_group
+			.source_column_name_b
+			.as_str(),
+	);
+	let tokenizer = serialize_tokenizer(
+		&bag_of_words_cosine_similarity_feature_group.tokenizer,
+		writer,
+	);
+	let ngrams = bag_of_words_cosine_similarity_feature_group
+		.ngrams
+		.iter()
+		.map(|(ngram, entry)| {
+			(
+				serialize_ngram(ngram, writer),
+				serialize_bag_of_words_feature_group_n_gram_entry(entry, writer),
+			)
+		})
+		.collect::<Vec<_>>();
+	let ngrams = writer.write(&ngrams);
+	let ngram_types = bag_of_words_cosine_similarity_feature_group
+		.ngram_types
+		.iter()
+		.map(|ngram_type| serialize_ngram_type(ngram_type, writer))
+		.collect::<Vec<_>>();
+	let ngram_types = writer.write(&ngram_types);
+	let strategy = serialize_bag_of_words_feature_group_strategy(
+		&bag_of_words_cosine_similarity_feature_group.strategy,
+		writer,
+	);
+	let feature_group = tangram_model::BagOfWordsCosineSimilarityFeatureGroupWriter {
+		source_column_name_a,
+		source_column_name_b,
+		tokenizer,
+		strategy,
+		ngram_types,
+		ngrams,
+	};
+	writer.write(&feature_group)
 }
 
 fn serialize_binary_classification_model(

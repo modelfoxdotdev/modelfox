@@ -2,51 +2,151 @@
 This module defines the `Config` struct, which is used to configure training a model with [`train`](crate::train::train).
 */
 
-use std::collections::BTreeMap;
-
 /// This is a configuration used for training.
 #[derive(Debug, Default, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Config {
-	/// Use this field to specify the column types for a subset of the columns. If the type is not specified for a column, it will be inferred.
-	pub column_types: Option<BTreeMap<String, ColumnType>>,
-	/// This is the fraction of the train dataset that will be set aside for choosing the best model. The default value is `0.1`.
-	pub comparison_fraction: Option<f32>,
-	/// This is the metric that will be computed on the comparison dataset to choose the best model.
-	pub comparison_metric: Option<ComparisonMetric>,
-	/// The `grid` specifies which models should be trained and with which hyperparameters. If you do not specify this option, a reasonable default grid will be used.
-	pub grid: Option<Vec<GridItem>>,
-	/// This option controls whether the dataset should be shuffled before splitting and training.
-	pub shuffle: Option<Shuffle>,
-	/// If you do not provide a separate test dataset, this is the fraction of the train dataset that will be set aside to evalute your model. The default value is `0.2`.
-	pub test_fraction: Option<f32>,
-}
-
-#[derive(Debug, serde::Deserialize)]
-#[serde(tag = "type")]
-pub enum ColumnType {
-	#[serde(rename = "unknown")]
-	Unknown,
-	#[serde(rename = "number")]
-	Number,
-	#[serde(rename = "enum")]
-	Enum(EnumColumnType),
-	#[serde(rename = "text")]
-	Text,
+	/// Use this field to configure the loading, shuffling, and interpretation of your dataset.
+	#[serde(default)]
+	pub dataset: Dataset,
+	/// Use this field to configure feature engineering.
+	#[serde(default)]
+	pub features: Features,
+	// Use this field to configure training.
+	#[serde(default)]
+	pub train: Train,
 }
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
-pub struct EnumColumnType {
-	pub variants: Vec<String>,
+pub struct Dataset {
+	/// This option controls shuffling of the dataset before splitting and training.
+	#[serde(default)]
+	pub shuffle: Shuffle,
+	/// This is the fraction of the train dataset that will be set aside for choosing the best model. The default value is `0.1`.
+	pub comparison_fraction: f32,
+	/// If you do not provide a separate test dataset, this is the fraction of the train dataset that will be set aside after shuffling to evalute your model. The default value is `0.2`.
+	#[serde(default)]
+	pub test_fraction: f32,
+	/// Use this field to specify the column types for a subset of the columns. If you do not configure a column here, its configuration will be inferred.
+	#[serde(default)]
+	pub columns: Vec<Column>,
 }
 
 /// This option controls whether the dataset should be shuffled before splitting and training.
 #[derive(Debug, serde::Deserialize)]
-#[serde(untagged)]
-pub enum Shuffle {
-	Enabled(bool),
-	Options { seed: u64 },
+pub struct Shuffle {
+	pub enable: bool,
+	pub seed: u64,
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(tag = "type")]
+pub enum Column {
+	#[serde(rename = "unknown")]
+	Unknown(UnknownColumn),
+	#[serde(rename = "number")]
+	Number(NumberColumn),
+	#[serde(rename = "enum")]
+	Enum(EnumColumn),
+	#[serde(rename = "text")]
+	Text(TextColumn),
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct UnknownColumn {
+	pub name: String,
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NumberColumn {
+	pub name: String,
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct EnumColumn {
+	pub name: String,
+	pub variants: Vec<String>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct TextColumn {
+	pub name: String,
+}
+
+#[derive(Debug, serde::Deserialize)]
+pub struct Features {
+	/// Use this field to control automatic feature engineering.
+	pub auto: AutoFeatures,
+	/// Use this field to include custom feature groups.
+	pub include: Vec<FeatureGroup>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+pub struct AutoFeatures {
+	/// Enable or disable automatic feature engineering.
+	pub enable: bool,
+	/// Exclude columns from automatic feature engineering.
+	pub exclude_columns: Vec<String>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(tag = "type")]
+pub enum FeatureGroup {
+	#[serde(rename = "identity")]
+	Identity(IdentityFeatureGroup),
+	#[serde(rename = "normalized")]
+	Normalized(NormalizedFeatureGroup),
+	#[serde(rename = "one_hot_encoded")]
+	OneHotEncoded(OneHotEncodedFeatureGroup),
+	#[serde(rename = "bag_of_words")]
+	BagOfWords(BagOfWordsFeatureGroup),
+	#[serde(rename = "bag_of_words_cosine_similarity")]
+	BagOfWordsCosineSimilarity(BagOfWordsCosineSimilarityFeatureGroup),
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct IdentityFeatureGroup {
+	pub source_column_name: String,
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct NormalizedFeatureGroup {
+	pub source_column_name: String,
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct OneHotEncodedFeatureGroup {
+	pub source_column_name: String,
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct BagOfWordsFeatureGroup {
+	pub source_column_name: String,
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct BagOfWordsCosineSimilarityFeatureGroup {
+	pub source_column_name_a: String,
+	pub source_column_name_b: String,
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Train {
+	/// The `grid` specifies which models should be trained and with which hyperparameters. If you do not specify this option, a reasonable default grid will be used.
+	pub grid: Option<Vec<GridItem>>,
+	/// This is the metric that will be computed on the comparison dataset to choose the best model.
+	pub comparison_metric: Option<ComparisonMetric>,
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -145,8 +245,52 @@ pub enum ComparisonMetric {
 	F1,
 }
 
-pub const DEFAULT_TEST_FRACTION: f32 = 0.2;
-pub const DEFAULT_COMPARISON_FRACTION: f32 = 0.1;
+impl Default for Dataset {
+	fn default() -> Self {
+		Dataset {
+			comparison_fraction: 0.1,
+			test_fraction: 0.2,
+			shuffle: Default::default(),
+			columns: Default::default(),
+		}
+	}
+}
+
+impl Default for Shuffle {
+	fn default() -> Self {
+		Shuffle {
+			enable: true,
+			seed: 42,
+		}
+	}
+}
+
+impl Default for Features {
+	fn default() -> Self {
+		Features {
+			auto: Default::default(),
+			include: Default::default(),
+		}
+	}
+}
+
+impl Default for AutoFeatures {
+	fn default() -> Self {
+		AutoFeatures {
+			enable: true,
+			exclude_columns: Default::default(),
+		}
+	}
+}
+
+impl Default for Train {
+	fn default() -> Self {
+		Train {
+			grid: Default::default(),
+			comparison_metric: Default::default(),
+		}
+	}
+}
 
 impl std::fmt::Display for ComparisonMetric {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

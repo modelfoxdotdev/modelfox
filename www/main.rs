@@ -1,8 +1,14 @@
 use clap::Clap;
-use html::html;
-use std::{path::PathBuf, sync::Arc};
+use pinwheel::prelude::*;
+use std::{path::PathBuf, sync::Arc, time::Duration};
 use tangram_error::{Error, Result};
-use tangram_serve::{serve, RouteMap};
+use tangram_id::Id;
+use tangram_serve::{request_id::RequestIdLayer, RouteMap};
+use tangram_www_blog::{blog_post_slugs_and_paths, BlogPostSlugAndPath};
+use tower::{make::Shared, ServiceBuilder};
+use tower_http::{add_extension::AddExtensionLayer, trace::TraceLayer};
+use tracing::{error, info, trace_span, Span};
+use tracing_subscriber::prelude::*;
 
 #[derive(Clap)]
 enum Args {
@@ -19,20 +25,58 @@ struct ExportArgs {
 
 #[tokio::main]
 async fn main() -> Result<()> {
+	tracing()?;
 	let args = Args::parse();
 	let route_map = route_map();
 	match args {
 		Args::Serve => {
-			let host = "0.0.0.0".parse()?;
-			let port = 8080;
+			let host_from_env = if let Ok(host) = std::env::var("HOST") {
+				Some(host.parse()?)
+			} else {
+				None
+			};
+			let host = host_from_env.unwrap_or_else(|| "0.0.0.0".parse().unwrap());
+			let port_from_env = if let Ok(port) = std::env::var("PORT") {
+				Some(port.parse()?)
+			} else {
+				None
+			};
+			let port = port_from_env.unwrap_or(8080);
 			let context = Context { route_map };
-			serve(host, port, context, request_handler).await?;
+			let context_layer = AddExtensionLayer::new(Arc::new(context));
+			let request_id_layer = RequestIdLayer::new();
+			let trace_layer = TraceLayer::new_for_http()
+				.make_span_with(|request: &http::Request<hyper::Body>| {
+					let id = request.extensions().get::<Id>().unwrap();
+					trace_span!("request", %id)
+				})
+				.on_request(|request: &http::Request<hyper::Body>, _span: &Span| {
+					info!(
+						method = %request.method(),
+						path = %request.uri().path(),
+						query = ?request.uri().query(),
+						"request",
+					);
+				})
+				.on_response(
+					|response: &http::Response<hyper::Body>, _latency: Duration, _span: &Span| {
+						info!(status = %response.status(), "response");
+					},
+				);
+			let service = ServiceBuilder::new()
+				.layer(context_layer)
+				.layer(request_id_layer)
+				.layer(trace_layer)
+				.service_fn(handle);
+			let addr = std::net::SocketAddr::new(host, port);
+			let server = hyper::server::Server::try_bind(&addr)?;
+			server.serve(Shared::new(service)).await?;
 		}
 		Args::Export(export_args) => {
 			let out_dir = std::path::Path::new(env!("OUT_DIR"));
 			let cwd = std::env::current_dir()?;
 			let dist_path = cwd.join(export_args.path);
-			tangram_serve::export(&out_dir, &dist_path, route_map)?;
+			tangram_serve::export::export(route_map, &out_dir, &dist_path)?;
 		}
 	}
 	Ok(())
@@ -40,54 +84,91 @@ async fn main() -> Result<()> {
 
 fn route_map() -> RouteMap {
 	let mut route_map = RouteMap::new();
-	route_map.insert("/", &|| {
-		html!(<tangram_www_index_server::Page />).render_to_string()
-	});
-	route_map.insert("/benchmarks", &|| {
-		html!(<tangram_www_benchmarks_server::Page />).render_to_string()
-	});
-	route_map.insert("/docs/", &|| {
-		html!(<tangram_www_docs_index_server::Page />).render_to_string()
-	});
-	route_map.insert("/docs/install", &|| {
-		html!(<tangram_www_docs_install_server::Page />).render_to_string()
-	});
-	route_map.insert("/docs/getting_started/", &|| {
-		html!(<tangram_www_docs_getting_started_index_server::Page />).render_to_string()
-	});
-	route_map.insert("/docs/getting_started/train", &|| {
-		html!(<tangram_www_docs_getting_started_train_server::Page />).render_to_string()
-	});
-	route_map.insert("/docs/getting_started/predict/", &|| {
-		html!(<tangram_www_docs_getting_started_predict_index_server::Page />).render_to_string()
-	});
-	route_map.insert("/docs/getting_started/predict/elixir", &|| {
-		html!(<tangram_www_docs_getting_started_predict_elixir_server::Page />).render_to_string()
-	});
-	route_map.insert("/docs/getting_started/predict/go", &|| {
-		html!(<tangram_www_docs_getting_started_predict_go_server::Page />).render_to_string()
-	});
-	route_map.insert("/docs/getting_started/predict/node", &|| {
-		html!(<tangram_www_docs_getting_started_predict_node_server::Page />).render_to_string()
-	});
-	route_map.insert("/docs/getting_started/predict/python", &|| {
-		html!(<tangram_www_docs_getting_started_predict_python_server::Page />).render_to_string()
-	});
-	route_map.insert("/docs/getting_started/predict/ruby", &|| {
-		html!(<tangram_www_docs_getting_started_predict_ruby_server::Page />).render_to_string()
-	});
-	route_map.insert("/docs/getting_started/predict/rust", &|| {
-		html!(<tangram_www_docs_getting_started_predict_rust_server::Page />).render_to_string()
-	});
-	route_map.insert("/docs/getting_started/inspect", &|| {
-		html!(<tangram_www_docs_getting_started_inspect_server::Page />).render_to_string()
-	});
-	route_map.insert("/docs/getting_started/monitor", &|| {
-		html!(<tangram_www_docs_getting_started_monitor_server::Page />).render_to_string()
-	});
-	route_map.insert("/docs/train/configuration", &|| {
-		html!(<tangram_www_docs_train_configuration_server::Page />).render_to_string()
-	});
+	route_map.insert(
+		"/".into(),
+		Box::new(|| html(tangram_www_index_server::Page::new())),
+	);
+	route_map.insert(
+		"/benchmarks".into(),
+		Box::new(|| html(tangram_www_benchmarks_server::Page::new())),
+	);
+	let blog_posts_path = PathBuf::from("www/content/blog/");
+	let blog_post_slugs_and_paths = blog_post_slugs_and_paths(&blog_posts_path).unwrap();
+	for blog_post_slug_and_path in blog_post_slugs_and_paths {
+		let BlogPostSlugAndPath { slug, path } = blog_post_slug_and_path;
+		route_map.insert(
+			format!("/blog/{}", slug).into(),
+			Box::new(move || html(tangram_www_blog_post_server::Page::new(path.clone()))),
+		);
+	}
+	route_map.insert(
+		"/blog/".into(),
+		Box::new(move || {
+			html(tangram_www_blog_index_server::Page::new(
+				blog_posts_path.clone(),
+			))
+		}),
+	);
+	route_map.insert(
+		"/docs/".into(),
+		Box::new(|| html(tangram_www_docs_index_server::Page::new())),
+	);
+	route_map.insert(
+		"/docs/install".into(),
+		Box::new(|| html(tangram_www_docs_install_server::Page::new())),
+	);
+	route_map.insert(
+		"/docs/getting_started/".into(),
+		Box::new(|| html(tangram_www_docs_getting_started_index_server::Page::new())),
+	);
+	route_map.insert(
+		"/docs/getting_started/train".into(),
+		Box::new(|| html(tangram_www_docs_getting_started_train_server::Page::new())),
+	);
+	route_map.insert(
+		"/docs/getting_started/predict/".into(),
+		Box::new(|| html(tangram_www_docs_getting_started_predict_index_server::Page::new())),
+	);
+	route_map.insert(
+		"/docs/getting_started/predict/elixir".into(),
+		Box::new(|| html(tangram_www_docs_getting_started_predict_elixir_server::Page::new())),
+	);
+	route_map.insert(
+		"/docs/getting_started/predict/go".into(),
+		Box::new(|| html(tangram_www_docs_getting_started_predict_go_server::Page::new())),
+	);
+	route_map.insert(
+		"/docs/getting_started/predict/node".into(),
+		Box::new(|| html(tangram_www_docs_getting_started_predict_node_server::Page::new())),
+	);
+	route_map.insert(
+		"/docs/getting_started/predict/python".into(),
+		Box::new(|| html(tangram_www_docs_getting_started_predict_python_server::Page::new())),
+	);
+	route_map.insert(
+		"/docs/getting_started/predict/ruby".into(),
+		Box::new(|| html(tangram_www_docs_getting_started_predict_ruby_server::Page::new())),
+	);
+	route_map.insert(
+		"/docs/getting_started/predict/rust".into(),
+		Box::new(|| html(tangram_www_docs_getting_started_predict_rust_server::Page::new())),
+	);
+	route_map.insert(
+		"/docs/getting_started/inspect".into(),
+		Box::new(|| html(tangram_www_docs_getting_started_inspect_server::Page::new())),
+	);
+	route_map.insert(
+		"/docs/getting_started/monitor".into(),
+		Box::new(|| html(tangram_www_docs_getting_started_monitor_server::Page::new())),
+	);
+	route_map.insert(
+		"/docs/train/configuration".into(),
+		Box::new(|| html(tangram_www_docs_train_configuration_server::Page::new())),
+	);
+	route_map.insert(
+		"/pricing".into(),
+		Box::new(|| html(tangram_www_pricing_server::Page::new())),
+	);
 	route_map
 }
 
@@ -95,10 +176,10 @@ struct Context {
 	route_map: RouteMap,
 }
 
-async fn request_handler(
-	context: Arc<Context>,
+async fn handle(
 	request: http::Request<hyper::Body>,
-) -> http::Response<hyper::Body> {
+) -> Result<http::Response<hyper::Body>, http::Error> {
+	let context = request.extensions().get::<Arc<Context>>().unwrap();
 	let method = request.method().clone();
 	let uri = request.uri().clone();
 	let path_and_query = uri.path_and_query().unwrap();
@@ -126,17 +207,28 @@ async fn request_handler(
 	}
 	.await
 	.unwrap_or_else(|error| {
-		eprintln!("{}", error);
-		let body = if cfg!(debug_assertions) {
-			format!("{}", error)
-		} else {
-			"internal server error".to_owned()
-		};
+		error!(%error);
 		http::Response::builder()
 			.status(http::StatusCode::INTERNAL_SERVER_ERROR)
-			.body(hyper::Body::from(body))
+			.body(hyper::Body::from("internal server error"))
 			.unwrap()
 	});
-	eprintln!("{} {} {}", method, path, response.status());
-	response
+	Ok(response)
+}
+
+fn tracing() -> Result<()> {
+	let env_layer = tracing_subscriber::EnvFilter::try_from_env("TANGRAM_TRACING");
+	let env_layer = if cfg!(debug_assertions) {
+		Some(env_layer.unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("[]=info")))
+	} else {
+		env_layer.ok()
+	};
+	if let Some(env_layer) = env_layer {
+		let format_layer = tracing_subscriber::fmt::layer().pretty();
+		let subscriber = tracing_subscriber::registry()
+			.with(env_layer)
+			.with(format_layer);
+		subscriber.init();
+	}
+	Ok(())
 }

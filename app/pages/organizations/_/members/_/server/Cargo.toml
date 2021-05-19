@@ -9,10 +9,10 @@ path = "lib.rs"
 
 [dependencies]
 futures = "0.3"
-html = { path = "../../../../../../../html" }
+pinwheel = { path = "../../../../../../../pinwheel" }
 http = "0.2"
-hyper = { version = "0.14", features = ["server"] }
-lettre = { version = "0.10.0-beta.4", default-features = false, features = ["builder", "hostname", "smtp-transport", "tokio1-rustls-tls"] }
+hyper = { version = "0.14", features = ["full"] }
+lettre = { version = "0.10.0-rc.2", default-features = false, features = ["builder", "hostname", "smtp-transport", "tokio1-rustls-tls"] }
 num = "0.4"
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 serde = { version = "1", features = ["derive"] }

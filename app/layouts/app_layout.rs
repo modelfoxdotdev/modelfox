@@ -1,33 +1,37 @@
-use html::{component, html, Props};
-use tangram_app_common::{
-	topbar::{Topbar, TopbarAvatar},
-	Context,
-};
+use pinwheel::prelude::*;
+use tangram_app_common::Context;
+use tangram_app_ui::topbar::{Topbar, TopbarAvatar};
 use tangram_error::Result;
 
-#[derive(Props)]
-pub struct AppLayoutProps {
+pub struct AppLayoutInfo {
 	pub topbar_avatar: Option<TopbarAvatar>,
 }
 
-#[component]
-pub fn AppLayout(props: AppLayoutProps) {
-	let topbar_avatar = props.topbar_avatar.map(|topbar_avatar| TopbarAvatar {
-		avatar_url: topbar_avatar.avatar_url,
-	});
-	html! {
-		<div class="app-layout-topbar-grid">
-			<Topbar topbar_avatar={topbar_avatar} />
-			<div class="app-layout">{children}</div>
-		</div>
+#[derive(ComponentBuilder)]
+pub struct AppLayout {
+	pub info: AppLayoutInfo,
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for AppLayout {
+	fn into_node(self) -> Node {
+		let topbar_avatar = self.info.topbar_avatar.map(|topbar_avatar| TopbarAvatar {
+			avatar_url: topbar_avatar.avatar_url,
+		});
+		div()
+			.class("app-layout-topbar-grid")
+			.child(Topbar::new(topbar_avatar))
+			.child(div().class("app-layout").child(self.children))
+			.into_node()
 	}
 }
 
-pub async fn get_app_layout_props(context: &Context) -> Result<AppLayoutProps> {
+pub async fn app_layout_info(context: &Context) -> Result<AppLayoutInfo> {
 	let topbar_avatar = if context.options.auth_enabled() {
 		Some(TopbarAvatar { avatar_url: None })
 	} else {
 		None
 	};
-	Ok(AppLayoutProps { topbar_avatar })
+	Ok(AppLayoutInfo { topbar_avatar })
 }

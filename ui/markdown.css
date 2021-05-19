@@ -1,0 +1,64 @@
+.markdown > * {
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+}
+
+.markdown > *:first-child {
+	margin-top: 0;
+}
+
+.markdown > *:last-child {
+	margin-bottom: 0;
+}
+
+.markdown a {
+	color: var(--blue);
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.markdown a:hover {
+	filter: brightness(90%);
+}
+
+.markdown a:focus {
+	filter: brightness(90%);
+}
+
+.markdown p {
+	line-height: 1.5;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+	margin-top: 2rem;
+	color: var(--heading-text-color);
+	font-weight: normal;
+}
+
+.markdown h1 {
+	font-size: 2rem;
+}
+
+.markdown h2 {
+	font-size: 1.5rem;
+}
+
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+	font-size: 1rem;
+}
+
+.markdown ul,
+.markdown ol {
+	line-height: 1.5;
+	list-style-position: inside;
+	margin: 0;
+	padding: 0;
+}

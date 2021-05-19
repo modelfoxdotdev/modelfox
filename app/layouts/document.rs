@@ -1,39 +1,55 @@
-use html::{component, html, raw, Props};
+use pinwheel::prelude::*;
+use tangram_serve::hash;
 
-#[derive(Props)]
-pub struct DocumentProps {
-	pub client_wasm_js_src: Option<String>,
+#[derive(ComponentBuilder)]
+pub struct Document {
+	#[optional]
+	pub client: Option<&'static str>,
+	#[children]
+	pub children: Vec<Node>,
 }
 
-#[component]
-pub fn Document(props: DocumentProps) {
-	html! {
-		<>
-			{raw!("<!doctype html>")}
-			<html lang="en">
-				<head>
-					<meta charset="utf-8" />
-					<meta content="width=device-width, initial-scale=1" name="viewport" />
-					<link href="/favicon.png" rel="icon" type="image/png" />
-					<title>{"Tangram"}</title>
-					<link href="/styles.css" rel="stylesheet" />
-					<meta
-						content="All-In-One Machine Learning Toolkit Designed for Programmers"
-						name="description"
-					/>
-				</head>
-				<body>
-					{children}
-					<script>
-						{"document.cookie = `tangram_timezone=${Intl.DateTimeFormat().resolvedOptions().timeZone};max-age=31536000;path=/;samesite=lax`"}
-					</script>
-					{props.client_wasm_js_src.map(|client_wasm_js_src| html! {
-						<script type="module">
-							{raw!(format!(r#"import init from "{}"; init()"#, client_wasm_js_src))}
-						</script>
-					})}
-				</body>
-			</html>
-		</>
+impl Component for Document {
+	fn into_node(self) -> Node {
+		let head = head()
+			.child(meta().attribute("charset", "utf-8"))
+			.child(
+				meta()
+					.attribute("content", "width=device-width, initial-scale=1")
+					.attribute("name", "viewport"),
+			)
+			.child(
+				link()
+					.attribute("href", "/favicon.png")
+					.attribute("rel", "icon")
+					.attribute("type", "image/png"),
+			)
+			.child(title().child("Tangram"))
+			.child(
+				link()
+					.attribute("href", "/styles.css")
+					.attribute("rel", "stylesheet"),
+			)
+			.child(
+				meta()
+					.attribute(
+						"content",
+						"All-In-One Machine Learning Toolkit Designed for Programmers",
+					)
+					.attribute("name", "description"),
+			);
+		let timezone_script = script().child(
+			"document.cookie = `tangram_timezone=${Intl.DateTimeFormat().resolvedOptions().timeZone};max-age=31536000;path=/;samesite=lax`");
+		let client_script = self.client.map(|client| {
+			script().attribute("type", "module").inner_html(format!(
+				r#"import init from "/js/{hash}.js"; init("/js/{hash}_bg.wasm")"#,
+				hash = hash(client),
+			))
+		});
+		let body = body()
+			.child(self.children)
+			.child(timezone_script)
+			.child(client_script);
+		html::html().child(head).child(body).into_node()
 	}
 }

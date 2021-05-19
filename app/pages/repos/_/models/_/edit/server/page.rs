@@ -1,115 +1,124 @@
-use html::{component, html, Props};
-use tangram_app_common::page_heading::PageHeading;
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	app_layout::{AppLayout, AppLayoutProps},
-	document::{Document, DocumentProps},
+	app_layout::{AppLayout, AppLayoutInfo},
+	document::Document,
 };
+use tangram_app_ui::page_heading::PageHeading;
 use tangram_id::Id;
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
-	pub app_layout_props: AppLayoutProps,
+#[derive(ComponentBuilder)]
+pub struct Page {
+	pub app_layout_info: AppLayoutInfo,
 	pub model_id: Id,
 	pub model_heading: String,
 	pub tag: Option<String>,
 	pub created_at: String,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<AppLayout {props.app_layout_props}>
-				<ui::S1>
-					<PageHeading>
-						<ui::H1>
-							{props.model_heading}
-						</ui::H1>
-					</PageHeading>
-					<ModelInfoTable created_at={props.created_at} model_id={props.model_id} />
-					<UpdateTagForm tag={props.tag} />
-					<DangerZone />
-				</ui::S1>
-			</AppLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		Document::new()
+			.child(
+				AppLayout::new(self.app_layout_info).child(
+					ui::S1::new()
+						.child(PageHeading::new().child(ui::H1::new().child(self.model_heading)))
+						.child(ModelInfoTable::new(self.model_id, self.created_at))
+						.child(UpdateTagForm::new(self.tag))
+						.child(DangerZone::new()),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-struct ModelInfoTableProps {
+#[derive(ComponentBuilder)]
+struct ModelInfoTable {
 	model_id: Id,
 	created_at: String,
 }
 
-#[component]
-fn ModelInfoTable(props: ModelInfoTableProps) {
-	html! {
-		<ui::S2>
-			<ui::Table>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-					{"Model Id"}
-					</ui::TableHeaderCell>
-					<ui::TableCell>
-						{Some(props.model_id.to_string())}
-					</ui::TableCell>
-				</ui::TableRow>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-						{"Uploaded At"}
-					</ui::TableHeaderCell>
-					<ui::TableCell>
-						{Some(props.created_at)}
-					</ui::TableCell>
-				</ui::TableRow>
-			</ui::Table>
-		</ui::S2>
+impl Component for ModelInfoTable {
+	fn into_node(self) -> Node {
+		ui::S2::new()
+			.child(
+				ui::Table::new()
+					.child(
+						ui::TableRow::new()
+							.child(ui::TableHeaderCell::new().child("Model Id"))
+							.child(ui::TableCell::new().child(Some(self.model_id.to_string()))),
+					)
+					.child(
+						ui::TableRow::new()
+							.child(ui::TableHeaderCell::new().child("Uploaded At"))
+							.child(ui::TableCell::new().child(Some(self.created_at))),
+					),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-struct UpdateTagFormProps {
+#[derive(ComponentBuilder)]
+struct UpdateTagForm {
 	tag: Option<String>,
 }
 
-#[component]
-fn UpdateTagForm(props: UpdateTagFormProps) {
-	html! {
-		<ui::S2>
-			<ui::H2>{"Tag"}</ui::H2>
-			<ui::Form post?={Some(true)}>
-				<input name="action" type="hidden" value="update_tag" />
-				<ui::TextField
-					label?="Tag"
-					name?="tag"
-					value?={props.tag}
-				/>
-				<ui::Button button_type?={Some(ui::ButtonType::Submit)}>
-					{"Update"}
-				</ui::Button>
-			</ui::Form>
-		</ui::S2>
+impl Component for UpdateTagForm {
+	fn into_node(self) -> Node {
+		ui::S2::new()
+			.child(ui::H2::new().child("Tag"))
+			.child(
+				ui::Form::new()
+					.post(Some(true))
+					.child(
+						input()
+							.attribute("name", "action")
+							.attribute("type", "hidden")
+							.attribute("value", "update_tag"),
+					)
+					.child(
+						ui::TextField::new()
+							.label("Tag".to_owned())
+							.name("tag".to_owned())
+							.value(self.tag),
+					)
+					.child(
+						ui::Button::new()
+							.button_type(Some(ui::ButtonType::Submit))
+							.child("Update"),
+					),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn DangerZone() {
-	html! {
-		<ui::S2>
-			<ui::H2>{"Danger Zone"}</ui::H2>
-			<ui::Form post?={Some(true)} onsubmit?="return confirm(\"Are you sure?\")">
-				<input name="action" type="hidden" value="delete" />
-				<ui::Button
-					button_type?={Some(ui::ButtonType::Submit)}
-					color?={Some(ui::colors::RED.to_owned())}
-				>
-					{"Delete"}
-				</ui::Button>
-			</ui::Form>
-		</ui::S2>
+#[derive(ComponentBuilder)]
+struct DangerZone {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for DangerZone {
+	fn into_node(self) -> Node {
+		ui::S2::new()
+			.child(ui::H2::new().child("Danger Zone"))
+			.child(
+				ui::Form::new()
+					.post(Some(true))
+					.onsubmit("return confirm(\"Are you sure?\")".to_owned())
+					.child(
+						input()
+							.attribute("name", "action")
+							.attribute("type", "hidden")
+							.attribute("value", "delete"),
+					)
+					.child(
+						ui::Button::new()
+							.button_type(Some(ui::ButtonType::Submit))
+							.color(Some(ui::colors::RED.to_owned()))
+							.child("Delete"),
+					),
+			)
+			.into_node()
 	}
 }

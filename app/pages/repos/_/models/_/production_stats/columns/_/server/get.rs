@@ -1,35 +1,37 @@
 use crate::{
-	number_column::{NumberColumnCountsSectionProps, NumberColumnStatsSectionProps},
+	number_column::{NumberColumnCountsSection, NumberColumnStatsSection},
 	page::{
-		EnumColumnCountsSectionProps, EnumColumnInvalidValuesSectionProps,
-		EnumColumnOverallHistogramEntry, EnumColumnProps, EnumColumnStatsSectionProps,
-		EnumColumnUniqueValuesSectionProps, EnumInvalidValuesTableProps, EnumInvalidValuesTableRow,
-		EnumUniqueValuesTableProps, EnumUniqueValuesTableRow, Inner, IntervalBoxChartDataPoint,
-		IntervalBoxChartDataPointStats, NumberColumnProps, NumberTrainingProductionComparison,
-		OverallBoxChartData, OverallBoxChartDataStats, Page, PageProps,
-		TextColumnCountsSectionProps, TextColumnProps, TextColumnStatsSectionProps,
-		TextColumnTokensSectionProps, TextNGramsTableProps, TextNGramsTableRow,
+		EnumColumn, EnumColumnCountsSection, EnumColumnInvalidValuesSection,
+		EnumColumnOverallHistogramEntry, EnumColumnStatsSection, EnumColumnUniqueValuesSection,
+		EnumInvalidValuesTable, EnumInvalidValuesTableRow, EnumUniqueValuesTable,
+		EnumUniqueValuesTableRow, Inner, IntervalBoxChartDataPoint, IntervalBoxChartDataPointStats,
+		NumberColumn, NumberTrainingProductionComparison, OverallBoxChartData,
+		OverallBoxChartDataStats, Page, TextColumn, TextColumnCountsSection,
+		TextColumnStatsSection, TextColumnTokensSection, TextNGramsTable, TextNGramsTableRow,
 	},
 };
 use chrono_tz::Tz;
-use html::html;
 use num::ToPrimitive;
+use pinwheel::prelude::*;
 use std::collections::BTreeMap;
 use std::sync::Arc;
 use tangram_app_common::{
-	date_window::{get_date_window_and_interval, DateWindow, DateWindowInterval},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	heuristics::PRODUCTION_STATS_TEXT_COLUMN_MAX_TOKENS_TO_SHOW_IN_TABLE,
 	model::get_model_bytes,
 	path_components,
-	production_stats::ProductionColumnStatsOutput,
-	production_stats::{get_production_stats, GetProductionStatsOutput},
-	time::format_date_window_interval,
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
+use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use tangram_app_production_stats::{
+	get_production_stats, GetProductionStatsOutput, ProductionColumnStatsOutput,
+};
+use tangram_app_ui::{
+	date_window::{get_date_window_and_interval, DateWindow, DateWindowInterval},
+	time::format_date_window_interval,
+};
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
@@ -37,7 +39,7 @@ pub async fn get(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let (model_id, column_name) = if let &["repos", _, "models", model_id, "production_stats", "columns", column_name] =
+	let (model_id, column_name) = if let ["repos", _, "models", model_id, "production_stats", "columns", column_name] =
 		path_components(&request).as_slice()
 	{
 		(model_id.to_owned(), column_name.to_owned())
@@ -78,8 +80,8 @@ pub async fn get(
 	}
 	let bytes = get_model_bytes(&context.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
-	let model_layout_props =
-		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::ProductionStats).await?;
+	let model_layout_info =
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionStats).await?;
 	let get_production_stats_output =
 		get_production_stats(&mut db, model, date_window, date_window_interval, timezone).await?;
 	let overall_train_row_count = match model.inner() {
@@ -117,7 +119,7 @@ pub async fn get(
 	let inner = match &train_column_stats {
 		tangram_model::ColumnStatsReader::NumberColumn(train_column_stats) => {
 			let train_column_stats = train_column_stats.read();
-			Inner::Number(number_props(
+			Inner::Number(number_column(
 				get_production_stats_output,
 				train_column_stats,
 				date_window,
@@ -127,7 +129,7 @@ pub async fn get(
 		}
 		tangram_model::ColumnStatsReader::EnumColumn(train_column_stats) => {
 			let train_column_stats = train_column_stats.read();
-			Inner::Enum(enum_props(
+			Inner::Enum(enum_column(
 				get_production_stats_output,
 				train_column_stats,
 				overall_train_row_count,
@@ -138,7 +140,7 @@ pub async fn get(
 		}
 		tangram_model::ColumnStatsReader::TextColumn(train_column_stats) => {
 			let train_column_stats = train_column_stats.read();
-			Inner::Text(text_props(
+			Inner::Text(text_column(
 				get_production_stats_output,
 				train_column_stats,
 				date_window,
@@ -148,14 +150,14 @@ pub async fn get(
 		}
 		_ => return Ok(bad_request()),
 	};
-	let props = PageProps {
+	let page = Page {
 		date_window,
 		column_name: column_name.to_owned(),
 		id: model_id.to_string(),
 		inner,
-		model_layout_props,
+		model_layout_info,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))
@@ -163,13 +165,13 @@ pub async fn get(
 	Ok(response)
 }
 
-fn number_props(
+fn number_column(
 	get_production_stats_output: GetProductionStatsOutput,
 	train_column_stats: tangram_model::NumberColumnStatsReader,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
 	timezone: Tz,
-) -> NumberColumnProps {
+) -> NumberColumn {
 	let overall = get_production_stats_output
 		.overall
 		.column_stats
@@ -252,19 +254,19 @@ fn number_props(
 		production: overall.stats.as_ref().map(|s| s.std),
 		training: train_column_stats.std(),
 	};
-	NumberColumnProps {
+	NumberColumn {
 		column_name: train_column_stats.column_name().to_owned(),
 		date_window,
 		date_window_interval,
 		alert: None,
-		number_column_counts_section_props: NumberColumnCountsSectionProps {
+		number_column_counts_section: NumberColumnCountsSection {
 			absent_count: overall.absent_count,
 			row_count: get_production_stats_output.overall.row_count,
 			invalid_count: overall.invalid_count,
 		},
 		interval_box_chart_data,
 		overall_box_chart_data,
-		number_column_stats_section_props: NumberColumnStatsSectionProps {
+		number_column_stats_section: NumberColumnStatsSection {
 			max_comparison,
 			mean_comparison,
 			min_comparison,
@@ -273,14 +275,14 @@ fn number_props(
 	}
 }
 
-fn enum_props(
+fn enum_column(
 	get_production_stats_output: GetProductionStatsOutput,
 	train_column_stats: tangram_model::EnumColumnStatsReader,
 	overall_train_row_count: u64,
 	date_window: DateWindow,
 	_date_window_interval: DateWindowInterval,
 	_timezone: Tz,
-) -> EnumColumnProps {
+) -> EnumColumn {
 	let overall = get_production_stats_output
 		.overall
 		.column_stats
@@ -327,11 +329,11 @@ fn enum_props(
 			production_fraction: histogram_entry.production_fraction,
 		})
 		.collect();
-	let enum_invalid_values_table_props =
+	let enum_invalid_values_table =
 		overall
 			.invalid_histogram
 			.as_ref()
-			.map(|invalid_histogram| EnumInvalidValuesTableProps {
+			.map(|invalid_histogram| EnumInvalidValuesTable {
 				rows: invalid_histogram
 					.iter()
 					.map(|(name, count)| EnumInvalidValuesTableRow {
@@ -342,36 +344,36 @@ fn enum_props(
 					})
 					.collect(),
 			});
-	EnumColumnProps {
+	EnumColumn {
 		alert: None,
-		counts_section_props: EnumColumnCountsSectionProps {
+		counts_section: EnumColumnCountsSection {
 			absent_count: overall.absent_count,
 			row_count: production_row_count,
 			invalid_count: overall.invalid_count,
 		},
-		stats_section_props: EnumColumnStatsSectionProps {
+		stats_section: EnumColumnStatsSection {
 			overall_chart_data,
 			column_name: overall.column_name,
 			date_window,
 		},
-		unique_values_section_props: EnumColumnUniqueValuesSectionProps {
-			enum_unique_values_table_props: EnumUniqueValuesTableProps {
+		unique_values_section: EnumColumnUniqueValuesSection {
+			enum_unique_values_table: EnumUniqueValuesTable {
 				rows: enum_unique_values_table_rows,
 			},
 		},
-		invalid_values_section_props: EnumColumnInvalidValuesSectionProps {
-			enum_invalid_values_table_props,
+		invalid_values_section: EnumColumnInvalidValuesSection {
+			enum_invalid_values_table,
 		},
 	}
 }
 
-fn text_props(
+fn text_column(
 	get_production_stats_output: GetProductionStatsOutput,
 	train_column_stats: tangram_model::TextColumnStatsReader,
 	date_window: DateWindow,
 	_date_window_interval: DateWindowInterval,
 	_timezone: Tz,
-) -> TextColumnProps {
+) -> TextColumn {
 	let overall = get_production_stats_output
 		.overall
 		.column_stats
@@ -392,26 +394,26 @@ fn text_props(
 			ngram: ngram.to_string(),
 			count: entry.row_count.to_usize().unwrap(),
 		})
-		.collect::<Vec<_>>();
+		.collect::<Vec<TextNGramsTableRow>>();
 	text_ngrams_table_rows.sort_by(|a, b| a.count.cmp(&b.count).reverse());
 	let ngram_row_counts = overall
 		.ngrams
 		.iter()
 		.map(|(ngram, entry)| (ngram.to_string(), entry.row_count))
 		.collect();
-	TextColumnProps {
+	TextColumn {
 		alert: None,
-		text_column_counts_section_props: TextColumnCountsSectionProps {
+		text_column_counts_section: TextColumnCountsSection {
 			row_count: get_production_stats_output.overall.row_count,
 			absent_count: overall.absent_count,
 			invalid_count: overall.invalid_count,
 		},
-		text_ngrams_section_props: TextColumnTokensSectionProps {
-			text_ngrams_table_props: TextNGramsTableProps {
+		text_ngrams_section: TextColumnTokensSection {
+			text_ngrams_table: TextNGramsTable {
 				rows: text_ngrams_table_rows,
 			},
 		},
-		text_column_stats_section_props: TextColumnStatsSectionProps {
+		text_column_stats_section: TextColumnStatsSection {
 			column_name: overall.column_name.to_owned(),
 			date_window,
 			ngram_row_counts,

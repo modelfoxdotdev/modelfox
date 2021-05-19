@@ -1,50 +1,48 @@
-use html::{component, html, Props};
-use tangram_app_common::page_heading::PageHeading;
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	app_layout::{AppLayout, AppLayoutProps},
-	document::{Document, DocumentProps},
+	app_layout::{AppLayout, AppLayoutInfo},
+	document::Document,
 };
-use tangram_serve::client;
+use tangram_app_ui::page_heading::PageHeading;
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
-	pub app_layout_props: AppLayoutProps,
+#[derive(ComponentBuilder)]
+pub struct Page {
+	pub app_layout_info: AppLayoutInfo,
 	pub error: Option<String>,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let document_props = DocumentProps {
-		client_wasm_js_src: Some(client!()),
-	};
-	html! {
-		<Document {document_props}>
-			<AppLayout {props.app_layout_props}>
-				<ui::S1>
-					<PageHeading>
-						<ui::H1>{"Upload Model"}</ui::H1>
-					</PageHeading>
-					<ui::Form enc_type?="multipart/form-data" post?={Some(true)}>
-						{
-							props.error.map(|error| html! {
-								<ui::Alert level={ui::Level::Danger}>
-									{error}
-								</ui::Alert>
-							})
-						}
-						<ui::FileField
-							disabled={None}
-							label="File"
-							name="file"
-							required={Some(true)}
-						/>
-						<ui::Button button_type?={Some(ui::ButtonType::Submit)}>
-							{"Upload"}
-						</ui::Button>
-					</ui::Form>
-				</ui::S1>
-			</AppLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		Document::new()
+			.client("tangram_app_new_model_server")
+			.child(
+				AppLayout::new(self.app_layout_info).child(
+					ui::S1::new()
+						.child(PageHeading::new().child(ui::H1::new().child("Upload Model")))
+						.child(
+							ui::Form::new()
+								.enc_type("multipart/form-data".to_owned())
+								.post(Some(true))
+								.child(
+									self.error.map(|error| {
+										ui::Alert::new(ui::Level::Danger).child(error)
+									}),
+								)
+								.child(
+									ui::FileField::new()
+										.label("File".to_string())
+										.name("file".to_string())
+										.required(true),
+								)
+								.child(
+									ui::Button::new()
+										.button_type(Some(ui::ButtonType::Submit))
+										.child("Upload"),
+								),
+						),
+				),
+			)
+			.into_node()
 	}
 }

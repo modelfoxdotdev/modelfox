@@ -8,9 +8,9 @@ version = "0.0.0"
 path = "page.rs"
 
 [dependencies]
-html = { path = "../../../../../html" }
+pinwheel = { path = "../../../../../pinwheel" }
 indoc = "1"
-tangram_www_common = { path = "../../../../common" }
+tangram_www_ui = { path = "../../../../ui" }
 tangram_www_layouts = { path = "../../../../layouts" }
 tangram_serve = { path = "../../../../../serve" }
 tangram_ui = { path = "../../../../../ui" }

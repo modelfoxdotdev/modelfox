@@ -151,7 +151,7 @@ fn main() {
 	.collect();
 	let income_variants = ["<=50K", ">50K"].iter().map(ToString::to_string).collect();
 	let options = tangram_table::FromCsvOptions {
-		column_types: Some(btreemap! {
+		column_types: Some(btreemap!(
 		  "age".to_owned() => TableColumnType::Number ,
 			"workclass".to_owned() => TableColumnType::Enum { variants: workclass_variants },
 			"fnlwgt".to_owned() => TableColumnType::Number,
@@ -167,7 +167,7 @@ fn main() {
 			"hours_per_week".to_owned() => TableColumnType::Number,
 			"native_country".to_owned() => TableColumnType::Enum { variants: native_country_variants },
 			"income".to_owned() => TableColumnType::Enum { variants: income_variants },
-		}),
+		)),
 		..Default::default()
 	};
 	let mut features_train =

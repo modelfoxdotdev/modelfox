@@ -1,6 +1,6 @@
 use tangram_charts::{bar_chart::BarChart, components::hydrate_chart};
 use wasm_bindgen::{self, prelude::*, JsCast};
-use web_sys::*;
+use web_sys as dom;
 
 #[wasm_bindgen(start)]
 pub fn start() {
@@ -14,7 +14,7 @@ fn hydrate_charts() {
 	let cpus = ["m1", "ryzen"];
 	let datasets = ["allstate", "flights", "higgs"];
 	let metrics = ["duration", "memory", "metric"];
-	let document = window().unwrap().document().unwrap();
+	let document = dom::window().unwrap().document().unwrap();
 	for cpu in cpus.iter() {
 		for dataset in datasets.iter() {
 			for metric in metrics.iter() {
@@ -28,12 +28,12 @@ fn hydrate_charts() {
 }
 
 fn set_dataset_hidden_states(selected_dataset: &str) {
-	let document = window().unwrap().document().unwrap();
+	let document = dom::window().unwrap().document().unwrap();
 	let datasets = ["allstate", "higgs", "flights"];
 	let cpu_selected_option = document
 		.get_element_by_id(&"cpu-select")
 		.unwrap()
-		.dyn_ref::<HtmlSelectElement>()
+		.dyn_ref::<dom::HtmlSelectElement>()
 		.unwrap()
 		.value();
 	for dataset in datasets.iter() {
@@ -41,7 +41,7 @@ fn set_dataset_hidden_states(selected_dataset: &str) {
 		let dataset_selected_section = document
 			.get_element_by_id(&dataset_selected_section_id)
 			.unwrap()
-			.dyn_into::<HtmlElement>()
+			.dyn_into::<dom::HtmlElement>()
 			.unwrap();
 		if dataset == &selected_dataset {
 			dataset_selected_section.set_hidden(false);
@@ -52,17 +52,18 @@ fn set_dataset_hidden_states(selected_dataset: &str) {
 }
 
 fn init_dataset_select() {
-	let document = window().unwrap().document().unwrap();
+	let document = dom::window().unwrap().document().unwrap();
 	let dataset_select_element = document.get_element_by_id(&"dataset-select").unwrap();
 
-	let callback_fn = Closure::<dyn Fn(_)>::wrap(Box::new(move |event: Event| {
+	let callback_fn = Closure::<dyn Fn(_)>::wrap(Box::new(move |event: dom::Event| {
 		if let Some(event) = event.current_target() {
-			let dataset_selected_option = event.dyn_ref::<HtmlSelectElement>().unwrap().value();
+			let dataset_selected_option =
+				event.dyn_ref::<dom::HtmlSelectElement>().unwrap().value();
 			set_dataset_hidden_states(dataset_selected_option.as_str());
 		}
 	}));
 
-	if let Some(select_element) = dataset_select_element.dyn_ref::<HtmlSelectElement>() {
+	if let Some(select_element) = dataset_select_element.dyn_ref::<dom::HtmlSelectElement>() {
 		set_dataset_hidden_states(select_element.value().as_str());
 		select_element
 			.add_event_listener_with_callback("change", callback_fn.as_ref().unchecked_ref())
@@ -72,17 +73,17 @@ fn init_dataset_select() {
 }
 
 fn init_cpu_select() {
-	let document = window().unwrap().document().unwrap();
+	let document = dom::window().unwrap().document().unwrap();
 	let cpu_select_element = document.get_element_by_id(&"cpu-select").unwrap();
 
 	fn set_cpu_hidden_states(cpu_selected_option: &str) {
-		let document = window().unwrap().document().unwrap();
+		let document = dom::window().unwrap().document().unwrap();
 		let cpus = ["m1", "ryzen"];
 		for cpu in cpus.iter() {
 			let cpu_selected_section = document
 				.get_element_by_id(&cpu)
 				.unwrap()
-				.dyn_into::<HtmlElement>()
+				.dyn_into::<dom::HtmlElement>()
 				.unwrap();
 			if cpu == &cpu_selected_option {
 				cpu_selected_section.set_hidden(false);
@@ -92,21 +93,21 @@ fn init_cpu_select() {
 		}
 	}
 
-	let callback_fn = Closure::<dyn Fn(_)>::wrap(Box::new(move |event: Event| {
+	let callback_fn = Closure::<dyn Fn(_)>::wrap(Box::new(move |event: dom::Event| {
 		if let Some(event) = event.current_target() {
-			let cpu_selected_option = event.dyn_ref::<HtmlSelectElement>().unwrap().value();
+			let cpu_selected_option = event.dyn_ref::<dom::HtmlSelectElement>().unwrap().value();
 			set_cpu_hidden_states(cpu_selected_option.as_str());
 			let dataset_select_element = document
 				.get_element_by_id(&"dataset-select")
 				.unwrap()
-				.dyn_into::<HtmlSelectElement>()
+				.dyn_into::<dom::HtmlSelectElement>()
 				.unwrap();
 			let dataset_selected_option = dataset_select_element.value();
 			set_dataset_hidden_states(dataset_selected_option.as_str());
 		}
 	}));
 
-	if let Some(select_element) = cpu_select_element.dyn_ref::<HtmlSelectElement>() {
+	if let Some(select_element) = cpu_select_element.dyn_ref::<dom::HtmlSelectElement>() {
 		set_cpu_hidden_states(select_element.value().as_str());
 		select_element
 			.add_event_listener_with_callback("change", callback_fn.as_ref().unchecked_ref())

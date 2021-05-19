@@ -1,0 +1,15 @@
+[package]
+edition = "2018"
+name = "tangram_app_ui"
+publish = false
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+chrono-tz = { version = "0.5", features = ["serde"] }
+pinwheel = { path = "../../pinwheel" }
+serde = { version = "1", features = ["derive"] }
+tangram_ui = { path = "../../ui" }

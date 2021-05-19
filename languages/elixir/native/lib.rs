@@ -297,6 +297,8 @@ enum FeatureContributionEntry {
 	OneHotEncoded(OneHotEncodedFeatureContribution),
 	#[serde(rename = "bag_of_words")]
 	BagOfWords(BagOfWordsFeatureContribution),
+	#[serde(rename = "bag_of_words_cosine_similarity")]
+	BagOfWordsCosineSimilarity(BagOfWordsCosineSimilarityFeatureContribution),
 	#[serde(rename = "word_embedding")]
 	WordEmbedding(WordEmbeddingFeatureContribution),
 }
@@ -315,6 +317,9 @@ impl From<tangram_core::predict::FeatureContributionEntry> for FeatureContributi
 			}
 			tangram_core::predict::FeatureContributionEntry::BagOfWords(value) => {
 				FeatureContributionEntry::BagOfWords(value.into())
+			}
+			tangram_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(value) => {
+				FeatureContributionEntry::BagOfWordsCosineSimilarity(value.into())
 			}
 			tangram_core::predict::FeatureContributionEntry::WordEmbedding(value) => {
 				FeatureContributionEntry::WordEmbedding(value.into())
@@ -413,6 +418,30 @@ impl From<tangram_core::predict::NGram> for NGram {
 			tangram_core::predict::NGram::Bigram(token_a, token_b) => {
 				NGram::Bigram(token_a, token_b)
 			}
+		}
+	}
+}
+
+#[derive(serde::Serialize)]
+#[serde(rename = "Elixir.Tangram.BagOfWordsCosineSimilarityFeatureContribution")]
+struct BagOfWordsCosineSimilarityFeatureContribution {
+	column_name_a: String,
+	column_name_b: String,
+	ngram: NGram,
+	feature_value: bool,
+	feature_contribution_value: f32,
+}
+
+impl From<tangram_core::predict::BagOfWordsCosineSimilarityFeatureContribution>
+	for BagOfWordsCosineSimilarityFeatureContribution
+{
+	fn from(value: tangram_core::predict::BagOfWordsCosineSimilarityFeatureContribution) -> Self {
+		BagOfWordsCosineSimilarityFeatureContribution {
+			column_name_a: value.column_name_a,
+			column_name_b: value.column_name_b,
+			ngram: value.ngram.into(),
+			feature_value: value.feature_value,
+			feature_contribution_value: value.feature_contribution_value,
 		}
 	}
 }

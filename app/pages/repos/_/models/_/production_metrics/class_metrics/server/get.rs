@@ -1,24 +1,27 @@
 use crate::page::{
 	ClassMetricsEntry, ConfusionMatrix, ConfusionMatrixFraction,
-	ConfusionMatrixTrainingProductionComparison, InnerProps, IntervalEntry, Metrics,
-	OverallClassMetrics, OverallClassMetricsEntry, Page, PageProps, TrainingProductionMetrics,
+	ConfusionMatrixTrainingProductionComparison, Inner, IntervalEntry, Metrics,
+	OverallClassMetrics, OverallClassMetricsEntry, Page, TrainingProductionMetrics,
 };
-use html::html;
 use num::ToPrimitive;
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
-	date_window::{get_date_window_and_interval, DateWindow},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
 	path_components,
-	production_metrics::ProductionPredictionMetricsOutput,
-	production_metrics::{get_production_metrics, GetProductionMetricsOutput},
-	time::format_date_window_interval,
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
+use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use tangram_app_production_metrics::{
+	get_production_metrics, GetProductionMetricsOutput, ProductionPredictionMetricsOutput,
+};
+use tangram_app_ui::{
+	date_window::{get_date_window_and_interval, DateWindow},
+	time::format_date_window_interval,
+};
 use tangram_error::{err, Result};
 use tangram_id::Id;
 use tangram_zip::zip;
@@ -27,7 +30,7 @@ pub async fn get(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let model_id = if let &["repos", _, "models", model_id, "production_metrics", "class_metrics"] =
+	let model_id = if let ["repos", _, "models", model_id, "production_metrics", "class_metrics"] =
 		path_components(&request).as_slice()
 	{
 		model_id.to_owned()
@@ -69,9 +72,8 @@ pub async fn get(
 	}
 	let bytes = get_model_bytes(&context.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
-	let model_layout_props =
-		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::ProductionMetrics)
-			.await?;
+	let model_layout_info =
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionMetrics).await?;
 	let production_metrics =
 		get_production_metrics(&mut db, model, date_window, date_window_interval, timezone).await?;
 	let model = match model.inner() {
@@ -249,15 +251,15 @@ pub async fn get(
 			}
 		})
 		.collect();
-	let class = search_params.and_then(|s| s.class.map(|class| class.to_owned()));
+	let class = search_params.and_then(|s| s.class);
 	let class_index = if let Some(class) = &class {
 		classes.iter().position(|c| c == class).unwrap()
 	} else {
 		0
 	};
 	let class = class.unwrap_or_else(|| classes.get(class_index).unwrap().to_owned());
-	let props = PageProps {
-		inner_props: InnerProps {
+	let page = Page {
+		inner: Inner {
 			id: model_id.to_string(),
 			class_metrics,
 			date_window,
@@ -266,9 +268,9 @@ pub async fn get(
 			overall,
 			class,
 		},
-		model_layout_props,
+		model_layout_info,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

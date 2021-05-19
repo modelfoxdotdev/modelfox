@@ -1,7 +1,7 @@
-use crate::page::{FoundProps, Inner, NotFoundProps, Page, PageProps};
+use crate::page::{Found, Inner, NotFound, Page};
 use chrono::prelude::*;
 use chrono_tz::Tz;
-use html::html;
+use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
@@ -9,15 +9,15 @@ use tangram_app_common::{
 	model::get_model_bytes,
 	path_components,
 	predict::{
-		compute_feature_contributions_chart_series, compute_input_table_props,
-		BinaryClassificationPredictOutputProps, MulticlassClassificationPredictOutputProps,
-		PredictOutputInnerProps, PredictOutputProps, RegressionPredictOutputProps,
+		compute_feature_contributions_chart_series, compute_input_table,
+		BinaryClassificationPredictOutput, MulticlassClassificationPredictOutput, PredictOutput,
+		PredictOutputInner, RegressionPredictOutput,
 	},
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
+use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_core::predict::{PredictInput, PredictOptions};
 use tangram_error::{err, Result};
 use tangram_id::Id;
@@ -26,7 +26,7 @@ pub async fn get(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let (model_id, identifier) = if let &["repos", _, "models", model_id, "production_predictions", "predictions", identifier] =
+	let (model_id, identifier) = if let ["repos", _, "models", model_id, "production_predictions", "predictions", identifier] =
 		path_components(&request).as_slice()
 	{
 		(model_id.to_owned(), identifier.to_owned())
@@ -51,7 +51,7 @@ pub async fn get(
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
-	let model_layout_props = get_model_layout_props(
+	let model_layout_info = model_layout_info(
 		&mut db,
 		&context,
 		model_id,
@@ -83,7 +83,7 @@ pub async fn get(
 			let date: DateTime<Tz> = Utc.timestamp(date, 0).with_timezone(&timezone);
 			let input: String = row.get(2);
 			let input: PredictInput = serde_json::from_str(&input)?;
-			let input_table = compute_input_table_props(model, &input);
+			let input_table = compute_input_table(model, &input);
 			let bytes = get_model_bytes(&context.storage, model_id).await?;
 			let model = tangram_model::from_bytes(&bytes)?;
 			let predict_model = tangram_core::predict::Model::from(model);
@@ -101,7 +101,7 @@ pub async fn get(
 							"output".to_owned(),
 							feature_contributions,
 						);
-					PredictOutputInnerProps::Regression(RegressionPredictOutputProps {
+					PredictOutputInner::Regression(RegressionPredictOutput {
 						feature_contributions_chart_series,
 						value: output.value,
 					})
@@ -113,13 +113,11 @@ pub async fn get(
 							"output".to_owned(),
 							feature_contributions,
 						);
-					PredictOutputInnerProps::BinaryClassification(
-						BinaryClassificationPredictOutputProps {
-							class_name: output.class_name,
-							feature_contributions_chart_series,
-							probability: output.probability,
-						},
-					)
+					PredictOutputInner::BinaryClassification(BinaryClassificationPredictOutput {
+						class_name: output.class_name,
+						feature_contributions_chart_series,
+						probability: output.probability,
+					})
 				}
 				tangram_core::predict::PredictOutput::MulticlassClassification(output) => {
 					let feature_contributions = output.feature_contributions.unwrap();
@@ -129,8 +127,8 @@ pub async fn get(
 							compute_feature_contributions_chart_series(class, feature_contributions)
 						})
 						.collect();
-					PredictOutputInnerProps::MulticlassClassification(
-						MulticlassClassificationPredictOutputProps {
+					PredictOutputInner::MulticlassClassification(
+						MulticlassClassificationPredictOutput {
 							class_name: output.class_name,
 							feature_contributions_chart_series,
 							probabilities: output.probabilities.into_iter().collect(),
@@ -139,23 +137,23 @@ pub async fn get(
 					)
 				}
 			};
-			Inner::Found(Box::new(FoundProps {
+			Inner::Found(Box::new(Found {
 				date: date.to_string(),
 				identifier: identifier.to_owned(),
-				predict_output_props: PredictOutputProps { inner, input_table },
+				predict_output: PredictOutput { inner, input_table },
 			}))
 		}
-		None => Inner::NotFound(Box::new(NotFoundProps {
+		None => Inner::NotFound(Box::new(NotFound {
 			identifier: identifier.to_owned(),
 		})),
 	};
 
-	let props = PageProps {
-		model_layout_props,
+	let page = Page {
+		model_layout_info,
 		identifier: identifier.to_owned(),
 		inner,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

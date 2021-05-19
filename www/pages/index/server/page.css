@@ -1,162 +1,161 @@
 .index-grid {
-  box-sizing: border-box;
-  display: grid;
-  margin: 0 auto;
-  max-width: var(--max-width);
-  width: 100%;
+	box-sizing: border-box;
+	display: grid;
+	margin: 0 auto;
+	max-width: var(--max-width);
+	width: 100%;
 }
 
 @media (max-width: 1199px) {
-  .index-grid {
-    row-gap: 2rem;
-    padding: 2rem 1rem;
-  }
+	.index-grid {
+		row-gap: 2rem;
+		padding: 2rem 1rem;
+	}
 }
 
 @media (min-width: 1200px) {
-  .index-grid {
-    row-gap: 8rem;
-    padding: 4rem 1rem;
-  }
+	.index-grid {
+		row-gap: 8rem;
+		padding: 4rem 1rem;
+	}
 }
 
 .index-hero-wrapper {
-  color: var(--text-color);
-  display: grid;
-  justify-content: center;
-  row-gap: 2rem;
-  max-width: 1000px;
-  margin: 0 auto;
+	color: var(--text-color);
+	display: grid;
+	justify-content: center;
+	row-gap: 2rem;
+	max-width: 1000px;
+	margin: 0 auto;
 }
 
 .index-hero-title {
-  color: var(--heading-text-color);
-  margin: 0;
-  text-align: center;
-  line-height: normal;
+	color: var(--heading-text-color);
+	margin: 0;
+	text-align: center;
+	line-height: normal;
 }
 
 @media (max-width: 1199px) {
-  .index-hero-title {
-    font-size: 2rem;
-  }
+	.index-hero-title {
+		font-size: 2rem;
+	}
 }
 
 @media (min-width: 1200px) {
-  .index-hero-title {
-    font-size: 2.5rem;
-  }
+	.index-hero-title {
+		font-size: 2.5rem;
+	}
 }
 
 .index-hero-subtitle {
-  line-height: 1.5;
-  text-align: center;
+	line-height: 1.5;
+	text-align: center;
 }
 
 @media (max-width: 1199px) {
-  .index-hero-subtitle {
-    font-size: 1rem;
-  }
+	.index-hero-subtitle {
+		font-size: 1rem;
+	}
 }
 
 @media (min-width: 1200px) {
-  .index-hero-subtitle {
-    font-size: 1.25rem;
-  }
+	.index-hero-subtitle {
+		font-size: 1.25rem;
+	}
 }
 
 .index-hero-buttons {
-  display: grid;
-  justify-content: center;
+	display: grid;
+	justify-content: center;
 }
 
 @media (max-width: 1199px) {
-  .index-hero-buttons {
-    grid-auto-flow: row;
-    row-gap: 1rem;
-  }
+	.index-hero-buttons {
+		grid-auto-flow: row;
+		row-gap: 1rem;
+	}
 }
 
 @media (min-width: 1200px) {
-  .index-hero-buttons {
-    grid-auto-flow: column;
-    column-gap: 1rem;
-  }
+	.index-hero-buttons {
+		grid-auto-flow: column;
+		column-gap: 1rem;
+	}
 }
 
-
 .index-video-placeholder {
-  background-color: #282c34;
-  border-radius: var(--border-radius);
-  overflow: hidden;
-  padding-top: calc((1 / (16 / 9)) * 100%);
-  position: relative;
-  width: 100%;
+	background-color: #282c34;
+	border-radius: var(--border-radius);
+	overflow: hidden;
+	padding-top: calc((1 / (16 / 9)) * 100%);
+	position: relative;
+	width: 100%;
 }
 
 .index-video {
-  border: none;
-  bottom: 0;
-  height: 100%;
-  left: 0;
-  outline: one;
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 100%;
+	border: none;
+	bottom: 0;
+	height: 100%;
+	left: 0;
+	outline: one;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 100%;
 }
 
 .index-step {
-  align-content: start;
-  display: grid;
+	align-content: start;
+	display: grid;
 }
 
 @media (max-width: 1199px) {
-  .index-step {
-    grid: auto / minmax(0, 1fr);
-    gap: 1rem;
-  }
+	.index-step {
+		grid: auto / minmax(0, 1fr);
+		gap: 1rem;
+	}
 }
 
 @media (min-width: 1200px) {
-  .index-step {
-    grid: auto / minmax(0, 1fr) minmax(0, 2fr);
-    gap: 2rem;
-  }
+	.index-step {
+		grid: auto / minmax(0, 1fr) minmax(0, 2fr);
+		gap: 2rem;
+	}
 }
 
 .index-step-title {
-  color: var(--heading-text-color);
-  font-weight: bold;
-  margin: 0;
-  margin-bottom: 1rem;
-  line-height: 1.5;
+	color: var(--heading-text-color);
+	font-weight: bold;
+	margin: 0;
+	margin-bottom: 1rem;
+	line-height: 1.5;
 }
 
 @media (max-width: 1199px) {
-  .index-step-title {
-    font-size: 1.5rem;
-  }
+	.index-step-title {
+		font-size: 1.5rem;
+	}
 }
 
 @media (min-width: 1200px) {
-  .index-step-title {
-    font-size: 1.5rem;
-  }
+	.index-step-title {
+		font-size: 1.5rem;
+	}
 }
 
 .index-step-text {
-  line-height: 1.5;
+	line-height: 1.5;
 }
 
 @media (max-width: 1199px) {
-  .index-step-text {
-    font-size: 1rem;
-  }
+	.index-step-text {
+		font-size: 1rem;
+	}
 }
 
 @media (min-width: 1200px) {
-  .index-step-text {
-    font-size: 1.25rem;
-  }
+	.index-step-text {
+		font-size: 1.25rem;
+	}
 }

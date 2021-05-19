@@ -308,6 +308,8 @@ pub enum FeatureContributionEntry {
 	OneHotEncoded(OneHotEncodedFeatureContribution),
 	#[serde(rename = "bag_of_words")]
 	BagOfWords(BagOfWordsFeatureContribution),
+	#[serde(rename = "bag_of_words_cosine_similarity")]
+	BagOfWordsCosineSimilarity(BagOfWordsCosineSimilarityFeatureContribution),
 	#[serde(rename = "word_embedding")]
 	WordEmbedding(WordEmbeddingFeatureContribution),
 }
@@ -326,6 +328,9 @@ impl From<tangram_core::predict::FeatureContributionEntry> for FeatureContributi
 			}
 			tangram_core::predict::FeatureContributionEntry::BagOfWords(value) => {
 				FeatureContributionEntry::BagOfWords(value.into())
+			}
+			tangram_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(value) => {
+				FeatureContributionEntry::BagOfWordsCosineSimilarity(value.into())
 			}
 			tangram_core::predict::FeatureContributionEntry::WordEmbedding(value) => {
 				FeatureContributionEntry::WordEmbedding(value.into())
@@ -440,6 +445,35 @@ impl From<tangram_core::predict::NGram> for NGram {
 			tangram_core::predict::NGram::Bigram(token_a, token_b) => {
 				NGram::Bigram(token_a, token_b)
 			}
+		}
+	}
+}
+
+/// This describes the contribution of a feature from a bag of words cosine similarity feature group.
+#[derive(Debug, serde::Serialize)]
+pub struct BagOfWordsCosineSimilarityFeatureContribution {
+	/// This is the name of the first source column for the feature group.
+	pub column_name_a: String,
+	/// This is the name of the second source column for the feature group.
+	pub column_name_b: String,
+	/// This is the ngram for the feature.
+	pub ngram: NGram,
+	/// This is the amount that the feature contributed to the output.
+	pub feature_value: bool,
+	/// This is the value of the feature.
+	pub feature_contribution_value: f32,
+}
+
+impl From<tangram_core::predict::BagOfWordsCosineSimilarityFeatureContribution>
+	for BagOfWordsCosineSimilarityFeatureContribution
+{
+	fn from(value: tangram_core::predict::BagOfWordsCosineSimilarityFeatureContribution) -> Self {
+		BagOfWordsCosineSimilarityFeatureContribution {
+			column_name_a: value.column_name_a,
+			column_name_b: value.column_name_b,
+			ngram: value.ngram.into(),
+			feature_value: value.feature_value,
+			feature_contribution_value: value.feature_contribution_value,
 		}
 	}
 }

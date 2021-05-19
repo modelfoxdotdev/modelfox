@@ -1,5 +1,5 @@
-use crate::page::{Owner, Page, PageProps};
-use html::html;
+use crate::page::{Owner, Page};
+use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
@@ -7,7 +7,7 @@ use tangram_app_common::{
 	user::{authorize_user, User},
 	Context,
 };
-use tangram_app_layouts::app_layout::get_app_layout_props;
+use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_error::Result;
 
 pub async fn get(
@@ -22,7 +22,7 @@ pub async fn get(
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
-	let app_layout_props = get_app_layout_props(&context).await?;
+	let app_layout_info = app_layout_info(&context).await?;
 	let owners = match user {
 		User::Root => None,
 		User::Normal(user) => {
@@ -55,14 +55,14 @@ pub async fn get(
 			Some(owners)
 		}
 	};
-	let props = PageProps {
-		app_layout_props,
+	let page = Page {
+		app_layout_info,
 		owners,
 		error: None,
 		owner: None,
 		title: None,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

@@ -1,152 +1,152 @@
 .topbar-wrapper {
-  align-items: center;
-  display: grid;
-  grid-auto-flow: column;
-  height: 4.5rem;
-  justify-content: space-between;
-  left: 0;
-  padding: 0 1rem;
-  position: relative;
-  right: 0;
-  top: 0;
+	align-items: center;
+	display: grid;
+	grid-auto-flow: column;
+	height: 4.5rem;
+	justify-content: space-between;
+	left: 0;
+	padding: 0 1rem;
+	position: relative;
+	right: 0;
+	top: 0;
 }
 
 .topbar-link {
-  color: var(--text-color);
-  cursor: pointer;
-  text-decoration: none;
+	color: var(--text-color);
+	cursor: pointer;
+	text-decoration: none;
 }
 
 .topbar-link:hover {
-  filter: brightness(90%);
+	filter: brightness(90%);
 }
 
 /* Hide the details arrow */
 .topbar-details > summary {
-  list-style: none;
+	list-style: none;
 }
 .topbar-details > summary::-webkit-details-marker {
-  display: none;
+	display: none;
 }
 
 /* This element fills the whole screen. When clicked or tapped, the dropdown will be dismissed. */
 .topbar-details[open] > summary::before {
-  background: transparent;
-  bottom: 0;
-  content: " ";
-  cursor: default;
-  display: block;
-  left: 0;
-  position: fixed;
-  right: 0;
-  top: 0;
-  z-index: 1;
+	background: transparent;
+	bottom: 0;
+	content: " ";
+	cursor: default;
+	display: block;
+	left: 0;
+	position: fixed;
+	right: 0;
+	top: 0;
+	z-index: 1;
 }
 
 @media (max-width: 1199px) {
-  .topbar-details {
-    display: block;
-  }
+	.topbar-details {
+		display: block;
+	}
 }
 
 @media (min-width: 1200px) {
-  .topbar-details {
-    display: none;
-  }
+	.topbar-details {
+		display: none;
+	}
 }
 
 .topbar-details[open] .topbar-hamburger-icon {
-  display: none;
+	display: none;
 }
 
 .topbar-details:not([open]) .topbar-x-icon {
-  display: none;
+	display: none;
 }
 
 .topbar-details > summary {
-  align-items: center;
-  box-sizing: border-box;
-  color: var(--heading-text-color);
-  cursor: pointer;
-  display: grid;
-  outline: none;
-  padding: 0rem 0.5rem;
+	align-items: center;
+	box-sizing: border-box;
+	color: var(--heading-text-color);
+	cursor: pointer;
+	display: grid;
+	outline: none;
+	padding: 0rem 0.5rem;
 }
 
 .topbar-brand-wrapper {
-  align-items: center;
-  display: grid;
-  grid: auto / auto auto;
-  gap: 0.5rem;
-  height: 2.5rem;
+	align-items: center;
+	display: grid;
+	grid: auto / auto auto;
+	gap: 0.5rem;
+	height: 2.5rem;
 }
 
 .topbar-brand-wrapper:hover {
-  filter: brightness(90%);
+	filter: brightness(90%);
 }
 
 .topbar-brand-img {
-  height: 2.5rem;
-  width: 2.5rem;
+	height: 2.5rem;
+	width: 2.5rem;
 }
 
 .topbar-brand-svg {
-  height: 2.5rem;
-  width: 2.5rem;
+	height: 2.5rem;
+	width: 2.5rem;
 }
 
 .topbar-brand-title {
-  color: var(--heading-text-color);
-  font-size: 1.75rem;
-  font-weight: bold;
-  user-select: none;
+	color: var(--heading-text-color);
+	font-size: 1.75rem;
+	font-weight: bold;
+	user-select: none;
 }
 
 .topbar-items-wrapper {
-  align-items: center;
-  display: grid;
-  grid-auto-flow: column;
-  column-gap: 2rem;
-  user-select: none;
+	align-items: center;
+	display: grid;
+	grid-auto-flow: column;
+	column-gap: 2rem;
+	user-select: none;
 }
 
 @media (max-width: 1199px) {
-  .topbar-items-wrapper {
-    display: none;
-  }
+	.topbar-items-wrapper {
+		display: none;
+	}
 }
 
 .topbar-hamburger {
-  align-content: space-between;
-  cursor: pointer;
-  display: grid;
-  justify-self: end;
+	align-content: space-between;
+	cursor: pointer;
+	display: grid;
+	justify-self: end;
 }
 
 .topbar-hamburger:hover {
-  filter: brightness(90%);
+	filter: brightness(90%);
 }
 
 .topbar-dropdown-wrapper {
-  left: 0;
-  padding: 1rem;
-  position: absolute;
-  right: 0;
-  top: 4.5rem;
-  z-index: 1;
+	left: 0;
+	padding: 1rem;
+	position: absolute;
+	right: 0;
+	top: 4.5rem;
+	z-index: 1;
 }
 
 .topbar-dropdown-item {
-  font-size: 1.25rem;
-  padding: 0.5rem 1rem;
+	font-size: 1.25rem;
+	padding: 0.5rem 1rem;
 }
 
 .topbar-dropdown-item:hover {
-  filter: brightness(90%);
+	filter: brightness(90%);
 }
 
 .topbar-dropdown-link {
-  color: var(--text-color);
-  cursor: pointer;
-  text-decoration: none;
+	color: var(--text-color);
+	cursor: pointer;
+	text-decoration: none;
 }

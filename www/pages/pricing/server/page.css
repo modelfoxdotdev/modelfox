@@ -1,0 +1,97 @@
+.pricing-grid {
+	display: grid;
+}
+
+@media (max-width: 1199px) {
+	.pricing-grid {
+		row-gap: 2rem;
+		grid-auto-flow: row;
+	}
+}
+
+@media (min-width: 1200px) {
+	.pricing-grid {
+		row-gap: 8rem;
+		grid-auto-flow: column;
+	}
+}
+
+.pricing-subtitle {
+	font-size: 1.5rem;
+	font-weight: normal;
+	line-height: 1.5;
+	margin: 0;
+	text-align: center;
+}
+
+.pricing-cards-grid {
+	display: grid;
+	gap: 0.5rem;
+}
+
+@media (min-width: 1200px) {
+	.pricing-cards-grid {
+		grid: auto / repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 1199px) {
+	.pricing-cards-grid {
+		grid: repeat(3, auto) / minmax(0, 1fr);
+	}
+}
+
+.pricing-card-grid {
+	align-content: space-between;
+	background-color: var(--surface-color);
+	border: var(--border);
+	border-radius: var(--border-radius);
+	display: grid;
+	gap: 2rem;
+	padding: 2rem;
+}
+
+.pricing-card-grid-selected {
+	border: var(--border);
+	background-color: var(--header-color);
+}
+
+.pricing-card-content-grid {
+	display: grid;
+	gap: 1rem;
+	justify-items: center;
+}
+
+.pricing-card-price-wrapper {
+	display: grid;
+	gap: 0.5rem;
+	justify-content: center;
+	justify-items: center;
+}
+
+.pricing-card-price {
+	font-size: 2rem;
+}
+
+.pricing-card-subtitle {
+	color: var(--muted-text-color);
+	font-size: 1rem;
+}
+
+.pricing-card-feature {
+	display: grid;
+	grid-auto-flow: column;
+	gap: 0.5rem;
+	justify-content: start;
+	line-height: 1.5;
+}
+
+.pricing-card-feature:before {
+	color: var(--blue);
+	content: "✔";
+}
+
+.pricing-card-features-list {
+	display: grid;
+	gap: 0.5rem;
+}

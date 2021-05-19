@@ -1,4 +1,5 @@
 pub mod bag_of_words;
+pub mod bag_of_words_cosine_similarity;
 pub mod compute;
 pub mod identity;
 pub mod normalized;
@@ -6,6 +7,7 @@ pub mod one_hot_encoded;
 pub mod word_embedding;
 
 pub use self::bag_of_words::BagOfWordsFeatureGroup;
+pub use self::bag_of_words_cosine_similarity::BagOfWordsCosineSimilarityFeatureGroup;
 pub use self::compute::{
 	compute_features_array_f32, compute_features_array_value, compute_features_table,
 };
@@ -22,6 +24,7 @@ pub enum FeatureGroup {
 	OneHotEncoded(OneHotEncodedFeatureGroup),
 	BagOfWords(BagOfWordsFeatureGroup),
 	WordEmbedding(WordEmbeddingFeatureGroup),
+	BagOfWordsCosineSimilarity(BagOfWordsCosineSimilarityFeatureGroup),
 }
 
 impl FeatureGroup {
@@ -32,6 +35,7 @@ impl FeatureGroup {
 			FeatureGroup::Normalized(_) => 1,
 			FeatureGroup::OneHotEncoded(s) => s.variants.len() + 1,
 			FeatureGroup::BagOfWords(s) => s.ngrams.len(),
+			FeatureGroup::BagOfWordsCosineSimilarity(_) => 1,
 			FeatureGroup::WordEmbedding(s) => s.model.size,
 		}
 	}

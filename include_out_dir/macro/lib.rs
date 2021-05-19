@@ -42,7 +42,7 @@ pub fn include_out_dir(_: proc_macro::TokenStream) -> proc_macro::TokenStream {
 			};
 			map.insert(path, file);
 		})*
-		include_out_dir::Dir::new(map)
+		include_out_dir::IncludeOutDir::new(map)
 	}};
 	ast.into()
 }

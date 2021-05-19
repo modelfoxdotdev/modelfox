@@ -9,14 +9,15 @@ path = "lib.rs"
 
 [dependencies]
 futures = "0.3"
-html = { path = "../../../../../../../html" }
+pinwheel = { path = "../../../../../../../pinwheel" }
 http = "0.2"
-hyper = { version = "0.14", features = ["server"] }
-multer = { git = "https://github.com/rousan/multer-rs" }
+hyper = { version = "0.14", features = ["full"] }
+multer = "2"
 num = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tangram_app_common = { path = "../../../../../../common" }
+tangram_app_ui = { path = "../../../../../../ui" }
 tangram_app_layouts = { path = "../../../../../../layouts" }
 tangram_core = { path = "../../../../../../../core" }
 tangram_error = { path = "../../../../../../../error" }

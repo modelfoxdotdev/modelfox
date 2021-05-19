@@ -1,19 +1,19 @@
-use html::{component, html, style, Props};
+use pinwheel::prelude::*;
 
-#[derive(Props)]
-pub struct TokenProps {
+#[derive(ComponentBuilder)]
+pub struct Token {
 	#[optional]
 	pub color: Option<String>,
+	#[children]
+	children: Vec<Node>,
 }
 
-#[component]
-pub fn Token(props: TokenProps) {
-	let style = style! {
-		"background-color" => props.color,
-	};
-	html! {
-		<span class="token" style={style}>
-			{children}
-		</span>
+impl Component for Token {
+	fn into_node(self) -> Node {
+		span()
+			.class("token")
+			.style(style::BACKGROUND_COLOR, self.color)
+			.child(self.children)
+			.into_node()
 	}
 }

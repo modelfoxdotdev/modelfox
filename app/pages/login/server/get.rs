@@ -1,5 +1,5 @@
-use crate::page::{Page, PageProps};
-use html::html;
+use crate::page::Page;
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{error::not_found, Context};
 use tangram_error::Result;
@@ -21,12 +21,12 @@ pub async fn get(
 		None
 	};
 	let email = search_params.map(|search_params| search_params.email);
-	let props = PageProps {
+	let page = Page {
 		code: email.is_some(),
 		error: None,
 		email,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

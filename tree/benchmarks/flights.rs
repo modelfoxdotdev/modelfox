@@ -95,7 +95,7 @@ fn main() {
 	.collect();
 	let target_variants = ["N", "Y"].iter().map(ToString::to_string).collect();
 	let options = tangram_table::FromCsvOptions {
-		column_types: Some(btreemap! {
+		column_types: Some(btreemap!(
 			"month".to_owned() => TableColumnType::Enum { variants: month_variants },
 			"day_of_week".to_owned() => TableColumnType::Enum { variants: day_of_week_variants },
 			"day_of_month".to_owned() => TableColumnType::Enum { variants: day_of_month_variants },
@@ -105,7 +105,7 @@ fn main() {
 			"dest".to_owned() => TableColumnType::Enum { variants: dest_variants },
 			"distance".to_owned() => TableColumnType::Number,
 			"dep_delayed_15min".to_owned() => TableColumnType::Enum { variants: target_variants }
-		}),
+		)),
 		..Default::default()
 	};
 	let mut features_train =

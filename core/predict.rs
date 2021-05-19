@@ -2,9 +2,9 @@ use ndarray::prelude::*;
 use num::ToPrimitive;
 use std::collections::BTreeMap;
 use tangram_features::{
-	bag_of_words::BagOfWordsFeatureGroupNGramEntry, BagOfWordsFeatureGroup, FeatureGroup,
-	IdentityFeatureGroup, NormalizedFeatureGroup, OneHotEncodedFeatureGroup,
-	WordEmbeddingFeatureGroup,
+	bag_of_words::BagOfWordsFeatureGroupNGramEntry, BagOfWordsCosineSimilarityFeatureGroup,
+	BagOfWordsFeatureGroup, FeatureGroup, IdentityFeatureGroup, NormalizedFeatureGroup,
+	OneHotEncodedFeatureGroup, WordEmbeddingFeatureGroup,
 };
 use tangram_table::prelude::*;
 use tangram_text::NGramType;
@@ -124,6 +124,7 @@ pub enum FeatureContributionEntry {
 	Normalized(NormalizedFeatureContribution),
 	OneHotEncoded(OneHotEncodedFeatureContribution),
 	BagOfWords(BagOfWordsFeatureContribution),
+	BagOfWordsCosineSimilarity(BagOfWordsCosineSimilarityFeatureContribution),
 	WordEmbedding(WordEmbeddingFeatureContribution),
 }
 
@@ -152,6 +153,15 @@ pub struct OneHotEncodedFeatureContribution {
 #[derive(Debug)]
 pub struct BagOfWordsFeatureContribution {
 	pub column_name: String,
+	pub ngram: NGram,
+	pub feature_value: bool,
+	pub feature_contribution_value: f32,
+}
+
+#[derive(Debug)]
+pub struct BagOfWordsCosineSimilarityFeatureContribution {
+	pub column_name_a: String,
+	pub column_name_b: String,
 	pub ngram: NGram,
 	pub feature_value: bool,
 	pub feature_contribution_value: f32,
@@ -499,6 +509,40 @@ fn deserialize_feature_group(feature_group: tangram_model::FeatureGroupReader) -
 				.collect();
 			FeatureGroup::BagOfWords(BagOfWordsFeatureGroup {
 				source_column_name,
+				strategy,
+				tokenizer,
+				ngram_types,
+				ngrams,
+			})
+		}
+		tangram_model::FeatureGroupReader::BagOfWordsCosineSimilarity(feature_group) => {
+			let feature_group = feature_group.read();
+			let source_column_name_a = feature_group.source_column_name_a().to_owned();
+			let source_column_name_b = feature_group.source_column_name_b().to_owned();
+			let tokenizer = deserialize_tokenizer(feature_group.tokenizer());
+			let strategy =
+				deserialize_bag_of_words_feature_group_strategy(feature_group.strategy());
+			let ngrams = feature_group
+				.ngrams()
+				.iter()
+				.map(|(ngram, entry)| {
+					(
+						deserialize_ngram(ngram),
+						BagOfWordsFeatureGroupNGramEntry { idf: entry.idf() },
+					)
+				})
+				.collect();
+			let ngram_types = feature_group
+				.ngram_types()
+				.iter()
+				.map(|ngram_type| match ngram_type {
+					tangram_model::NGramTypeReader::Unigram(_) => NGramType::Unigram,
+					tangram_model::NGramTypeReader::Bigram(_) => NGramType::Bigram,
+				})
+				.collect();
+			FeatureGroup::BagOfWordsCosineSimilarity(BagOfWordsCosineSimilarityFeatureGroup {
+				source_column_name_a,
+				source_column_name_b,
 				strategy,
 				tokenizer,
 				ngram_types,
@@ -1033,6 +1077,21 @@ fn compute_feature_contributions<'a>(
 						OneHotEncodedFeatureContribution {
 							column_name: feature_group.source_column_name.clone(),
 							variant: Some(variant.clone()),
+							feature_value: feature_value > 0.0,
+							feature_contribution_value,
+						},
+					));
+				}
+			}
+			tangram_features::FeatureGroup::BagOfWordsCosineSimilarity(feature_group) => {
+				for ngram in feature_group.ngrams.keys() {
+					let feature_value = features.next().unwrap();
+					let feature_contribution_value = feature_contribution_values.next().unwrap();
+					entries.push(FeatureContributionEntry::BagOfWordsCosineSimilarity(
+						BagOfWordsCosineSimilarityFeatureContribution {
+							column_name_a: feature_group.source_column_name_a.clone(),
+							column_name_b: feature_group.source_column_name_b.clone(),
+							ngram: ngram.clone().into(),
 							feature_value: feature_value > 0.0,
 							feature_contribution_value,
 						},

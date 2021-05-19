@@ -1,11 +1,11 @@
 use tangram_charts::{bar_chart::BarChart, box_chart::BoxChart, components::hydrate_chart};
 use wasm_bindgen::{self, prelude::*};
-use web_sys::*;
+use web_sys as dom;
 
 #[wasm_bindgen(start)]
 pub fn start() {
 	console_error_panic_hook::set_once();
-	let window = window().unwrap();
+	let window = dom::window().unwrap();
 	let document = window.document().unwrap();
 	if document.get_element_by_id("enum_histogram").is_some() {
 		hydrate_chart::<BarChart>("enum_histogram");

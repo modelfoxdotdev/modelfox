@@ -1,20 +1,20 @@
 use crate::{SelectField, SelectFieldOption};
-use html::{component, html, raw, style, Props};
-use once_cell::sync::Lazy;
+use pinwheel::prelude::*;
 use std::borrow::Cow;
 use wasm_bindgen::{prelude::*, JsCast};
-use web_sys::*;
+use web_sys as dom;
 
-#[derive(Props)]
-pub struct CodeProps {
-	pub code: String,
+#[derive(ComponentBuilder)]
+pub struct Code {
 	#[optional]
-	pub id: Option<String>,
+	pub code: Option<Cow<'static, str>>,
+	#[optional]
+	pub language: Option<Language>,
 	#[optional]
 	pub hide_line_numbers: Option<bool>,
 }
 
-#[derive(PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum Language {
 	Elixir,
 	Go,
@@ -24,40 +24,28 @@ pub enum Language {
 	Rust,
 }
 
-#[component]
-pub fn Code(props: CodeProps) {
-	let code = props.code;
-	let hide_line_numbers = props.hide_line_numbers.unwrap_or(false);
-	let line_numbers = if !hide_line_numbers {
-		Some(html! {
-			<LineNumbers count={count_lines(&code)} />
-		})
-	} else {
-		None
-	};
-	html! {
-		<div id={props.id} class="code">
-			{line_numbers}
-			<div class="code-inner">
-				{raw!(code)}
-			</div>
-		</div>
+impl Component for Code {
+	fn into_node(self) -> Node {
+		let mut code = self.code.unwrap_or(Cow::Borrowed(""));
+		if let Some(language) = self.language {
+			code = highlight(code.as_ref(), language).into();
+		}
+		let hide_line_numbers = self.hide_line_numbers.unwrap_or(false);
+		let line_numbers = if !hide_line_numbers {
+			Some(LineNumbers::new(count_lines(&code)))
+		} else {
+			None
+		};
+		div()
+			.class("code")
+			.child(line_numbers)
+			.child(div().class("code-inner").inner_html(code))
+			.into_node()
 	}
 }
 
-pub fn update_code(id: &str, code: String) {
-	let document = window().unwrap().document().unwrap();
-	let value_element = document
-		.query_selector(&format!(".code#{} .code-inner", id))
-		.unwrap()
-		.unwrap()
-		.dyn_into::<HtmlElement>()
-		.unwrap();
-	value_element.set_inner_html(&code);
-}
-
-#[derive(Props)]
-pub struct CodeSelectProps {
+#[derive(ComponentBuilder)]
+pub struct CodeSelect {
 	pub id: String,
 	pub code_for_language: CodeForLanguage,
 	#[optional]
@@ -75,179 +63,200 @@ pub struct CodeForLanguage {
 	pub rust: Cow<'static, str>,
 }
 
-#[component]
-pub fn CodeSelect(props: CodeSelectProps) {
-	let code_elixir = props.code_for_language.elixir;
-	let code_go = props.code_for_language.go;
-	let code_javascript = props.code_for_language.javascript;
-	let code_python = props.code_for_language.python;
-	let code_ruby = props.code_for_language.ruby;
-	let code_rust = props.code_for_language.rust;
-	let options = vec![
-		SelectFieldOption {
-			text: "elixir".to_owned(),
-			value: "elixir".to_owned(),
-		},
-		SelectFieldOption {
-			text: "go".to_owned(),
-			value: "go".to_owned(),
-		},
-		SelectFieldOption {
-			text: "javascript".to_owned(),
-			value: "javascript".to_owned(),
-		},
-		SelectFieldOption {
-			text: "python".to_owned(),
-			value: "python".to_owned(),
-		},
-		SelectFieldOption {
-			text: "ruby".to_owned(),
-			value: "ruby".to_owned(),
-		},
-		SelectFieldOption {
-			text: "rust".to_owned(),
-			value: "rust".to_owned(),
-		},
-	];
-	let selected_style = style! {
-		"display" => "block",
-	};
-	let value = props.language.unwrap_or(Language::Javascript);
-	let elixir_style = if value == Language::Elixir {
-		Some(selected_style.to_owned())
-	} else {
-		None
-	};
-	let go_style = if value == Language::Go {
-		Some(selected_style.to_owned())
-	} else {
-		None
-	};
-	let javascript_style = if value == Language::Javascript {
-		Some(selected_style.to_owned())
-	} else {
-		None
-	};
-	let python_style = if value == Language::Python {
-		Some(selected_style.to_owned())
-	} else {
-		None
-	};
-	let ruby_style = if value == Language::Ruby {
-		Some(selected_style.to_owned())
-	} else {
-		None
-	};
-	let rust_style = if value == Language::Rust {
-		Some(selected_style)
-	} else {
-		None
-	};
-	let value = match value {
-		Language::Elixir => "elixir".to_owned(),
-		Language::Go => "go".to_owned(),
-		Language::Javascript => "javascript".to_owned(),
-		Language::Python => "python".to_owned(),
-		Language::Ruby => "ruby".to_owned(),
-		Language::Rust => "rust".to_owned(),
-	};
-	html! {
-		<div class="code-select-grid">
-			<SelectField
-				id?="code_select"
-				options?={Some(options)}
-				value?={Some(value)}
-			/>
-			<div class="code-select-body">
-				<div
-					style={elixir_style}
-					class="code-select-code-wrapper"
-					data-lang="elixir"
-				>
-					<Code
-						code={code_elixir.into_owned()}
-						hide_line_numbers?={props.hide_line_numbers}
-					/>
-				</div>
-				<div
-					style={go_style}
-					class="code-select-code-wrapper"
-					data-lang="go"
-				>
-					<Code
-						code={code_go.into_owned()}
-						hide_line_numbers?={props.hide_line_numbers}
-					/>
-				</div>
-				<div
-					style={javascript_style}
-					class="code-select-code-wrapper"
-					data-lang="javascript"
-				>
-					<Code
-						code={code_javascript.into_owned()}
-						hide_line_numbers?={props.hide_line_numbers}
-					/>
-				</div>
-				<div
-					style={python_style}
-					class="code-select-code-wrapper"
-					data-lang="python"
-				>
-					<Code
-						code={code_python.into_owned()}
-						hide_line_numbers?={props.hide_line_numbers}
-					/>
-				</div>
-				<div
-					style={ruby_style}
-					class="code-select-code-wrapper"
-					data-lang="ruby"
-				>
-					<Code
-						code={code_ruby.into_owned()}
-						hide_line_numbers?={props.hide_line_numbers}
-					/>
-				</div>
-				<div
-					style={rust_style}
-					class="code-select-code-wrapper"
-					data-lang="rust"
-				>
-					<Code
-						code={code_rust.into_owned()}
-						hide_line_numbers?={props.hide_line_numbers}
-					/>
-				</div>
-			</div>
-		</div>
+impl Component for CodeSelect {
+	fn into_node(self) -> Node {
+		let code_elixir = self.code_for_language.elixir;
+		let code_go = self.code_for_language.go;
+		let code_javascript = self.code_for_language.javascript;
+		let code_python = self.code_for_language.python;
+		let code_ruby = self.code_for_language.ruby;
+		let code_rust = self.code_for_language.rust;
+		let options = vec![
+			SelectFieldOption {
+				text: "elixir".to_owned(),
+				value: "elixir".to_owned(),
+			},
+			SelectFieldOption {
+				text: "go".to_owned(),
+				value: "go".to_owned(),
+			},
+			SelectFieldOption {
+				text: "javascript".to_owned(),
+				value: "javascript".to_owned(),
+			},
+			SelectFieldOption {
+				text: "python".to_owned(),
+				value: "python".to_owned(),
+			},
+			SelectFieldOption {
+				text: "ruby".to_owned(),
+				value: "ruby".to_owned(),
+			},
+			SelectFieldOption {
+				text: "rust".to_owned(),
+				value: "rust".to_owned(),
+			},
+		];
+		let language = self.language.unwrap_or(Language::Javascript);
+		let language_str = match language {
+			Language::Elixir => "elixir".to_owned(),
+			Language::Go => "go".to_owned(),
+			Language::Javascript => "javascript".to_owned(),
+			Language::Python => "python".to_owned(),
+			Language::Ruby => "ruby".to_owned(),
+			Language::Rust => "rust".to_owned(),
+		};
+		div()
+			.class("code-select-grid")
+			.child(
+				SelectField::new()
+					.id(Some("code_select".to_owned()))
+					.options(Some(options))
+					.value(Some(language_str)),
+			)
+			.child(
+				div()
+					.class("code-select-body")
+					.child(
+						div()
+							.style(
+								style::DISPLAY,
+								if language == Language::Elixir {
+									Some("block")
+								} else {
+									None
+								},
+							)
+							.class("code-select-code-wrapper")
+							.attribute("data-lang", "elixir")
+							.child(
+								Code::new()
+									.code(code_elixir)
+									.hide_line_numbers(self.hide_line_numbers),
+							),
+					)
+					.child(
+						div()
+							.style(
+								style::DISPLAY,
+								if language == Language::Go {
+									Some("block")
+								} else {
+									None
+								},
+							)
+							.class("code-select-code-wrapper")
+							.attribute("data-lang", "go")
+							.child(
+								Code::new()
+									.code(code_go)
+									.hide_line_numbers(self.hide_line_numbers),
+							),
+					)
+					.child(
+						div()
+							.style(
+								style::DISPLAY,
+								if language == Language::Javascript {
+									Some("block")
+								} else {
+									None
+								},
+							)
+							.class("code-select-code-wrapper")
+							.attribute("data-lang", "javascript")
+							.child(
+								Code::new()
+									.code(code_javascript)
+									.hide_line_numbers(self.hide_line_numbers),
+							),
+					)
+					.child(
+						div()
+							.style(
+								style::DISPLAY,
+								if language == Language::Python {
+									Some("block")
+								} else {
+									None
+								},
+							)
+							.class("code-select-code-wrapper")
+							.attribute("data-lang", "python")
+							.child(
+								Code::new()
+									.code(code_python)
+									.hide_line_numbers(self.hide_line_numbers),
+							),
+					)
+					.child(
+						div()
+							.style(
+								style::DISPLAY,
+								if language == Language::Ruby {
+									Some("block")
+								} else {
+									None
+								},
+							)
+							.class("code-select-code-wrapper")
+							.attribute("data-lang", "ruby")
+							.child(
+								Code::new()
+									.code(code_ruby)
+									.hide_line_numbers(self.hide_line_numbers),
+							),
+					)
+					.child(
+						div()
+							.style(
+								style::DISPLAY,
+								if language == Language::Rust {
+									Some("block")
+								} else {
+									None
+								},
+							)
+							.class("code-select-code-wrapper")
+							.attribute("data-lang", "rust")
+							.child(
+								Code::new()
+									.code(code_rust)
+									.hide_line_numbers(self.hide_line_numbers),
+							),
+					),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct LineNumbersProps {
+#[derive(ComponentBuilder)]
+pub struct LineNumbers {
 	pub count: usize,
 }
 
-#[component]
-pub fn LineNumbers(props: LineNumbersProps) {
-	html! {
-		<div class="code-line-numbers-wrapper">
-			{(0..props.count).map(|index| html! {
-				<div class="code-line-numbers">
-					{(index + 1).to_string()}
-				</div>
-			}).collect::<Vec<_>>()}
-		</div>
+impl Component for LineNumbers {
+	fn into_node(self) -> Node {
+		div()
+			.class("code-line-numbers-wrapper")
+			.children((0..self.count).map(|index| {
+				div()
+					.class("code-line-numbers")
+					.child((index + 1).to_string())
+			}))
+			.into_node()
 	}
 }
 
-#[component]
-pub fn InlineCode() {
-	html! {
-		<span class="inline-code-wrapper">
-			{children}
-		</span>
+#[derive(ComponentBuilder)]
+pub struct InlineCode {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for InlineCode {
+	fn into_node(self) -> Node {
+		span().class("inline-code").child(self.children).into_node()
 	}
 }
 
@@ -272,23 +281,30 @@ pub fn highlight_code_for_language(code_for_language: CodeForLanguage) -> CodeFo
 	}
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 macro_rules! highlight_configuration {
 	($i:ident, $c:ident) => {
-		static $i: Lazy<tree_sitter_highlight::HighlightConfiguration> = Lazy::new(|| {
-			let language = $c::language();
-			let query = $c::HIGHLIGHT_QUERY;
-			let mut config =
-				tree_sitter_highlight::HighlightConfiguration::new(language, query, "", "")
-					.unwrap();
-			config.configure(&NAMES);
-			config
-		});
+		static $i: once_cell::sync::Lazy<tree_sitter_highlight::HighlightConfiguration> =
+			once_cell::sync::Lazy::new(|| {
+				let language = $c::language();
+				let query = $c::HIGHLIGHT_QUERY;
+				let mut config =
+					tree_sitter_highlight::HighlightConfiguration::new(language, query, "", "")
+						.unwrap();
+				config.configure(&NAMES);
+				config
+			});
 	};
+}
+
+#[cfg(target_arch = "wasm32")]
+pub fn highlight(code: &str, language: Language) -> String {
+	unimplemented!()
 }
 
 #[cfg(not(target_arch = "wasm32"))]
 pub fn highlight(code: &str, language: Language) -> String {
-	static NAMES: Lazy<Vec<String>> = Lazy::new(|| {
+	static NAMES: once_cell::sync::Lazy<Vec<String>> = once_cell::sync::Lazy::new(|| {
 		[
 			"comment",
 			"function",
@@ -343,18 +359,21 @@ pub fn highlight(code: &str, language: Language) -> String {
 }
 
 pub fn boot_code_select() {
-	let callback_fn = Closure::<dyn Fn(_)>::wrap(Box::new(move |event: Event| {
-		let document = window().unwrap().document().unwrap();
-		let select_node = event.current_target().unwrap().dyn_into::<Node>().unwrap();
-		let select_element = select_node.dyn_ref::<HtmlSelectElement>().unwrap();
+	let callback_fn = Closure::<dyn Fn(_)>::wrap(Box::new(move |event: dom::Event| {
+		let document = dom::window().unwrap().document().unwrap();
+		let select_node = event
+			.current_target()
+			.unwrap()
+			.dyn_into::<dom::Node>()
+			.unwrap();
+		let select_element = select_node.dyn_ref::<dom::HtmlSelectElement>().unwrap();
 		let select_element_language = select_element.value();
 		let code_select_elements = document.query_selector_all("#code_select").unwrap();
-		// update all code select elements
 		for index in 0..code_select_elements.length() {
 			let code_select_element = code_select_elements
 				.get(index)
 				.unwrap()
-				.dyn_into::<HtmlSelectElement>()
+				.dyn_into::<dom::HtmlSelectElement>()
 				.unwrap();
 			code_select_element.set_value(&select_element_language);
 		}
@@ -368,7 +387,7 @@ pub fn boot_code_select() {
 			let code_element = code_elements_not_selected_lang
 				.get(index)
 				.unwrap()
-				.dyn_into::<HtmlElement>()
+				.dyn_into::<dom::HtmlElement>()
 				.unwrap();
 			code_element
 				.style()
@@ -385,7 +404,7 @@ pub fn boot_code_select() {
 			let code_element_for_lang = code_elements_selected_lang
 				.get(index)
 				.unwrap()
-				.dyn_into::<HtmlElement>()
+				.dyn_into::<dom::HtmlElement>()
 				.unwrap();
 			code_element_for_lang
 				.style()
@@ -393,13 +412,13 @@ pub fn boot_code_select() {
 				.unwrap();
 		}
 	}));
-	let document = window().unwrap().document().unwrap();
+	let document = dom::window().unwrap().document().unwrap();
 	let code_select_elements = document.query_selector_all("#code_select").unwrap();
 	for index in 0..code_select_elements.length() {
 		let code_select_element = code_select_elements
 			.get(index)
 			.unwrap()
-			.dyn_into::<HtmlElement>()
+			.dyn_into::<dom::HtmlElement>()
 			.unwrap();
 		code_select_element
 			.add_event_listener_with_callback("change", callback_fn.as_ref().unchecked_ref())

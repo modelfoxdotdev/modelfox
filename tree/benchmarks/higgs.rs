@@ -14,7 +14,7 @@ fn main() {
 	let target_column_index = 0;
 	let signal_variants = ["false", "true"].iter().map(ToString::to_string).collect();
 	let options = tangram_table::FromCsvOptions {
-		column_types: Some(btreemap! {
+		column_types: Some(btreemap!(
 			"signal".to_owned() => TableColumnType::Enum { variants: signal_variants },
 			"lepton_pt".to_owned() => TableColumnType::Number,
 			"lepton_eta".to_owned() => TableColumnType::Number,
@@ -44,7 +44,7 @@ fn main() {
 			"m_bb".to_owned() => TableColumnType::Number,
 			"m_wbb".to_owned() => TableColumnType::Number,
 			"m_wwbb".to_owned() => TableColumnType::Number,
-		}),
+		)),
 		..Default::default()
 	};
 	let mut features_train =

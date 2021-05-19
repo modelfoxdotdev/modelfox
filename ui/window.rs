@@ -1,38 +1,55 @@
-use html::{classes, component, html, style, Props};
+use pinwheel::prelude::*;
 
 pub enum WindowShade {
 	Code,
 	Default,
 }
 
-#[derive(Props)]
-pub struct WindowProps {
+#[derive(ComponentBuilder)]
+pub struct Window {
+	#[optional]
 	pub padding: Option<bool>,
+	#[children]
+	pub children: Vec<Node>,
 }
 
-#[component]
-pub fn Window(props: WindowProps) {
-	let red_style = style! {
-		"background-color" => "var(--red)",
-	};
-	let yellow_style = style! {
-		"background-color"=> "var(--yellow)",
-	};
-	let green_style = style! {
-		"background-color"=> "var(--green)",
-	};
-	let window_body_class = classes! {
-		"window-body",
-		if props.padding.unwrap_or(false) { Some("window-body-padding") } else { None },
-	};
-	html! {
-		<div class="window-wrapper">
-			<div class="window-topbar">
-				<div class="window-topbar-button" style={red_style}></div>
-				<div class="window-topbar-button" style={yellow_style}></div>
-				<div class="window-topbar-button" style={green_style}></div>
-			</div>
-			<div class={window_body_class}>{children}</div>
-		</div>
+impl Component for Window {
+	fn into_node(self) -> Node {
+		let padding = self.padding.unwrap_or(true);
+		let window_body_class = classes!(
+			"window-body",
+			if padding {
+				Some("window-body-padding")
+			} else {
+				None
+			},
+		);
+		div()
+			.class("window-wrapper")
+			.child(
+				div()
+					.class("window-topbar")
+					.child(
+						div()
+							.class("window-topbar-button")
+							.style(style::BACKGROUND_COLOR, "var(--red)"),
+					)
+					.child(
+						div()
+							.class("window-topbar-button")
+							.style(style::BACKGROUND_COLOR, "var(--yellow)"),
+					)
+					.child(
+						div()
+							.class("window-topbar-button")
+							.style(style::BACKGROUND_COLOR, "var(--green)"),
+					),
+			)
+			.child(
+				div()
+					.attribute("class", window_body_class)
+					.child(self.children),
+			)
+			.into_node()
 	}
 }

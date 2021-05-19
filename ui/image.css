@@ -1,44 +1,44 @@
 .image-details[open] > summary::before {
-  -webkit-appearance: none;
-  background: transparent;
-  bottom: 0;
-  content: " ";
-  cursor: zoom-out;
-  display: block;
-  left: 0;
-  position: fixed;
-  right: 0;
-  top: 0;
-  z-index: 1;
+	-webkit-appearance: none;
+	background: transparent;
+	bottom: 0;
+	content: " ";
+	cursor: zoom-out;
+	display: block;
+	left: 0;
+	position: fixed;
+	right: 0;
+	top: 0;
+	z-index: 1;
 }
 
 .image-details-summary {
-  display: grid;
-  list-style-type: none;
-  outline: none;
+	display: grid;
+	list-style-type: none;
+	outline: none;
 }
 
 .image-img {
-  border-radius: 4px;
-  cursor: zoom-in;
-  width: 100%;
+	border-radius: 4px;
+	cursor: zoom-in;
+	width: 100%;
 }
 
 .image-viewer {
-  background-color: rgba(0, 0, 0, 0.8);
-  bottom: 0;
-  left: 0;
-  padding: 1rem;
-  position: fixed;
-  right: 0;
-  top: 0;
-  user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
+	background-color: rgba(0, 0, 0, 0.8);
+	bottom: 0;
+	left: 0;
+	padding: 1rem;
+	position: fixed;
+	right: 0;
+	top: 0;
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
 }
 
 .image-viewer-img {
-  height: 100%;
-  object-fit: contain;
-  width: 100%;
+	height: 100%;
+	object-fit: contain;
+	width: 100%;
 }

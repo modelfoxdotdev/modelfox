@@ -1,75 +1,79 @@
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	app_layout::{AppLayout, AppLayoutProps},
-	document::{Document, DocumentProps},
+	app_layout::{AppLayout, AppLayoutInfo},
+	document::Document,
 };
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
-	pub app_layout_props: AppLayoutProps,
+#[derive(ComponentBuilder)]
+pub struct Page {
+	pub app_layout_info: AppLayoutInfo,
 	pub member_email: String,
 	pub is_admin: bool,
 	pub can_delete: bool,
 	pub remove_button_text: String,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<AppLayout {props.app_layout_props}>
-				<ui::S1>
-					<ui::H1>{"Edit Member"}</ui::H1>
-					<ui::S2>
-						<ui::TextField
-							label?="Email"
-							disabled?={Some(true)}
-							value?={Some(props.member_email)}
-						/>
-						<ui::CheckboxField
-							label?="Admin"
-							disabled?={Some(true)}
-							name?="is_admin"
-							checked?={Some(props.is_admin)}
-						/>
-					</ui::S2>
-					{if props.can_delete {
-						Some(html! {
-							<DangerZone remove_button_text={props.remove_button_text} />
-						})
-					} else {
+impl Component for Page {
+	fn into_node(self) -> Node {
+		Document::new()
+			.child(
+				AppLayout::new(self.app_layout_info).child(
+					ui::S1::new()
+						.child(ui::H1::new().child("Edit Member"))
+						.child(
+							ui::S2::new()
+								.child(
+									ui::TextField::new()
+										.label("Email".to_owned())
+										.disabled(Some(true))
+										.value(Some(self.member_email)),
+								)
+								.child(
+									ui::CheckboxField::new()
+										.label("Admin".to_owned())
+										.disabled(Some(true))
+										.name("is_admin".to_owned())
+										.checked(Some(self.is_admin)),
+								),
+						)
+						.child(if self.can_delete {
+							Some(DangerZone::new(self.remove_button_text))
+						} else {
 							None
-						}
-					}
-				</ui::S1>
-			</AppLayout>
-		</Document>
+						}),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-struct DangerZoneProps {
+#[derive(ComponentBuilder)]
+struct DangerZone {
 	remove_button_text: String,
 }
 
-#[component]
-fn DangerZone(props: DangerZoneProps) {
-	html! {
-		<ui::S2>
-			<ui::H2>{"Danger Zone"}</ui::H2>
-			<ui::Form post?={Some(true)} onsubmit?="return confirm(\"Are you sure?\")">
-				<input name="action" type="hidden" value="delete" />
-				<ui::Button
-					button_type?={Some(ui::ButtonType::Submit)}
-					color?={Some(ui::colors::RED.to_owned())}
-				>
-					{props.remove_button_text}
-				</ui::Button>
-			</ui::Form>
-		</ui::S2>
+impl Component for DangerZone {
+	fn into_node(self) -> Node {
+		ui::S2::new()
+			.child(ui::H2::new().child("Danger Zone"))
+			.child(
+				ui::Form::new()
+					.post(Some(true))
+					.onsubmit("return confirm(\"Are you sure?\")".to_owned())
+					.child(
+						input()
+							.attribute("name", "action")
+							.attribute("type", "hidden")
+							.attribute("value", "delete"),
+					)
+					.child(
+						ui::Button::new()
+							.button_type(Some(ui::ButtonType::Submit))
+							.color(Some(ui::colors::RED.to_owned()))
+							.child(self.remove_button_text),
+					),
+			)
+			.into_node()
 	}
 }

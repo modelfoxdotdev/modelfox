@@ -72,6 +72,7 @@ pub fn main() -> Result<()> {
 }
 
 #[cfg(all(target_pointer_width = "64", target_endian = "little"))]
+#[allow(clippy::clippy::missing_safety_doc)]
 pub unsafe fn murmur2(key: *const u8, len: u64, seed: u64) -> u64 {
 	let m: u64 = 0xc6a4a7935bd1e995;
 	let r: u32 = 47;
@@ -114,5 +115,5 @@ pub unsafe fn murmur2(key: *const u8, len: u64, seed: u64) -> u64 {
 	h ^= h >> r;
 	h = h.wrapping_mul(m);
 	h ^= h >> r;
-	return h;
+	h
 }

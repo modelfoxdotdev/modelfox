@@ -13,6 +13,8 @@ pub enum FeatureGroup {
 	BagOfWords(BagOfWordsFeatureGroup),
 	#[tangram_serialize(id = 4)]
 	WordEmbedding(WordEmbeddingFeatureGroup),
+	#[tangram_serialize(id = 5)]
+	BagOfWordsCosineSimilarity(BagOfWordsCosineSimilarityFeatureGroup),
 }
 
 #[derive(tangram_serialize::Read, tangram_serialize::Write)]
@@ -54,6 +56,23 @@ pub struct BagOfWordsFeatureGroup {
 	#[tangram_serialize(id = 3, required)]
 	pub ngram_types: Vec<NGramType>,
 	#[tangram_serialize(id = 4, required)]
+	pub ngrams: Vec<(NGram, BagOfWordsFeatureGroupNGramEntry)>,
+}
+
+#[derive(tangram_serialize::Read, tangram_serialize::Write)]
+#[tangram_serialize(size = "dynamic")]
+pub struct BagOfWordsCosineSimilarityFeatureGroup {
+	#[tangram_serialize(id = 0, required)]
+	pub source_column_name_a: String,
+	#[tangram_serialize(id = 1, required)]
+	pub source_column_name_b: String,
+	#[tangram_serialize(id = 2, required)]
+	pub tokenizer: Tokenizer,
+	#[tangram_serialize(id = 3, required)]
+	pub strategy: BagOfWordsFeatureGroupStrategy,
+	#[tangram_serialize(id = 4, required)]
+	pub ngram_types: Vec<NGramType>,
+	#[tangram_serialize(id = 5, required)]
 	pub ngrams: Vec<(NGram, BagOfWordsFeatureGroupNGramEntry)>,
 }
 

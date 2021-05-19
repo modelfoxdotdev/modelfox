@@ -19,7 +19,7 @@ use num::ToPrimitive;
 use tangram_finite::Finite;
 use tangram_number_formatter::NumberFormatter;
 use wasm_bindgen::JsValue;
-use web_sys::*;
+use web_sys as dom;
 
 pub struct LineChart;
 
@@ -434,7 +434,7 @@ fn draw_line_chart(
 struct DrawPointOptions<'a> {
 	chart_rect: Rect,
 	color: &'a str,
-	ctx: &'a CanvasRenderingContext2d,
+	ctx: &'a dom::CanvasRenderingContext2d,
 	point: Point,
 	point_style: PointStyle,
 	radius: f64,
@@ -484,7 +484,7 @@ fn draw_point(options: DrawPointOptions) {
 struct DrawLineOptions<'a> {
 	chart_rect: Rect,
 	chart_config: &'a ChartConfig,
-	ctx: &'a CanvasRenderingContext2d,
+	ctx: &'a dom::CanvasRenderingContext2d,
 	series: &'a LineChartSeries,
 	x_max: f64,
 	x_min: f64,
@@ -778,7 +778,7 @@ fn draw_line_chart_overlay(
 struct DrawCrosshairsOptions<'a> {
 	chart_rect: Rect,
 	crosshairs_color: String,
-	ctx: &'a CanvasRenderingContext2d,
+	ctx: &'a dom::CanvasRenderingContext2d,
 	origin: Point,
 }
 

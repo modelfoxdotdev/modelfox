@@ -15,7 +15,7 @@ A `NormalizedFeatureGroup` transforms a number column to zero mean and unit vari
 use tangram_table::prelude::*;
 
 NumberTableColumn::new(
-  Some("values".to_string()),
+  Some("values".to_owned()),
   vec![0.0, 5.2, 1.3, 10.0],
 );
 ```

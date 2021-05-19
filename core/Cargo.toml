@@ -27,8 +27,8 @@ tangram_finite = { path = "../finite" }
 tangram_id = { path = "../id" }
 tangram_kill_chip = { path = "../kill_chip" }
 tangram_linear = { path = "../linear" }
-tangram_metrics = { path = "../metrics" }
 tangram_model = { path = "../model" }
+tangram_metrics = { path = "../metrics" }
 tangram_progress_counter = { path = "../progress_counter" }
 tangram_serialize = { path = "../serialize" }
 tangram_table = { path = "../table" }

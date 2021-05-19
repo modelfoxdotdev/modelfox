@@ -1,8 +1,8 @@
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 
-#[derive(Props)]
-pub struct DetailsProps {
-	pub options: Option<Vec<DetailsOption>>,
+#[derive(ComponentBuilder)]
+pub struct Details {
+	pub options: Vec<DetailsOption>,
 	pub summary: Option<String>,
 }
 
@@ -11,24 +11,20 @@ pub struct DetailsOption {
 	pub title: String,
 }
 
-#[component]
-pub fn Details(props: DetailsProps) {
-	html! {
-		<details class="details">
-			<summary>
-				{props.summary}
-			</summary>
-			<div class="details-list">
-				{props.options.map(|options|
-					options.into_iter().map(|option| {
-						html! {
-							<a class="details-list-item" href={option.href}>
-							{option.title}
-							</a>
-						}
-					}).collect::<Vec<_>>()
-				)}
-			</div>
-		</details>
+impl Component for Details {
+	fn into_node(self) -> Node {
+		details()
+			.class("details")
+			.child(summary().child(self.summary))
+			.child(
+				div()
+					.class("details-list")
+					.children(self.options.into_iter().map(|option| {
+						a().class("details-list-item")
+							.attribute("href", option.href)
+							.child(option.title)
+					})),
+			)
+			.into_node()
 	}
 }

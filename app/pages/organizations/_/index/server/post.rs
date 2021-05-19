@@ -2,9 +2,9 @@ use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
 	organizations::delete_organization,
+	path_components,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 	Context,
-	path_components
 };
 use tangram_error::{err, Result};
 use tangram_id::Id;
@@ -21,7 +21,7 @@ pub async fn post(
 	mut request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	let organization_id =
-		if let &["organizations", organization_id, ""] = path_components(&request).as_slice() {
+		if let ["organizations", organization_id, ""] = *path_components(&request).as_slice() {
 			organization_id.to_owned()
 		} else {
 			return Err(err!("unexpected path"));

@@ -1,18 +1,16 @@
-use crate::page::{
-	ColumnStatsTableProps, ColumnStatsTableRow, Page, PageProps, TargetColumnStatsTableProps,
-};
-use html::html;
+use crate::page::{ColumnStatsTable, ColumnStatsTableRow, Page, TargetColumnStatsTable};
 use num::ToPrimitive;
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
-	column_type::ColumnType,
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
 	path_components,
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
+use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use tangram_app_ui::column_type::ColumnType;
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
@@ -20,7 +18,7 @@ pub async fn get(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let model_id = if let &["repos", _, "models", model_id, "training_stats", ""] =
+	let model_id = if let ["repos", _, "models", model_id, "training_stats", ""] =
 		path_components(&request).as_slice()
 	{
 		model_id.to_owned()
@@ -44,24 +42,24 @@ pub async fn get(
 	}
 	let bytes = get_model_bytes(&context.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
-	let model_layout_props =
-		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::TrainingStats).await?;
-	let props = match model.inner() {
+	let model_layout_info =
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::TrainingStats).await?;
+	let page = match model.inner() {
 		tangram_model::ModelInnerReader::Regressor(regressor) => {
 			let regressor = regressor.read();
 			let column_stats = regressor.overall_column_stats();
-			PageProps {
-				column_stats_table_props: ColumnStatsTableProps {
+			Page {
+				column_stats_table: ColumnStatsTable {
 					column_stats_table_rows: column_stats
 						.iter()
 						.map(|column_stats| build_column_stats(&column_stats))
 						.collect(),
 				},
-				model_layout_props,
+				model_layout_info,
 				column_count: column_stats.len(),
 				row_count: regressor.test_row_count().to_usize().unwrap()
 					+ regressor.train_row_count().to_usize().unwrap(),
-				target_column_stats_table_props: TargetColumnStatsTableProps {
+				target_column_stats_table: TargetColumnStatsTable {
 					target_column_stats_table_row: build_column_stats(
 						&regressor.overall_target_column_stats(),
 					),
@@ -71,18 +69,18 @@ pub async fn get(
 		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			let binary_classifier = binary_classifier.read();
 			let column_stats = binary_classifier.overall_column_stats();
-			PageProps {
-				column_stats_table_props: ColumnStatsTableProps {
+			Page {
+				column_stats_table: ColumnStatsTable {
 					column_stats_table_rows: column_stats
 						.iter()
 						.map(|column_stats| build_column_stats(&column_stats))
 						.collect(),
 				},
-				model_layout_props,
+				model_layout_info,
 				column_count: column_stats.len(),
 				row_count: binary_classifier.test_row_count().to_usize().unwrap()
 					+ binary_classifier.train_row_count().to_usize().unwrap(),
-				target_column_stats_table_props: TargetColumnStatsTableProps {
+				target_column_stats_table: TargetColumnStatsTable {
 					target_column_stats_table_row: build_column_stats(
 						&binary_classifier.overall_target_column_stats(),
 					),
@@ -92,18 +90,18 @@ pub async fn get(
 		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 			let multiclass_classifier = multiclass_classifier.read();
 			let column_stats = multiclass_classifier.overall_column_stats();
-			PageProps {
-				column_stats_table_props: ColumnStatsTableProps {
+			Page {
+				column_stats_table: ColumnStatsTable {
 					column_stats_table_rows: column_stats
 						.iter()
 						.map(|column_stats| build_column_stats(&column_stats))
 						.collect(),
 				},
-				model_layout_props,
+				model_layout_info,
 				row_count: multiclass_classifier.test_row_count().to_usize().unwrap()
 					+ multiclass_classifier.train_row_count().to_usize().unwrap(),
 				column_count: column_stats.len(),
-				target_column_stats_table_props: TargetColumnStatsTableProps {
+				target_column_stats_table: TargetColumnStatsTable {
 					target_column_stats_table_row: build_column_stats(
 						&multiclass_classifier.overall_target_column_stats(),
 					),
@@ -111,7 +109,7 @@ pub async fn get(
 			}
 		}
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

@@ -1,71 +1,71 @@
 .details {
-  box-sizing: border-box;
-  position: relative;
+	box-sizing: border-box;
+	position: relative;
 }
 
 .details[open] > summary {
-  border-color: var(--accent-color);
+	border-color: var(--accent-color);
 }
 
 .details[open] > summary::before {
-  background: transparent;
-  bottom: 0;
-  content: "";
-  cursor: default;
-  display: block;
-  left: 0;
-  position: fixed;
-  right: 0;
-  top: 0;
-  z-index: 1;
+	background: transparent;
+	bottom: 0;
+	content: "";
+	cursor: default;
+	display: block;
+	left: 0;
+	position: fixed;
+	right: 0;
+	top: 0;
+	z-index: 1;
 }
 
 .details > summary {
-  -webkit-text-fill-color: inherit;
-  align-items: center;
-  appearance: none;
-  background-color: var(--surface-color);
-  border-radius: var(--border-radius);
-  border: var(--border);
-  box-sizing: border-box;
-  color: inherit;
-  cursor: pointer;
-  display: grid;
-  font-size: 1rem;
-  font: inherit;
-  height: 2.5rem;
-  letter-spacing: normal;
-  list-style-type: none;
-  outline: none;
-  padding: 0.5rem 1rem;
-  position: relative;
-  user-select: text;
-  width: 100%;
+	-webkit-text-fill-color: inherit;
+	align-items: center;
+	appearance: none;
+	background-color: var(--surface-color);
+	border-radius: var(--border-radius);
+	border: var(--border);
+	box-sizing: border-box;
+	color: inherit;
+	cursor: pointer;
+	display: grid;
+	font-size: 1rem;
+	font: inherit;
+	height: 2.5rem;
+	letter-spacing: normal;
+	list-style-type: none;
+	outline: none;
+	padding: 0.5rem 1rem;
+	position: relative;
+	user-select: text;
+	width: 100%;
 }
 
 .details > summary:hover {
-  border-color: var(--hover-color);
+	border-color: var(--hover-color);
 }
 
 .details-list {
-  background-color: var(--surface-color);
-  box-sizing: border-box;
-  font-size: 1rem;
-  margin-top: 2.5rem;
-  padding: 0rem;
-  position: absolute;
-  top: 0;
-  z-index: 1;
+	background-color: var(--surface-color);
+	box-sizing: border-box;
+	font-size: 1rem;
+	margin-top: 2.5rem;
+	padding: 0rem;
+	position: absolute;
+	top: 0;
+	z-index: 1;
 }
 
 .details-list-item {
-  color: var(--text-color);
-  display: block;
-  list-style: none;
-  padding: 0.5rem;
-  text-decoration: none;
+	color: var(--text-color);
+	display: block;
+	list-style: none;
+	padding: 0.5rem;
+	text-decoration: none;
 }
 
 .details-list-item:hover {
-  background-color: var(--hover-color);
+	background-color: var(--hover-color);
 }

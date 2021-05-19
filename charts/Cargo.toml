@@ -8,12 +8,28 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
-html = { path = "../html" }
 itertools = "0.10"
+pinwheel = { path = "../pinwheel" }
 num = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tangram_number_formatter = { path = "../number_formatter" }
 tangram_finite = { path = "../finite" }
-wasm-bindgen = "0.2.69"
-web-sys = "0.3.45"
+wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
+
+[dependencies.web-sys]
+version = "0.3"
+features = [
+  "CanvasRenderingContext2d",
+  "Document",
+  "DomRect",
+  "Element",
+  "MediaQueryList",
+  "Node",
+  "NodeList",
+  "TextMetrics",
+  "Touch",
+  "TouchEvent",
+  "TouchList",
+  "Window",
+]

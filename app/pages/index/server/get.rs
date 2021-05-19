@@ -1,5 +1,5 @@
-use crate::page::{Page, PageProps, ReposTableProps, ReposTableRow};
-use html::html;
+use crate::page::{Page, ReposTable, ReposTableRow};
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{redirect_to_login, service_unavailable},
@@ -7,7 +7,7 @@ use tangram_app_common::{
 	user::{authorize_user, User},
 	Context,
 };
-use tangram_app_layouts::app_layout::get_app_layout_props;
+use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_error::Result;
 
 pub async fn get(
@@ -22,12 +22,12 @@ pub async fn get(
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
-	let app_layout_props = get_app_layout_props(&context).await?;
+	let app_layout_info = app_layout_info(&context).await?;
 	let repos = match user {
 		User::Root => repos_for_root(&mut db).await?,
 		User::Normal(user) => repos_for_user(&mut db, &user).await?,
 	};
-	let repos_table_props = if !repos.is_empty() {
+	let repos_table = if !repos.is_empty() {
 		let rows = repos
 			.iter()
 			.map(|repo| ReposTableRow {
@@ -36,15 +36,15 @@ pub async fn get(
 				owner_name: repo.owner_name.clone(),
 			})
 			.collect();
-		Some(ReposTableProps { rows })
+		Some(ReposTable { rows })
 	} else {
 		None
 	};
-	let props = PageProps {
-		app_layout_props,
-		repos_table_props,
+	let page = Page {
+		app_layout_info,
+		repos_table,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

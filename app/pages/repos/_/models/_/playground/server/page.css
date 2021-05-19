@@ -1,30 +1,30 @@
 .predict-output-wrapper {
-  display: grid;
-  grid: auto / 1fr 1fr;
-  gap: 1rem;
+	display: grid;
+	grid: auto / 1fr 1fr;
+	gap: 1rem;
 }
 
 .predict-form-grid {
-  display: grid;
-  grid: auto / 1fr 20%;
-  align-content: center;
-  align-items: center;
-  gap: 1rem;
+	display: grid;
+	grid: auto / 1fr 20%;
+	align-content: center;
+	align-items: center;
+	gap: 1rem;
 }
 
 @media (max-width: 1199px) {
-  .predict-form-grid {
-    grid: auto / minmax(0, 1fr);
-  }
+	.predict-form-grid {
+		grid: auto / minmax(0, 1fr);
+	}
 }
 
 @media (max-width: 1199px) {
-  .predict-column-chart-wrapper {
-    display: none;
-  }
+	.predict-column-chart-wrapper {
+		display: none;
+	}
 }
 
 .predict-field-wrapper {
-  display: grid;
-  gap: 0.5rem;
+	display: grid;
+	gap: 0.5rem;
 }

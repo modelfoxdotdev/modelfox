@@ -1,18 +1,16 @@
 use crate::common::{
 	ClassificationProductionStatsChart, ClassificationProductionStatsIntervalChart,
-	ClassifierChartEntry, ColumnStatsTable, ColumnStatsTableProps, PredictionCountChart,
-	PredictionCountChartEntry,
+	ClassifierChartEntry, ColumnStatsTable, PredictionCountChart, PredictionCountChartEntry,
 };
-use html::{component, html, Props};
-use tangram_app_common::{
+use pinwheel::prelude::*;
+use tangram_app_ui::{
 	class_select_field::ClassSelectField,
 	date_window::{DateWindow, DateWindowInterval},
 	date_window_select_field::DateWindowSelectField,
 };
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct MulticlassClassifierProps {
+pub struct MulticlassClassifier {
 	pub date_window: DateWindow,
 	pub date_window_interval: DateWindowInterval,
 	pub class: String,
@@ -20,62 +18,60 @@ pub struct MulticlassClassifierProps {
 	pub prediction_count_chart: Vec<PredictionCountChartEntry>,
 	pub prediction_stats_chart: ClassifierChartEntry,
 	pub prediction_stats_interval_chart: Vec<ClassifierChartEntry>,
-	pub overall_column_stats_table_props: ColumnStatsTableProps,
+	pub overall_column_stats_table: ColumnStatsTable,
 }
 
-#[component]
-pub fn MulticlassClassifierPage(props: MulticlassClassifierProps) {
-	html! {
-		<ui::S1>
-			<ui::H1>{"Production Stats"}</ui::H1>
-			<DateWindowAndClassSelectForm
-				date_window={props.date_window}
-				date_window_interval={props.date_window_interval}
-				class={props.class}
-				classes={props.classes}
-			/>
-			<ui::Card>
-				<ClassificationProductionStatsIntervalChart
-					chart_data={props.prediction_stats_interval_chart}
-					date_window_interval={props.date_window_interval}
-				/>
-			</ui::Card>
-			<ui::Card>
-				<PredictionCountChart
-					chart_data={props.prediction_count_chart}
-					date_window_interval={props.date_window_interval}
-				/>
-			</ui::Card>
-			<ui::Card>
-			<ClassificationProductionStatsChart
-				chart_data={props.prediction_stats_chart}
-				date_window={props.date_window}
-			/>
-		</ui::Card>
-			<ColumnStatsTable {props.overall_column_stats_table_props} />
-		</ui::S1>
+impl Component for MulticlassClassifier {
+	fn into_node(self) -> Node {
+		ui::S1::new()
+			.child(ui::H1::new().child("Production Stats"))
+			.child(DateWindowAndClassSelectForm::new(
+				self.date_window,
+				self.date_window_interval,
+				self.class,
+				self.classes,
+			))
+			.child(
+				ui::Card::new().child(ClassificationProductionStatsIntervalChart::new(
+					self.prediction_stats_interval_chart,
+					self.date_window_interval,
+				)),
+			)
+			.child(ui::Card::new().child(PredictionCountChart::new(
+				self.prediction_count_chart,
+				self.date_window_interval,
+			)))
+			.child(
+				ui::Card::new().child(ClassificationProductionStatsChart::new(
+					self.prediction_stats_chart,
+					self.date_window,
+				)),
+			)
+			.child(self.overall_column_stats_table)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct DateWindowAndClassSelectFormProps {
+#[derive(ComponentBuilder)]
+pub struct DateWindowAndClassSelectForm {
 	pub date_window: DateWindow,
 	pub date_window_interval: DateWindowInterval,
 	pub class: String,
 	pub classes: Vec<String>,
 }
 
-#[component]
-fn DateWindowAndClassSelectForm(props: DateWindowAndClassSelectFormProps) {
-	html! {
-		<ui::Form>
-			<DateWindowSelectField date_window={props.date_window} />
-			<ClassSelectField class={props.class.clone()} classes={props.classes} />
-			<noscript>
-				<ui::Button button_type?={Some(ui::ButtonType::Submit)}>
-					{"Submit"}
-				</ui::Button>
-			</noscript>
-		</ui::Form>
+impl Component for DateWindowAndClassSelectForm {
+	fn into_node(self) -> Node {
+		ui::Form::new()
+			.child(DateWindowSelectField::new(self.date_window))
+			.child(ClassSelectField::new(self.class.clone(), self.classes))
+			.child(
+				noscript().child(
+					ui::Button::new()
+						.button_type(Some(ui::ButtonType::Submit))
+						.child("Submit"),
+				),
+			)
+			.into_node()
 	}
 }

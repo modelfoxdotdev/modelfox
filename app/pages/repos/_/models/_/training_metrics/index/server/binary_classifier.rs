@@ -1,13 +1,12 @@
-use html::{component, html, Props};
 use num::ToPrimitive;
-use tangram_app_common::{
+use pinwheel::prelude::*;
+use tangram_app_ui::{
+	colors::{BASELINE_COLOR, TRAINING_COLOR},
 	metrics_row::MetricsRow,
-	tokens::{BASELINE_COLOR, TRAINING_COLOR},
 };
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct BinaryClassifierProps {
+pub struct BinaryClassifier {
 	pub warning: Option<String>,
 	pub positive_class: String,
 	pub negative_class: String,
@@ -18,107 +17,112 @@ pub struct BinaryClassifierProps {
 	pub precision: f32,
 	pub recall: f32,
 	pub f1_score: f32,
-	pub confusion_matrix_section_props: ConfusionMatrixSectionProps,
+	pub confusion_matrix_section: ConfusionMatrixSection,
 }
 
-#[component]
-pub fn BinaryClassifier(props: BinaryClassifierProps) {
-	let aucroc_description = "The area under the receiver operating characteric curve is the probability that a randomly chosen positive example's predicted score is higher than a randomly selected negative example's score. A value of 100% means your model is perfectly able to classify positive and negative rows. A value of 50% means your model is unable to distinguish positive rows from negative rows. A value of 0% means your model is perfectly mis-classifying positive rows as negative and negative rows as positive.";
-	html! {
-		<ui::S1>
-			{props.warning.map(|warning| {
-				html! {
-					<ui::Alert level={ui::Level::Danger} title?="BAD MODEL">
-						{warning}
-					</ui::Alert>
-				}
-			})}
-			<ui::H1>{"Training Metrics"}</ui::H1>
-			<ui::TabBar>
-				<ui::TabLink
-					href=""
-					selected={true}
-				>
-					{"Overview"}
-				</ui::TabLink>
-				<ui::TabLink
-					selected={false}
-					href="precision_recall"
-				>
-					{"PR Curve"}
-				</ui::TabLink>
-				<ui::TabLink
-					href="roc"
-					selected={false}
-				>
-					{"ROC Curve"}
-				</ui::TabLink>
-			</ui::TabBar>
-			<ui::S2>
-				<ui::P>
-					{" The positive class is "}
-					<b>{props.positive_class.clone()}</b>
-					{" and the negative class is "}
-					<b>{props.negative_class.clone()}</b>
-				</ui::P>
-			</ui::S2>
-			<ui::S2>
-				<ui::H2>{"Accuracy"}</ui::H2>
-				<ui::P>{"Accuracy is the percentage of predictions that were correct."}</ui::P>
-				<ui::NumberComparisonCard
-					color_a={Some(BASELINE_COLOR.to_owned())}
-					color_b={Some(TRAINING_COLOR.to_owned())}
-					title="Accuracy"
-					value_a={Some(props.baseline_accuracy)}
-					value_a_title="Baseline"
-					value_b={Some(props.accuracy)}
-					value_b_title="Training"
-					number_formatter={ui::NumberFormatter::Percent(Default::default())}
-				/>
-			</ui::S2>
-			<ui::S2>
-				<ui::H2>{"Area Under the Receiver Operating Characteristic Curve"}</ui::H2>
-				<ui::P>{aucroc_description}</ui::P>
-				<ui::NumberCard
-					title="AUC ROC"
-					value={ui::format_percent(props.auc_roc)}
-				/>
-			</ui::S2>
-			<ui::S2>
-				<ui::H2>{"Precison, Recall, and F1 Score"}</ui::H2>
-				<ui::P>
-					{format!("Precision is the percent of rows in the test dataset that the model classified as having \"{}\" equal to ", props.target_column_name)}
-					<b>{props.positive_class.clone()}</b>
-					{format!(" that actually had \"{}\" equal to ", props.target_column_name)}
-					<b>{props.positive_class.clone()}</b>
-					{format!(". Recall is the percent of rows in the test dataset that had \"{}\" equal to ", props.target_column_name)}
-					<b>{props.positive_class.clone()}</b>
-					{" that the model correctly classified as "}
-					<b>{props.positive_class.clone()}</b>
-					{"."}
-				</ui::P>
-				<MetricsRow>
-					<ui::NumberCard
-						title="Precision"
-						value={ui::format_percent(props.precision)}
-					/>
-					<ui::NumberCard
-						title="Recall"
-						value={ui::format_percent(props.recall)}
-					/>
-					<ui::NumberCard
-						title="F1 Score"
-						value={ui::format_percent(props.f1_score)}
-					/>
-				</MetricsRow>
-			</ui::S2>
-			<ConfusionMatrixSection {props.confusion_matrix_section_props} />
-		</ui::S1>
+impl Component for BinaryClassifier {
+	fn into_node(self) -> Node {
+		let aucroc_description = "The area under the receiver operating characteric curve is the probability that a randomly chosen positive example's predicted score is higher than a randomly selected negative example's score. A value of 100% means your model is perfectly able to classify positive and negative rows. A value of 50% means your model is unable to distinguish positive rows from negative rows. A value of 0% means your model is perfectly mis-classifying positive rows as negative and negative rows as positive.";
+		let definition = ui::P::new().child(
+				format!("Precision is the percent of rows in the test dataset that the model classified as having \"{}\" equal to ", self.target_column_name)
+			).child(
+				b().child(self.positive_class.clone())
+			).child(
+				format!(" that actually had \"{}\" equal to ", self.target_column_name)
+			).child(
+				b().child(self.positive_class.clone())
+			)
+			.child(
+				format!(". Recall is the percent of rows in the test dataset that had \"{}\" equal to ", self.target_column_name)
+			)
+			.child(b().child(self.positive_class.clone()))
+			.child(" that the model correctly classified as ")
+			.child(b().child(self.positive_class.clone()))
+			.child(b().child(self.positive_class.clone()))
+			.child(b().child(self.positive_class.clone()))
+			.child(".")
+			.into_node();
+		ui::S1::new()
+			.child(self.warning.map(|warning| {
+				ui::Alert::new(ui::Level::Danger)
+					.title("BAD MODEL".to_owned())
+					.child(warning)
+			}))
+			.child(ui::H1::new().child("Training Metrics"))
+			.child(
+				ui::TabBar::new()
+					.child(ui::TabLink::new("".to_owned(), true).child("Overview"))
+					.child(ui::TabLink::new("precision_recall".to_owned(), false).child("PR Curve"))
+					.child(ui::TabLink::new("roc".to_owned(), false).child("ROC Curve")),
+			)
+			.child(
+				ui::S2::new().child(
+					ui::P::new()
+						.child(" The positive class is ")
+						.child(b().child(self.positive_class.clone()))
+						.child(" and the negative class is ")
+						.child(b().child(self.negative_class.clone())),
+				),
+			)
+			.child(
+				ui::S2::new()
+					.child(ui::H2::new().child("Accuracy"))
+					.child(
+						ui::P::new()
+							.child("Accuracy is the percentage of predictions that were correct."),
+					)
+					.child(
+						ui::NumberComparisonCard::new(
+							Some(self.baseline_accuracy),
+							Some(self.accuracy),
+						)
+						.color_a(Some(BASELINE_COLOR.to_owned()))
+						.color_b(Some(TRAINING_COLOR.to_owned()))
+						.title("Accuracy".to_owned())
+						.value_a_title("Baseline".to_owned())
+						.value_b_title("Training".to_owned())
+						.number_formatter(ui::NumberFormatter::Percent(Default::default())),
+					),
+			)
+			.child(
+				ui::S2::new()
+					.child(
+						ui::H2::new()
+							.child("Area Under the Receiver Operating Characteristic Curve"),
+					)
+					.child(ui::P::new().child(aucroc_description))
+					.child(ui::NumberCard::new(
+						"AUC ROC".to_owned(),
+						ui::format_percent(self.auc_roc),
+					)),
+			)
+			.child(
+				ui::S2::new()
+					.child(ui::H2::new().child("Precison, Recall, and F1 Score"))
+					.child(definition)
+					.child(
+						MetricsRow::new()
+							.child(ui::NumberCard::new(
+								"Precision".to_owned(),
+								ui::format_percent(self.precision),
+							))
+							.child(ui::NumberCard::new(
+								"Recall".to_owned(),
+								ui::format_percent(self.recall),
+							))
+							.child(ui::NumberCard::new(
+								"F1 Score".to_owned(),
+								ui::format_percent(self.f1_score),
+							)),
+					),
+			)
+			.child(self.confusion_matrix_section)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ConfusionMatrixSectionProps {
+#[derive(ComponentBuilder)]
+pub struct ConfusionMatrixSection {
 	pub class: String,
 	pub false_negatives: u64,
 	pub false_positives: u64,
@@ -126,19 +130,19 @@ pub struct ConfusionMatrixSectionProps {
 	pub true_positives: u64,
 }
 
-#[component]
-fn ConfusionMatrixSection(props: ConfusionMatrixSectionProps) {
-	html! {
-		<ui::S2>
-			<ui::H2>{"Confusion Matrix"}</ui::H2>
-			<ui::P>{"A confusion matrix categorizes predictions into false negatives, false positives, true negatives, and true positives."}</ui::P>
-			<ui::ConfusionMatrix
-				class_label={props.class}
-				false_negatives={props.false_negatives.to_usize()}
-				false_positives={props.false_positives.to_usize()}
-				true_negatives={props.true_negatives.to_usize()}
-				true_positives={props.true_positives.to_usize()}
-			/>
-		</ui::S2>
+impl Component for ConfusionMatrixSection {
+	fn into_node(self) -> Node {
+		let definition = "A confusion matrix categorizes predictions into false negatives, false positives, true negatives, and true positives.";
+		ui::S2::new()
+			.child(ui::H2::new().child("Confusion Matrix"))
+			.child(ui::P::new().child(definition))
+			.child(ui::ConfusionMatrix::new(
+				self.class,
+				self.false_negatives.to_usize(),
+				self.false_positives.to_usize(),
+				self.true_negatives.to_usize(),
+				self.true_positives.to_usize(),
+			))
+			.into_node()
 	}
 }

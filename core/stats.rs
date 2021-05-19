@@ -204,11 +204,11 @@ pub struct TextColumnStatsOutput {
 	/// This is the number of unique ngrams encountered.
 	pub ngrams_count: usize,
 	/// This contains stats for up to `stats_settings.ngrams_max_count` ngrams with the highest `entry.row_count`s.
-	pub top_ngrams: Vec<(NGram, TextColumnStatsOutputTopNGramsEntry)>,
+	pub top_ngrams: IndexMap<NGram, TextColumnStatsOutputTopNGramsEntry, FnvBuildHasher>,
 }
 
 /// This struct contains stats for individual ngrams.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct TextColumnStatsOutputTopNGramsEntry {
 	/// This is the number of rows that contain at least one occurrence of this ngram.
 	pub row_count: usize,
@@ -590,7 +590,7 @@ impl TextColumnStats {
 			.sort_by(|_, entry_a, _, entry_b| entry_a.row_count.cmp(&entry_b.row_count));
 		let row_count = self.row_count.to_f32().unwrap();
 		let ngrams_count = self.ngrams.len();
-		let ngrams = self
+		let ngrams: IndexMap<NGram, TextColumnStatsOutputTopNGramsEntry, FnvBuildHasher> = self
 			.ngrams
 			.into_iter()
 			.rev()

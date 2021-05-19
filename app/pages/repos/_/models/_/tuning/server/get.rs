@@ -1,5 +1,5 @@
-use crate::page::{Metrics, Page, PageProps, TuningProps};
-use html::html;
+use crate::page::Page;
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -8,7 +8,8 @@ use tangram_app_common::{
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
+use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use tangram_app_tuning_common::{Metrics, Tuning};
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
@@ -17,7 +18,7 @@ pub async fn get(
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	let model_id =
-		if let &["repos", _, "models", model_id, "tuning"] = path_components(&request).as_slice() {
+		if let ["repos", _, "models", model_id, "tuning"] = *path_components(&request).as_slice() {
 			model_id.to_owned()
 		} else {
 			return Err(err!("unexpected path"));
@@ -84,7 +85,7 @@ pub async fn get(
 				true_negatives_fraction: default_threshold_metrics.true_negatives() as f32 / total,
 				true_positives_fraction: default_threshold_metrics.true_positives() as f32 / total,
 			};
-			Some(TuningProps {
+			Some(Tuning {
 				default_threshold: 0.5,
 				metrics,
 				default_threshold_metrics,
@@ -93,13 +94,13 @@ pub async fn get(
 		}
 		tangram_model::ModelInnerReader::MulticlassClassifier(_) => None,
 	};
-	let model_layout_props =
-		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::Tuning).await?;
-	let props = PageProps {
-		model_layout_props,
+	let model_layout_info =
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::Tuning).await?;
+	let page = Page {
+		model_layout_info,
 		tuning,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

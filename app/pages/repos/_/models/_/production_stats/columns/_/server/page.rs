@@ -1,31 +1,28 @@
-use html::{component, html, Props};
-use tangram_app_common::{
-	date_window::DateWindow, date_window_select_field::DateWindowSelectField,
-};
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	document::{Document, DocumentProps},
-	model_layout::{ModelLayout, ModelLayoutProps},
+	document::Document,
+	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-use tangram_serve::client;
+use tangram_app_ui::{date_window::DateWindow, date_window_select_field::DateWindowSelectField};
 use tangram_ui as ui;
 
 pub use crate::enum_column::*;
 pub use crate::number_column::*;
 pub use crate::text_column::*;
 
-#[derive(Props)]
-pub struct PageProps {
+#[derive(ComponentBuilder)]
+pub struct Page {
 	pub column_name: String,
 	pub date_window: DateWindow,
 	pub id: String,
 	pub inner: Inner,
-	pub model_layout_props: ModelLayoutProps,
+	pub model_layout_info: ModelLayoutInfo,
 }
 
 pub enum Inner {
-	Number(NumberColumnProps),
-	Enum(EnumColumnProps),
-	Text(TextColumnProps),
+	Number(NumberColumn),
+	Enum(EnumColumn),
+	Text(TextColumn),
 }
 
 pub struct IntervalBoxChartDataPoint {
@@ -54,44 +51,43 @@ pub struct OverallBoxChartDataStats {
 	pub p75: f32,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let inner = match props.inner {
-		Inner::Number(inner) => html! { <NumberColumn {inner} /> },
-		Inner::Enum(inner) => html! { <EnumColumn {inner} /> },
-		Inner::Text(inner) => html! { <TextColumn {inner} /> },
-	};
-	let document_props = DocumentProps {
-		client_wasm_js_src: Some(client!()),
-	};
-	html! {
-		<Document {document_props}>
-			<ModelLayout {props.model_layout_props}>
-				<ui::S1>
-					<ui::H1>{props.column_name}</ui::H1>
-					<DateWindowSelectForm date_window={props.date_window} />
-					{inner}
-				</ui::S1>
-			</ModelLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		let inner = match self.inner {
+			Inner::Number(inner) => inner.into_node(),
+			Inner::Enum(inner) => inner.into_node(),
+			Inner::Text(inner) => inner.into_node(),
+		};
+		Document::new()
+			.client("tangram_app_production_stats_column_client")
+			.child(
+				ModelLayout::new(self.model_layout_info).child(
+					ui::S1::new()
+						.child(ui::H1::new().child(self.column_name))
+						.child(DateWindowSelectForm::new(self.date_window))
+						.child(inner),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct DateWindowSelectFormProps {
+#[derive(ComponentBuilder)]
+pub struct DateWindowSelectForm {
 	date_window: DateWindow,
 }
 
-#[component]
-fn DateWindowSelectForm(props: DateWindowSelectFormProps) {
-	html! {
-		<ui::Form>
-			<DateWindowSelectField date_window={props.date_window} />
-			<noscript>
-				<ui::Button button_type?={Some(ui::ButtonType::Submit)}>
-					{"Submit"}
-				</ui::Button>
-			</noscript>
-		</ui::Form>
+impl Component for DateWindowSelectForm {
+	fn into_node(self) -> Node {
+		ui::Form::new()
+			.child(DateWindowSelectField::new(self.date_window))
+			.child(
+				noscript().child(
+					ui::Button::new()
+						.button_type(Some(ui::ButtonType::Submit))
+						.child("Submit"),
+				),
+			)
+			.into_node()
 	}
 }

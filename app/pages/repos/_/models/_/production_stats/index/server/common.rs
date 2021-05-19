@@ -1,13 +1,11 @@
-use html::{component, html, Props};
 use num::ToPrimitive;
-use tangram_app_common::{
+use pinwheel::prelude::*;
+use tangram_app_ui::{
 	column_type::ColumnType,
 	date_window::{DateWindow, DateWindowInterval},
-};
-use tangram_app_common::{
 	date_window_select_field::DateWindowSelectField,
 	time::{interval_chart_title, overall_chart_title},
-	tokens::column_type_token,
+	tokens::ColumnTypeToken,
 };
 use tangram_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
@@ -31,155 +29,150 @@ pub struct ClassifierChartEntry {
 	pub histogram: ProductionTrainingHistogram,
 }
 
-#[derive(Props)]
-pub struct ClassificationProductionStatsIntervalChartProps {
+#[derive(ComponentBuilder)]
+pub struct ClassificationProductionStatsIntervalChart {
 	pub chart_data: Vec<ClassifierChartEntry>,
 	pub date_window_interval: DateWindowInterval,
 }
 
-#[component]
-pub fn ClassificationProductionStatsIntervalChart(
-	props: ClassificationProductionStatsIntervalChartProps,
-) {
-	let color_options = vec![
-		ui::colors::GREEN,
-		ui::colors::BLUE,
-		ui::colors::INDIGO,
-		ui::colors::PURPLE,
-		ui::colors::PINK,
-		ui::colors::RED,
-		ui::colors::ORANGE,
-		ui::colors::YELLOW,
-	];
-	let title = interval_chart_title(&props.date_window_interval, "Prediction Stats".to_owned());
-	let classes = props.chart_data[0]
-		.histogram
-		.production
-		.iter()
-		.cloned()
-		.map(|(class, _)| class)
-		.collect::<Vec<_>>();
-	let series = classes
-		.iter()
-		.enumerate()
-		.map(|(index, class)| {
-			let color = color_options[index % color_options.len()].to_owned();
-			BarChartSeries {
-				color,
-				data: props
-					.chart_data
-					.iter()
-					.enumerate()
-					.map(|(entry_index, entry)| BarChartPoint {
-						label: entry.label.to_owned(),
-						x: entry_index.to_f64().unwrap(),
-						y: Some(entry.histogram.production[index].1.to_f64().unwrap()),
-					})
-					.collect::<Vec<_>>(),
-				title: Some(class.to_owned()),
-			}
-		})
-		.collect::<Vec<_>>();
-	html! {
-		<BarChart
-			id?="histogram_intervals"
-			series?={Some(series)}
-			title?={Some(title)}
-			y_min?={Some(0.0)}
-		/>
+impl Component for ClassificationProductionStatsIntervalChart {
+	fn into_node(self) -> Node {
+		let color_options = vec![
+			ui::colors::GREEN,
+			ui::colors::BLUE,
+			ui::colors::INDIGO,
+			ui::colors::PURPLE,
+			ui::colors::PINK,
+			ui::colors::RED,
+			ui::colors::ORANGE,
+			ui::colors::YELLOW,
+		];
+		let title = interval_chart_title(&self.date_window_interval, "Prediction Stats".to_owned());
+		let classes = self.chart_data[0]
+			.histogram
+			.production
+			.iter()
+			.cloned()
+			.map(|(class, _)| class)
+			.collect::<Vec<_>>();
+		let series = classes
+			.iter()
+			.enumerate()
+			.map(|(index, class)| {
+				let color = color_options[index % color_options.len()].to_owned();
+				BarChartSeries {
+					color,
+					data: self
+						.chart_data
+						.iter()
+						.enumerate()
+						.map(|(entry_index, entry)| BarChartPoint {
+							label: entry.label.to_owned(),
+							x: entry_index.to_f64().unwrap(),
+							y: Some(entry.histogram.production[index].1.to_f64().unwrap()),
+						})
+						.collect::<Vec<_>>(),
+					title: Some(class.to_owned()),
+				}
+			})
+			.collect::<Vec<_>>();
+		BarChart::new()
+			.id("histogram_intervals".to_owned())
+			.series(Some(series))
+			.title(Some(title))
+			.y_min(Some(0.0))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ClassificationProductionStatsChartProps {
+#[derive(ComponentBuilder)]
+pub struct ClassificationProductionStatsChart {
 	pub chart_data: ClassifierChartEntry,
 	pub date_window: DateWindow,
 }
 
-#[component]
-pub fn ClassificationProductionStatsChart(props: ClassificationProductionStatsChartProps) {
-	let color_options = vec![
-		ui::colors::GREEN,
-		ui::colors::BLUE,
-		ui::colors::INDIGO,
-		ui::colors::PURPLE,
-		ui::colors::PINK,
-		ui::colors::RED,
-		ui::colors::ORANGE,
-		ui::colors::YELLOW,
-	];
-	let classes = props
-		.chart_data
-		.histogram
-		.production
-		.iter()
-		.cloned()
-		.map(|(class, _)| class)
-		.collect::<Vec<_>>();
-	let title = overall_chart_title(&props.date_window, "Prediction Stats".to_owned());
-	let series = zip!(classes.iter(), props.chart_data.histogram.production.iter())
-		.enumerate()
-		.map(|(index, (class, entry))| {
-			let color = color_options[index % color_options.len()].to_owned();
-			BarChartSeries {
-				color,
-				data: vec![BarChartPoint {
-					label: props.chart_data.label.to_owned(),
-					x: 0.0,
-					y: Some(entry.1.to_f64().unwrap()),
-				}],
-				title: Some(class.to_owned()),
-			}
-		})
-		.collect::<Vec<_>>();
-	html! {
-		<BarChart
-			id?="histogram_overall"
-			series?={Some(series)}
-			title?={Some(title)}
-			y_min?={Some(0.0)}
-		/>
+impl Component for ClassificationProductionStatsChart {
+	fn into_node(self) -> Node {
+		let color_options = vec![
+			ui::colors::GREEN,
+			ui::colors::BLUE,
+			ui::colors::INDIGO,
+			ui::colors::PURPLE,
+			ui::colors::PINK,
+			ui::colors::RED,
+			ui::colors::ORANGE,
+			ui::colors::YELLOW,
+		];
+		let classes = self
+			.chart_data
+			.histogram
+			.production
+			.iter()
+			.cloned()
+			.map(|(class, _)| class)
+			.collect::<Vec<_>>();
+		let title = overall_chart_title(&self.date_window, "Prediction Stats".to_owned());
+		let series = zip!(classes.iter(), self.chart_data.histogram.production.iter())
+			.enumerate()
+			.map(|(index, (class, entry))| {
+				let color = color_options[index % color_options.len()].to_owned();
+				BarChartSeries {
+					color,
+					data: vec![BarChartPoint {
+						label: self.chart_data.label.to_owned(),
+						x: 0.0,
+						y: Some(entry.1.to_f64().unwrap()),
+					}],
+					title: Some(class.to_owned()),
+				}
+			})
+			.collect::<Vec<_>>();
+		BarChart::new()
+			.id("histogram_overall".to_owned())
+			.series(Some(series))
+			.title(Some(title))
+			.y_min(Some(0.0))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct PredictionCountChartProps {
+#[derive(ComponentBuilder)]
+pub struct PredictionCountChart {
 	pub chart_data: Vec<PredictionCountChartEntry>,
 	pub date_window_interval: DateWindowInterval,
 }
 
-#[component]
-pub fn PredictionCountChart(props: PredictionCountChartProps) {
-	let prediction_count_chart_series = vec![BarChartSeries {
-		color: ui::colors::BLUE.to_owned(),
-		data: props
-			.chart_data
-			.into_iter()
-			.enumerate()
-			.map(|(index, entry)| BarChartPoint {
-				label: entry.label,
-				x: index.to_f64().unwrap(),
-				y: Some(entry.count.to_f64().unwrap()),
-			})
-			.collect::<Vec<_>>(),
-		title: Some("Prediction Count".to_owned()),
-	}];
-	let prediction_count_title = interval_chart_title(
-		&props.date_window_interval,
-		"Total Prediction Count".to_owned(),
-	);
-	html! {
-		<BarChart
-			id?="prediction_count"
-			series?={Some(prediction_count_chart_series)}
-			title?={Some(prediction_count_title)}
-			y_min?={Some(0.0)}
-		/>
+impl Component for PredictionCountChart {
+	fn into_node(self) -> Node {
+		let prediction_count_chart_series = vec![BarChartSeries {
+			color: ui::colors::BLUE.to_owned(),
+			data: self
+				.chart_data
+				.into_iter()
+				.enumerate()
+				.map(|(index, entry)| BarChartPoint {
+					label: entry.label,
+					x: index.to_f64().unwrap(),
+					y: Some(entry.count.to_f64().unwrap()),
+				})
+				.collect::<Vec<_>>(),
+			title: Some("Prediction Count".to_owned()),
+		}];
+		let prediction_count_title = interval_chart_title(
+			&self.date_window_interval,
+			"Total Prediction Count".to_owned(),
+		);
+		BarChart::new()
+			.id("prediction_count".to_owned())
+			.series(Some(prediction_count_chart_series))
+			.title(Some(prediction_count_title))
+			.y_min(Some(0.0))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ColumnStatsTableProps {
+#[derive(ComponentBuilder)]
+pub struct ColumnStatsTable {
 	pub rows: Vec<ColumnStatsTableRow>,
 }
 
@@ -192,95 +185,62 @@ pub struct ColumnStatsTableRow {
 	pub column_type: ColumnType,
 }
 
-#[component]
-pub fn ColumnStatsTable(props: ColumnStatsTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-						{"Status"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Column"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Type"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Absent Count"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Invalid Count"}
-					</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-			{props.rows.into_iter().map(|row| html! {
-				<ui::TableRow>
-					<ui::TableCell>
-						{if row.alert.is_some() {
-							html! {
-								<ui::AlertIcon
-									alert={row.alert.unwrap()}
-									level={ui::Level::Danger}
-								>
-									{"!"}
-								</ui::AlertIcon>
-							}
-							} else {
-								html! {
-									<ui::AlertIcon
-										alert="All good"
-										level={ui::Level::Success}
-									>
-										{"✓"}
-									</ui::AlertIcon>
-								}
-						}}
-					</ui::TableCell>
-					<ui::TableCell>
-					{if row.href.is_some() {
-						html! {
-							<ui::Link href={row.href.unwrap()}>
-								{row.name}
-							</ui::Link>
-						}
+impl Component for ColumnStatsTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new()
+						.child(ui::TableHeaderCell::new().child("Status"))
+						.child(ui::TableHeaderCell::new().child("Column"))
+						.child(ui::TableHeaderCell::new().child("Type"))
+						.child(ui::TableHeaderCell::new().child("Absent Count"))
+						.child(ui::TableHeaderCell::new().child("Invalid Count")),
+				),
+			)
+			.child(
+				ui::TableBody::new().children(self.rows.into_iter().map(|row| {
+					let link_or_label = if row.href.is_some() {
+						ui::Link::new()
+							.href(row.href.unwrap())
+							.child(row.name)
+							.into_node()
 					} else {
-						html! {<span>{row.name}</span>}
-					}}
-					</ui::TableCell>
-					<ui::TableCell>
-						{column_type_token(&row.column_type)}
-					</ui::TableCell>
-					<ui::TableCell>
-						{row.absent_count.to_string()}
-					</ui::TableCell>
-					<ui::TableCell>
-						{row.invalid_count.to_string()}
-					</ui::TableCell>
-				</ui::TableRow>
-			}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+						span().child(row.name).into_node()
+					};
+					ui::TableRow::new()
+						.child(ui::TableCell::new().child(if row.alert.is_some() {
+							ui::AlertIcon::new(row.alert.unwrap(), ui::Level::Danger).child("!")
+						} else {
+							ui::AlertIcon::new("All good".to_owned(), ui::Level::Success).child("✓")
+						}))
+						.child(ui::TableCell::new().child(link_or_label))
+						.child(ui::TableCell::new().child(ColumnTypeToken::new(row.column_type)))
+						.child(ui::TableCell::new().child(row.absent_count.to_string()))
+						.child(ui::TableCell::new().child(row.invalid_count.to_string()))
+				})),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct DateWindowSelectFormProps {
+#[derive(ComponentBuilder)]
+pub struct DateWindowSelectForm {
 	pub date_window: DateWindow,
 }
 
-#[component]
-pub fn DateWindowSelectForm(props: DateWindowSelectFormProps) {
-	html! {
-		<ui::Form>
-			<DateWindowSelectField date_window={props.date_window} />
-			<noscript>
-				<ui::Button button_type?={Some(ui::ButtonType::Submit)}>
-					{"Submit"}
-				</ui::Button>
-			</noscript>
-		</ui::Form>
+impl Component for DateWindowSelectForm {
+	fn into_node(self) -> Node {
+		ui::Form::new()
+			.child(DateWindowSelectField::new(self.date_window))
+			.child(
+				noscript().child(
+					ui::Button::new()
+						.button_type(Some(ui::ButtonType::Submit))
+						.child("Submit"),
+				),
+			)
+			.into_node()
 	}
 }

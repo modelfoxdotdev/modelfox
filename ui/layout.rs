@@ -1,106 +1,130 @@
-use html::{classes, component, html, Props};
+use pinwheel::prelude::*;
 
-#[component]
-pub fn S1() {
-	html! {
-		<div class="s1">
-			{children}
-		</div>
+#[derive(ComponentBuilder)]
+pub struct S1 {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for S1 {
+	fn into_node(self) -> Node {
+		div().class("s1").child(self.children).into_node()
 	}
 }
 
-#[component]
-pub fn S2() {
-	html! {
-		<div class="s2">
-			{children}
-		</div>
+#[derive(ComponentBuilder)]
+pub struct S2 {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for S2 {
+	fn into_node(self) -> Node {
+		div().class("s2").child(self.children).into_node()
 	}
 }
 
-#[component]
-pub fn SpaceBetween() {
-	html! {
-		<div class="space-between">
-			{children}
-		</div>
+#[derive(ComponentBuilder)]
+pub struct SpaceBetween {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for SpaceBetween {
+	fn into_node(self) -> Node {
+		div()
+			.class("space-between")
+			.child(self.children)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct H1Props {
+#[derive(ComponentBuilder)]
+pub struct H1 {
 	#[optional]
 	pub center: Option<bool>,
+	#[children]
+	pub children: Vec<Node>,
 }
 
-#[component]
-pub fn H1(props: H1Props) {
-	let center = if props.center.unwrap_or(false) {
-		Some("center")
-	} else {
-		None
-	};
-	let class = classes!(Some("h1"), center);
-	html! {
-		<h1 class={class}>
-			{children}
-		</h1>
+impl Component for H1 {
+	fn into_node(self) -> Node {
+		let center = if self.center.unwrap_or(false) {
+			Some("center")
+		} else {
+			None
+		};
+		let class = classes!(Some("h1"), center);
+		h1().class(class).child(self.children).into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct H2Props {
+#[derive(ComponentBuilder)]
+pub struct H2 {
 	#[optional]
 	pub center: Option<bool>,
+	#[children]
+	pub children: Vec<Node>,
 }
 
-#[component]
-pub fn H2(props: H2Props) {
-	let center = if props.center.unwrap_or(false) {
-		Some("center")
-	} else {
-		None
-	};
-	let class = classes!(Some("h2"), center);
-	html! {
-		<h2 class={class}>
-			{children}
-		</h2>
+impl Component for H2 {
+	fn into_node(self) -> Node {
+		let center = if self.center.unwrap_or(false) {
+			Some("center")
+		} else {
+			None
+		};
+		let class = classes!(Some("h2"), center);
+		h2().class(class).child(self.children).into_node()
 	}
 }
 
-#[component]
-pub fn P() {
-	html! {
-		<p class="p">
-			{children}
-		</p>
+#[derive(ComponentBuilder)]
+pub struct P {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for P {
+	fn into_node(self) -> Node {
+		p().class("p").child(self.children).into_node()
 	}
 }
 
-#[component]
-pub fn List() {
-	html! {
-		<ul class="list">
-			{children}
-		</ul>
+#[derive(ComponentBuilder)]
+pub struct UnorderedList {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for UnorderedList {
+	fn into_node(self) -> Node {
+		ul().class("unordered-list")
+			.child(self.children)
+			.into_node()
 	}
 }
 
-#[component]
-pub fn OrderedList() {
-	html! {
-		<ol class="ordered-list">
-			{children}
-		</ol>
+#[derive(ComponentBuilder)]
+pub struct OrderedList {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for OrderedList {
+	fn into_node(self) -> Node {
+		ol().class("ordered-list").child(self.children).into_node()
 	}
 }
 
-#[component]
-pub fn ListItem() {
-	html! {
-		<li>
-			{children}
-		</li>
+#[derive(ComponentBuilder)]
+pub struct ListItem {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for ListItem {
+	fn into_node(self) -> Node {
+		li().child(self.children).into_node()
 	}
 }

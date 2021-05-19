@@ -307,6 +307,18 @@ impl MulticlassClassifier {
 	) -> tangram_serialize::Position<crate::serialize::MulticlassClassifierWriter> {
 		crate::serialize::serialize_multiclass_classifier(self, writer)
 	}
+
+	pub fn from_bytes(&self, bytes: &[u8]) -> MulticlassClassifier {
+		let reader = tangram_serialize::read::<crate::serialize::MulticlassClassifierReader>(bytes);
+		Self::from_reader(reader)
+	}
+
+	pub fn to_bytes(&self) -> Vec<u8> {
+		// Create the writer.
+		let mut writer = tangram_serialize::Writer::new();
+		self.to_writer(&mut writer);
+		writer.into_bytes()
+	}
 }
 
 fn softmax(mut logits: ArrayViewMut2<f32>) {

@@ -1,67 +1,75 @@
-use html::{classes, component, html, Props};
+use pinwheel::prelude::*;
 
-#[derive(Props)]
-pub struct NavProps {
+#[derive(ComponentBuilder)]
+pub struct Nav {
 	#[optional]
 	title: Option<String>,
+	#[children]
+	pub children: Vec<Node>,
 }
 
-#[component]
-pub fn Nav(props: NavProps) {
-	html! {
-		<>
-			<details class="nav-details">
-				<summary>
-					{props.title}
-				</summary>
-			</details>
-			<nav class="nav">{children}</nav>
-		</>
+impl Component for Nav {
+	fn into_node(self) -> Node {
+		div()
+			.child(
+				details()
+					.class("nav-details")
+					.child(summary().child(self.title)),
+			)
+			.child(nav().class("nav").child(self.children))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct NavItemProps {
-	pub title: String,
+#[derive(ComponentBuilder)]
+pub struct NavItem {
+	#[optional]
+	pub title: Option<String>,
+	#[optional]
 	pub href: Option<String>,
+	#[optional]
 	pub selected: Option<bool>,
+	#[children]
+	pub children: Vec<Node>,
 }
 
-#[component]
-pub fn NavItem(props: NavItemProps) {
-	let selected = props.selected.unwrap_or(false);
-	let class = classes!(
-		"nav-item",
-		if selected {
-			Some("nav-item-selected")
-		} else {
-			None
-		},
-		if props.href.is_some() {
-			Some("nav-item-clickable")
-		} else {
-			None
-		}
-	);
-	html! {
-		<div class={class}>
-			<a href={props.href}>{props.title}</a>
-			{children}
-		</div>
+impl Component for NavItem {
+	fn into_node(self) -> Node {
+		let selected = self.selected.unwrap_or(false);
+		let class = classes!(
+			"nav-item",
+			if selected {
+				Some("nav-item-selected")
+			} else {
+				None
+			},
+			if self.href.is_some() {
+				Some("nav-item-clickable")
+			} else {
+				None
+			}
+		);
+		div()
+			.attribute("class", class)
+			.child(a().attribute("href", self.href).child(self.title))
+			.child(self.children)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct NavSectionProps {
+#[derive(ComponentBuilder)]
+pub struct NavSection {
 	pub title: String,
+	#[children]
+	pub children: Vec<Node>,
 }
 
-#[component]
-pub fn NavSection(props: NavSectionProps) {
-	html! {
-		<div class="nav-section">
-			<div class="nav-section-title">{props.title}</div>
-			{children}
-		</div>
+impl Component for NavSection {
+	fn into_node(self) -> Node {
+		div()
+			.class("nav-section")
+			.child(div().class("nav-section-title").child(self.title))
+			.child(self.children)
+			.into_node()
 	}
 }

@@ -1,12 +1,12 @@
 use crate::page::{AccuracyChart, TrainingProductionMetrics, TrueValuesCountChartEntry};
-use html::{component, html, Props};
 use num::ToPrimitive;
-use tangram_app_common::{
+use pinwheel::prelude::*;
+use tangram_app_ui::{
+	colors::{PRODUCTION_COLOR, TRAINING_COLOR},
 	date_window::{DateWindow, DateWindowInterval},
 	date_window_select_field::DateWindowSelectField,
 	metrics_row::MetricsRow,
 	time::interval_chart_title,
-	tokens::{PRODUCTION_COLOR, TRAINING_COLOR},
 };
 use tangram_charts::{
 	common::GridLineInterval,
@@ -16,8 +16,8 @@ use tangram_charts::{
 use tangram_finite::Finite;
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct BinaryClassifierProductionMetricsProps {
+#[derive(ComponentBuilder)]
+pub struct BinaryClassifierProductionMetrics {
 	pub date_window: DateWindow,
 	pub date_window_interval: DateWindowInterval,
 	pub true_values_count_chart: Vec<TrueValuesCountChartEntry>,
@@ -33,102 +33,112 @@ pub struct BinaryClassificationOverallProductionMetrics {
 	pub true_values_count: u64,
 }
 
-#[component]
-pub fn BinaryClassifierProductionMetrics(props: BinaryClassifierProductionMetricsProps) {
-	let chart_labels = props
-		.accuracy_chart
-		.data
-		.iter()
-		.map(|entry| entry.label.clone())
-		.collect::<Vec<_>>();
-	let accuracy_series = vec![
-		LineChartSeries {
-			color: TRAINING_COLOR.to_owned(),
-			data: (0..props.accuracy_chart.data.len())
-				.map(|index| LineChartPoint {
-					x: Finite::new(index.to_f64().unwrap()).unwrap(),
-					y: Some(
-						Finite::new(props.accuracy_chart.training_accuracy.to_f64().unwrap())
-							.unwrap(),
+impl Component for BinaryClassifierProductionMetrics {
+	fn into_node(self) -> Node {
+		let chart_labels = self
+			.accuracy_chart
+			.data
+			.iter()
+			.map(|entry| entry.label.clone())
+			.collect::<Vec<_>>();
+		let accuracy_series = vec![
+			LineChartSeries {
+				color: TRAINING_COLOR.to_owned(),
+				data: (0..self.accuracy_chart.data.len())
+					.map(|index| LineChartPoint {
+						x: Finite::new(index.to_f64().unwrap()).unwrap(),
+						y: Some(
+							Finite::new(self.accuracy_chart.training_accuracy.to_f64().unwrap())
+								.unwrap(),
+						),
+					})
+					.collect::<Vec<_>>(),
+				line_style: Some(LineStyle::Dashed),
+				point_style: Some(PointStyle::Hidden),
+				title: Some("Training Accuracy".to_owned()),
+			},
+			LineChartSeries {
+				color: PRODUCTION_COLOR.to_owned(),
+				data: self
+					.accuracy_chart
+					.data
+					.iter()
+					.enumerate()
+					.map(|(index, entry)| LineChartPoint {
+						x: Finite::new(index.to_f64().unwrap()).unwrap(),
+						y: entry
+							.accuracy
+							.map(|accuracy| Finite::new(accuracy.to_f64().unwrap()).unwrap()),
+					})
+					.collect::<Vec<_>>(),
+				line_style: None,
+				point_style: None,
+				title: Some("Production Accuracy".to_owned()),
+			},
+		];
+		let accuracy_chart_title =
+			interval_chart_title(&self.date_window_interval, "Accuracy".to_owned());
+		ui::S1::new()
+			.child(ui::H1::new().child("Production Metrics"))
+			.child(
+				ui::S2::new()
+					.child(
+						ui::Form::new()
+							.child(DateWindowSelectField::new(self.date_window))
+							.child(
+								noscript().child(
+									ui::Button::new()
+										.button_type(Some(ui::ButtonType::Submit))
+										.child("Submit"),
+								),
+							),
+					)
+					.child(
+						ui::P::new()
+							.child("You have logged ")
+							.child(b().child(self.overall.true_values_count.to_string()))
+							.child(" true values for this date range."),
+					)
+					.child(MetricsRow::new().child(ui::NumberCard::new(
+						"True Value Count".to_owned(),
+						self.overall.true_values_count.to_string(),
+					))),
+			)
+			.child(
+				ui::S2::new()
+					.child(ui::H2::new().child("Accuracy"))
+					.child(
+						ui::P::new()
+							.child("Accuracy is the percentage of predictions that were correct."),
+					)
+					.child(
+						ui::NumberComparisonCard::new(
+							Some(self.overall.accuracy.training),
+							self.overall.accuracy.production,
+						)
+						.color_a(Some(TRAINING_COLOR.to_owned()))
+						.color_b(Some(PRODUCTION_COLOR.to_owned()))
+						.title("Accuracy".to_owned())
+						.value_a_title("Training".to_owned())
+						.value_b_title("Production".to_owned())
+						.number_formatter(ui::NumberFormatter::Percent(Default::default())),
+					)
+					.child(
+						ui::Card::new().child(
+							LineChart::new()
+								.id("accuracy".to_owned())
+								.labels(Some(chart_labels))
+								.series(Some(accuracy_series))
+								.title(Some(accuracy_chart_title))
+								.x_axis_grid_line_interval(Some(GridLineInterval {
+									k: 1.0,
+									p: 0.0,
+								}))
+								.y_max(Some(Finite::new(1.0).unwrap()))
+								.y_min(Some(Finite::new(0.0).unwrap())),
+						),
 					),
-				})
-				.collect::<Vec<_>>(),
-			line_style: Some(LineStyle::Dashed),
-			point_style: Some(PointStyle::Hidden),
-			title: Some("Training Accuracy".to_owned()),
-		},
-		LineChartSeries {
-			color: PRODUCTION_COLOR.to_owned(),
-			data: props
-				.accuracy_chart
-				.data
-				.iter()
-				.enumerate()
-				.map(|(index, entry)| LineChartPoint {
-					x: Finite::new(index.to_f64().unwrap()).unwrap(),
-					y: entry
-						.accuracy
-						.map(|accuracy| Finite::new(accuracy.to_f64().unwrap()).unwrap()),
-				})
-				.collect::<Vec<_>>(),
-			line_style: None,
-			point_style: None,
-			title: Some("Production Accuracy".to_owned()),
-		},
-	];
-	let accuracy_chart_title =
-		interval_chart_title(&props.date_window_interval, "Accuracy".to_owned());
-	html! {
-		<ui::S1>
-			<ui::H1>{"Production Metrics"}</ui::H1>
-			<ui::S2>
-				<ui::Form>
-					<DateWindowSelectField date_window={props.date_window} />
-					<noscript>
-						<ui::Button button_type?={Some(ui::ButtonType::Submit)}>
-							{"Submit"}
-						</ui::Button>
-					</noscript>
-				</ui::Form>
-				<ui::P>
-					{"You have logged "}
-					<b>{props.overall.true_values_count.to_string()}</b>
-					{" true values for this date range."}
-				</ui::P>
-				<MetricsRow>
-					<ui::NumberCard
-						title="True Value Count"
-						value={props.overall.true_values_count.to_string()}
-					/>
-				</MetricsRow>
-			</ui::S2>
-			<ui::S2>
-				<ui::H2>{"Accuracy"}</ui::H2>
-				<ui::P>{"Accuracy is the percentage of predictions that were correct."}</ui::P>
-				<ui::NumberComparisonCard
-					color_a={Some(TRAINING_COLOR.to_owned())}
-					color_b={Some(PRODUCTION_COLOR.to_owned())}
-					title="Accuracy"
-					value_a={Some(props.overall.accuracy.training)}
-					value_a_title="Training"
-					value_b={props.overall.accuracy.production}
-					value_b_title="Production"
-					number_formatter={ui::NumberFormatter::Percent(Default::default())}
-				/>
-				<ui::Card>
-					<LineChart
-						id?="accuracy"
-						labels?={Some(chart_labels)}
-						series?={Some(accuracy_series)}
-						title?={Some(accuracy_chart_title)}
-						x_axis_grid_line_interval?={
-							Some(GridLineInterval { k: 1.0, p: 0.0 })
-						}
-						y_max?={Some(Finite::new(1.0).unwrap())}
-						y_min?={Some(Finite::new(0.0).unwrap())}
-					/>
-				</ui::Card>
-			</ui::S2>
-		</ui::S1>
+			)
+			.into_node()
 	}
 }

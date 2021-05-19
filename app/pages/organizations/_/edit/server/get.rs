@@ -1,8 +1,8 @@
-use crate::page::{Page, PageProps};
-use html::html;
+use crate::page::Page;
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{error::not_found, Context};
-use tangram_app_layouts::app_layout::get_app_layout_props;
+use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_error::Result;
 
 pub async fn get(
@@ -12,12 +12,12 @@ pub async fn get(
 	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
-	let app_layout_props = get_app_layout_props(&context).await?;
-	let props = PageProps {
-		app_layout_props,
+	let app_layout_info = app_layout_info(&context).await?;
+	let page = Page {
+		app_layout_info,
 		error: None,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

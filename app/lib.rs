@@ -1,14 +1,16 @@
 use futures::FutureExt;
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 use tangram_app_common::{
 	options::{Options, StorageOptions},
 	storage::{LocalStorage, S3Storage, Storage},
 	Context,
 };
 use tangram_error::{err, Result};
-use tangram_serve::serve;
-use tracing::error;
-use tracing_subscriber::prelude::*;
+use tangram_id::Id;
+use tangram_serve::request_id::RequestIdLayer;
+use tower::{make::Shared, ServiceBuilder};
+use tower_http::{add_extension::AddExtensionLayer, trace::TraceLayer};
+use tracing::{error, info, trace_span, Span};
 use url::Url;
 
 pub use tangram_app_common::options;
@@ -22,8 +24,6 @@ pub fn run(options: Options) -> Result<()> {
 }
 
 async fn run_inner(options: Options) -> Result<()> {
-	// Set up tracing.
-	tracing()?;
 	// Create the database pool.
 	let database_pool = create_database_pool(CreateDatabasePoolOptions {
 		database_max_connections: options.database.max_connections,
@@ -67,145 +67,172 @@ async fn run_inner(options: Options) -> Result<()> {
 		smtp_transport,
 		storage,
 	};
-	serve(host, port, context, handle).await?;
+	let context_layer = AddExtensionLayer::new(Arc::new(context));
+	let request_id_layer = RequestIdLayer::new();
+	let trace_layer = TraceLayer::new_for_http()
+		.make_span_with(|request: &http::Request<hyper::Body>| {
+			let id = request.extensions().get::<Id>().unwrap();
+			trace_span!("request", %id)
+		})
+		.on_request(|request: &http::Request<hyper::Body>, _span: &Span| {
+			info!(
+				method = %request.method(),
+				path = %request.uri().path(),
+				query = ?request.uri().query(),
+				"request",
+			);
+		})
+		.on_response(
+			|response: &http::Response<hyper::Body>, _latency: Duration, _span: &Span| {
+				info!(status = %response.status(), "response");
+			},
+		);
+	let service = ServiceBuilder::new()
+		.layer(context_layer)
+		.layer(request_id_layer)
+		.layer(trace_layer)
+		.service_fn(handle);
+	let addr = std::net::SocketAddr::new(host, port);
+	let server = hyper::server::Server::try_bind(&addr)?;
+	server.serve(Shared::new(service)).await?;
 	Ok(())
 }
 
 async fn handle(
-	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
-) -> http::Response<hyper::Body> {
-	let path = request.uri().path().clone();
+) -> Result<http::Response<hyper::Body>, http::Error> {
+	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let path = request.uri().path();
 	let path_components: Vec<_> = path.split('/').skip(1).collect();
 	#[rustfmt::skip]
 	let response = match path_components.as_slice() {
-		&["health"] => {
+		["health"] => {
 			tangram_app_health::handle(context, request)
 		},
-		&["track"] => {
+		["track"] => {
 			tangram_app_track::handle(context, request)
 		},
 		#[cfg(feature = "tangram_app_login")]
-		&["login"] => {
+		["login"] => {
 			tangram_app_login_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_index")]
-		&[""] => {
+		[""] => {
 			tangram_app_index_server::handle(context, request)
 		},
 		#[cfg(feature = "tangram_app_new_repo")]
-		&["repos", "new"] => {
+		["repos", "new"] => {
 			tangram_app_new_repo_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_repo_index")]
-		&["repos", _, ""] => {
+		["repos", _, ""] => {
 			tangram_app_repo_index_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_repo_edit")]
-		&["repos", _, "edit"] => {
+		["repos", _, "edit"] => {
 			tangram_app_repo_edit_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_new_model")]
-		&["repos", _, "models", "new"] => {
+		["repos", _, "models", "new"] => {
 			tangram_app_new_model_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_model_index")]
-		 &["repos", _, "models", _, ""] => {
+		["repos", _, "models", _, ""] => {
 			tangram_app_model_index_server::handle(context, request)
 		}
-		 &["repos", _, "models", _, "download"] => {
+		["repos", _, "models", _, "download"] => {
 			tangram_app_layouts::model_layout::download(context, request)
 		}
 		#[cfg(feature = "tangram_app_training_grid_index")]
-		 &["repos", _, "models", _, "training_grid", ""] => {
+		["repos", _, "models", _, "training_grid", ""] => {
 			tangram_app_training_grid_index_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_training_grid_item")]
-		 &["repos", _, "models", _, "training_grid", "grid_item", _grid_item_id] => {
+		["repos", _, "models", _, "training_grid", "grid_item", _grid_item_id] => {
 			tangram_app_training_grid_item_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_training_stats_index")]
-		 &["repos", _, "models", _, "training_stats", ""] => {
+		["repos", _, "models", _, "training_stats", ""] => {
 			tangram_app_training_stats_index_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_training_stats_column")]
-		 &["repos", _, "models", _, "training_stats", "columns", _column_name] => {
+		["repos", _, "models", _, "training_stats", "columns", _column_name] => {
 			tangram_app_training_stats_column_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_playground")]
-		 &["repos", _, "models", _, "playground"] => {
+		["repos", _, "models", _, "playground"] => {
 			tangram_app_playground_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_training_metrics_index")]
-		&["repos", _, "models", _, "training_metrics", ""] => {
+		["repos", _, "models", _, "training_metrics", ""] => {
 			tangram_app_training_metrics_index_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_training_class_metrics")]
-		 &["repos", _, "models", _, "training_metrics", "class_metrics"] => {
+		["repos", _, "models", _, "training_metrics", "class_metrics"] => {
 			tangram_app_training_class_metrics_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_training_metrics_precision_recall")]
-		 &["repos", _, "models", _, "training_metrics", "precision_recall"] => {
+		["repos", _, "models", _, "training_metrics", "precision_recall"] => {
 			tangram_app_training_metrics_precision_recall_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_training_metrics_roc")]
-		 &["repos", _, "models", _, "training_metrics", "roc"] => {
+		["repos", _, "models", _, "training_metrics", "roc"] => {
 			tangram_app_training_metrics_roc_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_tuning")]
-		 &["repos", _, "models", _, "tuning"] => {
+		["repos", _, "models", _, "tuning"] => {
 			tangram_app_tuning_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_production_predictions_index")]
-		 &["repos", _, "models", _, "production_predictions", ""] => {
+		["repos", _, "models", _, "production_predictions", ""] => {
 			tangram_app_production_predictions_index_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_production_prediction")]
-		 &["repos", _, "models", _, "production_predictions", "predictions", _] => {
+		["repos", _, "models", _, "production_predictions", "predictions", _] => {
 			tangram_app_production_prediction_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_production_stats_index")]
-		 &["repos", _, "models", _, "production_stats", ""] => {
+		["repos", _, "models", _, "production_stats", ""] => {
 			tangram_app_production_stats_index_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_production_stats_column")]
-		 &["repos", _, "models", _, "production_stats", "columns", _] => {
+		["repos", _, "models", _, "production_stats", "columns", _] => {
 			tangram_app_production_stats_column_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_production_metrics_index")]
-		 &["repos", _, "models", _, "production_metrics", ""] => {
+		["repos", _, "models", _, "production_metrics", ""] => {
 			tangram_app_production_metrics_index_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_production_class_metrics")]
-		 &["repos", _, "models", _, "production_metrics", "class_metrics"] => {
+		["repos", _, "models", _, "production_metrics", "class_metrics"] => {
 			tangram_app_production_class_metrics_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_model_edit")]
-		&["repos", _, "models", _, "edit"] => {
+		["repos", _, "models", _, "edit"] => {
 			tangram_app_model_edit_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_user")]
-		&["user"] => {
+		["user"] => {
 			tangram_app_user_server::handle(context, request)
 		},
 		#[cfg(feature = "tangram_app_new_organization")]
-		 &["organizations", "new"] => {
+		["organizations", "new"] => {
 			tangram_app_new_organization_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_organization_index")]
-		 &["organizations", _, ""] => {
+		["organizations", _, ""] => {
 			tangram_app_organization_index_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_edit_organization")]
-		 &["organizations", _, "edit"] => {
+		["organizations", _, "edit"] => {
 			tangram_app_edit_organization_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_new_member")]
-		 &["organizations", _, "members", "new"] => {
+		["organizations", _, "members", "new"] => {
 			tangram_app_new_member_server::handle(context, request)
 		}
 		#[cfg(feature = "tangram_app_organization_member")]
-		 &["organizations", _, "members", _] => {
+		["organizations", _, "members", _] => {
 			tangram_app_organization_member_server::handle(context, request)
 		}
 		_ => async {
@@ -229,7 +256,7 @@ async fn handle(
 			.body(hyper::Body::from("internal server error"))
 			.unwrap()
 	});
-	response
+	Ok(response)
 }
 
 pub fn migrate(database_url: Url) -> Result<()> {
@@ -283,29 +310,4 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 		.connect_with(pool_options)
 		.await?;
 	Ok(pool)
-}
-
-fn tracing() -> Result<()> {
-	let env_layer = tracing_subscriber::EnvFilter::try_from_env("TANGRAM_APP_TRACING");
-	let env_layer = if cfg!(debug_assertions) {
-		Some(env_layer.unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("[]=info")))
-	} else {
-		env_layer.ok()
-	};
-	if let Some(env_layer) = env_layer {
-		if cfg!(debug_assertions) {
-			let format_layer = tracing_subscriber::fmt::layer().pretty();
-			let subscriber = tracing_subscriber::registry()
-				.with(env_layer)
-				.with(format_layer);
-			subscriber.init();
-		} else {
-			let journald_layer = tracing_subscriber::fmt::layer().json();
-			let subscriber = tracing_subscriber::registry()
-				.with(env_layer)
-				.with(journald_layer);
-			subscriber.init();
-		}
-	}
-	Ok(())
 }

@@ -369,7 +369,7 @@ fn choose_best_split_root_row_major(
 
 struct ChooseBestSplitRootRowMajorForFeaturesOptions<'a, T>
 where
-	T: NumCast + Send + Sync,
+	T: Send + Sync + NumCast,
 {
 	bin_stats: &'a mut Vec<BinStatsEntry>,
 	binning_instructions: &'a [BinningInstruction],
@@ -384,7 +384,7 @@ fn choose_best_split_root_row_major_for_features<T>(
 	options: ChooseBestSplitRootRowMajorForFeaturesOptions<T>,
 ) -> (Option<ChooseBestSplitForFeatureOutput>, Vec<bool>)
 where
-	T: NumCast + Send + Sync,
+	T: Send + Sync + NumCast,
 {
 	let ChooseBestSplitRootRowMajorForFeaturesOptions {
 		bin_stats,

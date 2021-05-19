@@ -1,7 +1,7 @@
 .production-explanations-grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-areas:
-    "prediction probability"
-    "feature_contributions feature_contributions";
+	display: grid;
+	gap: 1rem;
+	grid-template-areas:
+		"prediction probability"
+		"feature-contributions feature-contributions";
 }

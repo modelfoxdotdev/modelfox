@@ -1,5 +1,5 @@
 use futures::FutureExt;
-use html::{component, html, style, Props};
+use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
@@ -7,24 +7,23 @@ use tangram_app_common::{
 	model::get_model_bytes,
 	path_components,
 	repos::get_model_version_ids,
-	topbar::{Topbar, TopbarAvatar},
 	user::{authorize_user, authorize_user_for_model},
 	Context, HandleOutput,
 };
+use tangram_app_ui::topbar::{Topbar, TopbarAvatar};
 use tangram_error::{err, Result};
 use tangram_id::Id;
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct ModelLayoutProps {
+pub struct ModelLayoutInfo {
 	pub model_id: Id,
 	pub model_tag: Option<String>,
 	pub model_version_ids: Vec<Id>,
 	pub owner: Option<Owner>,
 	pub repo_id: String,
 	pub repo_title: String,
-	pub topbar_avatar: Option<TopbarAvatar>,
 	pub selected_item: ModelNavItem,
+	pub topbar_avatar: Option<TopbarAvatar>,
 }
 
 pub enum Owner {
@@ -32,12 +31,19 @@ pub enum Owner {
 	Organization { id: Id, name: String },
 }
 
-pub async fn get_model_layout_props(
+#[derive(ComponentBuilder)]
+pub struct ModelLayout {
+	pub info: ModelLayoutInfo,
+	#[children]
+	pub children: Vec<Node>,
+}
+
+pub async fn model_layout_info(
 	mut db: &mut sqlx::Transaction<'_, sqlx::Any>,
 	context: &Context,
 	model_id: Id,
 	selected_item: ModelNavItem,
-) -> Result<ModelLayoutProps> {
+) -> Result<ModelLayoutInfo> {
 	let row = sqlx::query(
 		"
 			select
@@ -89,7 +95,7 @@ pub async fn get_model_layout_props(
 	} else {
 		None
 	};
-	Ok(ModelLayoutProps {
+	Ok(ModelLayoutInfo {
 		model_id,
 		model_tag,
 		model_version_ids,
@@ -165,7 +171,7 @@ pub async fn download_inner(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let model_id = if let &["repos", _, "models", model_id, "download"] =
+	let model_id = if let ["repos", _, "models", model_id, "download"] =
 		path_components(&request).as_slice()
 	{
 		model_id.to_owned()
@@ -210,48 +216,53 @@ pub enum ModelNavItem {
 	ProductionMetrics,
 }
 
-#[component]
-pub fn ModelLayout(props: ModelLayoutProps) {
-	let selected_model_version_id = props
-		.model_version_ids
-		.iter()
-		.find(|model_version_id| *model_version_id == &props.model_id)
-		.unwrap();
-	let topbar_avatar = props
-		.topbar_avatar
-		.as_ref()
-		.map(|topbar_avatar| TopbarAvatar {
-			avatar_url: topbar_avatar.avatar_url.to_owned(),
-		});
-	html! {
-		<div class="model-layout">
-			<div style={style! { "grid-area" => "topbar" }}>
-				<Topbar topbar_avatar={topbar_avatar} />
-			</div>
-			<ModelLayoutTop
-				model_id={props.model_id}
-				model_tag={props.model_tag}
-				model_version_ids={props.model_version_ids.clone()}
-				owner={props.owner}
-				repo_id={props.repo_id.clone()}
-				repo_title={props.repo_title}
-				selected_model_version_id={selected_model_version_id.to_string()}
-			/>
-			<div class="model-layout-left">
-				<ModelNav
-					repo_id={props.repo_id.to_string()}
-					model_id={props.model_id.to_string()}
-					selected_item={props.selected_item}
-				/>
-			</div>
-			<div class="model-layout-center">{children}</div>
-			<div class="model-layout-right"></div>
-		</div>
+impl Component for ModelLayout {
+	fn into_node(self) -> Node {
+		let selected_model_version_id = self
+			.info
+			.model_version_ids
+			.iter()
+			.find(|model_version_id| *model_version_id == &self.info.model_id)
+			.unwrap();
+		let topbar_avatar = self
+			.info
+			.topbar_avatar
+			.as_ref()
+			.map(|topbar_avatar| TopbarAvatar {
+				avatar_url: topbar_avatar.avatar_url.to_owned(),
+			});
+		let topbar = div()
+			.style(style::GRID_AREA, "topbar")
+			.child(Topbar::new(topbar_avatar));
+		let top = ModelLayoutTop {
+			model_id: self.info.model_id,
+			model_tag: self.info.model_tag,
+			model_version_ids: self.info.model_version_ids.clone(),
+			owner: self.info.owner,
+			repo_id: self.info.repo_id.clone(),
+			repo_title: self.info.repo_title,
+			selected_model_version_id: selected_model_version_id.to_string(),
+		};
+		let left = div().class("model-layout-left").child(ModelNav::new(
+			self.info.repo_id.to_string(),
+			self.info.model_id.to_string(),
+			self.info.selected_item,
+		));
+		let center = div().class("model-layout-center").child(self.children);
+		let right = div().class("model-layout-right");
+		div()
+			.class("model-layout")
+			.child(topbar)
+			.child(top)
+			.child(left)
+			.child(center)
+			.child(right)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ModelLayoutTopProps {
+#[derive(ComponentBuilder)]
+pub struct ModelLayoutTop {
 	pub model_id: Id,
 	pub model_tag: Option<String>,
 	pub model_version_ids: Vec<Id>,
@@ -261,142 +272,185 @@ pub struct ModelLayoutTopProps {
 	pub selected_model_version_id: String,
 }
 
-#[component]
-pub fn ModelLayoutTop(props: ModelLayoutTopProps) {
-	let repo_id = props.repo_id;
-	let model_id = props.model_id;
-	let model_heading = props.model_tag.unwrap_or_else(|| model_id.to_string());
-	struct OwnerInfo {
-		title: String,
-		url: String,
-	}
-	let owner_info = props.owner.map(|owner| match owner {
-		Owner::Organization { name, id } => OwnerInfo {
-			title: name,
-			url: format!("/organizations/{}", id),
-		},
-		Owner::User { email, .. } => OwnerInfo {
-			title: email,
-			url: "/user".to_owned(),
-		},
-	});
-	html! {
-		<div class="model-layout-top">
-			<div class="model-layout-top-title-wrapper">
-				{owner_info.map(|owner_info| {
-					html! {
-						<>
-							<a
-								class="model-layout-top-title-segment"
-								href={owner_info.url}
-								title="owner"
-							>
-								{owner_info.title}
-							</a>
-							<span class="model-layout-top-title-slash">{"/"}</span>
-						</>
-					}
-				})}
-				<a
-					class="model-layout-top-title-segment"
-					href={format!("/repos/{}/", repo_id)}
-					title="repo"
-				>
-					{props.repo_title.clone()}
-				</a>
-				<span class="model-layout-top-title-slash">{"/"}</span>
-				<a
-					class="model-layout-top-title-segment"
-					href={format!("/repos/{}/models/{}/", repo_id, props.model_id.to_string())}
-					title="repo"
-				>
-					{model_heading}
-				</a>
-			</div>
-			<div class="model-layout-top-buttons-wrapper">
-				<ui::Button
-					color?={Some(ui::colors::GRAY.to_owned())}
-					href?={Some(format!("/repos/{}/models/{}/edit", repo_id, props.model_id))}
-				>
-					{"Edit"}
-				</ui::Button>
-				<ui::Button
-					download?={Some(format!("{}.tangram", props.repo_title))}
-					href?={Some(format!("/repos/{}/models/{}/download", repo_id, props.model_id))}
-				>
-					{"Download"}
-				</ui::Button>
-			</div>
-		</div>
+impl Component for ModelLayoutTop {
+	fn into_node(self) -> Node {
+		let repo_id = self.repo_id;
+		let model_id = self.model_id;
+		let model_heading = self.model_tag.unwrap_or_else(|| model_id.to_string());
+		struct OwnerInfo {
+			title: String,
+			url: String,
+		}
+		let owner_info = self.owner.map(|owner| match owner {
+			Owner::Organization { name, id } => OwnerInfo {
+				title: name,
+				url: format!("/organizations/{}", id),
+			},
+			Owner::User { email, .. } => OwnerInfo {
+				title: email,
+				url: "/user".to_owned(),
+			},
+		});
+		let owner_segment = owner_info.map(|owner_info| {
+			a().class("model-layout-top-title-segment")
+				.attribute("href", owner_info.url)
+				.attribute("title", "owner")
+				.child(owner_info.title)
+		});
+		let owner_slash = owner_segment
+			.as_ref()
+			.map(|_| span().class("model-layout-top-title-slash").child("/"));
+		let repo_segment = a()
+			.class("model-layout-top-title-segment")
+			.attribute("title", "repo")
+			.href(format!("/repos/{}/", repo_id))
+			.child(self.repo_title.clone());
+		let repo_slash = span().class("model-layout-top-title-slash").child("/");
+		let model_segment = a()
+			.class("model-layout-top-title-segment")
+			.attribute("title", "repo")
+			.href(format!(
+				"/repos/{}/models/{}/",
+				repo_id,
+				self.model_id.to_string()
+			))
+			.child(model_heading);
+		let title = div()
+			.class("model-layout-top-title-wrapper")
+			.child(owner_segment)
+			.child(owner_slash)
+			.child(repo_segment)
+			.child(repo_slash)
+			.child(model_segment);
+		let buttons = div()
+			.class("model-layout-top-buttons-wrapper")
+			.child(
+				ui::Button::new()
+					.color(Some(ui::colors::GRAY.to_owned()))
+					.href(Some(format!(
+						"/repos/{}/models/{}/edit",
+						repo_id, self.model_id
+					)))
+					.child("Edit"),
+			)
+			.child(
+				ui::Button::new()
+					.href(Some(format!(
+						"/repos/{}/models/{}/download",
+						repo_id, self.model_id
+					)))
+					.download(Some(format!("{}.tangram", self.repo_title)))
+					.child("Download"),
+			);
+		div()
+			.class("model-layout-top")
+			.child(title)
+			.child(buttons)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ModelNavItemProps {
+#[derive(ComponentBuilder)]
+pub struct ModelNav {
 	repo_id: String,
 	model_id: String,
 	selected_item: ModelNavItem,
 }
 
-#[component]
-fn ModelNav(props: ModelNavItemProps) {
-	html! {
-		<ui::Nav title?="Pages">
-			<ui::NavSection title="Overview">
-				<ui::NavItem
-					title="Overview"
-					href={Some(format!("/repos/{}/models/{}/", props.repo_id, props.model_id))}
-					selected={Some(props.selected_item == ModelNavItem::Overview)}
-				/>
-			</ui::NavSection>
-			<ui::NavSection title="Training">
-				<ui::NavItem
-					title="Grid"
-					href={Some(format!("/repos/{}/models/{}/training_grid/", props.repo_id, props.model_id))}
-					selected={Some(props.selected_item == ModelNavItem::TrainingGrid)}
-				/>
-				<ui::NavItem
-					title="Stats"
-					href={Some(format!("/repos/{}/models/{}/training_stats/", props.repo_id, props.model_id))}
-					selected={Some(props.selected_item == ModelNavItem::TrainingStats)}
-				/>
-				<ui::NavItem
-					title="Metrics"
-					href={Some(format!("/repos/{}/models/{}/training_metrics/", props.repo_id, props.model_id))}
-					selected={Some(props.selected_item == ModelNavItem::TrainingMetrics)}
-				/>
-			</ui::NavSection>
-			<ui::NavSection title="Playground">
-				<ui::NavItem
-					title="Playground"
-					href={Some(format!("/repos/{}/models/{}/playground", props.repo_id, props.model_id))}
-					selected={Some(props.selected_item == ModelNavItem::Playground)}
-				/>
-			</ui::NavSection>
-			<ui::NavSection title="Tuning">
-				<ui::NavItem
-					title="Tuning"
-					href={Some(format!("/repos/{}/models/{}/tuning", props.repo_id, props.model_id))}
-					selected={Some(props.selected_item == ModelNavItem::Tuning)}
-				/>
-			</ui::NavSection>
-			<ui::NavSection title="Production">
-				<ui::NavItem
-					title="Predictions"
-					href={Some(format!("/repos/{}/models/{}/production_predictions/", props.repo_id, props.model_id))}
-					selected={Some(props.selected_item == ModelNavItem::ProductionPredictions)}
-				/>
-				<ui::NavItem
-					title="Stats"
-					href={Some(format!("/repos/{}/models/{}/production_stats/", props.repo_id, props.model_id))}
-					selected={Some(props.selected_item == ModelNavItem::ProductionStats)}
-				/>
-				<ui::NavItem
-					title="Metrics"
-					href={Some(format!("/repos/{}/models/{}/production_metrics/", props.repo_id, props.model_id))}
-					selected={Some(props.selected_item == ModelNavItem::ProductionMetrics)}
-				/>
-			</ui::NavSection>
-		</ui::Nav>
+impl Component for ModelNav {
+	fn into_node(self) -> Node {
+		let overview = ui::NavSection::new("Overview".to_owned()).child(
+			ui::NavItem::new()
+				.title("Overview".to_owned())
+				.href(Some(format!(
+					"/repos/{}/models/{}/",
+					self.repo_id, self.model_id
+				)))
+				.selected(Some(self.selected_item == ModelNavItem::Overview)),
+		);
+		let training = ui::NavSection::new("Training".to_owned())
+			.child(
+				ui::NavItem::new()
+					.title("Grid".to_owned())
+					.href(Some(format!(
+						"/repos/{}/models/{}/training_grid/",
+						self.repo_id, self.model_id
+					)))
+					.selected(Some(self.selected_item == ModelNavItem::TrainingGrid)),
+			)
+			.child(
+				ui::NavItem::new()
+					.title("Stats".to_owned())
+					.href(Some(format!(
+						"/repos/{}/models/{}/training_stats/",
+						self.repo_id, self.model_id
+					)))
+					.selected(Some(self.selected_item == ModelNavItem::TrainingStats)),
+			)
+			.child(
+				ui::NavItem::new()
+					.title("Metrics".to_owned())
+					.href(Some(format!(
+						"/repos/{}/models/{}/training_metrics/",
+						self.repo_id, self.model_id
+					)))
+					.selected(Some(self.selected_item == ModelNavItem::TrainingMetrics)),
+			);
+		let playground = ui::NavSection::new("Playground".to_owned()).child(
+			ui::NavItem::new()
+				.title("Playground".to_owned())
+				.href(Some(format!(
+					"/repos/{}/models/{}/playground",
+					self.repo_id, self.model_id
+				)))
+				.selected(Some(self.selected_item == ModelNavItem::Playground)),
+		);
+		let tuning = ui::NavSection::new("Tuning".to_owned()).child(
+			ui::NavItem::new()
+				.title("Tuning".to_owned())
+				.href(Some(format!(
+					"/repos/{}/models/{}/tuning",
+					self.repo_id, self.model_id
+				)))
+				.selected(Some(self.selected_item == ModelNavItem::Tuning)),
+		);
+		let production = ui::NavSection::new("Production".to_owned())
+			.child(
+				ui::NavItem::new()
+					.title("Predictions".to_owned())
+					.href(Some(format!(
+						"/repos/{}/models/{}/production_predictions/",
+						self.repo_id, self.model_id
+					)))
+					.selected(Some(
+						self.selected_item == ModelNavItem::ProductionPredictions,
+					)),
+			)
+			.child(
+				ui::NavItem::new()
+					.title("Stats".to_owned())
+					.href(Some(format!(
+						"/repos/{}/models/{}/production_stats/",
+						self.repo_id, self.model_id
+					)))
+					.selected(Some(self.selected_item == ModelNavItem::ProductionStats)),
+			)
+			.child(
+				ui::NavItem::new()
+					.title("Metrics".to_owned())
+					.href(Some(format!(
+						"/repos/{}/models/{}/production_metrics/",
+						self.repo_id, self.model_id
+					)))
+					.selected(Some(self.selected_item == ModelNavItem::ProductionMetrics)),
+			);
+		ui::Nav::new()
+			.title("Pages".to_owned())
+			.child(overview)
+			.child(training)
+			.child(playground)
+			.child(tuning)
+			.child(production)
+			.into_node()
 	}
 }

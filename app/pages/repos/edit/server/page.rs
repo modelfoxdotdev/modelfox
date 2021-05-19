@@ -1,78 +1,93 @@
-use html::{component, html, Props};
-use tangram_app_common::page_heading::PageHeading;
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	app_layout::{AppLayout, AppLayoutProps},
-	document::{Document, DocumentProps},
+	app_layout::{AppLayout, AppLayoutInfo},
+	document::Document,
 };
+use tangram_app_ui::page_heading::PageHeading;
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
-	pub app_layout_props: AppLayoutProps,
+#[derive(ComponentBuilder)]
+pub struct Page {
+	pub app_layout_info: AppLayoutInfo,
 	pub title: String,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<AppLayout {props.app_layout_props}>
-				<ui::S1>
-					<PageHeading>
-						<ui::H1>
-							{props.title.clone()}
-						</ui::H1>
-					</PageHeading>
-					<UpdateTitleForm title={props.title} />
-					<DangerZone />
-				</ui::S1>
-			</AppLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		Document::new()
+			.child(
+				AppLayout::new(self.app_layout_info).child(
+					ui::S1::new()
+						.child(PageHeading::new().child(ui::H1::new().child(self.title.clone())))
+						.child(UpdateTitleForm::new(self.title))
+						.child(DangerZone::new()),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-struct UpdateTitleFormProps {
+#[derive(ComponentBuilder)]
+struct UpdateTitleForm {
 	title: String,
 }
 
-#[component]
-fn UpdateTitleForm(props: UpdateTitleFormProps) {
-	html! {
-		<ui::S2>
-			<ui::H2>{"Title"}</ui::H2>
-			<ui::Form post?={Some(true)}>
-				<input name="action" type="hidden" value="update_title" />
-				<ui::TextField
-					label?="Title"
-					name?="title"
-					value?={Some(props.title)}
-				/>
-				<ui::Button button_type?={Some(ui::ButtonType::Submit)}>
-					{"Update"}
-				</ui::Button>
-			</ui::Form>
-		</ui::S2>
+impl Component for UpdateTitleForm {
+	fn into_node(self) -> Node {
+		ui::S2::new()
+			.child(ui::H2::new().child("Title"))
+			.child(
+				ui::Form::new()
+					.post(Some(true))
+					.child(
+						input()
+							.attribute("name", "action")
+							.attribute("type", "hidden")
+							.attribute("value", "update_title"),
+					)
+					.child(
+						ui::TextField::new()
+							.label("Title".to_owned())
+							.name("title".to_owned())
+							.value(Some(self.title)),
+					)
+					.child(
+						ui::Button::new()
+							.button_type(Some(ui::ButtonType::Submit))
+							.child("Update"),
+					),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn DangerZone() {
-	html! {
-		<ui::S2>
-			<ui::H2>{"Danger Zone"}</ui::H2>
-			<ui::Form post?={Some(true)} onsubmit?="return confirm(\"Are you sure?\")">
-				<input name="action" type="hidden" value="delete" />
-				<ui::Button
-					button_type?={Some(ui::ButtonType::Submit)}
-					color?={Some(ui::colors::RED.to_owned())}
-				>
-					{"Delete"}
-				</ui::Button>
-			</ui::Form>
-		</ui::S2>
+#[derive(ComponentBuilder)]
+struct DangerZone {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for DangerZone {
+	fn into_node(self) -> Node {
+		ui::S2::new()
+			.child(ui::H2::new().child("Danger Zone"))
+			.child(
+				ui::Form::new()
+					.post(Some(true))
+					.onsubmit("return confirm(\"Are you sure?\")".to_owned())
+					.child(
+						input()
+							.attribute("name", "action")
+							.attribute("type", "hidden")
+							.attribute("value", "delete"),
+					)
+					.child(
+						ui::Button::new()
+							.button_type(Some(ui::ButtonType::Submit))
+							.color(Some(ui::colors::RED.to_owned()))
+							.child("Delete"),
+					),
+			)
+			.into_node()
 	}
 }

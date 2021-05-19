@@ -3,12 +3,12 @@ use tangram_charts::{
 	feature_contributions_chart::FeatureContributionsChart,
 };
 use wasm_bindgen::{self, prelude::*};
-use web_sys::*;
+use web_sys as dom;
 
 #[wasm_bindgen(start)]
 pub fn start() {
 	console_error_panic_hook::set_once();
-	let window = window().unwrap();
+	let window = dom::window().unwrap();
 	let document = window.document().unwrap();
 	if document.get_element_by_id("probabilities").is_some() {
 		hydrate_chart::<BarChart>("probabilities");

@@ -1,4 +1,4 @@
-use html::{component, html, style};
+use pinwheel::prelude::*;
 use tangram_charts::{
 	components::LineChart,
 	line_chart::{LineChartPoint, LineChartSeries, LineStyle, PointStyle},
@@ -6,77 +6,90 @@ use tangram_charts::{
 use tangram_finite::Finite;
 use tangram_ui as ui;
 
-#[component]
-pub fn Inspection() {
-	let accuracy = 0.8567;
-	let baseline_accuracy = 0.7553;
-	let roc_chart_series = roc_chart_series();
-	let pr_chart_series = pr_chart_series();
-	html! {
-		<div class="index-step">
-			<div>
-				<div class="index-step-title">{"Learn more about your models in your browser."}</div>
-				<div class="index-step-text">
-					{"Run "}
-					<ui::InlineCode>{"tangram app"}</ui::InlineCode>
-					{" and open "}
-					<ui::Link href="http://localhost:8080">{"http://localhost:8080"}</ui::Link>
-					{", or go to "}
-					<ui::Link href="https://app.tangram.xyz">{"https://app.tangram.xyz"}</ui::Link>
-					{", and upload the model you trained."}
-				</div>
-				<br />
-				<div class="index-step-text">
-					{"The app shows you dataset statistics, a summary of all the models that the CLI trained, the features that were most important to your model, and metrics showing how the best model performed on the test set."}
-				</div>
-			</div>
-			<ui::Window padding={Some(true)}>
-				<div class="inspection-metrics-wrapper">
-					<div style={style! { "grid-area" => "accuracy" }}>
-						<ui::NumberComparisonCard
-							color_a={Some(ui::colors::GRAY.to_owned())}
-							color_b={Some(ui::colors::BLUE.to_owned())}
-							title="Accuracy"
-							value_a={Some(baseline_accuracy)}
-							value_a_title="Baseline"
-							value_b={Some(accuracy)}
-							value_b_title="Training"
-							number_formatter={ui::NumberFormatter::default()}
-						/>
-					</div>
-					<div style={style! { "grid-area" => "pr-curve" }}>
-						<ui::Card>
-							<LineChart
-								id?="pr-curve"
-								series?={Some(pr_chart_series)}
-								title?="PR Curve"
-								x_axis_title?="Precision"
-								y_axis_title?="Recall"
-								x_max?={Some(Finite::new(1.0).unwrap())}
-								x_min?={Some(Finite::new(0.0).unwrap())}
-								y_max?={Some(Finite::new(1.0).unwrap())}
-								y_min?={Some(Finite::new(0.0).unwrap())}
-							/>
-						</ui::Card>
-					</div>
-					<div style={style! { "grid-area" => "roc-curve" }}>
-						<ui::Card>
-							<LineChart
-								id?="roc-curve"
-								x_max?={Some(Finite::new(1.0).unwrap())}
-								x_min?={Some(Finite::new(0.0).unwrap())}
-								y_max?={Some(Finite::new(1.0).unwrap())}
-								y_min?={Some(Finite::new(0.0).unwrap())}
-								series?={Some(roc_chart_series)}
-								title?="ROC Curve"
-								x_axis_title?="FPR"
-								y_axis_title?="TPR"
-							/>
-						</ui::Card>
-					</div>
-				</div>
-			</ui::Window>
-		</div>
+#[derive(ComponentBuilder)]
+pub struct Inspection {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Inspection {
+	fn into_node(self) -> Node {
+		let accuracy = 0.8567;
+		let baseline_accuracy = 0.7553;
+		let roc_chart_series = roc_chart_series();
+		let pr_chart_series = pr_chart_series();
+		let title = div()
+			.class("index-step-title")
+			.child("Learn more about your models in your browser.");
+		let p1 = div()
+			.class("index-step-text")
+			.child("Run ")
+			.child(ui::InlineCode::new().child("tangram app"))
+			.child(" and open ")
+			.child(
+				ui::Link::new()
+					.href("http://localhost:8080".to_owned())
+					.child("http://localhost:8080"),
+			)
+			.child(", or go to ")
+			.child(
+				ui::Link::new()
+					.href("https://app.tangram.xyz".to_owned())
+					.child("https://app.tangram.xyz"),
+			)
+			.child(", and upload the model you trained.");
+		let p2 = "The app shows you dataset statistics, a summary of all the models that the CLI trained, the features that were most important to your model, and metrics showing how the best model performed on the test set.";
+		let p2 = div().class("index-step-text").child(p2);
+		let left = div().child(title).child(p1).child(br()).child(p2);
+		let accuracy = div().style(style::GRID_AREA, "accuracy").child(
+			ui::NumberComparisonCard::new(Some(baseline_accuracy), Some(accuracy))
+				.color_a(Some(ui::colors::GRAY.to_owned()))
+				.color_b(Some(ui::colors::BLUE.to_owned()))
+				.number_formatter(ui::NumberFormatter::default())
+				.title("Accuracy".to_owned())
+				.value_a_title("Baseline".to_owned())
+				.value_b_title("Training".to_owned()),
+		);
+		let pr = div().style(style::GRID_AREA, "pr").child(
+			ui::Card::new().child(
+				LineChart::new()
+					.id("pr-curve".to_owned())
+					.series(Some(pr_chart_series))
+					.title("PR Curve".to_owned())
+					.x_axis_title("Precision".to_owned())
+					.x_max(Some(Finite::new(1.0).unwrap()))
+					.x_min(Some(Finite::new(0.0).unwrap()))
+					.y_axis_title("Recall".to_owned())
+					.y_max(Some(Finite::new(1.0).unwrap()))
+					.y_min(Some(Finite::new(0.0).unwrap())),
+			),
+		);
+		let roc = div().style(style::GRID_AREA, "roc").child(
+			ui::Card::new().child(
+				LineChart::new()
+					.id("roc-curve".to_owned())
+					.x_max(Some(Finite::new(1.0).unwrap()))
+					.x_min(Some(Finite::new(0.0).unwrap()))
+					.y_max(Some(Finite::new(1.0).unwrap()))
+					.y_min(Some(Finite::new(0.0).unwrap()))
+					.series(Some(roc_chart_series))
+					.title("ROC Curve".to_owned())
+					.x_axis_title("FPR".to_owned())
+					.y_axis_title("TPR".to_owned()),
+			),
+		);
+		let right = ui::Window::new().child(
+			div()
+				.class("inspection-metrics-wrapper")
+				.child(accuracy)
+				.child(pr)
+				.child(roc),
+		);
+		div()
+			.class("index-step")
+			.child(left)
+			.child(right)
+			.into_node()
 	}
 }
 

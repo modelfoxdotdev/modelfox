@@ -1,11 +1,13 @@
 use crate::layout::Layout;
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct DocsLayoutProps {
+#[derive(ComponentBuilder)]
+pub struct DocsLayout {
 	pub selected_page: DocsPage,
 	pub headings: Option<Vec<Heading>>,
+	#[children]
+	pub children: Vec<Node>,
 }
 
 pub struct Heading {
@@ -46,167 +48,235 @@ pub enum TrainPage {
 	Configuration,
 }
 
-#[component]
-pub fn DocsLayout(props: DocsLayoutProps) {
-	html! {
-		<Layout>
-			<div class="docs-layout">
-				<div class="docs-layout-left">
-					<PageNav selected_page={props.selected_page} />
-				</div>
-				<div class="docs-layout-center">
-					{children}
-				</div>
-				<div class="docs-layout-right">
-					{props.headings.map(|headings| html! {
-						<Headings headings={headings} />
-					})}
-				</div>
-			</div>
-		</Layout>
+impl Component for DocsLayout {
+	fn into_node(self) -> Node {
+		Layout::new()
+			.child(
+				div()
+					.class("docs-layout")
+					.child(
+						div()
+							.class("docs-layout-left")
+							.child(PageNav::new(self.selected_page)),
+					)
+					.child(div().class("docs-layout-center").child(self.children))
+					.child(
+						div()
+							.class("docs-layout-right")
+							.child(self.headings.map(Headings::new)),
+					),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct PageNavProps {
+#[derive(ComponentBuilder)]
+pub struct PageNav {
 	pub selected_page: DocsPage,
 }
 
-#[component]
-pub fn PageNav(props: PageNavProps) {
-	html! {
-		<ui::Nav title?="Pages">
-			<ui::NavSection title="Overview">
-				<ui::NavItem
-					title="Overview"
-					href="/docs/"
-					selected={Some(props.selected_page == DocsPage::Overview)}
-				/>
-			</ui::NavSection>
-			<ui::NavSection title="Install">
-				<ui::NavItem
-					title="Install"
-					href="/docs/install"
-					selected={Some(props.selected_page == DocsPage::Install)}
-				/>
-			</ui::NavSection>
-			<ui::NavSection title="Getting Started">
-				<ui::NavItem
-					title="Overview"
-					href="/docs/getting_started/"
-					selected={Some(props.selected_page == DocsPage::GettingStarted(GettingStartedPage::Index))}
-				/>
-				<ui::NavItem
-					title="Train"
-					href="/docs/getting_started/train"
-					selected={Some(props.selected_page == DocsPage::GettingStarted(GettingStartedPage::Train))}
-				/>
-				<ui::NavItem
-					title="Predict"
-					href="/docs/getting_started/predict/"
-					selected={Some(matches! {props.selected_page, DocsPage::GettingStarted(GettingStartedPage::Predict(_))})}
-				>
-					<ui::NavItem
-						title="Elixir"
-						href="/docs/getting_started/predict/elixir"
-						selected={Some(props.selected_page == DocsPage::GettingStarted(GettingStartedPage::Predict(PredictPage::Elixir)))}
-					/>
-					<ui::NavItem
-						title="Go"
-						href="/docs/getting_started/predict/go"
-						selected={Some(props.selected_page == DocsPage::GettingStarted(GettingStartedPage::Predict(PredictPage::Go)))}
-					/>
-					<ui::NavItem
-						title="Node"
-						href="/docs/getting_started/predict/node"
-						selected={Some(props.selected_page == DocsPage::GettingStarted(GettingStartedPage::Predict(PredictPage::Node)))}
-					/>
-					<ui::NavItem
-						title="Python"
-						href="/docs/getting_started/predict/python"
-						selected={Some(props.selected_page == DocsPage::GettingStarted(GettingStartedPage::Predict(PredictPage::Python)))}
-					/>
-					<ui::NavItem
-						title="Ruby"
-						href="/docs/getting_started/predict/ruby"
-						selected={Some(props.selected_page == DocsPage::GettingStarted(GettingStartedPage::Predict(PredictPage::Ruby)))}
-					/>
-					<ui::NavItem
-						title="Rust"
-						href="/docs/getting_started/predict/rust"
-						selected={Some(props.selected_page == DocsPage::GettingStarted(GettingStartedPage::Predict(PredictPage::Rust)))}
-					/>
-				</ui::NavItem>
-				<ui::NavItem
-					title="Inspect"
-					href="/docs/getting_started/inspect"
-					selected={Some(props.selected_page == DocsPage::GettingStarted(GettingStartedPage::Inspect))}
-				/>
-				<ui::NavItem
-					title="Monitor"
-					href="/docs/getting_started/monitor"
-					selected={Some(props.selected_page == DocsPage::GettingStarted(GettingStartedPage::Monitor))}
-				/>
-			</ui::NavSection>
-			<ui::NavSection title="Train">
-				<ui::NavItem
-					title="Configuration"
-					href="/docs/train/configuration"
-					selected={Some(props.selected_page == DocsPage::Train(TrainPage::Configuration))}
-				/>
-			</ui::NavSection>
-			<ui::NavSection title="Languages">
-				<ui::NavItem
-					title="Elixir"
-					href="/docs/languages/elixir"
-					selected={Some(false)}
-				/>
-				<ui::NavItem
-					title="Go"
-					href="/docs/languages/go"
-					selected={Some(false)}
-				/>
-				<ui::NavItem
-					title="Node.js"
-					href="/docs/languages/node"
-					selected={Some(false)}
-				/>
-				<ui::NavItem
-				  title="Python"
-					href="/docs/languages/python"
-					selected={Some(false)}
-				/>
-				<ui::NavItem
-					title="Ruby"
-					href="/docs/languages/ruby"
-					selected={Some(false)}
-				/>
-				<ui::NavItem
-					title="Rust"
-					href="/docs/languages/rust"
-					selected={Some(false)}
-				/>
-			</ui::NavSection>
-		</ui::Nav>
+impl Component for PageNav {
+	fn into_node(self) -> Node {
+		ui::Nav::new()
+			.title("Pages".to_owned())
+			.child(
+				ui::NavSection::new("Overview".to_owned()).child(
+					ui::NavItem::new()
+						.title("Overview".to_owned())
+						.href("/docs/".to_owned())
+						.selected(Some(matches!(self.selected_page, DocsPage::Overview))),
+				),
+			)
+			.child(
+				ui::NavSection::new("Install").child(
+					ui::NavItem::new()
+						.title("Install".to_owned())
+						.href("/docs/install".to_owned())
+						.selected(Some(matches!(self.selected_page, DocsPage::Install))),
+				),
+			)
+			.child(
+				ui::NavSection::new("Getting Started")
+					.child(
+						ui::NavItem::new()
+							.title("Overview".to_owned())
+							.href("/docs/getting_started/".to_owned())
+							.selected(Some(matches!(
+								self.selected_page,
+								DocsPage::GettingStarted(GettingStartedPage::Index),
+							))),
+					)
+					.child(
+						ui::NavItem::new()
+							.title("Train".to_owned())
+							.href("/docs/getting_started/train".to_owned())
+							.selected(Some(matches!(
+								self.selected_page,
+								DocsPage::GettingStarted(GettingStartedPage::Train),
+							))),
+					)
+					.child(
+						ui::NavItem::new()
+							.title("Predict".to_owned())
+							.href("/docs/getting_started/predict/".to_owned())
+							.selected(Some(matches!(
+								self.selected_page,
+								DocsPage::GettingStarted(GettingStartedPage::Predict(_))
+							)))
+							.child(
+								ui::NavItem::new()
+									.title("Elixir".to_owned())
+									.href("/docs/getting_started/predict/elixir".to_owned())
+									.selected(Some(matches!(
+										self.selected_page,
+										DocsPage::GettingStarted(GettingStartedPage::Predict(
+											PredictPage::Elixir,
+										)),
+									))),
+							)
+							.child(
+								ui::NavItem::new()
+									.title("Go".to_owned())
+									.href("/docs/getting_started/predict/go".to_owned())
+									.selected(Some(matches!(
+										self.selected_page,
+										DocsPage::GettingStarted(GettingStartedPage::Predict(
+											PredictPage::Go
+										),)
+									))),
+							)
+							.child(
+								ui::NavItem::new()
+									.title("Node".to_owned())
+									.href("/docs/getting_started/predict/node".to_owned())
+									.selected(Some(matches!(
+										self.selected_page,
+										DocsPage::GettingStarted(GettingStartedPage::Predict(
+											PredictPage::Node,
+										)),
+									))),
+							)
+							.child(
+								ui::NavItem::new()
+									.title("Python".to_owned())
+									.href("/docs/getting_started/predict/python".to_owned())
+									.selected(Some(matches!(
+										self.selected_page,
+										DocsPage::GettingStarted(GettingStartedPage::Predict(
+											PredictPage::Python,
+										)),
+									))),
+							)
+							.child(
+								ui::NavItem::new()
+									.title("Ruby".to_owned())
+									.href("/docs/getting_started/predict/ruby".to_owned())
+									.selected(Some(matches!(
+										self.selected_page,
+										DocsPage::GettingStarted(GettingStartedPage::Predict(
+											PredictPage::Ruby,
+										)),
+									))),
+							)
+							.child(
+								ui::NavItem::new()
+									.title("Rust".to_owned())
+									.href("/docs/getting_started/predict/rust".to_owned())
+									.selected(Some(matches!(
+										self.selected_page,
+										DocsPage::GettingStarted(GettingStartedPage::Predict(
+											PredictPage::Rust,
+										)),
+									))),
+							),
+					)
+					.child(
+						ui::NavItem::new()
+							.title("Inspect".to_owned())
+							.href("/docs/getting_started/inspect".to_owned())
+							.selected(Some(matches!(
+								self.selected_page,
+								DocsPage::GettingStarted(GettingStartedPage::Inspect),
+							))),
+					)
+					.child(
+						ui::NavItem::new()
+							.title("Monitor".to_owned())
+							.href("/docs/getting_started/monitor".to_owned())
+							.selected(Some(matches!(
+								self.selected_page,
+								DocsPage::GettingStarted(GettingStartedPage::Monitor),
+							))),
+					),
+			)
+			.child(
+				ui::NavSection::new("Train").child(
+					ui::NavItem::new()
+						.title("Configuration".to_owned())
+						.href("/docs/train/configuration".to_owned())
+						.selected(Some(matches!(
+							self.selected_page,
+							DocsPage::Train(TrainPage::Configuration),
+						))),
+				),
+			)
+			.child(
+				ui::NavSection::new("Languages")
+					.child(
+						ui::NavItem::new()
+							.title("Elixir".to_owned())
+							.href("/docs/languages/elixir".to_owned())
+							.selected(Some(false)),
+					)
+					.child(
+						ui::NavItem::new()
+							.title("Go".to_owned())
+							.href("/docs/languages/go".to_owned())
+							.selected(Some(false)),
+					)
+					.child(
+						ui::NavItem::new()
+							.title("Node.js".to_owned())
+							.href("/docs/languages/node".to_owned())
+							.selected(Some(false)),
+					)
+					.child(
+						ui::NavItem::new()
+							.title("Python".to_owned())
+							.href("/docs/languages/python".to_owned())
+							.selected(Some(false)),
+					)
+					.child(
+						ui::NavItem::new()
+							.title("Ruby".to_owned())
+							.href("/docs/languages/ruby".to_owned())
+							.selected(Some(false)),
+					)
+					.child(
+						ui::NavItem::new()
+							.title("Rust".to_owned())
+							.href("/docs/languages/rust".to_owned())
+							.selected(Some(false)),
+					),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct HeadingsProps {
+#[derive(ComponentBuilder)]
+pub struct Headings {
 	headings: Vec<Heading>,
 }
 
-#[component]
-fn Headings(props: HeadingsProps) {
-	html! {
-		<ui::Nav>
-			{props.headings.into_iter().map(|heading| html! {
-				<ui::NavItem
-					title={heading.title}
-					href={Some(format!("#{}", heading.id))}
-					selected={Some(false)}
-				/>
-			}).collect::<Vec<_>>()}
-		</ui::Nav>
+impl Component for Headings {
+	fn into_node(self) -> Node {
+		ui::Nav::new()
+			.children(self.headings.into_iter().map(|heading| {
+				ui::NavItem::new()
+					.title(heading.title)
+					.href(Some(format!("#{}", heading.id)))
+					.selected(Some(false))
+			}))
+			.into_node()
 	}
 }

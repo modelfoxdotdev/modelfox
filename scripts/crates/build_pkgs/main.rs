@@ -91,33 +91,33 @@ fn alpine(
 		std::fs::create_dir_all(&repo_path)?;
 		std::fs::copy(alpine_public_key_path, repo_path.join("tangram.rsa"))?;
 		let apkbuild_path = repo_path.join("APKBUILD");
-		let apkbuild = formatdoc! {
+		let apkbuild = formatdoc!(
 			r#"
-			# Contributor: Tangram <root@tangram.xyz>
-			# Maintainer: Tangram <root@tangram.xyz>
-			pkgname=tangram
-			pkgver={version}
-			pkgrel=1
-			pkgdesc="Tangram is an automated machine learning framework designed for programmers."
-			url="https://www.tangram.xyz"
-			arch={arch}
-			license="MIT"
-			source="tangram"
-			\n
-			check() {{
-				:
-			}}
-			\n
-			package() {{
-				install -D -m 755 "$srcdir"/tangram "$pkgdir"/usr/bin/tangram
-			}}
-		"#,
+				# Contributor: Tangram <root@tangram.xyz>
+				# Maintainer: Tangram <root@tangram.xyz>
+				pkgname=tangram
+				pkgver={version}
+				pkgrel=1
+				pkgdesc="Tangram is an automated machine learning framework designed for programmers."
+				url="https://www.tangram.xyz"
+				arch={arch}
+				license="MIT"
+				source="tangram"
+				\n
+				check() {{
+					:
+				}}
+				\n
+				package() {{
+					install -D -m 755 "$srcdir"/tangram "$pkgdir"/usr/bin/tangram
+				}}
+			"#,
 			version = args.version,
 			arch = match arch {
 				Arch::X8664 => "x86_64",
 				Arch::AArch64 => "aarch64",
 			},
-		};
+		);
 		std::fs::write(&apkbuild_path, &apkbuild)?;
 		let tangram_cli_dst_path = repo_path.join("tangram");
 		let target = match arch {
@@ -137,7 +137,7 @@ fn alpine(
 		rm -rf src pkg
 	"#;
 		cmd!(
-			"podman",
+			"docker",
 			"run",
 			"-i",
 			"--rm",
@@ -217,7 +217,7 @@ fn deb(
 		for distribution_version in distribution_versions {
 			// Write the .list file.
 			let list_path = repo_path.join(format!("{}.list", distribution_version));
-			let list_file = formatdoc! {
+			let list_file = formatdoc!(
 				r#"
 					# tangram packages for {1} {2}
 					deb {0}/stable/{1} {2} main
@@ -225,7 +225,7 @@ fn deb(
 				args.url,
 				distribution,
 				distribution_version
-			};
+			);
 			std::fs::write(list_path, list_file)?;
 			// Copy the public key.
 			let public_key_path = repo_path.join(format!("{}.gpg", distribution_version));
@@ -254,7 +254,7 @@ fn deb(
 				let mut packages_file = String::new();
 				for deb in debs.iter() {
 					let deb_bytes = std::fs::read(&deb.path)?;
-					let packages_entry = formatdoc! {
+					let packages_entry = formatdoc!(
 						r#"
 							Package: tangram
 							Version: {version}
@@ -274,7 +274,7 @@ fn deb(
 						md5 = hex::encode(Md5::digest(&deb_bytes)),
 						sha1 = hex::encode(Sha1::digest(&deb_bytes)),
 						sha256 = hex::encode(Sha256::digest(&deb_bytes)),
-					};
+					);
 					packages_file.push_str(&packages_entry);
 					packages_file.push('\n');
 				}
@@ -300,26 +300,26 @@ fn deb(
 			}
 			// Write the Release file.
 			let release_file_path = distribution_path.join("Release");
-			let release_file = formatdoc! {
+			let release_file = formatdoc!(
 				r#"
-				Codename: {}
-				Architectures: amd64
-				Components: main
-				Date: {}
-				Description: Packages from Tangram, Inc. (https://www.tangram.xyz)
-				MD5Sum:
-				{}
-				SHA1:
-				{}
-				SHA256:
-				{}
-			"#,
+					Codename: {}
+					Architectures: amd64
+					Components: main
+					Date: {}
+					Description: Packages from Tangram, Inc. (https://www.tangram.xyz)
+					MD5Sum:
+					{}
+					SHA1:
+					{}
+					SHA256:
+					{}
+				"#,
 				distribution_version,
 				chrono::Utc::now().to_rfc2822(),
 				md5_lines.join("\n"),
 				sha1_lines.join("\n"),
 				sha256_lines.join("\n"),
-			};
+			);
 			std::fs::write(&release_file_path, &release_file)?;
 			// Write the Release.gpg file.
 			cmd!(
@@ -396,7 +396,7 @@ fn rpm(
 		let distribution_version_with_leading_slash = distribution_version
 			.map(|v| format!("/{}", v))
 			.unwrap_or_else(|| "".to_owned());
-		let repo_file = formatdoc! {
+		let repo_file = formatdoc!(
 			r#"
 				[tangram]
 				name=Tangram
@@ -410,7 +410,7 @@ fn rpm(
 			args.url,
 			distribution,
 			distribution_version_with_leading_slash,
-		};
+		);
 		std::fs::write(repo_file_path, repo_file)?;
 		// Copy the rpm public key.
 		std::fs::copy(rpm_public_key_path, repo_path.join("repo.gpg"))?;

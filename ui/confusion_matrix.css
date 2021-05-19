@@ -1,76 +1,76 @@
 .confusion-matrix-wrapper {
-  display: grid;
-  grid: auto 1fr 1fr / auto 1fr 1fr;
-  gap: 1rem;
-  grid-template-areas:
-    "empty actual-true-label actual-false-label"
-    "predicted-true-label true-positive false-positive"
-    "predicted-false-label false-negative true-negative";
-  max-width: 100%;
-  overflow: auto;
+	display: grid;
+	grid: auto 1fr 1fr / auto 1fr 1fr;
+	gap: 1rem;
+	grid-template-areas:
+		"empty actual-true-label actual-false-label"
+		"predicted-true-label true-positive false-positive"
+		"predicted-false-label false-negative true-negative";
+	max-width: 100%;
+	overflow: auto;
 }
 
 .confusion-matrix-item-wrapper {
-  align-content: center;
-  border: var(--border);
-  border-radius: var(--border-radius);
-  display: grid;
-  gap: 1rem;
-  justify-content: center;
-  justify-items: center;
-  padding: 2rem;
-  text-align: center;
+	align-content: center;
+	border: var(--border);
+	border-radius: var(--border-radius);
+	display: grid;
+	gap: 1rem;
+	justify-content: center;
+	justify-items: center;
+	padding: 1rem;
+	text-align: center;
 }
 
 .confusion-matrix-item-correct-wrapper {
-  background-color: var(--header-color);
-  color: var(--text-color);
+	background-color: var(--header-color);
+	color: var(--text-color);
 }
 
 .confusion-matrix-item-incorrect-wrapper {
-  background-color: var(--surface-color);
-  color: var(--text-color);
+	background-color: var(--surface-color);
+	color: var(--text-color);
 }
 
 @media (min-width: 1200px) {
-  .confusion-matrix-item-title {
-    font-size: 1.25rem;
-  }
+	.confusion-matrix-item-title {
+		font-size: 1.25rem;
+	}
 }
 
 @media (max-width: 1199px) {
-  .confusion-matrix-item-title {
-    font-size: 1rem;
-  }
+	.confusion-matrix-item-title {
+		font-size: 1rem;
+	}
 }
 
 @media (min-width: 1200px) {
-  .confusion-matrix-item-value {
-    font-size: 2rem;
-  }
+	.confusion-matrix-item-value {
+		font-size: 2rem;
+	}
 }
 
 @media (max-width: 1199px) {
-  .confusion-matrix-item-value {
-    font-size: 1.5rem;
-  }
+	.confusion-matrix-item-value {
+		font-size: 1.5rem;
+	}
 }
 
 @media (min-width: 1200px) {
-  .confusion-matrix-item-percent {
-    font-size: 1.25rem;
-  }
+	.confusion-matrix-item-percent {
+		font-size: 1.25rem;
+	}
 }
 
 @media (max-width: 1199px) {
-  .confusion-matrix-item-percent {
-    font-size: 1rem;
-  }
+	.confusion-matrix-item-percent {
+		font-size: 1rem;
+	}
 }
 
 .confusion-matrix-label {
-  align-self: center;
-  display: grid;
-  gap: 0.25rem;
-  justify-items: center;
+	align-self: center;
+	display: grid;
+	gap: 0.25rem;
+	justify-items: center;
 }

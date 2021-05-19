@@ -61,8 +61,8 @@ pub async fn main() {
 				.to_owned();
 			let mut cmd_args = vec![
 				"run".to_owned(),
-				"--bin".to_owned(),
-				"tangram".to_owned(),
+				"-p".to_owned(),
+				"tangram_cli".to_owned(),
 				"--".to_owned(),
 				"app".to_owned(),
 			];
@@ -78,9 +78,10 @@ pub async fn main() {
 				.to_owned();
 			let mut cmd_args = vec![
 				"run".to_owned(),
-				"--bin".to_owned(),
+				"-p".to_owned(),
 				"tangram_www".to_owned(),
 				"--".to_owned(),
+				"serve".to_owned(),
 			];
 			cmd_args.extend(args.args);
 			(cmd, cmd_args)
@@ -125,7 +126,7 @@ pub async fn main() {
 					child.kill().ok();
 					child.wait().unwrap();
 				}
-				// // Start the new process.
+				// Start the new process.
 				let notify = Arc::new(Notify::new());
 				let child = std::process::Command::new(&cmd)
 					.args(&cmd_args)

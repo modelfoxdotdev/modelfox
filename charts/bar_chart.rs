@@ -12,7 +12,7 @@ use crate::{
 use itertools::Itertools;
 use num::ToPrimitive;
 use tangram_number_formatter::NumberFormatter;
-use web_sys::*;
+use web_sys as dom;
 
 pub struct BarChart;
 
@@ -292,7 +292,7 @@ fn draw_bar_chart(
 struct DrawBarOptions<'a> {
 	chart_config: &'a ChartConfig,
 	color: &'a str,
-	ctx: &'a CanvasRenderingContext2d,
+	ctx: &'a dom::CanvasRenderingContext2d,
 	rect: Rect,
 }
 
@@ -331,7 +331,7 @@ pub struct DrawBarChartXAxisLabelsOptions<'a> {
 	pub chart_colors: &'a ChartColors,
 	pub rect: Rect,
 	pub categories: &'a [&'a String],
-	pub ctx: &'a CanvasRenderingContext2d,
+	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub group_width: f64,
 	pub width: f64,
 }

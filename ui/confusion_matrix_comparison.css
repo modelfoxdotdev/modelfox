@@ -1,64 +1,64 @@
 .confusion-matrix-comparison-wrapper {
-  display: grid;
-  grid: auto 1fr 1fr / auto 1fr 1fr;
-  gap: 1rem;
-  grid-template-areas:
-    "empty actual-true-label actual-false-label"
-    "predicted-true-label true-positive false-positive"
-    "predicted-false-label false-negative true-negative";
-  max-width: 100%;
-  overflow: auto;
+	display: grid;
+	grid: auto 1fr 1fr / auto 1fr 1fr;
+	gap: 1rem;
+	grid-template-areas:
+		"empty actual-true-label actual-false-label"
+		"predicted-true-label true-positive false-positive"
+		"predicted-false-label false-negative true-negative";
+	max-width: 100%;
+	overflow: auto;
 }
 
 .confusion-matrix-comparison-item-wrapper {
-  align-content: center;
-  border: var(--border);
-  border-radius: var(--border-radius);
-  display: grid;
-  gap: 1rem;
-  justify-content: center;
-  justify-items: center;
-  padding: 2rem;
-  text-align: center;
+	align-content: center;
+	border: var(--border);
+	border-radius: var(--border-radius);
+	display: grid;
+	gap: 1rem;
+	justify-content: center;
+	justify-items: center;
+	padding: 1rem;
+	text-align: center;
 }
 
 .confusion-matrix-comparison-item-correct-wrapper {
-  background-color: var(--header-color);
-  color: var(--text-color);
+	background-color: var(--header-color);
+	color: var(--text-color);
 }
 
 .confusion-matrix-comparison-item-incorrect-wrapper {
-  background-color: var(--surface-color);
-  color: var(--text-color);
+	background-color: var(--surface-color);
+	color: var(--text-color);
 }
 
 .confusion-matrix-comparison-number-comparison-wrapper {
-  align-items: center;
-  display: grid;
-  column-gap: 2rem;
-  row-gap: 0.5rem;
-  grid-template-columns: auto auto;
-  justify-content: center;
-  justify-items: center;
+	align-items: center;
+	display: grid;
+	column-gap: 2rem;
+	row-gap: 0.5rem;
+	grid-template-columns: auto auto;
+	justify-content: center;
+	justify-items: center;
 }
 
 .confusion-matrix-comparison-item-title {
-  font-size: 1.25rem;
+	font-size: 1.25rem;
 }
 
 .confusion-matrix-comparison-item-value {
-  font-size: 2rem;
+	font-size: 2rem;
 }
 
 @media (max-width: 1199px) {
-  .confusion-matrix-comparison-item-value {
-    font-size: 1.5rem;
-  }
+	.confusion-matrix-comparison-item-value {
+		font-size: 1.5rem;
+	}
 }
 
 .confusion-matrix-comparison-label {
-  align-self: center;
-  display: grid;
-  gap: 0.25rem;
-  justify-items: center;
+	align-self: center;
+	display: grid;
+	gap: 0.25rem;
+	justify-items: center;
 }

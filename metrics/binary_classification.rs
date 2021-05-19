@@ -79,14 +79,10 @@ impl BinaryClassificationMetrics {
 	pub fn new(n_thresholds: usize) -> BinaryClassificationMetrics {
 		// The number of thresholds must be odd so that 0.5 is the middle threshold.
 		assert!(n_thresholds % 2 == 1);
-		let mut confusion_matrices_for_thresholds = vec![(0.0, BinaryConfusionMatrix::new())];
-		(0..n_thresholds)
+		let confusion_matrices_for_thresholds = (0..n_thresholds)
 			.map(|i| (i + 1).to_f32().unwrap() * (1.0 / (n_thresholds.to_f32().unwrap() + 1.0)))
-			.for_each(|threshold| {
-				confusion_matrices_for_thresholds.push((threshold, BinaryConfusionMatrix::new()))
-			});
-		// Push a dummy threshold so there is a (0, 0) point on the roc curve
-		confusion_matrices_for_thresholds.push((2.0, BinaryConfusionMatrix::new()));
+			.map(|threshold| (threshold, BinaryConfusionMatrix::new()))
+			.collect();
 		BinaryClassificationMetrics {
 			confusion_matrices_for_thresholds,
 		}

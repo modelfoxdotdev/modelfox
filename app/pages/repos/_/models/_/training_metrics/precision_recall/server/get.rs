@@ -1,5 +1,5 @@
-use crate::page::{Page, PageProps, PrecisionRecallPoint};
-use html::html;
+use crate::page::{Page, PrecisionRecallPoint};
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -8,7 +8,7 @@ use tangram_app_common::{
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
+use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
@@ -16,7 +16,7 @@ pub async fn get(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let model_id = if let &["repos", _, "models", model_id, "training_metrics", "precision_recall"] =
+	let model_id = if let ["repos", _, "models", model_id, "training_metrics", "precision_recall"] =
 		path_components(&request).as_slice()
 	{
 		model_id.to_owned()
@@ -61,15 +61,15 @@ pub async fn get(
 			},
 		)
 		.collect();
-	let model_layout_props =
-		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::TrainingMetrics).await?;
-	let props = PageProps {
+	let model_layout_info =
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::TrainingMetrics).await?;
+	let page = Page {
 		class: model.positive_class().to_owned(),
 		precision_recall_curve_series,
 		id: model_id.to_string(),
-		model_layout_props,
+		model_layout_info,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

@@ -13,7 +13,7 @@ use crate::{
 use num::ToPrimitive;
 use tangram_number_formatter::NumberFormatter;
 use wasm_bindgen::JsValue;
-use web_sys::*;
+use web_sys as dom;
 
 pub struct BoxChart;
 
@@ -328,7 +328,7 @@ struct DrawBoxOptions<'a> {
 	box_group_width: f64,
 	chart_rect: Rect,
 	chart_config: &'a ChartConfig,
-	ctx: &'a CanvasRenderingContext2d,
+	ctx: &'a dom::CanvasRenderingContext2d,
 	data: &'a [BoxChartSeries],
 	point: &'a BoxChartPoint,
 	point_index: usize,
@@ -641,7 +641,7 @@ fn box_chart_hover_region(
 
 struct DrawLineOptions<'a> {
 	color: Option<&'a str>,
-	ctx: &'a CanvasRenderingContext2d,
+	ctx: &'a dom::CanvasRenderingContext2d,
 	dashed: Option<bool>,
 	end: Point,
 	line_cap: Option<&'a str>,

@@ -1,44 +1,35 @@
-use html::{component, html};
+use pinwheel::prelude::*;
 use tangram_ui as ui;
 use tangram_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage, GettingStartedPage},
-	document::{Document, DocumentProps},
+	document::Document,
 };
 
-#[component]
-pub fn Page() {
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<DocsLayout selected_page={DocsPage::GettingStarted(GettingStartedPage::Index)} headings={None}>
-				<ui::S1>
-					<ui::H1>{"Getting Started"}</ui::H1>
-					<ui::S2>
-						<ui::P>
-							{"Thanks for trying Tangram!"}
-						</ui::P>
-						<ui::P>
-							{"In this getting started guide, we will:"}
-						</ui::P>
-						<ui::List>
-							<ui::ListItem>
-								{"Train a model with the Tangram CLI to predict whether cardiac patients have heart disease."}
-							</ui::ListItem>
-							<ui::ListItem>
-								{"Make predictions using the Tangram language libraries."}
-							</ui::ListItem>
-							<ui::ListItem>
-								{"Learn more about our model with the Tangram web app."}
-							</ui::ListItem>
-							<ui::ListItem>
-								{"Set up production monitoring and debug our model's performance."}
-							</ui::ListItem>
-						</ui::List>
-					</ui::S2>
-				</ui::S1>
-			</DocsLayout>
-		</Document>
+#[derive(ComponentBuilder)]
+pub struct Page {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Page {
+	fn into_node(self) -> Node {
+		let list = ui::UnorderedList::new().child(ui::ListItem::new().child("Train a model with the Tangram CLI to predict whether cardiac patients have heart disease.")).child(ui::ListItem::new().child("Make predictions using the Tangram language libraries.")).child(ui::ListItem::new().child("Learn more about our model with the Tangram web app.")).child(ui::ListItem::new().child("Set up production monitoring and debug our model's performance."));
+		let prev_next_buttons = div().class("docs-prev-next-buttons").child(div()).child(
+			ui::Link::new()
+				.href("train".to_owned())
+				.child("Next: Train a Model. >"),
+		);
+		let content = ui::S1::new()
+			.child(ui::H1::new().child("Getting Started"))
+			.child(
+				ui::S2::new()
+					.child(ui::P::new().child("Thanks for trying Tangram!"))
+					.child(ui::P::new().child("In this getting started guide, we will:"))
+					.child(list),
+			)
+			.child(prev_next_buttons);
+		let layout = DocsLayout::new(DocsPage::GettingStarted(GettingStartedPage::Index), None)
+			.child(content);
+		Document::new().child(layout).into_node()
 	}
 }

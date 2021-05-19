@@ -1,10 +1,10 @@
-use html::{component, html, Props};
 use num::ToPrimitive;
-use tangram_app_common::{
+use pinwheel::prelude::*;
+use tangram_app_ui::{
+	colors::{PRODUCTION_COLOR, TRAINING_COLOR},
 	date_window::DateWindow,
 	metrics_row::MetricsRow,
 	time::overall_chart_title,
-	tokens::{PRODUCTION_COLOR, TRAINING_COLOR},
 };
 use tangram_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
@@ -12,13 +12,13 @@ use tangram_charts::{
 };
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct EnumColumnProps {
+#[derive(ComponentBuilder)]
+pub struct EnumColumn {
 	pub alert: Option<String>,
-	pub counts_section_props: EnumColumnCountsSectionProps,
-	pub stats_section_props: EnumColumnStatsSectionProps,
-	pub unique_values_section_props: EnumColumnUniqueValuesSectionProps,
-	pub invalid_values_section_props: EnumColumnInvalidValuesSectionProps,
+	pub counts_section: EnumColumnCountsSection,
+	pub stats_section: EnumColumnStatsSection,
+	pub unique_values_section: EnumColumnUniqueValuesSection,
+	pub invalid_values_section: EnumColumnInvalidValuesSection,
 }
 
 pub struct EnumColumnOverallHistogramEntry {
@@ -28,127 +28,125 @@ pub struct EnumColumnOverallHistogramEntry {
 	pub training_fraction: f32,
 }
 
-#[component]
-pub fn EnumColumn(props: EnumColumnProps) {
-	html! {
-		<>
-			{props.alert.map(|alert| html! {
-				<ui::Alert level={ui::Level::Danger}>
-					{alert}
-				</ui::Alert>
-			})}
-			<EnumStatsSection {props.stats_section_props} />
-			<EnumCountsSection {props.counts_section_props} />
-			<EnumUniqueValuesSection {props.unique_values_section_props} />
-			<EnumInvalidValuesSection {props.invalid_values_section_props} />
-		</>
+impl Component for EnumColumn {
+	fn into_node(self) -> Node {
+		fragment()
+			.child(
+				self.alert
+					.map(|alert| ui::Alert::new(ui::Level::Danger).child(alert)),
+			)
+			.child(self.stats_section)
+			.child(self.counts_section)
+			.child(self.unique_values_section)
+			.child(self.invalid_values_section)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct EnumColumnStatsSectionProps {
+#[derive(ComponentBuilder)]
+pub struct EnumColumnStatsSection {
 	pub overall_chart_data: Vec<(String, EnumColumnOverallHistogramEntry)>,
 	pub column_name: String,
 	pub date_window: DateWindow,
 }
 
-#[component]
-pub fn EnumStatsSection(props: EnumColumnStatsSectionProps) {
-	let overall_chart_series = vec![
-		BarChartSeries {
-			color: TRAINING_COLOR.to_owned(),
-			data: props
-				.overall_chart_data
-				.iter()
-				.enumerate()
-				.map(|(index, (label, value))| BarChartPoint {
-					label: label.to_owned(),
-					x: index.to_f64().unwrap(),
-					y: Some(value.training_fraction.to_f64().unwrap()),
-				})
-				.collect(),
-			title: Some("Training".to_owned()),
-		},
-		BarChartSeries {
-			color: PRODUCTION_COLOR.to_owned(),
-			data: props
-				.overall_chart_data
-				.iter()
-				.enumerate()
-				.map(|(index, (label, value))| BarChartPoint {
-					label: label.to_owned(),
-					x: index.to_f64().unwrap(),
-					y: value
-						.production_fraction
-						.map(|production_fraction| production_fraction.to_f64().unwrap()),
-				})
-				.collect(),
-			title: Some("Production".to_owned()),
-		},
-	];
-	let overall_distribution_chart_title = overall_chart_title(
-		&props.date_window,
-		format!("Distribution of Unique Values for {}", props.column_name),
-	);
-	html! {
-		<ui::Card>
-			<BarChart
-				id?="enum_overall"
-				series?={Some(overall_chart_series)}
-				title?={Some(overall_distribution_chart_title)}
-				x_axis_title?={Some(props.column_name)}
-				y_axis_title?="Percent"
-				y_max?={Some(1.0)}
-				y_min?={Some(0.0)}
-			/>
-		</ui::Card>
+impl Component for EnumColumnStatsSection {
+	fn into_node(self) -> Node {
+		let overall_chart_series = vec![
+			BarChartSeries {
+				color: TRAINING_COLOR.to_owned(),
+				data: self
+					.overall_chart_data
+					.iter()
+					.enumerate()
+					.map(|(index, (label, value))| BarChartPoint {
+						label: label.to_owned(),
+						x: index.to_f64().unwrap(),
+						y: Some(value.training_fraction.to_f64().unwrap()),
+					})
+					.collect(),
+				title: Some("Training".to_owned()),
+			},
+			BarChartSeries {
+				color: PRODUCTION_COLOR.to_owned(),
+				data: self
+					.overall_chart_data
+					.iter()
+					.enumerate()
+					.map(|(index, (label, value))| BarChartPoint {
+						label: label.to_owned(),
+						x: index.to_f64().unwrap(),
+						y: value
+							.production_fraction
+							.map(|production_fraction| production_fraction.to_f64().unwrap()),
+					})
+					.collect(),
+				title: Some("Production".to_owned()),
+			},
+		];
+		let overall_distribution_chart_title = overall_chart_title(
+			&self.date_window,
+			format!("Distribution of Unique Values for {}", self.column_name),
+		);
+		ui::Card::new()
+			.child(
+				BarChart::new()
+					.id("enum_overall".to_owned())
+					.series(Some(overall_chart_series))
+					.title(Some(overall_distribution_chart_title))
+					.x_axis_title(Some(self.column_name))
+					.y_axis_title("Percent".to_owned())
+					.y_max(Some(1.0))
+					.y_min(Some(0.0)),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct EnumColumnCountsSectionProps {
+#[derive(ComponentBuilder)]
+pub struct EnumColumnCountsSection {
 	pub absent_count: u64,
 	pub invalid_count: u64,
 	pub row_count: u64,
 }
 
-#[component]
-pub fn EnumCountsSection(props: EnumColumnCountsSectionProps) {
-	html! {
-		<MetricsRow>
-			<ui::NumberCard
-				title="Row Count"
-				value={props.row_count.to_string()}
-			/>
-			<ui::NumberCard
-				title="Absent Count"
-				value={props.absent_count.to_string()}
-			/>
-			<ui::NumberCard
-				title="Invalid Count"
-				value={props.invalid_count.to_string()}
-			/>
-		</MetricsRow>
+impl Component for EnumColumnCountsSection {
+	fn into_node(self) -> Node {
+		MetricsRow::new()
+			.child(ui::NumberCard::new(
+				"Row Count".to_owned(),
+				self.row_count.to_string(),
+			))
+			.child(ui::NumberCard::new(
+				"Absent Count".to_owned(),
+				self.absent_count.to_string(),
+			))
+			.child(ui::NumberCard::new(
+				"Invalid Count".to_owned(),
+				self.invalid_count.to_string(),
+			))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct EnumColumnUniqueValuesSectionProps {
-	pub enum_unique_values_table_props: EnumUniqueValuesTableProps,
+#[derive(ComponentBuilder)]
+pub struct EnumColumnUniqueValuesSection {
+	pub enum_unique_values_table: EnumUniqueValuesTable,
 }
 
-#[component]
-pub fn EnumUniqueValuesSection(props: EnumColumnUniqueValuesSectionProps) {
-	html! {
-		<ui::S2>
-			<ui::H2>{"Unique Values"}</ui::H2>
-			<EnumUniqueValuesTable {props.enum_unique_values_table_props} />
-		</ui::S2>
+impl Component for EnumColumnUniqueValuesSection {
+	fn into_node(self) -> Node {
+		ui::S2::new()
+			.child(ui::H2::new().child("Unique Values"))
+			.child(EnumUniqueValuesTable::new(
+				self.enum_unique_values_table.rows,
+			))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct EnumUniqueValuesTableProps {
+#[derive(ComponentBuilder)]
+pub struct EnumUniqueValuesTable {
 	pub rows: Vec<EnumUniqueValuesTableRow>,
 }
 
@@ -160,75 +158,57 @@ pub struct EnumUniqueValuesTableRow {
 	pub production_fraction: Option<f32>,
 }
 
-#[component]
-pub fn EnumUniqueValuesTable(props: EnumUniqueValuesTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-						{"Value"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Training Count"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Production Count"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Training Fraction"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Production Fraction"}
-					</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-				{props.rows.iter().map(|row| html! {
-					<ui::TableRow>
-						<ui::TableCell>
-							{row.name.to_owned()}
-						</ui::TableCell>
-						<ui::TableCell>
-							{row.training_count.to_string()}
-						</ui::TableCell>
-						<ui::TableCell>
-							{row.production_count.to_string()}
-						</ui::TableCell>
-						<ui::TableCell>
-							{ui::format_percent(row.training_fraction)}
-						</ui::TableCell>
-						<ui::TableCell>
-							{ui::format_option_percent(row.production_fraction)}
-						</ui::TableCell>
-					</ui::TableRow>
-				}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+impl Component for EnumUniqueValuesTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new()
+						.child(ui::TableHeaderCell::new().child("Value"))
+						.child(ui::TableHeaderCell::new().child("Training Count"))
+						.child(ui::TableHeaderCell::new().child("Production Count"))
+						.child(ui::TableHeaderCell::new().child("Training Fraction"))
+						.child(ui::TableHeaderCell::new().child("Production Fraction")),
+				),
+			)
+			.child(ui::TableBody::new().children(self.rows.iter().map(|row| {
+				ui::TableRow::new()
+					.child(ui::TableCell::new().child(row.name.to_owned()))
+					.child(ui::TableCell::new().child(row.training_count.to_string()))
+					.child(ui::TableCell::new().child(row.production_count.to_string()))
+					.child(ui::TableCell::new().child(ui::format_percent(row.training_fraction)))
+					.child(
+						ui::TableCell::new()
+							.child(ui::format_option_percent(row.production_fraction)),
+					)
+			})))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct EnumColumnInvalidValuesSectionProps {
-	pub enum_invalid_values_table_props: Option<EnumInvalidValuesTableProps>,
+#[derive(ComponentBuilder)]
+pub struct EnumColumnInvalidValuesSection {
+	pub enum_invalid_values_table: Option<EnumInvalidValuesTable>,
 }
 
-#[component]
-pub fn EnumInvalidValuesSection(props: EnumColumnInvalidValuesSectionProps) {
-	html! {
-		<>
-		{props.enum_invalid_values_table_props.map(|enum_invalid_values_table_props| html! {
-			<ui::S2>
-				<ui::H2>{"Invalid Values"}</ui::H2>
-				<EnumInvalidValuesTable {enum_invalid_values_table_props} />
-			</ui::S2>
-			})}
-		</>
+impl Component for EnumColumnInvalidValuesSection {
+	fn into_node(self) -> Node {
+		fragment()
+			.child(
+				self.enum_invalid_values_table
+					.map(|enum_invalid_values_table| {
+						ui::S2::new()
+							.child(ui::H2::new().child("Invalid Values"))
+							.child(enum_invalid_values_table)
+					}),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct EnumInvalidValuesTableProps {
+#[derive(ComponentBuilder)]
+pub struct EnumInvalidValuesTable {
 	pub rows: Vec<EnumInvalidValuesTableRow>,
 }
 
@@ -238,38 +218,28 @@ pub struct EnumInvalidValuesTableRow {
 	pub production_fraction: f32,
 }
 
-#[component]
-pub fn EnumInvalidValuesTable(props: EnumInvalidValuesTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-						{"Value"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Count"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Production Fraction"}
-					</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-			{props.rows.into_iter().map(|row| html! {
-				<ui::TableRow>
-					<ui::TableCell>
-						{row.name}
-					</ui::TableCell>
-					<ui::TableCell>
-						{row.count.to_string()}
-					</ui::TableCell>
-					<ui::TableCell>
-						{ui::format_percent(row.production_fraction)}
-					</ui::TableCell>
-				</ui::TableRow>
-			}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+impl Component for EnumInvalidValuesTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new()
+						.child(ui::TableHeaderCell::new().child("Value"))
+						.child(ui::TableHeaderCell::new().child("Count"))
+						.child(ui::TableHeaderCell::new().child("Production Fraction")),
+				),
+			)
+			.child(
+				ui::TableBody::new().children(self.rows.into_iter().map(|row| {
+					ui::TableRow::new()
+						.child(ui::TableCell::new().child(row.name))
+						.child(ui::TableCell::new().child(row.count.to_string()))
+						.child(
+							ui::TableCell::new().child(ui::format_percent(row.production_fraction)),
+						)
+				})),
+			)
+			.into_node()
 	}
 }

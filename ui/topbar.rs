@@ -1,176 +1,189 @@
-use super::Button;
-use html::{component, html, style, Props};
+use crate::Button;
+use pinwheel::prelude::*;
 
-#[derive(Props)]
-pub struct TopbarProps {
-	pub background_color: String,
-	pub dropdown_background_color: String,
+#[derive(ComponentBuilder)]
+pub struct Topbar {
+	#[optional]
+	pub background_color: Option<String>,
+	#[optional]
+	pub dropdown_background_color: Option<String>,
+	#[optional]
 	pub items: Option<Vec<TopbarItem>>,
-	pub logo: Option<html::Node>,
+	#[optional]
 	pub logo_href: Option<String>,
+	#[optional]
 	pub logo_img_url: Option<String>,
+	#[optional]
+	pub logo: Option<Node>,
+	#[optional]
 	pub title: Option<String>,
 }
 
 pub struct TopbarItem {
-	pub element: Option<html::Node>,
+	pub element: Option<Node>,
 	pub href: String,
 	pub title: String,
 }
 
-#[component]
-pub fn Topbar(props: TopbarProps) {
-	let dropdown_background_color = &props.dropdown_background_color;
-	let dropdown = props.items.as_ref().map(|items| {
-		let items: Vec<TopbarDropdownItem> = items
-			.iter()
-			.map(|item| TopbarDropdownItem {
-				href: item.href.clone(),
-				title: item.title.clone(),
-			})
-			.collect();
-		html! {
-			<details class="topbar-details">
-				<summary>
-					<TopbarHamburger />
-				</summary>
-				<TopbarDropdown
-					background_color={dropdown_background_color.to_owned()}
-					cta={None}
-					items={items}
-				/>
-			</details>
-		}
-	});
-	let items = props.items.map(|items| {
-		html! {
-			<TopbarItemsWrapper>
-				{items.into_iter().map(|item| {
-					if let Some(element) = item.element {
-						element
-					} else {
-						html! {
-							<a class="topbar-link" href={item.href}>
-								{item.title}
-							</a>
-						}
-					}
-				}).collect::<Vec<_>>()}
-			</TopbarItemsWrapper>
-		}
-	});
-	let wrapper_style = style! {
-		"background-color" => props.background_color,
-	};
-	html! {
-		<div class="topbar-wrapper" style={wrapper_style}>
-			<TopbarBrand
-				logo_element={props.logo}
-				logo_href={props.logo_href}
-				logo_img_url={props.logo_img_url}
-				title={props.title}
-			/>
-			{items}
-			{dropdown}
-		</div>
+impl Component for Topbar {
+	fn into_node(self) -> Node {
+		let dropdown = self.items.as_ref().map(|items| {
+			let items: Vec<TopbarDropdownItem> = items
+				.iter()
+				.map(|item| TopbarDropdownItem {
+					href: item.href.clone(),
+					title: item.title.clone(),
+				})
+				.collect();
+			details()
+				.class("topbar-details")
+				.child(summary().child(TopbarHamburger::new()))
+				.child(
+					TopbarDropdown::new(items)
+						.background_color(self.dropdown_background_color.clone()),
+				)
+		});
+		let items = self.items.map(|items| {
+			TopbarItemsWrapper::new().children(items.into_iter().map(|item| {
+				if let Some(element) = item.element {
+					element
+				} else {
+					a().class("topbar-link")
+						.attribute("href", item.href)
+						.child(item.title)
+						.into_node()
+				}
+			}))
+		});
+		div()
+			.class("topbar-wrapper")
+			.style(style::BACKGROUND_COLOR, self.background_color)
+			.child(TopbarBrand::new(
+				self.logo,
+				self.logo_href,
+				self.logo_img_url,
+				self.title,
+			))
+			.child(items)
+			.child(dropdown)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct TopbarBrandProps {
-	logo_element: Option<html::Node>,
+#[derive(ComponentBuilder)]
+pub struct TopbarBrand {
+	logo_element: Option<Node>,
 	logo_href: Option<String>,
 	logo_img_url: Option<String>,
 	title: Option<String>,
 }
 
-#[component]
-fn TopbarBrand(props: TopbarBrandProps) {
-	html! {
-		<a class="topbar-link" href={props.logo_href.unwrap_or_else(|| "/".to_owned())}>
-			<div class="topbar-brand-wrapper">
-				{if let Some(logo_img_url) = props.logo_img_url {
-					html! {
-						<img class="topbar-brand-img" srcset={format!("{} 3x", logo_img_url)} />
-					}
-				} else {
-					html! {
-						<div class="topbar-brand-svg">{props.logo_element}</div>
-					}
-				}}
-				{props.title.map(|title| html! {
-					<div class="topbar-brand-title">
-						{title}
-					</div>
-				})}
-			</div>
-		</a>
+impl Component for TopbarBrand {
+	fn into_node(self) -> Node {
+		let logo = if let Some(logo_img_url) = self.logo_img_url {
+			img()
+				.class("topbar-brand-img")
+				.attribute("srcset", format!("{} 3x", logo_img_url))
+				.into_node()
+		} else {
+			div()
+				.class("topbar-brand-svg")
+				.child(self.logo_element)
+				.into_node()
+		};
+		a().class("topbar-link")
+			.attribute("href", self.logo_href.unwrap_or_else(|| "/".to_owned()))
+			.child(
+				div().class("topbar-brand-wrapper").child(logo).child(
+					self.title
+						.map(|title| div().class("topbar-brand-title").child(title)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn TopbarItemsWrapper() {
-	html! { <nav class="topbar-items-wrapper">{children}</nav> }
+#[derive(ComponentBuilder)]
+struct TopbarItemsWrapper {
+	#[children]
+	pub children: Vec<Node>,
 }
 
-#[component]
-fn TopbarHamburger() {
-	html! {
-		<div class="topbar-hamburger">
-			<svg
-				class="topbar-hamburger-icon"
-				height="15px"
-				overflow="visible"
-				viewBox="0 0 1 1"
-				width="15px"
-			>
-				{[0.0, 0.5, 1.0].iter().map(|y| html! {
-					<line
-						stroke="currentColor"
-						stroke-linecap="round"
-						stroke-width="0.2"
-						x1="0"
-						x2="1"
-						y1={y.to_string()}
-						y2={y.to_string()}
-					/>
-				}).collect::<Vec<_>>()}
-			</svg>
-			<svg
-				class="topbar-x-icon"
-				height="15px"
-				overflow="visible"
-				viewBox="0 0 1 1"
-				width="15px"
-			>
-				<line
-					stroke="currentColor"
-					stroke-linecap="round"
-					stroke-width="0.2"
-					x1="0"
-					x2="1"
-					y1="0"
-					y2="1"
-				/>
-				<line
-					stroke="currentColor"
-					stroke-linecap="round"
-					stroke-width="0.2"
-					x1="1"
-					x2="0"
-					y1="0"
-					y2="1"
-				/>
-			</svg>
-		</div>
+impl Component for TopbarItemsWrapper {
+	fn into_node(self) -> Node {
+		nav()
+			.class("topbar-items-wrapper")
+			.child(self.children)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct TopbarDropdownProps {
-	background_color: String,
-	cta: Option<TopbarItem>,
+#[derive(ComponentBuilder)]
+struct TopbarHamburger;
+
+impl Component for TopbarHamburger {
+	fn into_node(self) -> Node {
+		div()
+			.class("topbar-hamburger")
+			.child(
+				svg()
+					.class("topbar-hamburger-icon")
+					.attribute("height", "15px")
+					.attribute("overflow", "visible")
+					.attribute("viewBox", "0 0 1 1")
+					.attribute("width", "15px")
+					.children({
+						[0.0, 0.5, 1.0].iter().map(|y| {
+							svg::line()
+								.attribute("stroke", "currentColor")
+								.attribute("stroke-linecap", "round")
+								.attribute("stroke-width", "0.2")
+								.attribute("x1", "0")
+								.attribute("x2", "1")
+								.attribute("y1", y.to_string())
+								.attribute("y2", y.to_string())
+						})
+					}),
+			)
+			.child(
+				svg()
+					.class("topbar-x-icon")
+					.attribute("height", "15px")
+					.attribute("overflow", "visible")
+					.attribute("viewBox", "0 0 1 1")
+					.attribute("width", "15px")
+					.child(
+						svg::line()
+							.attribute("stroke", "currentColor")
+							.attribute("stroke-linecap", "round")
+							.attribute("stroke-width", "0.2")
+							.attribute("x1", "0")
+							.attribute("x2", "1")
+							.attribute("y1", "0")
+							.attribute("y2", "1"),
+					)
+					.child(
+						svg::line()
+							.attribute("stroke", "currentColor")
+							.attribute("stroke-linecap", "round")
+							.attribute("stroke-width", "0.2")
+							.attribute("x1", "1")
+							.attribute("x2", "0")
+							.attribute("y1", "0")
+							.attribute("y2", "1"),
+					),
+			)
+			.into_node()
+	}
+}
+
+#[derive(ComponentBuilder)]
+pub struct TopbarDropdown {
 	items: Vec<TopbarDropdownItem>,
+	#[optional]
+	background_color: Option<String>,
+	#[optional]
+	cta: Option<TopbarItem>,
 }
 
 pub struct TopbarDropdownItem {
@@ -178,27 +191,21 @@ pub struct TopbarDropdownItem {
 	href: String,
 }
 
-#[component]
-fn TopbarDropdown(props: TopbarDropdownProps) {
-	let wrapper_style = style! {
-		"background-color" => props.background_color,
-	};
-	html! {
-		<div class="topbar-dropdown-wrapper" style={wrapper_style}>
-			{props.items.into_iter().map(|item| html! {
-				<a class="topbar-dropdown-link" href={item.href}>
-					<div class="topbar-dropdown-item">
-						{item.title}
-					</div>
-				</a>
-			}).collect::<Vec<_>>()}
-			{props.cta.map(|cta| html! {
-				<div class="topbar-dropdown-item">
-					<Button href?={Some(cta.href)}>
-						{cta.title}
-					</Button>
-				</div>
-			})}
-		</div>
+impl Component for TopbarDropdown {
+	fn into_node(self) -> Node {
+		div()
+			.class("topbar-dropdown-wrapper")
+			.style(style::BACKGROUND_COLOR, self.background_color)
+			.children(self.items.into_iter().map(|item| {
+				a().class("topbar-dropdown-link")
+					.attribute("href", item.href)
+					.child(div().class("topbar-dropdown-item").child(item.title))
+			}))
+			.child(self.cta.map(|cta| {
+				div()
+					.class("topbar-dropdown-item")
+					.child(Button::new().href(Some(cta.href)).child(cta.title))
+			}))
+			.into_node()
 	}
 }

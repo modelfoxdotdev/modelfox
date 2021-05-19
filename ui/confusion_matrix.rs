@@ -1,6 +1,6 @@
 use crate::Token;
-use html::{classes, component, html, style, Props};
 use num::ToPrimitive;
+use pinwheel::prelude::*;
 use tangram_number_formatter::PercentFormatter;
 
 // |---------------------------------------------------------|
@@ -17,8 +17,8 @@ use tangram_number_formatter::PercentFormatter;
 // |           ||     |                  |                   |
 // |---------------------------------------------------------|
 
-#[derive(Props)]
-pub struct ConfusionMatrixProps {
+#[derive(ComponentBuilder)]
+pub struct ConfusionMatrix {
 	pub class_label: String,
 	pub false_negatives: Option<usize>,
 	pub false_positives: Option<usize>,
@@ -26,75 +26,79 @@ pub struct ConfusionMatrixProps {
 	pub true_positives: Option<usize>,
 }
 
-#[component]
-pub fn ConfusionMatrix(props: ConfusionMatrixProps) {
-	let total = if let (
-		Some(false_negatives),
-		Some(false_positives),
-		Some(true_negatives),
-		Some(true_positives),
-	) = (
-		props.false_negatives,
-		props.false_positives,
-		props.true_negatives,
-		props.true_positives,
-	) {
-		Some(true_positives + true_negatives + false_positives + false_negatives)
-	} else {
-		None
-	};
-	html! {
-		<div class="confusion-matrix-wrapper">
-			<ConfusionMatrixLabel area="actual-true-label" left={None}>
-				<div>{"Actual"}</div>
-				<Token>{props.class_label.clone()}</Token>
-			</ConfusionMatrixLabel>
-			<ConfusionMatrixLabel area="actual-false-label" left={None}>
-				<div>{"Actual Not"}</div>
-				<Token>{props.class_label.clone()}</Token>
-			</ConfusionMatrixLabel>
-			<ConfusionMatrixLabel area="predicted-true-label" left={Some(true)}>
-				<div>{"Predicted"}</div>
-				<Token>{props.class_label.clone()}</Token>
-			</ConfusionMatrixLabel>
-			<ConfusionMatrixLabel area="predicted-false-label" left={Some(true)}>
-				<div>{"Predicted Not"}</div>
-				<Token>{props.class_label}</Token>
-			</ConfusionMatrixLabel>
-			<ConfusionMatrixItem
-				area="true-positive"
-				correct={true}
-				title="True Positives"
-				total={total}
-				value={props.true_positives}
-			/>
-			<ConfusionMatrixItem
-				area="false-positive"
-				title="False Positives"
-				correct={false}
-				total={total}
-				value={props.false_positives}
-			/>
-			<ConfusionMatrixItem
-				area="false-negative"
-				title="False Negatives"
-				correct={false}
-				total={total}
-				value={props.false_negatives}
-			/>
-			<ConfusionMatrixItem
-				area="true-negative"
-				correct={true}
-				title="True Negatives"
-				total={total}
-				value={props.true_negatives}
-			/>
-		</div>
+impl Component for ConfusionMatrix {
+	fn into_node(self) -> Node {
+		let total = if let (
+			Some(false_negatives),
+			Some(false_positives),
+			Some(true_negatives),
+			Some(true_positives),
+		) = (
+			self.false_negatives,
+			self.false_positives,
+			self.true_negatives,
+			self.true_positives,
+		) {
+			Some(true_positives + true_negatives + false_positives + false_negatives)
+		} else {
+			None
+		};
+		div()
+			.class("confusion-matrix-wrapper")
+			.child(
+				ConfusionMatrixLabel::new("actual-true-label".to_owned(), None)
+					.child(div().child("Actual"))
+					.child(Token::new().child(self.class_label.clone())),
+			)
+			.child(
+				ConfusionMatrixLabel::new("actual-false-label".to_owned(), None)
+					.child(div().child("Actual Not"))
+					.child(Token::new().child(self.class_label.clone())),
+			)
+			.child(
+				ConfusionMatrixLabel::new("predicted-true-label".to_owned(), Some(true))
+					.child(div().child("Predicted"))
+					.child(Token::new().child(self.class_label.clone())),
+			)
+			.child(
+				ConfusionMatrixLabel::new("predicted-false-label".to_owned(), Some(true))
+					.child(div().child("Predicted Not"))
+					.child(Token::new().child(self.class_label)),
+			)
+			.child(ConfusionMatrixItem::new(
+				"true-positive".to_owned(),
+				true,
+				"True Positives".to_owned(),
+				total,
+				self.true_positives,
+			))
+			.child(ConfusionMatrixItem::new(
+				"false-positive".to_owned(),
+				false,
+				"False Positives".to_owned(),
+				total,
+				self.false_positives,
+			))
+			.child(ConfusionMatrixItem::new(
+				"false-negative".to_owned(),
+				false,
+				"False Negatives".to_owned(),
+				total,
+				self.false_negatives,
+			))
+			.child(ConfusionMatrixItem::new(
+				"true-negative".to_owned(),
+				true,
+				"True Negatives".to_owned(),
+				total,
+				self.true_negatives,
+			))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ConfusionMatrixItemProps {
+#[derive(ComponentBuilder)]
+pub struct ConfusionMatrixItem {
 	area: String,
 	correct: bool,
 	title: String,
@@ -102,61 +106,50 @@ pub struct ConfusionMatrixItemProps {
 	value: Option<usize>,
 }
 
-#[component]
-fn ConfusionMatrixItem(props: ConfusionMatrixItemProps) {
-	let item_wrapper_style = style! {
-		"grid-area" => props.area,
-	};
-	let class = match props.correct {
-		true => "confusion-matrix-item-correct-wrapper",
-		false => "confusion-matrix-item-incorrect-wrapper",
-	};
-	let class = classes!("confusion-matrix-item-wrapper", class);
-	let percent = if let (Some(value), Some(total)) = (props.value, props.total) {
-		Some(value.to_f32().unwrap() / total.to_f32().unwrap())
-	} else {
-		None
-	};
-	let value = props
-		.value
-		.map(|value| value.to_string())
-		.unwrap_or_else(|| "N/A".to_owned());
-	let percent = PercentFormatter::default().format_option(percent);
-	html! {
-		<div
-			class={class}
-			style={item_wrapper_style}
-		>
-			<div class="confusion-matrix-item-title">
-				{props.title}
-			</div>
-			<div class="confusion-matrix-item-value">
-				{value}
-			</div>
-			<div class="confusion-matrix-item-percent">
-				{percent}
-			</div>
-		</div>
+impl Component for ConfusionMatrixItem {
+	fn into_node(self) -> Node {
+		let class = match self.correct {
+			true => "confusion-matrix-item-correct-wrapper",
+			false => "confusion-matrix-item-incorrect-wrapper",
+		};
+		let class = classes!("confusion-matrix-item-wrapper", class);
+		let percent = if let (Some(value), Some(total)) = (self.value, self.total) {
+			Some(value.to_f32().unwrap() / total.to_f32().unwrap())
+		} else {
+			None
+		};
+		let value = self
+			.value
+			.map(|value| value.to_string())
+			.unwrap_or_else(|| "N/A".to_owned());
+		let percent = PercentFormatter::default().format_option(percent);
+		div()
+			.attribute("class", class)
+			.style(style::GRID_AREA, self.area)
+			.child(div().class("confusion-matrix-item-title").child(self.title))
+			.child(div().class("confusion-matrix-item-value").child(value))
+			.child(div().class("confusion-matrix-item-percent").child(percent))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ConfusionMatrixLabelProps {
-	area: String,
-	left: Option<bool>,
+#[derive(ComponentBuilder)]
+pub struct ConfusionMatrixLabel {
+	pub area: String,
+	pub left: Option<bool>,
+	#[children]
+	pub children: Vec<Node>,
 }
 
-#[component]
-fn ConfusionMatrixLabel(props: ConfusionMatrixLabelProps) {
-	let left = props.left.unwrap_or(false);
-	let justify_items = if left { "end" } else { "auto" };
-	let style = style! {
-		"grid-area" => props.area,
-		"justify-items" => justify_items,
-	};
-	html! {
-		<div class="confusion-matrix-label" style={style}>
-			{children}
-		</div>
+impl Component for ConfusionMatrixLabel {
+	fn into_node(self) -> Node {
+		let left = self.left.unwrap_or(false);
+		let justify_items = if left { "end" } else { "auto" };
+		div()
+			.class("confusion-matrix-label")
+			.style(style::GRID_AREA, self.area)
+			.style(style::JUSTIFY_ITEMS, justify_items)
+			.child(self.children)
+			.into_node()
 	}
 }

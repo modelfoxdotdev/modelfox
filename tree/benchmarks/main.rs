@@ -222,50 +222,21 @@ fn run_benchmarks(libraries: &[Library], datasets: &[Dataset]) {
 
 fn run_benchmark(dataset: &Dataset, library: &Library) -> BenchmarkOutput {
 	let output = match library {
-		Library::Tangram => {
-			if cfg!(target_os = "linux") {
-				std::process::Command::new("time")
-					.arg("-f")
-					.arg("%M")
-					.arg(format!("target/release/tangram_tree_benchmark_{}", dataset))
-					.output()
-					.unwrap()
-			} else if cfg!(target_os = "macos") {
-				std::process::Command::new("gtime")
-					.arg("-f")
-					.arg("%M")
-					.arg(format!("target/release/tangram_tree_benchmark_{}", dataset))
-					.output()
-					.unwrap()
-			} else {
-				panic!("unsupported OS");
-			}
-		}
-		_ => {
-			if cfg!(target_os = "linux") {
-				std::process::Command::new("time")
-					.arg("-f")
-					.arg("%M")
-					.arg("python")
-					.arg(format!("tree/benchmarks/{}.py", dataset))
-					.arg("--library")
-					.arg(format!("{}", library))
-					.output()
-					.unwrap()
-			} else if cfg!(target_os = "macos") {
-				std::process::Command::new("gtime")
-					.arg("-f")
-					.arg("%M")
-					.arg("python")
-					.arg(format!("tree/benchmarks/{}.py", dataset))
-					.arg("--library")
-					.arg(format!("{}", library))
-					.output()
-					.unwrap()
-			} else {
-				panic!("unsupported OS");
-			}
-		}
+		Library::Tangram => std::process::Command::new(time_cmd_name())
+			.arg("-f")
+			.arg("%M")
+			.arg(format!("target/release/tangram_tree_benchmark_{}", dataset))
+			.output()
+			.unwrap(),
+		_ => std::process::Command::new(time_cmd_name())
+			.arg("-f")
+			.arg("%M")
+			.arg("python")
+			.arg(format!("tree/benchmarks/{}.py", dataset))
+			.arg("--library")
+			.arg(format!("{}", library))
+			.output()
+			.unwrap(),
 	};
 	assert!(output.status.success());
 	let stderr = String::from_utf8(output.stderr).unwrap();
@@ -274,4 +245,12 @@ fn run_benchmark(dataset: &Dataset, library: &Library) -> BenchmarkOutput {
 	let mut output: BenchmarkOutput = serde_json::from_str(stdout.lines().last().unwrap()).unwrap();
 	output.memory(memory);
 	output
+}
+
+fn time_cmd_name() -> &'static str {
+	if cfg!(target_os = "macos") {
+		"gtime"
+	} else {
+		"time"
+	}
 }

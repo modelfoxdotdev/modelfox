@@ -1,24 +1,24 @@
 .production-stats-wrapper {
-  display: grid;
-  gap: 1rem;
+	display: grid;
+	gap: 1rem;
 }
 
 @media (max-width: 1199px) {
-  .production-stats-wrapper {
-    grid: auto auto auto auto / auto;
-    grid-template-areas:
-      "number-alert"
-      "number"
-      "enum-alert"
-      "enum"
-  }
+	.production-stats-wrapper {
+		grid: auto auto auto auto / auto;
+		grid-template-areas:
+			"number-alert"
+			"number"
+			"enum-alert"
+			"enum";
+	}
 }
 
 @media (min-width: 1200px) {
-  .production-stats-wrapper {
-    grid: auto auto / minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-areas:
-      "number-alert enum-alert"
-      "number enum"
-  }
+	.production-stats-wrapper {
+		grid: auto auto / minmax(0, 1fr) minmax(0, 1fr);
+		grid-template-areas:
+			"number-alert enum-alert"
+			"number enum";
+	}
 }

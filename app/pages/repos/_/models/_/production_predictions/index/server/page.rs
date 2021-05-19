@@ -1,13 +1,13 @@
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	document::{Document, DocumentProps},
-	model_layout::{ModelLayout, ModelLayoutProps},
+	document::Document,
+	model_layout::{ModelLayout, ModelLayoutInfo},
 };
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
-	pub model_layout_props: ModelLayoutProps,
+#[derive(ComponentBuilder)]
+pub struct Page {
+	pub model_layout_info: ModelLayoutInfo,
 	pub pagination: Pagination,
 	pub prediction_table: Option<PredictionTable>,
 }
@@ -27,101 +27,98 @@ pub struct Pagination {
 	pub before: Option<usize>,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<ModelLayout {props.model_layout_props}>
-				<ui::S1>
-					<ui::H1>{"Production Predictions"}</ui::H1>
-					{if props.prediction_table.is_none() {
-						html! { <ui::P>{"You have not yet logged any predictions."}</ui::P> }
-					} else { html! {
-						<>
-							<ui::Form post?={Some(true)}>
-								<div class="search-bar-wrapper">
-									<ui::TextField
-										autocomplete?="off"
-										label?="Identifier"
-										name?="identifier"
-									/>
-									<ui::Button button_type?={Some(ui::ButtonType::Submit)}>
-										{"Lookup"}
-									</ui::Button>
-								</div>
-							</ui::Form>
-							<ui::Table width?="100%">
-								<ui::TableHeader>
-									<ui::TableRow>
-										<ui::TableHeaderCell>
-											{"Identifier"}
-										</ui::TableHeaderCell>
-										<ui::TableHeaderCell>
-											{"Date"}
-										</ui::TableHeaderCell>
-										<ui::TableHeaderCell>
-											{"Output"}
-										</ui::TableHeaderCell>
-									</ui::TableRow>
-								</ui::TableHeader>
-								<ui::TableBody>
-									{props.prediction_table.map(|prediction_table| prediction_table.rows.iter().map(|prediction| html! {
-										<ui::TableRow>
-											<ui::TableCell>
-												<ui::Link href={format!("./predictions/{}", prediction.identifier)}>
-													{prediction.identifier.clone()}
-												</ui::Link>
-											</ui::TableCell>
-											<ui::TableCell>
-											{prediction.date.clone()}
-											</ui::TableCell>
-											<ui::TableCell>
-												{prediction.output.clone()}
-											</ui::TableCell>
-										</ui::TableRow>
-									}).collect::<Vec<_>>())}
-								</ui::TableBody>
-							</ui::Table>
-							<div class="pagination-buttons">
-								<ui::Form>
-									{props.pagination.after.map(|after| html! {
-										<input
-											name="after"
-											type="hidden"
-											value={after.to_string()}
-										/>
-									})}
-									<ui::Button
-										button_type?={Some(ui::ButtonType::Submit)}
-										disabled?={Some(props.pagination.after.is_none())}
-									>
-										{"Newer"}
-									</ui::Button>
-								</ui::Form>
-								<ui::Form>
-									{props.pagination.before.map(|before| html! {
-										<input
-											name="before"
-											type="hidden"
-											value={before.to_string()}
-										/>
-									})}
-									<ui::Button
-										button_type?={Some(ui::ButtonType::Submit)}
-										disabled?={Some(props.pagination.before.is_none())}
-									>
-										{"Older"}
-									</ui::Button>
-								</ui::Form>
-							</div>
-						</>
-					}
-				}}
-				</ui::S1>
-			</ModelLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		let table = self.prediction_table.as_ref().map(|prediction_table| {
+			ui::Table::new()
+				.width("100%".to_owned())
+				.child(
+					ui::TableHeader::new().child(
+						ui::TableRow::new()
+							.child(ui::TableHeaderCell::new().child("Identifier"))
+							.child(ui::TableHeaderCell::new().child("Date"))
+							.child(ui::TableHeaderCell::new().child("Output")),
+					),
+				)
+				.child(
+					ui::TableBody::new().children(prediction_table.rows.iter().map(|prediction| {
+						ui::TableRow::new()
+							.child(
+								ui::TableCell::new().child(
+									ui::Link::new()
+										.href(format!("./predictions/{}", prediction.identifier))
+										.child(prediction.identifier.clone()),
+								),
+							)
+							.child(ui::TableCell::new().child(prediction.date.clone()))
+							.child(ui::TableCell::new().child(prediction.output.clone()))
+					})),
+				)
+		});
+		let prev_next_buttons = div()
+			.class("pagination-buttons")
+			.child(
+				ui::Form::new()
+					.child(self.pagination.after.map(|after| {
+						input()
+							.attribute("name", "after")
+							.attribute("type", "hidden")
+							.attribute("value", after.to_string())
+					}))
+					.child(
+						ui::Button::new()
+							.button_type(Some(ui::ButtonType::Submit))
+							.disabled(Some(self.pagination.after.is_none()))
+							.child("Newer"),
+					),
+			)
+			.child(
+				ui::Form::new()
+					.child(self.pagination.before.map(|before| {
+						input()
+							.attribute("name", "before")
+							.attribute("type", "hidden")
+							.attribute("value", before.to_string())
+					}))
+					.child(
+						ui::Button::new()
+							.button_type(Some(ui::ButtonType::Submit))
+							.disabled(Some(self.pagination.before.is_none()))
+							.child("Older"),
+					),
+			);
+		let predictions = if self.prediction_table.is_none() {
+			ui::P::new()
+				.child("You have not yet logged any predictions.")
+				.into_node()
+		} else {
+			fragment()
+				.child(
+					ui::Form::new().post(Some(true)).child(
+						div()
+							.class("search-bar-wrapper")
+							.child(
+								ui::TextField::new()
+									.autocomplete("off".to_owned())
+									.label("Identifier".to_owned())
+									.name("identifier".to_owned()),
+							)
+							.child(
+								ui::Button::new()
+									.button_type(Some(ui::ButtonType::Submit))
+									.child("Lookup"),
+							),
+					),
+				)
+				.child(table)
+				.child(prev_next_buttons)
+				.into_node()
+		};
+		let inner = ui::S1::new()
+			.child(ui::H1::new().child("Production Predictions"))
+			.child(predictions);
+		Document::new()
+			.child(ModelLayout::new(self.model_layout_info).child(inner))
+			.into_node()
 	}
 }

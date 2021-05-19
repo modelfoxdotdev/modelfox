@@ -26,8 +26,8 @@ use std::num::NonZeroUsize;
 use tangram_table::prelude::*;
 
 EnumTableColumn::new(
-  Some("color".to_string()),
-  vec!["red".to_string(), "green".to_string(), "blue".to_string()],
+  Some("color".to_owned()),
+  vec!["red".to_owned(), "green".to_owned(), "blue".to_owned()],
   vec![None, Some(NonZeroUsize::new(1).unwrap()), Some(NonZeroUsize::new(2).unwrap()), Some(NonZeroUsize::new(3).unwrap())],
 );
 ```

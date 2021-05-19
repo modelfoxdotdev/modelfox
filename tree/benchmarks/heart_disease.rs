@@ -51,7 +51,7 @@ fn main() {
 		.map(ToString::to_string)
 		.collect();
 	let options = tangram_table::FromCsvOptions {
-		column_types: Some(btreemap! {
+		column_types: Some(btreemap!(
 			"age".to_owned() => TableColumnType::Number,
 			"gender".to_owned() => TableColumnType::Enum { variants: gender_variants },
 			"chest_pain".to_owned() => TableColumnType::Enum { variants: chest_pain_variants },
@@ -66,7 +66,7 @@ fn main() {
 			"fluoroscopy_vessels_colored".to_owned() => TableColumnType::Enum { variants: fluoroscopy_vessels_colored_variants },
 			"thallium_stress_test".to_owned() => TableColumnType::Enum { variants: thallium_stress_test_variants },
 			"diagnosis".to_owned() => TableColumnType::Enum { variants: diagnosis_variants },
-		}),
+		)),
 		..Default::default()
 	};
 	let mut features_train =

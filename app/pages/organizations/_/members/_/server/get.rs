@@ -1,6 +1,6 @@
-use crate::page::{Page, PageProps};
-use html::html;
+use crate::page::Page;
 use num::ToPrimitive;
+use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
@@ -10,7 +10,7 @@ use tangram_app_common::{
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 	Context,
 };
-use tangram_app_layouts::app_layout::get_app_layout_props;
+use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
@@ -18,8 +18,8 @@ pub async fn get(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let (organization_id, member_id) = if let &["organizations", organization_id, "members", member_id] =
-		path_components(&request).as_slice()
+	let (organization_id, member_id) = if let ["organizations", organization_id, "members", member_id] =
+		*path_components(&request).as_slice()
 	{
 		(organization_id.to_owned(), member_id.to_owned())
 	} else {
@@ -43,7 +43,7 @@ pub async fn get(
 	if !authorize_normal_user_for_organization(&mut db, &user, organization_id).await? {
 		return Ok(not_found());
 	}
-	let app_layout_props = get_app_layout_props(&context).await?;
+	let app_layout_info = app_layout_info(&context).await?;
 	let row = sqlx::query(
 		"
 			select
@@ -85,15 +85,15 @@ pub async fn get(
 	} else {
 		"Remove from Organzation".to_owned()
 	};
-	let props = PageProps {
-		app_layout_props,
+	let page = Page {
+		app_layout_info,
 		member_email,
 		is_admin: member_is_admin,
 		can_delete,
 		remove_button_text,
 	};
 	db.commit().await?;
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

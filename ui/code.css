@@ -1,79 +1,79 @@
 .code-select-grid {
-  border-radius: var(--border-radius);
-  display: grid;
-  grid: "header" auto "body" auto / 1fr;
-  gap: 0.5rem;
+	border-radius: var(--border-radius);
+	display: grid;
+	grid: "header" auto "body" auto / 1fr;
+	gap: 0.5rem;
 }
 
 .code-select-code-wrapper {
-  display: none;
+	display: none;
 }
 
 .code {
-  border-radius: var(--border-radius);
-  color: var(--text-color);
-  display: grid;
-  grid: auto / auto minmax(0, 1fr);
-  overflow: auto;
+	border-radius: var(--border-radius);
+	color: var(--text-color);
+	display: grid;
+	grid: auto / auto minmax(0, 1fr);
+	overflow: auto;
 }
 
 .code-inner {
-  -moz-tab-size: 2;
-  caret-color: black;
-  color: var(--text-color);
-  font-size: 1rem;
-  line-height: 1.5;
-  tab-size: 2;
-  white-space: pre;
+	-moz-tab-size: 2;
+	caret-color: black;
+	color: var(--text-color);
+	font-size: 1rem;
+	line-height: 1.5;
+	tab-size: 2;
+	white-space: pre;
 }
 
 .code-line-numbers-wrapper {
-  margin-right: 0.5rem;
-  text-align: right;
-  user-select: none;
+	margin-right: 0.5rem;
+	text-align: right;
+	user-select: none;
 }
 
 .code-line-numbers {
-  color: var(--muted-text-color);
-  font-size: 1rem;
-  line-height: 1.5;
+	color: var(--muted-text-color);
+	font-size: 1rem;
+	line-height: 1.5;
 }
 
-.inline-code-wrapper {
-  background-color: var(--header-color);
-  border-radius: var(--border-radius);
-  color: var(--text-color);
-  padding: 0.1em 0.2em;
+.inline-code {
+	background-color: var(--header-color);
+	border-radius: var(--border-radius);
+	color: var(--text-color);
+	padding: 0.1em 0.2em;
 }
 
 .comment {
-  color: var(--gray);
+	color: var(--gray);
 }
 
 .function {
-  color: var(--blue);
+	color: var(--blue);
 }
 
 .keyword {
-  color: var(--purple);
+	color: var(--purple);
 }
 
 .operator {
-  color: var(--gray);
+	color: var(--gray);
 }
 
 .punctuation {
-  color: var(--gray);
+	color: var(--gray);
 }
 
 .string {
-  color: var(--green);
+	color: var(--green);
 }
 
 .type {
-  color: var(--orange);
+	color: var(--orange);
 }
 
 .variable {
-  color: inherit;
+	color: inherit;
 }

@@ -65,7 +65,7 @@ pub fn main() -> Result<()> {
 			Target::AArch64UnknownLinuxGnu => "arm64",
 			_ => unreachable!(),
 		};
-		let control = formatdoc! {
+		let control = formatdoc!(
 			r#"
 				Package: tangram
 				Architecture: {}
@@ -76,7 +76,7 @@ pub fn main() -> Result<()> {
 			"#,
 			architecture,
 			args.version,
-		};
+		);
 		std::fs::write(&control_path, &control)?;
 		// Run dpkg-deb
 		let deb_file_name = format!("tangram_{}_{}.deb", args.version, architecture);
@@ -102,7 +102,7 @@ pub fn main() -> Result<()> {
 		let tar_path = sources_path.join("tangram.tar.gz");
 		tar(vec![(tangram_cli_path, tangram_path_in_tar)], &tar_path)?;
 		// Write the spec file.
-		let spec = formatdoc! {
+		let spec = formatdoc!(
 			r#"
 				Name: tangram
 				Version: {}
@@ -125,7 +125,7 @@ pub fn main() -> Result<()> {
 				%attr(0755, root, root) %_bindir/tangram
 			"#,
 			args.version,
-		};
+		);
 		let spec_path = rpm_path.join("SPECS/tangram.spec");
 		std::fs::write(&spec_path, spec)?;
 		// Run rpmbuild.
@@ -163,7 +163,7 @@ pub fn main() -> Result<()> {
 		.unwrap()
 		.join(target.as_str())
 		.join(tangram_cli_file_name);
-	let dockerfile = formatdoc! {
+	let dockerfile = formatdoc!(
 		r#"
 			FROM docker.io/alpine
 			WORKDIR /
@@ -171,10 +171,10 @@ pub fn main() -> Result<()> {
 			ENTRYPOINT ["/tangram"]
 		"#,
 		tangram_cli_path.display(),
-	};
+	);
 	std::fs::write(&dockerfile_path, &dockerfile)?;
 	let tag = format!("docker.io/tangramxyz/tangram:{}", args.version);
-	cmd!("podman", "build", "-t", tag, &tangram_path).run()?;
+	cmd!("docker", "build", "-t", tag, &tangram_path).run()?;
 	std::fs::remove_file(&dockerfile_path)?;
 
 	eprintln!("libtangram");

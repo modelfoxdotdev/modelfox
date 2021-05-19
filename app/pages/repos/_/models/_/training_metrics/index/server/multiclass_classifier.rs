@@ -1,10 +1,10 @@
-use html::{component, html, Props};
-use tangram_app_common::tokens::{BASELINE_COLOR, TRAINING_COLOR};
+use pinwheel::prelude::*;
+use tangram_app_ui::colors::{BASELINE_COLOR, TRAINING_COLOR};
 use tangram_ui as ui;
 use tangram_zip::zip;
 
-#[derive(Props)]
-pub struct MulticlassClassifierProps {
+#[derive(ComponentBuilder)]
+pub struct MulticlassClassifier {
 	pub warning: Option<String>,
 	pub accuracy: f32,
 	pub baseline_accuracy: f32,
@@ -17,71 +17,73 @@ pub struct ClassMetrics {
 	pub recall: f32,
 }
 
-#[component]
-pub fn MulticlassClassifier(props: MulticlassClassifierProps) {
-	html! {
-	<ui::S1>
-		<ui::H1>{"Training Metrics"}</ui::H1>
-		<ui::TabBar>
-			<ui::TabLink
-				href=""
-				selected={true}
-			>
-				{"Overview"}
-			</ui::TabLink>
-			<ui::TabLink
-				href="class_metrics"
-				selected={false}
-			>
-				{"Class Metrics"}
-			</ui::TabLink>
-		</ui::TabBar>
-		<ui::S2>
-			<ui::H2>{"Accuracy"}</ui::H2>
-			<ui::P>{"Accuracy is the percentage of predictions that were correct."}</ui::P>
-			<ui::NumberComparisonCard
-				color_a={Some(BASELINE_COLOR.to_owned())}
-				color_b={Some(TRAINING_COLOR.to_owned())}
-				title="Accuracy"
-				value_a={Some(props.baseline_accuracy)}
-				value_a_title="Baseline"
-				value_b={Some(props.accuracy)}
-				value_b_title="Training"
-				number_formatter={ui::NumberFormatter::Percent(Default::default())}
-			/>
-		</ui::S2>
-		<ui::S2>
-			<ui::H2>{"Precision and Recall"}</ui::H2>
-			<ui::P>{"Precision is the percentage of examples that were labeled as this class that are actually this class. Recall is the percentage of examples that are of this class that were labeled as this class."}</ui::P>
-			<ui::Table width?="100%">
-				<ui::TableHeader>
-					<ui::TableRow>
-						<ui::TableHeaderCell>
-							{"Class"}
-						</ui::TableHeaderCell>
-						<ui::TableHeaderCell>
-							{"Precision"}
-						</ui::TableHeaderCell>
-						<ui::TableHeaderCell>
-							{"Recall"}
-						</ui::TableHeaderCell>
-					</ui::TableRow>
-				</ui::TableHeader>
-				<ui::TableBody>
-				{zip!(props.class_metrics, props.classes).map(|(class_metrics, class_name)| html! {
-					<ui::TableRow>
-						<ui::TableCell>{class_name}</ui::TableCell>
-						<ui::TableCell>
-							{ui::format_percent(class_metrics.precision)}
-						</ui::TableCell>
-						<ui::TableCell>
-							{ui::format_percent(class_metrics.recall)}
-						</ui::TableCell>
-					</ui::TableRow>
-				}).collect::<Vec<_>>()}
-				</ui::TableBody>
-			</ui::Table>
-		</ui::S2>
-	</ui::S1>
+impl Component for MulticlassClassifier {
+	fn into_node(self) -> Node {
+		let precision_definition = "Precision is the percentage of examples that were labeled as this class that are actually this class. Recall is the percentage of examples that are of this class that were labeled as this class.";
+		ui::S1::new()
+			.child(ui::H1::new().child("Training Metrics"))
+			.child(
+				ui::TabBar::new()
+					.child(ui::TabLink::new("".to_owned(), true).child("Overview"))
+					.child(
+						ui::TabLink::new("class_metrics".to_owned(), false).child("Class Metrics"),
+					),
+			)
+			.child(
+				ui::S2::new()
+					.child(ui::H2::new().child("Accuracy"))
+					.child(
+						ui::P::new()
+							.child("Accuracy is the percentage of predictions that were correct."),
+					)
+					.child(
+						ui::NumberComparisonCard::new(
+							Some(self.baseline_accuracy),
+							Some(self.accuracy),
+						)
+						.color_a(Some(BASELINE_COLOR.to_owned()))
+						.color_b(Some(TRAINING_COLOR.to_owned()))
+						.title("Accuracy".to_owned())
+						.value_a_title("Baseline".to_owned())
+						.value_b_title("Training".to_owned())
+						.number_formatter(ui::NumberFormatter::Percent(Default::default())),
+					),
+			)
+			.child(
+				ui::S2::new()
+					.child(ui::H2::new().child("Precision and Recall"))
+					.child(ui::P::new().child(precision_definition))
+					.child(
+						ui::Table::new()
+							.width("100%".to_owned())
+							.child(
+								ui::TableHeader::new().child(
+									ui::TableRow::new()
+										.child(ui::TableHeaderCell::new().child("Class"))
+										.child(ui::TableHeaderCell::new().child("Precision"))
+										.child(ui::TableHeaderCell::new().child("Recall")),
+								),
+							)
+							.child(ui::TableBody::new().children(
+								zip!(self.class_metrics, self.classes).map(
+									|(class_metrics, class_name)| {
+										ui::TableRow::new()
+											.child(ui::TableCell::new().child(class_name))
+											.child(
+												ui::TableCell::new().child(ui::format_percent(
+													class_metrics.precision,
+												)),
+											)
+											.child(
+												ui::TableCell::new().child(ui::format_percent(
+													class_metrics.recall,
+												)),
+											)
+									},
+								),
+							)),
+					),
+			)
+			.into_node()
 	}
 }

@@ -1,9 +1,6 @@
-use crate::page::{
-	EnumColumnProps, Inner, NGramStats, NGramsTableRow, NumberColumnProps, Page, PageProps,
-	TextColumnProps,
-};
-use html::html;
+use crate::page::{EnumColumn, Inner, NGramStats, NGramsTableRow, NumberColumn, Page, TextColumn};
 use num::ToPrimitive;
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -16,7 +13,7 @@ use tangram_app_common::{
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
+use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
@@ -24,7 +21,7 @@ pub async fn get(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let (model_id, column_name) = if let &["repos", _, "models", model_id, "training_stats", "columns", column_name] =
+	let (model_id, column_name) = if let ["repos", _, "models", model_id, "training_stats", "columns", column_name] =
 		path_components(&request).as_slice()
 	{
 		(model_id.to_owned(), column_name.to_owned())
@@ -86,7 +83,7 @@ pub async fn get(
 		tangram_model::ColumnStatsReader::UnknownColumn(_) => unimplemented!(),
 		tangram_model::ColumnStatsReader::NumberColumn(column_stats) => {
 			let column_stats = column_stats.read();
-			Inner::Number(NumberColumnProps {
+			Inner::Number(NumberColumn {
 				invalid_count: column_stats.invalid_count(),
 				min: column_stats.min(),
 				max: column_stats.max(),
@@ -106,7 +103,7 @@ pub async fn get(
 				.iter()
 				.map(|(_, count)| count)
 				.sum();
-			Inner::Enum(EnumColumnProps {
+			Inner::Enum(EnumColumn {
 				unique_values_chart_data: Some(
 					column_stats
 						.histogram()
@@ -161,7 +158,7 @@ pub async fn get(
 				.collect();
 			top_ngrams_chart_values
 				.truncate(TRAINING_STATS_TEXT_COLUMN_MAX_TOKENS_TO_SHOW_IN_CHART);
-			Inner::Text(TextColumnProps {
+			Inner::Text(TextColumn {
 				name: column_stats.column_name().to_owned(),
 				ngram_count,
 				top_ngrams_chart_values,
@@ -169,13 +166,13 @@ pub async fn get(
 			})
 		}
 	};
-	let model_layout_props =
-		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::TrainingStats).await?;
-	let props = PageProps {
+	let model_layout_info =
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::TrainingStats).await?;
+	let page = Page {
 		inner,
-		model_layout_props,
+		model_layout_info,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

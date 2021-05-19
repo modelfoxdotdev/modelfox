@@ -1,55 +1,42 @@
-use html::{component, html, text, Props};
-use tangram_app_common::page_heading::{PageHeading, PageHeadingButtons};
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	app_layout::{AppLayout, AppLayoutProps},
-	document::{Document, DocumentProps},
+	app_layout::{AppLayout, AppLayoutInfo},
+	document::Document,
 };
+use tangram_app_ui::page_heading::{PageHeading, PageHeadingButtons};
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
-	pub app_layout_props: AppLayoutProps,
-	pub repos_table_props: Option<ReposTableProps>,
+#[derive(ComponentBuilder)]
+pub struct Page {
+	pub app_layout_info: AppLayoutInfo,
+	pub repos_table: Option<ReposTable>,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<AppLayout {props.app_layout_props}>
-				<ui::S1>
-					<PageHeading>
-						<ui::H1>{"Suppositories"}</ui::H1>
-						<PageHeadingButtons>
-							<ui::Button href?="/repos/new">
-								{"Create Repo"}
-							</ui::Button>
-						</PageHeadingButtons>
-					</PageHeading>
-					{if let Some(repos_table_props) = props.repos_table_props {
-						html! {
-							<ReposTable {repos_table_props} />
-						}
-					} else {
-						html! {
-							<ui::Card>
-								<ui::P>
-									{"You do not have any repositories."}
-								</ui::P>
-							</ui::Card>
-						}
-					}}
-				</ui::S1>
-			</AppLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		let heading = PageHeading::new()
+			.child(ui::H1::new().child("Repositories"))
+			.child(
+				PageHeadingButtons::new().child(
+					ui::Button::new()
+						.href("/repos/new".to_owned())
+						.child("Create Repo"),
+				),
+			);
+		let body = if let Some(repos_table) = self.repos_table {
+			repos_table.into_node()
+		} else {
+			ui::Card::new()
+				.child(ui::P::new().child("You do not have any repositories."))
+				.into_node()
+		};
+		let content = ui::S1::new().child(heading).child(body);
+		let layout = AppLayout::new(self.app_layout_info).child(content);
+		Document::new().child(layout).into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ReposTableProps {
+pub struct ReposTable {
 	pub rows: Vec<ReposTableRow>,
 }
 
@@ -59,29 +46,27 @@ pub struct ReposTableRow {
 	pub owner_name: Option<String>,
 }
 
-#[component]
-fn ReposTable(props: ReposTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell expand?={Some(true)}>
-						{"Name"}
-					</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-				{props.rows.into_iter().map(|repo| html! {
-					<ui::TableRow>
-						<ui::TableCell>
-							<ui::Link href={format!("/repos/{}/", repo.id)}>
-								{repo.owner_name.map(|owner_name| text!(format!("{}/", owner_name)))}
-								{repo.title}
-							</ui::Link>
-						</ui::TableCell>
-					</ui::TableRow>
-				}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+impl Component for ReposTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new()
+						.child(ui::TableHeaderCell::new().expand(Some(true)).child("Name")),
+				),
+			)
+			.child(
+				ui::TableBody::new().children(self.rows.into_iter().map(|repo| {
+					let href = format!("/repos/{}/", repo.id);
+					let owner_slash = repo.owner_name.map(|owner_name| format!("{}/", owner_name));
+					let link_text =
+						format!("{}{}", owner_slash.as_deref().unwrap_or(""), repo.title,);
+					ui::TableRow::new().child(
+						ui::TableCell::new().child(ui::Link::new().href(href).child(link_text)),
+					)
+				})),
+			)
+			.into_node()
 	}
 }

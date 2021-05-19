@@ -1,49 +1,38 @@
-use crate::{
-	binary_classifier::binary_classifier_index_page,
-	multiclass_classifier::multiclass_classifier_index_page, regressor::regressor_index_page,
-};
-use html::{component, html, Props};
-use tangram_app_layouts::document::{Document, DocumentProps};
-use tangram_app_layouts::model_layout::{ModelLayout, ModelLayoutProps};
-use tangram_serve::client;
+use pinwheel::prelude::*;
+use tangram_app_layouts::document::Document;
+use tangram_app_layouts::model_layout::{ModelLayout, ModelLayoutInfo};
 
 pub use {
-	crate::binary_classifier::{BinaryClassifierMetricsSectionProps, BinaryClassifierProps},
+	crate::binary_classifier::{BinaryClassifier, BinaryClassifierMetricsSection},
 	crate::multiclass_classifier::{
-		MulticlassClassifierClassMetrics, MulticlassClassifierMetricsSectionProps,
-		MulticlassClassifierProps,
+		MulticlassClassifier, MulticlassClassifierClassMetrics, MulticlassClassifierMetricsSection,
 	},
-	crate::regressor::{RegressorMetricsSectionProps, RegressorProps},
+	crate::regressor::{Regressor, RegressorMetricsSection},
 };
 
-#[derive(Props)]
-pub struct PageProps {
+#[derive(ComponentBuilder)]
+pub struct Page {
 	pub id: String,
 	pub inner: Inner,
-	pub model_layout_props: ModelLayoutProps,
+	pub model_layout_info: ModelLayoutInfo,
 }
 
 pub enum Inner {
-	Regressor(RegressorProps),
-	BinaryClassifier(BinaryClassifierProps),
-	MulticlassClassifier(MulticlassClassifierProps),
+	Regressor(Regressor),
+	BinaryClassifier(BinaryClassifier),
+	MulticlassClassifier(MulticlassClassifier),
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let inner = match props.inner {
-		Inner::Regressor(inner) => regressor_index_page(inner),
-		Inner::BinaryClassifier(inner) => binary_classifier_index_page(inner),
-		Inner::MulticlassClassifier(inner) => multiclass_classifier_index_page(inner),
-	};
-	let document_props = DocumentProps {
-		client_wasm_js_src: Some(client!()),
-	};
-	html! {
-		<Document {document_props}>
-			<ModelLayout {props.model_layout_props}>
-				{inner}
-			</ModelLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		let inner = match self.inner {
+			Inner::Regressor(inner) => inner.into_node(),
+			Inner::BinaryClassifier(inner) => inner.into_node(),
+			Inner::MulticlassClassifier(inner) => inner.into_node(),
+		};
+		Document::new()
+			.client("tangram_app_model_index_client")
+			.child(ModelLayout::new(self.model_layout_info).child(inner))
+			.into_node()
 	}
 }

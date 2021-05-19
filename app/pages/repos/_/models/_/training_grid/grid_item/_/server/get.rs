@@ -1,5 +1,5 @@
-use super::page::{Page, PageProps};
-use html::html;
+use super::page::Page;
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -8,7 +8,7 @@ use tangram_app_common::{
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
+use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_app_training_grid_common::hyperparameters_for_grid_item;
 use tangram_error::{err, Result};
 use tangram_id::Id;
@@ -17,7 +17,7 @@ pub async fn get(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let (model_id, grid_item_id) = if let &["repos", _, "models", model_id, "training_grid", "grid_item", grid_item_id] =
+	let (model_id, grid_item_id) = if let ["repos", _, "models", model_id, "training_grid", "grid_item", grid_item_id] =
 		path_components(&request).as_slice()
 	{
 		(model_id.to_owned(), grid_item_id.to_owned())
@@ -67,15 +67,15 @@ pub async fn get(
 		}
 	};
 	let model_hyperparameters = hyperparameters_for_grid_item(&grid_item);
-	let model_layout_props =
-		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::TrainingGrid).await?;
-	let props = PageProps {
+	let model_layout_info =
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::TrainingGrid).await?;
+	let page = Page {
 		id: model_id.to_string(),
 		model_grid_item_identifier: grid_item_id.to_owned(),
 		model_hyperparameters,
-		model_layout_props,
+		model_layout_info,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

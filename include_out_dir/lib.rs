@@ -3,16 +3,16 @@ use std::{collections::HashMap, path::Path};
 
 pub use include_out_dir_macro::include_out_dir;
 
-pub struct Dir(pub HashMap<&'static Path, File>);
+pub struct IncludeOutDir(pub HashMap<&'static Path, File>);
 
 pub struct File {
 	pub data: &'static [u8],
 	pub hash: String,
 }
 
-impl Dir {
-	pub fn new(map: HashMap<&'static Path, File>) -> Dir {
-		Dir(map)
+impl IncludeOutDir {
+	pub fn new(map: HashMap<&'static Path, File>) -> IncludeOutDir {
+		IncludeOutDir(map)
 	}
 
 	pub fn read(&self, path: &Path) -> Option<&File> {

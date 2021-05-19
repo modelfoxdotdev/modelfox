@@ -1,44 +1,32 @@
 pub use crate::{enum_column::*, number_column::*, text_column::*};
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	document::{Document, DocumentProps},
-	model_layout::{ModelLayout, ModelLayoutProps},
+	document::Document,
+	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-use tangram_serve::client;
 
-#[derive(Props)]
-pub struct PageProps {
+#[derive(ComponentBuilder)]
+pub struct Page {
 	pub inner: Inner,
-	pub model_layout_props: ModelLayoutProps,
+	pub model_layout_info: ModelLayoutInfo,
 }
 
 pub enum Inner {
-	Number(NumberColumnProps),
-	Enum(EnumColumnProps),
-	Text(TextColumnProps),
+	Number(NumberColumn),
+	Enum(EnumColumn),
+	Text(TextColumn),
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let inner = match props.inner {
-		Inner::Number(inner) => html! {
-			<NumberColumn {inner} />
-		},
-		Inner::Enum(inner) => html! {
-			<EnumColumn {inner} />
-		},
-		Inner::Text(inner) => html! {
-			<TextColumn {inner} />
-		},
-	};
-	let document_props = DocumentProps {
-		client_wasm_js_src: Some(client!()),
-	};
-	html! {
-		<Document {document_props}>
-			<ModelLayout {props.model_layout_props}>
-				{inner}
-			</ModelLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		let inner = match self.inner {
+			Inner::Number(inner) => inner.into_node(),
+			Inner::Enum(inner) => inner.into_node(),
+			Inner::Text(inner) => inner.into_node(),
+		};
+		Document::new()
+			.client("tangram_app_training_stats_column_server")
+			.child(ModelLayout::new(self.model_layout_info).child(inner))
+			.into_node()
 	}
 }

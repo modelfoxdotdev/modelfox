@@ -12,11 +12,11 @@ use tangram_app_common::{
 		NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,
 		TrueValueMonitorEvent,
 	},
-	production_metrics::ProductionMetrics,
-	production_stats::ProductionStats,
 	storage::Storage,
 	Context,
 };
+use tangram_app_production_metrics::ProductionMetrics;
+use tangram_app_production_stats::ProductionStats;
 use tangram_error::{err, Result};
 use tangram_id::Id;
 use tracing::error;

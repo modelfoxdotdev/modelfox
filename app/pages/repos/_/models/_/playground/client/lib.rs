@@ -3,12 +3,12 @@ use tangram_charts::{
 	feature_contributions_chart::FeatureContributionsChart,
 };
 use wasm_bindgen::{self, prelude::*, JsCast};
-use web_sys::*;
+use web_sys as dom;
 
 #[wasm_bindgen(start)]
 pub fn start() {
 	console_error_panic_hook::set_once();
-	let window = window().unwrap();
+	let window = dom::window().unwrap();
 	let document = window.document().unwrap();
 	let bar_charts_query = document
 		.query_selector_all(".column-chart[data-chart-type='bar']")
@@ -17,7 +17,7 @@ pub fn start() {
 		let item = bar_charts_query
 			.item(index)
 			.unwrap()
-			.dyn_into::<Element>()
+			.dyn_into::<dom::Element>()
 			.unwrap();
 		hydrate_chart::<BarChart>(&item.id());
 	}
@@ -28,7 +28,7 @@ pub fn start() {
 		let item = box_charts_query
 			.item(index)
 			.unwrap()
-			.dyn_into::<Element>()
+			.dyn_into::<dom::Element>()
 			.unwrap();
 		hydrate_chart::<BoxChart>(&item.id());
 	}

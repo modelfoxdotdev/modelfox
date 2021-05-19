@@ -1,8 +1,8 @@
 use crate::page::{
-	DetailsSectionProps, MembersSectionProps, MembersTableProps, MembersTableRow, Page, PageProps,
-	ReposSectionProps, ReposTableProps, ReposTableRow,
+	DetailsSection, MembersSection, MembersTable, MembersTableRow, Page, ReposSection, ReposTable,
+	ReposTableRow,
 };
-use html::html;
+use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
@@ -12,7 +12,7 @@ use tangram_app_common::{
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 	Context,
 };
-use tangram_app_layouts::app_layout::get_app_layout_props;
+use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
@@ -21,7 +21,7 @@ pub async fn get(
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	let organization_id =
-		if let &["organizations", organization_id, ""] = path_components(&request).as_slice() {
+		if let ["organizations", organization_id, ""] = *path_components(&request).as_slice() {
 			organization_id.to_owned()
 		} else {
 			return Err(err!("unexpected path"));
@@ -29,7 +29,7 @@ pub async fn get(
 	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
-	let app_layout_props = get_app_layout_props(&context).await?;
+	let app_layout_info = app_layout_info(&context).await?;
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
@@ -52,7 +52,7 @@ pub async fn get(
 	let organization_user = get_organization_user(&mut db, organization_id, user.id)
 		.await?
 		.unwrap();
-	let details_props = DetailsSectionProps {
+	let details = DetailsSection {
 		organization_id: organization.id.to_string(),
 		organization_name: organization.name.clone(),
 		can_edit: organization_user.is_admin,
@@ -66,14 +66,14 @@ pub async fn get(
 			is_admin: member.is_admin,
 		})
 		.collect();
-	let members_table_props = MembersTableProps {
+	let members_table = MembersTable {
 		user_id: user.id.to_string(),
 		rows,
 		can_edit: organization_user.is_admin,
 	};
-	let members_props = MembersSectionProps {
+	let members = MembersSection {
 		organization_id: organization.id,
-		members_table_props,
+		members_table,
 	};
 	let rows = sqlx::query(
 		"
@@ -95,23 +95,23 @@ pub async fn get(
 			ReposTableRow { id, title }
 		})
 		.collect();
-	let repos_table_props = if !rows.is_empty() {
-		Some(ReposTableProps { rows })
+	let repos_table = if !rows.is_empty() {
+		Some(ReposTable { rows })
 	} else {
 		None
 	};
-	let repos_props = ReposSectionProps { repos_table_props };
-	let props = PageProps {
-		app_layout_props,
-		details_props,
+	let repos = ReposSection { repos_table };
+	let page = Page {
+		app_layout_info,
+		details_section: details,
 		id: organization_id.to_string(),
-		members_props,
+		members_section: members,
 		name: organization.name,
-		repos_props,
+		repos_section: repos,
 		can_delete: organization_user.is_admin,
 	};
 
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

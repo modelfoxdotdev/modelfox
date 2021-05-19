@@ -1,99 +1,86 @@
-use html::{component, html, Props};
 use num::ToPrimitive;
-use tangram_app_common::{class_select_field::ClassSelectField, metrics_row::MetricsRow};
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	document::{Document, DocumentProps},
-	model_layout::{ModelLayout, ModelLayoutProps},
+	document::Document,
+	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-use tangram_serve::client;
+use tangram_app_ui::{class_select_field::ClassSelectField, metrics_row::MetricsRow};
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
+#[derive(ComponentBuilder)]
+pub struct Page {
 	pub classes: Vec<String>,
 	pub class: String,
 	pub id: String,
-	pub model_layout_props: ModelLayoutProps,
-	pub precision_recall_section_props: PrecisionRecallSectionProps,
-	pub confusion_matrix_section_props: ConfusionMatrixSectionProps,
+	pub model_layout_info: ModelLayoutInfo,
+	pub precision_recall_section: PrecisionRecallSection,
+	pub confusion_matrix_section: ConfusionMatrixSection,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let document_props = DocumentProps {
-		client_wasm_js_src: Some(client!()),
-	};
-	html! {
-		<Document {document_props}>
-			<ModelLayout {props.model_layout_props}>
-				<ui::S1>
-					<ui::H1>{"Training Metrics"}</ui::H1>
-					<ui::TabBar>
-						<ui::TabLink
-							href="./"
-							selected={false}
-						>
-							{"Overview"}
-						</ui::TabLink>
-						<ui::TabLink
-							href="class_metrics"
-							selected={true}
-						>
-						{"Class Metrics"}
-						</ui::TabLink>
-					</ui::TabBar>
-					<ui::Form>
-						<ClassSelectField class={props.class.clone()} classes={props.classes} />
-						<noscript>
-							<ui::Button>
-								{"Submit"}
-							</ui::Button>
-						</noscript>
-					</ui::Form>
-					<PrecisionRecallSection {props.precision_recall_section_props} />
-					<ConfusionMatrixSection {props.confusion_matrix_section_props} />
-				</ui::S1>
-			</ModelLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		Document::new()
+			.client("tangram_app_training_class_metrics_client")
+			.child(
+				ModelLayout::new(self.model_layout_info).child(
+					ui::S1::new()
+						.child(ui::H1::new().child("Training Metrics"))
+						.child(
+							ui::TabBar::new()
+								.child(ui::TabLink::new("./".to_owned(), false).child("Overview"))
+								.child(
+									ui::TabLink::new("class_metrics".to_owned(), true)
+										.child("Class Metrics"),
+								),
+						)
+						.child(
+							ui::Form::new()
+								.child(ClassSelectField::new(self.class.clone(), self.classes))
+								.child(noscript().child(ui::Button::new().child("Submit"))),
+						)
+						.child(self.precision_recall_section)
+						.child(self.confusion_matrix_section),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct PrecisionRecallSectionProps {
+#[derive(ComponentBuilder)]
+pub struct PrecisionRecallSection {
 	pub class: String,
 	pub f1_score: f32,
 	pub precision: f32,
 	pub recall: f32,
 }
 
-#[component]
-fn PrecisionRecallSection(props: PrecisionRecallSectionProps) {
-	html! {
-		<ui::S2>
-			<ui::H2>{"Precision and Recall"}</ui::H2>
-			<ui::P>{"Precision is the percentage of examples that were labeled as this class that are actually this class. Recall is the percentage of examples that are of this class that were labeled as this class."}</ui::P>
-			<MetricsRow>
-				<ui::NumberCard
-					title="Precision"
-					value={ui::format_percent(props.precision)}
-				/>
-				<ui::NumberCard
-					title="Recall"
-					value={ui::format_percent(props.recall)}
-				/>
-			</MetricsRow>
-			<MetricsRow>
-				<ui::NumberCard
-					title="F1 Score"
-					value={ui::format_percent(props.f1_score)}
-				/>
-			</MetricsRow>
-		</ui::S2>
+impl Component for PrecisionRecallSection {
+	fn into_node(self) -> Node {
+		let precision_recall_definition = "Precision is the percentage of examples that were labeled as this class that are actually this class. Recall is the percentage of examples that are of this class that were labeled as this class.";
+		ui::S2::new()
+			.child(ui::H2::new().child("Precision and Recall"))
+			.child(ui::P::new().child(precision_recall_definition))
+			.child(
+				MetricsRow::new()
+					.child(ui::NumberCard::new(
+						"Precision".to_owned(),
+						ui::format_percent(self.precision),
+					))
+					.child(ui::NumberCard::new(
+						"Recall".to_owned(),
+						ui::format_percent(self.recall),
+					)),
+			)
+			.child(MetricsRow::new().child(ui::NumberCard::new(
+				"F1 Score".to_owned(),
+				ui::format_percent(self.f1_score),
+			)))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ConfusionMatrixSectionProps {
+#[derive(ComponentBuilder)]
+pub struct ConfusionMatrixSection {
 	pub class: String,
 	pub false_negatives: u64,
 	pub false_positives: u64,
@@ -101,19 +88,19 @@ pub struct ConfusionMatrixSectionProps {
 	pub true_positives: u64,
 }
 
-#[component]
-fn ConfusionMatrixSection(props: ConfusionMatrixSectionProps) {
-	html! {
-		<ui::S2>
-			<ui::H2>{"Confusion Matrix"}</ui::H2>
-			<ui::P>{"A confusion matrix categorizes predictions into false negatives, false positives, true negatives, and true positives."}</ui::P>
-			<ui::ConfusionMatrix
-				class_label={props.class}
-				false_negatives={props.false_negatives.to_usize()}
-				false_positives={props.false_positives.to_usize()}
-				true_negatives={props.true_negatives.to_usize()}
-				true_positives={props.true_positives.to_usize()}
-			/>
-		</ui::S2>
+impl Component for ConfusionMatrixSection {
+	fn into_node(self) -> Node {
+		let confusion_matrix_definition = "A confusion matrix categorizes predictions into false negatives, false positives, true negatives, and true positives.";
+		ui::S2::new()
+			.child(ui::H2::new().child("Confusion Matrix"))
+			.child(ui::P::new().child(confusion_matrix_definition))
+			.child(ui::ConfusionMatrix::new(
+				self.class,
+				self.false_negatives.to_usize(),
+				self.false_positives.to_usize(),
+				self.true_negatives.to_usize(),
+				self.true_positives.to_usize(),
+			))
+			.into_node()
 	}
 }

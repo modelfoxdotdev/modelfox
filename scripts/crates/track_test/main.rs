@@ -82,7 +82,7 @@ pub fn main() -> Result<()> {
 			if rng.gen::<bool>() {
 				let chest_pain = record.get_mut("chest_pain").unwrap();
 				if chest_pain == "asymptomatic" {
-					*chest_pain = serde_json::Value::String("asx".to_string());
+					*chest_pain = serde_json::Value::String("asx".to_owned());
 				}
 			}
 		}

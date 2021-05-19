@@ -1,61 +1,60 @@
-use html::{component, html, Props};
-use tangram_app_layouts::{
-	auth_layout::AuthLayout,
-	document::{Document, DocumentProps},
-};
+use pinwheel::prelude::*;
+use tangram_app_layouts::{auth_layout::AuthLayout, document::Document};
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
+#[derive(ComponentBuilder)]
+pub struct Page {
 	pub code: bool,
 	pub email: Option<String>,
 	pub error: Option<String>,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<AuthLayout>
-				<ui::Form post?={Some(true)}>
-					{props.error.map(|error| html! {
-						<ui::Alert level={ui::Level::Danger}>
-							{error}
-						</ui::Alert>
-					})}
-					<ui::TextField
-						autocomplete?="username"
-						name?={Some("email".into())}
-						placeholder?="Email"
-						value?={props.email}
-					/>
-					{if props.code {
-						Some(html! {
-							<ui::TextField
-								name?="code"
-								placeholder?="Code"
-							/>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		Document::new()
+			.child(
+				AuthLayout::new().child(
+					ui::Form::new()
+						.post(Some(true))
+						.child(
+							self.error
+								.map(|error| ui::Alert::new(ui::Level::Danger).child(error)),
+						)
+						.child(
+							ui::TextField::new()
+								.autocomplete("username".to_owned())
+								.name(Some("email".to_owned()))
+								.placeholder("Email".to_owned())
+								.value(self.email),
+						)
+						.child(if self.code {
+							Some(
+								ui::TextField::new()
+									.name("code".to_owned())
+									.placeholder("Code".to_owned()),
+							)
+						} else {
+							None
 						})
-					} else {
-						None
-					}}
-					<ui::Button button_type?={Some(ui::ButtonType::Submit)}>
-						{"Login"}
-					</ui::Button>
-					{if props.code {
-						Some(html! {
-							<div class="login-code-message">
-								{"We emailed you a code. Copy and paste it above to log in."}
-							</div>
-						})
-					} else {
-						None
-					}}
-				</ui::Form>
-			</AuthLayout>
-		</Document>
+						.child(
+							ui::Button::new()
+								.button_type(Some(ui::ButtonType::Submit))
+								.child("Login"),
+						)
+						.child(if self.code {
+							Some(
+								div()
+									.class("login-code-message")
+									.child(
+										"We emailed you a code. Copy and paste it above to log in.",
+									)
+									.into_node(),
+							)
+						} else {
+							None
+						}),
+				),
+			)
+			.into_node()
 	}
 }

@@ -282,4 +282,16 @@ impl BinaryClassifier {
 	) -> tangram_serialize::Position<crate::serialize::BinaryClassifierWriter> {
 		crate::serialize::serialize_binary_classifier(self, writer)
 	}
+
+	pub fn from_bytes(&self, bytes: &[u8]) -> BinaryClassifier {
+		let reader = tangram_serialize::read::<crate::serialize::BinaryClassifierReader>(bytes);
+		Self::from_reader(reader)
+	}
+
+	pub fn to_bytes(&self) -> Vec<u8> {
+		// Create the writer.
+		let mut writer = tangram_serialize::Writer::new();
+		self.to_writer(&mut writer);
+		writer.into_bytes()
+	}
 }

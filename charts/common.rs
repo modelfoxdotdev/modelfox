@@ -2,7 +2,7 @@ use super::config::{ChartColors, ChartConfig};
 use num::ToPrimitive;
 use std::borrow::Cow;
 use tangram_number_formatter::NumberFormatter;
-use web_sys::*;
+use web_sys as dom;
 
 // |--------------------------------------------------|
 // |  | |                                             |
@@ -20,7 +20,7 @@ use web_sys::*;
 
 pub struct ComputeRectsOptions<'a> {
 	pub chart_config: &'a ChartConfig,
-	pub ctx: &'a CanvasRenderingContext2d,
+	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub height: f64,
 	pub include_x_axis_labels: bool,
 	pub include_x_axis_title: bool,
@@ -291,7 +291,7 @@ pub fn compute_grid_line_info(
 
 pub struct ComputeXAxisGridLineInfoOptions<'a> {
 	pub chart_width: f64,
-	pub ctx: &'a CanvasRenderingContext2d,
+	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub number_formatter: &'a NumberFormatter,
 	pub x_axis_grid_line_interval: Option<GridLineInterval>,
 	pub x_max: f64,
@@ -357,7 +357,7 @@ pub fn compute_y_axis_grid_line_info(options: ComputeYAxisGridLineInfoOptions) -
 }
 
 fn compute_axis_labels_max_width(
-	ctx: &CanvasRenderingContext2d,
+	ctx: &dom::CanvasRenderingContext2d,
 	grid_line_info: &GridLineInfo,
 	number_formatter: &NumberFormatter,
 ) -> f64 {
@@ -375,7 +375,7 @@ fn compute_axis_labels_max_width(
 pub struct DrawXAxisGridLinesOptions<'a> {
 	pub chart_colors: &'a ChartColors,
 	pub chart_config: &'a ChartConfig,
-	pub ctx: &'a CanvasRenderingContext2d,
+	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub rect: Rect,
 	pub x_axis_grid_line_info: GridLineInfo,
 }
@@ -405,7 +405,7 @@ pub fn draw_x_axis_grid_lines(options: DrawXAxisGridLinesOptions) {
 pub struct DrawXAxisOptions<'a> {
 	pub chart_colors: &'a ChartColors,
 	pub chart_config: &'a ChartConfig,
-	pub ctx: &'a CanvasRenderingContext2d,
+	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub rect: Rect,
 	pub y_axis_grid_line_info: &'a GridLineInfo,
 }
@@ -439,7 +439,7 @@ pub fn draw_x_axis(options: DrawXAxisOptions) {
 pub struct DrawYAxisGridLinesOptions<'a> {
 	pub chart_colors: &'a ChartColors,
 	pub chart_config: &'a ChartConfig,
-	pub ctx: &'a CanvasRenderingContext2d,
+	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub rect: Rect,
 	pub y_axis_grid_line_info: &'a GridLineInfo,
 }
@@ -469,7 +469,7 @@ pub fn draw_y_axis_grid_lines(options: DrawYAxisGridLinesOptions) {
 pub struct DrawYAxisOptions<'a> {
 	pub chart_colors: &'a ChartColors,
 	pub chart_config: &'a ChartConfig,
-	pub ctx: &'a CanvasRenderingContext2d,
+	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub rect: Rect,
 	pub x_axis_grid_line_info: &'a GridLineInfo,
 }
@@ -503,7 +503,7 @@ pub fn draw_y_axis(options: DrawYAxisOptions) {
 pub struct DrawXAxisLabelsOptions<'a> {
 	pub chart_colors: &'a ChartColors,
 	pub rect: Rect,
-	pub ctx: &'a CanvasRenderingContext2d,
+	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub grid_line_info: GridLineInfo,
 	pub labels: &'a Option<Vec<String>>,
 	pub number_formatter: &'a NumberFormatter,
@@ -560,7 +560,7 @@ pub fn draw_x_axis_labels(options: DrawXAxisLabelsOptions) {
 pub struct DrawYAxisLabelsOptions<'a> {
 	pub chart_colors: &'a ChartColors,
 	pub rect: Rect,
-	pub ctx: &'a CanvasRenderingContext2d,
+	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub font_size: f64,
 	pub grid_line_info: &'a GridLineInfo,
 	pub height: f64,
@@ -603,7 +603,7 @@ pub fn draw_y_axis_labels(options: DrawYAxisLabelsOptions) {
 pub struct DrawXAxisTitleOptions<'a> {
 	pub chart_colors: &'a ChartColors,
 	pub rect: Rect,
-	pub ctx: &'a CanvasRenderingContext2d,
+	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub title: &'a str,
 }
 
@@ -627,7 +627,7 @@ pub fn draw_x_axis_title(options: DrawXAxisTitleOptions) {
 pub struct DrawYAxisTitleOptions<'a> {
 	pub chart_colors: &'a ChartColors,
 	pub rect: Rect,
-	pub ctx: &'a CanvasRenderingContext2d,
+	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub title: &'a str,
 }
 
@@ -651,7 +651,7 @@ pub fn draw_y_axis_title(options: DrawYAxisTitleOptions) {
 }
 
 pub struct DrawRoundedRectOptions<'a> {
-	pub ctx: &'a CanvasRenderingContext2d,
+	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub fill_color: Option<&'a str>,
 	pub radius: f64,
 	pub rect: Rect,
@@ -741,7 +741,7 @@ pub fn draw_rounded_rect(options: DrawRoundedRectOptions) {
 }
 
 fn truncate_text<'a>(
-	ctx: &'a CanvasRenderingContext2d,
+	ctx: &'a dom::CanvasRenderingContext2d,
 	label: &'a str,
 	width: f64,
 ) -> Cow<'a, str> {

@@ -1,0 +1,16 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "pinwheel_elements_macro"
+publish = false
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+proc-macro = true
+
+[dependencies]
+heck = "0.3"
+proc-macro2 = "1"
+quote = "1"
+syn = { version = "1", features = ["full", "extra-traits"] }

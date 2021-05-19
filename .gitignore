@@ -1,4 +1,5 @@
 /.direnv
+/.vscode
 /data
 /dist
 /secrets

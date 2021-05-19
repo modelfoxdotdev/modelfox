@@ -11,4 +11,5 @@ path = "lib.rs"
 [dependencies]
 console_error_panic_hook = "0.1"
 tangram_charts = { path = "../../../../../../../../charts" }
-wasm-bindgen = "0.2.69"
+tangram_ui = { path = "../../../../../../../../ui" }
+wasm-bindgen = "0.2"

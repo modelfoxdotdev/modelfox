@@ -648,6 +648,7 @@ pub enum tangram_feature_contribution_entry_type {
 	NORMALIZED,
 	ONE_HOT_ENCODED,
 	BAG_OF_WORDS,
+	BAG_OF_WORDS_COSINE_SIMILARITY,
 	WORD_EMBEDDING,
 }
 
@@ -670,6 +671,9 @@ pub unsafe extern "C" fn tangram_feature_contribution_entry_get_type(
 		tangram_core::predict::FeatureContributionEntry::BagOfWords(_) => {
 			tangram_feature_contribution_entry_type::BAG_OF_WORDS
 		}
+		tangram_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(_) => {
+			tangram_feature_contribution_entry_type::BAG_OF_WORDS_COSINE_SIMILARITY
+		}
 		tangram_core::predict::FeatureContributionEntry::WordEmbedding(_) => {
 			tangram_feature_contribution_entry_type::WORD_EMBEDDING
 		}
@@ -687,6 +691,7 @@ pub unsafe extern "C" fn tangram_feature_contribution_entry_as_identity(
 		tangram_core::predict::FeatureContributionEntry::Normalized(_) => null(),
 		tangram_core::predict::FeatureContributionEntry::OneHotEncoded(_) => null(),
 		tangram_core::predict::FeatureContributionEntry::BagOfWords(_) => null(),
+		tangram_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(_) => null(),
 		tangram_core::predict::FeatureContributionEntry::WordEmbedding(_) => null(),
 	};
 }
@@ -702,6 +707,7 @@ pub unsafe extern "C" fn tangram_feature_contribution_entry_as_normalized(
 		tangram_core::predict::FeatureContributionEntry::Normalized(f) => transmute(f),
 		tangram_core::predict::FeatureContributionEntry::OneHotEncoded(_) => null(),
 		tangram_core::predict::FeatureContributionEntry::BagOfWords(_) => null(),
+		tangram_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(_) => null(),
 		tangram_core::predict::FeatureContributionEntry::WordEmbedding(_) => null(),
 	};
 }
@@ -717,6 +723,7 @@ pub unsafe extern "C" fn tangram_feature_contribution_entry_as_one_hot_encoded(
 		tangram_core::predict::FeatureContributionEntry::Normalized(_) => null(),
 		tangram_core::predict::FeatureContributionEntry::OneHotEncoded(f) => transmute(f),
 		tangram_core::predict::FeatureContributionEntry::BagOfWords(_) => null(),
+		tangram_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(_) => null(),
 		tangram_core::predict::FeatureContributionEntry::WordEmbedding(_) => null(),
 	};
 }
@@ -732,6 +739,7 @@ pub unsafe extern "C" fn tangram_feature_contribution_entry_as_bag_of_words(
 		tangram_core::predict::FeatureContributionEntry::Normalized(_) => null(),
 		tangram_core::predict::FeatureContributionEntry::OneHotEncoded(_) => null(),
 		tangram_core::predict::FeatureContributionEntry::BagOfWords(f) => transmute(f),
+		tangram_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(_) => null(),
 		tangram_core::predict::FeatureContributionEntry::WordEmbedding(_) => null(),
 	};
 }
@@ -747,6 +755,7 @@ pub unsafe extern "C" fn tangram_feature_contribution_entry_as_word_embedding(
 		tangram_core::predict::FeatureContributionEntry::Normalized(_) => null(),
 		tangram_core::predict::FeatureContributionEntry::OneHotEncoded(_) => null(),
 		tangram_core::predict::FeatureContributionEntry::BagOfWords(_) => null(),
+		tangram_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(_) => null(),
 		tangram_core::predict::FeatureContributionEntry::WordEmbedding(f) => transmute(f),
 	};
 }

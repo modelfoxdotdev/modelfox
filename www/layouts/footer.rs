@@ -1,12 +1,22 @@
-use html::{component, html};
-use tangram_www_common::logo::{Logo, LogoScheme};
+use pinwheel::prelude::*;
+use tangram_www_ui::logo::{Logo, LogoScheme};
 
-#[component]
-pub fn Footer() {
-	html! {
-		<div class="footer-wrapper">
-			<Logo class="footer-logo" color_scheme={LogoScheme::Multi} color={None} />
-			<p class="footer-copyright">{"Tangram © 2020"}</p>
-		</div>
+#[derive(ComponentBuilder)]
+pub struct Footer {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Footer {
+	fn into_node(self) -> Node {
+		div()
+			.class("footer-wrapper")
+			.child(Logo::new(
+				Some("footer-logo".to_owned()),
+				None,
+				LogoScheme::Multi,
+			))
+			.child(p().class("footer-copyright").child("Tangram © 2020"))
+			.into_node()
 	}
 }

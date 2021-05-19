@@ -1,9 +1,9 @@
-use crate::{
+use num::ToPrimitive;
+use pinwheel::prelude::*;
+use tangram_app_ui::{
 	metrics_row::MetricsRow,
 	tokens::{EnumColumnToken, NumberColumnToken, TextColumnToken, UnknownColumnToken},
 };
-use html::{component, html, Props};
-use num::ToPrimitive;
 use tangram_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	components::{BarChart, FeatureContributionsChart},
@@ -13,44 +13,38 @@ use tangram_charts::{
 };
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PredictOutputProps {
-	pub inner: PredictOutputInnerProps,
-	pub input_table: InputTableProps,
+#[derive(ComponentBuilder)]
+pub struct PredictOutput {
+	pub inner: PredictOutputInner,
+	pub input_table: InputTable,
 }
 
-pub enum PredictOutputInnerProps {
-	Regression(RegressionPredictOutputProps),
-	BinaryClassification(BinaryClassificationPredictOutputProps),
-	MulticlassClassification(MulticlassClassificationPredictOutputProps),
+pub enum PredictOutputInner {
+	Regression(RegressionPredictOutput),
+	BinaryClassification(BinaryClassificationPredictOutput),
+	MulticlassClassification(MulticlassClassificationPredictOutput),
 }
 
-#[component]
-pub fn PredictOutput(props: PredictOutputProps) {
-	let inner = match props.inner {
-		PredictOutputInnerProps::Regression(inner) => {
-			html! { <RegressionPredictOutput {inner} /> }
-		}
-		PredictOutputInnerProps::BinaryClassification(inner) => {
-			html! { <BinaryClassificationPredictOutput {inner} /> }
-		}
-		PredictOutputInnerProps::MulticlassClassification(inner) => {
-			html! { <MulticlassClassificationPredictOutput {inner} /> }
-		}
-	};
-	html! {
-		<>
-			<ui::S2>
-				<ui::H2>{"Input"}</ui::H2>
-				<InputTable {props.input_table} />
-			</ui::S2>
-			{inner}
-		</>
+impl Component for PredictOutput {
+	fn into_node(self) -> Node {
+		let inner = match self.inner {
+			PredictOutputInner::Regression(inner) => inner.into_node(),
+			PredictOutputInner::BinaryClassification(inner) => inner.into_node(),
+			PredictOutputInner::MulticlassClassification(inner) => inner.into_node(),
+		};
+		fragment()
+			.child(
+				ui::S2::new()
+					.child(ui::H2::new().child("Input"))
+					.child(self.input_table),
+			)
+			.child(inner)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct InputTableProps {
+#[derive(ComponentBuilder)]
+pub struct InputTable {
 	pub rows: Vec<InputTableRow>,
 }
 
@@ -68,69 +62,50 @@ pub enum InputTableColumnType {
 	Text,
 }
 
-#[component]
-pub fn InputTable(props: InputTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-						{"Column Name"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Column Type"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Value"}
-					</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-				{props.rows.into_iter().map(|row| html! {
-					<ui::TableRow>
-						<ui::TableCell>
-							{row.column_name.to_owned()}
-						</ui::TableCell>
-						<ui::TableCell>
-							<ColumnTypeToken column_type={row.column_type} />
-						</ui::TableCell>
-						<ui::TableCell>
-							{row.value}
-						</ui::TableCell>
-					</ui::TableRow>
-				}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+impl Component for InputTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new()
+						.child(ui::TableHeaderCell::new().child("Column Name"))
+						.child(ui::TableHeaderCell::new().child("Column Type"))
+						.child(ui::TableHeaderCell::new().child("Value")),
+				),
+			)
+			.child(
+				ui::TableBody::new().children(self.rows.into_iter().map(|row| {
+					ui::TableRow::new()
+						.child(ui::TableCell::new().child(row.column_name.to_owned()))
+						.child(ui::TableCell::new().child(ColumnTypeToken::new(row.column_type)))
+						.child(ui::TableCell::new().child(row.value))
+				})),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ColumnTypeTokenProps {
+#[derive(ComponentBuilder)]
+pub struct ColumnTypeToken {
 	column_type: InputTableColumnType,
 }
 
-#[component]
-fn ColumnTypeToken(props: ColumnTypeTokenProps) -> html::Node {
-	match props.column_type {
-		InputTableColumnType::Unknown => {
-			html! { <UnknownColumnToken /> }
-		}
-		InputTableColumnType::Number => {
-			html! { <NumberColumnToken /> }
-		}
-		InputTableColumnType::Enum => {
-			html! { <EnumColumnToken /> }
-		}
-		InputTableColumnType::Text => {
-			html! { <TextColumnToken /> }
+impl Component for ColumnTypeToken {
+	fn into_node(self) -> Node {
+		match self.column_type {
+			InputTableColumnType::Unknown => UnknownColumnToken::new().into(),
+			InputTableColumnType::Number => NumberColumnToken::new().into(),
+			InputTableColumnType::Enum => EnumColumnToken::new().into(),
+			InputTableColumnType::Text => TextColumnToken::new().into(),
 		}
 	}
 }
 
-pub fn compute_input_table_props(
+pub fn compute_input_table(
 	model: tangram_model::ModelReader,
 	input: &tangram_core::predict::PredictInput,
-) -> InputTableProps {
+) -> InputTable {
 	let column_stats = match model.inner() {
 		tangram_model::ModelInnerReader::Regressor(regressor) => {
 			regressor.read().overall_column_stats()
@@ -198,150 +173,153 @@ pub fn compute_input_table_props(
 				}
 			}
 		})
-		.collect();
-	InputTableProps { rows }
+		.collect::<Vec<_>>();
+	InputTable::new(rows)
 }
 
-#[derive(Props)]
-pub struct RegressionPredictOutputProps {
+#[derive(ComponentBuilder)]
+pub struct RegressionPredictOutput {
 	pub feature_contributions_chart_series: FeatureContributionsChartSeries,
 	pub value: f32,
 }
 
-#[component]
-pub fn RegressionPredictOutput(props: RegressionPredictOutputProps) {
-	html! {
-		<ui::S2>
-			<ui::H2>{"Output"}</ui::H2>
-			<ui::NumberCard
-				title="Prediction"
-				value={ui::format_float(props.value)}
-			/>
-			<ui::H2>{"Explanation"}</ui::H2>
-			<ui::P>
-				{"This chart shows how the features contributed to the model's output."}
-			</ui::P>
-			<ui::Card>
-				<FeatureContributionsChart
-					id?="regression_feature_contributions"
-					include_x_axis_title?={Some(true)}
-					include_y_axis_labels?={Some(false)}
-					include_y_axis_title?={Some(false)}
-					negative_color={ui::colors::RED.to_owned()}
-					positive_color={ui::colors::GREEN.to_owned()}
-					series={vec![props.feature_contributions_chart_series]}
-				/>
-			</ui::Card>
-		</ui::S2>
+impl Component for RegressionPredictOutput {
+	fn into_node(self) -> Node {
+		ui::S2::new()
+			.child(ui::H2::new().child("Output"))
+			.child(ui::NumberCard::new(
+				"Prediction".to_owned(),
+				ui::format_float(self.value),
+			))
+			.child(ui::H2::new().child("Explanation"))
+			.child(
+				ui::P::new()
+					.child("This chart shows how the features contributed to the model's output."),
+			)
+			.child(
+				ui::Card::new().child(
+					FeatureContributionsChart::new(
+						ui::colors::RED.to_owned(),
+						ui::colors::GREEN.to_owned(),
+						vec![self.feature_contributions_chart_series],
+					)
+					.id("regression_feature_contributions".to_owned())
+					.include_x_axis_title(Some(true))
+					.include_y_axis_labels(Some(false))
+					.include_y_axis_title(Some(false)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct BinaryClassificationPredictOutputProps {
+#[derive(ComponentBuilder)]
+pub struct BinaryClassificationPredictOutput {
 	pub class_name: String,
 	pub feature_contributions_chart_series: FeatureContributionsChartSeries,
 	pub probability: f32,
 }
 
-#[component]
-pub fn BinaryClassificationPredictOutput(props: BinaryClassificationPredictOutputProps) {
-	html! {
-		<>
-			<ui::S2>
-				<ui::H2>{"Output"}</ui::H2>
-				<MetricsRow>
-					<ui::NumberCard
-						title="Prediction"
-						value={props.class_name}
-					/>
-					<ui::NumberCard
-						title="Probability"
-						value={ui::format_percent(props.probability)}
-					/>
-				</MetricsRow>
-			</ui::S2>
-			<ui::S2>
-				<ui::H2>{"Explanation"}</ui::H2>
-				<ui::P>
-					{"This chart shows how the features contributed to the model's output."}
-				</ui::P>
-				<ui::Card>
-					<FeatureContributionsChart
-						id?="binary_classification_feature_contributions"
-						include_x_axis_title?={Some(true)}
-						include_y_axis_labels?={Some(true)}
-						include_y_axis_title?={Some(true)}
-						negative_color={ui::colors::RED.to_owned()}
-						positive_color={ui::colors::GREEN.to_owned()}
-						series={vec![props.feature_contributions_chart_series]}
-					/>
-				</ui::Card>
-			</ui::S2>
-		</>
+impl Component for BinaryClassificationPredictOutput {
+	fn into_node(self) -> Node {
+		let output = ui::S2::new().child(ui::H2::new().child("Output")).child(
+			MetricsRow::new()
+				.child(ui::NumberCard::new(
+					"Prediction".to_owned(),
+					self.class_name,
+				))
+				.child(ui::NumberCard::new(
+					"Probability".to_owned(),
+					ui::format_percent(self.probability),
+				)),
+		);
+		let explanation = ui::S2::new()
+			.child(ui::H2::new().child("Explanation"))
+			.child(
+				ui::P::new()
+					.child("This chart shows how the features contributed to the model's output."),
+			)
+			.child(
+				ui::Card::new().child(
+					FeatureContributionsChart::new(
+						ui::colors::RED.to_owned(),
+						ui::colors::GREEN.to_owned(),
+						vec![self.feature_contributions_chart_series],
+					)
+					.id("binary_classification_feature_contributions".to_owned())
+					.include_x_axis_title(Some(true))
+					.include_y_axis_labels(Some(true))
+					.include_y_axis_title(Some(true)),
+				),
+			);
+		fragment().child(output).child(explanation).into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct MulticlassClassificationPredictOutputProps {
+#[derive(ComponentBuilder)]
+pub struct MulticlassClassificationPredictOutput {
 	pub class_name: String,
 	pub feature_contributions_chart_series: Vec<FeatureContributionsChartSeries>,
 	pub probabilities: Vec<(String, f32)>,
 	pub probability: f32,
 }
 
-#[component]
-pub fn MulticlassClassificationPredictOutput(props: MulticlassClassificationPredictOutputProps) {
-	let probability_series = vec![BarChartSeries {
-		color: ui::colors::BLUE.to_owned(),
-		title: Some("Probabilities".to_owned()),
-		data: props
-			.probabilities
+impl Component for MulticlassClassificationPredictOutput {
+	fn into_node(self) -> Node {
+		let probability_series = vec![BarChartSeries {
+			color: ui::colors::BLUE.to_owned(),
+			title: Some("Probabilities".to_owned()),
+			data: self
+				.probabilities
+				.iter()
+				.enumerate()
+				.map(|(index, (class_name, probability))| BarChartPoint {
+					label: class_name.to_owned(),
+					x: index.to_f64().unwrap(),
+					y: Some(probability.to_f64().unwrap()),
+				})
+				.collect::<Vec<_>>(),
+		}];
+		let series = vec![self
+			.feature_contributions_chart_series
 			.iter()
-			.enumerate()
-			.map(|(index, (class_name, probability))| BarChartPoint {
-				label: class_name.to_owned(),
-				x: index.to_f64().unwrap(),
-				y: Some(probability.to_f64().unwrap()),
-			})
-			.collect::<Vec<_>>(),
-	}];
-	let series = vec![props
-		.feature_contributions_chart_series
-		.iter()
-		.find(|series| series.title == props.class_name)
-		.unwrap()
-		.clone()];
-	html! {
-		<ui::S2>
-			<ui::H2>{"Output"}</ui::H2>
-			<ui::NumberCard
-				title="Prediction"
-				value={props.class_name}
-			/>
-			<ui::NumberCard
-				title="Probability"
-				value={ui::format_percent(props.probability)}
-			/>
-			<BarChart
-				id?="probabilities"
-				series?={Some(probability_series)}
-				title?="Predicted Probabilities"
-				y_min?={Some(0.0)}
-			/>
-			<ui::H2>{"Explanation"}</ui::H2>
-			<ui::P>
-				{"This chart shows how the features contributed to the model's output."}
-			</ui::P>
-			<FeatureContributionsChart
-				id?="multiclass_classification_feature_contributions"
-				include_x_axis_title?={Some(true)}
-				include_y_axis_labels?={Some(false)}
-				include_y_axis_title?={Some(true)}
-				negative_color={ui::colors::RED.to_owned()}
-				positive_color={ui::colors::GREEN.to_owned()}
-				series={series}
-			/>
-		</ui::S2>
+			.find(|series| series.title == self.class_name)
+			.unwrap()
+			.clone()];
+		ui::S2::new()
+			.child(ui::H2::new().child("Output"))
+			.child(ui::NumberCard::new(
+				"Prediction".to_owned(),
+				self.class_name,
+			))
+			.child(ui::NumberCard::new(
+				"Probability".to_owned(),
+				ui::format_percent(self.probability),
+			))
+			.child(
+				BarChart::new()
+					.id("probabilities".to_owned())
+					.series(Some(probability_series))
+					.title("Predicted Probabilities".to_owned())
+					.y_min(Some(0.0)),
+			)
+			.child(ui::H2::new().child("Explanation"))
+			.child(
+				ui::P::new()
+					.child("This chart shows how the features contributed to the model's output."),
+			)
+			.child(
+				FeatureContributionsChart::new(
+					ui::colors::RED.to_owned(),
+					ui::colors::GREEN.to_owned(),
+					series,
+				)
+				.id("multiclass_classification_feature_contributions".to_owned())
+				.include_x_axis_title(Some(true))
+				.include_y_axis_labels(Some(false))
+				.include_y_axis_title(Some(true)),
+			)
+			.into_node()
 	}
 }
 
@@ -417,6 +395,21 @@ fn compute_feature_contributions_chart_value(
 			let feature = format!(
 				"{} {} \"{}\"",
 				feature_contribution.column_name, predicate, feature_contribution.ngram
+			);
+			FeatureContributionsChartValue {
+				feature,
+				value: feature_contribution
+					.feature_contribution_value
+					.to_f64()
+					.unwrap(),
+			}
+		}
+		tangram_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(
+			feature_contribution,
+		) => {
+			let feature = format!(
+				"similarity of {} and {}",
+				feature_contribution.column_name_a, feature_contribution.column_name_b,
 			);
 			FeatureContributionsChartValue {
 				feature,

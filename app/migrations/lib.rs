@@ -9,8 +9,10 @@ mod migration_2020_01_01_000000;
 mod migration_2021_04_19_000000;
 
 #[rustfmt::skip]
-type Migration = &'static (dyn for<'a> Fn(&'a mut sqlx::Transaction<sqlx::Any>) -> BoxFuture<'a, Result<()>> + Sync);
+type Migration = &'static (dyn Sync + for<'a> Fn(&'a mut sqlx::Transaction<sqlx::Any>) -> BoxFuture<'a, Result<()>>);
+
 type MigrationMap = BTreeMap<&'static str, Migration>;
+
 static MIGRATIONS: Lazy<MigrationMap> = Lazy::new(|| {
 	let mut migrations: MigrationMap = BTreeMap::new();
 	migrations.insert("2020_01_01_000000", &|db| {

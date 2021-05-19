@@ -76,8 +76,8 @@ fn compute_binned_features_row_major_inner<T, P>(
 	_progress: &P,
 ) -> BinnedFeaturesRowMajorInner<T>
 where
-	T: Num + NumCast + Send + Sync + Copy + std::ops::Add + std::ops::AddAssign,
-	P: Fn() + Sync,
+	T: Send + Sync + Num + NumCast + Copy + std::ops::Add + std::ops::AddAssign,
+	P: Sync + Fn(),
 {
 	let n_features = splittable_features.ncols();
 	let n_examples = splittable_features.nrows();
@@ -276,8 +276,8 @@ fn compute_binned_features_column_major_for_enum_feature_inner<T, P>(
 	_progress: &P,
 ) -> ComputeBinnedFeaturesColumnMajorForEnumFeatureInnerOuptut<T>
 where
-	T: NumCast + Ord + Clone + Send + Sync,
-	P: Fn() + Sync,
+	T: Send + Sync + NumCast + Ord + Clone,
+	P: Sync + Fn(),
 {
 	let mut n_examples_per_bin = BTreeMap::new();
 	let binned_feature_column = feature

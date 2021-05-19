@@ -1,21 +1,33 @@
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 
-#[derive(Props)]
-pub struct ImgProps {
-	pub alt: String,
-	pub src: String,
+#[derive(ComponentBuilder)]
+pub struct Img {
+	#[optional]
+	pub alt: Option<String>,
+	#[optional]
+	pub src: Option<String>,
 }
 
-#[component]
-pub fn Img(props: ImgProps) {
-	html! (
-		<details class="image-details">
-			<summary class="image-details-summary">
-				<img alt={props.alt.clone()} class="image-img" src={props.src.clone()} />
-			</summary>
-			<div class="image-viewer">
-				<img alt={props.alt} class="image-viewer-img" src={props.src} />
-			</div>
-		</details>
-	)
+impl Component for Img {
+	fn into_node(self) -> Node {
+		details()
+			.class("image-details")
+			.child(
+				summary().class("image-details-summary").child(
+					img()
+						.class("image-img")
+						.attribute("alt", self.alt.clone())
+						.attribute("src", self.src.clone()),
+				),
+			)
+			.child(
+				div().class("image-viewer").child(
+					img()
+						.class("image-viewer-img")
+						.attribute("alt", self.alt)
+						.attribute("src", self.src),
+				),
+			)
+			.into_node()
+	}
 }

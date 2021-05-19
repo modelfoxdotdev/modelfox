@@ -1,7 +1,7 @@
-use crate::page::{ModelsTableProps, ModelsTableRow, Page, PageProps};
+use crate::page::{ModelsTable, ModelsTableRow, Page};
 use chrono::prelude::*;
 use chrono_tz::Tz;
-use html::html;
+use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
@@ -12,7 +12,7 @@ use tangram_app_common::{
 	user::{authorize_user, authorize_user_for_repo},
 	Context,
 };
-use tangram_app_layouts::app_layout::get_app_layout_props;
+use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
@@ -20,7 +20,7 @@ pub async fn get(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let repo_id = if let &["repos", repo_id, ""] = path_components(&request).as_slice() {
+	let repo_id = if let ["repos", repo_id, ""] = *path_components(&request).as_slice() {
 		repo_id.to_owned()
 	} else {
 		return Err(err!("unexpected path"));
@@ -42,7 +42,7 @@ pub async fn get(
 		return Ok(not_found());
 	};
 	let repo = get_repo(&mut db, repo_id).await?;
-	let app_layout_props = get_app_layout_props(&context).await?;
+	let app_layout_info = app_layout_info(&context).await?;
 	let rows = sqlx::query(
 		"
 			select
@@ -57,7 +57,7 @@ pub async fn get(
 	.bind(&repo_id.to_string())
 	.fetch_all(&mut db)
 	.await?;
-	let models_table_props = if !rows.is_empty() {
+	let models_table = if !rows.is_empty() {
 		let rows = rows
 			.iter()
 			.map(|row| {
@@ -74,17 +74,17 @@ pub async fn get(
 				}
 			})
 			.collect();
-		let models_table_props = ModelsTableProps { rows };
-		Some(models_table_props)
+		let models_table = ModelsTable { rows };
+		Some(models_table)
 	} else {
 		None
 	};
-	let props = PageProps {
-		app_layout_props,
-		models_table_props,
+	let page = Page {
+		app_layout_info,
+		models_table,
 		title: repo.title,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

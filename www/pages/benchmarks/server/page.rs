@@ -1,438 +1,500 @@
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 use tangram_charts::{bar_chart::BarChartPoint, bar_chart::BarChartSeries, components::BarChart};
-use tangram_serve::{self, client};
 use tangram_ui as ui;
-use tangram_www_layouts::{
-	document::{Document, DocumentProps},
-	layout::Layout,
-};
+use tangram_www_layouts::{document::Document, page_layout::PageLayout};
 
-#[component]
-pub fn Page() {
-	let document_props = DocumentProps {
-		client_wasm_js_src: Some(client!()),
-	};
-	let dataset_select_field_options = Some(vec![
-		ui::SelectFieldOption {
-			text: "allstate".to_owned(),
-			value: "allstate".to_owned(),
-		},
-		ui::SelectFieldOption {
-			text: "flights".to_owned(),
-			value: "flights".to_owned(),
-		},
-		ui::SelectFieldOption {
-			text: "higgs".to_owned(),
-			value: "higgs".to_owned(),
-		},
-	]);
-	let cpu_select_field_options = Some(vec![
-		ui::SelectFieldOption {
-			text: "Apple M1".to_owned(),
-			value: "m1".to_owned(),
-		},
-		ui::SelectFieldOption {
-			text: "AMD Ryzen 7 2700".to_owned(),
-			value: "ryzen".to_owned(),
-		},
-	]);
-	html! {
-		<Document {document_props}>
-			<Layout>
-				<div class="index-grid">
-					<ui::S1>
-						<ui::H1>{"Tangram Tree Benchmarks"}</ui::H1>
-						<ui::SelectField
-							id?="cpu-select"
-							label?="Select CPU"
-							options?={cpu_select_field_options}
-							value?="m1"
-						/>
-						<ui::SelectField
-							id?="dataset-select"
-							label?="Select Dataset"
-							options?={dataset_select_field_options}
-							value?="flights"
-						/>
-						<div id="m1">
-							<Benchmarks cpu={Cpu::M1} />
-						</div>
-						<div id="ryzen">
-							<Benchmarks cpu={Cpu::Ryzen} />
-						</div>
-					</ui::S1>
-				</div>
-			</Layout>
-		</Document>
+#[derive(ComponentBuilder)]
+pub struct Page {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Page {
+	fn into_node(self) -> Node {
+		let dataset_select_field_options = Some(vec![
+			ui::SelectFieldOption {
+				text: "allstate".to_owned(),
+				value: "allstate".to_owned(),
+			},
+			ui::SelectFieldOption {
+				text: "flights".to_owned(),
+				value: "flights".to_owned(),
+			},
+			ui::SelectFieldOption {
+				text: "higgs".to_owned(),
+				value: "higgs".to_owned(),
+			},
+		]);
+		let cpu_select_field_options = Some(vec![
+			ui::SelectFieldOption {
+				text: "Apple M1".to_owned(),
+				value: "m1".to_owned(),
+			},
+			ui::SelectFieldOption {
+				text: "AMD Ryzen 7 2700".to_owned(),
+				value: "ryzen".to_owned(),
+			},
+		]);
+		Document::new()
+			.client("tangram_www_benchmarks_client")
+			.child(
+				PageLayout::new().child(
+					div().class("index-grid").child(
+						ui::S1::new()
+							.child(ui::H1::new().child("Tangram Tree Benchmarks"))
+							.child(
+								ui::SelectField::new()
+									.id("cpu-select".to_owned())
+									.label("Select CPU".to_owned())
+									.options(cpu_select_field_options)
+									.value("m1".to_owned()),
+							)
+							.child(
+								ui::SelectField::new()
+									.id("dataset-select".to_owned())
+									.label("Select Dataset".to_owned())
+									.options(dataset_select_field_options)
+									.value("flights".to_owned()),
+							)
+							.child(div().attribute("id", "m1").child(Benchmarks::new(Cpu::M1)))
+							.child(
+								div()
+									.attribute("id", "ryzen")
+									.child(Benchmarks::new(Cpu::Ryzen)),
+							),
+					),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-struct BenchmarksProps {
+#[derive(ComponentBuilder)]
+struct Benchmarks {
 	cpu: Cpu,
 }
 
-#[component]
-fn Benchmarks(props: BenchmarksProps) {
-	html! {
-		<>
-			<div id={format!("{}-flights", props.cpu)}>
-				<ui::S2>
-					<ui::H2>{"Flights"}</ui::H2>
-					<ui::P>{"The flights dataset contains 9 columns. There are 10,000,000 rows in the train dataset and 100,000 rows in the test dataset. The target column is "}<ui::InlineCode>{"dep_delayed_15min"}</ui::InlineCode>{" and it is a binary classification task."}</ui::P>
-					<div class="benchmarks-grid-item duration">
-						<DurationTable cpu={props.cpu} dataset={Dataset::Flights} />
-						<DurationChart cpu={props.cpu} dataset={Dataset::Flights} />
-					</div>
-					<div class="benchmarks-grid-item memory">
-						<MemoryTable cpu={props.cpu} dataset={Dataset::Flights} />
-						<MemoryChart cpu={props.cpu} dataset={Dataset::Flights} />
-					</div>
-					<div class="benchmarks-grid-item metric">
-						<AUCTable cpu={props.cpu} dataset={Dataset::Flights} />
-						<AUCChart cpu={props.cpu} dataset={Dataset::Flights} />
-					</div>
-				</ui::S2>
-			</div>
-			<div id={format!("{}-higgs", props.cpu)}>
-				<ui::S2>
-					<ui::H2>{"Higgs"}</ui::H2>
-					<ui::P>{"The higgs dataset contains 28 numeric columns and the target column "} <ui::InlineCode>{"signal"}</ui::InlineCode>{". There are 10,500,000 rows in the train dataset and 500,000 rows in the test dataset. It is a binary classifiation task."}</ui::P>
-					<div class="benchmarks-grid-item duration">
-						<DurationTable cpu={props.cpu} dataset={Dataset::Higgs} />
-						<DurationChart cpu={props.cpu} dataset={Dataset::Higgs} />
-					</div>
-					<div class="benchmarks-grid-item memory">
-						<MemoryTable cpu={props.cpu} dataset={Dataset::Higgs} />
-						<MemoryChart cpu={props.cpu} dataset ={Dataset::Higgs} />
-					</div>
-					<div class="benchmarks-grid-item metric">
-						<AUCTable cpu={props.cpu} dataset={Dataset::Higgs} />
-						<AUCChart cpu={props.cpu} dataset={Dataset::Higgs} />
-					</div>
-				</ui::S2>
-			</div>
-			<div id={format!("{}-allstate", props.cpu)}>
-				<ui::S2>
-					<ui::H2>{"Allstate"}</ui::H2>
-					<ui::P>{"The allstate dataset contains 35 columns. There are 10,547,432 rows in the train dataset and 2,636,858 rows in the test dataset. The target column is "}<ui::InlineCode>{"claim_amount"}</ui::InlineCode>{" and it is a regression task."}</ui::P>
-					<div class="benchmarks-grid-item duration">
-						<DurationTable cpu={props.cpu} dataset={Dataset::Allstate} />
-						<DurationChart cpu={props.cpu} dataset={Dataset::Allstate} />
-					</div>
-					<div class="benchmarks-grid-item memory">
-						<MemoryTable cpu={props.cpu} dataset={Dataset::Allstate} />
-						<MemoryChart cpu={props.cpu} dataset={Dataset::Allstate} />
-					</div>
-					<div class="benchmarks-grid-item metric">
-						<MSETable cpu={props.cpu} dataset={Dataset::Allstate} />
-						<MSEChart cpu={props.cpu} dataset={Dataset::Allstate} />
-					</div>
-				</ui::S2>
-			</div>
-		</>
+impl Component for Benchmarks {
+	fn into_node(self) -> Node {
+		let id = format!("{}-flights", self.cpu);
+		let p = ui::P::new()
+			.child("The flights dataset contains 9 columns. There are 10,000,000 rows in the train dataset and 100,000 rows in the test dataset. The target column is ")
+			.child(ui::InlineCode::new()
+			.child("dep_delayed_15min"))
+			.child(" and it is a binary classification task.");
+		let duration = div()
+			.class("benchmarks-grid-item duration")
+			.child(DurationTable::new(self.cpu, Dataset::Flights))
+			.child(DurationChart::new(self.cpu, Dataset::Flights));
+		let memory = div()
+			.class("benchmarks-grid-item memory")
+			.child(MemoryTable::new(self.cpu, Dataset::Flights))
+			.child(MemoryChart::new(self.cpu, Dataset::Flights));
+		let auc = div()
+			.class("benchmarks-grid-item metric")
+			.child(AucTable::new(self.cpu, Dataset::Flights))
+			.child(AucChart::new(self.cpu, Dataset::Flights));
+		let flights = div().id(id).child(
+			ui::S2::new()
+				.child(ui::H2::new().child("Flights"))
+				.child(p)
+				.child(duration)
+				.child(memory)
+				.child(auc),
+		);
+		let id = format!("{}-higgs", self.cpu);
+		let p = ui::P::new()
+			.child("The higgs dataset contains 28 numeric columns and the target column ")
+			.child(ui::InlineCode::new()
+			.child("signal"))
+			.child(". There are 10,500,000 rows in the train dataset and 500,000 rows in the test dataset. It is a binary classifiation task.");
+		let duration = div()
+			.class("benchmarks-grid-item duration")
+			.child(DurationTable::new(self.cpu, Dataset::Higgs))
+			.child(DurationChart::new(self.cpu, Dataset::Higgs));
+		let memory = div()
+			.class("benchmarks-grid-item memory")
+			.child(MemoryTable::new(self.cpu, Dataset::Higgs))
+			.child(MemoryChart::new(self.cpu, Dataset::Higgs));
+		let auc = div()
+			.class("benchmarks-grid-item metric")
+			.child(AucTable::new(self.cpu, Dataset::Higgs))
+			.child(AucChart::new(self.cpu, Dataset::Higgs));
+		let higgs = div().id(id).child(
+			ui::S2::new()
+				.child(ui::H2::new().child("Higgs"))
+				.child(p)
+				.child(duration)
+				.child(memory)
+				.child(auc),
+		);
+		let id = format!("{}-allstate", self.cpu);
+		let p = ui::P::new()
+			.child("The allstate dataset contains 35 columns. There are 10,547,432 rows in the train dataset and 2,636,858 rows in the test dataset. The target column is ")
+			.child(ui::InlineCode::new()
+			.child("claim_amount"))
+			.child(" and it is a regression task.");
+		let duration = div()
+			.class("benchmarks-grid-item duration")
+			.child(DurationTable::new(self.cpu, Dataset::Allstate))
+			.child(DurationChart::new(self.cpu, Dataset::Allstate));
+		let memory = div()
+			.class("benchmarks-grid-item memory")
+			.child(MemoryTable::new(self.cpu, Dataset::Allstate))
+			.child(MemoryChart::new(self.cpu, Dataset::Allstate));
+		let mse = div()
+			.class("benchmarks-grid-item metric")
+			.child(MseTable::new(self.cpu, Dataset::Allstate))
+			.child(MseChart::new(self.cpu, Dataset::Allstate));
+		let allstate = div().id(id).child(
+			ui::S2::new()
+				.child(ui::H2::new().child("Allstate"))
+				.child(p)
+				.child(duration)
+				.child(memory)
+				.child(mse),
+		);
+		fragment()
+			.child(flights)
+			.child(higgs)
+			.child(allstate)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-struct DurationTableProps {
+#[derive(ComponentBuilder)]
+struct DurationTable {
+	cpu: Cpu,
 	dataset: Dataset,
-	cpu: Cpu,
 }
 
-#[component]
-fn DurationTable(props: DurationTableProps) {
-	let tangram_entry = benchmark_data(props.cpu, props.dataset, Library::Tangram);
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>{"Library"}</ui::TableHeaderCell>
-					<ui::TableHeaderCell>{"Duration"}</ui::TableHeaderCell>
-					<ui::TableHeaderCell>{"v. Tangram"}</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-				{LIBRARIES.iter().cloned().map(|library| {
-					let entry = benchmark_data(props.cpu, props.dataset, library);
-					let color = if library == Library::Tangram { Some(ui::colors::BLUE.to_owned()) } else { None };
-					let text_color = if library == Library::Tangram { Some("var(--fun-text-color)".to_owned()) } else { None };
+impl Component for DurationTable {
+	fn into_node(self) -> Node {
+		let tangram_entry = benchmark_data(self.cpu, self.dataset, Library::Tangram);
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new()
+						.child(ui::TableHeaderCell::new().child("Library"))
+						.child(ui::TableHeaderCell::new().child("Duration"))
+						.child(ui::TableHeaderCell::new().child("v. Tangram")),
+				),
+			)
+			.child(
+				ui::TableBody::new().children(LIBRARIES.iter().cloned().map(|library| {
+					let entry = benchmark_data(self.cpu, self.dataset, library);
+					let color = if library == Library::Tangram {
+						Some(ui::colors::BLUE.to_owned())
+					} else {
+						None
+					};
+					let text_color = if library == Library::Tangram {
+						Some("var(--fun-text-color)".to_owned())
+					} else {
+						None
+					};
 					let duration = format_duration(entry.duration);
 					let duration_delta = format_delta(entry.duration / tangram_entry.duration);
-					html! {
-						<ui::TableRow color?={color} text_color?={text_color}>
-							<ui::TableCell>{library.to_string()}</ui::TableCell>
-							<ui::TableCell>{duration}</ui::TableCell>
-							<ui::TableCell>{duration_delta}</ui::TableCell>
-						</ui::TableRow>
-					}
-				}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+					ui::TableRow::new()
+						.color(color)
+						.text_color(text_color)
+						.child(ui::TableCell::new().child(library.to_string()))
+						.child(ui::TableCell::new().child(duration))
+						.child(ui::TableCell::new().child(duration_delta))
+				})),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-struct DurationChartProps {
-	dataset: Dataset,
+#[derive(ComponentBuilder)]
+struct DurationChart {
 	cpu: Cpu,
+	dataset: Dataset,
 }
 
-#[component]
-fn DurationChart(props: DurationChartProps) {
-	let chart_data: Vec<BarChartSeries> = LIBRARIES
-		.iter()
-		.cloned()
-		.map(|library| {
-			let dataset = props.dataset;
-			let data = vec![BarChartPoint {
-				label: dataset.to_string(),
-				x: 0.0,
-				y: Some(benchmark_data(props.cpu, dataset, library).duration),
-			}];
-			BarChartSeries {
-				color: color_for_library(library).to_owned(),
-				data,
-				title: Some(library.to_string()),
-			}
-		})
-		.collect();
-	html! {
-		<BarChart
-			id?={Some(format!("{}_{}_duration_chart", props.cpu, props.dataset))}
-			group_gap?={Some(10.0)}
-			series?={Some(chart_data)}
-			title?="Training Time (lower is better)"
-			x_axis_title?="Dataset"
-			y_axis_title?="Training Time (seconds)"
-			y_min?={Some(0.0)}
-		/>
+impl Component for DurationChart {
+	fn into_node(self) -> Node {
+		let chart_data: Vec<BarChartSeries> = LIBRARIES
+			.iter()
+			.cloned()
+			.map(|library| {
+				let dataset = self.dataset;
+				let data = vec![BarChartPoint {
+					label: dataset.to_string(),
+					x: 0.0,
+					y: Some(benchmark_data(self.cpu, dataset, library).duration),
+				}];
+				BarChartSeries {
+					color: color_for_library(library).to_owned(),
+					data,
+					title: Some(library.to_string()),
+				}
+			})
+			.collect();
+		let id = format!("{}_{}_duration_chart", self.cpu, self.dataset);
+		BarChart::new()
+			.group_gap(Some(10.0))
+			.id(Some(id))
+			.series(Some(chart_data))
+			.title("Training Time (lower is better)".to_owned())
+			.x_axis_title("Dataset".to_owned())
+			.y_axis_title("Training Time (seconds)".to_owned())
+			.y_min(Some(0.0))
+			.into_node()
 	}
 }
-#[derive(Props)]
-struct MemoryTableProps {
-	dataset: Dataset,
+
+#[derive(ComponentBuilder)]
+struct MemoryTable {
 	cpu: Cpu,
+	dataset: Dataset,
 }
 
-#[component]
-fn MemoryTable(props: MemoryTableProps) {
-	let tangram_entry = benchmark_data(props.cpu, props.dataset, Library::Tangram);
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>{"Library"}</ui::TableHeaderCell>
-					<ui::TableHeaderCell>{"Memory"}</ui::TableHeaderCell>
-					<ui::TableHeaderCell>{"v. Tangram"}</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-				{LIBRARIES.iter().cloned().map(|library| {
-					let entry = benchmark_data(props.cpu,props.dataset, library);
-					let color = if library == Library::Tangram { Some(ui::colors::BLUE.to_owned()) } else { None };
-					let text_color = if library == Library::Tangram { Some("var(--fun-text-color)".to_owned()) } else { None };
+impl Component for MemoryTable {
+	fn into_node(self) -> Node {
+		let tangram_entry = benchmark_data(self.cpu, self.dataset, Library::Tangram);
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new()
+						.child(ui::TableHeaderCell::new().child("Library"))
+						.child(ui::TableHeaderCell::new().child("Memory"))
+						.child(ui::TableHeaderCell::new().child("v. Tangram")),
+				),
+			)
+			.child(
+				ui::TableBody::new().children(LIBRARIES.iter().cloned().map(|library| {
+					let entry = benchmark_data(self.cpu, self.dataset, library);
+					let color = if library == Library::Tangram {
+						Some(ui::colors::BLUE.to_owned())
+					} else {
+						None
+					};
+					let text_color = if library == Library::Tangram {
+						Some("var(--fun-text-color)".to_owned())
+					} else {
+						None
+					};
 					let duration = format_memory(entry.memory);
 					let duration_delta = format_delta(entry.memory / tangram_entry.memory);
-					html! {
-						<ui::TableRow color?={color} text_color?={text_color}>
-							<ui::TableCell>{library.to_string()}</ui::TableCell>
-							<ui::TableCell>{duration}</ui::TableCell>
-							<ui::TableCell>{duration_delta}</ui::TableCell>
-						</ui::TableRow>
-					}
-				}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+					ui::TableRow::new()
+						.color(color)
+						.text_color(text_color)
+						.child(ui::TableCell::new().child(library.to_string()))
+						.child(ui::TableCell::new().child(duration))
+						.child(ui::TableCell::new().child(duration_delta))
+				})),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-struct MemoryChartProps {
-	dataset: Dataset,
+#[derive(ComponentBuilder)]
+struct MemoryChart {
 	cpu: Cpu,
+	dataset: Dataset,
 }
 
-#[component]
-fn MemoryChart(props: MemoryChartProps) {
-	let chart_data: Vec<BarChartSeries> = LIBRARIES
-		.iter()
-		.cloned()
-		.map(|library| {
-			let dataset = props.dataset;
-			let data = vec![BarChartPoint {
-				label: dataset.to_string(),
-				x: 0.0,
-				y: Some(benchmark_data(props.cpu, dataset, library).memory),
-			}];
-			BarChartSeries {
-				color: color_for_library(library).to_owned(),
-				data,
-				title: Some(library.to_string()),
-			}
-		})
-		.collect();
-	html! {
-		<BarChart
-			id?={Some(format!("{}_{}_memory_chart", props.cpu, props.dataset))}
-			group_gap?={Some(10.0)}
-			series?={Some(chart_data)}
-			title?="Memory Usage (lower is better)"
-			x_axis_title?="Dataset"
-			y_axis_title?="Memory Usage (GB)"
-			y_min?={Some(0.0)}
-		/>
+impl Component for MemoryChart {
+	fn into_node(self) -> Node {
+		let chart_data: Vec<BarChartSeries> = LIBRARIES
+			.iter()
+			.cloned()
+			.map(|library| {
+				let dataset = self.dataset;
+				let data = vec![BarChartPoint {
+					label: dataset.to_string(),
+					x: 0.0,
+					y: Some(benchmark_data(self.cpu, dataset, library).memory),
+				}];
+				BarChartSeries {
+					color: color_for_library(library).to_owned(),
+					data,
+					title: Some(library.to_string()),
+				}
+			})
+			.collect();
+		let id = format!("{}_{}_memory_chart", self.cpu, self.dataset);
+		BarChart::new()
+			.id(Some(id))
+			.group_gap(Some(10.0))
+			.series(Some(chart_data))
+			.title("Memory Usage (lower is better)".to_owned())
+			.x_axis_title("Dataset".to_owned())
+			.y_axis_title("Memory Usage (GB)".to_owned())
+			.y_min(Some(0.0))
+			.into_node()
 	}
 }
-#[derive(Props)]
-struct MseTableProps {
-	dataset: Dataset,
+
+#[derive(ComponentBuilder)]
+struct MseTable {
 	cpu: Cpu,
+	dataset: Dataset,
 }
 
-#[component]
-fn MSETable(props: MseTableProps) {
-	let tangram_entry = benchmark_data(props.cpu, props.dataset, Library::Tangram);
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>{"Library"}</ui::TableHeaderCell>
-					<ui::TableHeaderCell>{"MSE"}</ui::TableHeaderCell>
-					<ui::TableHeaderCell>{"v. Tangram"}</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-				{LIBRARIES.iter().cloned().map(|library| {
-					let entry = benchmark_data(props.cpu,props.dataset, library);
-					let color = if library == Library::CatBoost { Some(ui::colors::RED.to_owned()) } else { None };
-					let text_color = if library == Library::CatBoost { Some("var(--fun-text-color)".to_owned()) } else { None };
+impl Component for MseTable {
+	fn into_node(self) -> Node {
+		let tangram_entry = benchmark_data(self.cpu, self.dataset, Library::Tangram);
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new()
+						.child(ui::TableHeaderCell::new().child("Library"))
+						.child(ui::TableHeaderCell::new().child("MSE"))
+						.child(ui::TableHeaderCell::new().child("v. Tangram")),
+				),
+			)
+			.child(
+				ui::TableBody::new().children(LIBRARIES.iter().cloned().map(|library| {
+					let entry = benchmark_data(self.cpu, self.dataset, library);
+					let color = if library == Library::CatBoost {
+						Some(ui::colors::RED.to_owned())
+					} else {
+						None
+					};
+					let text_color = if library == Library::CatBoost {
+						Some("var(--fun-text-color)".to_owned())
+					} else {
+						None
+					};
 					let mse = ui::format_float_with_digits(entry.metric, 6);
 					let mse_delta = format_delta(entry.metric / tangram_entry.metric);
-					html! {
-						<ui::TableRow color?={color} text_color?={text_color}>
-							<ui::TableCell>{library.to_string()}</ui::TableCell>
-							<ui::TableCell>{mse}</ui::TableCell>
-							<ui::TableCell>{mse_delta}</ui::TableCell>
-						</ui::TableRow>
-					}
-				}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+					ui::TableRow::new()
+						.color(color)
+						.text_color(text_color)
+						.child(ui::TableCell::new().child(library.to_string()))
+						.child(ui::TableCell::new().child(mse))
+						.child(ui::TableCell::new().child(mse_delta))
+				})),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-struct AucChartProps {
-	dataset: Dataset,
+#[derive(ComponentBuilder)]
+struct AucChart {
 	cpu: Cpu,
+	dataset: Dataset,
 }
 
-#[component]
-fn AUCChart(props: AucChartProps) {
-	let chart_data: Vec<BarChartSeries> = LIBRARIES
-		.iter()
-		.cloned()
-		.map(|library| {
-			let dataset = props.dataset;
-			let data = vec![BarChartPoint {
-				label: dataset.to_string(),
-				x: 0.0,
-				y: Some(benchmark_data(props.cpu, dataset, library).metric),
-			}];
-			BarChartSeries {
-				color: color_for_library(library).to_owned(),
-				data,
-				title: Some(library.to_string()),
-			}
-		})
-		.collect();
-	html! {
-		<BarChart
-			id?={Some(format!("{}_{}_metric_chart", props.cpu, props.dataset))}
-			group_gap?={Some(10.0)}
-			series?={Some(chart_data)}
-			title?="AUC (higher is better)"
-			x_axis_title?="Dataset"
-			y_axis_title?="AUC"
-			y_min?={Some(0.0)}
-		/>
+impl Component for AucChart {
+	fn into_node(self) -> Node {
+		let chart_data: Vec<BarChartSeries> = LIBRARIES
+			.iter()
+			.cloned()
+			.map(|library| {
+				let dataset = self.dataset;
+				let data = vec![BarChartPoint {
+					label: dataset.to_string(),
+					x: 0.0,
+					y: Some(benchmark_data(self.cpu, dataset, library).metric),
+				}];
+				BarChartSeries {
+					color: color_for_library(library).to_owned(),
+					data,
+					title: Some(library.to_string()),
+				}
+			})
+			.collect();
+		let id = format!("{}_{}_metric_chart", self.cpu, self.dataset);
+		BarChart::new()
+			.id(Some(id))
+			.group_gap(Some(10.0))
+			.series(Some(chart_data))
+			.title("AUC (higher is better)".to_owned())
+			.x_axis_title("Dataset".to_owned())
+			.y_axis_title("AUC".to_owned())
+			.y_min(Some(0.0))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-struct AucTableProps {
-	dataset: Dataset,
+#[derive(ComponentBuilder)]
+struct AucTable {
 	cpu: Cpu,
+	dataset: Dataset,
 }
 
-#[component]
-fn AUCTable(props: AucTableProps) {
-	let tangram_entry = benchmark_data(props.cpu, props.dataset, Library::Tangram);
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>{"Library"}</ui::TableHeaderCell>
-					<ui::TableHeaderCell>{"AUC"}</ui::TableHeaderCell>
-					<ui::TableHeaderCell>{"v. Tangram"}</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-				{LIBRARIES.iter().cloned().map(|library| {
-					let entry = benchmark_data(props.cpu, props.dataset, library);
-					let color = if library == Library::Tangram { Some(ui::colors::BLUE.to_owned()) } else { None };
-					let text_color = if library == Library::Tangram { Some("var(--fun-text-color)".to_owned()) } else { None };
+impl Component for AucTable {
+	fn into_node(self) -> Node {
+		let tangram_entry = benchmark_data(self.cpu, self.dataset, Library::Tangram);
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new()
+						.child(ui::TableHeaderCell::new().child("Library"))
+						.child(ui::TableHeaderCell::new().child("AUC"))
+						.child(ui::TableHeaderCell::new().child("v. Tangram")),
+				),
+			)
+			.child(
+				ui::TableBody::new().children(LIBRARIES.iter().cloned().map(|library| {
+					let entry = benchmark_data(self.cpu, self.dataset, library);
+					let color = if library == Library::Tangram {
+						Some(ui::colors::BLUE.to_owned())
+					} else {
+						None
+					};
+					let text_color = if library == Library::Tangram {
+						Some("var(--fun-text-color)".to_owned())
+					} else {
+						None
+					};
 					let auc = ui::format_float_with_digits(entry.metric, 4);
 					let auc_delta = format_delta(entry.metric / tangram_entry.metric);
-					html! {
-						<ui::TableRow color?={color} text_color?={text_color}>
-							<ui::TableCell>{library.to_string()}</ui::TableCell>
-							<ui::TableCell>{auc}</ui::TableCell>
-							<ui::TableCell>{auc_delta}</ui::TableCell>
-						</ui::TableRow>
-					}
-				}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+					ui::TableRow::new()
+						.color(color)
+						.text_color(text_color)
+						.child(ui::TableCell::new().child(library.to_string()))
+						.child(ui::TableCell::new().child(auc))
+						.child(ui::TableCell::new().child(auc_delta))
+				})),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-struct MseChartProps {
-	dataset: Dataset,
+#[derive(ComponentBuilder)]
+struct MseChart {
 	cpu: Cpu,
+	dataset: Dataset,
 }
 
-#[component]
-fn MSEChart(props: MseChartProps) {
-	let chart_data: Vec<BarChartSeries> = LIBRARIES
-		.iter()
-		.cloned()
-		.map(|library| {
-			let dataset = props.dataset;
-			let data = vec![BarChartPoint {
-				label: dataset.to_string(),
-				x: 0.0,
-				y: Some(benchmark_data(props.cpu, dataset, library).metric),
-			}];
-			BarChartSeries {
-				color: color_for_library(library).to_owned(),
-				data,
-				title: Some(library.to_string()),
-			}
-		})
-		.collect();
-	html! {
-		<BarChart
-			id?={Some(format!("{}_{}_metric_chart", props.cpu, props.dataset))}
-			group_gap?={Some(10.0)}
-			series?={Some(chart_data)}
-			title?="Mean Squared Error (lower is better)"
-			x_axis_title?="Dataset"
-			y_axis_title?="MSE"
-			y_min?={Some(0.0)}
-		/>
+impl Component for MseChart {
+	fn into_node(self) -> Node {
+		let chart_data: Vec<BarChartSeries> = LIBRARIES
+			.iter()
+			.cloned()
+			.map(|library| {
+				let dataset = self.dataset;
+				let data = vec![BarChartPoint {
+					label: dataset.to_string(),
+					x: 0.0,
+					y: Some(benchmark_data(self.cpu, dataset, library).metric),
+				}];
+				BarChartSeries {
+					color: color_for_library(library).to_owned(),
+					data,
+					title: Some(library.to_string()),
+				}
+			})
+			.collect();
+		let id = format!("{}_{}_metric_chart", self.cpu, self.dataset);
+		BarChart::new()
+			.id(Some(id))
+			.group_gap(Some(10.0))
+			.series(Some(chart_data))
+			.title("Mean Squared Error (lower is better)".to_owned())
+			.x_axis_title("Dataset".to_owned())
+			.y_axis_title("MSE".to_owned())
+			.y_min(Some(0.0))
+			.into_node()
 	}
 }
 

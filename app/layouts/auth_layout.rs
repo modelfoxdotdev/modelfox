@@ -1,17 +1,27 @@
-use html::{component, html};
-use tangram_app_common::logo::{Logo, LogoScheme};
+use pinwheel::prelude::*;
+use tangram_app_ui::logo::{Logo, LogoScheme};
 use tangram_ui as ui;
 
-#[component]
-pub fn AuthLayout() {
-	html! {
-		<div class="auth-layout">
-			<div class="auth-layout-logo-wrapper">
-				<Logo color_scheme={LogoScheme::Multi} />
-			</div>
-			<div class="auth-layout-card-wrapper">
-				<ui::Card>{children}</ui::Card>
-			</div>
-		</div>
+#[derive(ComponentBuilder)]
+pub struct AuthLayout {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for AuthLayout {
+	fn into_node(self) -> Node {
+		div()
+			.class("auth-layout")
+			.child(
+				div()
+					.class("auth-layout-logo-wrapper")
+					.child(Logo::new(LogoScheme::Multi)),
+			)
+			.child(
+				div()
+					.class("auth-layout-card-wrapper")
+					.child(ui::Card::new().child(self.children)),
+			)
+			.into_node()
 	}
 }

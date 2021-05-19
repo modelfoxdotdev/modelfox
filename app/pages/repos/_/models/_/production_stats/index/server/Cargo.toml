@@ -11,14 +11,16 @@ path = "lib.rs"
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.5", features = ["serde"] }
 futures = "0.3"
-html = { path = "../../../../../../../../../html" }
+pinwheel = { path = "../../../../../../../../../pinwheel" }
 http = "0.2"
-hyper = { version = "0.14", features = ["server"] }
+hyper = { version = "0.14", features = ["full"] }
 num = "0.4"
 sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }
 serde = { version = "1", features = ["derive"] }
 serde_urlencoded = "0.7"
 tangram_app_common = { path = "../../../../../../../../common" }
+tangram_app_ui = { path = "../../../../../../../../ui" }
+tangram_app_production_stats = { path = "../../../../../../../../production_stats" }
 tangram_app_layouts = { path = "../../../../../../../../layouts" }
 tangram_charts = { path = "../../../../../../../../../charts" }
 tangram_core = { path = "../../../../../../../../../core" }

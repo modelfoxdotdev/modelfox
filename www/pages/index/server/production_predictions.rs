@@ -1,4 +1,4 @@
-use html::{component, html, style};
+use pinwheel::prelude::*;
 use tangram_charts::{
 	components::FeatureContributionsChart,
 	feature_contributions_chart::{
@@ -7,53 +7,62 @@ use tangram_charts::{
 };
 use tangram_ui as ui;
 
-#[component]
-pub fn ProductionExplanations() {
-	let class_name = "Positive".to_owned();
-	let probability = 0.9748272;
-	let series = feature_contributions_chart_series();
-	html! {
-		<div class="index-step">
-			<div>
-				<div class="index-step-title">{"Monitor production predictions."}</div>
-				<div class="index-step-text">
-					{"After calling "}
-					<ui::InlineCode>{"logPrediction"}</ui::InlineCode>
-					{", look up any prediction in the app by its identifier."}
-				</div>
-				<br />
-				<div class="index-step-text">
-					{"Every prediction will display its input and output, as well as a detailed explanation showing how each feature contributed to the output."}
-				</div>
-			</div>
-			<ui::Window padding={Some(true)}>
-				<div class="production-explanations-grid">
-					<div style={style! { "grid-area" => "prediction" }}>
-						<ui::NumberCard
-							title="Prediction"
-							value={class_name}
-						/>
-					</div>
-					<div style={style! { "grid-area" => "probability" }}>
-						<ui::NumberCard
-							title="Probability"
-							value={ui::format_percent(probability)}
-						/>
-					</div>
-					<div style={style! { "grid-area" => "feature_contributions" }}>
-						<ui::Card>
-							<FeatureContributionsChart
-								id?="production-explanations"
-								include_x_axis_title?={Some(true)}
-								negative_color={ui::colors::RED.to_owned()}
-								positive_color={ui::colors::GREEN.to_owned()}
-								series={series}
-							/>
-						</ui::Card>
-					</div>
-				</div>
-			</ui::Window>
-		</div>
+#[derive(ComponentBuilder)]
+pub struct ProductionExplanations {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for ProductionExplanations {
+	fn into_node(self) -> Node {
+		let class_name = "Positive".to_owned();
+		let probability = 0.9748272;
+		let series = feature_contributions_chart_series();
+		let title = div()
+			.class("index-step-title")
+			.child("Monitor production predictions.");
+		let p1 = div()
+			.class("index-step-text")
+			.child("After calling ")
+			.child(ui::InlineCode::new().child("logPrediction"))
+			.child(", look up any prediction in the app by its identifier.");
+		let p2 = "Every prediction will display its input and output, as well as a detailed explanation showing how each feature contributed to the output.";
+		let p2 = div().class("index-step-text").child(p2);
+		let left = div().child(title).child(p1).child(br()).child(p2);
+		let prediction = div()
+			.style(style::GRID_AREA, "prediction")
+			.child(ui::NumberCard::new("Prediction".to_owned(), class_name));
+		let probability = div()
+			.style(style::GRID_AREA, "probability")
+			.child(ui::NumberCard::new(
+				"Probability".to_owned(),
+				ui::format_percent(probability),
+			));
+		let feature_contributions = div()
+			.style(style::GRID_AREA, "feature-contributions")
+			.child(
+				ui::Card::new().child(
+					FeatureContributionsChart::new(
+						ui::colors::RED.to_owned(),
+						ui::colors::GREEN.to_owned(),
+						series,
+					)
+					.id("production-explanations".to_owned())
+					.include_x_axis_title(Some(true)),
+				),
+			);
+		let right = ui::Window::new().child(
+			div()
+				.class("production-explanations-grid")
+				.child(prediction)
+				.child(probability)
+				.child(feature_contributions),
+		);
+		div()
+			.class("index-step")
+			.child(left)
+			.child(right)
+			.into_node()
 	}
 }
 

@@ -1,14 +1,14 @@
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	document::{Document, DocumentProps},
-	model_layout::{ModelLayout, ModelLayoutProps},
+	document::Document,
+	model_layout::{ModelLayout, ModelLayoutInfo},
 };
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
+#[derive(ComponentBuilder)]
+pub struct Page {
 	pub id: String,
-	pub model_layout_props: ModelLayoutProps,
+	pub model_layout_info: ModelLayoutInfo,
 	pub num_models: usize,
 	pub trained_models_metrics: Vec<TrainedModel>,
 	pub best_model_metrics: TrainedModel,
@@ -24,157 +24,138 @@ pub struct TrainedModel {
 	pub time: String,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let description = "This page shows you details of all the models that you trained.";
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<ModelLayout {props.model_layout_props}>
-				<ui::S1>
-					<ui::H1>{"Training Grid"}</ui::H1>
-					<ui::P>
-						{description}
-					</ui::P>
-					<ui::S2>
-						<ui::H2>{"Best Model Metrics"}</ui::H2>
-						<WinningModelMetricsTable
-							best_model={props.best_model_metrics}
-							model_comparison_metric_name={props.model_comparison_metric_name.clone()}
-						/>
-					</ui::S2>
-					<ui::S2>
-						<ui::H2>{"Best Model Hyperparameters"}</ui::H2>
-						<ModelHyperparametersTable hyperparameters={props.best_model_hyperparameters} />
-					</ui::S2>
-					<ui::S2>
-						<ui::H2>{"All Models"}</ui::H2>
-						<AllTrainedModelsMetricsTable
-							trained_models={props.trained_models_metrics}
-							model_comparison_metric_name={props.model_comparison_metric_name}
-						/>
-					</ui::S2>
-				</ui::S1>
-			</ModelLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		let description = "This page shows you details of all the models that you trained.";
+		Document::new()
+			.child(
+				ModelLayout::new(self.model_layout_info).child(
+					ui::S1::new()
+						.child(ui::H1::new().child("Training Grid"))
+						.child(ui::P::new().child(description))
+						.child(
+							ui::S2::new()
+								.child(ui::H2::new().child("Best Model Metrics"))
+								.child(WinningModelMetricsTable::new(
+									self.best_model_metrics,
+									self.model_comparison_metric_name.clone(),
+								)),
+						)
+						.child(
+							ui::S2::new()
+								.child(ui::H2::new().child("Best Model Hyperparameters"))
+								.child(ModelHyperparametersTable::new(
+									self.best_model_hyperparameters,
+								)),
+						)
+						.child(
+							ui::S2::new()
+								.child(ui::H2::new().child("All Models"))
+								.child(AllTrainedModelsMetricsTable::new(
+									self.trained_models_metrics,
+									self.model_comparison_metric_name,
+								)),
+						),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct WinningModelMetricsTableProps {
+#[derive(ComponentBuilder)]
+pub struct WinningModelMetricsTable {
 	best_model: TrainedModel,
 	model_comparison_metric_name: String,
 }
 
-#[component]
-fn WinningModelMetricsTable(props: WinningModelMetricsTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-						"Model Number"
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						"Model Type"
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						"Training Time"
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{props.model_comparison_metric_name}
-					</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableRow>
-				<ui::TableCell>
-					{props.best_model.identifier}
-				</ui::TableCell>
-				<ui::TableCell>
-					{props.best_model.model_type}
-				</ui::TableCell>
-				<ui::TableCell>
-					{props.best_model.time}
-				</ui::TableCell>
-				<ui::TableCell>
-					{ui::format_float(props.best_model.model_comparison_metric_value)}
-				</ui::TableCell>
-			</ui::TableRow>
-		</ui::Table>
+impl Component for WinningModelMetricsTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new()
+						.child(ui::TableHeaderCell::new().child("Model Number"))
+						.child(ui::TableHeaderCell::new().child("Model Type"))
+						.child(ui::TableHeaderCell::new().child("Training Time"))
+						.child(ui::TableHeaderCell::new().child(self.model_comparison_metric_name)),
+				),
+			)
+			.child(
+				ui::TableRow::new()
+					.child(ui::TableCell::new().child(self.best_model.identifier))
+					.child(ui::TableCell::new().child(self.best_model.model_type))
+					.child(ui::TableCell::new().child(self.best_model.time))
+					.child(ui::TableCell::new().child(ui::format_float(
+						self.best_model.model_comparison_metric_value,
+					))),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct AllTrainedModelsMetricsTableProps {
+#[derive(ComponentBuilder)]
+pub struct AllTrainedModelsMetricsTable {
 	trained_models: Vec<TrainedModel>,
 	model_comparison_metric_name: String,
 }
 
-#[component]
-fn AllTrainedModelsMetricsTable(props: AllTrainedModelsMetricsTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-						"Model Number"
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						"Model Type"
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						"Training Time"
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{props.model_comparison_metric_name}
-					</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			{props.trained_models.into_iter().map(|trained_model| html! {
-				<ui::TableRow>
-					<ui::TableCell>
-						<ui::Link href={format!("./grid_item/{}", trained_model.identifier)}>
-							{trained_model.identifier}
-						</ui::Link>
-					</ui::TableCell>
-					<ui::TableCell>
-						{trained_model.model_type}
-					</ui::TableCell>
-					<ui::TableCell>
-						{trained_model.time}
-					</ui::TableCell>
-					<ui::TableCell>
-						{ui::format_float(trained_model.model_comparison_metric_value)}
-					</ui::TableCell>
-				</ui::TableRow>
-			}).collect::<Vec<_>>()}
-		</ui::Table>
+impl Component for AllTrainedModelsMetricsTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new()
+						.child(ui::TableHeaderCell::new().child("Model Number"))
+						.child(ui::TableHeaderCell::new().child("Model Type"))
+						.child(ui::TableHeaderCell::new().child("Training Time"))
+						.child(ui::TableHeaderCell::new().child(self.model_comparison_metric_name)),
+				),
+			)
+			.children(self.trained_models.into_iter().map(|trained_model| {
+				ui::TableRow::new()
+					.child(
+						ui::TableCell::new().child(
+							ui::Link::new()
+								.href(format!("./grid_item/{}", trained_model.identifier))
+								.child(trained_model.identifier),
+						),
+					)
+					.child(ui::TableCell::new().child(trained_model.model_type))
+					.child(ui::TableCell::new().child(trained_model.time))
+					.child(ui::TableCell::new().child(ui::format_float(
+						trained_model.model_comparison_metric_value,
+					)))
+			}))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ModelHyperparametersTableProps {
+#[derive(ComponentBuilder)]
+pub struct ModelHyperparametersTable {
 	hyperparameters: Vec<(String, String)>,
 }
 
-#[component]
-fn ModelHyperparametersTable(props: ModelHyperparametersTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			{props.hyperparameters.into_iter().map(|(hyperparam_name, hyperparam_value)| {
-				html! {
-					<ui::TableRow>
-						<ui::TableHeaderCell expand?={Some(false)}>
-							{hyperparam_name}
-						</ui::TableHeaderCell>
-						<ui::TableCell expand?={Some(true)}>
-							{hyperparam_value}
-						</ui::TableCell>
-					</ui::TableRow>
-				}
-			}).collect::<Vec<_>>()}
-		</ui::Table>
+impl Component for ModelHyperparametersTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.children(self.hyperparameters.into_iter().map(
+				|(hyperparam_name, hyperparam_value)| {
+					ui::TableRow::new()
+						.child(
+							ui::TableHeaderCell::new()
+								.expand(Some(false))
+								.child(hyperparam_name),
+						)
+						.child(
+							ui::TableCell::new()
+								.expand(Some(true))
+								.child(hyperparam_value),
+						)
+				},
+			))
+			.into_node()
 	}
 }

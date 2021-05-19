@@ -18,8 +18,8 @@
             pandas
             pytorch
             scikitlearn
-            time
           ]))
+          time
         ];
       };
     }

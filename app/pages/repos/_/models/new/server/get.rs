@@ -1,5 +1,5 @@
-use crate::page::{Page, PageProps};
-use html::html;
+use crate::page::Page;
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{not_found, redirect_to_login, service_unavailable},
@@ -7,7 +7,7 @@ use tangram_app_common::{
 	user::{authorize_user, authorize_user_for_repo},
 	Context,
 };
-use tangram_app_layouts::app_layout::get_app_layout_props;
+use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
@@ -15,7 +15,7 @@ pub async fn get(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let repo_id = if let &["repos", repo_id, "models", "new"] = path_components(&request).as_slice()
+	let repo_id = if let ["repos", repo_id, "models", "new"] = *path_components(&request).as_slice()
 	{
 		repo_id.to_owned()
 	} else {
@@ -36,12 +36,12 @@ pub async fn get(
 	if !authorize_user_for_repo(&mut db, &user, repo_id).await? {
 		return Ok(not_found());
 	}
-	let app_layout_props = get_app_layout_props(&context).await?;
-	let props = PageProps {
-		app_layout_props,
+	let app_layout_info = app_layout_info(&context).await?;
+	let page = Page {
+		app_layout_info,
 		error: None,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

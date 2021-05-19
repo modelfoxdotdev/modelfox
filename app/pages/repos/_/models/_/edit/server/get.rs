@@ -1,7 +1,7 @@
-use crate::page::{Page, PageProps};
+use crate::page::Page;
 use chrono::prelude::*;
 use chrono_tz::Tz;
-use html::html;
+use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
@@ -11,7 +11,7 @@ use tangram_app_common::{
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::app_layout::get_app_layout_props;
+use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
@@ -20,7 +20,7 @@ pub async fn get(
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	let model_id =
-		if let &["repos", _, "models", model_id, "edit"] = path_components(&request).as_slice() {
+		if let ["repos", _, "models", model_id, "edit"] = *path_components(&request).as_slice() {
 			model_id.to_owned()
 		} else {
 			return Err(err!("unexpected path"));
@@ -41,7 +41,7 @@ pub async fn get(
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
-	let app_layout_props = get_app_layout_props(&context).await?;
+	let app_layout_info = app_layout_info(&context).await?;
 	let row = sqlx::query(
 		"
 			select
@@ -59,14 +59,14 @@ pub async fn get(
 	let created_at = created_at.to_string();
 	let model_tag: Option<String> = row.get(0);
 	let model_heading = model_tag.clone().unwrap_or_else(|| model_id.to_string());
-	let props = PageProps {
-		app_layout_props,
+	let page = Page {
+		app_layout_info,
 		model_id,
 		model_heading,
 		tag: model_tag,
 		created_at,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

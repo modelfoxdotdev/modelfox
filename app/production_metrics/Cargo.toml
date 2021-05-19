@@ -1,0 +1,30 @@
+[package]
+edition = "2018"
+name = "tangram_app_production_metrics"
+publish = false
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dev-dependencies]
+insta = "1"
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+chrono-tz = { version = "0.5", features = ["serde"] }
+num = "0.4"
+ndarray = { version = "0.15", features = ["rayon"] }
+pinwheel = { path = "../../pinwheel" }
+rust-s3 = { version = "0.27.0-rc4" , default-features = false, features = ["tokio-rustls-tls"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }
+tangram_ui = { path = "../../ui" }
+tangram_app_ui = { path = "../ui" }
+tangram_app_common = { path = "../common" }
+tangram_app_production_stats = { path = "../production_stats" }
+tangram_error = { path = "../../error" }
+tangram_metrics = { path = "../../metrics" }
+tangram_model = { path = "../../model" }
+tangram_zip = { path = "../../zip" }

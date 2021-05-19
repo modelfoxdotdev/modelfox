@@ -1,31 +1,43 @@
-use html::{component, html};
+use pinwheel::prelude::*;
+use std::borrow::Cow;
 use tangram_ui as ui;
 
-#[component]
-pub fn Train() {
-	html! {
-		<div class="index-step">
-			<div>
-				<div class="index-step-title">{"Train a model on the command line."}</div>
-				<div class="index-step-text">
-					{"Train a machine learning model by running "}
-					<ui::InlineCode>{"tangram train"}</ui::InlineCode>
-					{" with the path to a CSV file and the name of the column you want to predict."}
-				</div>
-				<br />
-				<div class="index-step-text">
-					{"The CLI automatically transforms your data into features, trains a number of models to predict the target column, and writes the best model to a "}
-					<ui::InlineCode>{".tangram"}</ui::InlineCode>
-					{" file."}
-				</div>
-				<br />
-				<div class="index-step-text">
-					{"If you want more control, you can provide a config file."}
-				</div>
-			</div>
-			<ui::Window padding={Some(true)}>
-				<ui::Code code={include_str!("./train.txt").to_owned()} hide_line_numbers?={Some(true)} />
-			</ui::Window>
-		</div>
+#[derive(ComponentBuilder)]
+pub struct Train {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Train {
+	fn into_node(self) -> Node {
+		let title = div()
+			.class("index-step-title")
+			.child("Train a model on the command line.");
+		let p1 = div()
+			.class("index-step-text")
+			.child("Train a machine learning model by running ")
+			.child(ui::InlineCode::new().child("tangram train"))
+			.child(" with the path to a CSV file and the name of the column you want to predict.");
+		let p2 = div().attribute("class","index-step-text").child("The CLI automatically transforms your data into features, trains a number of models to predict the target column, and writes the best model to a ").child(ui::InlineCode::new().child(".tangram")).child(" file.");
+		let p3 = div()
+			.class("index-step-text")
+			.child("If you want more control, you can provide a config file.");
+		let left = div()
+			.child(title)
+			.child(p1)
+			.child(br())
+			.child(p2)
+			.child(br())
+			.child(p3);
+		let right = ui::Window::new().child(
+			ui::Code::new()
+				.code(Cow::Borrowed(include_str!("./train.txt")))
+				.hide_line_numbers(Some(true)),
+		);
+		div()
+			.class("index-step")
+			.child(left)
+			.child(right)
+			.into_node()
 	}
 }

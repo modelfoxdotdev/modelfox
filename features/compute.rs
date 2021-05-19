@@ -1,7 +1,9 @@
 use crate::{
-	bag_of_words::BagOfWordsFeatureGroup, identity::IdentityFeatureGroup,
-	normalized::NormalizedFeatureGroup, one_hot_encoded::OneHotEncodedFeatureGroup,
-	word_embedding::WordEmbeddingFeatureGroup, FeatureGroup,
+	bag_of_words::BagOfWordsFeatureGroup,
+	bag_of_words_cosine_similarity::BagOfWordsCosineSimilarityFeatureGroup,
+	identity::IdentityFeatureGroup, normalized::NormalizedFeatureGroup,
+	one_hot_encoded::OneHotEncodedFeatureGroup, word_embedding::WordEmbeddingFeatureGroup,
+	FeatureGroup,
 };
 use ndarray::prelude::*;
 use tangram_table::prelude::*;
@@ -61,6 +63,14 @@ fn compute_features_array_f32_for_feature_group(
 		}
 		FeatureGroup::BagOfWords(feature_group) => {
 			compute_features_array_f32_for_bag_of_words_feature_group(
+				table,
+				feature_group,
+				features,
+				progress,
+			)
+		}
+		FeatureGroup::BagOfWordsCosineSimilarity(feature_group) => {
+			compute_features_array_f32_for_bag_of_words_cosine_similarity_feature_group(
 				table,
 				feature_group,
 				features,
@@ -138,6 +148,32 @@ fn compute_features_array_f32_for_bag_of_words_feature_group(
 	feature_group.compute_array_f32(features, source_column.view(), progress);
 }
 
+fn compute_features_array_f32_for_bag_of_words_cosine_similarity_feature_group(
+	table: &TableView,
+	feature_group: &BagOfWordsCosineSimilarityFeatureGroup,
+	features: ArrayViewMut2<f32>,
+	progress: &impl Fn(),
+) {
+	// Get the source column.
+	// Get the data for the source column.
+	let source_column_a = table
+		.columns()
+		.iter()
+		.find(|column| column.name().unwrap() == feature_group.source_column_name_a)
+		.unwrap();
+	let source_column_b = table
+		.columns()
+		.iter()
+		.find(|column| column.name().unwrap() == feature_group.source_column_name_b)
+		.unwrap();
+	feature_group.compute_array_f32(
+		features,
+		source_column_a.view(),
+		source_column_b.view(),
+		progress,
+	);
+}
+
 fn compute_features_array_f32_for_word_embedding_feature_group(
 	table: &TableView,
 	feature_group: &WordEmbeddingFeatureGroup,
@@ -190,6 +226,14 @@ fn compute_features_table_for_feature_group(
 		FeatureGroup::OneHotEncoded(_) => unimplemented!(),
 		FeatureGroup::BagOfWords(feature_group) => {
 			compute_features_table_for_bag_of_words_feature_group(
+				table,
+				feature_group,
+				features,
+				progress,
+			)
+		}
+		FeatureGroup::BagOfWordsCosineSimilarity(feature_group) => {
+			compute_features_table_for_bag_of_words_cosine_similarity_feature_group(
 				table,
 				feature_group,
 				features,
@@ -253,6 +297,28 @@ fn compute_features_table_for_bag_of_words_feature_group(
 	for column in columns {
 		features.columns_mut().push(column);
 	}
+}
+
+fn compute_features_table_for_bag_of_words_cosine_similarity_feature_group(
+	table: &TableView,
+	feature_group: &BagOfWordsCosineSimilarityFeatureGroup,
+	features: &mut Table,
+	progress: &impl Fn(u64),
+) {
+	// Get the data for the source column.
+	let source_column_a = table
+		.columns()
+		.iter()
+		.find(|column| column.name().unwrap() == feature_group.source_column_name_a)
+		.unwrap();
+	let source_column_b = table
+		.columns()
+		.iter()
+		.find(|column| column.name().unwrap() == feature_group.source_column_name_b)
+		.unwrap();
+	let column =
+		feature_group.compute_table(source_column_a.view(), source_column_b.view(), progress);
+	features.columns_mut().push(column);
 }
 
 fn compute_features_table_for_word_embedding_feature_group(
@@ -323,6 +389,14 @@ fn compute_features_array_value_for_feature_group(
 				progress,
 			)
 		}
+		FeatureGroup::BagOfWordsCosineSimilarity(feature_group) => {
+			compute_features_array_value_for_bag_of_words_cosine_similarity_feature_group(
+				table,
+				feature_group,
+				features,
+				progress,
+			)
+		}
 		FeatureGroup::WordEmbedding(feature_group) => {
 			compute_features_array_value_for_word_embedding_feature_group(
 				table,
@@ -375,6 +449,31 @@ fn compute_features_array_value_for_bag_of_words_feature_group(
 		.find(|column| column.name().unwrap() == feature_group.source_column_name)
 		.unwrap();
 	feature_group.compute_array_value(features, source_column.view(), progress);
+}
+
+fn compute_features_array_value_for_bag_of_words_cosine_similarity_feature_group(
+	table: &TableView,
+	feature_group: &BagOfWordsCosineSimilarityFeatureGroup,
+	features: ArrayViewMut2<tangram_table::TableValue>,
+	progress: &impl Fn(),
+) {
+	// Get the data for the source column.
+	let source_column_a = table
+		.columns()
+		.iter()
+		.find(|column| column.name().unwrap() == feature_group.source_column_name_a)
+		.unwrap();
+	let source_column_b = table
+		.columns()
+		.iter()
+		.find(|column| column.name().unwrap() == feature_group.source_column_name_b)
+		.unwrap();
+	feature_group.compute_array_value(
+		features,
+		source_column_a.view(),
+		source_column_b.view(),
+		progress,
+	);
 }
 
 fn compute_features_array_value_for_word_embedding_feature_group(

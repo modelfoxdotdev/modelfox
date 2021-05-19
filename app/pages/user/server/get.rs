@@ -1,9 +1,8 @@
 use crate::page::{
-	AuthProps, DetailsSectionProps, Inner, NoAuthProps, OrganizationsSectionProps,
-	OrganizationsTableProps, OrganizationsTableRow, Page, PageProps, ReposSectionProps,
-	ReposTableProps, ReposTableRow,
+	Auth, DetailsSection, Inner, NoAuth, OrganizationsSection, OrganizationsTable,
+	OrganizationsTableRow, Page, ReposSection, ReposTable, ReposTableRow,
 };
-use html::html;
+use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
@@ -12,7 +11,7 @@ use tangram_app_common::{
 	user::{authorize_user, User},
 	Context,
 };
-use tangram_app_layouts::app_layout::get_app_layout_props;
+use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_error::Result;
 use tangram_id::Id;
 
@@ -31,8 +30,8 @@ pub async fn get(
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
-	let app_layout_props = get_app_layout_props(&context).await?;
-	let props = match user {
+	let app_layout_info = app_layout_info(&context).await?;
+	let page = match user {
 		User::Root => {
 			let repos = get_root_user_repositories(&mut db).await?;
 			let rows: Vec<ReposTableRow> = repos
@@ -42,22 +41,20 @@ pub async fn get(
 					title: repo.title,
 				})
 				.collect();
-			let repos_table_props = if !rows.is_empty() {
-				Some(ReposTableProps { rows })
+			let repos_table = if !rows.is_empty() {
+				Some(ReposTable { rows })
 			} else {
 				None
 			};
-			let repos_section_props = ReposSectionProps { repos_table_props };
-			let inner = Inner::NoAuth(NoAuthProps {
-				repos_section_props,
-			});
-			PageProps {
-				app_layout_props,
+			let repos_section = ReposSection { repos_table };
+			let inner = Inner::NoAuth(NoAuth { repos_section });
+			Page {
+				app_layout_info,
 				inner,
 			}
 		}
 		User::Normal(user) => {
-			let details_section_props = DetailsSectionProps { email: user.email };
+			let details_section = DetailsSection { email: user.email };
 			let organizations = get_organizations(&mut db, user.id).await?;
 			let rows: Vec<OrganizationsTableRow> = organizations
 				.into_iter()
@@ -66,13 +63,13 @@ pub async fn get(
 					name: organization.name,
 				})
 				.collect();
-			let organizations_table_props = if !rows.is_empty() {
-				Some(OrganizationsTableProps { rows })
+			let organizations_table = if !rows.is_empty() {
+				Some(OrganizationsTable { rows })
 			} else {
 				None
 			};
-			let organizations_section_props = OrganizationsSectionProps {
-				organizations_table_props,
+			let organizations_section = OrganizationsSection {
+				organizations_table,
 			};
 			let repos = get_normal_user_repositories(&mut db, user.id).await?;
 			let rows: Vec<ReposTableRow> = repos
@@ -82,24 +79,24 @@ pub async fn get(
 					title: repo.title,
 				})
 				.collect();
-			let repos_table_props = if !rows.is_empty() {
-				Some(ReposTableProps { rows })
+			let repos_table = if !rows.is_empty() {
+				Some(ReposTable { rows })
 			} else {
 				None
 			};
-			let repos_section_props = ReposSectionProps { repos_table_props };
-			let inner = Inner::Auth(AuthProps {
-				details_section_props,
-				organizations_section_props,
-				repos_section_props,
+			let repos_section = ReposSection { repos_table };
+			let inner = Inner::Auth(Auth {
+				details_section,
+				organizations_section,
+				repos_section,
 			});
-			PageProps {
-				app_layout_props,
+			Page {
+				app_layout_info,
 				inner,
 			}
 		}
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

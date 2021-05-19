@@ -23,7 +23,7 @@ pub async fn post(
 	mut request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	let organization_id =
-		if let &["organizations", organization_id, ""] = path_components(&request).as_slice() {
+		if let ["organizations", organization_id, ""] = *path_components(&request).as_slice() {
 			organization_id.to_owned()
 		} else {
 			return Err(err!("unexpected path"));

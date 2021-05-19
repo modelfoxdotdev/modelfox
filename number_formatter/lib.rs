@@ -69,17 +69,17 @@ impl FloatFormatter {
 	pub fn format<T: Float>(&self, value: T) -> String {
 		let value = value.to_f64().unwrap();
 		if value.is_nan() {
-			return "NaN".to_string();
+			return "NaN".to_owned();
 		}
 		if value.is_infinite() {
 			if value.is_sign_positive() {
-				return "inf".to_string();
+				return "inf".to_owned();
 			} else {
-				return "-inf".to_string();
+				return "-inf".to_owned();
 			}
 		}
 		if value == 0.0 || value == -0.0 {
-			return "0".to_string();
+			return "0".to_owned();
 		}
 		let digits = self.digits;
 		let e = value.abs().log10().floor().to_i32().unwrap();

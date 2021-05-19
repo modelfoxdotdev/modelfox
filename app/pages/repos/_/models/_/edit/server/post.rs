@@ -27,8 +27,8 @@ pub async fn post(
 	context: Arc<Context>,
 	mut request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let (repo_id, model_id) = if let &["repos", repo_id, "models", model_id, "edit"] =
-		path_components(&request).as_slice()
+	let (repo_id, model_id) = if let ["repos", repo_id, "models", model_id, "edit"] =
+		*path_components(&request).as_slice()
 	{
 		(repo_id.to_owned(), model_id.to_owned())
 	} else {

@@ -1,35 +1,25 @@
 use crate::Card;
-use html::{component, html, Props};
-use wasm_bindgen::JsCast;
-use web_sys::*;
+use pinwheel::prelude::*;
 
-#[derive(Props)]
-pub struct NumberCardProps {
-	#[optional]
-	pub id: Option<String>,
+#[derive(ComponentBuilder)]
+pub struct NumberCard {
 	pub title: String,
-	pub value: String,
+	pub value: BoxSignal<String>,
 }
 
-#[component]
-pub fn NumberCard(props: NumberCardProps) {
-	html! {
-		<Card>
-			<div id={props.id} class="number-wrapper">
-				<div class="number-value">{props.value}</div>
-				<div class="number-title">{props.title}</div>
-			</div>
-		</Card>
+impl Component for NumberCard {
+	fn into_node(self) -> Node {
+		Card::new()
+			.child(
+				div()
+					.class("number-wrapper")
+					.child(
+						div()
+							.class("number-value")
+							.child_signal(self.value.signal_cloned()),
+					)
+					.child(div().class("number-title").child(self.title)),
+			)
+			.into_node()
 	}
-}
-
-pub fn update_number(id: &str, value: String) {
-	let document = window().unwrap().document().unwrap();
-	let value_element = document
-		.query_selector(&format!("#{} .number-value", id))
-		.unwrap()
-		.unwrap()
-		.dyn_into::<HtmlElement>()
-		.unwrap();
-	value_element.set_inner_html(&value);
 }

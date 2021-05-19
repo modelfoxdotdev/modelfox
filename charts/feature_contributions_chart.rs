@@ -14,7 +14,7 @@ use crate::{
 };
 use num::ToPrimitive;
 use tangram_number_formatter::NumberFormatter;
-use web_sys::*;
+use web_sys as dom;
 
 pub struct FeatureContributionsChart;
 
@@ -428,7 +428,7 @@ struct DrawFeatureContributionSeriesOptions<'a> {
 	chart_config: &'a ChartConfig,
 	rect: Rect,
 	box_height: f64,
-	ctx: &'a CanvasRenderingContext2d,
+	ctx: &'a dom::CanvasRenderingContext2d,
 	negative_color: &'a str,
 	positive_color: &'a str,
 	series: &'a FeatureContributionsChartSeries,
@@ -640,7 +640,7 @@ struct DrawFeatureContributionsChartYAxisLabelsOptions<'a> {
 	chart_config: &'a ChartConfig,
 	rect: Rect,
 	categories: &'a [&'a String],
-	ctx: &'a CanvasRenderingContext2d,
+	ctx: &'a dom::CanvasRenderingContext2d,
 }
 
 fn draw_feature_contributions_chart_y_axis_labels(
@@ -701,7 +701,7 @@ struct DrawFeatureContributionTooltipsOptions<'a> {
 	chart_colors: &'a ChartColors,
 	chart_config: &'a ChartConfig,
 	active_hover_regions: &'a [ActiveHoverRegion<FeatureContributionsChartHoverRegionInfo>],
-	overlay_div: &'a HtmlElement,
+	overlay_div: &'a dom::HtmlElement,
 }
 
 fn draw_feature_contribution_tooltips(options: DrawFeatureContributionTooltipsOptions) {
@@ -767,7 +767,7 @@ struct DrawFeatureContributionBoxOptions<'a> {
 	chart_config: &'a ChartConfig,
 	rect: Rect,
 	color: String,
-	ctx: &'a CanvasRenderingContext2d,
+	ctx: &'a dom::CanvasRenderingContext2d,
 	direction: FeatureContributionsBoxDirection,
 	label: String,
 }

@@ -1,13 +1,13 @@
-use html::{component, html, Props};
 use num::ToPrimitive;
+use pinwheel::prelude::*;
 use tangram_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	components::BarChart,
 };
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct TrainingSummarySectionProps {
+#[derive(ComponentBuilder)]
+pub struct TrainingSummarySection {
 	pub chosen_model_type_name: String,
 	pub column_count: usize,
 	pub model_comparison_metric_type_name: String,
@@ -15,35 +15,32 @@ pub struct TrainingSummarySectionProps {
 	pub test_row_count: usize,
 }
 
-#[component]
-pub fn TrainingSummarySection(props: TrainingSummarySectionProps) {
-	html! {
-		<ui::S2>
-			<ui::H2>{"Training Summary"}</ui::H2>
-			<ui::P>
-				{"Your dataset had "}
-				<b>
-					{(props.train_row_count +
-						props.test_row_count).to_string()}
-				</b>
-				{" rows and "}
-				<b>{props.column_count.to_string()}</b>
-				{" columns. "}
-				<b>{props.train_row_count.to_string()}</b>
-				{" rows were used in training and "}
-				<b>{props.test_row_count.to_string()}</b>
-				{" rows were used in testing. The model with the highest "}
-				<b>{props.model_comparison_metric_type_name}</b>
-				{" was chosen. The best model is a "}
-				<b>{props.chosen_model_type_name}</b>
-				{"."}
-			</ui::P>
-		</ui::S2>
+impl Component for TrainingSummarySection {
+	fn into_node(self) -> Node {
+		ui::S2::new()
+			.child(ui::H2::new().child("Training Summary"))
+			.child(
+				ui::P::new()
+					.child("Your dataset had ")
+					.child(b().child((self.train_row_count + self.test_row_count).to_string()))
+					.child(" rows and ")
+					.child(b().child(self.column_count.to_string()))
+					.child(" columns. ")
+					.child(b().child(self.train_row_count.to_string()))
+					.child(" rows were used in training and ")
+					.child(b().child(self.test_row_count.to_string()))
+					.child(" rows were used in testing. The model with the highest ")
+					.child(b().child(self.model_comparison_metric_type_name))
+					.child(" was chosen. The best model is a ")
+					.child(b().child(self.chosen_model_type_name))
+					.child("."),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct FeatureImportancesSectionProps {
+#[derive(ComponentBuilder)]
+pub struct FeatureImportancesSection {
 	pub n_columns: usize,
 	pub n_features: usize,
 	pub feature_importances_chart_values: Vec<FeatureImportance>,
@@ -56,94 +53,97 @@ pub struct FeatureImportance {
 	pub feature_name: String,
 }
 
-#[component]
-pub fn FeatureImportancesSection(props: FeatureImportancesSectionProps) {
-	let description =
-		"The chart and table below show which features were most important to the model.";
-	html! {
-		<ui::S2>
-			<ui::H2>
-				{"Feature Importances"}
-			</ui::H2>
-			<ui::P>
-				{description}
-			</ui::P>
-			<FeatureImportancesChart values={props.feature_importances_chart_values} />
-			<FeatureImportancesTable rows={props.feature_importances_table_rows} />
-		</ui::S2>
+impl Component for FeatureImportancesSection {
+	fn into_node(self) -> Node {
+		let description =
+			"The chart and table below show which features were most important to the model.";
+		ui::S2::new()
+			.child(ui::H2::new().child("Feature Importances"))
+			.child(ui::P::new().child(description))
+			.child(FeatureImportancesChart::new(
+				self.feature_importances_chart_values,
+			))
+			.child(FeatureImportancesTable::new(
+				self.feature_importances_table_rows,
+			))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-struct FeatureImportancesChartProps {
+#[derive(ComponentBuilder)]
+struct FeatureImportancesChart {
 	values: Vec<FeatureImportance>,
 }
 
-#[component]
-fn FeatureImportancesChart(props: FeatureImportancesChartProps) {
-	let bar_chart_series = vec![BarChartSeries {
-		color: ui::colors::BLUE.to_owned(),
-		data: props
-			.values
-			.iter()
-			.enumerate()
-			.map(|(index, feature_importance)| BarChartPoint {
-				label: feature_importance.feature_name.clone(),
-				x: index.to_f64().unwrap(),
-				y: Some(
-					feature_importance
-						.feature_importance_value
-						.to_f64()
-						.unwrap(),
-				),
-			})
-			.collect(),
-		title: Some("Feature Importance".to_owned()),
-	}];
-	let n_feature_importances_to_show_in_chart = props.values.len();
-	html! {
-		<ui::Card>
-			<BarChart
-				id?="feature_importances"
-				series?={Some(bar_chart_series)}
-				title?={Some(format!("Feature Importances for Top {} Features", n_feature_importances_to_show_in_chart))}
-				x_axis_title?="Feature Name"
-				y_axis_title?="Feature Importance Value"
-				y_min?={Some(0.0)}
-			/>
-		</ui::Card>
+impl Component for FeatureImportancesChart {
+	fn into_node(self) -> Node {
+		let bar_chart_series = vec![BarChartSeries {
+			color: ui::colors::BLUE.to_owned(),
+			data: self
+				.values
+				.iter()
+				.enumerate()
+				.map(|(index, feature_importance)| BarChartPoint {
+					label: feature_importance.feature_name.clone(),
+					x: index.to_f64().unwrap(),
+					y: Some(
+						feature_importance
+							.feature_importance_value
+							.to_f64()
+							.unwrap(),
+					),
+				})
+				.collect(),
+			title: Some("Feature Importance".to_owned()),
+		}];
+		let n_feature_importances_to_show_in_chart = self.values.len();
+		ui::Card::new()
+			.child(
+				BarChart::new()
+					.id("feature_importances".to_owned())
+					.series(Some(bar_chart_series))
+					.title(Some(format!(
+						"Feature Importances for Top {} Features",
+						n_feature_importances_to_show_in_chart
+					)))
+					.x_axis_title("Feature Name".to_owned())
+					.y_axis_title("Feature Importance Value".to_owned())
+					.y_min(Some(0.0)),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-struct FeatureImportancesTableProps {
+#[derive(ComponentBuilder)]
+struct FeatureImportancesTable {
 	rows: Vec<FeatureImportance>,
 }
 
-#[component]
-fn FeatureImportancesTable(props: FeatureImportancesTableProps) {
-	html! {
-		<ui::Table width?="100%" >
-			<ui::TableHeader>
-				<ui::TableHeaderCell>
-					{"Feature Name"}
-				</ui::TableHeaderCell>
-				<ui::TableHeaderCell>
-					{"Feature Importance Value"}
-				</ui::TableHeaderCell>
-			</ui::TableHeader>
-			<ui::TableBody>
-			{props.rows.iter().map(|feature_importance_table_row| html! {
-				<ui::TableRow>
-					<ui::TableCell>
-						{feature_importance_table_row.feature_name.clone()}
-					</ui::TableCell>
-					<ui::TableCell>
-						{feature_importance_table_row.feature_importance_value.to_string()}
-					</ui::TableCell>
-				</ui::TableRow>
-			}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+impl Component for FeatureImportancesTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new()
+					.child(ui::TableHeaderCell::new().child("Feature Name"))
+					.child(ui::TableHeaderCell::new().child("Feature Importance Value")),
+			)
+			.child(ui::TableBody::new().children(self.rows.iter().map(
+				|feature_importance_table_row| {
+					ui::TableRow::new()
+						.child(
+							ui::TableCell::new()
+								.child(feature_importance_table_row.feature_name.clone()),
+						)
+						.child(
+							ui::TableCell::new().child(
+								feature_importance_table_row
+									.feature_importance_value
+									.to_string(),
+							),
+						)
+				},
+			)))
+			.into_node()
 	}
 }

@@ -1,332 +1,441 @@
-use html::{component, html, Props};
 use indoc::{formatdoc, indoc};
+use pinwheel::prelude::*;
+use std::borrow::Cow;
 use tangram_ui as ui;
 use tangram_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage},
-	document::{Document, DocumentProps},
+	document::Document,
 };
 
-#[component]
-pub fn Page() {
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<DocsLayout selected_page={DocsPage::Install} headings={None}>
-				<ui::S1>
-					<ui::H1>{"Install"}</ui::H1>
-					<Homebrew />
-					<Deb
-						distribution="ubuntu"
-						version="groovy"
-						title="Ubuntu 20.10 (Groovy Gorilla)"
-					/>
-					<Deb
-						distribution="ubuntu"
-						version="focal"
-						title="Ubuntu 20.04 LTS (Focal Fossa)"
-					/>
-					<Deb
-						distribution="ubuntu"
-						version="bionic"
-						title="Ubuntu 18.04 LTS (Bionic Beaver)"
-					/>
-					<Deb
-						distribution="debian"
-						version="sid"
-						title="Debian Sid (unstable)"
-					/>
-					<Deb
-						distribution="debian"
-						version="bullseye"
-						title="Debian Bullseye (testing)"
-					/>
-					<Deb
-						distribution="debian"
-						version="buster"
-						title="Debian Buster (stable)"
-					/>
-					<Deb
-						distribution="debian"
-						version="stretch"
-						title="Debian Stretch (oldstable)"
-					/>
-					<Alpine />
-					<Arch />
-					<AmazonLinux2 />
-					<Centos7 />
-					<Centos8 />
-					<Fedora />
-					<Rhel />
-					<Scoop />
-					<Docker />
-					<Manual />
-				</ui::S1>
-			</DocsLayout>
-		</Document>
+#[derive(ComponentBuilder)]
+pub struct Page {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Page {
+	fn into_node(self) -> Node {
+		Document::new()
+			.child(
+				DocsLayout::new(DocsPage::Install, None).child(
+					ui::S1::new()
+						.child(ui::H1::new().child("Install"))
+						.child(Homebrew::new())
+						.child(Deb::new(
+							"ubuntu".to_owned(),
+							"groovy".to_owned(),
+							"Ubuntu 20.10 (Groovy Gorilla)".to_owned(),
+						))
+						.child(Deb::new(
+							"ubuntu".to_owned(),
+							"focal".to_owned(),
+							"Ubuntu 20.04 LTS (Focal Fossa)".to_owned(),
+						))
+						.child(Deb::new(
+							"ubuntu".to_owned(),
+							"bionic".to_owned(),
+							"Ubuntu 18.04 LTS (Bionic Beaver)".to_owned(),
+						))
+						.child(Deb::new(
+							"debian".to_owned(),
+							"sid".to_owned(),
+							"Debian Sid (unstable)".to_owned(),
+						))
+						.child(Deb::new(
+							"debian".to_owned(),
+							"bullseye".to_owned(),
+							"Debian Bullseye (testing)".to_owned(),
+						))
+						.child(Deb::new(
+							"debian".to_owned(),
+							"buster".to_owned(),
+							"Debian Buster (stable)".to_owned(),
+						))
+						.child(Deb::new(
+							"debian".to_owned(),
+							"stretch".to_owned(),
+							"Debian Stretch (oldstable)".to_owned(),
+						))
+						.child(Alpine::new())
+						.child(Arch::new())
+						.child(AmazonLinux2::new())
+						.child(Centos7::new())
+						.child(Centos8::new())
+						.child(Fedora::new())
+						.child(Rhel::new())
+						.child(Scoop::new())
+						.child(Docker::new())
+						.child(Manual::new()),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn Homebrew() {
-	let code = "brew install tangramxyz/tap/tangram";
-	html! {
-		<ui::S2>
-			<ui::H2>{"Homebrew"}</ui::H2>
-			<ui::P>
-				{"Install the tangram package from the "}
-				<ui::Link href="https://github.com/tangramxyz/homebrew-tap">
-					{"homebrew tap"}
-				</ui::Link>
-				{":"}
-			</ui::P>
-			<ui::Window padding={Some(true)}>
-				<ui::Code hide_line_numbers?={Some(true)} code={code.to_owned()} />
-			</ui::Window>
-		</ui::S2>
+#[derive(ComponentBuilder)]
+struct Homebrew {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Homebrew {
+	fn into_node(self) -> Node {
+		let code = "brew install tangramxyz/tap/tangram";
+		ui::S2::new()
+			.child(ui::H2::new().child("Homebrew"))
+			.child(
+				ui::P::new()
+					.child("Install the tangram package from the ")
+					.child(
+						ui::Link::new()
+							.href("https://github.com/tangramxyz/homebrew-tap".to_owned())
+							.child("homebrew tap"),
+					)
+					.child(":"),
+			)
+			.child(
+				ui::Window::new().child(
+					ui::Code::new()
+						.code(Cow::Borrowed(code))
+						.hide_line_numbers(Some(true)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn Alpine() {
-	let code = formatdoc! {
-		r#"
-			# Add the tangram rsa key.
-			curl -fsSL https://pkgs.tangram.xyz/stable/alpine/tangram.rsa | tee /etc/apk/keys/tangram.rsa
-			# Add the tangram repository.
-			echo "https://pkgs.tangram.xyz/stable/alpine" | tee /etc/apk/repositories
-			# Install!
-			apk add tangram
-		"#
-	};
-	html! {
-		<ui::S2>
-			<ui::H2>{"Alpine"}</ui::H2>
-			<ui::Window padding={Some(true)}>
-				<ui::Code hide_line_numbers?={Some(true)} code={code} />
-			</ui::Window>
-		</ui::S2>
+#[derive(ComponentBuilder)]
+struct Alpine {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Alpine {
+	fn into_node(self) -> Node {
+		let code = indoc!(
+			r#"
+				# Add the tangram rsa key.
+				curl -fsSL https://pkgs.tangram.xyz/stable/alpine/tangram.rsa | tee /etc/apk/keys/tangram.rsa
+				# Add the tangram repository.
+				echo "https://pkgs.tangram.xyz/stable/alpine" | tee /etc/apk/repositories
+				# Install!
+				apk add tangram
+			"#
+		);
+		ui::S2::new()
+			.child(ui::H2::new().child("Alpine"))
+			.child(
+				ui::Window::new().child(
+					ui::Code::new()
+						.code(Cow::Borrowed(code))
+						.hide_line_numbers(Some(true)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct DebProps {
+#[derive(ComponentBuilder)]
+pub struct Deb {
 	distribution: String,
 	version: String,
 	title: String,
 }
 
-#[component]
-fn Deb(props: DebProps) {
-	let code = formatdoc! {
-		r#"
-			# Add the tangram gpg key.
-			curl -fsSL https://pkgs.tangram.xyz/stable/{distribution}/{version}.gpg | sudo apt-key add -
-			# Add the tangram repository.
-			curl -fsSL https://pkgs.tangram.xyz/stable/{distribution}/{version}.list | sudo tee /etc/apt/sources.list.d/tangram.list
-			# Install!
-			sudo apt-get update && sudo apt-get install tangram
-		"#,
-		distribution = props.distribution,
-		version = props.version,
-	};
-	html! {
-		<ui::S2>
-			<ui::H2>{props.title}</ui::H2>
-			<ui::Window padding={Some(true)}>
-				<ui::Code hide_line_numbers?={Some(true)} code={code} />
-			</ui::Window>
-		</ui::S2>
+impl Component for Deb {
+	fn into_node(self) -> Node {
+		let code = formatdoc!(
+			r#"
+				# Add the tangram gpg key.
+				curl -fsSL https://pkgs.tangram.xyz/stable/{distribution}/{version}.gpg | sudo apt-key add -
+				# Add the tangram repository.
+				curl -fsSL https://pkgs.tangram.xyz/stable/{distribution}/{version}.list | sudo tee /etc/apt/sources.list.d/tangram.list
+				# Install!
+				sudo apt-get update && sudo apt-get install tangram
+			"#,
+			distribution = self.distribution,
+			version = self.version,
+		);
+		ui::S2::new()
+			.child(ui::H2::new().child(self.title))
+			.child(
+				ui::Window::new().child(
+					ui::Code::new()
+						.code(Cow::Owned(code))
+						.hide_line_numbers(Some(true)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn AmazonLinux2() {
-	let code = indoc! {
-		r#"
-			# Add the tangram repository.
-			sudo yum-config-manager --add-repo https://pkgs.tangram.xyz/stable/amazon-linux/2/tangram.repo
-			# Install!
-			sudo yum install tangram
-		"#
-	};
-	html! {
-		<ui::S2>
-			<ui::H2>{"Amazon Linux 2"}</ui::H2>
-			<ui::Window padding={Some(true)}>
-				<ui::Code hide_line_numbers?={Some(true)} code={code.to_owned()} />
-			</ui::Window>
-		</ui::S2>
+#[derive(ComponentBuilder)]
+struct AmazonLinux2 {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for AmazonLinux2 {
+	fn into_node(self) -> Node {
+		let code = indoc!(
+			r#"
+				# Add the tangram repository.
+				sudo yum-config-manager --add-repo https://pkgs.tangram.xyz/stable/amazon-linux/2/tangram.repo
+				# Install!
+				sudo yum install tangram
+			"#
+		);
+		ui::S2::new()
+			.child(ui::H2::new().child("Amazon Linux 2"))
+			.child(
+				ui::Window::new().child(
+					ui::Code::new()
+						.code(Cow::Borrowed(code))
+						.hide_line_numbers(Some(true)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn Centos7() {
-	let code = formatdoc! {
-		r#"
-			# Add the tangram repository.
-			sudo yum-config-manager --add-repo https://pkgs.tangram.xyz/stable/centos/7/tangram.repo
-			# Install!
-			sudo yum install tangram
-		"#
-	};
-	html! {
-		<ui::S2>
-			<ui::H2>{"Centos 7"}</ui::H2>
-			<ui::Window padding={Some(true)}>
-				<ui::Code hide_line_numbers?={Some(true)} code={code} />
-			</ui::Window>
-		</ui::S2>
+#[derive(ComponentBuilder)]
+struct Centos7 {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Centos7 {
+	fn into_node(self) -> Node {
+		let code = indoc!(
+			r#"
+				# Add the tangram repository.
+				sudo yum-config-manager --add-repo https://pkgs.tangram.xyz/stable/centos/7/tangram.repo
+				# Install!
+				sudo yum install tangram
+			"#
+		);
+		ui::S2::new()
+			.child(ui::H2::new().child("Centos 7"))
+			.child(
+				ui::Window::new().child(
+					ui::Code::new()
+						.code(Cow::Borrowed(code))
+						.hide_line_numbers(Some(true)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn Fedora() {
-	let code = formatdoc! {
-		r#"
-			# Add the tangram repository.
-			sudo dnf config-manager --add-repo https://pkgs.tangram.xyz/stable/fedora/tangram.repo
-			# Install!
-			sudo dnf install tangram
-		"#
-	};
-	html! {
-		<ui::S2>
-			<ui::H2>{"Fedora"}</ui::H2>
-			<ui::Window padding={Some(true)}>
-				<ui::Code hide_line_numbers?={Some(true)} code={code} />
-			</ui::Window>
-		</ui::S2>
+#[derive(ComponentBuilder)]
+struct Fedora {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Fedora {
+	fn into_node(self) -> Node {
+		let code = indoc!(
+			r#"
+				# Add the tangram repository.
+				sudo dnf config-manager --add-repo https://pkgs.tangram.xyz/stable/fedora/tangram.repo
+				# Install!
+				sudo dnf install tangram
+			"#
+		);
+		ui::S2::new()
+			.child(ui::H2::new().child("Fedora"))
+			.child(
+				ui::Window::new().child(
+					ui::Code::new()
+						.code(Cow::Borrowed(code))
+						.hide_line_numbers(Some(true)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn Rhel() {
-	let code = formatdoc! {
-		r#"
-			# Add the tangram repository.
-			sudo dnf config-manager --add-repo https://pkgs.tangram.xyz/stable/rhel/8/tangram.repo
-			# Install!
-			sudo dnf install tangram
-		"#
-	};
-	html! {
-		<ui::S2>
-			<ui::H2>{"RHEL 8"}</ui::H2>
-			<ui::Window padding={Some(true)}>
-				<ui::Code hide_line_numbers?={Some(true)} code={code} />
-			</ui::Window>
-		</ui::S2>
+#[derive(ComponentBuilder)]
+struct Rhel {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Rhel {
+	fn into_node(self) -> Node {
+		let code = indoc!(
+			r#"
+				# Add the tangram repository.
+				sudo dnf config-manager --add-repo https://pkgs.tangram.xyz/stable/rhel/8/tangram.repo
+				# Install!
+				sudo dnf install tangram
+			"#
+		);
+		ui::S2::new()
+			.child(ui::H2::new().child("RHEL 8"))
+			.child(
+				ui::Window::new().child(
+					ui::Code::new()
+						.code(Cow::Borrowed(code))
+						.hide_line_numbers(Some(true)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn Centos8() {
-	let code = formatdoc! {
-		r#"
-			# Add the tangram repository.
-			sudo dnf config-manager --add-repo https://pkgs.tangram.xyz/stable/centos/8/tangram.repo
-			# Install!
-			sudo dnf install tangram
-		"#
-	};
-	html! {
-		<ui::S2>
-			<ui::H2>{"Centos 8"}</ui::H2>
-			<ui::Window padding={Some(true)}>
-				<ui::Code hide_line_numbers?={Some(true)} code={code} />
-			</ui::Window>
-		</ui::S2>
+#[derive(ComponentBuilder)]
+struct Centos8 {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Centos8 {
+	fn into_node(self) -> Node {
+		let code = indoc!(
+			r#"
+				# Add the tangram repository.
+				sudo dnf config-manager --add-repo https://pkgs.tangram.xyz/stable/centos/8/tangram.repo
+				# Install!
+				sudo dnf install tangram
+			"#
+		);
+		ui::S2::new()
+			.child(ui::H2::new().child("Centos 8"))
+			.child(
+				ui::Window::new().child(
+					ui::Code::new()
+						.code(Cow::Borrowed(code))
+						.hide_line_numbers(Some(true)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn Arch() {
-	let code = "yay -S tangram";
-	html! {
-		<ui::S2>
-			<ui::H2>{"Arch"}</ui::H2>
-			<ui::P>
-				{"Install the tangram package from the "}
-				<ui::Link
-					href="https://aur.archlinux.org/packages/tangram"
-				>
-					{"AUR"}
-				</ui::Link>
-				{":"}
-			</ui::P>
-			<ui::Window padding={Some(true)}>
-				<ui::Code hide_line_numbers?={Some(true)} code={code.to_owned()} />
-			</ui::Window>
-		</ui::S2>
+#[derive(ComponentBuilder)]
+struct Arch {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Arch {
+	fn into_node(self) -> Node {
+		let code = "yay -S tangram";
+		ui::S2::new()
+			.child(ui::H2::new().child("Arch"))
+			.child(
+				ui::P::new()
+					.child("Install the tangram package from the ")
+					.child(
+						ui::Link::new()
+							.href("https://aur.archlinux.org/packages/tangram".to_owned())
+							.child("AUR"),
+					)
+					.child(":"),
+			)
+			.child(
+				ui::Window::new().child(
+					ui::Code::new()
+						.code(Cow::Borrowed(code))
+						.hide_line_numbers(Some(true)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn Scoop() {
-	let code = indoc! {
-		r#"
-			scoop bucket add tangram https://github.com/tangramxyz/scoop.git
-			scoop install tangram
-		"#
-	};
-	html! {
-		<ui::S2>
-			<ui::H2>{"Windows Scoop"}</ui::H2>
-			<ui::P>
-				{"Install the tangram package from the "}
-				<ui::Link href="https://aur.archlinux.org/packages/tangram">
-					{"scoop bucket"}
-				</ui::Link>
-				{":"}
-			</ui::P>
-			<ui::Window padding={Some(true)}>
-				<ui::Code hide_line_numbers?={Some(true)} code={code.to_owned()} />
-			</ui::Window>
-		</ui::S2>
+#[derive(ComponentBuilder)]
+struct Scoop {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Scoop {
+	fn into_node(self) -> Node {
+		let code = indoc!(
+			r#"
+				scoop bucket add tangram https://github.com/tangramxyz/scoop.git
+				scoop install tangram
+			"#
+		);
+		ui::S2::new()
+			.child(ui::H2::new().child("Windows Scoop"))
+			.child(
+				ui::P::new()
+					.child("Install the tangram package from the ")
+					.child(
+						ui::Link::new()
+							.href("https://aur.archlinux.org/packages/tangram".to_owned())
+							.child("scoop bucket"),
+					)
+					.child(":"),
+			)
+			.child(
+				ui::Window::new().child(
+					ui::Code::new()
+						.code(Cow::Borrowed(code))
+						.hide_line_numbers(Some(true)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn Docker() {
-	let code =
+#[derive(ComponentBuilder)]
+struct Docker {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Docker {
+	fn into_node(self) -> Node {
+		let code =
 		"docker run --rm -it tangramxyz/tangram train --file heart_disease.csv --target diagnosis";
-	html! {
-		<ui::S2>
-			<ui::H2>{"Docker"}</ui::H2>
-			<ui::P>
-				{"Run the tangramxyz/tangram docker image from "}
-				<ui::Link href="https://hub.docker.com/tangramxyz/tangram">
-					{"Docker Hub"}
-				</ui::Link>
-				{":"}
-			</ui::P>
-			<ui::Window padding={Some(true)}>
-				<ui::Code hide_line_numbers?={Some(true)} code={code.to_owned()} />
-			</ui::Window>
-		</ui::S2>
+		ui::S2::new()
+			.child(ui::H2::new().child("Docker"))
+			.child(
+				ui::P::new()
+					.child("Run the tangramxyz/tangram docker image from ")
+					.child(
+						ui::Link::new()
+							.href("https://hub.docker.com/tangramxyz/tangram".to_owned())
+							.child("Docker Hub"),
+					)
+					.child(":"),
+			)
+			.child(
+				ui::Window::new().child(
+					ui::Code::new()
+						.code(Cow::Borrowed(code))
+						.hide_line_numbers(Some(true)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn Manual() {
-	html! {
-		<ui::S2>
-			<ui::H2>{"Install Manually"}</ui::H2>
-			<ui::P>
-				{"If none of the above methods works for you, you can download the tarball for your CPU architecture and operating system from "}
-				<ui::Link href="https://github.com/tangramxyz/tangram/releases/">
-					{"GitHub Releases"}
-				</ui::Link>
-				{". Untar the file and place the tangram executable somewhere on your "}
-				<ui::InlineCode>{"PATH"}</ui::InlineCode>
-				{". If you do this, please email us at "}
-				<ui::Link href="mailto:hello@tangram.xyz">
-					{"hello@tangram.xyz"}
-				</ui::Link>
-				{" so we can consider supporting your preferred installation method."}
-			</ui::P>
-		</ui::S2>
+#[derive(ComponentBuilder)]
+struct Manual {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Manual {
+	fn into_node(self) -> Node {
+		let p = ui::P::new()
+			.child("If none of the above methods works for you, you can download the tarball for your CPU architecture and operating system from ")
+			.child(ui::Link::new().href("https://github.com/tangramxyz/tangram/releases/".to_owned()).child("GitHub Releases"))
+			.child(". Untar the file and place the tangram executable somewhere on your ")
+			.child(ui::InlineCode::new().child("PATH"))
+			.child(". If you do this, please email us at ")
+			.child(ui::Link::new().href("mailto:hello@tangram.xyz".to_owned())
+			.child("hello@tangram.xyz"))
+			.child(" so we can consider supporting your preferred installation method.");
+		ui::S2::new()
+			.child(ui::H2::new().child("Install Manually"))
+			.child(p)
+			.into_node()
 	}
 }

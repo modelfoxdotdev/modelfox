@@ -1,9 +1,6 @@
-use crate::page::{
-	EnumFieldProps, FieldProps, FormProps, Inner, NumberFieldProps, Page, PageProps,
-	TextFieldProps, UnknownFieldProps,
-};
-use html::html;
+use crate::page::{EnumField, Field, Form, Inner, NumberField, Page, TextField, UnknownField};
 use num::ToPrimitive;
+use pinwheel::prelude::*;
 use std::collections::BTreeMap;
 use std::sync::Arc;
 use tangram_app_common::{
@@ -11,14 +8,14 @@ use tangram_app_common::{
 	model::get_model_bytes,
 	path_components,
 	predict::{
-		compute_feature_contributions_chart_series, compute_input_table_props,
-		BinaryClassificationPredictOutputProps, MulticlassClassificationPredictOutputProps,
-		PredictOutputInnerProps, PredictOutputProps, RegressionPredictOutputProps,
+		compute_feature_contributions_chart_series, compute_input_table,
+		BinaryClassificationPredictOutput, MulticlassClassificationPredictOutput, PredictOutput,
+		PredictOutputInner, RegressionPredictOutput,
 	},
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
+use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_core::predict::{PredictInputValue, PredictOptions};
 use tangram_error::{err, Result};
 use tangram_id::Id;
@@ -27,7 +24,7 @@ pub async fn get(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let model_id = if let &["repos", _, "models", model_id, "playground"] =
+	let model_id = if let ["repos", _, "models", model_id, "playground"] =
 		path_components(&request).as_slice()
 	{
 		model_id.to_owned()
@@ -61,14 +58,14 @@ pub async fn get(
 	}
 	let bytes = get_model_bytes(&context.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
-	let model_layout_props =
-		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::Playground).await?;
+	let model_layout_info =
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::Playground).await?;
 	let inner = compute_inner(model, search_params);
-	let props = PageProps {
-		model_layout_props,
+	let page = Page {
+		model_layout_info,
 		inner,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))
@@ -82,17 +79,17 @@ fn compute_inner(
 ) -> Inner {
 	let input = predict_input_from_search_params(search_params);
 	if let Some(input) = input {
-		Inner::Output(compute_predict_output_props(model, input))
+		Inner::Output(compute_predict_output(model, input))
 	} else {
-		Inner::Form(compute_form_props(model, &input))
+		Inner::Form(compute_form(model, &input))
 	}
 }
 
-fn compute_predict_output_props(
+fn compute_predict_output(
 	model: tangram_model::ModelReader,
 	input: tangram_core::predict::PredictInput,
-) -> PredictOutputProps {
-	let input_table = compute_input_table_props(model, &input);
+) -> PredictOutput {
+	let input_table = compute_input_table(model, &input);
 	let predict_model = tangram_core::predict::Model::from(model);
 	let options = PredictOptions {
 		compute_feature_contributions: true,
@@ -107,7 +104,7 @@ fn compute_predict_output_props(
 				"output".to_owned(),
 				feature_contributions,
 			);
-			PredictOutputInnerProps::Regression(RegressionPredictOutputProps {
+			PredictOutputInner::Regression(RegressionPredictOutput {
 				feature_contributions_chart_series,
 				value: output.value,
 			})
@@ -118,7 +115,7 @@ fn compute_predict_output_props(
 				"output".to_owned(),
 				feature_contributions,
 			);
-			PredictOutputInnerProps::BinaryClassification(BinaryClassificationPredictOutputProps {
+			PredictOutputInner::BinaryClassification(BinaryClassificationPredictOutput {
 				class_name: output.class_name,
 				feature_contributions_chart_series,
 				probability: output.probability,
@@ -132,17 +129,15 @@ fn compute_predict_output_props(
 					compute_feature_contributions_chart_series(class, feature_contributions)
 				})
 				.collect();
-			PredictOutputInnerProps::MulticlassClassification(
-				MulticlassClassificationPredictOutputProps {
-					class_name: output.class_name,
-					feature_contributions_chart_series,
-					probabilities: output.probabilities.into_iter().collect(),
-					probability: output.probability,
-				},
-			)
+			PredictOutputInner::MulticlassClassification(MulticlassClassificationPredictOutput {
+				class_name: output.class_name,
+				feature_contributions_chart_series,
+				probabilities: output.probabilities.into_iter().collect(),
+				probability: output.probability,
+			})
 		}
 	};
-	PredictOutputProps { inner, input_table }
+	PredictOutput { inner, input_table }
 }
 
 // Convert the search params to predict input.
@@ -159,10 +154,10 @@ fn predict_input_from_search_params(
 		.map(tangram_core::predict::PredictInput)
 }
 
-fn compute_form_props(
+fn compute_form(
 	model: tangram_model::ModelReader,
 	input: &Option<tangram_core::predict::PredictInput>,
-) -> FormProps {
+) -> Form {
 	let column_stats = match model.inner() {
 		tangram_model::ModelInnerReader::Regressor(regressor) => {
 			let regressor = regressor.read();
@@ -189,7 +184,7 @@ fn compute_form_props(
 					.cloned()
 					.unwrap_or_else(|| PredictInputValue::String("".to_owned()))
 					.into();
-				FieldProps::Unknown(UnknownFieldProps { name, value })
+				Field::Unknown(UnknownField { name, value })
 			}
 			tangram_model::ColumnStatsReader::NumberColumn(column_stats) => {
 				let column_stats = column_stats.read();
@@ -202,7 +197,7 @@ fn compute_form_props(
 						PredictInputValue::Number(column_stats.mean().to_f64().unwrap())
 					})
 					.into();
-				FieldProps::Number(NumberFieldProps {
+				Field::Number(NumberField {
 					name,
 					max: column_stats.max(),
 					min: column_stats.min(),
@@ -235,7 +230,7 @@ fn compute_form_props(
 					.cloned()
 					.unwrap_or_else(|| PredictInputValue::String(compute_mode()))
 					.into();
-				FieldProps::Enum(EnumFieldProps {
+				Field::Enum(EnumField {
 					name,
 					options,
 					value,
@@ -251,9 +246,9 @@ fn compute_form_props(
 					.cloned()
 					.unwrap_or_else(|| PredictInputValue::String("".to_owned()))
 					.into();
-				FieldProps::Text(TextFieldProps { name, value })
+				Field::Text(TextField { name, value })
 			}
 		})
 		.collect();
-	FormProps { fields }
+	Form { fields }
 }

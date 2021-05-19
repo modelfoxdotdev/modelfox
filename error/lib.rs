@@ -3,13 +3,13 @@ use backtrace::Backtrace;
 pub type Result<T, E = Error> = std::result::Result<T, E>;
 
 pub struct Error {
-	error: Box<dyn 'static + std::error::Error + Send + Sync>,
+	error: Box<dyn 'static + Send + Sync + std::error::Error>,
 	backtrace: Backtrace,
 }
 
 impl<E> From<E> for Error
 where
-	E: 'static + std::error::Error + Send + Sync,
+	E: 'static + Send + Sync + std::error::Error,
 {
 	fn from(value: E) -> Self {
 		Error::new(value)
@@ -31,7 +31,7 @@ impl std::fmt::Display for Error {
 impl Error {
 	pub fn new<E>(error: E) -> Error
 	where
-		E: 'static + std::error::Error + Send + Sync,
+		E: 'static + Send + Sync + std::error::Error,
 	{
 		Error {
 			error: Box::new(error),
@@ -49,21 +49,21 @@ impl Error {
 
 	pub fn downcast_ref<T>(&self) -> Option<&T>
 	where
-		T: 'static + std::error::Error + Send + Sync,
+		T: 'static + Send + Sync + std::error::Error,
 	{
 		self.error.downcast_ref()
 	}
 
 	pub fn downcast_mut<T>(&mut self) -> Option<&mut T>
 	where
-		T: 'static + std::error::Error + Send + Sync,
+		T: 'static + Send + Sync + std::error::Error,
 	{
 		self.error.downcast_mut()
 	}
 
 	pub fn downcast<T>(mut self) -> Result<T, Self>
 	where
-		T: 'static + std::error::Error + Send + Sync,
+		T: 'static + Send + Sync + std::error::Error,
 	{
 		self.error = match self.error.downcast() {
 			Ok(error) => return Ok(*error),

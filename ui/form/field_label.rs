@@ -1,15 +1,18 @@
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 
-#[derive(Props)]
-pub struct FieldLabelProps {
+#[derive(ComponentBuilder)]
+pub struct FieldLabel {
 	pub html_for: Option<String>,
+	#[children]
+	children: Vec<Node>,
 }
 
-#[component]
-pub fn FieldLabel(props: FieldLabelProps) {
-	html! {
-		<label class="field-label" for={props.html_for}>
-			{children}
-		</label>
+impl Component for FieldLabel {
+	fn into_node(self) -> Node {
+		label()
+			.class("field-label")
+			.attribute("for", self.html_for)
+			.child(self.children)
+			.into_node()
 	}
 }

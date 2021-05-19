@@ -1,11 +1,11 @@
-use html::{component, html, style, Props};
 use num::ToPrimitive;
+use pinwheel::prelude::*;
 use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen::{prelude::*, JsCast};
-use web_sys::*;
+use web_sys as dom;
 
-#[derive(Props)]
-pub struct AsciicastProps {
+#[derive(ComponentBuilder)]
+pub struct Asciicast {
 	pub id: String,
 	pub height: String,
 	pub options: AsciicastOptions,
@@ -31,24 +31,25 @@ impl Default for AsciicastOptions {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct AsciicastEvent(pub f32, pub String);
 
-#[component]
-pub fn Asciicast(props: AsciicastProps) {
-	let style = style! {
-		"height" => props.height
-	};
-	let options = serde_json::to_string(&props.options).unwrap();
-	html! {
-		<div class="asciicast" id={props.id} style={style} data-options={options}></div>
+impl Component for Asciicast {
+	fn into_node(self) -> Node {
+		let options = serde_json::to_string(&self.options).unwrap();
+		div()
+			.class("asciicast")
+			.style(style::HEIGHT, self.height)
+			.attribute("id", self.id)
+			.attribute("data-options", options)
+			.into_node()
 	}
 }
 
 pub fn boot_asciicast(id: &str) {
-	let window = window().unwrap();
+	let window = dom::window().unwrap();
 	let document = window.document().unwrap();
 	let container = document
 		.get_element_by_id(id)
 		.unwrap()
-		.dyn_into::<HtmlElement>()
+		.dyn_into::<dom::HtmlElement>()
 		.unwrap();
 	let options = container.dataset().get("options").unwrap();
 	let options = serde_json::from_str(&options).unwrap();
@@ -62,7 +63,7 @@ struct AsciicastPlayer {
 	state: Option<AsciicastPlayerState>,
 	render_callback: Option<Closure<dyn Fn()>>,
 	start_callback: Option<Closure<dyn Fn()>>,
-	element: HtmlElement,
+	element: dom::HtmlElement,
 }
 
 struct AsciicastPlayerState {
@@ -71,7 +72,7 @@ struct AsciicastPlayerState {
 }
 
 impl AsciicastPlayer {
-	fn new(options: AsciicastOptions, element: HtmlElement) -> Rc<RefCell<AsciicastPlayer>> {
+	fn new(options: AsciicastOptions, element: dom::HtmlElement) -> Rc<RefCell<AsciicastPlayer>> {
 		let player = Rc::new(RefCell::new(Self {
 			options,
 			state: None,
@@ -95,7 +96,7 @@ impl AsciicastPlayer {
 	}
 
 	fn start(&mut self) {
-		let window = window().unwrap();
+		let window = dom::window().unwrap();
 		let performance = window.performance().unwrap();
 		self.element.set_inner_html("");
 		self.state = Some(AsciicastPlayerState {
@@ -106,7 +107,7 @@ impl AsciicastPlayer {
 	}
 
 	fn render(&mut self) {
-		let window = window().unwrap();
+		let window = dom::window().unwrap();
 		let performance = window.performance().unwrap();
 		let start_time = self.state.as_ref().unwrap().start_time;
 		let current_time = performance.now() - start_time;

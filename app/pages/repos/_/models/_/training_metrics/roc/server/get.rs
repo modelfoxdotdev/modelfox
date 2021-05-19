@@ -1,5 +1,5 @@
-use crate::page::{Page, PageProps, RocCurveData};
-use html::html;
+use crate::page::{Page, RocCurveData};
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -8,7 +8,7 @@ use tangram_app_common::{
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
+use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
@@ -16,7 +16,7 @@ pub async fn get(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let model_id = if let &["repos", _, "models", model_id, "training_metrics", "roc"] =
+	let model_id = if let ["repos", _, "models", model_id, "training_metrics", "roc"] =
 		path_components(&request).as_slice()
 	{
 		model_id.to_owned()
@@ -40,7 +40,7 @@ pub async fn get(
 	}
 	let bytes = get_model_bytes(&context.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
-	let props = match model.inner() {
+	let page = match model.inner() {
 		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			let binary_classifier = binary_classifier.read();
 			let test_metrics = binary_classifier.test_metrics();
@@ -53,22 +53,22 @@ pub async fn get(
 				})
 				.collect();
 			let auc_roc = test_metrics.auc_roc();
-			let model_layout_props =
-				get_model_layout_props(&mut db, &context, model_id, ModelNavItem::TrainingMetrics)
+			let model_layout_info =
+				model_layout_info(&mut db, &context, model_id, ModelNavItem::TrainingMetrics)
 					.await?;
-			PageProps {
+			Page {
 				id: model_id.to_string(),
 				class: binary_classifier.positive_class().to_owned(),
 				roc_curve_data,
 				auc_roc,
-				model_layout_props,
+				model_layout_info,
 			}
 		}
 		_ => {
 			return Ok(bad_request());
 		}
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))

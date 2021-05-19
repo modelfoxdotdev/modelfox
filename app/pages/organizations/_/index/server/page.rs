@@ -1,81 +1,106 @@
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	app_layout::{AppLayout, AppLayoutProps},
-	document::{Document, DocumentProps},
+	app_layout::{AppLayout, AppLayoutInfo},
+	document::Document,
 };
 use tangram_id::Id;
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
-	pub app_layout_props: AppLayoutProps,
-	pub details_props: DetailsSectionProps,
+#[derive(ComponentBuilder)]
+pub struct Page {
+	pub app_layout_info: AppLayoutInfo,
+	pub details_section: DetailsSection,
 	pub id: String,
-	pub members_props: MembersSectionProps,
+	pub members_section: MembersSection,
 	pub name: String,
-	pub repos_props: ReposSectionProps,
+	pub repos_section: ReposSection,
 	pub can_delete: bool,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<AppLayout {props.app_layout_props}>
-				<ui::S1>
-					<ui::H1>{props.name}</ui::H1>
-					<DetailsSection {props.details_props} />
-					<MembersSection {props.members_props} />
-					<ReposSection {props.repos_props} />
-					{if props.can_delete {
-						Some(html! { <DangerZoneSection /> })
-					} else {
-						None
-					}}
-				</ui::S1>
-			</AppLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		Document::new()
+			.child(
+				AppLayout::new(self.app_layout_info).child(
+					ui::S1::new()
+						.child(ui::H1::new().child(self.name))
+						.child(self.details_section)
+						.child(self.members_section)
+						.child(self.repos_section)
+						.child(if self.can_delete {
+							Some(DangerZoneSection::new())
+						} else {
+							None
+						}),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct DetailsSectionProps {
+pub struct DetailsSection {
 	pub organization_id: String,
 	pub organization_name: String,
 	pub can_edit: bool,
 }
 
-#[component]
-fn DetailsSection(props: DetailsSectionProps) {
-	html! {
-		<ui::S2>
-			<ui::SpaceBetween>
-				<ui::H2>{"Details"}</ui::H2>
-				<ui::Button
-					color?="var(--gray)"
-					disabled?={Some(false)}
-					href?={Some(format!("/organizations/{}/edit", props.organization_id))}
-				>
-					{"Edit"}
-				</ui::Button>
-			</ui::SpaceBetween>
-			<ui::TextField
-				disabled?={Some(true)}
-				value?={Some(props.organization_name)}
-				label?="Organization Name"
-				readonly?={Some(true)}
-			/>
-		</ui::S2>
+impl Component for DetailsSection {
+	fn into_node(self) -> Node {
+		ui::S2::new()
+			.child(
+				ui::SpaceBetween::new()
+					.child(ui::H2::new().child("Details"))
+					.child(
+						ui::Button::new()
+							.href(Some(format!(
+								"/organizations/{}/edit",
+								self.organization_id
+							)))
+							.color("var(--gray)".to_owned())
+							.disabled(Some(false))
+							.child("Edit"),
+					),
+			)
+			.child(
+				ui::TextField::new()
+					.disabled(Some(true))
+					.value(Some(self.organization_name))
+					.label("Organization Name".to_owned())
+					.readonly(Some(true)),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct MembersSectionProps {
+pub struct MembersSection {
 	pub organization_id: Id,
-	pub members_table_props: MembersTableProps,
+	pub members_table: MembersTable,
+}
+
+impl Component for MembersSection {
+	fn into_node(self) -> Node {
+		ui::S2::new()
+			.child(
+				ui::SpaceBetween::new()
+					.child(ui::H2::new().child("Members"))
+					.child(
+						ui::Button::new()
+							.href(Some(format!(
+								"/organizations/{}/members/new",
+								self.organization_id,
+							)))
+							.child("Invite Team Member"),
+					),
+			)
+			.child(self.members_table)
+			.into_node()
+	}
+}
+
+pub struct MembersTable {
+	pub user_id: String,
+	pub can_edit: bool,
+	pub rows: Vec<MembersTableRow>,
 }
 
 pub struct MembersTableRow {
@@ -84,129 +109,101 @@ pub struct MembersTableRow {
 	pub is_admin: bool,
 }
 
-#[component]
-fn MembersSection(props: MembersSectionProps) {
-	html! {
-		<ui::S2>
-			<ui::SpaceBetween>
-				<ui::H2>{"Members"}</ui::H2>
-				<ui::Button href?={Some(format!("/organizations/{}/members/new", props.organization_id))}>
-					{"Invite Team Member"}
-				</ui::Button>
-			</ui::SpaceBetween>
-			<MembersTable {props.members_table_props} />
-		</ui::S2>
+impl Component for MembersTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new()
+						.child(ui::TableHeaderCell::new().child("Email"))
+						.child(ui::TableHeaderCell::new().child("Role")),
+				),
+			)
+			.child(ui::TableBody::new().children(self.rows.iter().map(|row| {
+				let member_cell = if self.can_edit {
+					ui::Link::new()
+						.href(format!("members/{}", row.id))
+						.child(row.email.clone())
+						.into_node()
+				} else {
+					row.email.clone().into_node()
+				};
+				ui::TableRow::new()
+					.child(ui::TableCell::new().child(member_cell))
+					.child(ui::TableCell::new().child(if row.is_admin {
+						"Admin"
+					} else {
+						"Member"
+					}))
+			})))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct MembersTableProps {
-	pub user_id: String,
-	pub can_edit: bool,
-	pub rows: Vec<MembersTableRow>,
-}
-
-#[component]
-fn MembersTable(props: MembersTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-						{"Email"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Role"}
-					</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-				{props.rows.iter().map(|row| html! {
-					<ui::TableRow>
-						<ui::TableCell>
-						{if props.can_edit {
-							html! {
-								<ui::Link href={format!("members/{}", row.id)}>
-									{row.email.clone()}
-								</ui::Link>
-							}
-						} else {
-							html! { <>{row.email.clone()}</> }
-						}}
-						</ui::TableCell>
-						<ui::TableCell>
-							{if row.is_admin {
-								"Admin"
-							} else {
-								"Member"
-							}}
-						</ui::TableCell>
-					</ui::TableRow>
-				}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
-	}
-}
-
-#[derive(Props)]
-pub struct MemberDeleteFormProps {
+#[derive(ComponentBuilder)]
+pub struct MemberDeleteForm {
 	member_id: String,
 }
 
-#[component]
-fn MemberDeleteForm(props: MemberDeleteFormProps) {
-	html! {
-		<ui::Form post?={Some(true)}>
-			<input
-				name="action"
-				type="hidden"
-				value="delete_member"
-			/>
-			<input
-				name="member_id"
-				type="hidden"
-				value={props.member_id}
-			/>
-			<ui::Button button_type?={Some(ui::ButtonType::Submit)} color?="var(--red)">
-				{"Remove"}
-			</ui::Button>
-		</ui::Form>
+impl Component for MemberDeleteForm {
+	fn into_node(self) -> Node {
+		ui::Form::new()
+			.post(Some(true))
+			.child(
+				input()
+					.attribute("name", "action")
+					.attribute("type", "hidden")
+					.attribute("value", "delete_member"),
+			)
+			.child(
+				input()
+					.attribute("name", "member_id")
+					.attribute("type", "hidden")
+					.attribute("value", self.member_id),
+			)
+			.child(
+				ui::Button::new()
+					.button_type(Some(ui::ButtonType::Submit))
+					.color("var(--red)".to_owned())
+					.child("Remove"),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ReposSectionProps {
-	pub repos_table_props: Option<ReposTableProps>,
+#[derive(ComponentBuilder)]
+pub struct ReposSection {
+	pub repos_table: Option<ReposTable>,
 }
 
-#[component]
-fn ReposSection(props: ReposSectionProps) {
-	let repos_table_or_empty_message = if let Some(repos_table_props) = props.repos_table_props {
-		html! {
-			<ReposTable {repos_table_props} />
-		}
-	} else {
-		html! {
-			<ui::Card>
-				<ui::P>{"This organization does not have any repos."}</ui::P>
-			</ui::Card>
-		}
-	};
-	html! {
-		<ui::S2>
-			<ui::SpaceBetween>
-				<ui::H2>{"Repos"}</ui::H2>
-				<ui::Button href?="/repos/new">
-					{"Create New Repo"}
-				</ui::Button>
-			</ui::SpaceBetween>
-			{repos_table_or_empty_message}
-		</ui::S2>
+impl Component for ReposSection {
+	fn into_node(self) -> Node {
+		let repos_table_or_empty_message = self
+			.repos_table
+			.map(|repos_table| repos_table.into_node())
+			.unwrap_or_else(|| {
+				ui::Card::new()
+					.child(ui::P::new().child("This organization does not have any repos."))
+					.into_node()
+			});
+		ui::S2::new()
+			.child(
+				ui::SpaceBetween::new()
+					.child(ui::H2::new().child("Repos"))
+					.child(
+						ui::Button::new()
+							.href("/repos/new".to_owned())
+							.child("Create New Repo"),
+					),
+			)
+			.child(repos_table_or_empty_message)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ReposTableProps {
+#[derive(ComponentBuilder)]
+pub struct ReposTable {
 	pub rows: Vec<ReposTableRow>,
 }
 
@@ -215,50 +212,57 @@ pub struct ReposTableRow {
 	pub title: String,
 }
 
-#[component]
-fn ReposTable(props: ReposTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-						{"Repo Title"}
-					</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-			{props.rows.into_iter().map(|row| html! {
-				<ui::TableRow>
-					<ui::TableCell>
-						<ui::Link href={format!("/repos/{}/", row.id)}>
-							{row.title}
-						</ui::Link>
-					</ui::TableCell>
-				</ui::TableRow>
-			}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+impl Component for ReposTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new().child(ui::TableHeaderCell::new().child("Repo Title")),
+				),
+			)
+			.child(
+				ui::TableBody::new().children(self.rows.into_iter().map(|row| {
+					ui::TableRow::new().child(
+						ui::TableCell::new().child(
+							ui::Link::new()
+								.href(format!("/repos/{}/", row.id))
+								.child(row.title),
+						),
+					)
+				})),
+			)
+			.into_node()
 	}
 }
 
-#[component]
-fn DangerZoneSection() {
-	html! {
-		<ui::S2>
-			<ui::H2>{"Danger Zone"}</ui::H2>
-			<ui::Form post?={Some(true)} onsubmit?="return confirm(\"Are you sure?\")">
-				<input
-					name="action"
-					type="hidden"
-					value="delete_organization"
-				/>
-				<ui::Button
-					button_type?={Some(ui::ButtonType::Submit)}
-					color?="var(--red)"
-				>
-					{"Delete Organization"}
-				</ui::Button>
-			</ui::Form>
-		</ui::S2>
+#[derive(ComponentBuilder)]
+struct DangerZoneSection {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for DangerZoneSection {
+	fn into_node(self) -> Node {
+		ui::S2::new()
+			.child(ui::H2::new().child("Danger Zone"))
+			.child(
+				ui::Form::new()
+					.post(Some(true))
+					.onsubmit("return confirm(\"Are you sure?\")".to_owned())
+					.child(
+						input()
+							.attribute("name", "action")
+							.attribute("type", "hidden")
+							.attribute("value", "delete_organization"),
+					)
+					.child(
+						ui::Button::new()
+							.button_type(Some(ui::ButtonType::Submit))
+							.color("var(--red)".to_owned())
+							.child("Delete Organization"),
+					),
+			)
+			.into_node()
 	}
 }

@@ -1,6 +1,6 @@
-use crate::page::{Page, PageProps};
-use html::html;
+use crate::page::Page;
 use multer::Multipart;
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{not_found, redirect_to_login, service_unavailable},
@@ -9,7 +9,7 @@ use tangram_app_common::{
 	user::{authorize_user, authorize_user_for_repo},
 	Context,
 };
-use tangram_app_layouts::app_layout::get_app_layout_props;
+use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
@@ -17,7 +17,7 @@ pub async fn post(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let repo_id = if let &["repos", repo_id, "models", "new"] = path_components(&request).as_slice()
+	let repo_id = if let ["repos", repo_id, "models", "new"] = *path_components(&request).as_slice()
 	{
 		repo_id.to_owned()
 	} else {
@@ -38,7 +38,7 @@ pub async fn post(
 	if !authorize_user_for_repo(&mut db, &user, repo_id).await? {
 		return Ok(not_found());
 	}
-	let app_layout_props = get_app_layout_props(&context).await?;
+	let app_layout_info = app_layout_info(&context).await?;
 	let boundary = match request
 		.headers()
 		.get(http::header::CONTENT_TYPE)
@@ -47,15 +47,15 @@ pub async fn post(
 	{
 		Some(boundary) => boundary,
 		None => {
-			let props = PageProps {
-				app_layout_props,
+			let page = Page {
+				app_layout_info,
 				error: Some(format!(
 					"Failed to parse request body.\n{}:{}",
 					file!(),
 					line!()
 				)),
 			};
-			let html = html!(<Page {props} />).render_to_string();
+			let html = html(page);
 			let response = http::Response::builder()
 				.status(http::StatusCode::BAD_REQUEST)
 				.body(hyper::Body::from(html))
@@ -69,15 +69,15 @@ pub async fn post(
 		let name = match field.name() {
 			Some(name) => name.to_owned(),
 			None => {
-				let props = PageProps {
-					app_layout_props,
+				let page = Page {
+					app_layout_info,
 					error: Some(format!(
 						"Failed to parse request body.\n{}:{}",
 						file!(),
 						line!()
 					)),
 				};
-				let html = html!(<Page {props} />).render_to_string();
+				let html = html(page);
 				let response = http::Response::builder()
 					.status(http::StatusCode::BAD_REQUEST)
 					.body(hyper::Body::from(html))
@@ -89,15 +89,15 @@ pub async fn post(
 		match name.as_str() {
 			"file" => file = Some(field_data),
 			_ => {
-				let props = PageProps {
-					app_layout_props,
+				let page = Page {
+					app_layout_info,
 					error: Some(format!(
 						"Failed to parse request body.\n{}:{}",
 						file!(),
 						line!()
 					)),
 				};
-				let html = html!(<Page {props} />).render_to_string();
+				let html = html(page);
 				let response = http::Response::builder()
 					.status(http::StatusCode::BAD_REQUEST)
 					.body(hyper::Body::from(html))
@@ -109,11 +109,11 @@ pub async fn post(
 	let bytes = match file {
 		Some(file) => file,
 		None => {
-			let props = PageProps {
-				app_layout_props,
+			let page = Page {
+				app_layout_info,
 				error: Some("A file is required.".to_owned()),
 			};
-			let html = html!(<Page {props} />).render_to_string();
+			let html = html(page);
 			let response = http::Response::builder()
 				.status(http::StatusCode::BAD_REQUEST)
 				.body(hyper::Body::from(html))
@@ -124,11 +124,11 @@ pub async fn post(
 	let model = match tangram_model::from_bytes(&bytes) {
 		Ok(model) => model,
 		Err(_) => {
-			let props = PageProps {
-				app_layout_props,
+			let page = Page {
+				app_layout_info,
 				error: Some("Invalid tangram model file.".to_owned()),
 			};
-			let html = html!(<Page {props} />).render_to_string();
+			let html = html(page);
 			let response = http::Response::builder()
 				.status(http::StatusCode::BAD_REQUEST)
 				.body(hyper::Body::from(html))
@@ -145,11 +145,11 @@ pub async fn post(
 	)
 	.await;
 	if result.is_err() {
-		let props = PageProps {
-			app_layout_props,
+		let page = Page {
+			app_layout_info,
 			error: Some("There was an error uploading your model.".to_owned()),
 		};
-		let html = html!(<Page {props} />).render_to_string();
+		let html = html(page);
 		let response = http::Response::builder()
 			.status(http::StatusCode::BAD_REQUEST)
 			.body(hyper::Body::from(html))

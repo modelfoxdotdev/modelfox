@@ -1,39 +1,60 @@
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 
-#[derive(Props)]
-pub struct AvatarProps {
+#[derive(ComponentBuilder)]
+pub struct Avatar {
 	pub src: Option<String>,
 }
 
-#[component]
-pub fn Avatar(props: AvatarProps) {
-	html! {
-		<div class="avatar">
-			{if let Some(src) = props.src {
-				html! {
-					<div class="avatar-img">
-						<img alt="avatar" src={src} />
-					</div>
+impl Component for Avatar {
+	fn into_node(self) -> Node {
+		div()
+			.class("avatar")
+			.child({
+				if let Some(src) = self.src {
+					div()
+						.class("avatar-img")
+						.child(img().attribute("alt", "avatar").attribute("src", src))
+				} else {
+					div()
+						.class("avatar-placeholder")
+						.child(DefaultAvatar::new())
 				}
-			} else {
-				html! {
-					<div class="avatar-placeholder">
-						<DefaultAvatar />
-					</div>
-				}
-			}}
-		</div>
+			})
+			.into_node()
 	}
 }
 
-#[component]
-pub fn DefaultAvatar() {
-	html! {
-		<svg height="100%" viewBox="0 0 100 100" width="100%">
-			<desc>{"avatar"}</desc>
-			<circle cx="50" cy="50" fill="var(--accent-color)" r="50"></circle>
-			<circle cx="50" cy="40" fill="var(--surface-color)" r="16"></circle>
-			<circle cx="50" cy="96" fill="var(--surface-color)" r="36"></circle>
-		</svg>
+#[derive(ComponentBuilder)]
+struct DefaultAvatar;
+
+impl Component for DefaultAvatar {
+	fn into_node(self) -> Node {
+		svg()
+			.attribute("height", "100%")
+			.attribute("viewBox", "0 0 100 100")
+			.attribute("width", "100%")
+			.child(svg::desc().child("avatar"))
+			.child(
+				svg::circle()
+					.attribute("cx", "50")
+					.attribute("cy", "50")
+					.attribute("fill", "var(--accent-color)")
+					.attribute("r", "50"),
+			)
+			.child(
+				svg::circle()
+					.attribute("cx", "50")
+					.attribute("cy", "40")
+					.attribute("fill", "var(--surface-color)")
+					.attribute("r", "16"),
+			)
+			.child(
+				svg::circle()
+					.attribute("cx", "50")
+					.attribute("cy", "96")
+					.attribute("fill", "var(--surface-color)")
+					.attribute("r", "36"),
+			)
+			.into_node()
 	}
 }

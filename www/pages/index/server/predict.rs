@@ -1,163 +1,166 @@
-use html::{component, html};
 use indoc::indoc;
+use pinwheel::prelude::*;
 use tangram_ui as ui;
 
-#[component]
-pub fn Predict() {
-	let elixir = indoc! {
-		r#"
-			model = Tangram.load_model_from_path("./heart_disease.tangram")
+#[derive(ComponentBuilder)]
+pub struct Predict {
+	#[children]
+	pub children: Vec<Node>,
+}
 
-			output = Tangram.predict(model, %{
-				:age =>    63,
-				:gender => "male",
-				# ...
-			})
-		"#
-	}
-	.into();
-	let go = indoc! {
-		r#"
-			import "github.com/tangramxyz/tangram/languages/go"
+impl Component for Predict {
+	fn into_node(self) -> Node {
+		let elixir = indoc!(
+			r#"
+				model = Tangram.load_model_from_path("./heart_disease.tangram")
 
-			model, _ := tangram.LoadModelFromPath("./heart_disease.tangram", nil)
+				output = Tangram.predict(model, %{
+					:age =>    63,
+					:gender => "male",
+					# ...
+				})
+			"#
+		)
+		.into();
+		let go = indoc!(
+			r#"
+				import "github.com/tangramxyz/tangram/languages/go"
 
-			output := model.PredictOne(tangram.Input{
-				"age":    63,
-				"gender": "male",
-				// ...
-			}, nil)
-		"#
-	}
-	.into();
-	let javascript = indoc! {
-		r#"
-			const tangram = require("@tangramxyz/tangram");
+				model, _ := tangram.LoadModelFromPath("./heart_disease.tangram", nil)
 
-			const model = new tangram.Model("./heart_disease.tangram");
+				output := model.PredictOne(tangram.Input{
+					"age":    63,
+					"gender": "male",
+					// ...
+				}, nil)
+			"#
+		)
+		.into();
+		let javascript = indoc!(
+			r#"
+				const tangram = require("@tangramxyz/tangram");
 
-			const output = model.predictSync({
-				age: 63,
-				gender: "male",
-				// ...
-			});
-		"#
-	}
-	.into();
-	let python = indoc! {
-		r#"
-			import tangram
+				const model = new tangram.Model("./heart_disease.tangram");
 
-			model = tangram.Model.from_path('./census.tangram')
+				const output = model.predictSync({
+					age: 63,
+					gender: "male",
+					// ...
+				});
+			"#
+		)
+		.into();
+		let python = indoc!(
+			r#"
+				import tangram
 
-			output = model.predict({
-				'age': 63,
-				'gender': 'male',
-				# ...
-			})
-		"#
-	}
-	.into();
-	let ruby = indoc! {
-		r#"
-			require 'tangram'
+				model = tangram.Model.from_path('./census.tangram')
 
-			model = Tangram::Model.from_path('./heart_disease.tangram')
+				output = model.predict({
+					'age': 63,
+					'gender': 'male',
+					# ...
+				})
+			"#
+		)
+		.into();
+		let ruby = indoc!(
+			r#"
+				require 'tangram'
 
-			output = model.predict({
-				age: 63,
-				gender: 'male',
-				# ...
-			})
-		"#
-	}
-	.into();
-	let rust = indoc! {
-		r#"
-		use tangram_rust as tangram;
+				model = Tangram::Model.from_path('./heart_disease.tangram')
 
-		let model: tangram::Model =
-		tangram::Model::from_path("./heart_disease.tangram", None).unwrap();
+				output = model.predict({
+					age: 63,
+					gender: 'male',
+					# ...
+				})
+			"#
+		)
+		.into();
+		let rust = indoc!(
+			r#"
+				use tangram_rust as tangram;
 
-		let input = tangram::predict_input! {
-			"age": 63.0,
-			"gender": "male",
-			// ...
-		};
+				let model: tangram::Model =
+				tangram::Model::from_path("./heart_disease.tangram", None).unwrap();
 
-		let output = model.predict_one(input, None);
-		"#
-	}
-	.into();
-	let code_for_language = ui::highlight_code_for_language(ui::CodeForLanguage {
-		elixir,
-		go,
-		javascript,
-		python,
-		ruby,
-		rust,
-	});
-	html! {
-		<div class="index-step">
-			<div>
-				<div class="index-step-title">{"Make predictions in your favorite language."}</div>
-				<div class="index-step-text">
-					{"Make predictions with libraries for "}
-					<ui::Link
-						href="https://hex.pm/packages/tangram"
-						title?="Elixir"
-					>
-						{"Elixir"}
-					</ui::Link>
-					{", " }
-					<ui::Link
-						href="https://pkg.go.dev/github.com/tangramxyz/tangram-go"
-						title?="Go"
-					>
-						{"Go"}
-					</ui::Link>
-					{", " }
-					<ui::Link
-						href="https://www.npmjs.com/package/@tangramxyz/tangram-node"
-						title?="Node.js"
-					>
-						{"Node.js"}
-					</ui::Link>
-					{", " }
-					<ui::Link
-						href="https://pypi.org/project/tangram"
-						title?="Python"
-					>
-						{"Python"}
-					</ui::Link>
-					{", " }
-					<ui::Link
-						href="https://rubygems.org/gems/tangram"
-						title?="Ruby"
-					>
-						{"Ruby"}
-					</ui::Link>
-					{", and "}
-					<ui::Link
-						href="https://lib.rs/tangram_rust"
-						title?="Rust"
-					>
-						{"Rust"}
-					</ui::Link>
-					{"."}
-				</div>
-				<br/>
-				<div class="index-step-text">
-					{"Tangram is written in Rust and exposed to each langauge via native extensions, so predictions are fast and your data never travels over the network."}
-				</div>
-			</div>
-			<ui::Window padding={Some(true)}>
-				<ui::CodeSelect
-					id="prediction"
-					code_for_language={code_for_language}
-					hide_line_numbers?={Some(false)}
-				/>
-			</ui::Window>
-		</div>
+				let input = tangram::predict_input! {
+					"age": 63.0,
+					"gender": "male",
+					// ...
+				};
+
+				let output = model.predict_one(input, None);
+			"#
+		)
+		.into();
+		let code_for_language = ui::highlight_code_for_language(ui::CodeForLanguage {
+			elixir,
+			go,
+			javascript,
+			python,
+			ruby,
+			rust,
+		});
+		let title = div()
+			.class("index-step-title")
+			.child("Make predictions in your favorite language.");
+		let p1 = div()
+			.class("index-step-text")
+			.child("Make predictions with libraries for ")
+			.child(
+				ui::Link::new()
+					.href("https://hex.pm/packages/tangram".to_owned())
+					.title("Elixir".to_owned())
+					.child("Elixir"),
+			)
+			.child(", ")
+			.child(
+				ui::Link::new()
+					.href("https://pkg.go.dev/github.com/tangramxyz/tangram-go".to_owned())
+					.title("Go".to_owned())
+					.child("Go"),
+			)
+			.child(", ")
+			.child(
+				ui::Link::new()
+					.href("https://www.npmjs.com/package/@tangramxyz/tangram-node".to_owned())
+					.title("Node.js".to_owned())
+					.child("Node.js"),
+			)
+			.child(", ")
+			.child(
+				ui::Link::new()
+					.href("https://pypi.org/project/tangram".to_owned())
+					.title("Python".to_owned())
+					.child("Python"),
+			)
+			.child(", ")
+			.child(
+				ui::Link::new()
+					.href("https://rubygems.org/gems/tangram".to_owned())
+					.title("Ruby".to_owned())
+					.child("Ruby"),
+			)
+			.child(", and ")
+			.child(
+				ui::Link::new()
+					.href("https://lib.rs/tangram_rust".to_owned())
+					.title("Rust".to_owned())
+					.child("Rust"),
+			)
+			.child(".");
+		let p2 = div().attribute("class","index-step-text").child("Tangram is written in Rust and exposed to each langauge via native extensions, so predictions are fast and your data never travels over the network.");
+		let left = div().child(title).child(p1).child(br()).child(p2);
+		let right = ui::Window::new().child(
+			ui::CodeSelect::new("prediction".to_owned(), code_for_language)
+				.hide_line_numbers(Some(false)),
+		);
+		div()
+			.class("index-step")
+			.child(left)
+			.child(right)
+			.into_node()
 	}
 }

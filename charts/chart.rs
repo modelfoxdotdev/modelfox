@@ -1,28 +1,27 @@
 use crate::config::{ChartColors, ChartConfig, DARK_CHART_COLORS, LIGHT_CHART_COLORS};
-use html::{self, style};
 use num::ToPrimitive;
 use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen::{prelude::*, JsCast};
-use web_sys::*;
+use web_sys as dom;
 
 pub struct Chart<T>
 where
 	T: ChartImpl,
 {
 	active_hover_regions: Vec<ActiveHoverRegion<T::HoverRegionInfo>>,
-	chart_canvas: HtmlCanvasElement,
+	chart_canvas: dom::HtmlCanvasElement,
 	chart_colors: Option<ChartColors>,
 	chart_config: Option<ChartConfig>,
-	color_scheme_media_query: Option<MediaQueryList>,
-	container: HtmlElement,
+	color_scheme_media_query: Option<dom::MediaQueryList>,
+	container: dom::HtmlElement,
 	hover_regions: Option<Vec<HoverRegion<T::HoverRegionInfo>>>,
 	on_color_scheme_media_query_change: Option<Closure<dyn Fn()>>,
-	on_mouse_event: Option<Closure<dyn Fn(MouseEvent)>>,
+	on_mouse_event: Option<Closure<dyn Fn(dom::MouseEvent)>>,
 	on_resize: Option<Closure<dyn Fn()>>,
-	on_touch_event: Option<Closure<dyn Fn(TouchEvent)>>,
+	on_touch_event: Option<Closure<dyn Fn(dom::TouchEvent)>>,
 	options: Option<T::Options>,
-	overlay_canvas: HtmlCanvasElement,
-	overlay_div: HtmlElement,
+	overlay_canvas: dom::HtmlCanvasElement,
+	overlay_div: dom::HtmlElement,
 	overlay_info: Option<T::OverlayInfo>,
 }
 
@@ -41,7 +40,7 @@ pub trait ChartImpl: 'static {
 pub struct DrawChartOptions<'a, Options> {
 	pub chart_colors: &'a ChartColors,
 	pub chart_config: &'a ChartConfig,
-	pub ctx: &'a CanvasRenderingContext2d,
+	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub options: &'a Options,
 }
 
@@ -60,10 +59,10 @@ where
 	pub active_hover_regions: &'a [ActiveHoverRegion<HoverRegionInfo>],
 	pub chart_colors: &'a ChartColors,
 	pub chart_config: &'a ChartConfig,
-	pub ctx: &'a CanvasRenderingContext2d,
+	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub options: &'a Options,
 	pub overlay_info: &'a OverlayInfo,
-	pub overlay_div: &'a HtmlElement,
+	pub overlay_div: &'a dom::HtmlElement,
 }
 
 pub struct HoverRegion<HoverRegionInfo>
@@ -88,9 +87,9 @@ impl<T> Chart<T>
 where
 	T: ChartImpl,
 {
-	pub fn new(container: HtmlElement) -> Rc<RefCell<Chart<T>>> {
+	pub fn new(container: dom::HtmlElement) -> Rc<RefCell<Chart<T>>> {
 		// Create the chart canvas, overlay div (for tooltips), and overlay canvas (for crosshairs).
-		let window = window().unwrap();
+		let window = dom::window().unwrap();
 		let document = window.document().unwrap();
 		container
 			.style()
@@ -99,41 +98,47 @@ where
 		let chart_canvas = document
 			.create_element("canvas")
 			.unwrap()
-			.dyn_into::<HtmlCanvasElement>()
+			.dyn_into::<dom::HtmlCanvasElement>()
 			.unwrap();
-		chart_canvas.style().set_css_text(&style! {
-			"position" => "absolute",
-			"top" => "0",
-			"bottom" => "0",
-			"left" => "0",
-			"right" => "0",
-		});
+		chart_canvas.style().set_css_text(
+			r#"
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+			"#,
+		);
 		container.append_child(&chart_canvas).unwrap();
 		let overlay_div = document
 			.create_element("div")
 			.unwrap()
-			.dyn_into::<HtmlElement>()
+			.dyn_into::<dom::HtmlElement>()
 			.unwrap();
-		overlay_div.style().set_css_text(&style! {
-			"position" => "absolute",
-			"top" => "0",
-			"bottom" => "0",
-			"left" => "0",
-			"right" => "0",
-		});
+		overlay_div.style().set_css_text(
+			r#"
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+			"#,
+		);
 		container.append_child(&overlay_div).unwrap();
 		let overlay_canvas = document
 			.create_element("canvas")
 			.unwrap()
-			.dyn_into::<HtmlCanvasElement>()
+			.dyn_into::<dom::HtmlCanvasElement>()
 			.unwrap();
-		overlay_canvas.style().set_css_text(&style! {
-			"position" => "absolute",
-			"top" => "0",
-			"bottom" => "0",
-			"left" => "0",
-			"right" => "0",
-		});
+		overlay_canvas.style().set_css_text(
+			r#"
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+			"#,
+		);
 		container.append_child(&overlay_canvas).unwrap();
 		// Create the Chart.
 		let chart = Rc::new(RefCell::new(Chart {
@@ -155,7 +160,7 @@ where
 		}));
 		// Add the mouse move handler.
 		let chart_ref = Rc::downgrade(&chart);
-		let on_mouse_event = Closure::<dyn Fn(_)>::wrap(Box::new(move |event: MouseEvent| {
+		let on_mouse_event = Closure::<dyn Fn(_)>::wrap(Box::new(move |event: dom::MouseEvent| {
 			let chart = chart_ref.upgrade().unwrap();
 			let mut chart = chart.borrow_mut();
 			let canvas_client_rect = chart.chart_canvas.get_bounding_client_rect();
@@ -182,7 +187,7 @@ where
 		chart.borrow_mut().on_mouse_event = Some(on_mouse_event);
 		// Add the touch event handler.
 		let chart_ref = Rc::downgrade(&chart);
-		let on_touch_event = Closure::<dyn Fn(_)>::wrap(Box::new(move |event: TouchEvent| {
+		let on_touch_event = Closure::<dyn Fn(_)>::wrap(Box::new(move |event: dom::TouchEvent| {
 			let chart = chart_ref.upgrade().unwrap();
 			let mut chart = chart.borrow_mut();
 			let canvas_client_rect = chart.chart_canvas.get_bounding_client_rect();
@@ -237,7 +242,7 @@ where
 	fn draw_chart(&mut self) {
 		let width = self.container.client_width().to_f64().unwrap();
 		let height = self.container.client_height().to_f64().unwrap();
-		let dpr = window().unwrap().device_pixel_ratio();
+		let dpr = dom::window().unwrap().device_pixel_ratio();
 		self.chart_canvas.set_width((width * dpr).to_u32().unwrap());
 		self.chart_canvas
 			.set_height((height * dpr).to_u32().unwrap());
@@ -261,7 +266,7 @@ where
 			.get_context("2d")
 			.unwrap()
 			.unwrap()
-			.dyn_into::<CanvasRenderingContext2d>()
+			.dyn_into::<dom::CanvasRenderingContext2d>()
 			.unwrap();
 		ctx.scale(dpr, dpr).unwrap();
 		ctx.clear_rect(0.0, 0.0, width, height);
@@ -285,7 +290,7 @@ where
 	fn draw_overlay(&mut self) {
 		let width = self.container.client_width().to_f64().unwrap();
 		let height = self.container.client_height().to_f64().unwrap();
-		let dpr = window().unwrap().device_pixel_ratio();
+		let dpr = dom::window().unwrap().device_pixel_ratio();
 		self.overlay_canvas
 			.set_width((width * dpr).to_u32().unwrap());
 		self.overlay_canvas
@@ -310,7 +315,7 @@ where
 			.get_context("2d")
 			.unwrap()
 			.unwrap()
-			.dyn_into::<CanvasRenderingContext2d>()
+			.dyn_into::<dom::CanvasRenderingContext2d>()
 			.unwrap();
 		ctx.scale(dpr, dpr).unwrap();
 		ctx.clear_rect(0.0, 0.0, width, height);
@@ -389,7 +394,7 @@ where
 			)
 			.unwrap();
 		let on_resize = self.on_resize.as_ref().unwrap();
-		window()
+		dom::window()
 			.unwrap()
 			.remove_event_listener_with_callback("resize", on_resize.as_ref().unchecked_ref())
 			.unwrap();

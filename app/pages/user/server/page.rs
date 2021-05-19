@@ -1,162 +1,150 @@
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	app_layout::{AppLayout, AppLayoutProps},
-	document::{Document, DocumentProps},
+	app_layout::{AppLayout, AppLayoutInfo},
+	document::Document,
 };
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
-	pub app_layout_props: AppLayoutProps,
+#[derive(ComponentBuilder)]
+pub struct Page {
+	pub app_layout_info: AppLayoutInfo,
 	pub inner: Inner,
 }
 
 pub enum Inner {
-	Auth(AuthProps),
-	NoAuth(NoAuthProps),
+	Auth(Auth),
+	NoAuth(NoAuth),
 }
 
-#[derive(Props)]
-pub struct AuthProps {
-	pub details_section_props: DetailsSectionProps,
-	pub organizations_section_props: OrganizationsSectionProps,
-	pub repos_section_props: ReposSectionProps,
+#[derive(ComponentBuilder)]
+pub struct Auth {
+	pub details_section: DetailsSection,
+	pub organizations_section: OrganizationsSection,
+	pub repos_section: ReposSection,
 }
 
-#[derive(Props)]
-pub struct NoAuthProps {
-	pub repos_section_props: ReposSectionProps,
+#[derive(ComponentBuilder)]
+pub struct NoAuth {
+	pub repos_section: ReposSection,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let inner = match props.inner {
-		Inner::Auth(inner) => {
-			html! {
-				<Auth {inner} />
-			}
-		}
-		Inner::NoAuth(inner) => {
-			html! {
-				<NoAuth {inner} />
-			}
-		}
-	};
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<AppLayout {props.app_layout_props}>
-				{inner}
-			</AppLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		let inner = match self.inner {
+			Inner::Auth(inner) => inner.into_node(),
+			Inner::NoAuth(inner) => inner.into_node(),
+		};
+		Document::new()
+			.child(AppLayout::new(self.app_layout_info).child(inner))
+			.into_node()
 	}
 }
 
-#[component]
-pub fn NoAuth(props: NoAuthProps) {
-	html! {
-		<ui::S1>
-			<ui::P>
-				{"You are using the free version of tangram that does not support user accounts or organizations. Checkout out the different plans that allow you to collaborate with your team."}
-			</ui::P>
-		</ui::S1>
+impl Component for NoAuth {
+	fn into_node(self) -> Node {
+		let text = "You are using the free version of tangram that does not support user accounts or organizations. Checkout out the different plans that allow you to collaborate with your team.";
+		ui::S1::new().child(ui::P::new().child(text)).into_node()
 	}
 }
 
-#[component]
-pub fn Auth(props: AuthProps) {
-	let AuthProps {
-		organizations_section_props,
-		repos_section_props,
-		details_section_props,
-	} = props;
-	html! {
-		<ui::S1>
-			<Header />
-			<DetailsSection {details_section_props} />
-			<OrganizationsSection {organizations_section_props} />
-			<ReposSection {repos_section_props} />
-		</ui::S1>
+impl Component for Auth {
+	fn into_node(self) -> Node {
+		let Auth {
+			organizations_section,
+			repos_section,
+			details_section,
+		} = self;
+		ui::S1::new()
+			.child(Header::new())
+			.child(details_section)
+			.child(organizations_section)
+			.child(repos_section)
+			.into_node()
 	}
 }
 
-#[component]
-fn Header() {
-	html! {
-		<ui::SpaceBetween>
-			<ui::H1>{"User"}</ui::H1>
-			<ui::Form post?={Some(true)}>
-				<input
-					name="action"
-					type="hidden"
-					value="logout"
-				/>
-				<ui::Button color?="var(--red)" button_type?={Some(ui::ButtonType::Submit)}>
-					{"Logout"}
-				</ui::Button>
-			</ui::Form>
-		</ui::SpaceBetween>
+#[derive(ComponentBuilder)]
+struct Header {
+	#[children]
+	pub children: Vec<Node>,
+}
+
+impl Component for Header {
+	fn into_node(self) -> Node {
+		ui::SpaceBetween::new()
+			.child(ui::H1::new().child("User"))
+			.child(
+				ui::Form::new()
+					.post(Some(true))
+					.child(
+						input()
+							.attribute("name", "action")
+							.attribute("type", "hidden")
+							.attribute("value", "logout"),
+					)
+					.child(
+						ui::Button::new()
+							.color("var(--red)".to_owned())
+							.button_type(Some(ui::ButtonType::Submit))
+							.child("Logout"),
+					),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct DetailsSectionProps {
+#[derive(ComponentBuilder)]
+pub struct DetailsSection {
 	pub email: String,
 }
 
-#[component]
-fn DetailsSection(props: DetailsSectionProps) {
-	html! {
-		<ui::S2>
-			<ui::Form>
-				<ui::TextField
-					label?="Email"
-					readonly?={Some(true)}
-					value?={Some(props.email)}
-				/>
-			</ui::Form>
-		</ui::S2>
+impl Component for DetailsSection {
+	fn into_node(self) -> Node {
+		ui::S2::new()
+			.child(
+				ui::Form::new().child(
+					ui::TextField::new()
+						.label("Email".to_owned())
+						.readonly(Some(true))
+						.value(Some(self.email)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ReposSectionProps {
-	pub repos_table_props: Option<ReposTableProps>,
+#[derive(ComponentBuilder)]
+pub struct ReposSection {
+	pub repos_table: Option<ReposTable>,
 }
 
-#[component]
-fn ReposSection(props: ReposSectionProps) {
-	let repos_table_or_empty_message = if let Some(repos_table_props) = props.repos_table_props {
-		html! {
-			<ReposTable {repos_table_props} />
-		}
-	} else {
-		html! {
-			<ui::Card>
-				<ui::P>{"You do not have any repos."}</ui::P>
-			</ui::Card>
-		}
-	};
-	html! {
-		<ui::S2>
-			<ui::SpaceBetween>
-				<ui::H2>{"User Repos"}</ui::H2>
-				<ui::Button
-					href?="/repos/new"
-					id?={None}
-				>
-					{"Create New Repo"}
-				</ui::Button>
-			</ui::SpaceBetween>
-			{repos_table_or_empty_message}
-		</ui::S2>
+impl Component for ReposSection {
+	fn into_node(self) -> Node {
+		let repos_table_or_empty_message = if let Some(repos_table) = self.repos_table {
+			repos_table.into_node()
+		} else {
+			ui::Card::new()
+				.child(ui::P::new().child("You do not have any repos."))
+				.into_node()
+		};
+		ui::S2::new()
+			.child(
+				ui::SpaceBetween::new()
+					.child(ui::H2::new().child("User Repos"))
+					.child(
+						ui::Button::new()
+							.href("/repos/new".to_owned())
+							.id(None)
+							.child("Create New Repo"),
+					),
+			)
+			.child(repos_table_or_empty_message)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ReposTableProps {
+#[derive(ComponentBuilder)]
+pub struct ReposTable {
 	pub rows: Vec<ReposTableRow>,
 }
 
@@ -165,66 +153,61 @@ pub struct ReposTableRow {
 	pub title: String,
 }
 
-#[component]
-fn ReposTable(props: ReposTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-						{"Repo Title"}
-					</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-			{props.rows.into_iter().map(|row| html! {
-				<ui::TableRow>
-					<ui::TableCell>
-						<ui::Link href={format!("/repos/{}/", row.id)}>
-							{row.title}
-						</ui::Link>
-					</ui::TableCell>
-				</ui::TableRow>
-			}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+impl Component for ReposTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new().child(ui::TableHeaderCell::new().child("Repo Title")),
+				),
+			)
+			.child(
+				ui::TableBody::new().children(self.rows.into_iter().map(|row| {
+					let href = format!("/repos/{}/", row.id);
+					{
+						ui::TableRow::new().child(
+							ui::TableCell::new().child(ui::Link::new().href(href).child(row.title)),
+						)
+					}
+				})),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct OrganizationsSectionProps {
-	pub organizations_table_props: Option<OrganizationsTableProps>,
+#[derive(ComponentBuilder)]
+pub struct OrganizationsSection {
+	pub organizations_table: Option<OrganizationsTable>,
 }
 
-#[component]
-fn OrganizationsSection(props: OrganizationsSectionProps) {
-	let organizations_table_or_empty_message =
-		if let Some(organizations_table_props) = props.organizations_table_props {
-			html! {
-				<OrganizationsTable {organizations_table_props} />
-			}
-		} else {
-			html! {
-				<ui::Card>
-					<ui::P>{"You do not have any organizations."}</ui::P>
-				</ui::Card>
-			}
-		};
-	html! {
-		<ui::S2>
-			<ui::SpaceBetween>
-				<ui::H2>{"Organizations"}</ui::H2>
-				<ui::Button href?="/organizations/new">
-					{"Create New Organization"}
-				</ui::Button>
-			</ui::SpaceBetween>
-			{organizations_table_or_empty_message}
-		</ui::S2>
+impl Component for OrganizationsSection {
+	fn into_node(self) -> Node {
+		let organizations_table_or_empty_message =
+			if let Some(organizations_table) = self.organizations_table {
+				organizations_table.into_node()
+			} else {
+				ui::Card::new()
+					.child(ui::P::new().child("You do not have any organizations."))
+					.into_node()
+			};
+		ui::S2::new()
+			.child(
+				ui::SpaceBetween::new()
+					.child(ui::H2::new().child("Organizations"))
+					.child(
+						ui::Button::new()
+							.href("/organizations/new".to_owned())
+							.child("Create New Organization"),
+					),
+			)
+			.child(organizations_table_or_empty_message)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct OrganizationsTableProps {
+#[derive(ComponentBuilder)]
+pub struct OrganizationsTable {
 	pub rows: Vec<OrganizationsTableRow>,
 }
 
@@ -233,28 +216,22 @@ pub struct OrganizationsTableRow {
 	pub name: String,
 }
 
-#[component]
-fn OrganizationsTable(props: OrganizationsTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-						{"Organization Name"}
-					</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-				{props.rows.iter().map(|row| html! {
-					<ui::TableRow>
-						<ui::TableCell>
-							<ui::Link href={format!("/organizations/{}/", row.id)}>
-								{row.name.clone()}
-							</ui::Link>
-						</ui::TableCell>
-					</ui::TableRow>
-				}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+impl Component for OrganizationsTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(ui::TableHeader::new().child(
+				ui::TableRow::new().child(ui::TableHeaderCell::new().child("Organization Name")),
+			))
+			.child(ui::TableBody::new().children(self.rows.iter().map(|row| {
+				let href = format!("/organizations/{}/", row.id);
+				{
+					ui::TableRow::new().child(
+						ui::TableCell::new()
+							.child(ui::Link::new().href(href).child(row.name.clone())),
+					)
+				}
+			})))
+			.into_node()
 	}
 }

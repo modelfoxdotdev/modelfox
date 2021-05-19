@@ -1,8 +1,8 @@
 use crate::page::{
-	BinaryClassifierProps, ClassMetrics, ConfusionMatrixSectionProps, Inner,
-	MulticlassClassifierProps, Page, PageProps, RegressorProps,
+	BinaryClassifier, ClassMetrics, ConfusionMatrixSection, Inner, MulticlassClassifier, Page,
+	Regressor,
 };
-use html::html;
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -11,7 +11,7 @@ use tangram_app_common::{
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
+use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
@@ -19,7 +19,7 @@ pub async fn get(
 	context: Arc<Context>,
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
-	let model_id = if let &["repos", _, "models", model_id, "training_metrics", ""] =
+	let model_id = if let ["repos", _, "models", model_id, "training_metrics", ""] =
 		path_components(&request).as_slice()
 	{
 		model_id.to_owned()
@@ -56,14 +56,14 @@ pub async fn get(
 			))
 		}
 	};
-	let model_layout_props =
-		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::TrainingMetrics).await?;
-	let props = PageProps {
+	let model_layout_info =
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::TrainingMetrics).await?;
+	let page = Page {
 		id: model_id.to_string(),
 		inner,
-		model_layout_props,
+		model_layout_info,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))
@@ -71,13 +71,13 @@ pub async fn get(
 	Ok(response)
 }
 
-fn build_inner_regressor(model: tangram_model::RegressorReader) -> RegressorProps {
+fn build_inner_regressor(model: tangram_model::RegressorReader) -> Regressor {
 	let warning = if model.baseline_metrics().rmse() > model.test_metrics().rmse() {
 		Some("Baseline RMSE is lower! Your model performs worse than if it were just guessing the mean of the target column.".into())
 	} else {
 		None
 	};
-	RegressorProps {
+	Regressor {
 		warning,
 		rmse: model.test_metrics().rmse(),
 		baseline_rmse: model.baseline_metrics().rmse(),
@@ -86,9 +86,7 @@ fn build_inner_regressor(model: tangram_model::RegressorReader) -> RegressorProp
 	}
 }
 
-fn build_inner_binary_classifier(
-	model: tangram_model::BinaryClassifierReader,
-) -> BinaryClassifierProps {
+fn build_inner_binary_classifier(model: tangram_model::BinaryClassifierReader) -> BinaryClassifier {
 	let test_metrics = model.test_metrics();
 	let default_threshold_test_metrics = test_metrics.default_threshold();
 	let default_threshold_baseline_metrics = model.baseline_metrics().default_threshold();
@@ -103,14 +101,14 @@ fn build_inner_binary_classifier(
 	let true_positives = default_threshold_test_metrics.true_positives();
 	let false_negatives = default_threshold_test_metrics.false_negatives();
 	let false_positives = default_threshold_test_metrics.false_positives();
-	let confusion_matrix_section_props = ConfusionMatrixSectionProps {
+	let confusion_matrix_section = ConfusionMatrixSection {
 		false_negatives,
 		false_positives,
 		true_negatives,
 		true_positives,
 		class: model.positive_class().to_owned(),
 	};
-	BinaryClassifierProps {
+	BinaryClassifier {
 		warning,
 		accuracy: default_threshold_test_metrics.accuracy(),
 		baseline_accuracy: default_threshold_baseline_metrics.accuracy(),
@@ -121,13 +119,13 @@ fn build_inner_binary_classifier(
 		positive_class: model.positive_class().to_owned(),
 		negative_class: model.negative_class().to_owned(),
 		target_column_name: model.target_column_name().to_owned(),
-		confusion_matrix_section_props,
+		confusion_matrix_section,
 	}
 }
 
 fn build_inner_multiclass_classifier(
 	model: tangram_model::MulticlassClassifierReader,
-) -> MulticlassClassifierProps {
+) -> MulticlassClassifier {
 	let classes = model
 		.classes()
 		.iter()
@@ -149,7 +147,7 @@ fn build_inner_multiclass_classifier(
 	} else {
 		None
 	};
-	MulticlassClassifierProps {
+	MulticlassClassifier {
 		warning,
 		accuracy: model.test_metrics().accuracy(),
 		baseline_accuracy: model.baseline_metrics().accuracy(),

@@ -1,61 +1,58 @@
-use html::{component, html, Props};
-use tangram_app_common::page_heading::{PageHeading, PageHeadingButtons};
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	app_layout::{AppLayout, AppLayoutProps},
-	document::{Document, DocumentProps},
+	app_layout::{AppLayout, AppLayoutInfo},
+	document::Document,
 };
+use tangram_app_ui::page_heading::{PageHeading, PageHeadingButtons};
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
-	pub app_layout_props: AppLayoutProps,
-	pub models_table_props: Option<ModelsTableProps>,
+#[derive(ComponentBuilder)]
+pub struct Page {
+	pub app_layout_info: AppLayoutInfo,
+	pub models_table: Option<ModelsTable>,
 	pub title: String,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let models_table_or_empty_message = if let Some(models_table_props) = props.models_table_props {
-		html! {
-			<ModelsTable {models_table_props} />
-		}
-	} else {
-		html! {
-			<ui::Card>
-				<ui::P>{"This repository has no models."}</ui::P>
-			</ui::Card>
-		}
-	};
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<AppLayout {props.app_layout_props}>
-				<ui::S1>
-					<PageHeading>
-						<ui::H1>{props.title}</ui::H1>
-						<PageHeadingButtons>
-							<ui::Button
-								color?={Some(ui::colors::GRAY.to_owned())}
-								href?="edit"
-							>
-								{"Edit"}
-							</ui::Button>
-							<ui::Button href?="models/new">
-								{"Upload New Version"}
-							</ui::Button>
-						</PageHeadingButtons>
-					</PageHeading>
-					{models_table_or_empty_message}
-				</ui::S1>
-			</AppLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		let models_table_or_empty_message = if let Some(models_table) = self.models_table {
+			models_table.into_node()
+		} else {
+			ui::Card::new()
+				.child(ui::P::new().child("This repository has no models."))
+				.into_node()
+		};
+		Document::new()
+			.child(
+				AppLayout::new(self.app_layout_info).child(
+					ui::S1::new()
+						.child(
+							PageHeading::new()
+								.child(ui::H1::new().child(self.title))
+								.child(
+									PageHeadingButtons::new()
+										.child(
+											ui::Button::new()
+												.color(Some(ui::colors::GRAY.to_owned()))
+												.href("edit".to_owned())
+												.child("Edit"),
+										)
+										.child(
+											ui::Button::new()
+												.href("models/new".to_owned())
+												.child("Upload New Version"),
+										),
+								),
+						)
+						.child(models_table_or_empty_message),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ModelsTableProps {
+#[derive(ComponentBuilder)]
+pub struct ModelsTable {
 	pub rows: Vec<ModelsTableRow>,
 }
 
@@ -65,40 +62,32 @@ pub struct ModelsTableRow {
 	pub tag: Option<String>,
 }
 
-#[component]
-pub fn ModelsTable(props: ModelsTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-						{"Id"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Tag"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Uploaded"}
-					</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-				{props.rows.into_iter().map(|row| html! {
-					<ui::TableRow>
-						<ui::TableCell>
-							<ui::Link href={format!("./models/{}/", row.id)}>
-								{row.id.clone()}
-							</ui::Link>
-						</ui::TableCell>
-						<ui::TableCell>
-							{row.tag.clone()}
-						</ui::TableCell>
-						<ui::TableCell>
-							{row.created_at}
-						</ui::TableCell>
-					</ui::TableRow>
-				}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+impl Component for ModelsTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new()
+						.child(ui::TableHeaderCell::new().child("Id"))
+						.child(ui::TableHeaderCell::new().child("Tag"))
+						.child(ui::TableHeaderCell::new().child("Uploaded")),
+				),
+			)
+			.child(
+				ui::TableBody::new().children(self.rows.into_iter().map(|row| {
+					ui::TableRow::new()
+						.child(
+							ui::TableCell::new().child(
+								ui::Link::new()
+									.href(format!("./models/{}/", row.id))
+									.child(row.id.clone()),
+							),
+						)
+						.child(ui::TableCell::new().child(row.tag.clone()))
+						.child(ui::TableCell::new().child(row.created_at))
+				})),
+			)
+			.into_node()
 	}
 }

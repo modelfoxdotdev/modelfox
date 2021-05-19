@@ -1,8 +1,8 @@
 use super::FieldLabel;
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 
-#[derive(Props)]
-pub struct CheckboxFieldProps {
+#[derive(ComponentBuilder)]
+pub struct CheckboxField {
 	#[optional]
 	pub label: Option<String>,
 	#[optional]
@@ -17,20 +17,20 @@ pub struct CheckboxFieldProps {
 	pub checked: Option<bool>,
 }
 
-#[component]
-pub fn CheckboxField(props: CheckboxFieldProps) {
-	html! {
-		<FieldLabel html_for={None}>
-			{props.label}
-			<input
-				class="form-checkbox-field"
-				name={props.name}
-				placeholder={props.placeholder}
-				disabled={props.disabled}
-				type="checkbox"
-				value={props.value}
-				checked={props.checked}
-			/>
-		</FieldLabel>
+impl Component for CheckboxField {
+	fn into_node(self) -> Node {
+		FieldLabel::new(None)
+			.child(self.label)
+			.child(
+				input()
+					.class("form-checkbox-field")
+					.attribute("name", self.name)
+					.attribute("placeholder", self.placeholder)
+					.attribute("disabled", self.disabled)
+					.attribute("type", "checkbox")
+					.attribute("value", self.value)
+					.attribute("checked", self.checked),
+			)
+			.into_node()
 	}
 }

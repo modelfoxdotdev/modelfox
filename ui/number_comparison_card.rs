@@ -1,50 +1,92 @@
 use crate::{Card, Token};
-use html::{classes, component, html, Props};
+use pinwheel::prelude::*;
 use tangram_number_formatter::NumberFormatter;
-use wasm_bindgen::JsCast;
-use web_sys::*;
 
-#[derive(Props)]
-pub struct NumberComparisonCardProps {
+#[derive(ComponentBuilder)]
+pub struct NumberComparisonCard {
+	pub value_a: BoxSignal<Option<f32>>,
+	pub value_b: BoxSignal<Option<f32>>,
 	#[optional]
 	pub id: Option<String>,
+	#[optional]
 	pub color_a: Option<String>,
+	#[optional]
 	pub color_b: Option<String>,
-	pub title: Option<String>,
-	pub value_a: Option<f32>,
-	pub value_a_title: Option<String>,
-	pub value_b: Option<f32>,
-	pub value_b_title: String,
+	#[optional]
 	pub number_formatter: NumberFormatter,
+	#[optional]
+	pub title: Option<String>,
+	#[optional]
+	pub value_a_title: Option<String>,
+	#[optional]
+	pub value_b_title: Option<String>,
 }
 
-#[component]
-pub fn NumberComparisonCard(props: NumberComparisonCardProps) {
-	let number_formatter = props.number_formatter;
-	let number_formatter_string = serde_json::to_string(&number_formatter).unwrap();
-	let difference_string = difference_string(props.value_a, props.value_b, &number_formatter);
-	let difference_class = difference_class(props.value_a, props.value_b);
-	let difference_class = classes!("number-comparison-card-difference", difference_class);
-	let value_a = number_formatter.format_option(props.value_a);
-	let value_b = number_formatter.format_option(props.value_b);
-	html! {
-		<Card>
-			<div class="number-comparison-card-wrapper"
-				id={props.id}
-				data-number-formatter={number_formatter_string}
-			>
-				<div class="number-comparison-card-title">{props.title}</div>
-				<div class={difference_class} data-field="difference">{difference_string}</div>
-				<div class="number-comparison-card-value a" data-field="value-a">{value_a}</div>
-				<div class="number-comparison-card-value b" data-field="value-b">{value_b}</div>
-				<div class="number-comparison-card-value-title a">
-					<Token color?={props.color_a}>{props.value_a_title}</Token>
-				</div>
-				<div class="number-comparison-card-value-title b">
-					<Token color?={props.color_b}>{props.value_b_title}</Token>
-				</div>
-			</div>
-		</Card>
+impl Component for NumberComparisonCard {
+	fn into_node(self) -> Node {
+		let number_formatter = self.number_formatter;
+		let number_formatter_string = serde_json::to_string(&number_formatter).unwrap();
+		let difference_string = (self.value_a.signal_cloned(), self.value_b.signal_cloned())
+			.zip()
+			.map({
+				clone!(number_formatter);
+				move |(value_a, value_b)| difference_string(value_a, value_b, &number_formatter)
+			});
+		let difference_class = (self.value_a.signal_cloned(), self.value_b.signal_cloned())
+			.zip()
+			.map(|(value_a, value_b)| {
+				classes!(
+					"number-comparison-card-difference",
+					difference_class(value_a, value_b)
+				)
+			});
+		let value_a = {
+			clone!(number_formatter);
+			self.value_a
+				.signal_cloned()
+				.map(move |value_a| number_formatter.format_option(value_a))
+		};
+		let value_b = {
+			clone!(number_formatter);
+			self.value_b
+				.signal_cloned()
+				.map(move |value_b| number_formatter.format_option(value_b))
+		};
+		let content = div()
+			.class("number-comparison-card-wrapper")
+			.attribute("id", self.id)
+			.attribute("data-number-formatter", number_formatter_string)
+			.child(
+				div()
+					.class("number-comparison-card-title")
+					.child(self.title),
+			)
+			.child(
+				div()
+					.class_signal(difference_class)
+					.child_signal(difference_string),
+			)
+			.child(
+				div()
+					.class("number-comparison-card-value a")
+					.child_signal(value_a),
+			)
+			.child(
+				div()
+					.class("number-comparison-card-value b")
+					.child_signal(value_b),
+			)
+			.child(
+				div()
+					.class("number-comparison-card-value-title a")
+					.child(Token::new().color(self.color_a).child(self.value_a_title)),
+			)
+			.child(
+				div()
+					.class("number-comparison-card-value-title b")
+					.child(Token::new().color(self.color_b).child(self.value_b_title)),
+			);
+		Card::new().child(content).into_node()
 	}
 }
 
@@ -79,39 +121,4 @@ fn difference_string(
 		}
 	}
 	"N/A".to_owned()
-}
-
-pub fn update_number_comparison_chart(id: &str, value_a: Option<f32>, value_b: Option<f32>) {
-	let document = window().unwrap().document().unwrap();
-	let container = document
-		.get_element_by_id(&id)
-		.unwrap()
-		.dyn_into::<HtmlElement>()
-		.unwrap();
-	let number_formatter = container.dataset().get("numberFormatter").unwrap();
-	let number_formatter: NumberFormatter = serde_json::from_str(&number_formatter).unwrap();
-	let difference_element = document
-		.query_selector(&format!("#{} [data-field='difference']", id))
-		.unwrap()
-		.unwrap()
-		.dyn_into::<HtmlElement>()
-		.unwrap();
-	let value_a_element = document
-		.query_selector(&format!("#{} [data-field='value-a']", id))
-		.unwrap()
-		.unwrap()
-		.dyn_into::<HtmlElement>()
-		.unwrap();
-	let value_b_element = document
-		.query_selector(&format!("#{} [data-field='value-b']", id))
-		.unwrap()
-		.unwrap()
-		.dyn_into::<HtmlElement>()
-		.unwrap();
-	value_a_element.set_inner_html(&number_formatter.format_option(value_a));
-	value_b_element.set_inner_html(&number_formatter.format_option(value_b));
-	difference_element.set_inner_html(&difference_string(value_a, value_b, &number_formatter));
-	let difference_class = difference_class(value_a, value_b);
-	let difference_class = classes!("number-comparison-card-difference", difference_class);
-	difference_element.set_class_name(&difference_class);
 }

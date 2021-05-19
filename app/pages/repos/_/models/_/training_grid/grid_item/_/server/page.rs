@@ -1,56 +1,56 @@
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	document::{Document, DocumentProps},
-	model_layout::{ModelLayout, ModelLayoutProps},
+	document::Document,
+	model_layout::{ModelLayout, ModelLayoutInfo},
 };
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
+#[derive(ComponentBuilder)]
+pub struct Page {
 	pub id: String,
 	pub model_grid_item_identifier: String,
-	pub model_layout_props: ModelLayoutProps,
+	pub model_layout_info: ModelLayoutInfo,
 	pub model_hyperparameters: Vec<(String, String)>,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<ModelLayout {props.model_layout_props}>
-				<ui::S1>
-					<ui::H1>{"Hyperparameters"}</ui::H1>
-					<ModelHyperparametersTable hyperparameters={props.model_hyperparameters} />
-				</ui::S1>
-			</ModelLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		Document::new()
+			.child(
+				ModelLayout::new(self.model_layout_info).child(
+					ui::S1::new()
+						.child(ui::H1::new().child("Hyperparameters"))
+						.child(ModelHyperparametersTable::new(self.model_hyperparameters)),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ModelHyperparametersTableProps {
+#[derive(ComponentBuilder)]
+pub struct ModelHyperparametersTable {
 	hyperparameters: Vec<(String, String)>,
 }
 
-#[component]
-fn ModelHyperparametersTable(props: ModelHyperparametersTableProps) {
-	html! {
-		<ui::Table width?="100%">
-		{props.hyperparameters.into_iter().map(|(hyperparam_name, hyperparam_value)| {
-			html! {
-				<ui::TableRow>
-					<ui::TableHeaderCell expand?={Some(false)}>
-						{hyperparam_name}
-					</ui::TableHeaderCell>
-					<ui::TableCell expand?={Some(true)}>
-						{hyperparam_value}
-					</ui::TableCell>
-				</ui::TableRow>
-			}
-		}).collect::<Vec<_>>()}
-		</ui::Table>
+impl Component for ModelHyperparametersTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.children(self.hyperparameters.into_iter().map(
+				|(hyperparam_name, hyperparam_value)| {
+					ui::TableRow::new()
+						.child(
+							ui::TableHeaderCell::new()
+								.expand(Some(false))
+								.child(hyperparam_name),
+						)
+						.child(
+							ui::TableCell::new()
+								.expand(Some(true))
+								.child(hyperparam_value),
+						)
+				},
+			))
+			.into_node()
 	}
 }

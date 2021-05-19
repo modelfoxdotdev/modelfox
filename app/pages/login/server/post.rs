@@ -1,7 +1,7 @@
-use crate::page::{Page, PageProps};
+use crate::page::Page;
 use chrono::prelude::*;
-use html::html;
 use lettre::AsyncTransport;
+use pinwheel::prelude::*;
 use rand::Rng;
 use sqlx::prelude::*;
 use std::sync::Arc;
@@ -94,12 +94,12 @@ pub async fn post(
 			let row = if let Some(row) = row {
 				row
 			} else {
-				let props = PageProps {
+				let page = Page {
 					code: true,
 					error: Some("invalid code".to_owned()),
 					email: Some(email),
 				};
-				let html = html!(<Page {props} />).render_to_string();
+				let html = html(page);
 				let response = http::Response::builder()
 					.status(http::StatusCode::BAD_REQUEST)
 					.body(hyper::Body::from(html))?;

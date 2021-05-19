@@ -1,13 +1,13 @@
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	app_layout::{AppLayout, AppLayoutProps},
-	document::{Document, DocumentProps},
+	app_layout::{AppLayout, AppLayoutInfo},
+	document::Document,
 };
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
-	pub app_layout_props: AppLayoutProps,
+#[derive(ComponentBuilder)]
+pub struct Page {
+	pub app_layout_info: AppLayoutInfo,
 	pub error: Option<String>,
 	pub owner: Option<String>,
 	pub owners: Option<Vec<Owner>>,
@@ -19,47 +19,53 @@ pub struct Owner {
 	pub title: String,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	let owner = props.owner;
-	html! {
-		<Document {document_props}>
-			<AppLayout {props.app_layout_props}>
-				<ui::S1>
-					<ui::H1>{"Create New Repo"}</ui::H1>
-					<ui::Form post?={Some(true)}>
-						{props.error.map(|error| html! {
-							<ui::Alert level={ui::Level::Danger}>
-								{error}
-							</ui::Alert>
-						})}
-						<ui::TextField
-							label?="Title"
-							name?="title"
-							required?={Some(true)}
-							value?={props.title}
-						/>
-						{props.owners.map(|owners| html! {
-							<ui::SelectField
-								label?="Owner"
-								name?="owner"
-								options?={Some(owners.into_iter().map(|owner| ui::SelectFieldOption {
-									text: owner.title,
-									value: owner.value,
-								}).collect::<Vec<_>>())}
-								required?={Some(true)}
-								value?={owner}
-							/>
-						})}
-						<ui::Button button_type?={Some(ui::ButtonType::Submit)}>
-							{"Submit"}
-						</ui::Button>
-					</ui::Form>
-				</ui::S1>
-			</AppLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		let owner = self.owner;
+		Document::new()
+			.child(
+				AppLayout::new(self.app_layout_info).child(
+					ui::S1::new()
+						.child(ui::H1::new().child("Create New Repo"))
+						.child(
+							ui::Form::new()
+								.post(Some(true))
+								.child(
+									self.error.map(|error| {
+										ui::Alert::new(ui::Level::Danger).child(error)
+									}),
+								)
+								.child(
+									ui::TextField::new()
+										.label("Title".to_owned())
+										.name("title".to_owned())
+										.required(Some(true))
+										.value(self.title),
+								)
+								.child(self.owners.map(|owners| {
+									ui::SelectField::new()
+										.label("Owner".to_owned())
+										.name("owner".to_owned())
+										.options(Some(
+											owners
+												.into_iter()
+												.map(|owner| ui::SelectFieldOption {
+													text: owner.title,
+													value: owner.value,
+												})
+												.collect::<Vec<_>>(),
+										))
+										.required(Some(true))
+										.value(owner)
+								}))
+								.child(
+									ui::Button::new()
+										.button_type(Some(ui::ButtonType::Submit))
+										.child("Submit"),
+								),
+						),
+				),
+			)
+			.into_node()
 	}
 }

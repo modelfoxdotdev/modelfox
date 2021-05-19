@@ -162,7 +162,7 @@ pub fn test_linear_binary_classifier(
 			let predictions = Array::zeros(n_examples_per_batch);
 			State {
 				predictions,
-				test_metrics: tangram_metrics::BinaryClassificationMetrics::new(10001),
+				test_metrics: tangram_metrics::BinaryClassificationMetrics::new(99),
 			}
 		},
 		|mut state, (features, labels)| {

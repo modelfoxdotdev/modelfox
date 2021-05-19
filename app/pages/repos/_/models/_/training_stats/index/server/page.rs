@@ -1,20 +1,20 @@
-use html::{component, html, Props};
-use tangram_app_common::{
+use pinwheel::prelude::*;
+use tangram_app_layouts::{
+	document::Document,
+	model_layout::{ModelLayout, ModelLayoutInfo},
+};
+use tangram_app_ui::{
 	column_type::ColumnType,
 	metrics_row::MetricsRow,
 	tokens::{EnumColumnToken, NumberColumnToken, TextColumnToken},
 };
-use tangram_app_layouts::{
-	document::{Document, DocumentProps},
-	model_layout::{ModelLayout, ModelLayoutProps},
-};
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
-	pub model_layout_props: ModelLayoutProps,
-	pub target_column_stats_table_props: TargetColumnStatsTableProps,
-	pub column_stats_table_props: ColumnStatsTableProps,
+#[derive(ComponentBuilder)]
+pub struct Page {
+	pub model_layout_info: ModelLayoutInfo,
+	pub target_column_stats_table: TargetColumnStatsTable,
+	pub column_stats_table: ColumnStatsTable,
 	pub column_count: usize,
 	pub row_count: usize,
 }
@@ -31,215 +31,186 @@ pub struct ColumnStatsTableRow {
 	pub variance: Option<f32>,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<ModelLayout {props.model_layout_props}>
-				<ui::S1>
-					<ui::H1>{"Training Stats"}</ui::H1>
-					<ui::S2>
-						<ui::H2>{"Target Column"}</ui::H2>
-						<TargetColumnStatsTable {props.target_column_stats_table_props} />
-					</ui::S2>
-					<ui::S2>
-						<ui::H2>{"Columns"}</ui::H2>
-						<MetricsRow>
-							<ui::NumberCard
-								title="Rows"
-								value={props.row_count.to_string()}
-							/>
-							<ui::NumberCard
-								title="Columns"
-								value={props.column_count.to_string()}
-							/>
-						</MetricsRow>
-						<ColumnStatsTable {props.column_stats_table_props} />
-					</ui::S2>
-				</ui::S1>
-			</ModelLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		Document::new()
+			.child(
+				ModelLayout::new(self.model_layout_info).child(
+					ui::S1::new()
+						.child(ui::H1::new().child("Training Stats"))
+						.child(
+							ui::S2::new()
+								.child(ui::H2::new().child("Target Column"))
+								.child(self.target_column_stats_table),
+						)
+						.child(
+							ui::S2::new()
+								.child(ui::H2::new().child("Columns"))
+								.child(
+									MetricsRow::new()
+										.child(ui::NumberCard::new(
+											"Rows".to_owned(),
+											self.row_count.to_string(),
+										))
+										.child(ui::NumberCard::new(
+											"Columns".to_owned(),
+											self.column_count.to_string(),
+										)),
+								)
+								.child(self.column_stats_table),
+						),
+				),
+			)
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct TargetColumnStatsTableProps {
+#[derive(ComponentBuilder)]
+pub struct TargetColumnStatsTable {
 	pub target_column_stats_table_row: ColumnStatsTableRow,
 }
 
-#[component]
-fn TargetColumnStatsTable(props: TargetColumnStatsTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-						{"Column"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Type"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Unique Count"}
-					</ui::TableHeaderCell>
-					{if props.target_column_stats_table_row.column_type == ColumnType::Number {
-						Some(html! {
-							<>
-								<ui::TableHeaderCell>
-									{"Min"}
-								</ui::TableHeaderCell>
-								<ui::TableHeaderCell>
-									{"Max"}
-								</ui::TableHeaderCell>
-								<ui::TableHeaderCell>
-									{"Mean"}
-								</ui::TableHeaderCell>
-								<ui::TableHeaderCell>
-									{"Std"}
-								</ui::TableHeaderCell>
-							</>
-						})
-					} else {
-						None
-					}}
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-				<ui::TableRow>
-					<ui::TableCell>
-						<ui::Link href={format!("./columns/{}", props.target_column_stats_table_row.name)}>
-							{props.target_column_stats_table_row.name}
-						</ui::Link>
-					</ui::TableCell>
-					<ui::TableCell>
-						<ColumnTypeToken column_type={props.target_column_stats_table_row.column_type} />
-					</ui::TableCell>
-					<ui::TableCell>
-						{props.target_column_stats_table_row.unique_count.map(|unique_count| unique_count.to_string())}
-					</ui::TableCell>
-					{if props.target_column_stats_table_row.column_type == ColumnType::Number {
-						Some(html! {
-							<>
-								<ui::TableCell>
-									{props.target_column_stats_table_row.min.unwrap().to_string()}
-								</ui::TableCell>
-								<ui::TableCell>
-									{props.target_column_stats_table_row.max.unwrap().to_string()}
-								</ui::TableCell>
-								<ui::TableCell>
-									{props.target_column_stats_table_row.mean.unwrap().to_string()}
-								</ui::TableCell>
-								<ui::TableCell>
-									{props.target_column_stats_table_row.std.unwrap().to_string()}
-								</ui::TableCell>
-							</>
-						})
-					} else {
-						None
-					}}
-				</ui::TableRow>
-			</ui::TableBody>
-		</ui::Table>
+impl Component for TargetColumnStatsTable {
+	fn into_node(self) -> Node {
+		let number_columns_table_header_cells =
+			if self.target_column_stats_table_row.column_type == ColumnType::Number {
+				Some(
+					fragment()
+						.child(ui::TableHeaderCell::new().child("Min"))
+						.child(ui::TableHeaderCell::new().child("Max"))
+						.child(ui::TableHeaderCell::new().child("Mean"))
+						.child(ui::TableHeaderCell::new().child("Std")),
+				)
+			} else {
+				None
+			};
+		let number_columns_table_cells = if self.target_column_stats_table_row.column_type
+			== ColumnType::Number
+		{
+			Some(
+				fragment()
+					.child(
+						ui::TableCell::new()
+							.child(self.target_column_stats_table_row.min.unwrap().to_string()),
+					)
+					.child(
+						ui::TableCell::new()
+							.child(self.target_column_stats_table_row.max.unwrap().to_string()),
+					)
+					.child(
+						ui::TableCell::new()
+							.child(self.target_column_stats_table_row.mean.unwrap().to_string()),
+					)
+					.child(
+						ui::TableCell::new()
+							.child(self.target_column_stats_table_row.std.unwrap().to_string()),
+					),
+			)
+		} else {
+			None
+		};
+		let header = ui::TableRow::new()
+			.child(ui::TableHeaderCell::new().child("Column"))
+			.child(ui::TableHeaderCell::new().child("Type"))
+			.child(ui::TableHeaderCell::new().child("Unique Count"))
+			.children(number_columns_table_header_cells);
+		let href = format!("./columns/{}", self.target_column_stats_table_row.name);
+		let body = ui::TableRow::new()
+			.child(
+				ui::TableCell::new().child(
+					ui::Link::new()
+						.href(href)
+						.child(self.target_column_stats_table_row.name),
+				),
+			)
+			.child(ui::TableCell::new().child(ColumnTypeToken::new(
+				self.target_column_stats_table_row.column_type,
+			)))
+			.child(
+				ui::TableCell::new().child(
+					self.target_column_stats_table_row
+						.unique_count
+						.map(|unique_count| unique_count.to_string()),
+				),
+			)
+			.children(number_columns_table_cells);
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(ui::TableHeader::new().child(header))
+			.child(ui::TableBody::new().child(body))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ColumnStatsTableProps {
+#[derive(ComponentBuilder)]
+pub struct ColumnStatsTable {
 	pub column_stats_table_rows: Vec<ColumnStatsTableRow>,
 }
 
-#[component]
-fn ColumnStatsTable(props: ColumnStatsTableProps) {
-	html! {
-		<ui::Table width?="100%">
-			<ui::TableHeader>
-				<ui::TableRow>
-					<ui::TableHeaderCell>
-						{"Column"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Type"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Unique Values Count"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Null Count"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Min"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Max"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Mean"}
-					</ui::TableHeaderCell>
-					<ui::TableHeaderCell>
-						{"Std"}
-					</ui::TableHeaderCell>
-				</ui::TableRow>
-			</ui::TableHeader>
-			<ui::TableBody>
-				{props.column_stats_table_rows.iter().map(|column_stats| html! {
-					<ui::TableRow>
-						<ui::TableCell>
-							{if column_stats.column_type == ColumnType::Unknown {
-								html! {
-									<>
-										{column_stats.name.clone()}
-									</>
-								}
-							} else {
-								html! {
-									<ui::Link href={format!("./columns/{}", column_stats.name)}>
-										{column_stats.name.clone()}
-									</ui::Link>
-								}
-							}}
-						</ui::TableCell>
-						<ui::TableCell>
-							<ColumnTypeToken column_type={column_stats.column_type} />
-						</ui::TableCell>
-						<ui::TableCell>
-							{column_stats.unique_count.map(|unique_count| unique_count.to_string())}
-						</ui::TableCell>
-						<ui::TableCell>
-							{column_stats.invalid_count.map(|invalid_count| invalid_count.to_string())}
-						</ui::TableCell>
-						<ui::TableCell>
-							{column_stats.min.map(ui::format_float)}
-						</ui::TableCell>
-						<ui::TableCell>
-							{column_stats.max.map(ui::format_float)}
-						</ui::TableCell>
-						<ui::TableCell>
-							{column_stats.mean.map(ui::format_float)}
-						</ui::TableCell>
-						<ui::TableCell>
-							{column_stats.std.map(ui::format_float)}
-						</ui::TableCell>
-					</ui::TableRow>
-				}).collect::<Vec<_>>()}
-			</ui::TableBody>
-		</ui::Table>
+impl Component for ColumnStatsTable {
+	fn into_node(self) -> Node {
+		let table_header = ui::TableRow::new()
+			.child(ui::TableHeaderCell::new().child("Column"))
+			.child(ui::TableHeaderCell::new().child("Type"))
+			.child(ui::TableHeaderCell::new().child("Unique Values Count"))
+			.child(ui::TableHeaderCell::new().child("Null Count"))
+			.child(ui::TableHeaderCell::new().child("Min"))
+			.child(ui::TableHeaderCell::new().child("Max"))
+			.child(ui::TableHeaderCell::new().child("Mean"))
+			.child(ui::TableHeaderCell::new().child("Std"));
+		let table_body = self.column_stats_table_rows.iter().map(|column_stats| {
+			let link = if column_stats.column_type == ColumnType::Unknown {
+				fragment().child(column_stats.name.clone()).into_node()
+			} else {
+				let href = format!("./columns/{}", column_stats.name);
+				ui::Link::new()
+					.href(href)
+					.child(column_stats.name.clone())
+					.into_node()
+			};
+			ui::TableRow::new()
+				.child(ui::TableCell::new().child(link))
+				.child(ui::TableCell::new().child(ColumnTypeToken::new(column_stats.column_type)))
+				.child(
+					ui::TableCell::new().child(
+						column_stats
+							.unique_count
+							.map(|unique_count| unique_count.to_string()),
+					),
+				)
+				.child(
+					ui::TableCell::new().child(
+						column_stats
+							.invalid_count
+							.map(|invalid_count| invalid_count.to_string()),
+					),
+				)
+				.child(ui::TableCell::new().child(column_stats.min.map(ui::format_float)))
+				.child(ui::TableCell::new().child(column_stats.max.map(ui::format_float)))
+				.child(ui::TableCell::new().child(column_stats.mean.map(ui::format_float)))
+				.child(ui::TableCell::new().child(column_stats.std.map(ui::format_float)))
+		});
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(ui::TableHeader::new().child(table_header))
+			.child(ui::TableBody::new().children(table_body))
+			.into_node()
 	}
 }
 
-#[derive(Props)]
-pub struct ColumnTypeTokenProps {
+#[derive(ComponentBuilder)]
+pub struct ColumnTypeToken {
 	column_type: ColumnType,
 }
 
-#[component]
-fn ColumnTypeToken(props: ColumnTypeTokenProps) {
-	match props.column_type {
-		ColumnType::Number => html! { <NumberColumnToken /> },
-		ColumnType::Enum => html! { <EnumColumnToken /> },
-		ColumnType::Text => html! { <TextColumnToken /> },
-		ColumnType::Unknown => html! { <></> },
+impl Component for ColumnTypeToken {
+	fn into_node(self) -> Node {
+		match self.column_type {
+			ColumnType::Number => Some(NumberColumnToken::new().into_node()),
+			ColumnType::Enum => Some(EnumColumnToken::new().into_node()),
+			ColumnType::Text => Some(TextColumnToken::new().into_node()),
+			ColumnType::Unknown => None,
+		}
+		.into_node()
 	}
 }

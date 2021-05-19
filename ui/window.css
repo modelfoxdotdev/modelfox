@@ -1,37 +1,37 @@
 .window-wrapper {
-  background-color: var(--background-color);
-  border: var(--border);
-  border-radius: var(--border-radius);
-  display: grid;
-  grid: auto 1fr / minmax(0, 1fr);
-  height: min-content;
+	background-color: var(--background-color);
+	border: var(--border);
+	border-radius: var(--border-radius);
+	display: grid;
+	grid: auto 1fr / minmax(0, 1fr);
+	height: min-content;
 }
 
 .window-topbar {
-  background-color: var(--header-color);
-  display: grid;
-  grid: auto / auto auto auto;
-  column-gap: 0.5rem;
-  justify-content: start;
-  padding: 0.75rem;
+	background-color: var(--header-color);
+	display: grid;
+	grid: auto / auto auto auto;
+	column-gap: 0.5rem;
+	justify-content: start;
+	padding: 0.75rem;
 }
 
 .window-topbar-button {
-  border-radius: 0.375rem;
-  box-sizing: border-box;
-  height: 0.75rem;
-  width: 0.75rem;
+	border-radius: 0.375rem;
+	box-sizing: border-box;
+	height: 0.75rem;
+	width: 0.75rem;
 }
 
 .window-body {
-  background-color: var(--surface-color);
-  border-bottom: var(--border-color);
-  border-bottom-left-radius: var(--border-radius);
-  border-bottom-right-radius: var(--border-radius);
-  border-left: var(--border-color);
-  border-right: var(--border-color);
+	background-color: var(--surface-color);
+	border-bottom: var(--border-color);
+	border-bottom-left-radius: var(--border-radius);
+	border-bottom-right-radius: var(--border-radius);
+	border-left: var(--border-color);
+	border-right: var(--border-color);
 }
 
 .window-body-padding {
-  padding: 1rem;
+	padding: 1rem;
 }

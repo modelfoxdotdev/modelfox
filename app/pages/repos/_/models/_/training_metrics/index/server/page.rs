@@ -1,44 +1,32 @@
 pub use crate::{binary_classifier::*, multiclass_classifier::*, regressor::*};
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	document::{Document, DocumentProps},
-	model_layout::{ModelLayout, ModelLayoutProps},
+	document::Document,
+	model_layout::{ModelLayout, ModelLayoutInfo},
 };
 
-#[derive(Props)]
-pub struct PageProps {
+#[derive(ComponentBuilder)]
+pub struct Page {
 	pub id: String,
 	pub inner: Inner,
-	pub model_layout_props: ModelLayoutProps,
+	pub model_layout_info: ModelLayoutInfo,
 }
 
 pub enum Inner {
-	Regressor(RegressorProps),
-	BinaryClassifier(BinaryClassifierProps),
-	MulticlassClassifier(MulticlassClassifierProps),
+	Regressor(Regressor),
+	BinaryClassifier(BinaryClassifier),
+	MulticlassClassifier(MulticlassClassifier),
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let inner = match props.inner {
-		Inner::Regressor(inner) => {
-			html! { <Regressor {inner} /> }
-		}
-		Inner::BinaryClassifier(inner) => {
-			html! { <BinaryClassifier {inner} /> }
-		}
-		Inner::MulticlassClassifier(inner) => {
-			html! { <MulticlassClassifier {inner} /> }
-		}
-	};
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<ModelLayout {props.model_layout_props}>
-				{inner}
-			</ModelLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		let inner = match self.inner {
+			Inner::Regressor(inner) => inner.into_node(),
+			Inner::BinaryClassifier(inner) => inner.into_node(),
+			Inner::MulticlassClassifier(inner) => inner.into_node(),
+		};
+		Document::new()
+			.child(ModelLayout::new(self.model_layout_info).child(inner))
+			.into_node()
 	}
 }

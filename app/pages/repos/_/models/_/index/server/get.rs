@@ -1,13 +1,13 @@
 use crate::{
-	common::{FeatureImportance, FeatureImportancesSectionProps, TrainingSummarySectionProps},
+	common::{FeatureImportance, FeatureImportancesSection, TrainingSummarySection},
 	page::{
-		BinaryClassifierMetricsSectionProps, BinaryClassifierProps, Inner,
-		MulticlassClassifierClassMetrics, MulticlassClassifierMetricsSectionProps,
-		MulticlassClassifierProps, Page, PageProps, RegressorMetricsSectionProps, RegressorProps,
+		BinaryClassifier, BinaryClassifierMetricsSection, Inner, MulticlassClassifier,
+		MulticlassClassifierClassMetrics, MulticlassClassifierMetricsSection, Page, Regressor,
+		RegressorMetricsSection,
 	},
 };
-use html::html;
 use num::ToPrimitive;
+use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -20,7 +20,7 @@ use tangram_app_common::{
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::model_layout::{get_model_layout_props, ModelNavItem};
+use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_error::{err, Result};
 use tangram_id::Id;
 use tangram_zip::zip;
@@ -30,7 +30,7 @@ pub async fn get(
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	let model_id =
-		if let &["repos", _, "models", model_id, ""] = path_components(&request).as_slice() {
+		if let ["repos", _, "models", model_id, ""] = *path_components(&request).as_slice() {
 			model_id.to_owned()
 		} else {
 			return Err(err!("unexpected path"));
@@ -52,8 +52,8 @@ pub async fn get(
 	}
 	let bytes = get_model_bytes(&context.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
-	let summary_section_props = compute_summary_section_props(model);
-	let feature_importances_section_props = compute_feature_importances_section_props(model);
+	let summary_section = compute_summary_section(model);
+	let feature_importances_section = compute_feature_importances_section(model);
 	let inner = match model.inner() {
 		tangram_model::ModelInnerReader::Regressor(regressor) => {
 			let regressor = regressor.read();
@@ -72,17 +72,17 @@ pub async fn get(
 					model.losses().map(|losses| losses.iter().collect())
 				}
 			};
-			Inner::Regressor(RegressorProps {
+			Inner::Regressor(Regressor {
 				id: model_id.to_string(),
-				metrics_section_props: RegressorMetricsSectionProps {
+				training_metrics_section: RegressorMetricsSection {
 					rmse: regressor.test_metrics().rmse(),
 					baseline_rmse: regressor.baseline_metrics().rmse(),
 					mse: regressor.test_metrics().mse(),
 					baseline_mse: regressor.baseline_metrics().mse(),
 					losses_chart_series,
 				},
-				summary_section_props,
-				feature_importances_section_props,
+				training_summary_section: summary_section,
+				feature_importances_section,
 				warning,
 			})
 		}
@@ -109,10 +109,10 @@ pub async fn get(
 					model.losses().map(|losses| losses.iter().collect())
 				}
 			};
-			Inner::BinaryClassifier(BinaryClassifierProps {
+			Inner::BinaryClassifier(BinaryClassifier {
 				id: model_id.to_string(),
 				warning,
-				training_metrics_section_props: BinaryClassifierMetricsSectionProps {
+				training_metrics_section: BinaryClassifierMetricsSection {
 					baseline_accuracy: default_threshold_baseline_metrics.accuracy(),
 					auc_roc: model.test_metrics().auc_roc(),
 					accuracy: default_threshold_test_metrics.accuracy(),
@@ -120,8 +120,8 @@ pub async fn get(
 					recall: default_threshold_test_metrics.recall().unwrap(),
 					losses_chart_series,
 				},
-				training_summary_section_props: summary_section_props,
-				feature_importances_section_props,
+				training_summary_section: summary_section,
+				feature_importances_section,
 			})
 		}
 		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
@@ -152,29 +152,29 @@ pub async fn get(
 					model.losses().map(|losses| losses.iter().collect())
 				}
 			};
-			Inner::MulticlassClassifier(MulticlassClassifierProps {
+			Inner::MulticlassClassifier(MulticlassClassifier {
 				id: model_id.to_string(),
-				metrics_section_props: MulticlassClassifierMetricsSectionProps {
+				training_metrics_section: MulticlassClassifierMetricsSection {
 					accuracy: test_metrics.accuracy(),
 					baseline_accuracy: baseline_metrics.accuracy(),
 					class_metrics,
 					classes: model.classes().iter().map(ToOwned::to_owned).collect(),
 					losses_chart_series,
 				},
-				summary_section_props,
-				feature_importances_section_props,
+				training_summary_section: summary_section,
+				feature_importances_section,
 				warning,
 			})
 		}
 	};
-	let model_layout_props =
-		get_model_layout_props(&mut db, &context, model_id, ModelNavItem::Overview).await?;
-	let props = PageProps {
+	let model_layout_info =
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::Overview).await?;
+	let page = Page {
 		id: model_id.to_string(),
 		inner,
-		model_layout_props,
+		model_layout_info,
 	};
-	let html = html!(<Page {props} />).render_to_string();
+	let html = html(page);
 	let response = http::Response::builder()
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))
@@ -182,12 +182,12 @@ pub async fn get(
 	Ok(response)
 }
 
-fn compute_summary_section_props(model: tangram_model::ModelReader) -> TrainingSummarySectionProps {
+fn compute_summary_section(model: tangram_model::ModelReader) -> TrainingSummarySection {
 	let chosen_model_type_name = model_type_name(model);
 	match model.inner() {
 		tangram_model::ModelInnerReader::Regressor(regressor) => {
 			let regressor = regressor.read();
-			TrainingSummarySectionProps {
+			TrainingSummarySection {
 				chosen_model_type_name,
 				column_count: regressor.overall_column_stats().len() + 1,
 				model_comparison_metric_type_name: regression_model_comparison_type_name(
@@ -199,7 +199,7 @@ fn compute_summary_section_props(model: tangram_model::ModelReader) -> TrainingS
 		}
 		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			let binary_classifier = binary_classifier.read();
-			TrainingSummarySectionProps {
+			TrainingSummarySection {
 				chosen_model_type_name,
 				column_count: binary_classifier.overall_column_stats().len() + 1,
 				model_comparison_metric_type_name: binary_classification_model_comparison_type_name(
@@ -211,7 +211,7 @@ fn compute_summary_section_props(model: tangram_model::ModelReader) -> TrainingS
 		}
 		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 			let multiclass_classifier = multiclass_classifier.read();
-			TrainingSummarySectionProps {
+			TrainingSummarySection {
 				chosen_model_type_name,
 				column_count: multiclass_classifier.overall_column_stats().len() + 1,
 				model_comparison_metric_type_name:
@@ -291,9 +291,9 @@ fn model_type_name(model: tangram_model::ModelReader) -> String {
 	}
 }
 
-fn compute_feature_importances_section_props(
+fn compute_feature_importances_section(
 	model: tangram_model::ModelReader,
-) -> FeatureImportancesSectionProps {
+) -> FeatureImportancesSection {
 	let n_columns = match model.inner() {
 		tangram_model::ModelInnerReader::Regressor(regressor) => {
 			regressor.read().overall_column_stats().len()
@@ -453,7 +453,7 @@ fn compute_feature_importances_section_props(
 		.collect();
 	feature_importances.truncate(TRAINING_IMPORTANCES_MAX_FEATURE_IMPORTANCES_TO_SHOW_IN_CHART);
 	let feature_importances_chart_values = feature_importances;
-	FeatureImportancesSectionProps {
+	FeatureImportancesSection {
 		n_columns,
 		n_features,
 		feature_importances_chart_values,
@@ -491,6 +491,14 @@ fn compute_feature_names<'a>(
 						format!("{} contains {}", feature_group.source_column_name(), ngram)
 					})
 					.collect()
+			}
+			tangram_model::FeatureGroupReader::BagOfWordsCosineSimilarity(feature_group) => {
+				let feature_group = feature_group.read();
+				vec![format!(
+					"similarity of {} and {}",
+					feature_group.source_column_name_a(),
+					feature_group.source_column_name_b(),
+				)]
 			}
 			tangram_model::FeatureGroupReader::WordEmbedding(feature_group) => {
 				let feature_group = feature_group.read();

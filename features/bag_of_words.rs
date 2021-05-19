@@ -2,6 +2,7 @@ use fnv::{FnvBuildHasher, FnvHashSet};
 use indexmap::IndexMap;
 use itertools::Itertools;
 use ndarray::prelude::*;
+use num::ToPrimitive;
 use tangram_table::{
 	NumberTableColumn, TableColumn, TableColumnView, TableValue, TextTableColumnView,
 };
@@ -94,7 +95,6 @@ impl BagOfWordsFeatureGroup {
 		let mut feature_columns = vec![vec![0.0; column.len()]; self.ngrams.len()];
 		// Compute the feature values for each example.
 		for (example_index, value) in column.iter().enumerate() {
-			let mut feature_values_sum_of_squares = 0.0;
 			// Set the feature value for each token for this example.
 			let unigram_iter = if self.ngram_types.contains(&NGramType::Unigram) {
 				Some(
@@ -132,18 +132,24 @@ impl BagOfWordsFeatureGroup {
 						}
 						BagOfWordsFeatureGroupStrategy::TfIdf => {
 							let feature_value = 1.0 * ngram_entry.idf;
-							feature_values_sum_of_squares += feature_value * feature_value;
 							feature_columns[ngram_index][example_index] += feature_value;
 						}
 					}
 				}
 			}
 			if matches!(self.strategy, BagOfWordsFeatureGroupStrategy::TfIdf) {
+				let mut feature_values_sum_of_squares = 0.0;
+				#[allow(clippy::needless_range_loop)]
+				for ngram_index in 0..self.ngrams.len() {
+					let value = feature_columns[ngram_index][example_index];
+					feature_values_sum_of_squares +=
+						value.to_f64().unwrap() * value.to_f64().unwrap();
+				}
 				// Normalize the feature values for this example.
 				if feature_values_sum_of_squares > 0.0 {
 					let norm = feature_values_sum_of_squares.sqrt();
 					for feature_column in feature_columns.iter_mut() {
-						feature_column[example_index] /= norm;
+						feature_column[example_index] /= norm.to_f32().unwrap();
 					}
 				}
 			}
@@ -165,7 +171,6 @@ impl BagOfWordsFeatureGroup {
 		features.fill(0.0);
 		// Compute the feature values for each example.
 		for (example_index, value) in column.iter().enumerate() {
-			let mut feature_values_sum_of_squares = 0.0;
 			// Set the feature value for each token for this example.
 			let unigram_iter = if self.ngram_types.contains(&NGramType::Unigram) {
 				Some(
@@ -205,7 +210,6 @@ impl BagOfWordsFeatureGroup {
 						}
 						BagOfWordsFeatureGroupStrategy::TfIdf => {
 							let feature_value = 1.0 * ngram_entry.idf;
-							feature_values_sum_of_squares += feature_value * feature_value;
 							*features.get_mut([example_index, ngram_index]).unwrap() +=
 								feature_value;
 						}
@@ -214,10 +218,15 @@ impl BagOfWordsFeatureGroup {
 			}
 			if matches!(self.strategy, BagOfWordsFeatureGroupStrategy::TfIdf) {
 				// Normalize the feature values for this example.
+				let feature_values_sum_of_squares = features
+					.row(example_index)
+					.iter()
+					.map(|value| value.to_f64().unwrap() * value.to_f64().unwrap())
+					.sum::<f64>();
 				if feature_values_sum_of_squares > 0.0 {
 					let norm = feature_values_sum_of_squares.sqrt();
 					for feature in features.row_mut(example_index).iter_mut() {
-						*feature /= norm;
+						*feature /= norm.to_f32().unwrap();
 					}
 				}
 			}
@@ -237,7 +246,6 @@ impl BagOfWordsFeatureGroup {
 		}
 		// Compute the feature values for each example.
 		for (example_index, value) in column.iter().enumerate() {
-			let mut feature_values_sum_of_squares = 0.0;
 			// Set the feature value for each token for this example.
 			let unigram_iter = if self.ngram_types.contains(&NGramType::Unigram) {
 				Some(
@@ -288,17 +296,24 @@ impl BagOfWordsFeatureGroup {
 								.unwrap()
 								.as_number_mut()
 								.unwrap() += feature_value;
-							feature_values_sum_of_squares += feature_value * feature_value;
 						}
 					}
 				}
 			}
 			if matches!(self.strategy, BagOfWordsFeatureGroupStrategy::TfIdf) {
 				// Normalize the feature values for this example.
+				let feature_values_sum_of_squares = features
+					.row(example_index)
+					.iter()
+					.map(|value| {
+						value.as_number().unwrap().to_f64().unwrap()
+							* value.as_number().unwrap().to_f64().unwrap()
+					})
+					.sum::<f64>();
 				if feature_values_sum_of_squares > 0.0 {
 					let norm = feature_values_sum_of_squares.sqrt();
 					for feature in features.row_mut(example_index).iter_mut() {
-						*feature.as_number_mut().unwrap() /= norm;
+						*feature.as_number_mut().unwrap() /= norm.to_f32().unwrap();
 					}
 				}
 			}

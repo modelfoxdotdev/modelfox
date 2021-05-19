@@ -19,9 +19,9 @@
             numpy
             pandas
             scikitlearn
-            time
             xgboost
           ]))
+          time
         ];
       };
     }

@@ -1,10 +1,10 @@
 use super::FieldLabel;
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 use wasm_bindgen::{prelude::*, JsCast};
-use web_sys::*;
+use web_sys as dom;
 
-#[derive(Props)]
-pub struct SelectFieldProps {
+#[derive(ComponentBuilder)]
+pub struct SelectField {
 	#[optional]
 	pub disabled: Option<bool>,
 	#[optional]
@@ -28,57 +28,55 @@ pub struct SelectFieldOption {
 	pub value: String,
 }
 
-#[component]
-pub fn SelectField(props: SelectFieldProps) {
-	let options = props.options.unwrap_or_else(Vec::new);
-	let value = props.value;
-	let autocomplete = value.as_ref().map(|_| "off".to_owned());
-	html! {
-		<FieldLabel html_for={None}>
-			{props.label}
-			<select
-				autocomplete={autocomplete}
-				class="form-select-field"
-				disabled={props.disabled}
-				id={props.id}
-				name={props.name}
-				placeholder={props.placeholder}
-				required={props.required}
-			>
-				{options.iter().map(|option| {
-					let selected = value
-						.as_ref()
-						.map(|value| *value == option.value)
-						.unwrap_or(false);
-					html! {
-						<option value={option.value.clone()} selected={selected}>
-							{option.text.clone()}
-						</option>
-					}
-				}).collect::<Vec<_>>()}
-			</select>
-		</FieldLabel>
+impl Component for SelectField {
+	fn into_node(self) -> Node {
+		let options = self.options.unwrap_or_else(Vec::new);
+		let value = self.value;
+		let autocomplete = value.as_ref().map(|_| "off".to_owned());
+		FieldLabel::new(None)
+			.child(self.label)
+			.child(
+				select()
+					.attribute("autocomplete", autocomplete)
+					.class("form-select-field")
+					.attribute("disabled", self.disabled)
+					.attribute("id", self.id)
+					.attribute("name", self.name)
+					.attribute("placeholder", self.placeholder)
+					.attribute("required", self.required)
+					.children(options.iter().map(|option| {
+						let selected = value
+							.as_ref()
+							.map(|value| *value == option.value)
+							.unwrap_or(false);
+						html::option()
+							.attribute("value", option.value.clone())
+							.attribute("selected", selected)
+							.child(option.text.clone())
+					})),
+			)
+			.into_node()
 	}
 }
 
 pub fn select_field_submit_on_change(id: String) {
-	let document = window().unwrap().document().unwrap();
+	let document = dom::window().unwrap().document().unwrap();
 	let select_element = document.get_element_by_id(&id).unwrap();
-	let callback_fn = Closure::<dyn Fn(_)>::wrap(Box::new(move |event: Event| {
+	let callback_fn = Closure::<dyn Fn(_)>::wrap(Box::new(move |event: dom::Event| {
 		if let Some(event) = event.current_target() {
 			let form = event
-				.dyn_ref::<HtmlElement>()
+				.dyn_ref::<dom::HtmlElement>()
 				.unwrap()
 				.closest("form")
 				.unwrap();
 			form.unwrap()
-				.dyn_ref::<HtmlFormElement>()
+				.dyn_ref::<dom::HtmlFormElement>()
 				.unwrap()
 				.submit()
 				.ok();
 		}
 	}));
-	if let Some(select_element) = select_element.dyn_ref::<HtmlSelectElement>() {
+	if let Some(select_element) = select_element.dyn_ref::<dom::HtmlSelectElement>() {
 		select_element
 			.add_event_listener_with_callback("change", callback_fn.as_ref().unchecked_ref())
 			.unwrap();

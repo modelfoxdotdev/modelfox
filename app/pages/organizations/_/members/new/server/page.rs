@@ -1,41 +1,42 @@
-use html::{component, html, Props};
+use pinwheel::prelude::*;
 use tangram_app_layouts::{
-	app_layout::{AppLayout, AppLayoutProps},
-	document::{Document, DocumentProps},
+	app_layout::{AppLayout, AppLayoutInfo},
+	document::Document,
 };
 use tangram_ui as ui;
 
-#[derive(Props)]
-pub struct PageProps {
-	pub app_layout_props: AppLayoutProps,
+#[derive(ComponentBuilder)]
+pub struct Page {
+	pub app_layout_info: AppLayoutInfo,
 	pub error: Option<String>,
 }
 
-#[component]
-pub fn Page(props: PageProps) {
-	let document_props = DocumentProps {
-		client_wasm_js_src: None,
-	};
-	html! {
-		<Document {document_props}>
-			<AppLayout {props.app_layout_props}>
-				<ui::S1>
-					<ui::H1>{"Invite"}</ui::H1>
-					<ui::Form post?={Some(true)}>
-						<ui::TextField
-							label?="Email"
-							name?="email"
-						/>
-						<ui::CheckboxField
-							label?="Admin"
-							name?="is_admin"
-						/>
-						<ui::Button button_type?={Some(ui::ButtonType::Submit)}>
-							{"Invite"}
-						</ui::Button>
-					</ui::Form>
-				</ui::S1>
-			</AppLayout>
-		</Document>
+impl Component for Page {
+	fn into_node(self) -> Node {
+		Document::new()
+			.child(
+				AppLayout::new(self.app_layout_info).child(
+					ui::S1::new().child(ui::H1::new().child("Invite")).child(
+						ui::Form::new()
+							.post(Some(true))
+							.child(
+								ui::TextField::new()
+									.label("Email".to_owned())
+									.name("email".to_owned()),
+							)
+							.child(
+								ui::CheckboxField::new()
+									.label("Admin".to_owned())
+									.name("is_admin".to_owned()),
+							)
+							.child(
+								ui::Button::new()
+									.button_type(Some(ui::ButtonType::Submit))
+									.child("Invite"),
+							),
+					),
+				),
+			)
+			.into_node()
 	}
 }
