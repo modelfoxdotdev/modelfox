@@ -1,4 +1,5 @@
 use clap::Clap;
+use duct::cmd;
 use serde_json::json;
 use sha2::Digest;
 use std::path::PathBuf;
@@ -7,22 +8,22 @@ use tangram_id::Id;
 
 #[derive(Clap)]
 pub struct Args {
-	#[clap(long, about = "the path to the tangram license private key file")]
-	pub private_key: PathBuf,
-	#[clap(long, about = "the path to write the license file")]
+	#[clap(short, long, about = "the path to write the license file")]
 	pub output: PathBuf,
 }
 
 pub fn main() -> Result<()> {
 	let args = Args::parse();
-	let tangram_license_private_key = std::fs::read_to_string(args.private_key)?;
+	let tangram_license_private_key = cmd!("pass", "tangram/keys/license.private.rsa")
+		.run()?
+		.stdout;
 	let tangram_license_private_key = tangram_license_private_key
 		.lines()
 		.skip(1)
 		.filter(|line| !line.starts_with('-'))
-		.fold(String::new(), |mut data, line| {
-			data.push_str(&line);
-			data
+		.fold(String::new(), |mut string, line| {
+			string.push_str(&line);
+			string
 		});
 	let tangram_license_private_key = base64::decode(tangram_license_private_key)?;
 	let tangram_license_private_key = rsa::RSAPrivateKey::from_pkcs1(&tangram_license_private_key)?;

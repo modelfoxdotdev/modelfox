@@ -129,13 +129,13 @@ fn alpine(
 			.join(TargetFileNames::for_target(target).tangram_cli_file_name);
 		std::fs::copy(tangram_cli_path, &tangram_cli_dst_path)?;
 		let script = r#"
-		apk add build-base abuild
-		echo "PACKAGER_PUBKEY=/tangram.public.rsa" >> /etc/abuild.conf
-		echo "PACKAGER_PRIVKEY=/tangram.private.rsa" >> /etc/abuild.conf
-		abuild -F checksum
-		abuild -F -P $PWD
-		rm -rf src pkg
-	"#;
+			apk add build-base abuild
+			echo "PACKAGER_PUBKEY=/tangram.public.rsa" >> /etc/abuild.conf
+			echo "PACKAGER_PRIVKEY=/tangram.private.rsa" >> /etc/abuild.conf
+			abuild -F checksum
+			abuild -F -P $PWD
+			rm -rf src pkg
+		"#;
 		cmd!(
 			"docker",
 			"run",

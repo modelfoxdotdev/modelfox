@@ -13,6 +13,7 @@ path = "main.rs"
 base64 = "0.13"
 chrono = { version = "0.4", features = ["serde"] }
 clap = { version = "3.0.0-beta.2", features = ["color"] }
+duct = "0.13"
 rand = "0.8"
 rsa = "0.4"
 serde = { version = "1", features = ["derive"] }
