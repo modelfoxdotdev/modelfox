@@ -68,7 +68,14 @@ impl Component for Hero {
 			.child(
 				ui::Button::new()
 					.href("/docs/install".to_owned())
+					.color(ui::colors::TEAL.to_owned())
 					.child("Install the CLI"),
+			)
+			.child(
+				ui::Button::new()
+					.href("https://cozycal.com/tangram/demo".to_owned())
+					.color(ui::colors::GREEN.to_owned())
+					.child("Schedule a Demo"),
 			);
 		div()
 			.class("index-hero-wrapper")
