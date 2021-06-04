@@ -287,16 +287,16 @@ mod test {
 			&"hello".to_owned(),
 			bag_of_words_features.as_mut_slice(),
 		);
-		let right = &[0.0, 1.0];
-		assert_eq!(bag_of_words_features, right);
+		assert!((bag_of_words_features[0] - 0.0).abs() < f32::EPSILON);
+		assert!((bag_of_words_features[1] - 1.0).abs() < f32::EPSILON);
 
 		let mut bag_of_words_features = vec![0.0; feature_group.ngrams.len()];
 		feature_group.compute_bag_of_words_feature(
 			&"hello test".to_owned(),
 			bag_of_words_features.as_mut_slice(),
 		);
-		let right = &[1.0 / 2.0f32.sqrt(), 1.0 / 2.0f32.sqrt()];
-		assert_eq!(bag_of_words_features, right);
+		assert!((bag_of_words_features[0] - 1.0 / 2.0f32.sqrt()).abs() < f32::EPSILON);
+		assert!((bag_of_words_features[1] - 1.0 / 2.0f32.sqrt()).abs() < f32::EPSILON);
 	}
 
 	#[test]

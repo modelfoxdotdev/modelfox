@@ -20,7 +20,6 @@ app = ["tangram_app"]
 
 [dependencies]
 backtrace = "0.3"
-base64 = "0.13"
 clap = { version = "3.0.0-beta.2", features = ["color"] }
 colored = "2"
 csv = "1"
@@ -30,15 +29,14 @@ itertools = "0.10"
 num = "0.4"
 once_cell = "1"
 rayon = "1.5"
-rsa = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-sha2 = "0.9"
 tangram_app = { path = "../app", optional = true }
 tangram_core = { path = "../core" }
 tangram_error = { path = "../error" }
 tangram_id = { path = "../id" }
 tangram_kill_chip = { path = "../kill_chip" }
+tangram_license = { path = "../license" }
 tangram_model = { path = "../model" }
 tangram_progress_counter = { path = "../progress_counter" }
 tangram_table = { path = "../table" }

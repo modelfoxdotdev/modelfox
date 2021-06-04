@@ -3955,7 +3955,6 @@ name = "tangram_cli"
 version = "0.3.0"
 dependencies = [
  "backtrace",
- "base64 0.13.0",
  "clap 3.0.0-beta.2",
  "colored",
  "csv",
@@ -3967,15 +3966,14 @@ dependencies = [
  "num",
  "once_cell",
  "rayon",
- "rsa",
  "serde",
  "serde_json",
- "sha2",
  "tangram_app",
  "tangram_core",
  "tangram_error",
  "tangram_id",
  "tangram_kill_chip",
+ "tangram_license",
  "tangram_model",
  "tangram_progress_counter",
  "tangram_table",
@@ -4075,6 +4073,22 @@ dependencies = [
 [[package]]
 name = "tangram_kill_chip"
 version = "0.0.0"
+
+[[package]]
+name = "tangram_license"
+version = "0.0.0"
+dependencies = [
+ "base64 0.13.0",
+ "indoc 1.0.3",
+ "pem",
+ "rand",
+ "rsa",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tangram_error",
+ "tangram_id",
+]
 
 [[package]]
 name = "tangram_linear"
@@ -4302,17 +4316,14 @@ dependencies = [
 name = "tangram_script_generate_license"
 version = "0.0.0"
 dependencies = [
- "base64 0.13.0",
  "chrono",
  "clap 3.0.0-beta.2",
  "duct",
- "rand",
- "rsa",
  "serde",
  "serde_json",
- "sha2",
  "tangram_error",
  "tangram_id",
+ "tangram_license",
 ]
 
 [[package]]
