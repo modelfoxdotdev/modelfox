@@ -25,7 +25,7 @@ impl Component for Page {
 			Inner::Text(inner) => inner.into_node(),
 		};
 		Document::new()
-			.client("tangram_app_training_stats_column_server")
+			.client("tangram_app_training_stats_column_client")
 			.child(ModelLayout::new(self.model_layout_info).child(inner))
 			.into_node()
 	}

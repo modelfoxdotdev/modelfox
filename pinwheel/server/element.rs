@@ -1,8 +1,8 @@
 use super::{text::EscapedText, Node};
 use crate::{
 	attribute_value::{AttributeValue, IntoAttributeValue},
-	style_value::{IntoStyleValue, StyleValue},
-	text_value::IntoTextValue,
+	option_string_value::{IntoOptionStringValue, OptionStringValue},
+	string_value::IntoStringValue,
 };
 use futures::{executor::block_on, stream::StreamExt};
 use futures_signals::{
@@ -16,6 +16,7 @@ pub struct Element {
 	tag: &'static str,
 	kind: Option<HtmlElementKind>,
 	attributes: Vec<Attribute>,
+	classes: Vec<Class>,
 	styles: Vec<Style>,
 	children: Vec<Node>,
 	inner_html: Option<Cow<'static, str>>,
@@ -42,9 +43,13 @@ pub struct Attribute {
 	value: AttributeValue,
 }
 
+pub struct Class {
+	value: OptionStringValue,
+}
+
 pub struct Style {
 	name: Cow<'static, str>,
-	value: StyleValue,
+	value: OptionStringValue,
 }
 
 impl Element {
@@ -53,6 +58,7 @@ impl Element {
 			tag,
 			kind,
 			attributes: Vec::new(),
+			classes: Vec::new(),
 			styles: Vec::new(),
 			children: Vec::new(),
 			inner_html: None,
@@ -82,13 +88,34 @@ impl Element {
 		self
 	}
 
+	pub fn class<T>(mut self, value: T) -> Element
+	where
+		T: IntoOptionStringValue,
+	{
+		self.classes.push(Class {
+			value: value.into_option_string_value(),
+		});
+		self
+	}
+
+	pub fn class_signal<S, T>(mut self, value: S) -> Element
+	where
+		S: 'static + Unpin + Signal<Item = T>,
+		T: IntoOptionStringValue,
+	{
+		self.classes.push(Class {
+			value: block_on(value.first().to_future()).into_option_string_value(),
+		});
+		self
+	}
+
 	pub fn style<T>(mut self, name: impl Into<Cow<'static, str>>, value: T) -> Element
 	where
-		T: IntoStyleValue,
+		T: IntoOptionStringValue,
 	{
 		self.styles.push(Style {
 			name: name.into(),
-			value: value.into_style_value(),
+			value: value.into_option_string_value(),
 		});
 		self
 	}
@@ -96,11 +123,11 @@ impl Element {
 	pub fn style_signal<S, T>(mut self, name: impl Into<Cow<'static, str>>, value: S) -> Element
 	where
 		S: 'static + Unpin + Signal<Item = T>,
-		T: IntoStyleValue,
+		T: IntoOptionStringValue,
 	{
 		self.styles.push(Style {
 			name: name.into(),
-			value: block_on(value.first().to_future()).into_style_value(),
+			value: block_on(value.first().to_future()).into_option_string_value(),
 		});
 		self
 	}
@@ -163,8 +190,8 @@ impl Element {
 		self
 	}
 
-	pub fn inner_html(mut self, value: impl IntoTextValue) -> Element {
-		let html = value.into_text_value();
+	pub fn inner_html(mut self, value: impl IntoStringValue) -> Element {
+		let html = value.into_string_value();
 		self.inner_html = Some(html.0);
 		self.children.clear();
 		self
@@ -187,6 +214,21 @@ impl std::fmt::Display for Element {
 					}
 				}
 			}
+		}
+		if !self.classes.is_empty() {
+			write!(f, " class=\"")?;
+			let mut first = true;
+			for class in self.classes.iter() {
+				if let Some(value) = class.value.0.as_ref() {
+					if first {
+						first = false;
+					} else {
+						write!(f, " ")?;
+					}
+					write!(f, "{}", value)?;
+				}
+			}
+			write!(f, "\"")?;
 		}
 		if !self.styles.is_empty() {
 			write!(f, " style=\"")?;

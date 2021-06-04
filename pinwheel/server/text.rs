@@ -1,30 +1,30 @@
-use crate::text_value::{IntoTextValue, TextValue};
+use crate::string_value::{IntoStringValue, StringValue};
 use futures::executor::block_on;
 use futures_signals::signal::{Signal, SignalExt};
 use std::fmt::Write;
 
-pub fn text(text: impl IntoTextValue) -> Text {
+pub fn text(text: impl IntoStringValue) -> Text {
 	Text::new(text)
 }
 
 pub struct Text {
-	value: TextValue,
+	value: StringValue,
 }
 
 impl Text {
-	pub fn new(value: impl IntoTextValue) -> Text {
+	pub fn new(value: impl IntoStringValue) -> Text {
 		Text {
-			value: value.into_text_value(),
+			value: value.into_string_value(),
 		}
 	}
 
 	pub fn new_signal<T, S>(value: S) -> Text
 	where
-		T: IntoTextValue,
+		T: IntoStringValue,
 		S: 'static + Unpin + Signal<Item = T>,
 	{
 		Text {
-			value: block_on(value.first().to_future()).into_text_value(),
+			value: block_on(value.first().to_future()).into_string_value(),
 		}
 	}
 }

@@ -5,8 +5,8 @@ pub mod component;
 pub mod dehydrate;
 pub mod elements;
 pub mod hydrate;
-pub mod style_value;
-pub mod text_value;
+pub mod option_string_value;
+pub mod string_value;
 pub mod zip;
 
 #[cfg(target_arch = "wasm32")]

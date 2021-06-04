@@ -176,9 +176,24 @@ impl quote::ToTokens for Element {
 					self.0 = self.0.attribute_signal(name, value);
 					self
 				}
+				pub fn class<T>(mut self, value: T) -> Self
+				where
+					T: crate::option_string_value::IntoOptionStringValue,
+				{
+					self.0 = self.0.class(value);
+					self
+				}
+				pub fn class_signal<S, T>(mut self, value: S) -> Self
+				where
+					S: 'static + Unpin + futures_signals::signal::Signal<Item = T>,
+					T: crate::option_string_value::IntoOptionStringValue,
+				{
+					self.0 = self.0.class_signal(value);
+					self
+				}
 				pub fn style<T>(mut self, name: impl Into<std::borrow::Cow<'static, str>>, value: T) -> Self
 				where
-					T: crate::style_value::IntoStyleValue,
+					T: crate::option_string_value::IntoOptionStringValue,
 				{
 					self.0 = self.0.style(name, value);
 					self
@@ -186,7 +201,7 @@ impl quote::ToTokens for Element {
 				pub fn style_signal<S, T>(mut self, name: impl Into<std::borrow::Cow<'static, str>>, value: S) -> Self
 				where
 					S: 'static + Unpin + futures_signals::signal::Signal<Item = T>,
-					T: crate::style_value::IntoStyleValue,
+					T: crate::option_string_value::IntoOptionStringValue,
 				{
 					self.0 = self.0.style_signal(name, value);
 					self
@@ -232,7 +247,7 @@ impl quote::ToTokens for Element {
 					self.0 = self.0.child_signal_vec(signal_vec);
 					self
 				}
-				pub fn inner_html(mut self, value: impl crate::text_value::IntoTextValue) -> Self {
+				pub fn inner_html(mut self, value: impl crate::string_value::IntoStringValue) -> Self {
 					self.0 = self.0.inner_html(value);
 					self
 				}
@@ -344,7 +359,7 @@ fn html_element_attributes() -> Attributes {
 		*/
 		autocapitalize,
 		/// A space-separated list of the classes of the element. Classes allows CSS and JavaScript to select and access specific elements via the class selectors or functions like the method `Document.getElementsByClassName()`.
-		class,
+		// class,
 		/**
 		An enumerated attribute indicating if the element should be editable by the user. If so, the browser modifies its widget to allow editing. The attribute must take one of the following values:
 		true or the empty string, which indicates that the element must be editable;

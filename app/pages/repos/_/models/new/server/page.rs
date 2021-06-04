@@ -15,7 +15,7 @@ pub struct Page {
 impl Component for Page {
 	fn into_node(self) -> Node {
 		Document::new()
-			.client("tangram_app_new_model_server")
+			.client("tangram_app_new_model_client")
 			.child(
 				AppLayout::new(self.app_layout_info).child(
 					ui::S1::new()

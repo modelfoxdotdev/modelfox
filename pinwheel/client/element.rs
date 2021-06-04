@@ -1,8 +1,8 @@
 use super::{node::Node, signal::SignalNode, signal_vec::SignalVecNode, Handle};
 use crate::{
 	attribute_value::{AttributeValue, IntoAttributeValue},
-	style_value::IntoStyleValue,
-	text_value::IntoTextValue,
+	option_string_value::{IntoOptionStringValue, OptionStringValue},
+	string_value::IntoStringValue,
 };
 use futures::{future::abortable, prelude::*};
 use futures_signals::signal::{Signal, SignalExt};
@@ -106,9 +106,54 @@ impl Element {
 		};
 	}
 
+	pub fn class<T>(self, value: T) -> Element
+	where
+		T: IntoOptionStringValue,
+	{
+		let value = value.into_option_string_value();
+		Self::set_class(&self.element, &value, None);
+		self
+	}
+
+	pub fn class_signal<S, T>(mut self, value: S) -> Element
+	where
+		S: 'static + Unpin + Signal<Item = T>,
+		T: IntoOptionStringValue,
+	{
+		let element = self.element.clone();
+		let mut previous_value = None;
+		let (future, handle) = abortable(value.for_each(move |value| {
+			let value = value.into_option_string_value();
+			Self::set_class(&element, &value, previous_value.as_ref());
+			previous_value = Some(value);
+			ready(())
+		}));
+		spawn_local(future.map(|_| ()));
+		let handle = Handle(handle);
+		self.handles.push(handle);
+		self
+	}
+
+	fn set_class(
+		element: &dom::Element,
+		value: &OptionStringValue,
+		previous_value: Option<&OptionStringValue>,
+	) {
+		if let Some(previous_value) = previous_value.and_then(|value| value.0.as_ref()) {
+			for class in previous_value.split(' ') {
+				element.class_list().remove_1(&class).unwrap();
+			}
+		}
+		if let Some(value) = value.0.as_ref() {
+			for class in value.split(' ') {
+				element.class_list().add_1(&class).unwrap();
+			}
+		}
+	}
+
 	pub fn style<T>(self, name: impl Into<Cow<'static, str>>, value: T) -> Element
 	where
-		T: IntoStyleValue,
+		T: IntoOptionStringValue,
 	{
 		let name = name.into();
 		Self::set_style(&self.element, &name, value);
@@ -118,7 +163,7 @@ impl Element {
 	pub fn style_signal<S, T>(mut self, name: impl Into<Cow<'static, str>>, value: S) -> Element
 	where
 		S: 'static + Unpin + Signal<Item = T>,
-		T: IntoStyleValue,
+		T: IntoOptionStringValue,
 	{
 		let name = name.into();
 		let element = self.element.clone();
@@ -132,8 +177,8 @@ impl Element {
 		self
 	}
 
-	fn set_style(element: &dom::Element, name: &str, value: impl IntoStyleValue) {
-		let value = value.into_style_value();
+	fn set_style(element: &dom::Element, name: &str, value: impl IntoOptionStringValue) {
+		let value = value.into_option_string_value();
 		if let Some(element) = element.dyn_ref::<dom::HtmlElement>() {
 			if let Some(value) = value.0 {
 				element.style().set_property(&name, &value).unwrap();
@@ -209,8 +254,8 @@ impl Element {
 		self
 	}
 
-	pub fn inner_html(mut self, value: impl IntoTextValue) -> Element {
-		let html = value.into_text_value();
+	pub fn inner_html(mut self, value: impl IntoStringValue) -> Element {
+		let html = value.into_string_value();
 		self.element.set_inner_html(html.0.as_ref());
 		self.children.clear();
 		self

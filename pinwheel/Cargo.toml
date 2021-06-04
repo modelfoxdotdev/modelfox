@@ -27,6 +27,7 @@ features = [
   "Document",
   "DocumentFragment",
   "DomStringMap",
+  "DomTokenList",
   "Element",
   "HtmlElement",
   "Node",

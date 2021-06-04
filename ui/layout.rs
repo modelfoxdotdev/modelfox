@@ -54,7 +54,7 @@ impl Component for H1 {
 		} else {
 			None
 		};
-		let class = classes!(Some("h1"), center);
+		let class = classes!("h1", center);
 		h1().class(class).child(self.children).into_node()
 	}
 }
@@ -74,7 +74,7 @@ impl Component for H2 {
 		} else {
 			None
 		};
-		let class = classes!(Some("h2"), center);
+		let class = classes!("h2", center);
 		h2().class(class).child(self.children).into_node()
 	}
 }

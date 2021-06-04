@@ -287,13 +287,15 @@ impl<'a> InferStats<'a> {
 			InferColumnType::Number => {
 				// If all the values in a number column are zero or one then make this an enum column instead.
 				if let Some(unique_values) = self.unique_values {
-					let mut values = unique_values.iter();
-					if values.next().map(|s| s.as_str()) == Some("0")
-						&& values.next().map(|s| s.as_str()) == Some("1")
-					{
-						return TableColumnType::Enum {
-							variants: unique_values.into_iter().collect(),
-						};
+					if unique_values.len() == 2 {
+						let mut values = unique_values.iter();
+						if values.next().map(|s| s.as_str()) == Some("0")
+							&& values.next().map(|s| s.as_str()) == Some("1")
+						{
+							return TableColumnType::Enum {
+								variants: unique_values.into_iter().collect(),
+							};
+						}
 					}
 				}
 				TableColumnType::Number
