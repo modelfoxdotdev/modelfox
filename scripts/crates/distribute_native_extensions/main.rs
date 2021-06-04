@@ -22,10 +22,10 @@ fn main() -> Result<()> {
 		install(
 			&dist_path
 				.join(target.as_str())
-				.join(target_file_names.tangram_elixir_file_name),
+				.join(target_file_names.tangram_elixir_src_file_name),
 			&elixir_priv_path
 				.join(target.as_str())
-				.join(target_file_names.tangram_elixir_file_name),
+				.join(target_file_names.tangram_elixir_dst_file_name),
 		)?;
 	}
 
@@ -74,8 +74,10 @@ fn main() -> Result<()> {
 		install(
 			&dist_path
 				.join(target.as_str())
-				.join(target_file_names.tangram_node_file_name),
-			&node_dist_path.join(target.as_str()).join("tangram.node"),
+				.join(target_file_names.tangram_node_src_file_name),
+			&node_dist_path
+				.join(target.as_str())
+				.join(target_file_names.tangram_node_dst_file_name),
 		)?;
 	}
 

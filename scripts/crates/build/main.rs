@@ -84,8 +84,8 @@ pub fn main() -> Result<()> {
 				cargo_artifact_path.join(target_file_names.tangram_cli_file_name),
 				cargo_artifact_path.join(target_file_names.libtangram_dynamic_file_name),
 				cargo_artifact_path.join(target_file_names.libtangram_static_file_name),
-				cargo_artifact_path.join(target_file_names.tangram_elixir_file_name),
-				cargo_artifact_path.join(target_file_names.tangram_node_file_name),
+				cargo_artifact_path.join(target_file_names.tangram_elixir_src_file_name),
+				cargo_artifact_path.join(target_file_names.tangram_node_src_file_name),
 			)
 		}
 		Target::X8664UnknownLinuxMusl | Target::AArch64UnknownLinuxMusl => {
@@ -101,8 +101,8 @@ pub fn main() -> Result<()> {
 				cargo_artifact_path_static.join(target_file_names.tangram_cli_file_name),
 				cargo_artifact_path_dynamic.join(target_file_names.libtangram_dynamic_file_name),
 				cargo_artifact_path_static.join(target_file_names.libtangram_static_file_name),
-				cargo_artifact_path_dynamic.join(target_file_names.tangram_elixir_file_name),
-				cargo_artifact_path_dynamic.join(target_file_names.tangram_node_file_name),
+				cargo_artifact_path_dynamic.join(target_file_names.tangram_elixir_src_file_name),
+				cargo_artifact_path_dynamic.join(target_file_names.tangram_node_src_file_name),
 			)
 		}
 	};
@@ -120,11 +120,11 @@ pub fn main() -> Result<()> {
 	)?;
 	std::fs::copy(
 		tangram_elixir_artifact_path,
-		dist_target_path.join(target_file_names.tangram_elixir_file_name),
+		dist_target_path.join(target_file_names.tangram_elixir_src_file_name),
 	)?;
 	std::fs::copy(
 		tangram_node_artifact_path,
-		dist_target_path.join(target_file_names.tangram_node_file_name),
+		dist_target_path.join(target_file_names.tangram_node_src_file_name),
 	)?;
 
 	// Build the python wheels.
