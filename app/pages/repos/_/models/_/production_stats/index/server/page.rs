@@ -31,7 +31,7 @@ impl Component for Page {
 			Inner::MulticlassClassifier(inner) => inner.into_node(),
 		};
 		Document::new()
-			.client("tangram_app_production_stats_index_server")
+			.client("tangram_app_production_stats_index_client")
 			.child(ModelLayout::new(self.model_layout_info).child(inner))
 			.into_node()
 	}
