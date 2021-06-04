@@ -17,7 +17,7 @@ pub fn main() -> Result<()> {
 	let tangram_license_private_key = cmd!("pass", "tangram/keys/license.private.rsa")
 		.run()?
 		.stdout;
-	let tangram_license_private_key = tangram_license_private_key
+	let tangram_license_private_key = String::from_utf8(tangram_license_private_key)?
 		.lines()
 		.skip(1)
 		.filter(|line| !line.starts_with('-'))
