@@ -753,7 +753,7 @@ pub unsafe extern "C" fn tangram_feature_contribution_entry_as_bag_of_words(
 #[no_mangle]
 pub unsafe extern "C" fn tangram_feature_contribution_entry_as_bag_of_words_cosine_similarity(
 	feature_contribution_entry: *const tangram_feature_contribution_entry,
-	feature_contribution_ptr: *mut *const tangram_bag_of_words_feature_contribution,
+	feature_contribution_ptr: *mut *const tangram_bag_of_words_cosine_similarity_feature_contribution,
 ) {
 	*feature_contribution_ptr = match &(*feature_contribution_entry).0 {
 		tangram_core::predict::FeatureContributionEntry::Identity(_) => null(),

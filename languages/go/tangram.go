@@ -661,7 +661,7 @@ func makeBagOfWordsCosineSimilarityFeatureContribution(f *C.tangram_feature_cont
 	C.tangram_bag_of_words_cosine_similarity_feature_contribution_get_column_name_a(cFeatureContribution, &cColumnNameA)
 	C.tangram_bag_of_words_cosine_similarity_feature_contribution_get_column_name_b(cFeatureContribution, &cColumnNameB)
 	C.tangram_bag_of_words_cosine_similarity_feature_contribution_get_feature_contribution_value(cFeatureContribution, &cFeatureContributionValue)
-	C.tangram_bag_of_words_feature_contribution_get_feature_value(cFeatureContribution, &cFeatureValue)
+	C.tangram_bag_of_words_cosine_similarity_feature_contribution_get_feature_value(cFeatureContribution, &cFeatureValue)
 	return BagOfWordsCosineSimilarityFeatureContribution{
 		ColumnNameA:               C.GoStringN(cColumnNameA.ptr, C.int(cColumnNameA.len)),
 		ColumnNameB:               C.GoStringN(cColumnNameB.ptr, C.int(cColumnNameB.len)),

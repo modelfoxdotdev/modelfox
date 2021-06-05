@@ -22,6 +22,7 @@
           nodejs-16_x
           python39
           rpm
+          rust-cbindgen
           ruby
           sequoia
           sqlite

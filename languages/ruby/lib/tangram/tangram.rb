@@ -197,7 +197,7 @@ module Tangram
     attr_reader :feature_value
     # This is the amount that the feature contributed to the output.
     attr_reader :feature_contribution_value
-    def initialize(column_name_a: column_name_b:, feature_contribution_value:, feature_value:)
+    def initialize(column_name_a:, column_name_b:, feature_contribution_value:, feature_value:)
       @column_name_a = column_name_a
       @column_name_b = column_name_b
       @feature_contribution_value = feature_contribution_value

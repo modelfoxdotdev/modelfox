@@ -23,7 +23,7 @@ defmodule Tangram.MixProject do
         description:
           "Tangram is an all-in-one machine learning toolkit designed for programmers.",
         licenses: ["MIT"],
-        links: %{"homepage" = "https://www.tangram.xyz"}
+        links: %{homepage: "https://www.tangram.xyz"}
       ],
       source_url: "https://github.com/tangramxyz/tangram/tree/master/languages/elixir",
       start_permanent: Mix.env() == :prod,
