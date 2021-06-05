@@ -18,6 +18,7 @@ fn tangram(py: Python, m: &PyModule) -> PyResult<()> {
 	m.add_class::<NormalizedFeatureContribution>()?;
 	m.add_class::<OneHotEncodedFeatureContribution>()?;
 	m.add_class::<BagOfWordsFeatureContribution>()?;
+	m.add_class::<BagOfWordsCosineSimilarityFeatureContribution>()?;
 	m.add_class::<WordEmbeddingFeatureContribution>()?;
 	m.add("PredictInput", predict_input(py)?)?;
 	m.add("PredictOutput", predict_output(py)?)?;
@@ -733,7 +734,7 @@ struct BagOfWordsFeatureContribution {
 	#[pyo3(get)]
 	ngram: NGram,
 	#[pyo3(get)]
-	feature_value: bool,
+	feature_value: f32,
 	#[pyo3(get)]
 	feature_contribution_value: f32,
 }
@@ -794,9 +795,7 @@ struct BagOfWordsCosineSimilarityFeatureContribution {
 	#[pyo3(get)]
 	column_name_b: String,
 	#[pyo3(get)]
-	ngram: NGram,
-	#[pyo3(get)]
-	feature_value: bool,
+	feature_value: f32,
 	#[pyo3(get)]
 	feature_contribution_value: f32,
 }
@@ -808,7 +807,6 @@ impl From<tangram_core::predict::BagOfWordsCosineSimilarityFeatureContribution>
 		BagOfWordsCosineSimilarityFeatureContribution {
 			column_name_a: value.column_name_a,
 			column_name_b: value.column_name_b,
-			ngram: value.ngram.into(),
 			feature_value: value.feature_value,
 			feature_contribution_value: value.feature_contribution_value,
 		}
@@ -909,6 +907,7 @@ fn feature_contribution_entry(py: Python) -> PyResult<PyObject> {
 		NormalizedFeatureContribution::type_object(py),
 		OneHotEncodedFeatureContribution::type_object(py),
 		BagOfWordsFeatureContribution::type_object(py),
+		BagOfWordsCosineSimilarityFeatureContribution::type_object(py),
 		WordEmbeddingFeatureContribution::type_object(py),
 	))?;
 	Ok(feature_contribution_entry.into())

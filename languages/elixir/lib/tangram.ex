@@ -179,6 +179,7 @@ defmodule Tangram do
           | {:normalized, NormalizedFeatureContribution.t()}
           | {:one_hot_encoded, OneHotEncodedFeatureContribution.t()}
           | {:bag_of_words, BagOfWordsFeatureContribution.t()}
+          | {:bag_of_words_cosine_similarity, BagOfWordsCosineSimilarityFeatureContribution.t()}
           | {:word_embedding, WordEmbeddingFeatureContribution.t()}
 
   defmodule IdentityFeatureContribution do
@@ -291,6 +292,38 @@ defmodule Tangram do
       :feature_contribution_value
     ]
   end
+
+  defmodule BagOfWordsCosineSimilarityFeatureContribution do
+    @moduledoc """
+    This describes the contribution of a feature from a bag of words cosine similarity feature group.
+
+    ## `column_name_a`
+    This is the name of the source column a for the bag of words cosine similarity feature group.
+
+    ## `column_name_b`
+    This is the name of the source column b for the bag of words cosine similarity feature group.
+
+    ## `feature_value`
+    This is the value of the feature.
+
+    ## `feature_contribution_value`
+    This is the amount that the feature contributed to the output.
+    """
+    @type ngram :: String.t() | {String.t(), String.t()}
+    @type t :: %__MODULE__{
+            column_name_a: String.t(),
+            column_name_b: String.t(),
+            feature_value: float,
+            feature_contribution_value: float
+          }
+    defstruct [
+      :column_name_a,
+      :column_name_b,
+      :feature_value,
+      :feature_contribution_value
+    ]
+  end
+
 
   defmodule WordEmbeddingFeatureContribution do
     @moduledoc """

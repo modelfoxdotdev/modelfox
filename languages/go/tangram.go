@@ -120,6 +120,8 @@ const (
 	OneHotEncodedFeatureContributionType
 	// BagOfWordsFeatureContributionType is the feature contribution type of a bag of words feature group.
 	BagOfWordsFeatureContributionType
+	// BagOfWordsCosineSimilarityFeatureContributionType is the feature contribution type of a bag of words cosine similarity feature group.
+	BagOfWordsCosineSimilarityFeatureContributionType
 	// WordEmbeddingFeatureContributionType is the feature contribution type of a word embedding feature group.
 	WordEmbeddingFeatureContributionType
 )
@@ -133,6 +135,7 @@ func (IdentityFeatureContribution) isFeatureContribution()      {}
 func (NormalizedFeatureContribution) isFeatureContribution()    {}
 func (OneHotEncodedFeatureContribution) isFeatureContribution() {}
 func (BagOfWordsFeatureContribution) isFeatureContribution()    {}
+func (BagOfWordsCosineSimilarityFeatureContribution) isFeatureContribution()    {}
 func (WordEmbeddingFeatureContribution) isFeatureContribution() {}
 
 // This describes the contribution of a feature from an identity feature group
@@ -174,7 +177,7 @@ type BagOfWordsFeatureContribution struct {
 	// This is the ngram for the feature.
 	NGram NGram
 	// This is the value of the feature.
-	FeatureValue bool
+	FeatureValue float32
 	// This is the amount that the feature contributed to the output.
 	FeatureContributionValue float32
 }
@@ -199,6 +202,18 @@ type Bigram struct {
 	TokenA string
 	// This is the second token in the bigram.
 	TokenB string
+}
+
+// This describes the contribution of a feature from a bag of words cosine similarity feature group.
+type BagOfWordsCosineSimilarityFeatureContribution struct {
+	// This is the name of the source column a for the feature group.
+	ColumnNameA string
+	// This is the name of the source column b for the feature group.
+	ColumnNameB string
+	// This is the value of the feature.
+	FeatureValue float32
+	// This is the amount that the feature contributed to the output.
+	FeatureContributionValue float32
 }
 
 // This describes the contribution of a feature from a word embedding feature group.
@@ -522,6 +537,8 @@ func makeFeatureContribution(f *C.tangram_feature_contribution_entry) FeatureCon
 		return makeOneHotEncodedFeatureContribution(f)
 	case BagOfWordsFeatureContributionType:
 		return makeBagOfWordsFeatureContribution(f)
+	case BagOfWordsCosineSimilarityFeatureContributionType:
+		return makeBagOfWordsCosineSimilarityFeatureContribution(f)
 	case WordEmbeddingFeatureContributionType:
 		return makeWordEmbeddingFeatureContribution(f)
 	}
@@ -583,7 +600,7 @@ func makeBagOfWordsFeatureContribution(f *C.tangram_feature_contribution_entry) 
 	var cFeatureContribution *C.tangram_bag_of_words_feature_contribution
 	var cColumnName C.tangram_string_view
 	var cNGram *C.tangram_ngram
-	var cFeatureValue C.bool
+	var cFeatureValue C.float
 	var cFeatureContributionValue C.float
 	C.tangram_feature_contribution_entry_as_bag_of_words(f, &cFeatureContribution)
 	C.tangram_bag_of_words_feature_contribution_get_column_name(cFeatureContribution, &cColumnName)
@@ -594,7 +611,7 @@ func makeBagOfWordsFeatureContribution(f *C.tangram_feature_contribution_entry) 
 		ColumnName:               C.GoStringN(cColumnName.ptr, C.int(cColumnName.len)),
 		NGram:                    makeNGram(cNGram),
 		FeatureContributionValue: float32(cFeatureContributionValue),
-		FeatureValue:             bool(cFeatureValue),
+		FeatureValue:             float32(cFeatureValue),
 	}
 }
 
@@ -631,6 +648,25 @@ func makeBigramNGram(n *C.tangram_ngram) Bigram {
 	return Bigram{
 		TokenA: C.GoStringN(cTokenA.ptr, C.int(cTokenA.len)),
 		TokenB: C.GoStringN(cTokenB.ptr, C.int(cTokenB.len)),
+	}
+}
+
+func makeBagOfWordsCosineSimilarityFeatureContribution(f *C.tangram_feature_contribution_entry) BagOfWordsCosineSimilarityFeatureContribution {
+	var cFeatureContribution *C.tangram_bag_of_words_cosine_similarity_feature_contribution
+	var cColumnNameA C.tangram_string_view
+	var cColumnNameB C.tangram_string_view
+	var cFeatureValue C.float
+	var cFeatureContributionValue C.float
+	C.tangram_feature_contribution_entry_as_bag_of_words_cosine_similarity(f, &cFeatureContribution)
+	C.tangram_bag_of_words_cosine_similarity_feature_contribution_get_column_name_a(cFeatureContribution, &cColumnNameA)
+	C.tangram_bag_of_words_cosine_similarity_feature_contribution_get_column_name_b(cFeatureContribution, &cColumnNameB)
+	C.tangram_bag_of_words_cosine_similarity_feature_contribution_get_feature_contribution_value(cFeatureContribution, &cFeatureContributionValue)
+	C.tangram_bag_of_words_feature_contribution_get_feature_value(cFeatureContribution, &cFeatureValue)
+	return BagOfWordsCosineSimilarityFeatureContribution{
+		ColumnNameA:               C.GoStringN(cColumnNameA.ptr, C.int(cColumnNameA.len)),
+		ColumnNameB:               C.GoStringN(cColumnNameB.ptr, C.int(cColumnNameB.len)),
+		FeatureContributionValue: float32(cFeatureContributionValue),
+		FeatureValue:             float32(cFeatureValue),
 	}
 }
 

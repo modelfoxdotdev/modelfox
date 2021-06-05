@@ -387,7 +387,7 @@ fn compute_feature_contributions_chart_value(
 			}
 		}
 		tangram_core::predict::FeatureContributionEntry::BagOfWords(feature_contribution) => {
-			let predicate = if feature_contribution.feature_value {
+			let predicate = if feature_contribution.feature_value != 0.0 {
 				"contains"
 			} else {
 				"does not contain"

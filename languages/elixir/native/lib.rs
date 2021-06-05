@@ -389,7 +389,7 @@ impl From<tangram_core::predict::OneHotEncodedFeatureContribution>
 struct BagOfWordsFeatureContribution {
 	column_name: String,
 	ngram: NGram,
-	feature_value: bool,
+	feature_value: f32,
 	feature_contribution_value: f32,
 }
 
@@ -427,8 +427,7 @@ impl From<tangram_core::predict::NGram> for NGram {
 struct BagOfWordsCosineSimilarityFeatureContribution {
 	column_name_a: String,
 	column_name_b: String,
-	ngram: NGram,
-	feature_value: bool,
+	feature_value: f32,
 	feature_contribution_value: f32,
 }
 
@@ -439,7 +438,6 @@ impl From<tangram_core::predict::BagOfWordsCosineSimilarityFeatureContribution>
 		BagOfWordsCosineSimilarityFeatureContribution {
 			column_name_a: value.column_name_a,
 			column_name_b: value.column_name_b,
-			ngram: value.ngram.into(),
 			feature_value: value.feature_value,
 			feature_contribution_value: value.feature_contribution_value,
 		}

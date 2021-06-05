@@ -154,7 +154,7 @@ pub struct OneHotEncodedFeatureContribution {
 pub struct BagOfWordsFeatureContribution {
 	pub column_name: String,
 	pub ngram: NGram,
-	pub feature_value: bool,
+	pub feature_value: f32,
 	pub feature_contribution_value: f32,
 }
 
@@ -162,8 +162,7 @@ pub struct BagOfWordsFeatureContribution {
 pub struct BagOfWordsCosineSimilarityFeatureContribution {
 	pub column_name_a: String,
 	pub column_name_b: String,
-	pub ngram: NGram,
-	pub feature_value: bool,
+	pub feature_value: f32,
 	pub feature_contribution_value: f32,
 }
 
@@ -1083,21 +1082,6 @@ fn compute_feature_contributions<'a>(
 					));
 				}
 			}
-			tangram_features::FeatureGroup::BagOfWordsCosineSimilarity(feature_group) => {
-				for ngram in feature_group.ngrams.keys() {
-					let feature_value = features.next().unwrap();
-					let feature_contribution_value = feature_contribution_values.next().unwrap();
-					entries.push(FeatureContributionEntry::BagOfWordsCosineSimilarity(
-						BagOfWordsCosineSimilarityFeatureContribution {
-							column_name_a: feature_group.source_column_name_a.clone(),
-							column_name_b: feature_group.source_column_name_b.clone(),
-							ngram: ngram.clone().into(),
-							feature_value: feature_value > 0.0,
-							feature_contribution_value,
-						},
-					));
-				}
-			}
 			tangram_features::FeatureGroup::BagOfWords(feature_group) => {
 				for ngram in feature_group.ngrams.keys() {
 					let feature_value = features.next().unwrap();
@@ -1106,11 +1090,23 @@ fn compute_feature_contributions<'a>(
 						BagOfWordsFeatureContribution {
 							column_name: feature_group.source_column_name.clone(),
 							ngram: ngram.clone().into(),
-							feature_value: feature_value > 0.0,
+							feature_value,
 							feature_contribution_value,
 						},
 					));
 				}
+			}
+			tangram_features::FeatureGroup::BagOfWordsCosineSimilarity(feature_group) => {
+				let feature_value = features.next().unwrap();
+				let feature_contribution_value = feature_contribution_values.next().unwrap();
+				entries.push(FeatureContributionEntry::BagOfWordsCosineSimilarity(
+					BagOfWordsCosineSimilarityFeatureContribution {
+						column_name_a: feature_group.source_column_name_a.clone(),
+						column_name_b: feature_group.source_column_name_b.clone(),
+						feature_value,
+						feature_contribution_value,
+					},
+				));
 			}
 			tangram_features::FeatureGroup::WordEmbedding(feature_group) => {
 				for value_index in 0..feature_group.model.size {

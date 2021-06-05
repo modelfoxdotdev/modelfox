@@ -115,6 +115,7 @@ FeatureContributionEntry = Union[
     NormalizedFeatureContribution,
     OneHotEncodedFeatureContribution,
     BagOfWordsFeatureContribution,
+    BagOfWordsCosineSimilarityFeatureContribution,
     WordEmbeddingFeatureContribution,
 ]
 
@@ -137,6 +138,12 @@ class BagOfWordsFeatureContribution:
     column_name: str
     feature_value: float
     ngram: NGram
+    feature_contribution_value: float
+
+class BagOfWordsCosineSimilarityFeatureContribution:
+    column_name_a: str
+    column_name_b: str
+    feature_value: float
     feature_contribution_value: float
 
 NGram = Union[str, Tuple[str, str]]

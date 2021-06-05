@@ -305,6 +305,11 @@ pub struct tangram_bag_of_words_feature_contribution(
 	tangram_core::predict::BagOfWordsFeatureContribution,
 );
 
+/// `tangram_bag_of_words_cosine_similarity_feature_contribution` is an opaque handle to a single tangram bag of words cosine similarity feature contribution.
+pub struct tangram_bag_of_words_cosine_similarity_feature_contribution(
+	tangram_core::predict::BagOfWordsCosineSimilarityFeatureContribution,
+);
+
 /// `tangram_word_embedding_feature_contribution` is an opaque handle to a single tangram word embedding feature contribution.
 pub struct tangram_word_embedding_feature_contribution(
 	tangram_core::predict::WordEmbeddingFeatureContribution,
@@ -744,6 +749,24 @@ pub unsafe extern "C" fn tangram_feature_contribution_entry_as_bag_of_words(
 	};
 }
 
+/// Cast the feature contribution entry as `tangram_bag_of_words_cosine_similarity_feature_contribution`. If this feature contribution is not a bag of words cosine similarity feature contribution, null will be written to `feature_contribution_ouput_ptr`.
+#[no_mangle]
+pub unsafe extern "C" fn tangram_feature_contribution_entry_as_bag_of_words_cosine_similarity(
+	feature_contribution_entry: *const tangram_feature_contribution_entry,
+	feature_contribution_ptr: *mut *const tangram_bag_of_words_feature_contribution,
+) {
+	*feature_contribution_ptr = match &(*feature_contribution_entry).0 {
+		tangram_core::predict::FeatureContributionEntry::Identity(_) => null(),
+		tangram_core::predict::FeatureContributionEntry::Normalized(_) => null(),
+		tangram_core::predict::FeatureContributionEntry::OneHotEncoded(_) => null(),
+		tangram_core::predict::FeatureContributionEntry::BagOfWords(_) => null(),
+		tangram_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(f) => {
+			transmute(f)
+		}
+		tangram_core::predict::FeatureContributionEntry::WordEmbedding(_) => null(),
+	};
+}
+
 /// Cast the feature contribution entry as `tangram_word_embedding_feature_contribution`. If this feature contribution is not a word embedding feature contribution, null will be written to `feature_contribution_ouput_ptr`.
 #[no_mangle]
 pub unsafe extern "C" fn tangram_feature_contribution_entry_as_word_embedding(
@@ -923,7 +946,7 @@ pub unsafe extern "C" fn tangram_bigram_get_token_b(
 #[no_mangle]
 pub unsafe extern "C" fn tangram_bag_of_words_feature_contribution_get_feature_value(
 	feature_contribution: *const tangram_bag_of_words_feature_contribution,
-	feature_value: *mut bool,
+	feature_value: *mut c_float,
 ) {
 	*feature_value = (*feature_contribution).0.feature_value;
 }
@@ -932,6 +955,42 @@ pub unsafe extern "C" fn tangram_bag_of_words_feature_contribution_get_feature_v
 #[no_mangle]
 pub unsafe extern "C" fn tangram_bag_of_words_feature_contribution_get_feature_contribution_value(
 	feature_contribution: *const tangram_bag_of_words_feature_contribution,
+	feature_contribution_value: *mut c_float,
+) {
+	*feature_contribution_value = (*feature_contribution).0.feature_contribution_value;
+}
+
+/// Retrieve the column name a.
+#[no_mangle]
+pub unsafe extern "C" fn tangram_bag_of_words_cosine_similarity_feature_contribution_get_column_name_a(
+	feature_contribution: *const tangram_bag_of_words_cosine_similarity_feature_contribution,
+	column_name_ptr: *mut tangram_string_view,
+) {
+	*column_name_ptr = (*feature_contribution).0.column_name_a.as_str().into();
+}
+
+/// Retrieve the column name b.
+#[no_mangle]
+pub unsafe extern "C" fn tangram_bag_of_words_cosine_similarity_feature_contribution_get_column_name_b(
+	feature_contribution: *const tangram_bag_of_words_cosine_similarity_feature_contribution,
+	column_name_ptr: *mut tangram_string_view,
+) {
+	*column_name_ptr = (*feature_contribution).0.column_name_b.as_str().into();
+}
+
+/// Retrieve the feature value.
+#[no_mangle]
+pub unsafe extern "C" fn tangram_bag_of_words_cosine_similarity_feature_contribution_get_feature_value(
+	feature_contribution: *const tangram_bag_of_words_cosine_similarity_feature_contribution,
+	feature_value: *mut c_float,
+) {
+	*feature_value = (*feature_contribution).0.feature_value;
+}
+
+/// Retrieve the feature contribution value.
+#[no_mangle]
+pub unsafe extern "C" fn tangram_bag_of_words_cosine_similarity_feature_contribution_get_feature_contribution_value(
+	feature_contribution: *const tangram_bag_of_words_cosine_similarity_feature_contribution,
 	feature_contribution_value: *mut c_float,
 ) {
 	*feature_contribution_value = (*feature_contribution).0.feature_contribution_value;

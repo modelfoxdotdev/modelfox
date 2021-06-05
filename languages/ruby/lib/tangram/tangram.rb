@@ -187,6 +187,24 @@ module Tangram
     end
   end
 
+  # This describes the contribution of a feature from a bag of words cosine similarity feature group.
+  class BagOfWordsCosineSimilarityFeatureContribution
+    # This is the name of the source column a for the feature group.
+    attr_reader :column_name_a
+    # This is the name of the source column b for the feature group.
+    attr_reader :column_name_b
+    # This is the value of the feature.
+    attr_reader :feature_value
+    # This is the amount that the feature contributed to the output.
+    attr_reader :feature_contribution_value
+    def initialize(column_name_a: column_name_b:, feature_contribution_value:, feature_value:)
+      @column_name_a = column_name_a
+      @column_name_b = column_name_b
+      @feature_contribution_value = feature_contribution_value
+      @feature_value = feature_value
+    end
+  end
+
   # This describes the contribution of a feature from a word embedding feature group.
   class WordEmbeddingFeatureContribution
     # This is the name of the source column for the feature group.
@@ -569,6 +587,8 @@ module Tangram
         get_one_hot_encoded_feature_contribution(c_feature_contribution)
       when LibTangram::TangramFeatureContributionEntryType[:bag_of_words]
         get_bag_of_words_feature_contribution(c_feature_contribution)
+      when LibTangram::TangramFeatureContributionEntryType[:bag_of_words_cosine_similarity]
+        get_bag_of_words_cosine_similarity_feature_contribution(c_feature_contribution)
       when LibTangram::TangramFeatureContributionEntryType[:word_embedding]
         get_word_embedding_feature_contribution(c_feature_contribution)
       end
@@ -626,9 +646,9 @@ module Tangram
       c_feature_contribution_value = FFI::MemoryPointer.new(:float)
       LibTangram.tangram_one_hot_encoded_feature_contribution_get_feature_contribution_value(c_one_hot_encoded_feature_contribution, c_feature_contribution_value)
       feature_contribution_value = c_feature_contribution_value.read(:float)
-      c_feature_value = FFI::MemoryPointer.new(:float)
+      c_feature_value = FFI::MemoryPointer.new(:bool)
       LibTangram.tangram_one_hot_encoded_feature_contribution_get_feature_value(c_one_hot_encoded_feature_contribution, c_feature_value)
-      feature_value = c_feature_value.read(:float)
+      feature_value = c_feature_value.read(:bool)
       c_variant = LibTangram::TangramStringView.new
       LibTangram.tangram_one_hot_encoded_feature_contribution_get_variant(c_one_hot_encoded_feature_contribution, c_variant)
       variant = c_variant[:ptr].null? ? nil : c_variant.into_string
@@ -660,6 +680,30 @@ module Tangram
       BagOfWordsFeatureContribution.new(
         column_name: column_name,
         ngram: ngram,
+        feature_contribution_value: feature_contribution_value,
+        feature_value: feature_value
+      )
+    end
+
+    def get_bag_of_words_cosine_similarity_feature_contribution(c_feature_contribution)
+      c_bag_of_words_cosine_similarity_feature_contribution = FFI::MemoryPointer.new(:pointer)
+      LibTangram.tangram_feature_contribution_entry_as_bag_of_words_cosine_similarity(c_feature_contribution, c_bag_of_words_cosine_similarity_feature_contribution)
+      c_bag_of_words_cosine_similarity_feature_contribution = c_bag_of_words_cosine_similarity_feature_contribution.read_pointer
+      c_column_name_a = LibTangram::TangramStringView.new
+      LibTangram.tangram_bag_of_words_feature_contribution_get_column_name_a(c_bag_of_words_cosine_similarity_feature_contribution, c_column_name_a)
+      column_name_a = c_column_name_a.into_string
+      c_column_name_b = LibTangram::TangramStringView.new
+      LibTangram.tangram_bag_of_words_feature_contribution_get_column_name_b(c_bag_of_words_cosine_similarity_feature_contribution, c_column_name_b)
+      column_name_b = c_column_name_b.into_string
+      c_feature_contribution_value = FFI::MemoryPointer.new(:float)
+      LibTangram.tangram_bag_of_words_cosine_similarity_feature_contribution_get_feature_contribution_value(c_bag_of_words_cosine_similarity_feature_contribution, c_feature_contribution_value)
+      feature_contribution_value = c_feature_contribution_value.read(:float)
+      c_feature_value = FFI::MemoryPointer.new(:float)
+      LibTangram.tangram_bag_of_words_cosine_similarity_feature_contribution_get_feature_value(c_bag_of_words_cosine_similarity_feature_contribution, c_feature_value)
+      feature_value = c_feature_value.read(:float)
+      BagOfWordsFeatureContribution.new(
+        column_name_a: column_name_a,
+        column_name_b: column_name_b,
         feature_contribution_value: feature_contribution_value,
         feature_value: feature_value
       )
@@ -759,6 +803,7 @@ module Tangram
       :normalized,
       :one_hot_encoded,
       :bag_of_words,
+      :bag_of_words_cosine_similarity,
       :word_embedding
     )
 
@@ -819,6 +864,7 @@ module Tangram
     attach_function :tangram_feature_contribution_entry_as_normalized, [:pointer, :pointer], :void
     attach_function :tangram_feature_contribution_entry_as_one_hot_encoded, [:pointer, :pointer], :void
     attach_function :tangram_feature_contribution_entry_as_bag_of_words, [:pointer, :pointer], :void
+    attach_function :tangram_feature_contribution_entry_as_bag_of_words_cosine_similarity, [:pointer, :pointer], :void
     attach_function :tangram_feature_contribution_entry_as_word_embedding, [:pointer, :pointer], :void
     attach_function :tangram_identity_feature_contribution_get_column_name, [:pointer, TangramStringView.by_ref], :void
     attach_function :tangram_identity_feature_contribution_get_feature_value, [:pointer, :pointer], :void
@@ -838,6 +884,10 @@ module Tangram
     attach_function :tangram_unigram_get_token, [:pointer, TangramStringView.by_ref], :void
     attach_function :tangram_bigram_get_token_a, [:pointer, TangramStringView.by_ref], :void
     attach_function :tangram_bigram_get_token_b, [:pointer, TangramStringView.by_ref], :void
+    attach_function :tangram_bag_of_words_cosine_similarity_feature_contribution_get_column_name_a, [:pointer, TangramStringView.by_ref], :void
+    attach_function :tangram_bag_of_words_cosine_similarity_feature_contribution_get_column_name_b, [:pointer, TangramStringView.by_ref], :void
+    attach_function :tangram_bag_of_words_cosine_similarity_feature_contribution_get_feature_value, [:pointer, :pointer], :void
+    attach_function :tangram_bag_of_words_cosine_similarity_feature_contribution_get_feature_contribution_value, [:pointer, :pointer], :void
     attach_function :tangram_word_embedding_feature_contribution_get_column_name, [:pointer, TangramStringView.by_ref], :void
     attach_function :tangram_word_embedding_feature_contribution_get_value_index, [:pointer, :pointer], :void
     attach_function :tangram_word_embedding_feature_contribution_get_feature_contribution_value, [:pointer, :pointer], :void

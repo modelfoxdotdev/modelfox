@@ -387,9 +387,9 @@ pub struct OneHotEncodedFeatureContribution {
 	pub column_name: String,
 	/// This is the enum variant the feature indicates the presence of.
 	pub variant: Option<String>,
-	/// This is the amount that the feature contributed to the output.
-	pub feature_value: bool,
 	/// This is the value of the feature.
+	pub feature_value: bool,
+	/// This is the amount that the feature contributed to the output.
 	pub feature_contribution_value: f32,
 }
 
@@ -413,9 +413,9 @@ pub struct BagOfWordsFeatureContribution {
 	pub column_name: String,
 	/// This is the ngram for the feature.
 	pub ngram: NGram,
-	/// This is the amount that the feature contributed to the output.
-	pub feature_value: bool,
 	/// This is the value of the feature.
+	pub feature_value: f32,
+	/// This is the amount that the feature contributed to the output.
 	pub feature_contribution_value: f32,
 }
 
@@ -456,11 +456,9 @@ pub struct BagOfWordsCosineSimilarityFeatureContribution {
 	pub column_name_a: String,
 	/// This is the name of the second source column for the feature group.
 	pub column_name_b: String,
-	/// This is the ngram for the feature.
-	pub ngram: NGram,
-	/// This is the amount that the feature contributed to the output.
-	pub feature_value: bool,
 	/// This is the value of the feature.
+	pub feature_value: f32,
+	/// This is the amount that the feature contributed to the output.
 	pub feature_contribution_value: f32,
 }
 
@@ -471,7 +469,6 @@ impl From<tangram_core::predict::BagOfWordsCosineSimilarityFeatureContribution>
 		BagOfWordsCosineSimilarityFeatureContribution {
 			column_name_a: value.column_name_a,
 			column_name_b: value.column_name_b,
-			ngram: value.ngram.into(),
 			feature_value: value.feature_value,
 			feature_contribution_value: value.feature_contribution_value,
 		}

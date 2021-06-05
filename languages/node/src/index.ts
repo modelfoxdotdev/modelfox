@@ -150,6 +150,7 @@ export type FeatureContributionEntry =
 	| NormalizedFeatureContribution
 	| OneHotEncodedFeatureContribution
 	| BagOfWordsFeatureContribution
+	| BagOfWordsCosineSimilarityFeatureContribution
 	| WordEmbeddingFeatureContribution
 
 /**
@@ -160,6 +161,7 @@ export enum FeatureContributionType {
 	Normalized = "normalized",
 	OneHotEncoded = "one_hot_encoded",
 	BagOfWords = "bag_of_words",
+	BagOfWordsCosineSimilarity = "bag_of_words_cosine_similarity",
 	WordEmbedding = "word_embedding",
 }
 
@@ -251,6 +253,29 @@ export type BagOfWordsFeatureContribution = {
  * This is a sequence of `n` tokens. Tangram currently supports unigrams and bigrams.
  */
 export type NGram = string | [string, string]
+
+/**
+ * This describes the contribution of a feature from a bag of words feature group.
+ */
+export type BagOfWordsCosineSimilarityFeatureContribution = {
+	type: FeatureContributionType.BagOfWordsCosineSimilarity
+	/**
+	 * This is the name of the source column a for the feature group.
+	 */
+	columnNameA: string
+	/**
+	 * This is the name of the source column b for the feature group.
+	 */
+	columnNameB: string
+	/**
+	 * This is the value of the feature.
+	 */
+	featureValue: number
+	/**
+	 * This is the amount that the feature contributed to the output.
+	 */
+	featureContributionValue: number
+}
 
 /**
  * This describes the contribution of a feature from a word vector feature group.
