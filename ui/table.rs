@@ -83,11 +83,14 @@ pub enum Align {
 
 impl Component for TableHeaderCell {
 	fn into_node(self) -> Node {
-		let text_align = self.align.map(|text_align| match text_align {
-			Align::Left => "left",
-			Align::Center => "center",
-			Align::Right => "right",
-		});
+		let text_align = self
+			.align
+			.map(|text_align| match text_align {
+				Align::Left => "left",
+				Align::Center => "center",
+				Align::Right => "right",
+			})
+			.unwrap_or("left");
 		let width = self
 			.expand
 			.and_then(|expand| if expand { Some("100%") } else { None });
