@@ -32,8 +32,6 @@ pub struct MulticlassClassificationMetricsOutput {
 	pub recall_unweighted: f32,
 	/// The weighted recall is a weighted mean of each class's recall weighted by the fraction of the total examples in the class.
 	pub recall_weighted: f32,
-	/// The accuracy if the model always predicted the majority class.
-	pub baseline_accuracy: f32,
 }
 
 /// ClassMetrics are class specific metrics used to evaluate the model's performance on each individual class.
@@ -143,14 +141,6 @@ impl MulticlassClassificationMetrics {
 			})
 			.sum::<f32>()
 			/ n_examples.to_f32().unwrap();
-		let baseline_accuracy = n_examples_per_class
-			.iter()
-			.map(|n| n.to_f32().unwrap())
-			.fold(None, |a: Option<f32>, b| match a {
-				None => Some(b),
-				Some(a) => Some(f32::max(a, b)),
-			})
-			.unwrap() / n_examples.to_f32().unwrap();
 		MulticlassClassificationMetricsOutput {
 			class_metrics,
 			accuracy,
@@ -158,7 +148,6 @@ impl MulticlassClassificationMetrics {
 			precision_weighted,
 			recall_unweighted,
 			recall_weighted,
-			baseline_accuracy,
 		}
 	}
 }
