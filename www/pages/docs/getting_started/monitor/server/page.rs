@@ -340,7 +340,7 @@ impl Component for ProductionMetrics {
 				ui::S1::new()
 					.child(ui::H1::new().child("Production Metrics"))
 					.child(
-						ui::NumberComparisonCard::new(Some(0.83333), None)
+						ui::NumberComparisonCard::new(Some(0.83333), Some(0.78867))
 							.color_a(ui::colors::BLUE.to_owned())
 							.color_b(ui::colors::GREEN.to_owned())
 							.title("Accuracy".to_owned())
