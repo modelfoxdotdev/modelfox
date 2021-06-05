@@ -64,7 +64,7 @@ impl Component for Install {
 		let code = indoc!(
 			r#"
 				[dependencies]
-				tangram_rust = { git = "https://github.com/tangramxyz/tangram" }
+				tangram = { version = "0.4" }
 			"#
 		);
 		let code = ui::highlight(code, ui::Language::Rust);
@@ -88,8 +88,6 @@ impl Component for Predict {
 	fn into_node(self) -> Node {
 		let code = indoc!(
 			r#"
-				use tangram_rust as tangram;
-
 				fn main() {
 					// Load the model from the path.
 					let model: tangram::Model =

@@ -5,11 +5,14 @@
     };
     flake-utils = {
       url = "github:numtide/flake-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
   outputs = inputs: inputs.flake-utils.lib.eachDefaultSystem (system:
     let
-      pkgs = inputs.nixpkgs.legacyPackages.${system};
+      pkgs = import inputs.nixpkgs {
+        inherit system;
+      };
     in {
       devShell = pkgs.mkShell {
         buildInputs = with pkgs; [

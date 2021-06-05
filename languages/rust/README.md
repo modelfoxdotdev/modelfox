@@ -9,12 +9,10 @@ The Tangram Rust crate makes it easy to make predictions with your Tangram machi
 
 ```toml
 [dependencies]
-tangram_rust = { git = "https://github.com/tangramxyz/tangram" }
+tangram = { version = "0.4" }
 ```
 
 ```rust
-use tangram_rust as tangram;
-
 let model = tangram::Model::<Input, Output>::from_path("examples/heart-disease.tangram");
 
 let input = tangram::predict_input! {

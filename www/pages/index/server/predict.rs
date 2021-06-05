@@ -80,8 +80,6 @@ impl Component for Predict {
 		.into();
 		let rust = indoc!(
 			r#"
-				use tangram_rust as tangram;
-
 				let model: tangram::Model =
 				tangram::Model::from_path("./heart_disease.tangram", None).unwrap();
 
@@ -146,7 +144,7 @@ impl Component for Predict {
 			.child(", and ")
 			.child(
 				ui::Link::new()
-					.href("https://lib.rs/tangram_rust".to_owned())
+					.href("https://lib.rs/tangram".to_owned())
 					.title("Rust".to_owned())
 					.child("Rust"),
 			)

@@ -237,10 +237,7 @@ impl Component for ReposTable {
 }
 
 #[derive(ComponentBuilder)]
-struct DangerZoneSection {
-	#[children]
-	pub children: Vec<Node>,
-}
+struct DangerZoneSection;
 
 impl Component for DangerZoneSection {
 	fn into_node(self) -> Node {

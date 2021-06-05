@@ -1,5 +1,3 @@
-use tangram_rust as tangram;
-
 fn main() {
 	// Load the model from the path.
 	let model: tangram::Model =

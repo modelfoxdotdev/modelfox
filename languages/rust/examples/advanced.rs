@@ -1,5 +1,4 @@
 use tangram_error::Result;
-use tangram_rust as tangram;
 
 #[derive(Clone, Debug, tangram::PredictInput)]
 pub struct Input {

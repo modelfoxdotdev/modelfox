@@ -93,10 +93,7 @@ impl Component for UpdateTagForm {
 }
 
 #[derive(ComponentBuilder)]
-struct DangerZone {
-	#[children]
-	pub children: Vec<Node>,
-}
+struct DangerZone;
 
 impl Component for DangerZone {
 	fn into_node(self) -> Node {

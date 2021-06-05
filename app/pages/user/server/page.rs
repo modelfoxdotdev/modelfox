@@ -64,10 +64,7 @@ impl Component for Auth {
 }
 
 #[derive(ComponentBuilder)]
-struct Header {
-	#[children]
-	pub children: Vec<Node>,
-}
+struct Header;
 
 impl Component for Header {
 	fn into_node(self) -> Node {

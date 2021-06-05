@@ -7,7 +7,7 @@
 Tangram is an automated machine learning framework designed for programmers.
 
 - Run `tangram train` to train a model from a CSV file on the command line.
-- Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramxyz/tangram-go), [Node.js](https://www.npmjs.com/package/@tangramxyz/tangram-node), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](lib.rs/tangram_rust).
+- Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramxyz/tangram-go), [Node.js](https://www.npmjs.com/package/@tangramxyz/tangram-node), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](lib.rs/tangram).
 - Run `tangram app` to learn more about your models and monitor them in production.
 
 ### Install
@@ -30,7 +30,7 @@ The CLI automatically transforms your data into features, trains a number of mod
 
 ### Predict
 
-Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramxyz/tangram-go), [Node.js](https://www.npmjs.com/package/@tangramxyz/tangram-node), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](https://lib.rs/tangram_rust).
+Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramxyz/tangram-go), [Node.js](https://www.npmjs.com/package/@tangramxyz/tangram-node), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](https://lib.rs/tangram).
 
 ```javascript
 let tangram = require("@tangramxyz/tangram-node");
@@ -38,9 +38,9 @@ let tangram = require("@tangramxyz/tangram-node");
 let model = new tangram.Model("./heart_disease.tangram");
 
 let input = {
-  age: 63,
-  gender: "male",
-  // ...
+	age: 63,
+	gender: "male",
+	// ...
 };
 
 let output = model.predictSync(input);
@@ -66,10 +66,10 @@ Once your model is deployed, make sure that it performs as well in production as
 ```javascript
 // Log the prediction.
 model.logPrediction({
-  identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
-  input,
-  options,
-  output,
+	identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
+	input,
+	options,
+	output,
 });
 ```
 

@@ -298,7 +298,7 @@ macro_rules! highlight_configuration {
 }
 
 #[cfg(target_arch = "wasm32")]
-pub fn highlight(code: &str, language: Language) -> String {
+pub fn highlight(_code: &str, _language: Language) -> String {
 	unimplemented!()
 }
 
@@ -321,7 +321,7 @@ pub fn highlight(code: &str, language: Language) -> String {
 		.collect()
 	});
 	highlight_configuration!(ELIXIR, tree_sitter_python);
-	highlight_configuration!(GO, tree_sitter_go);
+	highlight_configuration!(GO, tree_sitter_javascript);
 	highlight_configuration!(JAVASCRIPT, tree_sitter_javascript);
 	highlight_configuration!(PYTHON, tree_sitter_python);
 	highlight_configuration!(RUBY, tree_sitter_python);
