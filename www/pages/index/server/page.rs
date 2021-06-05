@@ -74,6 +74,7 @@ impl Component for Hero {
 			.child(
 				ui::Button::new()
 					.href("https://cozycal.com/tangram/demo".to_owned())
+					.open_new_window(true)
 					.color(ui::colors::GREEN.to_owned())
 					.child("Schedule a Demo"),
 			);

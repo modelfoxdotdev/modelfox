@@ -13,6 +13,8 @@ pub struct Button {
 	#[optional]
 	pub href: Option<String>,
 	#[optional]
+	pub open_new_window: bool,
+	#[optional]
 	pub id: Option<String>,
 	#[children]
 	pub children: Vec<Node>,
@@ -33,9 +35,15 @@ impl Component for Button {
 			ButtonType::Submit => "submit",
 		};
 		if let Some(href) = self.href {
+			let target = if self.open_new_window {
+				Some("_blank")
+			} else {
+				None
+			};
 			a().class("button")
 				.download(self.download)
 				.href(href)
+				.target(target)
 				.style(
 					style::BACKGROUND_COLOR,
 					self.color.unwrap_or_else(|| "".to_owned()),

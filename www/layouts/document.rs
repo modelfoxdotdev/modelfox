@@ -44,13 +44,7 @@ impl Component for Document {
 				hash = hash(client),
 			))
 		});
-		let cozy_cal_script = script()
-			.attribute("async", "async")
-			.attribute("src", "https://static.cozycal.com/embed/v1/7135.js");
-		let body = body()
-			.child(self.children)
-			.child(client_script)
-			.child(cozy_cal_script);
+		let body = body().child(self.children).child(client_script);
 		html::html().child(head).child(body).into_node()
 	}
 }
