@@ -52,8 +52,11 @@ impl Component for ReposTable {
 			.width("100%".to_owned())
 			.child(
 				ui::TableHeader::new().child(
-					ui::TableRow::new()
-						.child(ui::TableHeaderCell::new().expand(Some(true)).child("Name")),
+					ui::TableRow::new().child(
+						ui::TableHeaderCell::new()
+							.width("100%".to_owned())
+							.child("Name"),
+					),
 				),
 			)
 			.child(

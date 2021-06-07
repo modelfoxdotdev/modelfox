@@ -144,14 +144,10 @@ impl Component for ModelHyperparametersTable {
 			.children(self.hyperparameters.into_iter().map(
 				|(hyperparam_name, hyperparam_value)| {
 					ui::TableRow::new()
-						.child(
-							ui::TableHeaderCell::new()
-								.expand(Some(false))
-								.child(hyperparam_name),
-						)
+						.child(ui::TableHeaderCell::new().child(hyperparam_name))
 						.child(
 							ui::TableCell::new()
-								.expand(Some(true))
+								.width("100%".to_owned())
 								.child(hyperparam_value),
 						)
 				},

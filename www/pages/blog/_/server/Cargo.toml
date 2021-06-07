@@ -9,5 +9,5 @@ path = "page.rs"
 [dependencies]
 pinwheel = { path = "../../../../../pinwheel" }
 tangram_ui = { path = "../../../../../ui" }
-tangram_www_blog = { path = "../../../../blog" }
+tangram_www_content = { path = "../../../../content" }
 tangram_www_layouts = { path = "../../../../layouts" }

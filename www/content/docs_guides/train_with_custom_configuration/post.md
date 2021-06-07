@@ -1,4 +1,11 @@
 {
+"title": "Train with Custom Configuration."
+}
+
+If you want more control over training you can provide a json config file to the tangram train command: `--config config.json`. Below is an example config file. It includes all of the possible options you can set. Every field is optional.
+
+```javascript
+{
   "column_types": {
     "age": {
       "type": "number"
@@ -102,3 +109,4 @@
   },
   "test_fraction": 0.2
 }
+```

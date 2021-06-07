@@ -68,7 +68,7 @@ pub struct TableHeaderCell {
 	#[optional]
 	pub color: Option<String>,
 	#[optional]
-	pub expand: Option<bool>,
+	pub width: Option<String>,
 	#[optional]
 	pub align: Option<Align>,
 	#[children]
@@ -91,11 +91,8 @@ impl Component for TableHeaderCell {
 				Align::Right => "right",
 			})
 			.unwrap_or("left");
-		let width = self
-			.expand
-			.and_then(|expand| if expand { Some("100%") } else { None });
 		th().style(style::TEXT_ALIGN, text_align)
-			.style(style::WIDTH, width)
+			.style(style::WIDTH, self.width)
 			.style(style::BACKGROUND_COLOR, self.color)
 			.child(self.children)
 			.into_node()
@@ -107,7 +104,7 @@ pub struct TableCell {
 	#[optional]
 	pub color: Option<String>,
 	#[optional]
-	pub expand: Option<bool>,
+	pub width: Option<String>,
 	#[optional]
 	pub align: Option<Align>,
 	#[children]
@@ -121,11 +118,8 @@ impl Component for TableCell {
 			Align::Center => "center",
 			Align::Right => "right",
 		});
-		let width = self
-			.expand
-			.and_then(|expand| if expand { Some("100%") } else { None });
 		td().style(style::TEXT_ALIGN, text_align)
-			.style(style::WIDTH, width)
+			.style(style::WIDTH, self.width)
 			.style(style::BACKGROUND_COLOR, self.color)
 			.child(self.children)
 			.into_node()

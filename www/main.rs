@@ -4,7 +4,7 @@ use std::{path::PathBuf, sync::Arc, time::Duration};
 use tangram_error::{Error, Result};
 use tangram_id::Id;
 use tangram_serve::{request_id::RequestIdLayer, RouteMap};
-use tangram_www_blog::{blog_post_slugs_and_paths, BlogPostSlugAndPath};
+use tangram_www_content::{BlogPost, Content, DocsGuide};
 use tower::{make::Shared, ServiceBuilder};
 use tower_http::{add_extension::AddExtensionLayer, trace::TraceLayer};
 use tracing::{error, info, trace_span, Span};
@@ -92,22 +92,15 @@ fn route_map() -> RouteMap {
 		"/benchmarks".into(),
 		Box::new(|| html(tangram_www_benchmarks_server::Page::new())),
 	);
-	let blog_posts_path = PathBuf::from("www/content/blog/");
-	let blog_post_slugs_and_paths = blog_post_slugs_and_paths(&blog_posts_path).unwrap();
-	for blog_post_slug_and_path in blog_post_slugs_and_paths {
-		let BlogPostSlugAndPath { slug, path } = blog_post_slug_and_path;
+	for slug in BlogPost::slugs().unwrap() {
 		route_map.insert(
 			format!("/blog/{}", slug).into(),
-			Box::new(move || html(tangram_www_blog_post_server::Page::new(path.clone()))),
+			Box::new(move || html(tangram_www_blog_post_server::Page::new(slug.clone()))),
 		);
 	}
 	route_map.insert(
 		"/blog/".into(),
-		Box::new(move || {
-			html(tangram_www_blog_index_server::Page::new(
-				blog_posts_path.clone(),
-			))
-		}),
+		Box::new(move || html(tangram_www_blog_index_server::Page::new())),
 	);
 	route_map.insert(
 		"/docs/".into(),
@@ -161,10 +154,12 @@ fn route_map() -> RouteMap {
 		"/docs/getting_started/monitor".into(),
 		Box::new(|| html(tangram_www_docs_getting_started_monitor_server::Page::new())),
 	);
-	route_map.insert(
-		"/docs/train/configuration".into(),
-		Box::new(|| html(tangram_www_docs_train_configuration_server::Page::new())),
-	);
+	for slug in DocsGuide::slugs().unwrap() {
+		route_map.insert(
+			format!("/docs/guides/{}", slug).into(),
+			Box::new(move || html(tangram_www_docs_guide_server::Page::new(slug.clone()))),
+		);
+	}
 	route_map.insert(
 		"/pricing".into(),
 		Box::new(|| html(tangram_www_pricing_server::Page::new())),

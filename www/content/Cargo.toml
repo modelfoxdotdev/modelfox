@@ -1,6 +1,6 @@
 [package]
 edition = "2018"
-name = "tangram_www_blog"
+name = "tangram_www_content"
 version = "0.0.0"
 
 [lib]

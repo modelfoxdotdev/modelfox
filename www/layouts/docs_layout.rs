@@ -1,6 +1,7 @@
 use crate::layout::Layout;
 use pinwheel::prelude::*;
 use tangram_ui as ui;
+use tangram_www_content::{Content, DocsGuide};
 
 #[derive(ComponentBuilder)]
 pub struct DocsLayout {
@@ -20,7 +21,7 @@ pub enum DocsPage {
 	Overview,
 	Install,
 	GettingStarted(GettingStartedPage),
-	Train(TrainPage),
+	Guides(String),
 }
 
 #[derive(PartialEq)]
@@ -41,11 +42,6 @@ pub enum PredictPage {
 	Python,
 	Ruby,
 	Rust,
-}
-
-#[derive(PartialEq)]
-pub enum TrainPage {
-	Configuration,
 }
 
 impl Component for DocsLayout {
@@ -209,17 +205,14 @@ impl Component for PageNav {
 							))),
 					),
 			)
-			.child(
-				ui::NavSection::new("Train").child(
+			.child(ui::NavSection::new("Guides").children(
+				DocsGuide::list().unwrap().into_iter().map(|guide| {
 					ui::NavItem::new()
-						.title("Configuration".to_owned())
-						.href("/docs/train/configuration".to_owned())
-						.selected(Some(matches!(
-							self.selected_page,
-							DocsPage::Train(TrainPage::Configuration),
-						))),
-				),
-			)
+						.title(guide.front_matter.title)
+						.href(format!("/docs/guides/{}", guide.slug))
+						.selected(Some(self.selected_page == DocsPage::Guides(guide.slug)))
+				}),
+			))
 			.child(
 				ui::NavSection::new("Languages")
 					.child(

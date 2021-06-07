@@ -11,4 +11,5 @@ path = "lib.rs"
 pinwheel = { path = "../../pinwheel" }
 tangram_serve = { path = "../../serve" }
 tangram_ui = { path = "../../ui" }
+tangram_www_content = { path = "../content" }
 tangram_www_ui = { path = "../ui" }

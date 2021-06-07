@@ -4498,9 +4498,9 @@ dependencies = [
  "tangram_serve",
  "tangram_www_benchmarks_client",
  "tangram_www_benchmarks_server",
- "tangram_www_blog",
  "tangram_www_blog_index_server",
  "tangram_www_blog_post_server",
+ "tangram_www_content",
  "tangram_www_docs_getting_started_index_server",
  "tangram_www_docs_getting_started_inspect_server",
  "tangram_www_docs_getting_started_monitor_server",
@@ -4512,11 +4512,11 @@ dependencies = [
  "tangram_www_docs_getting_started_predict_ruby_server",
  "tangram_www_docs_getting_started_predict_rust_server",
  "tangram_www_docs_getting_started_train_server",
+ "tangram_www_docs_guide_server",
  "tangram_www_docs_index_server",
  "tangram_www_docs_inspect_client",
  "tangram_www_docs_install_server",
  "tangram_www_docs_monitor_client",
- "tangram_www_docs_train_configuration_server",
  "tangram_www_index_client",
  "tangram_www_index_server",
  "tangram_www_pricing_server",
@@ -4551,23 +4551,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "tangram_www_blog"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "serde",
- "serde_json",
- "tangram_error",
- "tangram_ui",
-]
-
-[[package]]
 name = "tangram_www_blog_index_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
  "tangram_ui",
- "tangram_www_blog",
+ "tangram_www_content",
  "tangram_www_layouts",
 ]
 
@@ -4577,8 +4566,19 @@ version = "0.0.0"
 dependencies = [
  "pinwheel",
  "tangram_ui",
- "tangram_www_blog",
+ "tangram_www_content",
  "tangram_www_layouts",
+]
+
+[[package]]
+name = "tangram_www_content"
+version = "0.0.0"
+dependencies = [
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "tangram_error",
+ "tangram_ui",
 ]
 
 [[package]]
@@ -4718,6 +4718,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "tangram_www_docs_guide_server"
+version = "0.0.0"
+dependencies = [
+ "pinwheel",
+ "tangram_serve",
+ "tangram_ui",
+ "tangram_www_content",
+ "tangram_www_layouts",
+ "tangram_www_ui",
+]
+
+[[package]]
 name = "tangram_www_docs_index_server"
 version = "0.0.0"
 dependencies = [
@@ -4773,18 +4785,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tangram_www_docs_train_configuration_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "syn",
- "tangram_serve",
- "tangram_ui",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
 name = "tangram_www_index_client"
 version = "0.0.0"
 dependencies = [
@@ -4835,6 +4835,7 @@ dependencies = [
  "pinwheel",
  "tangram_serve",
  "tangram_ui",
+ "tangram_www_content",
  "tangram_www_ui",
 ]
 

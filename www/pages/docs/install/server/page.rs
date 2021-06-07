@@ -361,7 +361,7 @@ impl Component for Scoop {
 			"#
 		);
 		ui::S2::new()
-			.child(ui::H2::new().child("Windows Scoop"))
+			.child(ui::H2::new().child("Scoop"))
 			.child(
 				ui::P::new()
 					.child("Install the tangram package from the ")

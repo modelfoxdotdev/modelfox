@@ -32,7 +32,7 @@
 
 .nav-section {
 	display: grid;
-	gap: 1rem;
+	gap: 0.5rem;
 	outline: none;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -48,7 +48,7 @@
 
 .nav-item {
 	display: grid;
-	gap: 1rem;
+	gap: 0.5rem;
 	outline: none;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -59,6 +59,7 @@
 .nav-item > a {
 	color: var(--text-color);
 	text-decoration: none;
+	line-height: 1.5;
 }
 
 .nav-item-clickable > a:hover {

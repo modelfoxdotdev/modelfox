@@ -62,21 +62,22 @@ impl Component for Hero {
 			.class("index-hero-buttons")
 			.child(
 				ui::Button::new()
+					.color(ui::colors::RED.to_owned())
 					.href("https://github.com/tangramxyz/tangram".to_owned())
 					.child("View on GitHub"),
 			)
 			.child(
 				ui::Button::new()
-					.href("/docs/install".to_owned())
-					.color(ui::colors::TEAL.to_owned())
-					.child("Install the CLI"),
+					.color(ui::colors::GREEN.to_owned())
+					.href("https://cozycal.com/tangram/demo".to_owned())
+					.open_new_window(true)
+					.child("Schedule a Demo"),
 			)
 			.child(
 				ui::Button::new()
-					.href("https://cozycal.com/tangram/demo".to_owned())
-					.open_new_window(true)
-					.color(ui::colors::GREEN.to_owned())
-					.child("Schedule a Demo"),
+					.color(ui::colors::BLUE.to_owned())
+					.href("/docs/install".to_owned())
+					.child("Install the CLI"),
 			);
 		div()
 			.class("index-hero-wrapper")

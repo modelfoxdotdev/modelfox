@@ -45,11 +45,13 @@ pub async fn main() {
 	let child_port = 8081;
 	let child_addr = std::net::SocketAddr::new(child_host.parse().unwrap(), child_port);
 	let workspace_dir = std::env::current_dir().unwrap();
-	let target_dir = workspace_dir.join("target");
-	let target_wasm_dir = workspace_dir.join("target_wasm");
-	let languages_dir = workspace_dir.join("languages");
+	let ignore_paths = vec![
+		workspace_dir.join("target"),
+		workspace_dir.join("target_wasm"),
+		workspace_dir.join("target_check"),
+		workspace_dir.join("languages"),
+	];
 	let watch_paths = vec![workspace_dir];
-	let ignore_paths = vec![target_dir, target_wasm_dir, languages_dir];
 
 	let (cmd, cmd_args) = match args.target {
 		Target::App => {

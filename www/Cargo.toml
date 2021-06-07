@@ -23,7 +23,7 @@ serde_json = "1"
 tangram_error = { path = "../error" }
 tangram_id = { path = "../id" }
 tangram_serve = { path = "../serve" }
-tangram_www_blog = { path = "blog" }
+tangram_www_content = { path = "content" }
 tokio = { version = "1", features = ["full"] }
 tower = { version = "0.4", features = ["make", "util"] }
 tower-http = { version = "0.1", features = ["add-extension", "trace"] }
@@ -44,9 +44,9 @@ tangram_www_docs_getting_started_predict_python_server = { path = "pages/docs/ge
 tangram_www_docs_getting_started_predict_ruby_server = { path = "pages/docs/getting_started/predict/ruby/server" }
 tangram_www_docs_getting_started_predict_rust_server = { path = "pages/docs/getting_started/predict/rust/server" }
 tangram_www_docs_getting_started_train_server = { path = "pages/docs/getting_started/train/server" }
+tangram_www_docs_guide_server = { path = "pages/docs/guides/_/server" }
 tangram_www_docs_index_server = { path = "pages/docs/index/server" }
 tangram_www_docs_install_server = { path = "pages/docs/install/server" }
-tangram_www_docs_train_configuration_server = { path = "pages/docs/train/configuration/server" }
 tangram_www_index_server = { path = "pages/index/server" }
 tangram_www_pricing_server = { path = "pages/pricing/server" }
 
