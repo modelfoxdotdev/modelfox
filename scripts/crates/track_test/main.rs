@@ -217,8 +217,12 @@ fn get_random_row(table: TableView) -> HashMap<String, serde_json::Value> {
 			tangram_table::TableColumnView::Number(column) => {
 				let column_name = column.name().unwrap().to_owned();
 				let value = column.data()[random_row_index].to_f64().unwrap();
-				let value = serde_json::Number::from_f64(value).unwrap();
-				(column_name, serde_json::Value::Number(value))
+				let value = if let Some(value) = serde_json::Number::from_f64(value) {
+					serde_json::Value::Number(value)
+				} else {
+					serde_json::Value::Null
+				};
+				(column_name, value)
 			}
 			tangram_table::TableColumnView::Enum(column) => {
 				let column_name = column.name().unwrap().to_owned();
