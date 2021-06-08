@@ -1,4 +1,4 @@
-use crate::Card;
+use crate as ui;
 use pinwheel::prelude::*;
 
 #[derive(ComponentBuilder)]
@@ -9,7 +9,7 @@ pub struct NumberCard {
 
 impl Component for NumberCard {
 	fn into_node(self) -> Node {
-		Card::new()
+		ui::Card::new()
 			.child(
 				div()
 					.class("number-wrapper")

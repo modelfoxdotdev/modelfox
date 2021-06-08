@@ -1,3 +1,4 @@
+use crate as ui;
 use pinwheel::prelude::*;
 
 pub enum WindowShade {
@@ -32,17 +33,17 @@ impl Component for Window {
 					.child(
 						div()
 							.class("window-topbar-button")
-							.style(style::BACKGROUND_COLOR, "var(--red)"),
+							.style(style::BACKGROUND_COLOR, ui::colors::RED),
 					)
 					.child(
 						div()
 							.class("window-topbar-button")
-							.style(style::BACKGROUND_COLOR, "var(--yellow)"),
+							.style(style::BACKGROUND_COLOR, ui::colors::YELLOW),
 					)
 					.child(
 						div()
 							.class("window-topbar-button")
-							.style(style::BACKGROUND_COLOR, "var(--green)"),
+							.style(style::BACKGROUND_COLOR, ui::colors::GREEN),
 					),
 			)
 			.child(

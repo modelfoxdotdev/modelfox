@@ -81,7 +81,7 @@ impl Component for Header {
 					)
 					.child(
 						ui::Button::new()
-							.color("var(--red)".to_owned())
+							.color(ui::colors::RED.to_owned())
 							.button_type(Some(ui::ButtonType::Submit))
 							.child("Logout"),
 					),

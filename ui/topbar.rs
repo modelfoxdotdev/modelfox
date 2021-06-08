@@ -1,4 +1,4 @@
-use crate::Button;
+use crate as ui;
 use pinwheel::prelude::*;
 
 #[derive(ComponentBuilder)]
@@ -204,7 +204,7 @@ impl Component for TopbarDropdown {
 			.child(self.cta.map(|cta| {
 				div()
 					.class("topbar-dropdown-item")
-					.child(Button::new().href(Some(cta.href)).child(cta.title))
+					.child(ui::Button::new().href(Some(cta.href)).child(cta.title))
 			}))
 			.into_node()
 	}

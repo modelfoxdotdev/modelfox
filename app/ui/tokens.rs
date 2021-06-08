@@ -11,7 +11,7 @@ pub struct UnknownColumnToken {
 impl Component for UnknownColumnToken {
 	fn into_node(self) -> Node {
 		ui::Token::new()
-			.color("var(--gray)".to_owned())
+			.color(ui::colors::GRAY.to_owned())
 			.child("Unknown")
 			.into_node()
 	}
@@ -26,7 +26,7 @@ pub struct NumberColumnToken {
 impl Component for NumberColumnToken {
 	fn into_node(self) -> Node {
 		ui::Token::new()
-			.color("var(--teal)".to_owned())
+			.color(ui::colors::TEAL.to_owned())
 			.child("Number")
 			.into_node()
 	}
@@ -41,7 +41,7 @@ pub struct EnumColumnToken {
 impl Component for EnumColumnToken {
 	fn into_node(self) -> Node {
 		ui::Token::new()
-			.color("var(--purple)".to_owned())
+			.color(ui::colors::PURPLE.to_owned())
 			.child("Enum")
 			.into_node()
 	}
@@ -56,7 +56,7 @@ pub struct TextColumnToken {
 impl Component for TextColumnToken {
 	fn into_node(self) -> Node {
 		ui::Token::new()
-			.color("var(--orange)".to_owned())
+			.color(ui::colors::ORANGE.to_owned())
 			.child("Text")
 			.into_node()
 	}

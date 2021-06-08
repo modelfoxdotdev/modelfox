@@ -1,4 +1,4 @@
-use crate::{SelectField, SelectFieldOption};
+use crate as ui;
 use pinwheel::prelude::*;
 use std::borrow::Cow;
 use wasm_bindgen::{prelude::*, JsCast};
@@ -72,27 +72,27 @@ impl Component for CodeSelect {
 		let code_ruby = self.code_for_language.ruby;
 		let code_rust = self.code_for_language.rust;
 		let options = vec![
-			SelectFieldOption {
+			ui::SelectFieldOption {
 				text: "elixir".to_owned(),
 				value: "elixir".to_owned(),
 			},
-			SelectFieldOption {
+			ui::SelectFieldOption {
 				text: "go".to_owned(),
 				value: "go".to_owned(),
 			},
-			SelectFieldOption {
+			ui::SelectFieldOption {
 				text: "javascript".to_owned(),
 				value: "javascript".to_owned(),
 			},
-			SelectFieldOption {
+			ui::SelectFieldOption {
 				text: "python".to_owned(),
 				value: "python".to_owned(),
 			},
-			SelectFieldOption {
+			ui::SelectFieldOption {
 				text: "ruby".to_owned(),
 				value: "ruby".to_owned(),
 			},
-			SelectFieldOption {
+			ui::SelectFieldOption {
 				text: "rust".to_owned(),
 				value: "rust".to_owned(),
 			},
@@ -109,7 +109,7 @@ impl Component for CodeSelect {
 		div()
 			.class("code-select-grid")
 			.child(
-				SelectField::new()
+				ui::SelectField::new()
 					.id(Some("code_select".to_owned()))
 					.options(Some(options))
 					.value(Some(language_str)),

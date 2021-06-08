@@ -63,8 +63,8 @@ impl Component for Topbar {
 			},
 		];
 		ui::Topbar::new()
-			.background_color("var(--background-color)".to_owned())
-			.dropdown_background_color("var(--background-color)".to_owned())
+			.background_color(ui::colors::BACKGROUND.to_owned())
+			.dropdown_background_color(ui::colors::BACKGROUND.to_owned())
 			.items(Some(topbar_items))
 			.logo(Some(Logo::new(None, None, LogoScheme::Multi).into()))
 			.title(Some("tangram".to_owned()))

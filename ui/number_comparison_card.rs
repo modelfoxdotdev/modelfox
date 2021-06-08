@@ -1,4 +1,4 @@
-use crate::{Card, Token};
+use crate as ui;
 use pinwheel::prelude::*;
 use tangram_number_formatter::NumberFormatter;
 
@@ -77,16 +77,20 @@ impl Component for NumberComparisonCard {
 					.child_signal(value_b),
 			)
 			.child(
-				div()
-					.class("number-comparison-card-value-title a")
-					.child(Token::new().color(self.color_a).child(self.value_a_title)),
+				div().class("number-comparison-card-value-title a").child(
+					ui::Token::new()
+						.color(self.color_a)
+						.child(self.value_a_title),
+				),
 			)
 			.child(
-				div()
-					.class("number-comparison-card-value-title b")
-					.child(Token::new().color(self.color_b).child(self.value_b_title)),
+				div().class("number-comparison-card-value-title b").child(
+					ui::Token::new()
+						.color(self.color_b)
+						.child(self.value_b_title),
+				),
 			);
-		Card::new().child(content).into_node()
+		ui::Card::new().child(content).into_node()
 	}
 }
 

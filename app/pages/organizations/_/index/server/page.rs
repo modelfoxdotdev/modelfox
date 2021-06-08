@@ -56,7 +56,7 @@ impl Component for DetailsSection {
 								"/organizations/{}/edit",
 								self.organization_id
 							)))
-							.color("var(--gray)".to_owned())
+							.color(ui::colors::GRAY.to_owned())
 							.disabled(Some(false))
 							.child("Edit"),
 					),
@@ -165,7 +165,7 @@ impl Component for MemberDeleteForm {
 			.child(
 				ui::Button::new()
 					.button_type(Some(ui::ButtonType::Submit))
-					.color("var(--red)".to_owned())
+					.color(ui::colors::RED.to_owned())
 					.child("Remove"),
 			)
 			.into_node()
@@ -256,7 +256,7 @@ impl Component for DangerZoneSection {
 					.child(
 						ui::Button::new()
 							.button_type(Some(ui::ButtonType::Submit))
-							.color("var(--red)".to_owned())
+							.color(ui::colors::RED.to_owned())
 							.child("Delete Organization"),
 					),
 			)

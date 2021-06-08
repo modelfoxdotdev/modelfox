@@ -1,3 +1,4 @@
+use crate as ui;
 use pinwheel::prelude::*;
 
 #[derive(ComponentBuilder)]
@@ -38,21 +39,21 @@ impl Component for DefaultAvatar {
 				svg::circle()
 					.attribute("cx", "50")
 					.attribute("cy", "50")
-					.attribute("fill", "var(--accent-color)")
+					.attribute("fill", ui::colors::ACCENT)
 					.attribute("r", "50"),
 			)
 			.child(
 				svg::circle()
 					.attribute("cx", "50")
 					.attribute("cy", "40")
-					.attribute("fill", "var(--surface-color)")
+					.attribute("fill", ui::colors::SURFACE)
 					.attribute("r", "16"),
 			)
 			.child(
 				svg::circle()
 					.attribute("cx", "50")
 					.attribute("cy", "96")
-					.attribute("fill", "var(--surface-color)")
+					.attribute("fill", ui::colors::SURFACE)
 					.attribute("r", "36"),
 			)
 			.into_node()

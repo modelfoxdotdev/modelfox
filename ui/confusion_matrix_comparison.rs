@@ -1,4 +1,4 @@
-use crate::Token;
+use crate as ui;
 use pinwheel::prelude::*;
 use tangram_number_formatter::format_option_percent;
 
@@ -42,22 +42,22 @@ impl Component for ConfusionMatrixComparison {
 			.child(
 				ConfusionMatrixLabel::new("actual-true-label", None)
 					.child(div().child("Actual"))
-					.child(Token::new().child(self.class_label.clone())),
+					.child(ui::Token::new().child(self.class_label.clone())),
 			)
 			.child(
 				ConfusionMatrixLabel::new("actual-false-label", None)
 					.child(div().child("Actual Not"))
-					.child(Token::new().child(self.class_label.clone())),
+					.child(ui::Token::new().child(self.class_label.clone())),
 			)
 			.child(
 				ConfusionMatrixLabel::new("predicted-true-label".to_owned(), Some(true))
 					.child(div().child("Predicted"))
-					.child(Token::new().child(self.class_label.clone())),
+					.child(ui::Token::new().child(self.class_label.clone())),
 			)
 			.child(
 				ConfusionMatrixLabel::new("predicted-false-label".to_owned(), Some(true))
 					.child(div().child("Predicted Not"))
-					.child(Token::new().child(self.class_label)),
+					.child(ui::Token::new().child(self.class_label)),
 			)
 			.child(ConfusionMatrixComparisonItem {
 				area: "true-positive".to_owned(),
@@ -190,14 +190,14 @@ impl Component for ConfusionMatrixComparisonItem {
 					)
 					.child(
 						div().child(
-							Token::new()
+							ui::Token::new()
 								.color(Some(self.color_a))
 								.child(self.value_a_title),
 						),
 					)
 					.child(
 						div().child(
-							Token::new()
+							ui::Token::new()
 								.color(Some(self.color_b))
 								.child(self.value_b_title),
 						),

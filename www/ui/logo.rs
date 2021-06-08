@@ -1,4 +1,5 @@
 use pinwheel::prelude::*;
+use tangram_ui as ui;
 
 #[derive(ComponentBuilder)]
 pub struct Logo {
@@ -26,18 +27,16 @@ impl Component for Logo {
 		}
 		let shapes_colors = if self.color_scheme == LogoScheme::Multi {
 			ShapesColors {
-				trapezoid: "var(--pink)".to_owned(),
-				square: "var(--yellow)".to_owned(),
-				medium_triangle: "var(--teal)".to_owned(),
-				small_triangle1: "var(--purple)".to_owned(),
-				small_triangle2: "var(--indigo)".to_owned(),
-				large_triangle1: "var(--blue)".to_owned(),
-				large_triangle2: "var(--green)".to_owned(),
+				trapezoid: ui::colors::PINK.to_owned(),
+				square: ui::colors::YELLOW.to_owned(),
+				medium_triangle: ui::colors::TEAL.to_owned(),
+				small_triangle1: ui::colors::PURPLE.to_owned(),
+				small_triangle2: ui::colors::INDIGO.to_owned(),
+				large_triangle1: ui::colors::BLUE.to_owned(),
+				large_triangle2: ui::colors::GREEN.to_owned(),
 			}
 		} else {
-			let color = self
-				.color
-				.unwrap_or_else(|| "var(--accent-color)".to_owned());
+			let color = self.color.unwrap_or_else(|| ui::colors::ACCENT.to_owned());
 			ShapesColors {
 				trapezoid: color.clone(),
 				square: color.clone(),

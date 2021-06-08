@@ -1,9 +1,9 @@
-use crate::alert::Level;
+use crate as ui;
 use pinwheel::prelude::*;
 
 #[derive(ComponentBuilder)]
 pub struct Callout {
-	pub level: Level,
+	pub level: ui::Level,
 	#[optional]
 	pub title: Option<String>,
 	#[children]
@@ -13,10 +13,10 @@ pub struct Callout {
 impl Component for Callout {
 	fn into_node(self) -> Node {
 		let level_class = match self.level {
-			Level::Danger => "callout-wrapper-danger",
-			Level::Info => "callout-wrapper-info",
-			Level::Warning => "callout-wrapper-warning",
-			Level::Success => "callout-wrapper-success",
+			ui::Level::Danger => "callout-wrapper-danger",
+			ui::Level::Info => "callout-wrapper-info",
+			ui::Level::Warning => "callout-wrapper-warning",
+			ui::Level::Success => "callout-wrapper-success",
 		};
 		let class = classes!("callout-wrapper", level_class);
 		div()

@@ -190,7 +190,7 @@ impl Component for DurationTable {
 						None
 					};
 					let text_color = if library == Library::Tangram {
-						Some("var(--fun-text-color)".to_owned())
+						Some(ui::colors::FUN_TEXT.to_owned())
 					} else {
 						None
 					};
@@ -274,7 +274,7 @@ impl Component for MemoryTable {
 						None
 					};
 					let text_color = if library == Library::Tangram {
-						Some("var(--fun-text-color)".to_owned())
+						Some(ui::colors::FUN_TEXT.to_owned())
 					} else {
 						None
 					};
@@ -358,7 +358,7 @@ impl Component for MseTable {
 						None
 					};
 					let text_color = if library == Library::CatBoost {
-						Some("var(--fun-text-color)".to_owned())
+						Some(ui::colors::FUN_TEXT.to_owned())
 					} else {
 						None
 					};
@@ -442,7 +442,7 @@ impl Component for AucTable {
 						None
 					};
 					let text_color = if library == Library::Tangram {
-						Some("var(--fun-text-color)".to_owned())
+						Some(ui::colors::FUN_TEXT.to_owned())
 					} else {
 						None
 					};

@@ -8,6 +8,8 @@ pub mod colors {
 	pub const PURPLE: &str = "#bf5af2";
 	pub const RED: &str = "#ff453a";
 	pub const TEAL: &str = "#4dd0e1";
+	pub const YELLOW: &str = "#ffd60a";
+
 	pub const TERMINAL_BLACK: &str = "#000000";
 	pub const TERMINAL_BLUE: &str = "#0a84ff";
 	pub const TERMINAL_CYAN: &str = "#4dd0e1";
@@ -16,5 +18,15 @@ pub mod colors {
 	pub const TERMINAL_RED: &str = "#ff453a";
 	pub const TERMINAL_WHITE: &str = "#ffffff";
 	pub const TERMINAL_YELLOW: &str = "#ffd60a";
-	pub const YELLOW: &str = "#ffd60a";
+
+	pub const BACKGROUND: &str = "var(--background-color)";
+	pub const BORDER: &str = "var(--border-color";
+	pub const HEADER: &str = "var(--header-color";
+	pub const HOVER: &str = "var(--hover-color";
+	pub const SURFACE: &str = "var(--surface-color";
+	pub const MUTEXT_TEXT: &str = "var(--muted-text-color";
+	pub const TEXT: &str = "var(--text-color";
+	pub const HEADING_TEXT: &str = "var(--heading-text-color";
+	pub const ACCENT: &str = "var(--accent-color";
+	pub const FUN_TEXT: &str = "var(--fun-text-color";
 }

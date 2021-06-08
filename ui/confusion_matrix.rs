@@ -1,4 +1,4 @@
-use crate::Token;
+use crate as ui;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use tangram_number_formatter::PercentFormatter;
@@ -48,22 +48,22 @@ impl Component for ConfusionMatrix {
 			.child(
 				ConfusionMatrixLabel::new("actual-true-label".to_owned(), None)
 					.child(div().child("Actual"))
-					.child(Token::new().child(self.class_label.clone())),
+					.child(ui::Token::new().child(self.class_label.clone())),
 			)
 			.child(
 				ConfusionMatrixLabel::new("actual-false-label".to_owned(), None)
 					.child(div().child("Actual Not"))
-					.child(Token::new().child(self.class_label.clone())),
+					.child(ui::Token::new().child(self.class_label.clone())),
 			)
 			.child(
 				ConfusionMatrixLabel::new("predicted-true-label".to_owned(), Some(true))
 					.child(div().child("Predicted"))
-					.child(Token::new().child(self.class_label.clone())),
+					.child(ui::Token::new().child(self.class_label.clone())),
 			)
 			.child(
 				ConfusionMatrixLabel::new("predicted-false-label".to_owned(), Some(true))
 					.child(div().child("Predicted Not"))
-					.child(Token::new().child(self.class_label)),
+					.child(ui::Token::new().child(self.class_label)),
 			)
 			.child(ConfusionMatrixItem::new(
 				"true-positive".to_owned(),

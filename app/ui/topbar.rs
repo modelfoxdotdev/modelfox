@@ -30,8 +30,8 @@ impl Component for Topbar {
 		};
 		let logo = Some(Logo::new(LogoScheme::Multi).into_node());
 		ui::Topbar::new()
-			.background_color("var(--header-color)".to_owned())
-			.dropdown_background_color("var(--surface-color)".to_owned())
+			.background_color(ui::colors::HEADER.to_owned())
+			.dropdown_background_color(ui::colors::SURFACE.to_owned())
 			.items(items)
 			.logo_href("/".to_owned())
 			.logo(logo)
