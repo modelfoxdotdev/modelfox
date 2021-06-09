@@ -1,5 +1,5 @@
 /*!
-The Tangram Rust crate makes it easy to make predictions with your Tangram machine learning model from Rust.
+The Tangram crate makes it easy to make predictions with your Tangram machine learning model from Rust.
 
 ## Usage
 

@@ -4,7 +4,7 @@ use pinwheel::prelude::*;
 #[derive(ComponentBuilder)]
 pub struct NumberCard {
 	pub title: String,
-	pub value: BoxSignal<String>,
+	pub value: String,
 }
 
 impl Component for NumberCard {
@@ -13,11 +13,7 @@ impl Component for NumberCard {
 			.child(
 				div()
 					.class("number-wrapper")
-					.child(
-						div()
-							.class("number-value")
-							.child_signal(self.value.signal_cloned()),
-					)
+					.child(div().class("number-value").child(self.value))
 					.child(div().class("number-title").child(self.title)),
 			)
 			.into_node()

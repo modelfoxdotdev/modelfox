@@ -9,7 +9,7 @@ use wasm_bindgen::prelude::*;
 #[wasm_bindgen(start)]
 pub fn start() {
 	console_error_panic_hook::set_once();
-	console_log::init_with_level(log::Level::Info).unwrap();
+	tracing_wasm::set_as_global_default();
 	ui::boot_code_select();
 	hydrate_chart::<LineChart>("pr-curve");
 	hydrate_chart::<LineChart>("roc-curve");

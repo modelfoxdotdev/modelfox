@@ -12,5 +12,7 @@ path = "lib.rs"
 console_error_panic_hook = "0.1"
 pinwheel = { path = "../../../../../../../../pinwheel" }
 tangram_app_tuning_common = { path = "../common" }
+tracing = "0.1"
+tracing-wasm = "0.2"
 wasm-bindgen = "0.2"
 web-sys = "0.3"

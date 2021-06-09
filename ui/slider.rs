@@ -1,5 +1,4 @@
-use num::ToPrimitive;
-use pinwheel::prelude::*;
+use pinwheel::{prelude::*, signal::Broadcaster};
 use wasm_bindgen::JsCast;
 use web_sys as dom;
 
@@ -22,20 +21,20 @@ impl Component for Slider {
 			max,
 			on_change,
 			tooltip_number_formatter,
+			value,
 			..
 		} = self;
-		let percent = self
-			.value
-			.signal_cloned()
-			.map(move |value| ((value.to_f32().unwrap() - min) / (max - min)) * 100.0)
-			.boxed();
-		let tooltip_value =
-			self.value
-				.signal_cloned()
-				.map(move |value| match &tooltip_number_formatter {
-					Some(tooltip_number_formatter) => tooltip_number_formatter(value),
-					None => value.to_string(),
-				});
+		let value = Broadcaster::new(value);
+		let percent = value
+			.signal()
+			.map(move |value| ((value - min) / (max - min)) * 100.0);
+		let percent = Broadcaster::new(percent);
+		let tooltip_value = value
+			.signal()
+			.map(move |value| match &tooltip_number_formatter {
+				Some(tooltip_number_formatter) => tooltip_number_formatter(value),
+				None => value.to_string(),
+			});
 		let oninput = move |event: dom::InputEvent| {
 			let current_target = event
 				.current_target()
@@ -56,7 +55,7 @@ impl Component for Slider {
 					.attribute("type", "range")
 					.min(self.min.to_string())
 					.max(self.max.to_string())
-					.value_signal(self.value.signal_cloned().map(|value| value.to_string()))
+					.value_signal(value.signal().map(|value| value.to_string()))
 					.step("1")
 					.autocomplete("off")
 					.oninput(oninput),
@@ -64,22 +63,16 @@ impl Component for Slider {
 			.child(
 				div()
 					.class("slider-inner-wrapper")
-					.child(
-						div().class("slider-progress").style_signal(
-							style::WIDTH,
-							percent
-								.signal_cloned()
-								.map(|percent| format!("{}%", percent)),
-						),
-					)
+					.child(div().class("slider-progress").style_signal(
+						style::WIDTH,
+						percent.signal().map(|percent| format!("{}%", percent)),
+					))
 					.child(
 						div()
 							.class("slider-tooltip")
 							.style_signal(
 								style::MARGIN_LEFT,
-								percent
-									.signal_cloned()
-									.map(|percent| format!("{}%", percent)),
+								percent.signal().map(|percent| format!("{}%", percent)),
 							)
 							.child_signal(tooltip_value),
 					),

@@ -197,7 +197,7 @@ impl Component for PricingTable {
 			)
 			.child(
 				ui::TableRow::new()
-					.child(ui::TableHeaderCell::new().child("GitHub and Zulip support."))
+					.child(ui::TableHeaderCell::new().child("GitHub support."))
 					.child(ui::TableCell::new().child("✔"))
 					.child(ui::TableCell::new().child("✔"))
 					.child(ui::TableCell::new().child("✔")),
@@ -225,10 +225,7 @@ impl Component for PricingTable {
 			)
 			.child(
 				ui::TableRow::new()
-					.child(
-						ui::TableHeaderCell::new()
-							.child("Phone and dedicated Slack channel support."),
-					)
+					.child(ui::TableHeaderCell::new().child("Dedicated Slack support."))
 					.child(ui::TableCell::new().child(""))
 					.child(ui::TableCell::new().child(""))
 					.child(ui::TableCell::new().child("✔")),

@@ -423,16 +423,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "console_log"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "501a375961cef1a0d44767200e66e4a559283097e91d0730b1d75dfb2f8a1494"
-dependencies = [
- "log",
- "web-sys",
-]
-
-[[package]]
 name = "convert_case"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1997,6 +1987,7 @@ dependencies = [
  "pinwheel_macro",
  "serde",
  "serde_json",
+ "tracing",
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
@@ -3888,6 +3879,8 @@ dependencies = [
  "console_error_panic_hook",
  "pinwheel",
  "tangram_app_tuning_common",
+ "tracing",
+ "tracing-wasm",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -3902,6 +3895,7 @@ dependencies = [
  "serde_json",
  "tangram_app_ui",
  "tangram_ui",
+ "tracing",
 ]
 
 [[package]]
@@ -4474,6 +4468,7 @@ dependencies = [
  "tangram_charts",
  "tangram_finite",
  "tangram_number_formatter",
+ "tracing",
  "tree-sitter",
  "tree-sitter-highlight",
  "tree-sitter-javascript",
@@ -4790,12 +4785,12 @@ name = "tangram_www_index_client"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
- "console_log",
  "log",
  "pinwheel",
  "tangram_charts",
  "tangram_ui",
  "tangram_www_index_common",
+ "tracing-wasm",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -5177,6 +5172,17 @@ dependencies = [
  "tracing-core",
  "tracing-log",
  "tracing-serde",
+]
+
+[[package]]
+name = "tracing-wasm"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ae741706df70547fca8715f74a8569677666e7be3454313af70f6e158034485"
+dependencies = [
+ "tracing",
+ "tracing-subscriber",
+ "wasm-bindgen",
 ]
 
 [[package]]

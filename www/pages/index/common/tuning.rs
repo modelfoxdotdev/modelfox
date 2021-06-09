@@ -31,7 +31,7 @@ impl Component for Tuning {
 		let threshold_metrics = Rc::new(threshold_metrics);
 		let n_thresholds = threshold_metrics.len();
 		let center = n_thresholds / 2;
-		let selected_index: State<usize> = State::new(center);
+		let selected_index: Mutable<usize> = Mutable::new(center);
 		let tooltip_number_formatter: Box<dyn Fn(f32) -> String> = {
 			clone!(threshold_metrics);
 			Box::new(move |value: f32| {
@@ -47,7 +47,7 @@ impl Component for Tuning {
 			0.0,
 			(threshold_metrics.len() - 1).to_f32().unwrap(),
 			1.0,
-			selected_index.signal().map(|i| i.to_f32().unwrap()).boxed(),
+			Box::new(selected_index.signal().map(|i| i.to_f32().unwrap())) as BoxSignal<_>,
 		)
 		.tooltip_number_formatter(tooltip_number_formatter)
 		.on_change(on_change);
@@ -57,21 +57,18 @@ impl Component for Tuning {
 				.signal()
 				.map(move |i| ui::format_percent(threshold_metrics[i].accuracy))
 		};
-		let accuracy = div()
-			.style(style::GRID_AREA, "accuracy")
-			.child(ui::NumberCard::new("Accuracy".to_owned(), accuracy.boxed()));
+		let accuracy = div().style(style::GRID_AREA, "accuracy").child_signal(
+			accuracy.map(|accuracy| ui::NumberCard::new("Accuracy".to_owned(), accuracy)),
+		);
 		let precision = {
 			clone!(threshold_metrics);
 			selected_index
 				.signal()
 				.map(move |i| ui::format_percent(threshold_metrics[i].precision))
 		};
-		let precision = div()
-			.style(style::GRID_AREA, "precision")
-			.child(ui::NumberCard::new(
-				"Precision".to_owned(),
-				precision.boxed(),
-			));
+		let precision = div().style(style::GRID_AREA, "precision").child_signal(
+			precision.map(|precision| ui::NumberCard::new("Precision".to_owned(), precision)),
+		);
 		let recall = {
 			clone!(threshold_metrics);
 			selected_index
@@ -80,7 +77,7 @@ impl Component for Tuning {
 		};
 		let recall = div()
 			.style(style::GRID_AREA, "recall")
-			.child(ui::NumberCard::new("Recall".to_owned(), recall.boxed()));
+			.child_signal(recall.map(|recall| ui::NumberCard::new("Recall".to_owned(), recall)));
 		let code = {
 			clone!(threshold_metrics);
 			selected_index.signal().map(move |i| {

@@ -4,8 +4,8 @@ use tangram_number_formatter::NumberFormatter;
 
 #[derive(ComponentBuilder)]
 pub struct NumberComparisonCard {
-	pub value_a: BoxSignal<Option<f32>>,
-	pub value_b: BoxSignal<Option<f32>>,
+	pub value_a: Option<f32>,
+	pub value_b: Option<f32>,
 	#[optional]
 	pub id: Option<String>,
 	#[optional]
@@ -26,32 +26,11 @@ impl Component for NumberComparisonCard {
 	fn into_node(self) -> Node {
 		let number_formatter = self.number_formatter;
 		let number_formatter_string = serde_json::to_string(&number_formatter).unwrap();
-		let difference_string = (self.value_a.signal_cloned(), self.value_b.signal_cloned())
-			.zip()
-			.map({
-				clone!(number_formatter);
-				move |(value_a, value_b)| difference_string(value_a, value_b, &number_formatter)
-			});
-		let difference_class = (self.value_a.signal_cloned(), self.value_b.signal_cloned())
-			.zip()
-			.map(|(value_a, value_b)| {
-				classes!(
-					"number-comparison-card-difference",
-					difference_class(value_a, value_b)
-				)
-			});
-		let value_a = {
-			clone!(number_formatter);
-			self.value_a
-				.signal_cloned()
-				.map(move |value_a| number_formatter.format_option(value_a))
-		};
-		let value_b = {
-			clone!(number_formatter);
-			self.value_b
-				.signal_cloned()
-				.map(move |value_b| number_formatter.format_option(value_b))
-		};
+		let difference_string = difference_string(self.value_a, self.value_b, &number_formatter);
+		let difference_class = classes!(
+			"number-comparison-card-difference",
+			difference_class(self.value_a, self.value_b)
+		);
 		let content = div()
 			.class("number-comparison-card-wrapper")
 			.attribute("id", self.id)
@@ -61,20 +40,16 @@ impl Component for NumberComparisonCard {
 					.class("number-comparison-card-title")
 					.child(self.title),
 			)
-			.child(
-				div()
-					.class_signal(difference_class)
-					.child_signal(difference_string),
-			)
+			.child(div().class(difference_class).child(difference_string))
 			.child(
 				div()
 					.class("number-comparison-card-value a")
-					.child_signal(value_a),
+					.child(number_formatter.format_option(self.value_a)),
 			)
 			.child(
 				div()
 					.class("number-comparison-card-value b")
-					.child_signal(value_b),
+					.child(number_formatter.format_option(self.value_b)),
 			)
 			.child(
 				div().class("number-comparison-card-value-title a").child(

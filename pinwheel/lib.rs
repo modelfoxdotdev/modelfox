@@ -20,6 +20,7 @@ mod server;
 pub use crate::server::*;
 
 pub mod prelude {
+	pub use crate::BoxSignal;
 	pub use crate::{
 		app::App,
 		classes, clone,
@@ -32,13 +33,15 @@ pub mod prelude {
 		zip::{ZipSignal, ZipSignalTrait},
 		Element, Fragment, Namespace, Node, SignalNode, SignalVecNode, Text,
 	};
-	pub use crate::{BoxSignal, BoxSignalTrait, State, StateVec};
 	pub use futures_signals::{
-		signal::{Signal, SignalExt},
-		signal_vec::{SignalVec, SignalVecExt},
+		signal::{Mutable, Signal, SignalExt},
+		signal_vec::{MutableVec, SignalVec, SignalVecExt},
 	};
 	pub use pinwheel_macro::ComponentBuilder;
 }
+
+pub use futures_signals::signal;
+pub use futures_signals::signal_vec;
 
 #[macro_export]
 macro_rules! clone {
@@ -51,51 +54,4 @@ pub fn html<T: component::Component>(component: T) -> String {
 	format!("<!doctype html>{}", component.into_node())
 }
 
-use futures_signals::signal::{Broadcaster, Signal};
-
-pub type State<T> = futures_signals::signal::Mutable<T>;
-pub type StateVec<T> = futures_signals::signal_vec::MutableVec<T>;
-
-pub struct BoxSignal<T> {
-	#[allow(dead_code)]
-	state: Option<State<T>>,
-	signal: Broadcaster<Box<dyn 'static + Unpin + Signal<Item = T>>>,
-}
-
-impl<T> std::ops::Deref for BoxSignal<T> {
-	type Target = Broadcaster<Box<dyn 'static + Unpin + Signal<Item = T>>>;
-	fn deref(&self) -> &Self::Target {
-		&self.signal
-	}
-}
-
-pub trait BoxSignalTrait<T> {
-	fn boxed(self) -> BoxSignal<T>;
-}
-
-impl<T, S> BoxSignalTrait<T> for S
-where
-	S: 'static + Unpin + Signal<Item = T>,
-{
-	fn boxed(self) -> BoxSignal<T> {
-		BoxSignal {
-			state: None,
-			signal: Broadcaster::new(Box::new(self)),
-		}
-	}
-}
-
-impl<T> From<T> for BoxSignal<T>
-where
-	T: 'static + Clone,
-{
-	fn from(value: T) -> Self {
-		let state = State::new(value);
-		let signal: Broadcaster<Box<dyn 'static + Unpin + Signal<Item = T>>> =
-			Broadcaster::new(Box::new(state.signal_cloned()));
-		BoxSignal {
-			state: Some(state),
-			signal,
-		}
-	}
-}
+pub type BoxSignal<T> = Box<dyn 'static + Unpin + futures_signals::signal::Signal<Item = T>>;

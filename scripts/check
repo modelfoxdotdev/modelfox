@@ -1,1 +1,1 @@
-CARGO_TARGET_DIR=target_check cargo clippy --message-format json --all-targets
+cargo clippy --target-dir target_check --message-format json --all-targets

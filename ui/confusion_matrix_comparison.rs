@@ -21,9 +21,9 @@ pub struct ConfusionMatrixComparison {
 	pub class_label: String,
 	pub color_a: String,
 	pub color_b: String,
-	pub value_a: BoxSignal<Option<ConfusionMatrixComparisonValue>>,
+	pub value_a: Option<ConfusionMatrixComparisonValue>,
 	pub value_a_title: String,
-	pub value_b: BoxSignal<Option<ConfusionMatrixComparisonValue>>,
+	pub value_b: Option<ConfusionMatrixComparisonValue>,
 	pub value_b_title: String,
 }
 
@@ -66,17 +66,9 @@ impl Component for ConfusionMatrixComparison {
 				correct: true,
 				label: "True Positives".to_owned(),
 				value_a_title: self.value_a_title.clone(),
-				value_a: self
-					.value_a
-					.signal_cloned()
-					.map(|value_a| value_a.as_ref().map(|value| value.true_positive))
-					.boxed(),
+				value_a: self.value_a.as_ref().map(|value| value.true_positive),
 				value_b_title: self.value_b_title.clone(),
-				value_b: self
-					.value_b
-					.signal_cloned()
-					.map(|value_b| value_b.as_ref().map(|value| value.true_positive))
-					.boxed(),
+				value_b: self.value_b.as_ref().map(|value| value.true_positive),
 			})
 			.child(ConfusionMatrixComparisonItem {
 				area: "false-positive".to_owned(),
@@ -85,17 +77,9 @@ impl Component for ConfusionMatrixComparison {
 				correct: false,
 				label: "False Positives".to_owned(),
 				value_a_title: self.value_a_title.clone(),
-				value_a: self
-					.value_a
-					.signal_cloned()
-					.map(|value_a| value_a.as_ref().map(|value| value.false_positive))
-					.boxed(),
+				value_a: self.value_a.as_ref().map(|value| value.false_positive),
 				value_b_title: self.value_b_title.clone(),
-				value_b: self
-					.value_b
-					.signal_cloned()
-					.map(|value_b| value_b.as_ref().map(|value| value.false_positive))
-					.boxed(),
+				value_b: self.value_b.as_ref().map(|value| value.false_positive),
 			})
 			.child(ConfusionMatrixComparisonItem {
 				area: "false-negative".to_owned(),
@@ -104,17 +88,9 @@ impl Component for ConfusionMatrixComparison {
 				correct: false,
 				label: "False Negatives".to_owned(),
 				value_a_title: self.value_a_title.clone(),
-				value_a: self
-					.value_a
-					.signal_cloned()
-					.map(|value_a| value_a.as_ref().map(|value| value.false_negative))
-					.boxed(),
+				value_a: self.value_a.as_ref().map(|value| value.false_negative),
 				value_b_title: self.value_b_title.clone(),
-				value_b: self
-					.value_b
-					.signal_cloned()
-					.map(|value_b| value_b.as_ref().map(|value| value.false_negative))
-					.boxed(),
+				value_b: self.value_b.as_ref().map(|value| value.false_negative),
 			})
 			.child(ConfusionMatrixComparisonItem {
 				area: "true-negative".to_owned(),
@@ -123,17 +99,9 @@ impl Component for ConfusionMatrixComparison {
 				correct: true,
 				label: "True Negatives".to_owned(),
 				value_a_title: self.value_a_title,
-				value_a: self
-					.value_a
-					.signal_cloned()
-					.map(|value_a| value_a.as_ref().map(|value| value.true_negative))
-					.boxed(),
+				value_a: self.value_a.as_ref().map(|value| value.true_negative),
 				value_b_title: self.value_b_title,
-				value_b: self
-					.value_b
-					.signal_cloned()
-					.map(|value_b| value_b.as_ref().map(|value| value.true_negative))
-					.boxed(),
+				value_b: self.value_b.as_ref().map(|value| value.true_negative),
 			})
 			.into_node()
 	}
@@ -146,9 +114,9 @@ pub struct ConfusionMatrixComparisonItem {
 	pub correct: bool,
 	pub label: String,
 	pub value_a_title: String,
-	pub value_a: BoxSignal<Option<f32>>,
+	pub value_a: Option<f32>,
 	pub value_b_title: String,
-	pub value_b: BoxSignal<Option<f32>>,
+	pub value_b: Option<f32>,
 }
 
 impl Component for ConfusionMatrixComparisonItem {
@@ -159,8 +127,8 @@ impl Component for ConfusionMatrixComparisonItem {
 			"confusion-matrix-comparison-item-incorrect-wrapper"
 		};
 		let class = classes!("confusion-matrix-comparison-item-wrapper", class);
-		let value_a = self.value_a.signal_cloned().map(format_option_percent);
-		let value_b = self.value_b.signal_cloned().map(format_option_percent);
+		let value_a = format_option_percent(self.value_a);
+		let value_b = format_option_percent(self.value_b);
 		div()
 			.attribute("class", class)
 			.style(style::GRID_AREA, self.area.clone())
@@ -180,13 +148,13 @@ impl Component for ConfusionMatrixComparisonItem {
 						div()
 							.class("confusion-matrix-comparison-item-value")
 							.attribute("data-field", "value-a")
-							.child_signal(value_a),
+							.child(value_a),
 					)
 					.child(
 						div()
 							.class("confusion-matrix-comparison-item-value")
 							.attribute("data-field", "value-b")
-							.child_signal(value_b),
+							.child(value_b),
 					)
 					.child(
 						div().child(
