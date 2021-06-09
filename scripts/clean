@@ -1,3 +1,2 @@
-rm -rf target/*
-rm -rf target_wasm/*
+rm -rf target*
 rm -rf dist

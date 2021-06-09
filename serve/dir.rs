@@ -3,25 +3,6 @@ use include_out_dir::IncludeOutDir;
 use std::path::Path;
 use tangram_error::Result;
 
-#[macro_export]
-macro_rules! serve_from_out_dir {
-	($request:expr) => {
-		async {
-			#[cfg(debug_assertions)]
-			{
-				let dir = std::path::PathBuf::from(env!("OUT_DIR"));
-				$crate::dir::serve_from_dir(&dir, $request).await
-			}
-			#[cfg(not(debug_assertions))]
-			{
-				use include_out_dir;
-				let dir = include_out_dir::include_out_dir!();
-				$crate::dir::serve_from_include_out_dir(&dir, $request).await
-			}
-		}
-	};
-}
-
 pub async fn serve_from_dir(
 	dir: &Path,
 	request: &http::Request<hyper::Body>,

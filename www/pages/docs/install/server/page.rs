@@ -322,7 +322,7 @@ struct Arch {
 
 impl Component for Arch {
 	fn into_node(self) -> Node {
-		let code = "yay -S tangram";
+		let code = "yay -S tangram-bin";
 		ui::S2::new()
 			.child(ui::H2::new().child("Arch"))
 			.child(
@@ -330,7 +330,7 @@ impl Component for Arch {
 					.child("Install the tangram package from the ")
 					.child(
 						ui::Link::new()
-							.href("https://aur.archlinux.org/packages/tangram".to_owned())
+							.href("https://aur.archlinux.org/packages/tangram-bin".to_owned())
 							.child("AUR"),
 					)
 					.child(":"),

@@ -15,7 +15,7 @@
 
 @media (min-width: 1200px) {
 	.index-grid {
-		row-gap: 8rem;
+		row-gap: 4rem;
 		padding: 4rem 1rem;
 	}
 }
@@ -86,11 +86,11 @@
 
 .index-video-placeholder {
 	background-color: #282c34;
-	border-radius: var(--border-radius);
 	overflow: hidden;
-	padding-top: calc((1 / (16 / 9)) * 100%);
+	padding-top: calc((1 / (16 / 9)) * 60%);
 	position: relative;
-	width: 100%;
+	margin: 0 auto;
+	width: 60%;
 }
 
 .index-video {

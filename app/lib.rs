@@ -236,15 +236,21 @@ async fn handle(
 			tangram_app_organization_member_server::handle(context, request)
 		}
 		_ => async {
-			if let Some(response) = tangram_serve::serve_from_out_dir!(&request).await? {
-				Ok(response)
-			} else {
-				let response = http::Response::builder()
+			#[cfg(debug_assertions)]
+			let dir = std::path::Path::new(env!("OUT_DIR")).join("output");
+			#[cfg(not(debug_assertions))]
+			let dir = include_out_dir::include_out_dir!("output");
+			#[cfg(debug_assertions)]
+			let response = tangram_serve::dir::serve_from_dir(&dir, &request).await?;
+			#[cfg(not(debug_assertions))]
+			let response = tangram_serve::dir::serve_from_include_out_dir(&dir, &request).await?;
+			let response = response.unwrap_or_else(|| {
+				http::Response::builder()
 					.status(http::StatusCode::NOT_FOUND)
 					.body(hyper::Body::from("not found"))
-					.unwrap();
-				Ok(response)
-			}
+					.unwrap()
+			});
+			Ok(response)
 		}
 		.boxed(),
 	}

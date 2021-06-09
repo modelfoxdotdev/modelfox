@@ -11,55 +11,50 @@
       url = "github:nix-community/fenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    naersk = {
-      url = "github:nmattia/naersk";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
-  outputs = { nixpkgs, flake-utils, fenix, naersk, ... }: flake-utils.lib.eachDefaultSystem (system:
+  outputs = { nixpkgs, flake-utils, fenix, ... }: flake-utils.lib.eachDefaultSystem (system:
     let
       pkgs = import nixpkgs {
         inherit system;
       };
-      rustToolchain = (with fenix.packages.${system};
-        combine [
-          stable.rustc
-          latest.cargo
-          targets.wasm32-unknown-unknown.stable.rust-std
-        ]);
+      rust = (with fenix.packages.${system}; combine [
+        stable.rustc
+        stable.cargo
+        targets.wasm32-unknown-unknown.stable.rust-std
+      ]);
     in rec {
-      defaultPackage = packages.tangram;
-      packages = {
-        tangram = (naersk.lib.${system}.override {
-          rustc = rustToolchain;
-          cargo = rustToolchain;
-        }).buildPackage {
-          pname = "tangram";
-          src = ./.;
-          targets = [ "tangram_cli" ];
-          copySources = [ "." ];
-          buildInputs = with pkgs; [ lld_12 python3 ];
-          CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "${pkgs.lld_12}/bin/lld";
-        };
+      defaultApp = flake-utils.lib.mkApp {
+        drv = defaultPackage;
       };
-      defaultApp = apps.tangram;
-      apps = {
-        tangram = flake-utils.lib.mkApp {
-          drv = packages.tangram;
-        };
+      defaultPackage = (pkgs.makeRustPlatform {
+        inherit rust;
+      }).buildRustPackage {
+        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS = "-C link-arg=-fuse-ld=lld";
+        CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
+        buildInputs = with pkgs; [
+          lld_12
+          python39
+        ];
+        pname = "tangram";
+        src = ./.;
+        cargoSha256 = pkgs.lib.fakeSha256;
       };
       devShell = pkgs.mkShell {
-        LD_LIBRARY_PATH = "${pkgs.stdenv.cc.cc.lib}/lib";
+        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = toString ./. + "/scripts/linker/x86_64-unknown-linux-gnu/clang";
+        CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
         buildInputs = with pkgs; [
+          clang_12
           createrepo_c
           dpkg
           elixir
           go
+          lld_12
           nodejs-16_x
           python39
           rpm
-          rust-cbindgen
           ruby
+          rust
+          rust-cbindgen
           sequoia
           sqlite
         ];

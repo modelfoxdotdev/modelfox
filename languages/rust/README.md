@@ -9,7 +9,7 @@ The Tangram Rust crate makes it easy to make predictions with your Tangram machi
 
 ```toml
 [dependencies]
-tangram = { version = "0.4" }
+tangram = { version = "*" }
 ```
 
 ```rust

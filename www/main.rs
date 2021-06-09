@@ -191,13 +191,20 @@ async fn handle(
 				);
 			}
 		}
-		if let Some(response) = tangram_serve::serve_from_out_dir!(&request).await? {
-			return Ok(response);
-		}
-		let response = http::Response::builder()
-			.status(http::StatusCode::NOT_FOUND)
-			.body(hyper::Body::from("not found"))
-			.unwrap();
+		#[cfg(debug_assertions)]
+		let dir = std::path::Path::new(env!("OUT_DIR")).join("output");
+		#[cfg(not(debug_assertions))]
+		let dir = include_out_dir::include_out_dir!("output");
+		#[cfg(debug_assertions)]
+		let response = tangram_serve::dir::serve_from_dir(&dir, &request).await?;
+		#[cfg(not(debug_assertions))]
+		let response = tangram_serve::dir::serve_from_include_out_dir(&dir, &request).await?;
+		let response = response.unwrap_or_else(|| {
+			http::Response::builder()
+				.status(http::StatusCode::NOT_FOUND)
+				.body(hyper::Body::from("not found"))
+				.unwrap()
+		});
 		Ok(response)
 	}
 	.await

@@ -47,7 +47,6 @@ pub async fn main() {
 	let workspace_dir = std::env::current_dir().unwrap();
 	let ignore_paths = vec![
 		workspace_dir.join("target"),
-		workspace_dir.join("target_wasm"),
 		workspace_dir.join("target_check"),
 		workspace_dir.join("languages"),
 	];

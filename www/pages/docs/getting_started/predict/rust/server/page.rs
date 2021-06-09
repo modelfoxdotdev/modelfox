@@ -64,7 +64,7 @@ impl Component for Install {
 		let code = indoc!(
 			r#"
 				[dependencies]
-				tangram = { version = "0.4" }
+				tangram = { version = "*" }
 			"#
 		);
 		let code = ui::highlight(code, ui::Language::Rust);

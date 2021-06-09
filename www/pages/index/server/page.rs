@@ -31,6 +31,7 @@ impl Component for Page {
 					div()
 						.class("index-grid")
 						.child(Hero::new())
+						.child(Video::new())
 						.child(Train::new())
 						.child(Predict::new())
 						.child(Inspection::new())
@@ -88,11 +89,20 @@ impl Component for Hero {
 	}
 }
 
-// <div class="index-video-placeholder">
-// 	<iframe
-// 		allow_full_screen={true}
-// 		class="index-video"
-// 		src="https://player.vimeo.com/video/385352664"
-// 		title="tangram video">
-// 	</iframe>
-// </div>
+#[derive(ComponentBuilder)]
+struct Video;
+
+impl Component for Video {
+	fn into_node(self) -> Node {
+		div()
+			.class("index-video-placeholder")
+			.child(
+				iframe()
+					.class("index-video")
+					.attribute("allow-full-screen", true)
+					.attribute("src", "https://player.vimeo.com/video/385352664")
+					.title("Tangram Video"),
+			)
+			.into_node()
+	}
+}

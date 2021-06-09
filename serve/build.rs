@@ -9,15 +9,18 @@ pub struct BuildOptions {
 	pub workspace_dir: PathBuf,
 	pub crate_dir: PathBuf,
 	pub crate_out_dir: PathBuf,
-	pub cargo_target_wasm_dir: PathBuf,
 	pub css_dirs: Vec<PathBuf>,
 }
 
 pub fn build(options: BuildOptions) -> Result<()> {
-	let client_release =
-		option_env!("TANGRAM_SERVE_RELEASE") == Some("1") || cfg!(not(debug_assertions));
-	std::fs::create_dir_all(options.crate_out_dir.join("assets")).unwrap();
-	std::fs::create_dir_all(options.crate_out_dir.join("js")).unwrap();
+	let target_wasm_dir = options.crate_out_dir.join("target_wasm");
+	let output_dir = options.crate_out_dir.join("output");
+	let assets_dir = output_dir.join("assets");
+	let js_dir = output_dir.join("js");
+	let profile = std::env::var("PROFILE").unwrap();
+	std::fs::create_dir_all(&output_dir).unwrap();
+	std::fs::create_dir_all(&assets_dir).unwrap();
+	std::fs::create_dir_all(&js_dir).unwrap();
 	// Build client crates.
 	let mut client_crate_manifest_paths = Vec::new();
 	for entry in Walk::new(options.crate_dir.join("pages")) {
@@ -53,12 +56,12 @@ pub fn build(options: BuildOptions) -> Result<()> {
 		let cmd = which("cargo")?;
 		let mut args = vec![
 			"build".to_owned(),
+			"--target-dir".to_owned(),
+			target_wasm_dir.display().to_string(),
 			"--target".to_owned(),
 			"wasm32-unknown-unknown".to_owned(),
-			"--target-dir".to_owned(),
-			options.cargo_target_wasm_dir.to_str().unwrap().to_owned(),
 		];
-		if client_release {
+		if profile == "release" {
 			args.push("--release".to_owned())
 		}
 		for client_crate_package_name in client_crate_package_names.iter() {
@@ -77,14 +80,9 @@ pub fn build(options: BuildOptions) -> Result<()> {
 			let hash = hash(client_crate_package_name);
 			let input_path = format!(
 				"{}/wasm32-unknown-unknown/{}/{}.wasm",
-				options.cargo_target_wasm_dir.to_str().unwrap(),
-				if client_release { "release" } else { "debug" },
-				client_crate_package_name,
+				target_wasm_dir.display(), profile, client_crate_package_name,
 			);
-			let output_path = options
-				.crate_out_dir
-				.join("js")
-				.join(format!("{}_bg.wasm", hash));
+			let output_path = js_dir.join(format!("{}_bg.wasm", hash));
 			// Do not re-run wasm-bindgen if the output wasm exists and is not older than the input wasm.
 			let input_metadata = std::fs::metadata(&input_path).unwrap();
 			let input_modified_time = input_metadata.modified().unwrap();
@@ -97,12 +95,12 @@ pub fn build(options: BuildOptions) -> Result<()> {
 			wasm_bindgen_cli_support::Bindgen::new()
 				.web(true)
 				.unwrap()
-				.keep_debug(!client_release)
+				.keep_debug(profile == "debug")
 				.remove_producers_section(true)
 				.remove_name_section(true)
 				.input_path(input_path)
 				.out_name(&hash)
-				.generate(&options.crate_out_dir.join("js"))
+				.generate(&js_dir)
 				.map_err(|error| err!(error))
 				.unwrap();
 		});
@@ -118,7 +116,7 @@ pub fn build(options: BuildOptions) -> Result<()> {
 			}
 		}
 	}
-	std::fs::write(options.crate_out_dir.join("styles.css"), css).unwrap();
+	std::fs::write(output_dir.join("styles.css"), css).unwrap();
 	// Copy static files.
 	let static_dir = options.crate_dir.join("static");
 	for entry in Walk::new(&static_dir) {
@@ -127,9 +125,7 @@ pub fn build(options: BuildOptions) -> Result<()> {
 		if !input_path.is_file() {
 			continue;
 		}
-		let output_path = options
-			.crate_out_dir
-			.join(input_path.strip_prefix(&static_dir).unwrap());
+		let output_path = output_dir.join(input_path.strip_prefix(&static_dir).unwrap());
 		let input_metadata = std::fs::metadata(&input_path).unwrap();
 		let input_modified_time = input_metadata.modified().unwrap();
 		if let Ok(output_metadata) = std::fs::metadata(&output_path) {
@@ -159,10 +155,7 @@ pub fn build(options: BuildOptions) -> Result<()> {
 		}
 		let asset_path = input_path.strip_prefix(&options.workspace_dir).unwrap();
 		let hash = hash(asset_path.to_str().unwrap().as_bytes());
-		let output_path = options
-			.crate_out_dir
-			.join("assets")
-			.join(&format!("{}.{}", hash, extension));
+		let output_path = assets_dir.join(&format!("{}.{}", hash, extension));
 		let input_metadata = std::fs::metadata(&input_path).unwrap();
 		let input_modified_time = input_metadata.modified().unwrap();
 		if let Ok(output_metadata) = std::fs::metadata(&output_path) {
