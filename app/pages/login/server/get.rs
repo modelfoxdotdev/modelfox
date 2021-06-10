@@ -4,10 +4,8 @@ use std::sync::Arc;
 use tangram_app_common::{error::not_found, Context};
 use tangram_error::Result;
 
-pub async fn get(
-	context: Arc<Context>,
-	request: http::Request<hyper::Body>,
-) -> Result<http::Response<hyper::Body>> {
+pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
+	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}

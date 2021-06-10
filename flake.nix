@@ -21,26 +21,33 @@
         stable.rustc
         stable.cargo
         targets.wasm32-unknown-unknown.stable.rust-std
+        targets.aarch64-apple-darwin.stable.rust-std
+        targets.x86_64-apple-darwin.stable.rust-std
       ]);
     in rec {
       defaultApp = flake-utils.lib.mkApp {
-        drv = defaultPackage;
-      };
-      defaultPackage = (pkgs.makeRustPlatform {
-        inherit rust;
-      }).buildRustPackage {
-        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_RUSTFLAGS = "-C link-arg=-fuse-ld=lld";
-        CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
-        buildInputs = with pkgs; [
-          lld_12
-          python39
-        ];
-        pname = "tangram";
-        src = ./.;
-        cargoSha256 = pkgs.lib.fakeSha256;
+        drv = (pkgs.makeRustPlatform {
+          rustc = rust;
+          cargo = rust;
+        }).buildRustPackage {
+          CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = toString ./. + "/scripts/linker/x86_64-unknown-linux-gnu/clang";
+          CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
+          buildInputs = with pkgs; [
+            clang_12
+            lld_12
+            python39
+          ];
+          pname = "tangram";
+          src = ./.;
+          cargoSha256 = pkgs.lib.fakeSha256;
+        };
       };
       devShell = pkgs.mkShell {
-        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = toString ./. + "/scripts/linker/x86_64-unknown-linux-gnu/clang";
+        # AR_x86_64_apple_darwin = toString ./. + "/scripts/zar";
+        # CC_x86_64_apple_darwin = toString ./. + "/scripts/zcc";
+        # CXX_x86_64_apple_darwin = toString ./. + "/scripts/zxx";
+        # CARGO_TARGET_X86_64_APPLE_DARWIN_LINKER = toString ./. + "/scripts/zcc";
+        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = toString ./. + "/scripts/clang";
         CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
         buildInputs = with pkgs; [
           clang_12
@@ -57,6 +64,7 @@
           rust-cbindgen
           sequoia
           sqlite
+          zig
         ];
       };
     }

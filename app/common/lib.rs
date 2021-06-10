@@ -19,9 +19,11 @@ pub struct Context {
 	pub options: self::options::Options,
 	pub smtp_transport: Option<lettre::AsyncSmtpTransport<lettre::Tokio1Executor>>,
 	pub storage: self::storage::Storage,
+	pub include_out_dir: Option<include_out_dir::IncludeOutDir>,
 }
 
-pub type HandleOutput = Pin<Box<dyn Send + Future<Output = Result<http::Response<hyper::Body>>>>>;
+pub type HandleOutput<'a> =
+	Pin<Box<dyn 'a + Send + Future<Output = Result<http::Response<hyper::Body>>>>>;
 
 pub fn path_components(request: &http::Request<hyper::Body>) -> Vec<&str> {
 	request.uri().path().split('/').skip(1).collect::<Vec<_>>()

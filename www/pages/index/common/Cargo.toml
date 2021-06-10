@@ -8,9 +8,7 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
-log = "0.4"
 tangram_ui = { path = "../../../../ui" }
-indoc = "1"
 num = "0.4"
 pinwheel = { path = "../../../../pinwheel" }
 serde = { version = "1", features = ["derive"] }

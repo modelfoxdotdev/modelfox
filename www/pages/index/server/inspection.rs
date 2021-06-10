@@ -51,9 +51,9 @@ impl Component for Inspection {
 				.value_b_title("Training".to_owned()),
 		);
 		let pr = div().style(style::GRID_AREA, "pr").child(
-			ui::Card::new().child(
+			ui::Card::new().child(Dehydrate::new(
+				"pr-curve",
 				LineChart::new()
-					.id("pr-curve".to_owned())
 					.series(Some(pr_chart_series))
 					.title("PR Curve".to_owned())
 					.x_axis_title("Precision".to_owned())
@@ -62,12 +62,12 @@ impl Component for Inspection {
 					.y_axis_title("Recall".to_owned())
 					.y_max(Some(Finite::new(1.0).unwrap()))
 					.y_min(Some(Finite::new(0.0).unwrap())),
-			),
+			)),
 		);
 		let roc = div().style(style::GRID_AREA, "roc").child(
-			ui::Card::new().child(
+			ui::Card::new().child(Dehydrate::new(
+				"roc-curve",
 				LineChart::new()
-					.id("roc-curve".to_owned())
 					.x_max(Some(Finite::new(1.0).unwrap()))
 					.x_min(Some(Finite::new(0.0).unwrap()))
 					.y_max(Some(Finite::new(1.0).unwrap()))
@@ -76,7 +76,7 @@ impl Component for Inspection {
 					.title("ROC Curve".to_owned())
 					.x_axis_title("FPR".to_owned())
 					.y_axis_title("TPR".to_owned()),
-			),
+			)),
 		);
 		let right = ui::Window::new().child(
 			div()

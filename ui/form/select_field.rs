@@ -21,8 +21,11 @@ pub struct SelectField {
 	pub required: Option<bool>,
 	#[optional]
 	pub value: Option<String>,
+	#[optional]
+	pub on_change: Option<Box<dyn Fn(String)>>,
 }
 
+#[derive(Clone)]
 pub struct SelectFieldOption {
 	pub text: String,
 	pub value: String,
@@ -33,6 +36,20 @@ impl Component for SelectField {
 		let options = self.options.unwrap_or_else(Vec::new);
 		let value = self.value;
 		let autocomplete = value.as_ref().map(|_| "off".to_owned());
+		let oninput = {
+			let on_change = self.on_change;
+			move |event: dom::InputEvent| {
+				let current_target = event
+					.current_target()
+					.unwrap()
+					.dyn_into::<dom::HtmlSelectElement>()
+					.unwrap();
+				let value = current_target.value();
+				if let Some(on_change) = on_change.as_ref() {
+					on_change(value);
+				}
+			}
+		};
 		FieldLabel::new(None)
 			.child(self.label)
 			.child(
@@ -44,6 +61,7 @@ impl Component for SelectField {
 					.attribute("name", self.name)
 					.attribute("placeholder", self.placeholder)
 					.attribute("required", self.required)
+					.oninput(oninput)
 					.children(options.iter().map(|option| {
 						let selected = value
 							.as_ref()

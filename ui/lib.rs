@@ -52,4 +52,5 @@ pub use self::token::*;
 pub use self::topbar::*;
 pub use self::window::*;
 
+pub use indoc::{formatdoc, indoc as doc};
 pub use tangram_number_formatter::*;

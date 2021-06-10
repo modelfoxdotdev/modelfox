@@ -35,9 +35,10 @@ impl Component for Tuning {
 			.position(|metrics| (metrics.threshold - default_threshold).abs() < std::f32::EPSILON)
 			.unwrap();
 		let selected_index: Mutable<usize> = Mutable::new(baseline_index);
-		let on_change: Box<dyn Fn(f32)> = {
+		let on_change = {
 			clone!(selected_index);
 			Box::new(move |value: f32| selected_index.set(value.to_usize().unwrap()))
+				as Box<dyn Fn(_)>
 		};
 		let tooltip_number_formatter: Box<dyn Fn(f32) -> String> = {
 			clone!(metrics);

@@ -61,6 +61,17 @@ impl Element {
 		}
 	}
 
+	pub fn future<F>(mut self, f: impl FnOnce(&Element) -> F) -> Element
+	where
+		F: 'static + Future<Output = ()>,
+	{
+		let (future, handle) = abortable(f(&self));
+		spawn_local(future.map(|_| ()));
+		let handle = Handle(handle);
+		self.handles.push(handle);
+		self
+	}
+
 	pub fn attribute<T>(self, name: impl Into<Cow<'static, str>>, value: T) -> Element
 	where
 		T: IntoAttributeValue,
@@ -259,6 +270,10 @@ impl Element {
 		self.element.set_inner_html(html.0.as_ref());
 		self.children.clear();
 		self
+	}
+
+	pub fn dom_element(&self) -> dom::Element {
+		self.element.clone()
 	}
 }
 

@@ -37,14 +37,14 @@ impl ChartImpl for FeatureContributionsChart {
 }
 
 /// These are the options for displaying a feature contributions chart.
-#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct FeatureContributionsChartOptions {
 	pub include_x_axis_title: Option<bool>,
 	pub include_y_axis_labels: Option<bool>,
 	pub include_y_axis_title: Option<bool>,
-	pub negative_color: String,
+	pub negative_color: Option<String>,
 	pub number_formatter: NumberFormatter,
-	pub positive_color: String,
+	pub positive_color: Option<String>,
 	pub series: Vec<FeatureContributionsChartSeries>,
 }
 
@@ -113,6 +113,12 @@ fn draw_feature_contributions_chart(
 	let include_x_axis_title = include_x_axis_title.unwrap_or(false);
 	let include_y_axis_labels = include_y_axis_labels.unwrap_or(false);
 	let include_y_axis_title = include_y_axis_title.unwrap_or(false);
+	let negative_color = negative_color
+		.as_deref()
+		.unwrap_or(chart_config.feature_contributions_default_negative_color);
+	let positive_color = positive_color
+		.as_deref()
+		.unwrap_or(chart_config.feature_contributions_default_positive_color);
 
 	let canvas = ctx.canvas().unwrap();
 	let height = canvas.client_height().to_f64().unwrap();

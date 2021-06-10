@@ -1,8 +1,4 @@
 use pinwheel::prelude::*;
-use tangram_charts::{
-	bar_chart::BarChart, box_chart::BoxChart, components::hydrate_chart,
-	feature_contributions_chart::FeatureContributionsChart, line_chart::LineChart,
-};
 use tangram_ui as ui;
 use wasm_bindgen::prelude::*;
 
@@ -11,12 +7,12 @@ pub fn start() {
 	console_error_panic_hook::set_once();
 	tracing_wasm::set_as_global_default();
 	ui::boot_code_select();
-	hydrate_chart::<LineChart>("pr-curve");
-	hydrate_chart::<LineChart>("roc-curve");
-	hydrate_chart::<FeatureContributionsChart>("production-explanations");
-	hydrate_chart::<BarChart>("production-stats-enum");
-	hydrate_chart::<BoxChart>("production-stats-number");
-	hydrate_chart::<LineChart>("production-accuracy");
-	hydrate_chart::<LineChart>("production-precision");
+	hydrate::<tangram_charts::components::LineChart>("pr-curve");
+	hydrate::<tangram_charts::components::LineChart>("roc-curve");
+	hydrate::<tangram_charts::components::FeatureContributionsChart>("production-explanations");
+	hydrate::<tangram_charts::components::BarChart>("production-stats-enum");
+	hydrate::<tangram_charts::components::BoxChart>("production-stats-number");
+	hydrate::<tangram_charts::components::LineChart>("production-accuracy");
+	hydrate::<tangram_charts::components::LineChart>("production-precision");
 	hydrate::<tangram_www_index_common::tuning::Tuning>("tuning");
 }

@@ -1,7 +1,4 @@
-use tangram_charts::{
-	bar_chart::BarChart, box_chart::BoxChart, components::hydrate_chart,
-	feature_contributions_chart::FeatureContributionsChart,
-};
+use pinwheel::prelude::*;
 use wasm_bindgen::{self, prelude::*, JsCast};
 use web_sys as dom;
 
@@ -11,7 +8,7 @@ pub fn start() {
 	let window = dom::window().unwrap();
 	let document = window.document().unwrap();
 	let bar_charts_query = document
-		.query_selector_all(".column-chart[data-chart-type='bar']")
+		.query_selector_all("[data-chart-type='bar']")
 		.unwrap();
 	for index in 0..bar_charts_query.length() {
 		let item = bar_charts_query
@@ -19,10 +16,10 @@ pub fn start() {
 			.unwrap()
 			.dyn_into::<dom::Element>()
 			.unwrap();
-		hydrate_chart::<BarChart>(&item.id());
+		hydrate::<tangram_charts::components::BarChart>(&item.id());
 	}
 	let box_charts_query = document
-		.query_selector_all(".column-chart[data-chart-type='box']")
+		.query_selector_all("[data-chart-type='box']")
 		.unwrap();
 	for index in 0..box_charts_query.length() {
 		let item = box_charts_query
@@ -30,28 +27,32 @@ pub fn start() {
 			.unwrap()
 			.dyn_into::<dom::Element>()
 			.unwrap();
-		hydrate_chart::<BoxChart>(&item.id());
+		hydrate::<tangram_charts::components::BoxChart>(&item.id());
 	}
 	if document.get_element_by_id("probabilities").is_some() {
-		hydrate_chart::<BarChart>("probabilities")
+		hydrate::<tangram_charts::components::BarChart>("probabilities")
 	}
 	if document
 		.get_element_by_id("regression_feature_contributions")
 		.is_some()
 	{
-		hydrate_chart::<FeatureContributionsChart>("regression_feature_contributions")
+		hydrate::<tangram_charts::components::FeatureContributionsChart>(
+			"regression_feature_contributions",
+		)
 	}
 	if document
 		.get_element_by_id("binary_classification_feature_contributions")
 		.is_some()
 	{
-		hydrate_chart::<FeatureContributionsChart>("binary_classification_feature_contributions")
+		hydrate::<tangram_charts::components::FeatureContributionsChart>(
+			"binary_classification_feature_contributions",
+		)
 	}
 	if document
 		.get_element_by_id("multiclass_classification_feature_contributions")
 		.is_some()
 	{
-		hydrate_chart::<FeatureContributionsChart>(
+		hydrate::<tangram_charts::components::FeatureContributionsChart>(
 			"multiclass_classification_feature_contributions",
 		)
 	}

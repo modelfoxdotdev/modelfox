@@ -13,13 +13,15 @@ where
 	chart_colors: Option<ChartColors>,
 	chart_config: Option<ChartConfig>,
 	color_scheme_media_query: Option<dom::MediaQueryList>,
-	container: dom::HtmlElement,
+	container: dom::HtmlDivElement,
 	hover_regions: Option<Vec<HoverRegion<T::HoverRegionInfo>>>,
+	intersection_callback: Option<Closure<dyn Fn(JsValue, dom::IntersectionObserver)>>,
+	intersection_observer: Option<dom::IntersectionObserver>,
 	on_color_scheme_media_query_change: Option<Closure<dyn Fn()>>,
 	on_mouse_event: Option<Closure<dyn Fn(dom::MouseEvent)>>,
 	on_resize: Option<Closure<dyn Fn()>>,
 	on_touch_event: Option<Closure<dyn Fn(dom::TouchEvent)>>,
-	options: Option<T::Options>,
+	options: T::Options,
 	overlay_canvas: dom::HtmlCanvasElement,
 	overlay_div: dom::HtmlElement,
 	overlay_info: Option<T::OverlayInfo>,
@@ -87,7 +89,7 @@ impl<T> Chart<T>
 where
 	T: ChartImpl,
 {
-	pub fn new(container: dom::HtmlElement) -> Rc<RefCell<Chart<T>>> {
+	pub fn new(container: dom::HtmlDivElement, options: T::Options) -> Rc<RefCell<Chart<T>>> {
 		// Create the chart canvas, overlay div (for tooltips), and overlay canvas (for crosshairs).
 		let window = dom::window().unwrap();
 		let document = window.document().unwrap();
@@ -149,15 +151,32 @@ where
 			color_scheme_media_query: None,
 			container,
 			hover_regions: None,
+			intersection_callback: None,
+			intersection_observer: None,
 			on_color_scheme_media_query_change: None,
 			on_mouse_event: None,
 			on_resize: None,
 			on_touch_event: None,
-			options: None,
+			options,
 			overlay_canvas,
 			overlay_div,
 			overlay_info: None,
 		}));
+		// Add the intersection observer.
+		let chart_ref = Rc::downgrade(&chart);
+		let intersection_callback = Closure::<dyn Fn(_, _)>::wrap(Box::new(move |_, _| {
+			let chart = chart_ref.upgrade().unwrap();
+			let mut chart = chart.borrow_mut();
+			chart.draw_chart();
+			chart.draw_overlay();
+			chart.intersection_observer.take().unwrap().disconnect();
+			chart.intersection_callback.take().unwrap();
+		}));
+		let intersection_observer =
+			dom::IntersectionObserver::new(intersection_callback.as_ref().unchecked_ref()).unwrap();
+		intersection_observer.observe(&chart.borrow().container);
+		chart.borrow_mut().intersection_callback = Some(intersection_callback);
+		chart.borrow_mut().intersection_observer = Some(intersection_observer);
 		// Add the mouse move handler.
 		let chart_ref = Rc::downgrade(&chart);
 		let on_mouse_event = Closure::<dyn Fn(_)>::wrap(Box::new(move |event: dom::MouseEvent| {
@@ -239,6 +258,12 @@ where
 		chart
 	}
 
+	pub fn update(&mut self, options: T::Options) {
+		self.options = options;
+		self.draw_chart();
+		self.draw_overlay();
+	}
+
 	fn draw_chart(&mut self) {
 		let width = self.container.client_width().to_f64().unwrap();
 		let height = self.container.client_height().to_f64().unwrap();
@@ -281,7 +306,7 @@ where
 			chart_colors: self.chart_colors.as_ref().unwrap(),
 			chart_config: self.chart_config.as_ref().unwrap(),
 			ctx: &ctx,
-			options: self.options.as_mut().unwrap(),
+			options: &mut self.options,
 		});
 		self.hover_regions = Some(output.hover_regions);
 		self.overlay_info = Some(output.overlay_info);
@@ -334,16 +359,10 @@ where
 			chart_colors: &self.chart_colors.as_ref().unwrap(),
 			chart_config: &self.chart_config.as_ref().unwrap(),
 			ctx: &ctx,
-			options: self.options.as_ref().unwrap(),
+			options: &self.options,
 			overlay_info: self.overlay_info.as_ref().unwrap(),
 			overlay_div: &self.overlay_div,
 		});
-	}
-
-	pub fn draw(&mut self, options: T::Options) {
-		self.options = Some(options);
-		self.draw_chart();
-		self.draw_overlay();
 	}
 
 	fn update_active_hover_regions(&mut self, x: f64, y: f64) {

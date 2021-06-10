@@ -13,10 +13,8 @@ struct Action {
 	name: String,
 }
 
-pub async fn post(
-	context: Arc<Context>,
-	mut request: http::Request<hyper::Body>,
-) -> Result<http::Response<hyper::Body>> {
+pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
+	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	let organization_id =
 		if let ["organizations", organization_id, "edit"] = *path_components(&request).as_slice() {
 			organization_id.to_owned()

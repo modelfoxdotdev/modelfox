@@ -1,4 +1,3 @@
-use indoc::indoc;
 use pinwheel::prelude::*;
 use tangram_app_production_stats_column_server::{
 	EnumColumnInvalidValuesSection, EnumColumnOverallHistogramEntry, EnumColumnStatsSection,
@@ -20,26 +19,23 @@ use tangram_www_layouts::{
 };
 
 #[derive(ComponentBuilder)]
-pub struct Page {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Page;
 
 impl Component for Page {
 	fn into_node(self) -> Node {
 		let p1 = ui::P::new()
-			.child("Once our model is deployed, we want to make sure that it performs as well in production as it did in training. We can opt in to logging predictions by calling ")
+			.child("Once our model is deployed, we want to make sure that it performs as well in production as it did in training. We can opt in to logging by calling ")
 			.child(ui::InlineCode::new().child("logPrediction"))
 			.child(". Later on, as we get official diagnoses for patients, we can call ")
 			.child(ui::InlineCode::new().child("logTrueValue"))
 			.child(" and use the same identifier as we used in the call to ")
 			.child(ui::InlineCode::new().child("logPrediction"))
 			.child(".");
-		let p2 = ui::P::new().child("Back in the app, we can look up a prediction by its identifier, and get an explanation which shows how each feature affects the output.");
-		let p3 = ui::P::new().child("Now let's see how accurate our model has been in production. Lets open the app and view 'Production Metrics'");
-		let p4 = ui::P::new().child("Uh oh! It's a bit lower than we expected. Let's try to find the cause. Under 'Production Stats', we see that the 'chest_pain' column has an alert and a high unknown values count. Click on the column to view more details.");
-		let p5 = ui::P::new().child("It looks like there is a large discrepancy between the value 'asymptomatic' in production versus training. In the table below, we see a high number of invalid values with the string 'asx'. It looks like we are accidentally using the string 'asx' in our code instead of 'asymptomatic' for the chest pain column. We can update our code to use the correct value and follow the metrics going forward to confirm they bounce back.");
-		let p6 = ui::P::new().child("Hooray! We have made it to the end of the getting started guide! In this guide, we learned how to train a model, make predictions from our code, tune our model, and monitor it in production. If you're still unsure of you how want to use Tangram for your own datasets, reach out to us! We are happy to help.");
+		let p2 = ui::P::new().child("Back in the app, we can look up a prediction by its identifier, and get an explanation that shows how each feature affects the output.");
+		let p3 = ui::P::new().child("Now let's see how accurate our model has been in production. Let's open the app and choose Production Metrics in the sidebar.");
+		let p4 = ui::P::new().child(r#"Uh oh! It's a bit lower than we expected. Let's try to find the cause. Under "Production Stats", we see that the "chest_pain" column has an alert and a high invalid values count. Click on the column to view more details."#);
+		let p5 = ui::P::new().child(r#"It looks like there is a large discrepancy between the value "asymptomatic" in production versus training. In the table below, we see a high number of invalid values with the string "asx". It looks like we are accidentally using the string "asx" in our code instead of "asymptomatic" for the chest pain column. We can update our code to use the correct value and follow the metrics going forward to confirm they bounce back."#);
+		let p6 = ui::Markdown::new("Hooray! You made it to the end! In this guide, we learned how to train a model, make predictions from our code, tune our model, and monitor it in production. If you want help using Tangram with your own data, send us an email at [hello@tangram.xyz](mailto:hello@tangram.xyz) or join us on [discord](https://discord.gg/7MjcvRQr).");
 		let section = ui::S2::new()
 			.child(p1)
 			.child(Log::new())
@@ -84,7 +80,7 @@ pub struct Log {
 impl Component for Log {
 	fn into_node(self) -> Node {
 		let code_for_language = ui::highlight_code_for_language(ui::CodeForLanguage {
-			elixir: indoc!(
+			elixir: ui::doc!(
 				r#"
 					# Log the prediction.
 					Tangram.log_prediction(model, %Tangram.LogPredictionArgs{
@@ -101,7 +97,7 @@ impl Component for Log {
 					})
 				"#
 			).into(),
-			go: indoc!(
+			go: ui::doc!(
 				r#"
 					// Log the prediction.
 					err = model.LogPrediction(tangram.LogPredictionArgs{
@@ -124,7 +120,7 @@ impl Component for Log {
 					}
 			"#
 			).into(),
-			javascript: indoc!(
+			javascript: ui::doc!(
 				r#"
 					// Log the prediction.
 					model.logPrediction({
@@ -141,7 +137,7 @@ impl Component for Log {
 					})
 				"#
 			).into(),
-			python: indoc!(
+			python: ui::doc!(
 				r#"
 					# Log the prediction.
 					model.log_prediction(
@@ -158,7 +154,7 @@ impl Component for Log {
 					)
 				"#
 			).into(),
-			ruby: indoc!(
+			ruby: ui::doc!(
 				r#"
 					# Log the prediction.
 					model.log_prediction(
@@ -175,7 +171,7 @@ impl Component for Log {
 					)
 				"#
 			).into(),
-			rust: indoc!(
+			rust: ui::doc!(
 				r#"
 					// Log the prediction.
 					model.log_prediction(tangram::LogPredictionArgs {
@@ -194,10 +190,7 @@ impl Component for Log {
 			).into(),
 		});
 		ui::Window::new()
-			.child(
-				ui::CodeSelect::new("prediction-threshold", code_for_language)
-					.hide_line_numbers(false),
-			)
+			.child(ui::CodeSelect::new(code_for_language).hide_line_numbers(false))
 			.into_node()
 	}
 }
@@ -534,12 +527,13 @@ impl Component for ProductionExplanations {
 			],
 			..Default::default()
 		}];
-		let feature_contributions_chart = FeatureContributionsChart::new(
-			ui::colors::RED.to_owned(),
-			ui::colors::GREEN.to_owned(),
-			feature_contributions_chart_data,
-		)
-		.id("production-explanations".to_owned());
+		let feature_contributions_chart = Dehydrate::new(
+			"production-explanations",
+			FeatureContributionsChart::new()
+				.series(feature_contributions_chart_data)
+				.negative_color(ui::colors::RED.to_owned())
+				.positive_color(ui::colors::GREEN.to_owned()),
+		);
 		ui::Window::new()
 			.child(
 				ui::S1::new()

@@ -23,7 +23,7 @@ use web_sys as dom;
 
 pub struct LineChart;
 
-#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct LineChartOptions {
 	pub hide_legend: Option<bool>,
 	pub labels: Option<Vec<String>>,

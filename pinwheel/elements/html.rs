@@ -167,6 +167,7 @@ element!(
 	/// The HTML Content Division element (`<div>`) is the generic container for flow content. It has no effect on the content or layout until styled in some way using CSS (e.g. styling is directly applied to it, or some kind of layout model like Flexbox is applied to its parent element).
 	namespace = "html",
 	tag = "div",
+	element = web_sys::HtmlDivElement,
 );
 
 element!(
@@ -772,6 +773,10 @@ element!(
 	/// The HTML `<select>` element represents a control that provides a menu of options
 	namespace = "html",
 	tag = "select",
+	events = {
+		change: InputEvent,
+		input: InputEvent,
+	},
 );
 
 element!(

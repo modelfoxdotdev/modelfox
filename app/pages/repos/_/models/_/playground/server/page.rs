@@ -167,15 +167,16 @@ impl Component for NumberField {
 					),
 			)
 			.child(
-				div().class("predict-column-chart-wrapper").child(
-					BoxChart::new()
-						.class("column-chart".to_owned())
-						.hide_legend(Some(true))
-						.id(Some(self.name))
-						.series(Some(column_chart_series))
-						.should_draw_x_axis_labels(Some(false))
-						.should_draw_y_axis_labels(Some(false)),
-				),
+				div()
+					.class("predict-column-chart-wrapper")
+					.child(Dehydrate::new(
+						self.name,
+						BoxChart::new()
+							.hide_legend(Some(true))
+							.series(Some(column_chart_series))
+							.should_draw_x_axis_labels(Some(false))
+							.should_draw_y_axis_labels(Some(false)),
+					)),
 			)
 			.into_node()
 	}
@@ -231,15 +232,16 @@ impl Component for EnumField {
 					),
 			)
 			.child(
-				div().class("predict-column-chart-wrapper").child(
-					BarChart::new()
-						.class("column-chart".to_owned())
-						.hide_legend(Some(true))
-						.id(Some(self.name))
-						.series(Some(series))
-						.should_draw_x_axis_labels(Some(false))
-						.should_draw_y_axis_labels(Some(false)),
-				),
+				div()
+					.class("predict-column-chart-wrapper")
+					.child(Dehydrate::new(
+						self.name,
+						BarChart::new()
+							.hide_legend(Some(true))
+							.series(Some(series))
+							.should_draw_x_axis_labels(Some(false))
+							.should_draw_y_axis_labels(Some(false)),
+					)),
 			)
 			.into_node()
 	}

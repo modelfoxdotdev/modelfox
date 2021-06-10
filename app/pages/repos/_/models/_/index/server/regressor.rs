@@ -81,15 +81,15 @@ impl Component for RegressorMetricsSection {
 					.number_formatter(ui::NumberFormatter::Float(Default::default())),
 			)
 			.child(losses_chart_series.map(|losses_chart_series| {
-				ui::Card::new().child(
+				ui::Card::new().child(Dehydrate::new(
+					"loss",
 					LineChart::new()
-						.id("loss".to_owned())
 						.series(Some(losses_chart_series))
 						.title("Training Loss By Round or Epoch".to_owned())
 						.x_axis_title("Round or Epoch".to_owned())
 						.y_axis_title("Loss".to_owned())
 						.y_min(Some(Finite::new(0.0).unwrap())),
-				)
+				))
 			}))
 			.into_node()
 	}

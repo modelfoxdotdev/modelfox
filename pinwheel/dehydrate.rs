@@ -1,10 +1,11 @@
 use crate::prelude::*;
+use std::borrow::Cow;
 
 pub struct Dehydrate<T>
 where
 	T: Component + serde::Serialize + serde::de::DeserializeOwned,
 {
-	id: &'static str,
+	id: Cow<'static, str>,
 	component: T,
 }
 
@@ -12,8 +13,11 @@ impl<T> Dehydrate<T>
 where
 	T: Component + serde::Serialize + serde::de::DeserializeOwned,
 {
-	pub fn new(id: &'static str, component: T) -> Dehydrate<T> {
-		Dehydrate { id, component }
+	pub fn new(id: impl Into<Cow<'static, str>>, component: T) -> Dehydrate<T> {
+		Dehydrate {
+			id: id.into(),
+			component,
+		}
 	}
 }
 

@@ -1,4 +1,3 @@
-use indoc::formatdoc;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use std::borrow::Cow;
@@ -81,7 +80,7 @@ impl Component for Tuning {
 		let code = {
 			clone!(threshold_metrics);
 			selected_index.signal().map(move |i| {
-				formatdoc!(
+				ui::formatdoc!(
 					r#"
 						// Update your code to use the selected threshold.
 						model.predict(input, {{ threshold: {:.2} }})

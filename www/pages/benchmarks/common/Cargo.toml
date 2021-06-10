@@ -1,0 +1,16 @@
+[package]
+edition = "2018"
+name = "tangram_www_benchmarks_common"
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+futures-signals = "0.3"
+num = "0.4"
+pinwheel = { path = "../../../../pinwheel" }
+serde = { version = "1", features = ["derive"] }
+tangram_ui = { path = "../../../../ui" }
+tangram_charts = { path = "../../../../charts" }
+tracing = "0.1"

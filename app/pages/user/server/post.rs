@@ -13,10 +13,8 @@ enum Action {
 	Logout,
 }
 
-pub async fn post(
-	context: Arc<Context>,
-	mut request: http::Request<hyper::Body>,
-) -> Result<http::Response<hyper::Body>> {
+pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
+	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}

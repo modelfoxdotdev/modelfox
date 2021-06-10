@@ -98,9 +98,9 @@ impl Component for FeatureImportancesChart {
 		}];
 		let n_feature_importances_to_show_in_chart = self.values.len();
 		ui::Card::new()
-			.child(
+			.child(Dehydrate::new(
+				"feature_importances",
 				BarChart::new()
-					.id("feature_importances".to_owned())
 					.series(Some(bar_chart_series))
 					.title(Some(format!(
 						"Feature Importances for Top {} Features",
@@ -109,7 +109,7 @@ impl Component for FeatureImportancesChart {
 					.x_axis_title("Feature Name".to_owned())
 					.y_axis_title("Feature Importance Value".to_owned())
 					.y_min(Some(0.0)),
-			)
+			))
 			.into_node()
 	}
 }

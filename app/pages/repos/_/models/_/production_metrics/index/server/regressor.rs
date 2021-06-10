@@ -107,9 +107,9 @@ impl Component for RegressorProductionMetrics {
 							.child(" true values for this date range."),
 					)
 					.child(
-						ui::Card::new().child(
+						ui::Card::new().child(Dehydrate::new(
+							"mse",
 							LineChart::new()
-								.id("mse".to_owned())
 								.labels(Some(mse_chart_labels))
 								.series(Some(mse_series))
 								.title(Some(mse_chart_title))
@@ -119,7 +119,7 @@ impl Component for RegressorProductionMetrics {
 								}))
 								.y_max(Some(Finite::new(1.0).unwrap()))
 								.y_min(Some(Finite::new(0.0).unwrap())),
-						),
+						)),
 					)
 					.child(MetricsRow::new().child(ui::NumberCard::new(
 						"True Value Count".to_owned(),

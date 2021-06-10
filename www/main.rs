@@ -42,7 +42,14 @@ async fn main() -> Result<()> {
 				None
 			};
 			let port = port_from_env.unwrap_or(8080);
-			let context = Context { route_map };
+			#[cfg(debug_assertions)]
+			let include_out_dir = None;
+			#[cfg(not(debug_assertions))]
+			let include_out_dir = Some(include_out_dir::include_out_dir!("output"));
+			let context = Context {
+				route_map,
+				include_out_dir,
+			};
 			let context_layer = AddExtensionLayer::new(Arc::new(context));
 			let request_id_layer = RequestIdLayer::new();
 			let trace_layer = TraceLayer::new_for_http()
@@ -169,12 +176,13 @@ fn route_map() -> RouteMap {
 
 struct Context {
 	route_map: RouteMap,
+	include_out_dir: Option<include_out_dir::IncludeOutDir>,
 }
 
 async fn handle(
 	request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>, http::Error> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap();
+	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	let method = request.method().clone();
 	let uri = request.uri().clone();
 	let path_and_query = uri.path_and_query().unwrap();
@@ -191,14 +199,19 @@ async fn handle(
 				);
 			}
 		}
-		#[cfg(debug_assertions)]
-		let dir = std::path::Path::new(env!("OUT_DIR")).join("output");
-		#[cfg(not(debug_assertions))]
-		let dir = include_out_dir::include_out_dir!("output");
-		#[cfg(debug_assertions)]
-		let response = tangram_serve::dir::serve_from_dir(&dir, &request).await?;
-		#[cfg(not(debug_assertions))]
-		let response = tangram_serve::dir::serve_from_include_out_dir(&dir, &request).await?;
+		let response = if cfg!(debug_assertions) {
+			tangram_serve::dir::serve_from_dir(
+				&std::path::Path::new(env!("OUT_DIR")).join("output"),
+				&request,
+			)
+			.await?
+		} else {
+			tangram_serve::dir::serve_from_include_out_dir(
+				context.include_out_dir.as_ref().unwrap(),
+				&request,
+			)
+			.await?
+		};
 		let response = response.unwrap_or_else(|| {
 			http::Response::builder()
 				.status(http::StatusCode::NOT_FOUND)

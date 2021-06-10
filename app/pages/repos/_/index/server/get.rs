@@ -16,10 +16,8 @@ use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
-pub async fn get(
-	context: Arc<Context>,
-	request: http::Request<hyper::Body>,
-) -> Result<http::Response<hyper::Body>> {
+pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
+	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	let repo_id = if let ["repos", repo_id, ""] = *path_components(&request).as_slice() {
 		repo_id.to_owned()
 	} else {

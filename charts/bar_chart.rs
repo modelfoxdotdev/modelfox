@@ -34,7 +34,7 @@ impl ChartImpl for BarChart {
 	}
 }
 
-#[derive(Clone, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct BarChartOptions {
 	pub group_gap: Option<f64>,
 	pub hide_legend: Option<bool>,

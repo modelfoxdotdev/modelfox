@@ -46,7 +46,6 @@ impl Component for Code {
 
 #[derive(ComponentBuilder)]
 pub struct CodeSelect {
-	pub id: String,
 	pub code_for_language: CodeForLanguage,
 	#[optional]
 	pub hide_line_numbers: Option<bool>,

@@ -41,15 +41,14 @@ impl Component for ProductionExplanations {
 		let feature_contributions = div()
 			.style(style::GRID_AREA, "feature-contributions")
 			.child(
-				ui::Card::new().child(
-					FeatureContributionsChart::new(
-						ui::colors::RED.to_owned(),
-						ui::colors::GREEN.to_owned(),
-						series,
-					)
-					.id("production-explanations".to_owned())
-					.include_x_axis_title(Some(true)),
-				),
+				ui::Card::new().child(Dehydrate::new(
+					"production-explanations",
+					FeatureContributionsChart::new()
+						.series(series)
+						.negative_color(ui::colors::RED.to_owned())
+						.positive_color(ui::colors::GREEN.to_owned())
+						.include_x_axis_title(Some(true)),
+				)),
 			);
 		let right = ui::Window::new().child(
 			div()

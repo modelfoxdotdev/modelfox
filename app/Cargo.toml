@@ -14,67 +14,37 @@ tangram_serve = { path = "../serve" }
 
 [features]
 default = [
-  "tangram_app_edit_organization",
-  "tangram_app_index",
-  "tangram_app_login",
-  "tangram_app_model_edit",
-  "tangram_app_model_index",
-  "tangram_app_new_member",
-  "tangram_app_new_model",
-  "tangram_app_new_organization",
-  "tangram_app_new_repo",
-  "tangram_app_organization_index",
-  "tangram_app_organization_member",
-  "tangram_app_playground",
-  "tangram_app_production_class_metrics",
-  "tangram_app_production_metrics_index",
-  "tangram_app_production_prediction",
-  "tangram_app_production_predictions_index",
-  "tangram_app_production_stats_column",
-  "tangram_app_production_stats_index",
-  "tangram_app_repo_edit",
-  "tangram_app_repo_index",
-  "tangram_app_training_class_metrics",
-  "tangram_app_training_grid_index",
-  "tangram_app_training_grid_item",
-  "tangram_app_training_metrics_index",
-  "tangram_app_training_metrics_precision_recall",
-  "tangram_app_training_metrics_roc",
-  "tangram_app_training_stats_column",
-  "tangram_app_training_stats_index",
-  "tangram_app_tuning",
-  "tangram_app_user",
+  "tangram_app_edit_organization_server",
+  "tangram_app_index_server",
+  "tangram_app_login_server",
+  "tangram_app_model_edit_server",
+  "tangram_app_model_index_server", "tangram_app_model_index_client",
+  "tangram_app_new_member_server",
+  "tangram_app_new_model_server", "tangram_app_new_model_client",
+  "tangram_app_new_organization_server",
+  "tangram_app_new_repo_server",
+  "tangram_app_organization_index_server",
+  "tangram_app_organization_member_server",
+  "tangram_app_playground_server", "tangram_app_playground_client",
+  "tangram_app_production_class_metrics_server", "tangram_app_production_class_metrics_client",
+  "tangram_app_production_metrics_index_server", "tangram_app_production_metrics_index_client",
+  "tangram_app_production_prediction_server", "tangram_app_production_prediction_client",
+  "tangram_app_production_predictions_index_server",
+  "tangram_app_production_stats_column_server", "tangram_app_production_stats_column_client",
+  "tangram_app_production_stats_index_server", "tangram_app_production_stats_index_client",
+  "tangram_app_repo_edit_server",
+  "tangram_app_repo_index_server",
+  "tangram_app_training_class_metrics_server", "tangram_app_training_class_metrics_client",
+  "tangram_app_training_grid_index_server",
+  "tangram_app_training_grid_item_server",
+  "tangram_app_training_metrics_index_server",
+  "tangram_app_training_metrics_precision_recall_server", "tangram_app_training_metrics_precision_recall_client",
+  "tangram_app_training_metrics_roc_server", "tangram_app_training_metrics_roc_client",
+  "tangram_app_training_stats_column_server", "tangram_app_training_stats_column_client",
+  "tangram_app_training_stats_index_server",
+  "tangram_app_tuning_server", "tangram_app_tuning_client",
+  "tangram_app_user_server",
 ]
-tangram_app_edit_organization = ["tangram_app_edit_organization_server"]
-tangram_app_index = ["tangram_app_index_server"]
-tangram_app_login = ["tangram_app_login_server"]
-tangram_app_model_edit = ["tangram_app_model_edit_server"]
-tangram_app_model_index = ["tangram_app_model_index_server", "tangram_app_model_index_client"]
-tangram_app_new_member = ["tangram_app_new_member_server"]
-tangram_app_new_model = ["tangram_app_new_model_server", "tangram_app_new_model_client"]
-tangram_app_new_organization = ["tangram_app_new_organization_server"]
-tangram_app_new_repo = ["tangram_app_new_repo_server"]
-tangram_app_organization_index = ["tangram_app_organization_index_server"]
-tangram_app_organization_member = ["tangram_app_organization_member_server"]
-tangram_app_playground = ["tangram_app_playground_server", "tangram_app_playground_client"]
-tangram_app_production_class_metrics = ["tangram_app_production_class_metrics_server", "tangram_app_production_class_metrics_client"]
-tangram_app_production_metrics_index = ["tangram_app_production_metrics_index_server", "tangram_app_production_metrics_index_client"]
-tangram_app_production_prediction = ["tangram_app_production_prediction_server", "tangram_app_production_prediction_client"]
-tangram_app_production_predictions_index = ["tangram_app_production_predictions_index_server"]
-tangram_app_production_stats_column = ["tangram_app_production_stats_column_server", "tangram_app_production_stats_column_client"]
-tangram_app_production_stats_index = ["tangram_app_production_stats_index_server", "tangram_app_production_stats_index_client"]
-tangram_app_repo_edit = ["tangram_app_repo_edit_server"]
-tangram_app_repo_index = ["tangram_app_repo_index_server"]
-tangram_app_training_class_metrics = ["tangram_app_training_class_metrics_server", "tangram_app_training_class_metrics_client"]
-tangram_app_training_grid_index = ["tangram_app_training_grid_index_server"]
-tangram_app_training_grid_item = ["tangram_app_training_grid_item_server"]
-tangram_app_training_metrics_index = ["tangram_app_training_metrics_index_server"]
-tangram_app_training_metrics_precision_recall = ["tangram_app_training_metrics_precision_recall_server", "tangram_app_training_metrics_precision_recall_client"]
-tangram_app_training_metrics_roc = ["tangram_app_training_metrics_roc_server", "tangram_app_training_metrics_roc_client"]
-tangram_app_training_stats_column = ["tangram_app_training_stats_column_server", "tangram_app_training_stats_column_client"]
-tangram_app_training_stats_index = ["tangram_app_training_stats_index_server"]
-tangram_app_tuning = ["tangram_app_tuning_server", "tangram_app_tuning_client"]
-tangram_app_user = ["tangram_app_user_server"]
 
 [dependencies]
 backtrace = "0.3"

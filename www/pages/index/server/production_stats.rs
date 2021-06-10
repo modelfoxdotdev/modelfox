@@ -109,28 +109,28 @@ impl Component for ProductionStats {
 			.style(style::GRID_AREA, "number-alert")
 			.child(ui::Alert::new(ui::Level::Success).child("All Good"));
 		let number_chart = div().style(style::GRID_AREA, "number").child(
-			ui::Card::new().child(
+			ui::Card::new().child(Dehydrate::new(
+				"production-stats-number",
 				BoxChart::new()
-					.id("production-stats-number".to_owned())
 					.series(Some(box_chart_series))
 					.title("exercise_max_heart_rate".to_owned())
 					.should_draw_x_axis_labels(Some(false)),
-			),
+			)),
 		);
 		let enum_alert = div()
 			.style(style::GRID_AREA, "enum-alert")
 			.child(ui::Alert::new(ui::Level::Warning).child("High Invalid Count"));
 		let enum_chart = div().style(style::GRID_AREA, "enum").child(
-			ui::Card::new().child(
+			ui::Card::new().child(Dehydrate::new(
+				"production-stats-enum",
 				BarChart::new()
-					.id("production-stats-enum".to_owned())
 					.series(Some(bar_chart_series))
 					.title("chest_pain".to_owned())
 					.x_axis_title("chest_pain".to_owned())
 					.y_axis_title("Percent".to_owned())
 					.y_max(Some(1.0))
 					.y_min(Some(0.0)),
-			),
+			)),
 		);
 		let right = ui::Window::new().child(
 			div()

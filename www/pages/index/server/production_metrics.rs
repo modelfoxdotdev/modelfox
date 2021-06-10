@@ -262,28 +262,28 @@ impl Component for ProductionMetrics {
 			.child(div().class("index-step-title").child("Monitor metrics."))
 			.child(div().class("index-step-text").child(text));
 		let accuracy = div().style(style::GRID_AREA, "accuracy").child(
-			ui::Card::new().child(
+			ui::Card::new().child(Dehydrate::new(
+				"production-accuracy",
 				LineChart::new()
-					.id("production-accuracy".to_owned())
 					.labels(Some(month_labels.clone()))
 					.series(Some(accuracy_data))
 					.title("Monthly Accuracy".to_owned())
 					.x_axis_grid_line_interval(Some(GridLineInterval { k: 1.0, p: 0.0 }))
 					.y_max(Some(Finite::new(1.0).unwrap()))
 					.y_min(Some(Finite::new(0.0).unwrap())),
-			),
+			)),
 		);
 		let precision = div().style(style::GRID_AREA, "precision").child(
-			ui::Card::new().child(
+			ui::Card::new().child(Dehydrate::new(
+				"production-precision",
 				LineChart::new()
-					.id("production-precision".to_owned())
 					.labels(Some(month_labels))
 					.series(Some(precision_data))
 					.title("Monthly Precision".to_owned())
 					.x_axis_grid_line_interval(Some(GridLineInterval { k: 1.0, p: 0.0 }))
 					.y_max(Some(Finite::new(1.0).unwrap()))
 					.y_min(Some(Finite::new(0.0).unwrap())),
-			),
+			)),
 		);
 		let right = ui::Window::new().child(
 			div()

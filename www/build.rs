@@ -12,6 +12,7 @@ fn main() -> Result<()> {
 		workspace_dir.join("www"),
 	];
 	println!("cargo:rerun-if-changed=../charts");
+	println!("cargo:rerun-if-changed=../pinwheel");
 	println!("cargo:rerun-if-changed=../ui");
 	println!("cargo:rerun-if-changed=../www");
 	tangram_serve::build::build(tangram_serve::build::BuildOptions {

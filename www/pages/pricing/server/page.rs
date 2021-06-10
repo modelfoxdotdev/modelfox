@@ -32,14 +32,9 @@ impl Component for Page {
 			enterprise_selected: false,
 		};
 		let table = PricingTable;
-		let faqs = FAQs;
-		let content = div().class("pricing-grid").child(
-			ui::S1::new()
-				.child(title)
-				.child(cards)
-				.child(table)
-				.child(faqs),
-		);
+		let content = div()
+			.class("pricing-grid")
+			.child(ui::S1::new().child(title).child(cards).child(table));
 		Document::new()
 			.child(PageLayout::new().child(content))
 			.into_node()
@@ -234,18 +229,6 @@ impl Component for PricingTable {
 			.width("100%".to_owned())
 			.child(head)
 			.child(body)
-			.into_node()
-	}
-}
-
-struct FAQs;
-
-impl Component for FAQs {
-	fn into_node(self) -> Node {
-		let what_is_tangram = "Tangram makes it easy to train and deploy machine learning models. Programmers can train a model on the command line and make predictions from any programming language. Programmers can then collaborate with product teams to understand how the model works, tune it, and monitor it in production.";
-		ui::S2::new()
-			.child(ui::H2::new().child("What is Tangram?"))
-			.child(ui::P::new().child(what_is_tangram.to_owned()))
 			.into_node()
 	}
 }

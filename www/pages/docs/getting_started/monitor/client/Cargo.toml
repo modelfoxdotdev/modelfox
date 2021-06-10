@@ -10,6 +10,7 @@ path = "lib.rs"
 
 [dependencies]
 console_error_panic_hook = "0.1"
+pinwheel = { path = "../../../../../../pinwheel" }
 tangram_charts = { path = "../../../../../../charts" }
 tangram_ui = { path = "../../../../../../ui" }
 wasm-bindgen = "0.2"

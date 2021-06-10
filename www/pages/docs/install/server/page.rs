@@ -1,4 +1,3 @@
-use indoc::{formatdoc, indoc};
 use pinwheel::prelude::*;
 use std::borrow::Cow;
 use tangram_ui as ui;
@@ -8,10 +7,7 @@ use tangram_www_layouts::{
 };
 
 #[derive(ComponentBuilder)]
-pub struct Page {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Page;
 
 impl Component for Page {
 	fn into_node(self) -> Node {
@@ -112,7 +108,7 @@ struct Alpine {
 
 impl Component for Alpine {
 	fn into_node(self) -> Node {
-		let code = indoc!(
+		let code = ui::doc!(
 			r#"
 				# Add the tangram rsa key.
 				curl -fsSL https://pkgs.tangram.xyz/stable/alpine/tangram.rsa | tee /etc/apk/keys/tangram.rsa
@@ -144,7 +140,7 @@ pub struct Deb {
 
 impl Component for Deb {
 	fn into_node(self) -> Node {
-		let code = formatdoc!(
+		let code = ui::formatdoc!(
 			r#"
 				# Add the tangram gpg key.
 				curl -fsSL https://pkgs.tangram.xyz/stable/{distribution}/{version}.gpg | sudo apt-key add -
@@ -177,7 +173,7 @@ struct AmazonLinux2 {
 
 impl Component for AmazonLinux2 {
 	fn into_node(self) -> Node {
-		let code = indoc!(
+		let code = ui::doc!(
 			r#"
 				# Add the tangram repository.
 				sudo yum-config-manager --add-repo https://pkgs.tangram.xyz/stable/amazon-linux/2/tangram.repo
@@ -206,7 +202,7 @@ struct Centos7 {
 
 impl Component for Centos7 {
 	fn into_node(self) -> Node {
-		let code = indoc!(
+		let code = ui::doc!(
 			r#"
 				# Add the tangram repository.
 				sudo yum-config-manager --add-repo https://pkgs.tangram.xyz/stable/centos/7/tangram.repo
@@ -235,7 +231,7 @@ struct Fedora {
 
 impl Component for Fedora {
 	fn into_node(self) -> Node {
-		let code = indoc!(
+		let code = ui::doc!(
 			r#"
 				# Add the tangram repository.
 				sudo dnf config-manager --add-repo https://pkgs.tangram.xyz/stable/fedora/tangram.repo
@@ -264,7 +260,7 @@ struct Rhel {
 
 impl Component for Rhel {
 	fn into_node(self) -> Node {
-		let code = indoc!(
+		let code = ui::doc!(
 			r#"
 				# Add the tangram repository.
 				sudo dnf config-manager --add-repo https://pkgs.tangram.xyz/stable/rhel/8/tangram.repo
@@ -293,7 +289,7 @@ struct Centos8 {
 
 impl Component for Centos8 {
 	fn into_node(self) -> Node {
-		let code = indoc!(
+		let code = ui::doc!(
 			r#"
 				# Add the tangram repository.
 				sudo dnf config-manager --add-repo https://pkgs.tangram.xyz/stable/centos/8/tangram.repo
@@ -354,7 +350,7 @@ struct Scoop {
 
 impl Component for Scoop {
 	fn into_node(self) -> Node {
-		let code = indoc!(
+		let code = ui::doc!(
 			r#"
 				scoop bucket add tangram https://github.com/tangramxyz/scoop.git
 				scoop install tangram

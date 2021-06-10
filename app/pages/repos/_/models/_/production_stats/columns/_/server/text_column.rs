@@ -61,15 +61,15 @@ impl Component for TextColumnStatsSection {
 		);
 		ui::S2::new()
 			.child(
-				ui::Card::new().child(
+				ui::Card::new().child(Dehydrate::new(
+					"text_overall",
 					BarChart::new()
-						.id("text_overall".to_owned())
 						.series(Some(overall_chart_series))
 						.title(Some(overall_distribution_chart_title))
 						.x_axis_title(Some(self.column_name))
 						.y_axis_title("Count".to_owned())
 						.y_min(Some(0.0)),
-				),
+				)),
 			)
 			.into_node()
 	}

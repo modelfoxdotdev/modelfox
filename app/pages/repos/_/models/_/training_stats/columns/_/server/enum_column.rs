@@ -76,16 +76,16 @@ impl Component for EnumColumnUniqueValuesChart {
 		}];
 		let enum_histogram_title = Some(format!("Histogram of Unique Values for {}", self.name));
 		ui::Card::new()
-			.child(
+			.child(Dehydrate::new(
+				"enum_histogram",
 				BarChart::new()
-					.id("enum_histogram".to_owned())
 					.hide_legend(Some(true))
 					.series(Some(chart_series))
 					.title(enum_histogram_title)
 					.x_axis_title(Some(self.name))
 					.y_axis_title("Count".to_owned())
 					.y_min(Some(0.0)),
-			)
+			))
 			.into_node()
 	}
 }

@@ -17,6 +17,7 @@ fnv = "1"
 pinwheel = { path = "../../pinwheel" }
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
+include_out_dir = { path = "../../include_out_dir" }
 indexmap = { version = "1.6", features = ["serde-1"] }
 itertools = "0.10"
 lettre = { version = "0.10.0-rc.2", default-features = false, features = ["builder", "hostname", "smtp-transport", "tokio1-rustls-tls"] }

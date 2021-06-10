@@ -84,9 +84,9 @@ impl Component for Page {
 					.child(ui::H2::new().child("Receiver Operating Characteristic Curve"))
 					.child(ui::P::new().child(roc_description))
 					.child(
-						ui::Card::new().child(
+						ui::Card::new().child(Dehydrate::new(
+							"roc",
 							LineChart::new()
-								.id("roc".to_owned())
 								.series(Some(roc_series))
 								.title("Receiver Operating Characteristic Curve".to_owned())
 								.x_axis_title("False Positive Rate".to_owned())
@@ -95,7 +95,7 @@ impl Component for Page {
 								.x_min(Some(Finite::new(0.0).unwrap()))
 								.y_max(Some(Finite::new(1.0).unwrap()))
 								.y_min(Some(Finite::new(0.0).unwrap())),
-						),
+						)),
 					),
 			);
 		Document::new()

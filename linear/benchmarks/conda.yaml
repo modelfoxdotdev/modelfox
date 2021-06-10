@@ -1,8 +1,0 @@
-name: tangram_linear_benchmarks
-channels:
-  - conda-forge
-dependencies:
-  - numpy
-  - pandas
-  - scikit-learn
-  - pytorch

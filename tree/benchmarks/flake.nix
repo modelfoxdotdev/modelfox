@@ -16,7 +16,10 @@
     in {
       devShell = pkgs.mkShell {
         buildInputs = with pkgs; [
-          (python38.withPackages(ps: with ps; [
+          cargo
+          rustc
+          time
+          (python38.withPackages(p: with p; [
             catboost
             lightgbm
             numpy
@@ -24,7 +27,6 @@
             scikitlearn
             xgboost
           ]))
-          time
         ];
       };
     }

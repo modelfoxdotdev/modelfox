@@ -1981,7 +1981,6 @@ version = "0.0.0"
 dependencies = [
  "futures",
  "futures-signals",
- "log",
  "pin-project",
  "pinwheel_elements_macro",
  "pinwheel_macro",
@@ -2949,6 +2948,7 @@ dependencies = [
  "fnv",
  "http",
  "hyper",
+ "include_out_dir",
  "indexmap",
  "insta",
  "itertools",
@@ -3122,6 +3122,7 @@ name = "tangram_app_model_index_client"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
+ "pinwheel",
  "tangram_charts",
  "tangram_ui",
  "wasm-bindgen",
@@ -3293,6 +3294,7 @@ name = "tangram_app_playground_client"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
+ "pinwheel",
  "tangram_charts",
  "wasm-bindgen",
  "web-sys",
@@ -3325,6 +3327,7 @@ name = "tangram_app_production_class_metrics_client"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
+ "pinwheel",
  "tangram_charts",
  "tangram_ui",
  "wasm-bindgen",
@@ -3386,6 +3389,7 @@ name = "tangram_app_production_metrics_index_client"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
+ "pinwheel",
  "tangram_charts",
  "tangram_ui",
  "wasm-bindgen",
@@ -3423,6 +3427,7 @@ name = "tangram_app_production_prediction_client"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
+ "pinwheel",
  "tangram_charts",
  "wasm-bindgen",
  "web-sys",
@@ -3507,6 +3512,7 @@ name = "tangram_app_production_stats_column_client"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
+ "pinwheel",
  "tangram_charts",
  "tangram_ui",
  "wasm-bindgen",
@@ -3547,6 +3553,7 @@ name = "tangram_app_production_stats_index_client"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
+ "pinwheel",
  "tangram_charts",
  "tangram_ui",
  "wasm-bindgen",
@@ -3765,6 +3772,7 @@ name = "tangram_app_training_metrics_precision_recall_client"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
+ "pinwheel",
  "tangram_charts",
  "wasm-bindgen",
 ]
@@ -3795,6 +3803,7 @@ name = "tangram_app_training_metrics_roc_client"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
+ "pinwheel",
  "tangram_charts",
  "wasm-bindgen",
 ]
@@ -3825,6 +3834,7 @@ name = "tangram_app_training_stats_column_client"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
+ "pinwheel",
  "tangram_charts",
  "wasm-bindgen",
  "web-sys",
@@ -3953,6 +3963,7 @@ dependencies = [
 name = "tangram_charts"
 version = "0.0.0"
 dependencies = [
+ "futures",
  "itertools",
  "num",
  "pinwheel",
@@ -3960,6 +3971,7 @@ dependencies = [
  "serde_json",
  "tangram_finite",
  "tangram_number_formatter",
+ "tracing",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -4458,7 +4470,7 @@ dependencies = [
 name = "tangram_ui"
 version = "0.0.0"
 dependencies = [
- "log",
+ "indoc 1.0.3",
  "num",
  "once_cell",
  "pinwheel",
@@ -4528,10 +4540,27 @@ name = "tangram_www_benchmarks_client"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
+ "pinwheel",
  "tangram_charts",
  "tangram_ui",
+ "tangram_www_benchmarks_common",
+ "tracing",
+ "tracing-wasm",
  "wasm-bindgen",
  "web-sys",
+]
+
+[[package]]
+name = "tangram_www_benchmarks_common"
+version = "0.0.0"
+dependencies = [
+ "futures-signals",
+ "num",
+ "pinwheel",
+ "serde",
+ "tangram_charts",
+ "tangram_ui",
+ "tracing",
 ]
 
 [[package]]
@@ -4543,6 +4572,7 @@ dependencies = [
  "tangram_charts",
  "tangram_serve",
  "tangram_ui",
+ "tangram_www_benchmarks_common",
  "tangram_www_layouts",
 ]
 
@@ -4591,7 +4621,6 @@ dependencies = [
 name = "tangram_www_docs_getting_started_inspect_server"
 version = "0.0.0"
 dependencies = [
- "indoc 1.0.3",
  "num",
  "pinwheel",
  "tangram_serve",
@@ -4605,7 +4634,6 @@ dependencies = [
 name = "tangram_www_docs_getting_started_monitor_server"
 version = "0.0.0"
 dependencies = [
- "indoc 1.0.3",
  "pinwheel",
  "tangram_app_common",
  "tangram_app_production_stats_column_server",
@@ -4622,7 +4650,6 @@ dependencies = [
 name = "tangram_www_docs_getting_started_predict_elixir_server"
 version = "0.0.0"
 dependencies = [
- "indoc 1.0.3",
  "pinwheel",
  "tangram_serve",
  "tangram_ui",
@@ -4634,7 +4661,6 @@ dependencies = [
 name = "tangram_www_docs_getting_started_predict_go_server"
 version = "0.0.0"
 dependencies = [
- "indoc 1.0.3",
  "pinwheel",
  "tangram_serve",
  "tangram_ui",
@@ -4646,7 +4672,6 @@ dependencies = [
 name = "tangram_www_docs_getting_started_predict_index_server"
 version = "0.0.0"
 dependencies = [
- "indoc 1.0.3",
  "pinwheel",
  "tangram_serve",
  "tangram_ui",
@@ -4658,7 +4683,6 @@ dependencies = [
 name = "tangram_www_docs_getting_started_predict_node_server"
 version = "0.0.0"
 dependencies = [
- "indoc 1.0.3",
  "pinwheel",
  "tangram_serve",
  "tangram_ui",
@@ -4670,7 +4694,6 @@ dependencies = [
 name = "tangram_www_docs_getting_started_predict_python_server"
 version = "0.0.0"
 dependencies = [
- "indoc 1.0.3",
  "pinwheel",
  "tangram_serve",
  "tangram_ui",
@@ -4682,7 +4705,6 @@ dependencies = [
 name = "tangram_www_docs_getting_started_predict_ruby_server"
 version = "0.0.0"
 dependencies = [
- "indoc 1.0.3",
  "pinwheel",
  "tangram_serve",
  "tangram_ui",
@@ -4694,7 +4716,6 @@ dependencies = [
 name = "tangram_www_docs_getting_started_predict_rust_server"
 version = "0.0.0"
 dependencies = [
- "indoc 1.0.3",
  "pinwheel",
  "tangram_serve",
  "tangram_ui",
@@ -4761,7 +4782,6 @@ dependencies = [
 name = "tangram_www_docs_install_server"
 version = "0.0.0"
 dependencies = [
- "indoc 1.0.3",
  "pinwheel",
  "tangram_serve",
  "tangram_ui",
@@ -4774,6 +4794,7 @@ name = "tangram_www_docs_monitor_client"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
+ "pinwheel",
  "tangram_charts",
  "tangram_ui",
  "wasm-bindgen",
@@ -4785,11 +4806,11 @@ name = "tangram_www_index_client"
 version = "0.0.0"
 dependencies = [
  "console_error_panic_hook",
- "log",
  "pinwheel",
  "tangram_charts",
  "tangram_ui",
  "tangram_www_index_common",
+ "tracing",
  "tracing-wasm",
  "wasm-bindgen",
  "web-sys",
@@ -4799,8 +4820,6 @@ dependencies = [
 name = "tangram_www_index_common"
 version = "0.0.0"
 dependencies = [
- "indoc 1.0.3",
- "log",
  "num",
  "pinwheel",
  "serde",
@@ -4813,7 +4832,6 @@ dependencies = [
 name = "tangram_www_index_server"
 version = "0.0.0"
 dependencies = [
- "indoc 1.0.3",
  "pinwheel",
  "tangram_charts",
  "tangram_finite",

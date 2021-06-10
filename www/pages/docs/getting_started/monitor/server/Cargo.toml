@@ -9,13 +9,12 @@ path = "page.rs"
 
 [dependencies]
 pinwheel = { path = "../../../../../../pinwheel" }
-indoc = "1"
-tangram_charts = { path = "../../../../../../charts" }
-tangram_www_ui = { path = "../../../../../ui" }
-tangram_www_layouts = { path = "../../../../../layouts" }
 tangram_app_common = { path = "../../../../../../app/common" }
-tangram_app_ui = { path = "../../../../../../app/ui" }
 tangram_app_production_stats_column_server = { path = "../../../../../../app/pages/repos/_/models/_/production_stats/columns/_/server"}
 tangram_app_production_stats_index_server = { path = "../../../../../../app/pages/repos/_/models/_/production_stats/index/server"}
+tangram_app_ui = { path = "../../../../../../app/ui" }
+tangram_charts = { path = "../../../../../../charts" }
 tangram_serve = { path = "../../../../../../serve" }
 tangram_ui = { path = "../../../../../../ui" }
+tangram_www_layouts = { path = "../../../../../layouts" }
+tangram_www_ui = { path = "../../../../../ui" }

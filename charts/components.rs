@@ -1,7 +1,7 @@
 use crate::{
 	bar_chart::{BarChartOptions, BarChartSeries},
 	box_chart::{BoxChartOptions, BoxChartSeries},
-	chart::{Chart, ChartImpl},
+	chart::Chart,
 	common::GridLineInterval,
 	config::ChartConfig,
 	feature_contributions_chart::CompressFeatureContributionsChartSeriesOptions,
@@ -11,42 +11,19 @@ use crate::{
 	},
 	line_chart::{LineChartOptions, LineChartSeries},
 };
+use futures::FutureExt;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use tangram_finite::Finite;
 use tangram_number_formatter::NumberFormatter;
 use wasm_bindgen::JsCast;
-use web_sys as dom;
 
-pub fn hydrate_chart<T>(id: &str)
-where
-	T: ChartImpl,
-	T::Options: serde::de::DeserializeOwned,
-{
-	let window = dom::window().unwrap();
-	let document = window.document().unwrap();
-	let container = document
-		.get_element_by_id(id)
-		.unwrap()
-		.dyn_into::<dom::HtmlElement>()
-		.unwrap();
-	let options = container.dataset().get("options").unwrap();
-	let options = serde_json::from_str(&options).unwrap();
-	let chart = Chart::<T>::new(container);
-	chart.borrow_mut().draw(options);
-	std::mem::forget(chart);
-}
-
-#[derive(ComponentBuilder)]
+#[derive(ComponentBuilder, serde::Serialize, serde::Deserialize)]
 pub struct BarChart {
-	#[optional]
-	pub class: Option<String>,
 	#[optional]
 	pub group_gap: Option<f64>,
 	#[optional]
 	pub hide_legend: Option<bool>,
-	#[optional]
-	pub id: Option<String>,
 	#[optional]
 	pub series: Option<Vec<BarChartSeries>>,
 	#[optional]
@@ -98,43 +75,42 @@ impl Component for BarChart {
 				})
 			})
 			.collect();
-		let options = serde_json::to_string(&options).unwrap();
-		div()
-			.class("chart-wrapper")
-			.child(ChartTitle::new().child(self.title))
-			.child(if !hide_legend {
-				Some(ChartLegend::new(legend_items))
-			} else {
-				None
+		let title = self.title.map(|title| ChartTitle::new().child(title));
+		let legend = if !hide_legend {
+			Some(ChartLegend::new(legend_items))
+		} else {
+			None
+		};
+		let chart = div()
+			.style(style::PADDING_TOP, "50%")
+			.style(style::WIDTH, "100%")
+			.future(|chart| {
+				pending_with(Chart::<crate::bar_chart::BarChart>::new(
+					chart.dom_element().unchecked_into(),
+					options,
+				))
+				.map(|_| ())
 			})
 			.child(
-				div()
-					.attribute("class", self.class)
-					.style(style::PADDING_TOP, "50%")
-					.style(style::WIDTH, "100%")
-					.attribute("data-chart-type", "bar")
-					.attribute("data-options", options)
-					.attribute("id", self.id)
-					.child(
-						noscript().child(
-							div()
-								.class("chart-noscript")
-								.child("Please enable JavaScript to view charts."),
-						),
-					),
-			)
+				noscript().child(
+					div()
+						.class("chart-noscript")
+						.child("Please enable JavaScript to view charts."),
+				),
+			);
+		div()
+			.class("chart-wrapper")
+			.child(title)
+			.child(legend)
+			.child(chart)
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(ComponentBuilder, serde::Serialize, serde::Deserialize)]
 pub struct BoxChart {
 	#[optional]
-	pub class: Option<String>,
-	#[optional]
 	pub hide_legend: Option<bool>,
-	#[optional]
-	pub id: Option<String>,
 	#[optional]
 	pub series: Option<Vec<BoxChartSeries>>,
 	#[optional]
@@ -183,44 +159,46 @@ impl Component for BoxChart {
 				})
 			})
 			.collect();
-		let options = serde_json::to_string(&options).unwrap();
-		div()
-			.class("chart-wrapper")
-			.child(ChartTitle::new().child(self.title))
-			.child(if !hide_legend {
-				Some(ChartLegend::new(legend_items))
-			} else {
-				None
+		let title = self.title.map(|title| ChartTitle::new().child(title));
+		let legend = if !hide_legend {
+			Some(ChartLegend::new(legend_items))
+		} else {
+			None
+		};
+		let chart = div()
+			.style(style::PADDING_TOP, "50%")
+			.style(style::WIDTH, "100%")
+			.future(|chart| {
+				pending_with(Chart::<crate::box_chart::BoxChart>::new(
+					chart.dom_element().unchecked_into(),
+					options,
+				))
+				.map(|_| ())
 			})
 			.child(
-				div()
-					.attribute("class", self.class)
-					.style(style::PADDING_TOP, "50%")
-					.style(style::WIDTH, "100%")
-					.attribute("data-chart-type", "box")
-					.attribute("data-options", options)
-					.attribute("id", self.id)
-					.child(
-						noscript().child(
-							div()
-								.class("chart-noscript")
-								.child("Please enable JavaScript to view charts."),
-						),
-					),
-			)
+				noscript().child(
+					div()
+						.class("chart-noscript")
+						.child("Please enable JavaScript to view charts."),
+				),
+			);
+		div()
+			.class("chart-wrapper")
+			.child(title)
+			.child(legend)
+			.child(chart)
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(ComponentBuilder, serde::Serialize, serde::Deserialize)]
 pub struct FeatureContributionsChart {
-	pub negative_color: String,
-	pub positive_color: String,
-	pub series: Vec<FeatureContributionsChartSeries>,
 	#[optional]
-	pub class: Option<String>,
+	pub series: Option<Vec<FeatureContributionsChartSeries>>,
 	#[optional]
-	pub id: Option<String>,
+	pub negative_color: Option<String>,
+	#[optional]
+	pub positive_color: Option<String>,
 	#[optional]
 	pub include_x_axis_title: Option<bool>,
 	#[optional]
@@ -234,8 +212,8 @@ pub struct FeatureContributionsChart {
 impl Component for FeatureContributionsChart {
 	fn into_node(self) -> Node {
 		let chart_config = ChartConfig::default();
-		let n_series = self.series.len();
-		let mut series = self.series;
+		let mut series = self.series.unwrap_or_else(Vec::new);
+		let n_series = series.len();
 		// Compress the feature contributions chart series on the server assuming a reasonable chart width to avoid sending too much data to the client.
 		compress_feature_contributions_chart_series(
 			series.as_mut_slice(),
@@ -272,38 +250,35 @@ impl Component for FeatureContributionsChart {
 			0.0
 		} + label_padding
 			+ font_size + bottom_padding;
-		let options = serde_json::to_string(&options).unwrap();
+		let title = self.title.map(|title| ChartTitle::new().child(title));
+		let chart = div()
+			.style(style::WIDTH, "100%")
+			.style(style::HEIGHT, format!("{}px", height))
+			.future(|chart| {
+				pending_with(Chart::<
+					crate::feature_contributions_chart::FeatureContributionsChart,
+				>::new(chart.dom_element().unchecked_into(), options))
+				.map(|_| ())
+			})
+			.child(
+				noscript().child(
+					div()
+						.class("chart-noscript")
+						.child("Please enable JavaScript to view charts."),
+				),
+			);
 		div()
 			.class("chart-wrapper")
-			.child(ChartTitle::new().child(self.title))
-			.child(
-				div()
-					.attribute("class", self.class)
-					.style(style::WIDTH, "100%")
-					.style(style::HEIGHT, format!("{}px", height))
-					.attribute("data-chart-type", "feature_contributions")
-					.attribute("data-options", options)
-					.attribute("id", self.id)
-					.child(
-						noscript().child(
-							div()
-								.class("chart-noscript")
-								.child("Please enable JavaScript to view charts."),
-						),
-					),
-			)
+			.child(title)
+			.child(chart)
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(ComponentBuilder, serde::Serialize, serde::Deserialize)]
 pub struct LineChart {
 	#[optional]
-	pub class: Option<String>,
-	#[optional]
 	pub hide_legend: Option<bool>,
-	#[optional]
-	pub id: Option<String>,
 	#[optional]
 	pub labels: Option<Vec<String>>,
 	#[optional]
@@ -367,31 +342,34 @@ impl Component for LineChart {
 				})
 			})
 			.collect();
-		let options = serde_json::to_string(&options).unwrap();
-		div()
-			.class("chart-wrapper")
-			.child(ChartTitle::new().child(self.title))
-			.child(if !hide_legend {
-				Some(ChartLegend::new(legend_items))
-			} else {
-				None
+		let title = self.title.map(|title| ChartTitle::new().child(title));
+		let legend = if !hide_legend {
+			Some(ChartLegend::new(legend_items))
+		} else {
+			None
+		};
+		let chart = div()
+			.style(style::PADDING_TOP, "50%")
+			.style(style::WIDTH, "100%")
+			.future(|chart| {
+				pending_with(Chart::<crate::line_chart::LineChart>::new(
+					chart.dom_element().unchecked_into(),
+					options,
+				))
+				.map(|_| ())
 			})
 			.child(
-				div()
-					.attribute("class", self.class)
-					.style(style::PADDING_TOP, "50%")
-					.style(style::WIDTH, "100%")
-					.attribute("data-chart-type", "line")
-					.attribute("data-options", options)
-					.attribute("id", self.id)
-					.child(
-						noscript().child(
-							div()
-								.class("chart-noscript")
-								.child("Please enable JavaScript to view charts."),
-						),
-					),
-			)
+				noscript().child(
+					div()
+						.class("chart-noscript")
+						.child("Please enable JavaScript to view charts."),
+				),
+			);
+		div()
+			.class("chart-wrapper")
+			.child(title)
+			.child(legend)
+			.child(chart)
 			.into_node()
 	}
 }
@@ -401,6 +379,7 @@ pub struct ChartTitle {
 	#[children]
 	pub children: Vec<Node>,
 }
+
 impl Component for ChartTitle {
 	fn into_node(self) -> Node {
 		div().class("chart-title").child(self.children).into_node()

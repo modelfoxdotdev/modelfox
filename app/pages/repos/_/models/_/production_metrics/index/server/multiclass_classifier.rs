@@ -136,9 +136,9 @@ impl Component for MulticlassClassifierProductionMetrics {
 						.number_formatter(ui::NumberFormatter::Percent(Default::default())),
 					)
 					.child(
-						ui::Card::new().child(
+						ui::Card::new().child(Dehydrate::new(
+							"accuracy",
 							LineChart::new()
-								.id("accuracy".to_owned())
 								.labels(Some(chart_labels))
 								.series(Some(accuracy_series))
 								.title(Some(accuracy_chart_title))
@@ -148,7 +148,7 @@ impl Component for MulticlassClassifierProductionMetrics {
 								}))
 								.y_max(Some(Finite::new(1.0).unwrap()))
 								.y_min(Some(Finite::new(0.0).unwrap())),
-						),
+						)),
 					),
 			)
 			.child(ClassMetricsTable::new(self.overall.class_metrics_table))

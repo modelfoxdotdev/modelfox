@@ -92,12 +92,12 @@ impl Component for NumberColumn {
 							)),
 					)
 					.child(
-						ui::Card::new().child(
+						ui::Card::new().child(Dehydrate::new(
+							"number_quantiles",
 							BoxChart::new()
-								.id("number_quantiles".to_owned())
 								.series(Some(quantiles_chart_series))
 								.title(number_quantiles_title),
-						),
+						)),
 					),
 			)
 			.into_node()

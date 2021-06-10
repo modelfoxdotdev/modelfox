@@ -89,9 +89,9 @@ impl Component for Page {
 					.child(ui::H2::new().child("Parametric Precision Recall Curve"))
 					.child(ui::P::new().child(parametric_pr_curve_definition))
 					.child(
-						ui::Card::new().child(
+						ui::Card::new().child(Dehydrate::new(
+							"parametric_pr",
 							LineChart::new()
-								.id("parametric_pr".to_owned())
 								.hide_legend(Some(true))
 								.series(Some(parametric_series))
 								.title("Parametric Precision Recall Curve".to_owned())
@@ -101,7 +101,7 @@ impl Component for Page {
 								.x_min(Some(Finite::new(0.0).unwrap()))
 								.y_max(Some(Finite::new(1.0).unwrap()))
 								.y_min(Some(Finite::new(0.0).unwrap())),
-						),
+						)),
 					),
 			)
 			.child(
@@ -109,9 +109,9 @@ impl Component for Page {
 					.child(ui::H2::new().child("Non-Parametric Precision Recall Curve"))
 					.child(ui::P::new().child(non_parametric_pr_curve_definition))
 					.child(
-						ui::Card::new().child(
+						ui::Card::new().child(Dehydrate::new(
+							"non_parametric_pr",
 							LineChart::new()
-								.id("non_parametric_pr".to_owned())
 								.hide_legend(Some(true))
 								.series(Some(non_parametric_series))
 								.title("Non-Parametric Precision Recall Curve".to_owned())
@@ -121,7 +121,7 @@ impl Component for Page {
 								.x_min(Some(Finite::new(0.0).unwrap()))
 								.y_max(Some(Finite::new(1.0).unwrap()))
 								.y_min(Some(Finite::new(0.0).unwrap())),
-						),
+						)),
 					),
 			);
 		Document::new()

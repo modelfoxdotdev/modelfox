@@ -1,4 +1,3 @@
-use indoc::indoc;
 use pinwheel::prelude::*;
 use tangram_ui as ui;
 
@@ -10,7 +9,7 @@ pub struct Monitoring {
 
 impl Component for Monitoring {
 	fn into_node(self) -> Node {
-		let elixir = indoc!(
+		let elixir = ui::doc!(
 			r#"
 				# Log the prediction.
 				Tangram.log_prediction(model, %Tangram.LogPredictionArgs{
@@ -28,7 +27,7 @@ impl Component for Monitoring {
 			"#
 		)
 		.into();
-		let go = indoc!(
+		let go = ui::doc!(
 			r#"
 				// Log the prediction.
 				err = model.LogPrediction(tangram.LogPredictionArgs{
@@ -52,7 +51,7 @@ impl Component for Monitoring {
 			"#
 		)
 		.into();
-		let javascript = indoc!(
+		let javascript = ui::doc!(
 			r#"
 				// Log the prediction.
 				model.logPrediction({
@@ -70,7 +69,7 @@ impl Component for Monitoring {
 			"#
 		)
 		.into();
-		let python = indoc!(
+		let python = ui::doc!(
 			r#"
 				# Log the prediction.
 				model.log_prediction(
@@ -88,7 +87,7 @@ impl Component for Monitoring {
 			"#
 		)
 		.into();
-		let ruby = indoc!(
+		let ruby = ui::doc!(
 			r#"
 				# Log the prediction.
 				model.log_prediction(
@@ -106,7 +105,7 @@ impl Component for Monitoring {
 			"#
 		)
 		.into();
-		let rust = indoc!(
+		let rust = ui::doc!(
 			r#"
 				// Log the prediction.
 				model.log_prediction(tangram::LogPredictionArgs {
@@ -153,9 +152,8 @@ impl Component for Monitoring {
 			.child(p2)
 			.child(br())
 			.child(p3);
-		let right = ui::Window::new().child(
-			ui::CodeSelect::new("prediction", code_for_language).hide_line_numbers(Some(false)),
-		);
+		let right = ui::Window::new()
+			.child(ui::CodeSelect::new(code_for_language).hide_line_numbers(Some(false)));
 		div()
 			.class("index-step")
 			.child(left)

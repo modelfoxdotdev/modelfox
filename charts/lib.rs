@@ -1,6 +1,6 @@
 pub mod bar_chart;
 pub mod box_chart;
-mod chart;
+pub mod chart;
 pub mod common;
 pub mod components;
 pub mod config;

@@ -8,7 +8,7 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
-log = "0.4"
+indoc = "1"
 num = "0.4"
 once_cell = "1"
 pinwheel = { path = "../pinwheel" }

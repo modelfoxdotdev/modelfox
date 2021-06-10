@@ -113,11 +113,11 @@ impl Component for RegressionProductionStatsChart {
 			&self.date_window,
 			"Prediction Distribution Stats".to_owned(),
 		);
-		BoxChart::new()
-			.id("quantiles_overall".to_owned())
-			.series(Some(series))
-			.title(Some(title))
-			.into_node()
+		Dehydrate::new(
+			"quantiles_overall",
+			BoxChart::new().series(Some(series)).title(Some(title)),
+		)
+		.into_node()
 	}
 }
 
@@ -153,10 +153,10 @@ impl Component for RegressionProductionStatsIntervalChart {
 			&self.date_window_interval,
 			"Prediction Distribution Stats".to_owned(),
 		);
-		BoxChart::new()
-			.id("quantiles_intervals".to_owned())
-			.series(Some(series))
-			.title(Some(title))
-			.into_node()
+		Dehydrate::new(
+			"quantiles_intervals",
+			BoxChart::new().series(Some(series)).title(Some(title)),
+		)
+		.into_node()
 	}
 }

@@ -14,10 +14,8 @@ struct Action {
 	owner: Option<String>,
 }
 
-pub async fn post(
-	context: Arc<Context>,
-	mut request: http::Request<hyper::Body>,
-) -> Result<http::Response<hyper::Body>> {
+pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
+	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),

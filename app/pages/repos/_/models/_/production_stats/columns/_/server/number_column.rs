@@ -94,20 +94,20 @@ impl Component for NumberColumn {
 			)
 			.child(self.number_column_counts_section)
 			.child(
-				ui::Card::new().child(
+				ui::Card::new().child(Dehydrate::new(
+					"number_overall",
 					BoxChart::new()
-						.id("number_overall".to_owned())
 						.series(Some(overall_box_chart_series))
 						.title(Some(stats_overall_chart_title)),
-				),
+				)),
 			)
 			.child(
-				ui::Card::new().child(
+				ui::Card::new().child(Dehydrate::new(
+					"number_intervals",
 					BoxChart::new()
-						.id("number_intervals".to_owned())
 						.series(Some(interval_box_chart_series))
 						.title(Some(stats_interval_chart_title)),
-				),
+				)),
 			)
 			.child(self.number_column_stats_section)
 			.into_node()

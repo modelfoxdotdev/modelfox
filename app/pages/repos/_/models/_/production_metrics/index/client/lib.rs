@@ -1,4 +1,4 @@
-use tangram_charts::{components::hydrate_chart, line_chart::LineChart};
+use pinwheel::prelude::*;
 use tangram_ui as ui;
 use wasm_bindgen::{self, prelude::*};
 use web_sys as dom;
@@ -10,9 +10,9 @@ pub fn start() {
 	let window = dom::window().unwrap();
 	let document = window.document().unwrap();
 	if document.get_element_by_id("mse").is_some() {
-		hydrate_chart::<LineChart>("mse");
+		hydrate::<tangram_charts::components::LineChart>("mse");
 	}
 	if document.get_element_by_id("accuracy").is_some() {
-		hydrate_chart::<LineChart>("accuracy");
+		hydrate::<tangram_charts::components::LineChart>("accuracy");
 	}
 }

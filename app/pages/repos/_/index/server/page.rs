@@ -40,7 +40,7 @@ impl Component for Page {
 										.child(
 											ui::Button::new()
 												.href("models/new".to_owned())
-												.child("Upload New Version"),
+												.child("Upload Model"),
 										),
 								),
 						)

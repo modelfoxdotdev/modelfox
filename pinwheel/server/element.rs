@@ -9,8 +9,9 @@ use futures_signals::{
 	signal::{Signal, SignalExt},
 	signal_vec::{SignalVec, SignalVecExt},
 };
-use std::borrow::Cow;
+use std::{borrow::Cow, future::Future};
 use wasm_bindgen::prelude::*;
+use web_sys as dom;
 
 pub struct Element {
 	tag: &'static str,
@@ -63,6 +64,13 @@ impl Element {
 			children: Vec::new(),
 			inner_html: None,
 		}
+	}
+
+	pub fn future<F>(self, _f: impl FnOnce(&Element) -> F) -> Element
+	where
+		F: 'static + Future<Output = ()>,
+	{
+		self
 	}
 
 	pub fn attribute<T>(mut self, name: impl Into<Cow<'static, str>>, value: T) -> Element
@@ -195,6 +203,10 @@ impl Element {
 		self.inner_html = Some(html.0);
 		self.children.clear();
 		self
+	}
+
+	pub fn dom_element(&self) -> dom::Element {
+		unimplemented!()
 	}
 }
 

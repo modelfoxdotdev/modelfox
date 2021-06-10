@@ -1,13 +1,11 @@
 use crate as ui;
 use pinwheel::prelude::*;
 use pulldown_cmark::{escape::escape_html, Alignment, CodeBlockKind, Event, Options, Parser, Tag};
-use std::{borrow::Cow, collections::HashMap, fmt::Write};
+use std::{borrow::Cow, fmt::Write};
 
 #[derive(ComponentBuilder)]
 pub struct Markdown {
 	string: Cow<'static, str>,
-	#[optional]
-	nodes: Option<HashMap<Cow<'static, str>, Node>>,
 }
 
 enum State {
@@ -233,17 +231,12 @@ impl Component for Markdown {
 					};
 				}
 				Event::Code(code) => {
-					let node = ui::InlineCode::new().child(code.into_string()).into_node();
-					write!(&mut html, "{}", node).unwrap();
+					html.push_str(r#"<span class="inline-code">"#);
+					escape_html(&mut html, &code).unwrap();
+					html.push_str(r#"</span>"#);
 				}
 				Event::Html(raw) => {
-					if raw.starts_with("<!--") && raw.ends_with("-->\n") {
-						let name = dbg!(&raw[5..raw.len() - 5]);
-						let node = self.nodes.as_ref().unwrap().get(name).unwrap();
-						write!(&mut html, "{}", node).unwrap();
-					} else {
-						html.push_str(&raw);
-					}
+					html.push_str(&raw);
 				}
 				Event::FootnoteReference(_reference) => unimplemented!(),
 				Event::SoftBreak => {

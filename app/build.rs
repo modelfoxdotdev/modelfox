@@ -12,6 +12,7 @@ fn main() -> Result<()> {
 	];
 	println!("cargo:rerun-if-changed=../app");
 	println!("cargo:rerun-if-changed=../charts");
+	println!("cargo:rerun-if-changed=../pinwheel");
 	println!("cargo:rerun-if-changed=../ui");
 	tangram_serve::build::build(tangram_serve::build::BuildOptions {
 		workspace_dir,

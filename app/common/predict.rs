@@ -197,17 +197,16 @@ impl Component for RegressionPredictOutput {
 					.child("This chart shows how the features contributed to the model's output."),
 			)
 			.child(
-				ui::Card::new().child(
-					FeatureContributionsChart::new(
-						ui::colors::RED.to_owned(),
-						ui::colors::GREEN.to_owned(),
-						vec![self.feature_contributions_chart_series],
-					)
-					.id("regression_feature_contributions".to_owned())
-					.include_x_axis_title(Some(true))
-					.include_y_axis_labels(Some(false))
-					.include_y_axis_title(Some(false)),
-				),
+				ui::Card::new().child(Dehydrate::new(
+					"regression_feature_contributions",
+					FeatureContributionsChart::new()
+						.series(vec![self.feature_contributions_chart_series])
+						.negative_color(ui::colors::RED.to_owned())
+						.positive_color(ui::colors::GREEN.to_owned())
+						.include_x_axis_title(Some(true))
+						.include_y_axis_labels(Some(false))
+						.include_y_axis_title(Some(false)),
+				)),
 			)
 			.into_node()
 	}
@@ -240,17 +239,16 @@ impl Component for BinaryClassificationPredictOutput {
 					.child("This chart shows how the features contributed to the model's output."),
 			)
 			.child(
-				ui::Card::new().child(
-					FeatureContributionsChart::new(
-						ui::colors::RED.to_owned(),
-						ui::colors::GREEN.to_owned(),
-						vec![self.feature_contributions_chart_series],
-					)
-					.id("binary_classification_feature_contributions".to_owned())
-					.include_x_axis_title(Some(true))
-					.include_y_axis_labels(Some(true))
-					.include_y_axis_title(Some(true)),
-				),
+				ui::Card::new().child(Dehydrate::new(
+					"binary_classification_feature_contributions",
+					FeatureContributionsChart::new()
+						.series(vec![self.feature_contributions_chart_series])
+						.negative_color(ui::colors::RED.to_owned())
+						.positive_color(ui::colors::GREEN.to_owned())
+						.include_x_axis_title(Some(true))
+						.include_y_axis_labels(Some(true))
+						.include_y_axis_title(Some(true)),
+				)),
 			);
 		fragment().child(output).child(explanation).into_node()
 	}
@@ -296,29 +294,28 @@ impl Component for MulticlassClassificationPredictOutput {
 				"Probability".to_owned(),
 				ui::format_percent(self.probability),
 			))
-			.child(
+			.child(Dehydrate::new(
+				"probabilities",
 				BarChart::new()
-					.id("probabilities".to_owned())
 					.series(Some(probability_series))
 					.title("Predicted Probabilities".to_owned())
 					.y_min(Some(0.0)),
-			)
+			))
 			.child(ui::H2::new().child("Explanation"))
 			.child(
 				ui::P::new()
 					.child("This chart shows how the features contributed to the model's output."),
 			)
-			.child(
-				FeatureContributionsChart::new(
-					ui::colors::RED.to_owned(),
-					ui::colors::GREEN.to_owned(),
-					series,
-				)
-				.id("multiclass_classification_feature_contributions".to_owned())
-				.include_x_axis_title(Some(true))
-				.include_y_axis_labels(Some(false))
-				.include_y_axis_title(Some(true)),
-			)
+			.child(Dehydrate::new(
+				"multiclass_classification_feature_contributions",
+				FeatureContributionsChart::new()
+					.series(series)
+					.negative_color(ui::colors::RED.to_owned())
+					.positive_color(ui::colors::GREEN.to_owned())
+					.include_x_axis_title(Some(true))
+					.include_y_axis_labels(Some(false))
+					.include_y_axis_title(Some(true)),
+			))
 			.into_node()
 	}
 }

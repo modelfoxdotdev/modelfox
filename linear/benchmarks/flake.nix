@@ -16,13 +16,15 @@
     in {
       devShell = pkgs.mkShell {
         buildInputs = with pkgs; [
+          cargo
+          rustc
+          time
           (python38.withPackages(ps: with ps; [
             numpy
             pandas
             pytorch
             scikitlearn
           ]))
-          time
         ];
       };
     }

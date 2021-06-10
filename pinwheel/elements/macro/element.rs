@@ -12,7 +12,6 @@ struct Element {
 	namespace: Namespace,
 	tag: String,
 	kind: Option<syn::Expr>,
-	#[allow(dead_code)]
 	element: Option<syn::Path>,
 	attributes: Option<Attributes>,
 	events: Option<Events>,
@@ -156,10 +155,19 @@ impl quote::ToTokens for Element {
 		};
 		let fn_ident = format_ident!("{}", tag);
 		let element_ident = format_ident!("{}Element", tag.to_camel_case());
+		let dom_element_ty = self
+			.element
+			.as_ref()
+			.map(|element| quote! { #element })
+			.unwrap_or_else(|| quote! { web_sys::Element });
 		let basic_impl = quote! {
 			impl #element_ident {
 				pub fn new() -> Self {
 					#element_ident(crate::Element::new(#tag, #namespace, #kind))
+				}
+				pub fn future<F>(mut self, f: impl FnOnce(&crate::Element) -> F ) -> Self where F: 'static + std::future::Future<Output = ()> {
+					self.0 = self.0.future(f);
+					self
 				}
 				pub fn attribute<T>(mut self, name: impl Into<std::borrow::Cow<'static, str>>, value: T) -> Self
 				where
@@ -250,6 +258,10 @@ impl quote::ToTokens for Element {
 				pub fn inner_html(mut self, value: impl crate::string_value::IntoStringValue) -> Self {
 					self.0 = self.0.inner_html(value);
 					self
+				}
+				#[cfg(target_arch = "wasm32")]
+				pub fn dom_element(&self) -> #dom_element_ty {
+					wasm_bindgen::JsCast::unchecked_into(self.0.dom_element())
 				}
 			}
 		};

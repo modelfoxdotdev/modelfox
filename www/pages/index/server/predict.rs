@@ -1,4 +1,3 @@
-use indoc::indoc;
 use pinwheel::prelude::*;
 use tangram_ui as ui;
 
@@ -10,7 +9,7 @@ pub struct Predict {
 
 impl Component for Predict {
 	fn into_node(self) -> Node {
-		let elixir = indoc!(
+		let elixir = ui::doc!(
 			r#"
 				model = Tangram.load_model_from_path("./heart_disease.tangram")
 
@@ -22,7 +21,7 @@ impl Component for Predict {
 			"#
 		)
 		.into();
-		let go = indoc!(
+		let go = ui::doc!(
 			r#"
 				import "github.com/tangramxyz/tangram/languages/go"
 
@@ -36,7 +35,7 @@ impl Component for Predict {
 			"#
 		)
 		.into();
-		let javascript = indoc!(
+		let javascript = ui::doc!(
 			r#"
 				const tangram = require("@tangramxyz/tangram");
 
@@ -50,7 +49,7 @@ impl Component for Predict {
 			"#
 		)
 		.into();
-		let python = indoc!(
+		let python = ui::doc!(
 			r#"
 				import tangram
 
@@ -64,7 +63,7 @@ impl Component for Predict {
 			"#
 		)
 		.into();
-		let ruby = indoc!(
+		let ruby = ui::doc!(
 			r#"
 				require 'tangram'
 
@@ -78,7 +77,7 @@ impl Component for Predict {
 			"#
 		)
 		.into();
-		let rust = indoc!(
+		let rust = ui::doc!(
 			r#"
 				let model: tangram::Model =
 				tangram::Model::from_path("./heart_disease.tangram", None).unwrap();
@@ -151,10 +150,8 @@ impl Component for Predict {
 			.child(".");
 		let p2 = div().attribute("class","index-step-text").child("Tangram is written in Rust and exposed to each langauge via native extensions, so predictions are fast and your data never travels over the network.");
 		let left = div().child(title).child(p1).child(br()).child(p2);
-		let right = ui::Window::new().child(
-			ui::CodeSelect::new("prediction".to_owned(), code_for_language)
-				.hide_line_numbers(Some(false)),
-		);
+		let right = ui::Window::new()
+			.child(ui::CodeSelect::new(code_for_language).hide_line_numbers(Some(false)));
 		div()
 			.class("index-step")
 			.child(left)

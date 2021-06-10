@@ -1,4 +1,3 @@
-use indoc::indoc;
 use pinwheel::prelude::*;
 use tangram_ui as ui;
 use tangram_www_docs_inspect_common::{ThresholdMetrics, Tuning};
@@ -8,10 +7,7 @@ use tangram_www_layouts::{
 };
 
 #[derive(ComponentBuilder)]
-pub struct Page {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Page;
 
 impl Component for Page {
 	fn into_node(self) -> Node {
@@ -226,33 +222,25 @@ impl Component for Page {
 				true_positives: 3,
 			},
 		];
-		let p1 = ui::P::new()
-			.child("Run ")
-			.child(ui::InlineCode::new().child("tangram app"))
-			.child(" and open your browser to ")
-			.child(
-				ui::Link::new()
-					.href("http://localhost:8080".to_owned())
-					.child("http://localhost:8080"),
-			)
-			.child(".");
-		let p2 = ui::P::new()
-			.child("Create a new repo and upload the ")
-			.child(ui::InlineCode::new().child(".tangram"))
-			.child(" file we just trained.");
-		let callout = ui::Callout::new(ui::Level::Info)
-			.title("Repo".to_owned())
-			.child("A repo is where we can compare multiple versions of the same model.");
-		let p3 = ui::P::new()
-			.child("Click on 'Training Metrics' and have a look at the confusion matrix.");
-		let p4 = ui::P::new().child("It looks like false negatives are a bit high. This means we are predicting people are healthy when they actually aren't. It would be better if the model had fewer false negatives, even if it means more false positives, because doctors can rule out heart disease with further testing. Let's make that change by going to the 'Tuning' page.");
-		let p5 = ui::P::new()
-			.child("Drag the tuning slider below and see how different thresholds affect precision and recall.");
-		let p6 = ui::P::new()
-			.child("When we lower the threhold, we predict that more people have heart disease which results in lower precision but higher recall.");
-		let p7 = ui::P::new().child(
-			"Once you've chosen a threshold, you can go back to your prediction code to use it.",
-		);
+		let m1 = ui::Markdown::new(ui::doc!(
+			r#"
+				We can learn more about our model with the tangram app. Run `tangram app` and open your browser to http://localhost:8080, or use the cloud hosted app at https://app.tangram.xyz.
+
+				Click the "Create Repo" button to create a new repo. Repos allow you to manage and compare multiple versions of the same model, just like git repos hold multiple versions of the same codebase. Click "Upload Model" to upload the first version of your model.
+
+				Click Training Metrics in the sidebar and have a look at the confusion matrix.
+			"#
+		));
+		let m2 = ui::Markdown::new(ui::doc!(
+			r#"
+				It looks like false negatives are a bit high. This means we are predicting people are healthy when they actually aren't. It would be better if the model had fewer false negatives, even if it means more false positives, because doctors can rule out heart disease with further testing. Let's make that change by going to the Tuning page. Drag the tuning slider to see how different thresholds affect precision and recall.
+			"#
+		));
+		let m3 = ui::Markdown::new(ui::doc!(
+			r#"
+				When we lower the threhold, we predict that more people have heart disease which results in lower precision but higher recall. Once you've chosen a threshold, you can update your prediction code to use it.
+			"#
+		));
 		let prev_next_buttons = div()
 			.class("docs-prev-next-buttons")
 			.child(
@@ -269,23 +257,17 @@ impl Component for Page {
 			.child(ui::H1::new().child("Inspect"))
 			.child(
 				ui::S2::new()
-					.child(p1)
-					.child(p2)
-					.child(callout)
-					.child(p3)
+					.child(m1)
 					.child(TrainingMetrics::new())
-					.child(p4)
-					.child(p5)
+					.child(m2)
 					.child(
 						ui::Window::new()
 							.child(Dehydrate::new("tuning", Tuning { threshold_metrics })),
 					)
-					.child(p6)
-					.child(p7)
+					.child(m3)
 					.child(TuningCode::new()),
 			)
 			.child(prev_next_buttons);
-		// let content = ui::Markdown::new(include_str("page.md")).nodes()
 		let layout = DocsLayout::new(DocsPage::GettingStarted(GettingStartedPage::Inspect), None)
 			.child(content);
 		Document::new()
@@ -328,7 +310,7 @@ pub struct TuningCode {
 impl Component for TuningCode {
 	fn into_node(self) -> Node {
 		let code_for_language = ui::highlight_code_for_language(ui::CodeForLanguage {
-			elixir: indoc!(
+			elixir: ui::doc!(
 				r#"
 					predict_options = %Tangram.PredictOptions{
 						threshold: 0.5,
@@ -338,7 +320,7 @@ impl Component for TuningCode {
 				"#
 			)
 			.into(),
-			go: indoc!(
+			go: ui::doc!(
 				r#"
 					predictOptions := tangram.PredictOptions{
 						Threshold:                   0.5,
@@ -348,7 +330,7 @@ impl Component for TuningCode {
 				"#
 			)
 			.into(),
-			javascript: indoc!(
+			javascript: ui::doc!(
 				r#"
 					options = {
 						threshold: 0.5,
@@ -358,7 +340,7 @@ impl Component for TuningCode {
 				"#
 			)
 			.into(),
-			python: indoc!(
+			python: ui::doc!(
 				r#"
 					predict_options = tangram.PredictOptions(
 							threshold=0.5,
@@ -368,7 +350,7 @@ impl Component for TuningCode {
 				"#
 			)
 			.into(),
-			ruby: indoc!(
+			ruby: ui::doc!(
 				r#"
 					options = Tangram::PredictOptions.new(
 						threshold: 0.5,
@@ -378,7 +360,7 @@ impl Component for TuningCode {
 				"#
 			)
 			.into(),
-			rust: indoc!(
+			rust: ui::doc!(
 				r#"
 					let options = tangram::PredictOptions {
 						threshold: Some(0.5),
@@ -390,7 +372,7 @@ impl Component for TuningCode {
 			.into(),
 		});
 		ui::Window::new()
-			.child(ui::CodeSelect::new("predict-threshold", code_for_language))
+			.child(ui::CodeSelect::new(code_for_language))
 			.into_node()
 	}
 }

@@ -1,12 +1,11 @@
 use futures::FutureExt;
-use std::sync::Arc;
-use tangram_app_common::{error::method_not_allowed, Context, HandleOutput};
+use tangram_app_common::{error::method_not_allowed, HandleOutput};
 
 mod post;
 
-pub fn handle(context: Arc<Context>, request: http::Request<hyper::Body>) -> HandleOutput {
+pub fn handle(request: &mut http::Request<hyper::Body>) -> HandleOutput {
 	match *request.method() {
-		http::Method::POST => self::post::post(context, request).boxed(),
+		http::Method::POST => self::post::post(request).boxed(),
 		_ => async { Ok(method_not_allowed()) }.boxed(),
 	}
 }

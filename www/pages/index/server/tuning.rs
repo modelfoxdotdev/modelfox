@@ -1,4 +1,3 @@
-use indoc::indoc;
 use pinwheel::prelude::*;
 use tangram_ui as ui;
 use tangram_www_index_common::{self as common, tuning::ThresholdMetrics};
@@ -229,7 +228,7 @@ impl Component for Tuning {
 		// 	.child("Tune binary classification models to your preferred tradeoff between precision and recall. To use your selected threshold, update the ")
 		// 	.child(ui::InlineCode::new().child("predict"))
 		// 	.child(" call in your code.");
-		let text = ui::Markdown::new(indoc!(
+		let text = ui::Markdown::new(ui::doc!(
 			r#"
 				Tune binary classification models to your preferred tradeoff between precision and recall. To use your selected threshold, update the `predict` call in your code.
 			"#

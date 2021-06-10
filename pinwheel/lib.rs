@@ -7,7 +7,6 @@ pub mod elements;
 pub mod hydrate;
 pub mod option_string_value;
 pub mod string_value;
-pub mod zip;
 
 #[cfg(target_arch = "wasm32")]
 mod client;
@@ -29,10 +28,9 @@ pub mod prelude {
 		elements::{html, html::*, svg},
 		fragment, html,
 		hydrate::hydrate,
-		text,
-		zip::{ZipSignal, ZipSignalTrait},
-		Element, Fragment, Namespace, Node, SignalNode, SignalVecNode, Text,
+		text, Element, Fragment, Namespace, Node, SignalNode, SignalVecNode, Text,
 	};
+	pub use crate::{pending_with, PendingWith};
 	pub use futures_signals::{
 		signal::{Mutable, Signal, SignalExt},
 		signal_vec::{MutableVec, SignalVec, SignalVecExt},
@@ -55,3 +53,19 @@ pub fn html<T: component::Component>(component: T) -> String {
 }
 
 pub type BoxSignal<T> = Box<dyn 'static + Unpin + futures_signals::signal::Signal<Item = T>>;
+
+pub fn pending_with<T>(value: T) -> PendingWith<T> {
+	PendingWith(value)
+}
+
+pub struct PendingWith<T>(T);
+
+impl<T> std::future::Future for PendingWith<T> {
+	type Output = T;
+	fn poll(
+		self: std::pin::Pin<&mut Self>,
+		_cx: &mut std::task::Context<'_>,
+	) -> std::task::Poll<Self::Output> {
+		std::task::Poll::Pending
+	}
+}

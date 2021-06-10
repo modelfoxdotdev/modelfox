@@ -1,4 +1,3 @@
-use indoc::indoc;
 use pinwheel::prelude::*;
 use std::borrow::Cow;
 use tangram_ui as ui;
@@ -8,14 +7,11 @@ use tangram_www_layouts::{
 };
 
 #[derive(ComponentBuilder)]
-pub struct Page {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Page;
 
 impl Component for Page {
 	fn into_node(self) -> Node {
-		let predict_text = ui::P::new().child("First, we import the tangram library and load the model file. Then, we make an object with info for a new patient that matches the CSV, excluding the diagnosis column. Finally, we call predict and print out the result.");
+		let predict_text = ui::P::new().child("First, import the tangram library and load the model file. Then, make an object with info for a new patient that matches the CSV, excluding the diagnosis column. Finally, call predict and print out the result.");
 		Document::new()
 			.child(
 				DocsLayout::new(
@@ -27,9 +23,9 @@ impl Component for Page {
 						.child(ui::H1::new().child("Predict with Node"))
 						.child(
 							ui::S2::new()
-								.child(ui::H2::new().child("1. Add the Tangram npm package."))
+								.child(ui::H2::new().child("1. Install."))
 								.child(Install::new())
-								.child(ui::H2::new().child("2. Make a Prediction!"))
+								.child(ui::H2::new().child("2. Predict."))
 								.child(predict_text)
 								.child(Predict::new()),
 						)
@@ -61,7 +57,7 @@ pub struct Install {
 
 impl Component for Install {
 	fn into_node(self) -> Node {
-		let code = indoc!(
+		let code = ui::doc!(
 			r#"
 				dependencies: {
 					"@tangramxyz/tangram-node": "*",
@@ -87,7 +83,7 @@ pub struct Predict {
 
 impl Component for Predict {
 	fn into_node(self) -> Node {
-		let code = indoc!(
+		let code = ui::doc!(
 			r#"
 				const fs = require("fs");
 				const path = require("path");

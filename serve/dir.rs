@@ -1,4 +1,3 @@
-use crate::hash;
 use include_out_dir::IncludeOutDir;
 use std::path::Path;
 use tangram_error::Result;
@@ -22,18 +21,9 @@ pub async fn serve_from_dir(
 		return Ok(None);
 	}
 	let data = tokio::fs::read(&path).await?;
-	let hash = &hash(&data);
 	let mut response = http::Response::builder();
 	if let Some(content_type) = content_type(&path) {
 		response = response.header(http::header::CONTENT_TYPE, content_type);
-	}
-	response = response.header(http::header::ETAG, hash);
-	if let Some(etag) = request.headers().get(http::header::IF_NONE_MATCH) {
-		if etag.as_bytes() == hash.as_bytes() {
-			response = response.status(http::StatusCode::NOT_MODIFIED);
-			let response = response.body(hyper::Body::empty()).unwrap();
-			return Ok(Some(response));
-		}
 	}
 	response = response.status(http::StatusCode::OK);
 	let response = response.body(hyper::Body::from(data)).unwrap();

@@ -76,12 +76,14 @@ impl Component for ClassificationProductionStatsIntervalChart {
 				}
 			})
 			.collect::<Vec<_>>();
-		BarChart::new()
-			.id("histogram_intervals".to_owned())
-			.series(Some(series))
-			.title(Some(title))
-			.y_min(Some(0.0))
-			.into_node()
+		Dehydrate::new(
+			"histogram_intervals",
+			BarChart::new()
+				.series(Some(series))
+				.title(Some(title))
+				.y_min(Some(0.0)),
+		)
+		.into_node()
 	}
 }
 
@@ -127,12 +129,14 @@ impl Component for ClassificationProductionStatsChart {
 				}
 			})
 			.collect::<Vec<_>>();
-		BarChart::new()
-			.id("histogram_overall".to_owned())
-			.series(Some(series))
-			.title(Some(title))
-			.y_min(Some(0.0))
-			.into_node()
+		Dehydrate::new(
+			"histogram_overall",
+			BarChart::new()
+				.series(Some(series))
+				.title(Some(title))
+				.y_min(Some(0.0)),
+		)
+		.into_node()
 	}
 }
 
@@ -162,12 +166,14 @@ impl Component for PredictionCountChart {
 			&self.date_window_interval,
 			"Total Prediction Count".to_owned(),
 		);
-		BarChart::new()
-			.id("prediction_count".to_owned())
-			.series(Some(prediction_count_chart_series))
-			.title(Some(prediction_count_title))
-			.y_min(Some(0.0))
-			.into_node()
+		Dehydrate::new(
+			"prediction_count",
+			BarChart::new()
+				.series(Some(prediction_count_chart_series))
+				.title(Some(prediction_count_title))
+				.y_min(Some(0.0)),
+		)
+		.into_node()
 	}
 }
 

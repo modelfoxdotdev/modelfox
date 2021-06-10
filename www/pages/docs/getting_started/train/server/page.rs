@@ -10,10 +10,7 @@ use tangram_www_layouts::{
 mod dataset_preview;
 
 #[derive(ComponentBuilder)]
-pub struct Page {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Page;
 
 impl Component for Page {
 	fn into_node(self) -> Node {

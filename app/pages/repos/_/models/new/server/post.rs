@@ -13,10 +13,8 @@ use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_error::{err, Result};
 use tangram_id::Id;
 
-pub async fn post(
-	context: Arc<Context>,
-	request: http::Request<hyper::Body>,
-) -> Result<http::Response<hyper::Body>> {
+pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
+	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	let repo_id = if let ["repos", repo_id, "models", "new"] = *path_components(&request).as_slice()
 	{
 		repo_id.to_owned()
@@ -64,7 +62,7 @@ pub async fn post(
 		}
 	};
 	let mut file: Option<Vec<u8>> = None;
-	let mut multipart = Multipart::new(request.into_body(), boundary);
+	let mut multipart = Multipart::new(request.body_mut(), boundary);
 	while let Some(field) = multipart.next_field().await? {
 		let name = match field.name() {
 			Some(name) => name.to_owned(),

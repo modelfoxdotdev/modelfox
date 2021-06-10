@@ -117,10 +117,10 @@ enum Action {
 }
 
 pub async fn post(
-	context: &Context,
-	request: http::Request<hyper::Body>,
+	request: &mut http::Request<hyper::Body>,
 	model_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
+	let context = request.extensions().get::<Arc<Context>>().unwrap();
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
@@ -163,14 +163,14 @@ async fn delete_model(
 	Ok(response)
 }
 
-pub fn download(context: Arc<Context>, request: http::Request<hyper::Body>) -> HandleOutput {
-	download_inner(context, request).boxed()
+pub fn download(request: &mut http::Request<hyper::Body>) -> HandleOutput {
+	download_inner(request).boxed()
 }
 
 pub async fn download_inner(
-	context: Arc<Context>,
-	request: http::Request<hyper::Body>,
+	request: &mut http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
+	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	let model_id = if let ["repos", _, "models", model_id, "download"] =
 		path_components(&request).as_slice()
 	{

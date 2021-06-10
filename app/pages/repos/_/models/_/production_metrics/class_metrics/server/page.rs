@@ -327,28 +327,28 @@ impl Component for PrecisionRecallSection {
 					),
 			)
 			.child(
-				ui::Card::new().child(
+				ui::Card::new().child(Dehydrate::new(
+					"precision_intervals",
 					LineChart::new()
-						.id("precision_intervals".to_owned())
 						.labels(Some(chart_labels.clone()))
 						.series(Some(precision_chart_series))
 						.title(Some(precision_interval_chart_title))
 						.x_axis_grid_line_interval(Some(GridLineInterval { k: 1.0, p: 0.0 }))
 						.y_max(Some(Finite::new(1.0).unwrap()))
 						.y_min(Some(Finite::new(0.0).unwrap())),
-				),
+				)),
 			)
 			.child(
-				ui::Card::new().child(
+				ui::Card::new().child(Dehydrate::new(
+					"recall_intervals",
 					LineChart::new()
-						.id("recall_intervals".to_owned())
 						.x_axis_grid_line_interval(Some(GridLineInterval { k: 1.0, p: 0.0 }))
 						.y_max(Some(Finite::new(1.0).unwrap()))
 						.y_min(Some(Finite::new(0.0).unwrap()))
 						.labels(Some(chart_labels.clone()))
 						.series(Some(recall_chart_series))
 						.title(Some(recall_interval_chart_title)),
-				),
+				)),
 			)
 			.child(
 				MetricsRow::new().child(
@@ -367,9 +367,9 @@ impl Component for PrecisionRecallSection {
 				),
 			)
 			.child(
-				ui::Card::new().child(
+				ui::Card::new().child(Dehydrate::new(
+					"f1_intervals",
 					LineChart::new()
-						.id("f1_intervals".to_owned())
 						.x_axis_grid_line_interval(Some(GridLineInterval { k: 1.0, p: 0.0 }))
 						.y_axis_grid_line_interval(None)
 						.labels(Some(chart_labels))
@@ -377,7 +377,7 @@ impl Component for PrecisionRecallSection {
 						.title(Some(f1_score_interval_chart_title))
 						.y_min(Some(Finite::new(0.0).unwrap()))
 						.y_max(Some(Finite::new(1.0).unwrap())),
-				),
+				)),
 			)
 			.into_node()
 	}

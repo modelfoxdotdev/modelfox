@@ -2,7 +2,7 @@ use crate::{app::App, component::Component};
 use wasm_bindgen::JsCast;
 use web_sys as dom;
 
-pub fn hydrate<T>(id: &'static str)
+pub fn hydrate<T>(id: &str)
 where
 	T: Component + serde::Serialize + serde::de::DeserializeOwned,
 {

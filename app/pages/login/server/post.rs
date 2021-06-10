@@ -18,10 +18,8 @@ struct Action {
 	code: Option<String>,
 }
 
-pub async fn post(
-	context: Arc<Context>,
-	mut request: http::Request<hyper::Body>,
-) -> Result<http::Response<hyper::Body>> {
+pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
+	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	// Read the post data.
 	let data = match hyper::body::to_bytes(request.body_mut()).await {
 		Ok(data) => data,
