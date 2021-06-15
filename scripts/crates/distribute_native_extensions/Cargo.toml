@@ -10,5 +10,5 @@ name = "tangram_script_distribute_native_extensions"
 path = "main.rs"
 
 [dependencies]
-tangram_error = { path = "../../../error" }
+tangram_error = { path = "../../../crates/error" }
 tangram_script_build = { path = "../build" }

@@ -22,9 +22,9 @@ memmap = "0.7"
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tangram_core = { path = "../../core" }
-tangram_error = { path = "../../error" }
-tangram_model = { path = "../../model" }
+tangram_core = { path = "../../crates/core" }
+tangram_error = { path = "../../crates/error" }
 tangram_macro = { path = "macro" }
+tangram_model = { path = "../../crates/model" }
 tokio = { version = "1", features = [], optional = true }
 url = { version = "2", features = ["serde"] }

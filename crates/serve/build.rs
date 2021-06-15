@@ -119,8 +119,7 @@ pub fn build(options: BuildOptions) -> Result<()> {
 	// Collect CSS.
 	let mut css = String::new();
 	for dir in options.css_dirs {
-		let css_src_dir = options.workspace_dir.join(dir);
-		for entry in Walk::new(&css_src_dir) {
+		for entry in Walk::new(&dir) {
 			let entry = entry?;
 			let path = entry.path();
 			if path.extension().map(|e| e.to_str().unwrap()) == Some("css") {

@@ -16,7 +16,7 @@ http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
 notify = "5.0.0-pre.9"
 serde = { version = "1", features = ["derive"] }
-tangram_error = { path = "../../../error" }
+tangram_error = { path = "../../../crates/error" }
 tokio = { version = "1", features = ["full"] }
 tokio-stream = "0.1"
 which = "4"

@@ -1,2 +1,2 @@
 #!/bin/sh
-zig c++ -target x86_64-macos $@
+zig c++ -target aarch64-linux $@

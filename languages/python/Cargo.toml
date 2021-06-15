@@ -17,7 +17,7 @@ pyo3 = { version = "0.13", features = ["abi3-py36", "extension-module"] }
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tangram_core = { path = "../../core" }
-tangram_error = { path = "../../error" }
-tangram_model = { path = "../../model" }
+tangram_core = { path = "../../crates/core" }
+tangram_error = { path = "../../crates/error" }
+tangram_model = { path = "../../crates/model" }
 url = { version = "2", features = ["serde"] }

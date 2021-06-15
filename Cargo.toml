@@ -1,14 +1,14 @@
 [workspace]
 resolver = "2"
 members = [
-	"cli",
+	"crates/cli",
+	"crates/www",
 	"languages/c",
 	"languages/elixir/native",
 	"languages/node/native",
 	"languages/python",
 	"languages/rust",
 	"scripts/crates/*",
-	"www",
 ]
 
 [profile.dev.build-override]
