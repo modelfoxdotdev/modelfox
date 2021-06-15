@@ -106,6 +106,7 @@ tangram_app_training_stats_index_server = { path = "pages/repos/_/models/_/train
 tangram_app_tuning_server = { path = "pages/repos/_/models/_/tuning/server", optional = true }
 tangram_app_user_server = { path = "pages/user/server", optional = true }
 
+[target.wasm32-unknown-unknown.dependencies]
 tangram_app_model_index_client = { path = "pages/repos/_/models/_/index/client", optional = true }
 tangram_app_new_model_client = { path = "pages/repos/_/models/new/client", optional = true }
 tangram_app_playground_client = { path = "pages/repos/_/models/_/playground/client", optional = true }

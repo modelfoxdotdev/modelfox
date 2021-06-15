@@ -50,6 +50,7 @@ tangram_www_docs_install_server = { path = "pages/docs/install/server" }
 tangram_www_index_server = { path = "pages/index/server" }
 tangram_www_pricing_server = { path = "pages/pricing/server" }
 
+[target.wasm32-unknown-unknown.dependencies]
 tangram_www_benchmarks_client = { path = "pages/benchmarks/client" }
 tangram_www_index_client = { path = "pages/index/client" }
 tangram_www_docs_inspect_client = {path = "pages/docs/getting_started/inspect/client"}

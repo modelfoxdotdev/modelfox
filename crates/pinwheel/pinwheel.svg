@@ -1,0 +1,9 @@
+<svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M150 150L200 200V300L150 250V150Z" fill="#FF375F"/>
+<path d="M100 0L150 50L100 100L50 50L100 0Z" fill="#FFD60A"/>
+<path d="M200 200L300 300H200V200Z" fill="#4DD0E1"/>
+<path d="M100 100L150 50V150L100 100Z" fill="#5E5CE6"/>
+<path d="M100 0L50 50L0 0H100Z" fill="#BF5AF2"/>
+<path d="M150 150.001L291.421 8.57996V150.001H150Z" fill="#30D158"/>
+<path d="M150.001 150H8.58V291.421L150.001 150Z" fill="#0A84FF"/>
+</svg>
