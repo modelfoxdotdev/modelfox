@@ -46,6 +46,7 @@ path = "benchmarks/iris.rs"
 
 [dependencies]
 bitvec = "0.19"
+buffalo = { path = "../buffalo", features = ["ndarray_0_15", "bitvec_0_19"] }
 clap = { version = "3.0.0-beta.2", features = ["color"] }
 itertools = "0.10"
 maplit = "1"
@@ -58,6 +59,5 @@ tangram_finite = { path = "../finite" }
 tangram_kill_chip = { path = "../kill_chip" }
 tangram_metrics = { path = "../metrics" }
 tangram_progress_counter = { path = "../progress_counter" }
-tangram_serialize = { path = "../serialize", features = ["ndarray_0_15", "bitvec_0_19"] }
 tangram_table = { path = "../table" }
 tangram_zip = { path = "../zip" }

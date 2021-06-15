@@ -31,7 +31,7 @@ pub use self::{
 	vec_reader::VecReader,
 	writer::Writer,
 };
-pub use tangram_serialize_macro::{Read, Write};
+pub use buffalo_macro::{Read, Write};
 
 pub fn read<'a, T>(bytes: &'a [u8]) -> T::Output
 where
@@ -45,40 +45,40 @@ where
 
 #[cfg(test)]
 mod test {
-	use crate as tangram_serialize;
+	use crate as buffalo;
 
-	#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-	#[tangram_serialize(size = "dynamic")]
+	#[derive(buffalo::Read, buffalo::Write)]
+	#[buffalo(size = "dynamic")]
 	struct AddressBook {
-		#[tangram_serialize(id = 0, required)]
+		#[buffalo(id = 0, required)]
 		pub contacts: Vec<Contact>,
 	}
 
-	#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-	#[tangram_serialize(size = "dynamic")]
+	#[derive(buffalo::Read, buffalo::Write)]
+	#[buffalo(size = "dynamic")]
 	struct Contact {
-		#[tangram_serialize(id = 0, required)]
+		#[buffalo(id = 0, required)]
 		pub age: u16,
-		#[tangram_serialize(id = 1, required)]
+		#[buffalo(id = 1, required)]
 		pub name: String,
-		#[tangram_serialize(id = 2, required)]
+		#[buffalo(id = 2, required)]
 		pub phone_numbers: Option<Vec<PhoneNumber>>,
 	}
 
-	#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-	#[tangram_serialize(size = "static", value_size = 8)]
+	#[derive(buffalo::Read, buffalo::Write)]
+	#[buffalo(size = "static", value_size = 8)]
 	enum PhoneNumber {
 		#[allow(unused)]
-		#[tangram_serialize(id = 0)]
+		#[buffalo(id = 0)]
 		Home(String),
 		#[allow(unused)]
-		#[tangram_serialize(id = 1)]
+		#[buffalo(id = 1)]
 		Mobile(String),
 	}
 
 	#[test]
 	fn test_address_book() {
-		let mut writer = tangram_serialize::Writer::new();
+		let mut writer = buffalo::Writer::new();
 		let name = writer.write("John Doe");
 		let home = writer.write("1231231234");
 		let mobile = writer.write("4564564567");
@@ -95,7 +95,7 @@ mod test {
 		let address_book = writer.write(&AddressBookWriter { contacts });
 		writer.write(&address_book);
 		let bytes = writer.into_bytes();
-		let address_book = tangram_serialize::read::<AddressBookReader>(&bytes);
+		let address_book = buffalo::read::<AddressBookReader>(&bytes);
 		let contact = address_book.contacts().get(0).unwrap();
 		assert_eq!(contact.name(), "John Doe");
 		assert_eq!(contact.age(), 28);

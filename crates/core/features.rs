@@ -350,7 +350,7 @@ fn bag_of_words_cosine_similarity_feature_group_for_column(
 // fn word_embedding_feature_group_for_column(
 // 	column_stats: &TextColumnStatsOutput,
 // ) -> tangram_features::FeatureGroup {
-// 	let model = tangram_serialize::read::<tangram_model::WordEmbeddingModelReader>(bytes);
+// 	let model = buffalo::read::<tangram_model::WordEmbeddingModelReader>(bytes);
 // 	let model = model.into();
 // 	tangram_features::FeatureGroup::WordEmbedding(tangram_features::WordEmbeddingFeatureGroup {
 // 		source_column_name: column_stats.column_name.to_owned(),

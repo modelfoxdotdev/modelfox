@@ -1,7 +1,7 @@
 [package]
 edition = "2018"
 license = "MIT"
-name = "tangram_serialize"
+name = "buffalo"
 publish = true
 version = "0.0.0"
 
@@ -17,4 +17,4 @@ bitvec = {version = "0.19", optional = true }
 derive_deref = "1"
 ndarray = { version = "0.15", optional = true }
 num = "0.4"
-tangram_serialize_macro = { path = "macro" }
+buffalo_macro = { path = "macro" }

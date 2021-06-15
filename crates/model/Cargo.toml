@@ -9,10 +9,10 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
+buffalo = { path = "../buffalo" }
 fnv = "1"
 num = "0.4"
 tangram_error = { path = "../error" }
 tangram_linear = { path = "../linear" }
-tangram_serialize = { path = "../serialize" }
 tangram_text = { path = "../text" }
 tangram_tree = { path = "../tree" }

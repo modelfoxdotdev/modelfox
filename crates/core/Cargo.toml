@@ -10,6 +10,7 @@ path = "lib.rs"
 
 [dependencies]
 bitvec = "0.19"
+buffalo = { path = "../buffalo" }
 chrono = { version = "0.4", features = ["serde"] }
 fast-float = "0.2"
 fnv = "1"
@@ -27,10 +28,9 @@ tangram_finite = { path = "../finite" }
 tangram_id = { path = "../id" }
 tangram_kill_chip = { path = "../kill_chip" }
 tangram_linear = { path = "../linear" }
-tangram_model = { path = "../model" }
 tangram_metrics = { path = "../metrics" }
+tangram_model = { path = "../model" }
 tangram_progress_counter = { path = "../progress_counter" }
-tangram_serialize = { path = "../serialize" }
 tangram_table = { path = "../table" }
 tangram_text = { path = "../text" }
 tangram_tree = { path = "../tree" }

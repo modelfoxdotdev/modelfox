@@ -41,6 +41,7 @@ name = "tangram_linear_benchmark_iris"
 path = "benchmarks/iris.rs"
 
 [dependencies]
+buffalo = { path = "../buffalo" }
 clap = { version = "3.0.0-beta.2", features = ["color"] }
 maplit = "1"
 ndarray = { version = "0.15", features = ["rayon"] }
@@ -52,6 +53,5 @@ tangram_features = { path = "../features" }
 tangram_kill_chip = { path = "../kill_chip" }
 tangram_metrics = { path = "../metrics" }
 tangram_progress_counter = { path = "../progress_counter" }
-tangram_serialize = { path = "../serialize" }
 tangram_table = { path = "../table" }
 tangram_zip = { path = "../zip" }

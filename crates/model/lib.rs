@@ -1,5 +1,5 @@
 /*!
-This crate defines the structure of `.tangram` files using the `tangram_serialize` crate.
+This crate defines the structure of `.tangram` files using the `buffalo` crate.
 */
 
 use fnv::FnvHashMap;
@@ -44,7 +44,7 @@ pub fn from_bytes(bytes: &[u8]) -> Result<ModelReader> {
 		return Err(err!("This model has a revision number of {}, which is lower than the minumum supported revision number of {} for this version of tangram. Please downgrade to an earlier version of tangram to use it.", revision, MIN_SUPPORTED_REVISION));
 	}
 	let bytes = &bytes[4..];
-	let model = tangram_serialize::read::<ModelReader>(bytes);
+	let model = buffalo::read::<ModelReader>(bytes);
 	Ok(model)
 }
 
@@ -60,28 +60,28 @@ pub fn to_path(path: &Path, bytes: &[u8]) -> Result<()> {
 	Ok(())
 }
 
-#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "dynamic")]
+#[derive(buffalo::Read, buffalo::Write)]
+#[buffalo(size = "dynamic")]
 pub struct Model {
-	#[tangram_serialize(id = 0, required)]
+	#[buffalo(id = 0, required)]
 	pub id: String,
-	#[tangram_serialize(id = 1, required)]
+	#[buffalo(id = 1, required)]
 	pub version: String,
-	#[tangram_serialize(id = 2, required)]
+	#[buffalo(id = 2, required)]
 	pub date: String,
-	#[tangram_serialize(id = 3, required)]
+	#[buffalo(id = 3, required)]
 	pub inner: ModelInner,
 }
 
-#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "static", value_size = 8)]
+#[derive(buffalo::Read, buffalo::Write)]
+#[buffalo(size = "static", value_size = 8)]
 #[allow(clippy::large_enum_variant)]
 pub enum ModelInner {
-	#[tangram_serialize(id = 0)]
+	#[buffalo(id = 0)]
 	Regressor(Regressor),
-	#[tangram_serialize(id = 1)]
+	#[buffalo(id = 1)]
 	BinaryClassifier(BinaryClassifier),
-	#[tangram_serialize(id = 2)]
+	#[buffalo(id = 2)]
 	MulticlassClassifier(MulticlassClassifier),
 }
 

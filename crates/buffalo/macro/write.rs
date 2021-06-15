@@ -62,7 +62,7 @@ fn static_struct_write(
 		.map(|field| {
 			let field_ident = &field.ident;
 			let field_ty = &field.ty;
-			quote!(#visibility #field_ident: <#field_ty as tangram_serialize::WriteType>::WriteType)
+			quote!(#visibility #field_ident: <#field_ty as buffalo::WriteType>::WriteType)
 		})
 		.collect::<Vec<_>>();
 	let writer_decl = quote! {
@@ -75,12 +75,12 @@ fn static_struct_write(
 		.iter()
 		.map(|field| {
 			let field_ty = &field.ty;
-			quote! { <<#field_ty as tangram_serialize::ReadType>::ReadType as tangram_serialize::StaticSize>::STATIC_SIZE }
+			quote! { <<#field_ty as buffalo::ReadType>::ReadType as buffalo::StaticSize>::STATIC_SIZE }
 		})
 		.collect::<Vec<_>>();
 	let static_size_impl = quote! {
-		impl tangram_serialize::StaticSize for #writer_ident {
-			const STATIC_SIZE: tangram_serialize::PointerType = #(#size_exprs)+*;
+		impl buffalo::StaticSize for #writer_ident {
+			const STATIC_SIZE: buffalo::PointerType = #(#size_exprs)+*;
 		}
 	};
 	let fields = data
@@ -99,9 +99,9 @@ fn static_struct_write(
 		}
 	});
 	let write_impl = quote! {
-		impl tangram_serialize::Write for #writer_ident {
+		impl buffalo::Write for #writer_ident {
 			type Output = Self;
-			fn write(&self, writer: &mut tangram_serialize::Writer) -> tangram_serialize::Position<Self::Output> {
+			fn write(&self, writer: &mut buffalo::Writer) -> buffalo::Position<Self::Output> {
 				let position = writer.position();
 				#(#writer_statements)*
 				position
@@ -109,7 +109,7 @@ fn static_struct_write(
 		}
 	};
 	let write_type_impl = quote! {
-		impl tangram_serialize::WriteType for #ident {
+		impl buffalo::WriteType for #ident {
 			type WriteType = #writer_ident;
 		}
 	};
@@ -143,7 +143,7 @@ fn dynamic_enum_write(
 				Ok(quote!(#variant_ident))
 			} else {
 				let variant_ty = variant_ty(&variant)?;
-				Ok(quote!(#variant_ident(<#variant_ty as tangram_serialize::WriteType>::WriteType)))
+				Ok(quote!(#variant_ident(<#variant_ty as buffalo::WriteType>::WriteType)))
 			}
 		})
 		.collect::<syn::Result<Vec<_>>>()?;
@@ -182,9 +182,9 @@ fn dynamic_enum_write(
 		})
 		.collect::<syn::Result<Vec<_>>>()?;
 	let write_impl = quote! {
-		impl tangram_serialize::Write for #writer_ident {
+		impl buffalo::Write for #writer_ident {
 			type Output = Self;
-			fn write(&self, writer: &mut tangram_serialize::Writer) -> tangram_serialize::Position<Self::Output> {
+			fn write(&self, writer: &mut buffalo::Writer) -> buffalo::Position<Self::Output> {
 				match self {
 					#(#write_match_arms)*
 				}
@@ -192,8 +192,8 @@ fn dynamic_enum_write(
 		}
 	};
 	let write_type_impl = quote! {
-		impl tangram_serialize::WriteType for #ident {
-			type WriteType = tangram_serialize::Position<#writer_ident>;
+		impl buffalo::WriteType for #ident {
+			type WriteType = buffalo::Position<#writer_ident>;
 		}
 	};
 	let code = quote! {
@@ -230,7 +230,7 @@ fn dynamic_struct_write(
 		.map(|field| {
 			let field_ident = &field.ident;
 			let field_ty = &field.ty;
-			quote!(#visibility #field_ident: <#field_ty as tangram_serialize::WriteType>::WriteType)
+			quote!(#visibility #field_ident: <#field_ty as buffalo::WriteType>::WriteType)
 		})
 		.collect::<Vec<_>>();
 	let writer_decl = quote! {
@@ -253,7 +253,7 @@ fn dynamic_struct_write(
 			let field_ty = &field.ty;
 			Some(quote! {
 				index.set_field_offset(#field_id as #index_ty, offset);
-				offset += <<#field_ty as tangram_serialize::WriteType>::WriteType as tangram_serialize::StaticSize>::STATIC_SIZE as #index_ty;
+				offset += <<#field_ty as buffalo::WriteType>::WriteType as buffalo::StaticSize>::STATIC_SIZE as #index_ty;
 			})
 		} else {
 			None
@@ -266,13 +266,13 @@ fn dynamic_struct_write(
 		}
 	});
 	let write_impl = quote! {
-		impl tangram_serialize::Write for #writer_ident {
+		impl buffalo::Write for #writer_ident {
 			type Output = Self;
-			fn write(&self, writer: &mut tangram_serialize::Writer) -> tangram_serialize::Position<Self::Output> {
-				let mut offset = <tangram_serialize::PointerType as tangram_serialize::StaticSize>::STATIC_SIZE as #index_ty;
-				let mut index = tangram_serialize::DynamicStructIndexWriterI::<#index_ty>::new(#index_field_count as #index_ty);
+			fn write(&self, writer: &mut buffalo::Writer) -> buffalo::Position<Self::Output> {
+				let mut offset = <buffalo::PointerType as buffalo::StaticSize>::STATIC_SIZE as #index_ty;
+				let mut index = buffalo::DynamicStructIndexWriterI::<#index_ty>::new(#index_field_count as #index_ty);
 				#(#index_statements)*
-				let index = tangram_serialize::DynamicStructIndexWriter::#index_variant(index);
+				let index = buffalo::DynamicStructIndexWriter::#index_variant(index);
 				let index_position = if let Some(index_position) = writer.get_index(&index) {
 					*index_position
 				} else {
@@ -288,8 +288,8 @@ fn dynamic_struct_write(
 		}
 	};
 	let write_type_impl = quote! {
-		impl tangram_serialize::WriteType for #ident {
-			type WriteType = tangram_serialize::Position<#writer_ident>;
+		impl buffalo::WriteType for #ident {
+			type WriteType = buffalo::Position<#writer_ident>;
 		}
 	};
 	let code = quote! {
@@ -331,7 +331,7 @@ fn static_enum_write(
 				Ok(quote!(#variant_ident))
 			} else {
 				let variant_ty = variant_ty(&variant)?;
-				Ok(quote!(#variant_ident(<#variant_ty as tangram_serialize::WriteType>::WriteType)))
+				Ok(quote!(#variant_ident(<#variant_ty as buffalo::WriteType>::WriteType)))
 			}
 		})
 		.collect::<syn::Result<Vec<_>>>()?;
@@ -342,8 +342,8 @@ fn static_enum_write(
 	};
 	let static_size = discriminant_size + value_size;
 	let static_size_impl = quote! {
-		impl tangram_serialize::StaticSize for #writer_ident {
-			const STATIC_SIZE: tangram_serialize::PointerType = #static_size;
+		impl buffalo::StaticSize for #writer_ident {
+			const STATIC_SIZE: buffalo::PointerType = #static_size;
 		}
 	};
 	let write_match_arms = data
@@ -370,8 +370,8 @@ fn static_enum_write(
 						let position = writer.position();
 						writer.write(&#variant_id);
 						writer.write(value);
-						const variant_size: tangram_serialize::PointerType = <<#variant_ty as tangram_serialize::WriteType>::WriteType as tangram_serialize::StaticSize>::STATIC_SIZE;
-						const extra_bytes_count: tangram_serialize::PointerType = #value_size - variant_size;
+						const variant_size: buffalo::PointerType = <<#variant_ty as buffalo::WriteType>::WriteType as buffalo::StaticSize>::STATIC_SIZE;
+						const extra_bytes_count: buffalo::PointerType = #value_size - variant_size;
 						writer.write_raw::<()>(&vec![0u8; extra_bytes_count as usize]);
 						position
 					}
@@ -381,9 +381,9 @@ fn static_enum_write(
 		})
 		.collect::<syn::Result<Vec<_>>>()?;
 	let write_impl = quote! {
-		impl tangram_serialize::Write for #writer_ident {
+		impl buffalo::Write for #writer_ident {
 			type Output = Self;
-			fn write(&self, writer: &mut tangram_serialize::Writer) -> tangram_serialize::Position<Self::Output> {
+			fn write(&self, writer: &mut buffalo::Writer) -> buffalo::Position<Self::Output> {
 				match self {
 					#(#write_match_arms)*
 				}
@@ -391,7 +391,7 @@ fn static_enum_write(
 		}
 	};
 	let write_type_impl = quote! {
-		impl tangram_serialize::WriteType for #ident {
+		impl buffalo::WriteType for #ident {
 			type WriteType = #writer_ident;
 		}
 	};

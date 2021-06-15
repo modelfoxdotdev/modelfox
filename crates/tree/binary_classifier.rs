@@ -13,13 +13,13 @@ use tangram_zip::{pzip, zip};
 
 /// `BinaryClassifier`s predict binary target values, for example whether a patient has heart disease or not.
 #[derive(Clone, Debug)]
-// #[tangram_serialize(size = "dynamic")]
+// #[buffalo(size = "dynamic")]
 pub struct BinaryClassifier {
 	/// The initial prediction of the model given no trained trees. The bias is calculated using the distribution of the unique values in target column in the training dataset.
-	// #[tangram_serialize(id = 0, required)]
+	// #[buffalo(id = 0, required)]
 	pub bias: f32,
 	/// The trees for this model.
-	// #[tangram_serialize(id = 1, required)]
+	// #[buffalo(id = 1, required)]
 	pub trees: Vec<Tree>,
 }
 
@@ -94,19 +94,19 @@ impl BinaryClassifier {
 
 	pub fn to_writer(
 		&self,
-		writer: &mut tangram_serialize::Writer,
-	) -> tangram_serialize::Position<crate::serialize::BinaryClassifierWriter> {
+		writer: &mut buffalo::Writer,
+	) -> buffalo::Position<crate::serialize::BinaryClassifierWriter> {
 		crate::serialize::serialize_binary_classifier(self, writer)
 	}
 
 	pub fn from_bytes(&self, bytes: &[u8]) -> BinaryClassifier {
-		let reader = tangram_serialize::read::<crate::serialize::BinaryClassifierReader>(bytes);
+		let reader = buffalo::read::<crate::serialize::BinaryClassifierReader>(bytes);
 		Self::from_reader(reader)
 	}
 
 	pub fn to_bytes(&self) -> Vec<u8> {
 		// Create the writer.
-		let mut writer = tangram_serialize::Writer::new();
+		let mut writer = buffalo::Writer::new();
 		self.to_writer(&mut writer);
 		writer.into_bytes()
 	}

@@ -2,113 +2,113 @@ use bitvec::prelude::*;
 use ndarray::prelude::*;
 use num::ToPrimitive;
 
-#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "dynamic")]
+#[derive(buffalo::Read, buffalo::Write)]
+#[buffalo(size = "dynamic")]
 pub struct Regressor {
-	#[tangram_serialize(id = 0, required)]
+	#[buffalo(id = 0, required)]
 	pub bias: f32,
-	#[tangram_serialize(id = 1, required)]
+	#[buffalo(id = 1, required)]
 	pub trees: Vec<Tree>,
 }
 
-#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "dynamic")]
+#[derive(buffalo::Read, buffalo::Write)]
+#[buffalo(size = "dynamic")]
 pub struct BinaryClassifier {
-	#[tangram_serialize(id = 0, required)]
+	#[buffalo(id = 0, required)]
 	pub bias: f32,
-	#[tangram_serialize(id = 1, required)]
+	#[buffalo(id = 1, required)]
 	pub trees: Vec<Tree>,
 }
 
-#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "dynamic")]
+#[derive(buffalo::Read, buffalo::Write)]
+#[buffalo(size = "dynamic")]
 pub struct MulticlassClassifier {
-	#[tangram_serialize(id = 0, required)]
+	#[buffalo(id = 0, required)]
 	pub biases: Array1<f32>,
-	#[tangram_serialize(id = 1, required)]
+	#[buffalo(id = 1, required)]
 	pub trees: Array2<Tree>,
 }
 
-#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "dynamic")]
+#[derive(buffalo::Read, buffalo::Write)]
+#[buffalo(size = "dynamic")]
 pub struct Tree {
-	#[tangram_serialize(id = 0, required)]
+	#[buffalo(id = 0, required)]
 	pub nodes: Vec<Node>,
 }
 
-#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "static", value_size = 8)]
+#[derive(buffalo::Read, buffalo::Write)]
+#[buffalo(size = "static", value_size = 8)]
 pub enum Node {
-	#[tangram_serialize(id = 0)]
+	#[buffalo(id = 0)]
 	Branch(BranchNode),
-	#[tangram_serialize(id = 1)]
+	#[buffalo(id = 1)]
 	Leaf(LeafNode),
 }
 
-#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "dynamic")]
+#[derive(buffalo::Read, buffalo::Write)]
+#[buffalo(size = "dynamic")]
 pub struct BranchNode {
-	#[tangram_serialize(id = 0, required)]
+	#[buffalo(id = 0, required)]
 	pub left_child_index: u64,
-	#[tangram_serialize(id = 1, required)]
+	#[buffalo(id = 1, required)]
 	pub right_child_index: u64,
-	#[tangram_serialize(id = 2, required)]
+	#[buffalo(id = 2, required)]
 	pub split: BranchSplit,
-	#[tangram_serialize(id = 3, required)]
+	#[buffalo(id = 3, required)]
 	pub examples_fraction: f32,
 }
 
-#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "static", value_size = 8)]
+#[derive(buffalo::Read, buffalo::Write)]
+#[buffalo(size = "static", value_size = 8)]
 pub enum BranchSplit {
-	#[tangram_serialize(id = 0)]
+	#[buffalo(id = 0)]
 	Continuous(BranchSplitContinuous),
-	#[tangram_serialize(id = 1)]
+	#[buffalo(id = 1)]
 	Discrete(BranchSplitDiscrete),
 }
 
-#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "dynamic")]
+#[derive(buffalo::Read, buffalo::Write)]
+#[buffalo(size = "dynamic")]
 pub struct BranchSplitContinuous {
-	#[tangram_serialize(id = 0, required)]
+	#[buffalo(id = 0, required)]
 	pub feature_index: u64,
-	#[tangram_serialize(id = 1, required)]
+	#[buffalo(id = 1, required)]
 	pub split_value: f32,
-	#[tangram_serialize(id = 2, required)]
+	#[buffalo(id = 2, required)]
 	pub invalid_values_direction: SplitDirection,
 }
 
-#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "dynamic")]
+#[derive(buffalo::Read, buffalo::Write)]
+#[buffalo(size = "dynamic")]
 pub struct BranchSplitDiscrete {
-	#[tangram_serialize(id = 0, required)]
+	#[buffalo(id = 0, required)]
 	pub feature_index: u64,
-	#[tangram_serialize(id = 1, required)]
+	#[buffalo(id = 1, required)]
 	pub directions: BitVec<Lsb0, u8>,
 }
 
-#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "static", value_size = 0)]
+#[derive(buffalo::Read, buffalo::Write)]
+#[buffalo(size = "static", value_size = 0)]
 pub enum SplitDirection {
-	#[tangram_serialize(id = 0)]
+	#[buffalo(id = 0)]
 	Left,
-	#[tangram_serialize(id = 1)]
+	#[buffalo(id = 1)]
 	Right,
 }
 
-#[derive(tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "dynamic")]
+#[derive(buffalo::Read, buffalo::Write)]
+#[buffalo(size = "dynamic")]
 pub struct LeafNode {
-	#[tangram_serialize(id = 0, required)]
+	#[buffalo(id = 0, required)]
 	pub value: f64,
-	#[tangram_serialize(id = 1, required)]
+	#[buffalo(id = 1, required)]
 	pub examples_fraction: f32,
 }
 
 pub(crate) fn serialize_regressor(
 	regressor: &crate::Regressor,
-	writer: &mut tangram_serialize::Writer,
-) -> tangram_serialize::Position<RegressorWriter> {
+	writer: &mut buffalo::Writer,
+) -> buffalo::Position<RegressorWriter> {
 	let trees = regressor
 		.trees
 		.iter()
@@ -126,8 +126,8 @@ pub(crate) fn serialize_regressor(
 
 pub(crate) fn serialize_binary_classifier(
 	binary_classifier: &crate::BinaryClassifier,
-	writer: &mut tangram_serialize::Writer,
-) -> tangram_serialize::Position<BinaryClassifierWriter> {
+	writer: &mut buffalo::Writer,
+) -> buffalo::Position<BinaryClassifierWriter> {
 	let trees = binary_classifier
 		.trees
 		.iter()
@@ -145,8 +145,8 @@ pub(crate) fn serialize_binary_classifier(
 
 pub(crate) fn serialize_multiclass_classifier(
 	multiclass_classifier: &crate::MulticlassClassifier,
-	writer: &mut tangram_serialize::Writer,
-) -> tangram_serialize::Position<MulticlassClassifierWriter> {
+	writer: &mut buffalo::Writer,
+) -> buffalo::Position<MulticlassClassifierWriter> {
 	let biases = writer.write(&multiclass_classifier.biases);
 	let trees = multiclass_classifier.trees.map(|tree| {
 		let tree = serialize_tree(tree, writer);
@@ -156,7 +156,7 @@ pub(crate) fn serialize_multiclass_classifier(
 	writer.write(&MulticlassClassifierWriter { biases, trees })
 }
 
-fn serialize_tree(tree: &crate::Tree, writer: &mut tangram_serialize::Writer) -> TreeWriter {
+fn serialize_tree(tree: &crate::Tree, writer: &mut buffalo::Writer) -> TreeWriter {
 	let nodes = tree
 		.nodes
 		.iter()
@@ -166,7 +166,7 @@ fn serialize_tree(tree: &crate::Tree, writer: &mut tangram_serialize::Writer) ->
 	TreeWriter { nodes }
 }
 
-fn serialize_node(node: &crate::Node, writer: &mut tangram_serialize::Writer) -> NodeWriter {
+fn serialize_node(node: &crate::Node, writer: &mut buffalo::Writer) -> NodeWriter {
 	match node {
 		crate::Node::Branch(node) => {
 			let split = serialize_branch_split(&node.split, writer);
@@ -190,7 +190,7 @@ fn serialize_node(node: &crate::Node, writer: &mut tangram_serialize::Writer) ->
 
 fn serialize_branch_split(
 	branch_split: &crate::BranchSplit,
-	writer: &mut tangram_serialize::Writer,
+	writer: &mut buffalo::Writer,
 ) -> BranchSplitWriter {
 	match branch_split {
 		crate::BranchSplit::Continuous(split) => {
@@ -216,7 +216,7 @@ fn serialize_branch_split(
 
 fn serialize_split_direction(
 	split_direction: &crate::SplitDirection,
-	_writer: &mut tangram_serialize::Writer,
+	_writer: &mut buffalo::Writer,
 ) -> SplitDirectionWriter {
 	match split_direction {
 		crate::SplitDirection::Left => SplitDirectionWriter::Left,

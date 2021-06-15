@@ -59,15 +59,15 @@ pub fn enum_attributes(input: &syn::DeriveInput) -> syn::Result<EnumAttributes> 
 	let attr = input
 		.attrs
 		.iter()
-		.find(|attr| attr.path.is_ident("tangram_serialize"))
-		.ok_or_else(|| syn::Error::new(input.span(), "tangram_serialize attribute is required"))?;
+		.find(|attr| attr.path.is_ident("buffalo"))
+		.ok_or_else(|| syn::Error::new(input.span(), "buffalo attribute is required"))?;
 	let meta = attr.parse_meta()?;
 	let list = match meta {
 		syn::Meta::List(list) => list,
 		_ => {
 			return Err(syn::Error::new_spanned(
 				attr,
-				"tangram_serialize attribute must contain a list",
+				"buffalo attribute must contain a list",
 			))
 		}
 	};

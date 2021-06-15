@@ -1,44 +1,27 @@
 use quote::quote;
 use syn::spanned::Spanned;
 
-pub struct FieldAttributes {
+pub struct VariantAttributes {
 	pub id: u64,
-	pub required: bool,
 }
 
-pub enum FieldIdValue {
-	U8(u8),
-	U16(u16),
-}
-
-impl quote::ToTokens for FieldIdValue {
-	fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-		let code = match self {
-			FieldIdValue::U8(value) => quote! { #value },
-			FieldIdValue::U16(value) => quote! { #value },
-		};
-		code.to_tokens(tokens);
-	}
-}
-
-pub fn field_attributes(field: &syn::Field) -> syn::Result<FieldAttributes> {
-	let attr = field
+pub fn variant_attributes(variant: &syn::Variant) -> syn::Result<VariantAttributes> {
+	let attr = variant
 		.attrs
 		.iter()
-		.find(|attr| attr.path.is_ident("tangram_serialize"))
-		.ok_or_else(|| syn::Error::new(field.span(), "tangram_serialize attribute is required"))?;
+		.find(|attr| attr.path.is_ident("buffalo"))
+		.ok_or_else(|| syn::Error::new(variant.span(), "buffalo attribute is required"))?;
 	let meta = attr.parse_meta()?;
 	let list = match meta {
 		syn::Meta::List(list) => list,
 		_ => {
 			return Err(syn::Error::new_spanned(
 				attr,
-				"tangram_serialize attribute must contain a list",
+				"attribute arguments must be a list",
 			))
 		}
 	};
 	let mut id = None;
-	let mut required = None;
 	for item in list.nested.iter() {
 		match item {
 			syn::NestedMeta::Meta(syn::Meta::NameValue(item)) if item.path.is_ident("id") => {
@@ -55,17 +38,25 @@ pub fn field_attributes(field: &syn::Field) -> syn::Result<FieldAttributes> {
 				})?;
 				id = Some(value);
 			}
-			syn::NestedMeta::Meta(syn::Meta::Path(item)) if item.is_ident("required") => {
-				required = Some(true);
-			}
 			_ => {}
 		}
 	}
 	let id = id.ok_or_else(|| {
 		syn::Error::new_spanned(&list.nested, "an attribute with key \"id\" is required")
 	})?;
-	Ok(FieldAttributes {
-		id,
-		required: required.unwrap_or(false),
-	})
+	Ok(VariantAttributes { id })
+}
+
+pub fn variant_ty(variant: &syn::Variant) -> syn::Result<proc_macro2::TokenStream> {
+	match &variant.fields {
+		syn::Fields::Named(_) => Err(syn::Error::new_spanned(
+			variant,
+			"variants with named fields are not supported",
+		)),
+		syn::Fields::Unnamed(fields) => {
+			let variant_ty = &fields.unnamed.first().unwrap().ty;
+			Ok(quote! { #variant_ty })
+		}
+		syn::Fields::Unit => Ok(quote! { () }),
+	}
 }

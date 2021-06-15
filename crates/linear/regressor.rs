@@ -247,19 +247,19 @@ impl Regressor {
 
 	pub fn to_writer(
 		&self,
-		writer: &mut tangram_serialize::Writer,
-	) -> tangram_serialize::Position<crate::serialize::RegressorWriter> {
+		writer: &mut buffalo::Writer,
+	) -> buffalo::Position<crate::serialize::RegressorWriter> {
 		crate::serialize::serialize_regressor(self, writer)
 	}
 
 	pub fn from_bytes(&self, bytes: &[u8]) -> Regressor {
-		let reader = tangram_serialize::read::<crate::serialize::RegressorReader>(bytes);
+		let reader = buffalo::read::<crate::serialize::RegressorReader>(bytes);
 		Self::from_reader(reader)
 	}
 
 	pub fn to_bytes(&self) -> Vec<u8> {
 		// Create the writer.
-		let mut writer = tangram_serialize::Writer::new();
+		let mut writer = buffalo::Writer::new();
 		self.to_writer(&mut writer);
 		writer.into_bytes()
 	}

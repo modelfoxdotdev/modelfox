@@ -33,8 +33,8 @@ pub fn struct_attributes(
 ) -> syn::Result<StructAttributes> {
 	let attr = attrs
 		.iter()
-		.find(|attr| attr.path.is_ident("tangram_serialize"))
-		.ok_or_else(|| syn::Error::new(span, "tangram_serialize attribute is required"))?;
+		.find(|attr| attr.path.is_ident("buffalo"))
+		.ok_or_else(|| syn::Error::new(span, "buffalo attribute is required"))?;
 	let meta = attr.parse_meta()?;
 	let list = match meta {
 		syn::Meta::List(list) => list,

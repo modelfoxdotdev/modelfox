@@ -256,6 +256,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "buffalo"
+version = "0.0.0"
+dependencies = [
+ "bitvec",
+ "buffalo_macro",
+ "derive_deref",
+ "ndarray",
+ "num",
+]
+
+[[package]]
+name = "buffalo_macro"
+version = "0.0.0"
+dependencies = [
+ "heck",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4014,6 +4035,7 @@ name = "tangram_core"
 version = "0.0.0"
 dependencies = [
  "bitvec",
+ "buffalo",
  "chrono",
  "fast-float",
  "fnv",
@@ -4034,7 +4056,6 @@ dependencies = [
  "tangram_metrics",
  "tangram_model",
  "tangram_progress_counter",
- "tangram_serialize",
  "tangram_table",
  "tangram_text",
  "tangram_tree",
@@ -4118,6 +4139,7 @@ dependencies = [
 name = "tangram_linear"
 version = "0.0.0"
 dependencies = [
+ "buffalo",
  "clap 3.0.0-beta.2",
  "maplit",
  "ndarray",
@@ -4129,7 +4151,6 @@ dependencies = [
  "tangram_kill_chip",
  "tangram_metrics",
  "tangram_progress_counter",
- "tangram_serialize",
  "tangram_table",
  "tangram_zip",
 ]
@@ -4158,11 +4179,11 @@ dependencies = [
 name = "tangram_model"
 version = "0.0.0"
 dependencies = [
+ "buffalo",
  "fnv",
  "num",
  "tangram_error",
  "tangram_linear",
- "tangram_serialize",
  "tangram_text",
  "tangram_tree",
 ]
@@ -4281,6 +4302,7 @@ dependencies = [
 name = "tangram_script_build_word_embedding_models"
 version = "0.0.0"
 dependencies = [
+ "buffalo",
  "duct",
  "ndarray",
  "ndarray-npy",
@@ -4292,7 +4314,6 @@ dependencies = [
  "serde_json",
  "tangram_error",
  "tangram_model",
- "tangram_serialize",
 ]
 
 [[package]]
@@ -4353,30 +4374,8 @@ dependencies = [
  "tangram_error",
  "tangram_id",
  "tangram_model",
- "tangram_serialize",
  "tangram_table",
  "url",
-]
-
-[[package]]
-name = "tangram_serialize"
-version = "0.0.0"
-dependencies = [
- "bitvec",
- "derive_deref",
- "ndarray",
- "num",
- "tangram_serialize_macro",
-]
-
-[[package]]
-name = "tangram_serialize_macro"
-version = "0.0.0"
-dependencies = [
- "heck",
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]
@@ -4448,6 +4447,7 @@ name = "tangram_tree"
 version = "0.0.0"
 dependencies = [
  "bitvec",
+ "buffalo",
  "clap 3.0.0-beta.2",
  "itertools",
  "maplit",
@@ -4460,7 +4460,6 @@ dependencies = [
  "tangram_kill_chip",
  "tangram_metrics",
  "tangram_progress_counter",
- "tangram_serialize",
  "tangram_table",
  "tangram_zip",
 ]

@@ -63,19 +63,19 @@ fn dynamic_struct_read(
 	let reader_ident = format_ident!("{}Reader", ident);
 	let reader_decl = quote! {
 		#[derive(Clone, Copy, Debug)]
-		#visibility struct #reader_ident<'a>(tangram_serialize::DynamicStructReader<'a, #index_type>);
+		#visibility struct #reader_ident<'a>(buffalo::DynamicStructReader<'a, #index_type>);
 	};
 	let read_impl = quote! {
-		impl<'a> tangram_serialize::Read<'a> for #reader_ident<'a> {
+		impl<'a> buffalo::Read<'a> for #reader_ident<'a> {
 			type Output = Self;
-			fn read(bytes: &'a [u8], position: tangram_serialize::Position<Self>) -> Self::Output {
-				Self(tangram_serialize::DynamicStructReader::read(bytes, position.cast()))
+			fn read(bytes: &'a [u8], position: buffalo::Position<Self>) -> Self::Output {
+				Self(buffalo::DynamicStructReader::read(bytes, position.cast()))
 			}
 		}
 	};
 	let read_type_impl = quote! {
-		impl<'a> tangram_serialize::ReadType<'a> for #ident {
-			type ReadType = tangram_serialize::Pointer<#reader_ident<'a>>;
+		impl<'a> buffalo::ReadType<'a> for #ident {
+			type ReadType = buffalo::Pointer<#reader_ident<'a>>;
 		}
 	};
 	let accessors = data
@@ -91,17 +91,17 @@ fn dynamic_struct_read(
 			};
 			if field_attributes.required {
 				let code = quote! {
-					#visibility fn #field_ident(self) -> <<#field_ty as tangram_serialize::ReadType<'a>>::ReadType as tangram_serialize::Read<'a>>::Output {
-						let field_id = tangram_serialize::DynamicStructIndexFieldId(#field_id);
-						self.0.get_field_value::<<#field_ty as tangram_serialize::ReadType<'a>>::ReadType>(field_id).unwrap()
+					#visibility fn #field_ident(self) -> <<#field_ty as buffalo::ReadType<'a>>::ReadType as buffalo::Read<'a>>::Output {
+						let field_id = buffalo::DynamicStructIndexFieldId(#field_id);
+						self.0.get_field_value::<<#field_ty as buffalo::ReadType<'a>>::ReadType>(field_id).unwrap()
 					}
 				};
 				Ok(code)
 			} else {
 				let code = quote! {
-					#visibility fn #field_ident(self) -> Option<<<#field_ty as tangram_serialize::ReadType<'a>>::ReadType as tangram_serialize::Read<'a>>::Output> {
-						let field_id = tangram_serialize::DynamicStructIndexFieldId(#field_id);
-						self.0.get_field_value::<<#field_ty as tangram_serialize::ReadType<'a>>::ReadType>(field_id)
+					#visibility fn #field_ident(self) -> Option<<<#field_ty as buffalo::ReadType<'a>>::ReadType as buffalo::Read<'a>>::Output> {
+						let field_id = buffalo::DynamicStructIndexFieldId(#field_id);
+						self.0.get_field_value::<<#field_ty as buffalo::ReadType<'a>>::ReadType>(field_id)
 					}
 				};
 				Ok(code)
@@ -132,31 +132,31 @@ fn static_struct_read(
 	let reader_ident = format_ident!("{}Reader", ident);
 	let reader_decl = quote! {
 		#[derive(Clone, Copy, Debug)]
-		#visibility struct #reader_ident<'a>(tangram_serialize::StaticStructReader<'a>);
+		#visibility struct #reader_ident<'a>(buffalo::StaticStructReader<'a>);
 	};
 	let size_exprs = data
 		.fields
 		.iter()
 		.map(|field| {
 			let field_ty = &field.ty;
-			quote! { <<#field_ty as tangram_serialize::ReadType>::ReadType as tangram_serialize::StaticSize>::STATIC_SIZE }
+			quote! { <<#field_ty as buffalo::ReadType>::ReadType as buffalo::StaticSize>::STATIC_SIZE }
 		})
 		.collect::<Vec<_>>();
 	let static_size_impl = quote! {
-		impl<'a> tangram_serialize::StaticSize for #reader_ident<'a> {
-			const STATIC_SIZE: tangram_serialize::PointerType = #(#size_exprs)+*;
+		impl<'a> buffalo::StaticSize for #reader_ident<'a> {
+			const STATIC_SIZE: buffalo::PointerType = #(#size_exprs)+*;
 		}
 	};
 	let read_impl = quote! {
-		impl<'a> tangram_serialize::Read<'a> for #reader_ident<'a> {
+		impl<'a> buffalo::Read<'a> for #reader_ident<'a> {
 			type Output = Self;
-			fn read(bytes: &'a [u8], position: tangram_serialize::Position<Self>) -> Self::Output {
-				Self(tangram_serialize::StaticStructReader::read(bytes, position.cast()))
+			fn read(bytes: &'a [u8], position: buffalo::Position<Self>) -> Self::Output {
+				Self(buffalo::StaticStructReader::read(bytes, position.cast()))
 			}
 		}
 	};
 	let read_type_impl = quote! {
-		impl<'a> tangram_serialize::ReadType<'a> for #ident {
+		impl<'a> buffalo::ReadType<'a> for #ident {
 			type ReadType = #reader_ident<'a>;
 		}
 	};
@@ -171,19 +171,19 @@ fn static_struct_read(
 			let previous_size_exprs = size_exprs.iter().take(field_index);
 			if field_attributes.required {
 				let code = quote! {
-					#visibility fn #field_ident(self) -> <<#field_ty as tangram_serialize::ReadType<'a>>::ReadType as tangram_serialize::Read<'a>>::Output {
+					#visibility fn #field_ident(self) -> <<#field_ty as buffalo::ReadType<'a>>::ReadType as buffalo::Read<'a>>::Output {
 						let mut field_offset = 0;
 						#(field_offset += #previous_size_exprs;)*;
-						self.0.get_field_value::<<#field_ty as tangram_serialize::ReadType<'a>>::ReadType>(field_offset).unwrap()
+						self.0.get_field_value::<<#field_ty as buffalo::ReadType<'a>>::ReadType>(field_offset).unwrap()
 					}
 				};
 				Ok(code)
 			} else {
 				let code = quote! {
-					#visibility fn #field_ident(self) -> Option<<<#field_ty as tangram_serialize::ReadType<'a>>::ReadType as tangram_serialize::Read<'a>>::Output> {
+					#visibility fn #field_ident(self) -> Option<<<#field_ty as buffalo::ReadType<'a>>::ReadType as buffalo::Read<'a>>::Output> {
 						let mut field_offset = 0;
 						#(field_offset += #previous_size_exprs;)*;
-						self.0.get_field_value::<<#field_ty as tangram_serialize::ReadType<'a>>::ReadType>(field_offset)
+						self.0.get_field_value::<<#field_ty as buffalo::ReadType<'a>>::ReadType>(field_offset)
 					}
 				};
 				Ok(code)
@@ -228,7 +228,7 @@ fn dynamic_enum_read(
 			let variant_ident = &variant.ident;
 			let variant_ty = variant_ty(&variant)?;
 			let code = quote! {
-				#variant_ident(tangram_serialize::VariantReader<'a, <#variant_ty as tangram_serialize::ReadType<'a>>::ReadType>),
+				#variant_ident(buffalo::VariantReader<'a, <#variant_ty as buffalo::ReadType<'a>>::ReadType>),
 			};
 			Ok(code)
 		})
@@ -248,7 +248,7 @@ fn dynamic_enum_read(
 			let variant_id = discriminant_type.value(variant_attributes.id);
 			let code = quote! {
 				#variant_id => {
-					Self::#variant_ident(tangram_serialize::VariantReader::new(
+					Self::#variant_ident(buffalo::VariantReader::new(
 						bytes,
 						position.offset(#discriminant_size),
 					))
@@ -258,9 +258,9 @@ fn dynamic_enum_read(
 		})
 		.collect::<syn::Result<Vec<_>>>()?;
 	let read_impl = quote! {
-		impl<'a> tangram_serialize::Read<'a> for #reader_ident<'a> {
+		impl<'a> buffalo::Read<'a> for #reader_ident<'a> {
 			type Output = Self;
-			fn read(bytes: &'a [u8], position: tangram_serialize::Position<Self>) -> Self::Output {
+			fn read(bytes: &'a [u8], position: buffalo::Position<Self>) -> Self::Output {
 				let variant_id = #discriminant_type::read(bytes, position.cast());
 				match variant_id {
 					#(#read_match_arms)*
@@ -270,8 +270,8 @@ fn dynamic_enum_read(
 		}
 	};
 	let read_type_impl = quote! {
-		impl<'a> tangram_serialize::ReadType<'a> for #ident {
-			type ReadType = tangram_serialize::Pointer<#reader_ident<'a>>;
+		impl<'a> buffalo::ReadType<'a> for #ident {
+			type ReadType = buffalo::Pointer<#reader_ident<'a>>;
 		}
 	};
 	let accessors = data
@@ -283,7 +283,7 @@ fn dynamic_enum_read(
 				format_ident!("as_{}", variant_ident.to_string().to_snake_case());
 			let variant_ty = variant_ty(&variant)?;
 			let code = quote! {
-				#visibility fn #accessor_fn_name(self) -> Option<<<#variant_ty as tangram_serialize::ReadType<'a>>::ReadType as tangram_serialize::Read<'a>>::Output> {
+				#visibility fn #accessor_fn_name(self) -> Option<<<#variant_ty as buffalo::ReadType<'a>>::ReadType as buffalo::Read<'a>>::Output> {
 					match self {
 						Self::#variant_ident(s) => Some(s.read()),
 						_ => None,
@@ -336,7 +336,7 @@ fn static_enum_read(
 			let variant_ident = &variant.ident;
 			let variant_ty = variant_ty(&variant)?;
 			let code = quote! {
-				#variant_ident(tangram_serialize::VariantReader<'a, <#variant_ty as tangram_serialize::ReadType<'a>>::ReadType>),
+				#variant_ident(buffalo::VariantReader<'a, <#variant_ty as buffalo::ReadType<'a>>::ReadType>),
 			};
 			Ok(code)
 		})
@@ -349,8 +349,8 @@ fn static_enum_read(
 	};
 	let static_size = discriminant_size + value_size;
 	let static_size_impl = quote! {
-		impl<'a> tangram_serialize::StaticSize for #reader_ident<'a> {
-			const STATIC_SIZE: tangram_serialize::PointerType = #static_size;
+		impl<'a> buffalo::StaticSize for #reader_ident<'a> {
+			const STATIC_SIZE: buffalo::PointerType = #static_size;
 		}
 	};
 	let read_match_arms = data
@@ -362,7 +362,7 @@ fn static_enum_read(
 			let variant_id = discriminant_type.value(variant_attributes.id);
 			let code = quote! {
 				#variant_id => {
-					Self::#variant_ident(tangram_serialize::VariantReader::new(
+					Self::#variant_ident(buffalo::VariantReader::new(
 						bytes,
 						position.offset(#discriminant_size),
 					))
@@ -372,9 +372,9 @@ fn static_enum_read(
 		})
 		.collect::<syn::Result<Vec<_>>>()?;
 	let read_impl = quote! {
-		impl<'a> tangram_serialize::Read<'a> for #reader_ident<'a> {
+		impl<'a> buffalo::Read<'a> for #reader_ident<'a> {
 			type Output = Self;
-			fn read(bytes: &'a [u8], position: tangram_serialize::Position<Self>) -> Self::Output {
+			fn read(bytes: &'a [u8], position: buffalo::Position<Self>) -> Self::Output {
 				let variant_id = #discriminant_type::read(bytes, position.cast());
 				match variant_id {
 					#(#read_match_arms)*
@@ -384,7 +384,7 @@ fn static_enum_read(
 		}
 	};
 	let read_type_impl = quote! {
-		impl<'a> tangram_serialize::ReadType<'a> for #ident {
+		impl<'a> buffalo::ReadType<'a> for #ident {
 			type ReadType = #reader_ident<'a>;
 		}
 	};
@@ -397,7 +397,7 @@ fn static_enum_read(
 				format_ident!("as_{}", variant_ident.to_string().to_snake_case());
 			let variant_ty = variant_ty(&variant)?;
 			let code = quote! {
-				#visibility fn #accessor_fn_name(self) -> Option<<<#variant_ty as tangram_serialize::ReadType<'a>>::ReadType as tangram_serialize::Read<'a>>::Output> {
+				#visibility fn #accessor_fn_name(self) -> Option<<<#variant_ty as buffalo::ReadType<'a>>::ReadType as buffalo::Read<'a>>::Output> {
 					match self {
 						Self::#variant_ident(s) => Some(s.read()),
 						_ => None,

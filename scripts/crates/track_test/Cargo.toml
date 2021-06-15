@@ -26,6 +26,5 @@ tangram_app_common = { path = "../../../crates/app/common" }
 tangram_error = { path = "../../../crates/error" }
 tangram_id = { path = "../../../crates/id" }
 tangram_model = { path = "../../../crates/model" }
-tangram_serialize = { path = "../../../crates/serialize" }
 tangram_table = { path = "../../../crates/table" }
 url = { version = "2", features = ["serde"] }

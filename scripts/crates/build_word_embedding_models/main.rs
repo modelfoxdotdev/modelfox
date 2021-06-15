@@ -46,7 +46,7 @@ pub fn main() -> Result<()> {
 		}
 	}
 	let values: Array2<f32> = ndarray_npy::read_npy(vocab_path.join("vectors"))?;
-	let mut writer = tangram_serialize::Writer::new();
+	let mut writer = buffalo::Writer::new();
 	let size = values.ncols().to_u64().unwrap();
 	let words = words
 		.iter()

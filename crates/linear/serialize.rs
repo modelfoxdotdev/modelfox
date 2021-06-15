@@ -1,42 +1,42 @@
 use ndarray::prelude::*;
 
-#[derive(Clone, Debug, tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "dynamic")]
+#[derive(Clone, Debug, buffalo::Read, buffalo::Write)]
+#[buffalo(size = "dynamic")]
 pub struct Regressor {
-	#[tangram_serialize(id = 0, required)]
+	#[buffalo(id = 0, required)]
 	pub bias: f32,
-	#[tangram_serialize(id = 1, required)]
+	#[buffalo(id = 1, required)]
 	pub weights: Array1<f32>,
-	#[tangram_serialize(id = 2, required)]
+	#[buffalo(id = 2, required)]
 	pub means: Vec<f32>,
 }
 
-#[derive(Clone, Debug, tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "dynamic")]
+#[derive(Clone, Debug, buffalo::Read, buffalo::Write)]
+#[buffalo(size = "dynamic")]
 pub struct BinaryClassifier {
-	#[tangram_serialize(id = 0, required)]
+	#[buffalo(id = 0, required)]
 	pub bias: f32,
-	#[tangram_serialize(id = 1, required)]
+	#[buffalo(id = 1, required)]
 	pub weights: Array1<f32>,
-	#[tangram_serialize(id = 2, required)]
+	#[buffalo(id = 2, required)]
 	pub means: Vec<f32>,
 }
 
-#[derive(Clone, Debug, tangram_serialize::Read, tangram_serialize::Write)]
-#[tangram_serialize(size = "dynamic")]
+#[derive(Clone, Debug, buffalo::Read, buffalo::Write)]
+#[buffalo(size = "dynamic")]
 pub struct MulticlassClassifier {
-	#[tangram_serialize(id = 0, required)]
+	#[buffalo(id = 0, required)]
 	pub biases: Array1<f32>,
-	#[tangram_serialize(id = 1, required)]
+	#[buffalo(id = 1, required)]
 	pub weights: Array2<f32>,
-	#[tangram_serialize(id = 2, required)]
+	#[buffalo(id = 2, required)]
 	pub means: Vec<f32>,
 }
 
 pub(crate) fn serialize_regressor(
 	regressor: &crate::Regressor,
-	writer: &mut tangram_serialize::Writer,
-) -> tangram_serialize::Position<RegressorWriter> {
+	writer: &mut buffalo::Writer,
+) -> buffalo::Position<RegressorWriter> {
 	let weights = writer.write(&regressor.weights);
 	let means = writer.write(regressor.means.as_slice());
 	writer.write(&RegressorWriter {
@@ -68,8 +68,8 @@ pub(crate) fn deserialize_regressor(regressor: RegressorReader) -> crate::Regres
 
 pub(crate) fn serialize_binary_classifier(
 	binary_classifier: &crate::BinaryClassifier,
-	writer: &mut tangram_serialize::Writer,
-) -> tangram_serialize::Position<BinaryClassifierWriter> {
+	writer: &mut buffalo::Writer,
+) -> buffalo::Position<BinaryClassifierWriter> {
 	let weights = writer.write(&binary_classifier.weights);
 	let means = writer.write(binary_classifier.means.as_slice());
 	writer.write(&BinaryClassifierWriter {
@@ -103,8 +103,8 @@ pub(crate) fn deserialize_binary_classifier(
 
 pub(crate) fn serialize_multiclass_classifier(
 	multiclass_classifier: &crate::MulticlassClassifier,
-	writer: &mut tangram_serialize::Writer,
-) -> tangram_serialize::Position<MulticlassClassifierWriter> {
+	writer: &mut buffalo::Writer,
+) -> buffalo::Position<MulticlassClassifierWriter> {
 	let weights = writer.write(&multiclass_classifier.weights);
 	let biases = writer.write(&multiclass_classifier.biases);
 	let means = writer.write(multiclass_classifier.means.as_slice());
