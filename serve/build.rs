@@ -37,7 +37,7 @@ pub fn build(options: BuildOptions) -> Result<()> {
 			let client_crate_manifest =
 				std::fs::read_to_string(&options.workspace_dir.join(client_crate_manifest_path))?;
 			let client_crate_manifest: toml::Value = toml::from_str(&client_crate_manifest)?;
-			let client_crate_name = client_crate_manifest
+			let client_crate_package_name = client_crate_manifest
 				.as_table()
 				.unwrap()
 				.get("package")
@@ -49,10 +49,20 @@ pub fn build(options: BuildOptions) -> Result<()> {
 				.as_str()
 				.unwrap()
 				.to_owned();
-			Ok(client_crate_name)
+			Ok(client_crate_package_name)
 		})
 		.collect::<Result<Vec<_>>>()?;
-	if !client_crate_package_names.is_empty() {
+	let enabled_client_crate_package_names = client_crate_package_names
+		.into_iter()
+		.filter(|client_crate_package_name| {
+			std::env::var(format!(
+				"CARGO_FEATURE_{}",
+				client_crate_package_name.to_uppercase()
+			))
+			.is_ok()
+		})
+		.collect::<Vec<_>>();
+	if !enabled_client_crate_package_names.is_empty() {
 		let cmd = which("cargo")?;
 		let mut args = vec![
 			"build".to_owned(),
@@ -64,9 +74,9 @@ pub fn build(options: BuildOptions) -> Result<()> {
 		if profile == "release" {
 			args.push("--release".to_owned())
 		}
-		for client_crate_package_name in client_crate_package_names.iter() {
+		for enabled_client_crate_package_name in enabled_client_crate_package_names.iter() {
 			args.push("--package".to_owned());
-			args.push(client_crate_package_name.clone());
+			args.push(enabled_client_crate_package_name.clone());
 		}
 		let mut process = std::process::Command::new(cmd).args(&args).spawn()?;
 		let status = process.wait()?;
@@ -74,13 +84,15 @@ pub fn build(options: BuildOptions) -> Result<()> {
 			return Err(err!("cargo {}", status.to_string()));
 		}
 	}
-	client_crate_package_names
+	enabled_client_crate_package_names
 		.par_iter()
 		.for_each(|client_crate_package_name| {
 			let hash = hash(client_crate_package_name);
 			let input_path = format!(
 				"{}/wasm32-unknown-unknown/{}/{}.wasm",
-				target_wasm_dir.display(), profile, client_crate_package_name,
+				target_wasm_dir.display(),
+				profile,
+				client_crate_package_name,
 			);
 			let output_path = js_dir.join(format!("{}_bg.wasm", hash));
 			// Do not re-run wasm-bindgen if the output wasm exists and is not older than the input wasm.

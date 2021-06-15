@@ -13,7 +13,7 @@ path = "main.rs"
 [features]
 default = ["train", "app"]
 train = []
-app = ["tangram_app"]
+app = ["tangram_app", "tangram_app/default"]
 
 [dependencies]
 backtrace = "0.3"
@@ -28,7 +28,7 @@ once_cell = "1"
 rayon = "1.5"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tangram_app = { path = "../app", optional = true }
+tangram_app = { path = "../app", default-features = false, optional = true }
 tangram_core = { path = "../core" }
 tangram_error = { path = "../error" }
 tangram_id = { path = "../id" }

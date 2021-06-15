@@ -13,7 +13,6 @@ hyper = { version = "0.14", features = ["full"] }
 num = "0.4"
 pinwheel = { path = "../../../../../../../../pinwheel" }
 tangram_app_common = { path = "../../../../../../../common" }
-tangram_app_layouts = { path = "../../../../../../../layouts" }
 tangram_charts = { path = "../../../../../../../../charts" }
 tangram_core = { path = "../../../../../../../../core" }
 tangram_error = { path = "../../../../../../../../error" }

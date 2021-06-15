@@ -3696,7 +3696,6 @@ dependencies = [
  "num",
  "pinwheel",
  "tangram_app_common",
- "tangram_app_layouts",
  "tangram_charts",
  "tangram_core",
  "tangram_error",

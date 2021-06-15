@@ -58,7 +58,7 @@ struct S3StorageConfig {
 	pub cache_path: Option<PathBuf>,
 }
 
-#[cfg(feature = "app")]
+#[cfg(feature = "tangram_app")]
 pub fn app(args: AppArgs) -> Result<()> {
 	let config: Option<AppConfig> = if let Some(config_path) = args.config {
 		let config = std::fs::read(config_path)?;
@@ -185,7 +185,7 @@ pub fn app(args: AppArgs) -> Result<()> {
 }
 
 /// Retrieve the user cache directory using the `dirs` crate.
-#[cfg(feature = "app")]
+#[cfg(feature = "tangram_app")]
 fn cache_path() -> Result<PathBuf> {
 	let cache_dir = dirs::cache_dir().ok_or_else(|| err!("failed to find user cache directory"))?;
 	let tangram_cache_dir = cache_dir.join("tangram");
@@ -199,7 +199,7 @@ fn cache_path() -> Result<PathBuf> {
 }
 
 /// Retrieve the user data directory using the `dirs` crate.
-#[cfg(feature = "app")]
+#[cfg(feature = "tangram_app")]
 fn data_path() -> Result<PathBuf> {
 	let data_dir = dirs::data_dir().ok_or_else(|| err!("failed to find user data directory"))?;
 	let tangram_data_dir = data_dir.join("tangram");
@@ -213,7 +213,7 @@ fn data_path() -> Result<PathBuf> {
 }
 
 /// Retrieve the default database url, which is a sqlite database in the user data directory.
-#[cfg(feature = "app")]
+#[cfg(feature = "tangram_app")]
 pub fn default_database_url() -> Url {
 	let tangram_database_path = data_path().unwrap().join("db").join("tangram.db");
 	std::fs::create_dir_all(tangram_database_path.parent().unwrap()).unwrap();

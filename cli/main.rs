@@ -5,9 +5,9 @@ use colored::Colorize;
 use std::path::PathBuf;
 use tracing_subscriber::prelude::*;
 
-#[cfg(feature = "app")]
+#[cfg(feature = "tangram_app")]
 mod app;
-#[cfg(feature = "app")]
+#[cfg(feature = "tangram_app")]
 mod migrate;
 #[cfg(feature = "train")]
 mod predict;
@@ -27,10 +27,10 @@ enum Args {
 	#[cfg(feature = "train")]
 	#[clap(name = "predict")]
 	Predict(Box<PredictArgs>),
-	#[cfg(feature = "app")]
+	#[cfg(feature = "tangram_app")]
 	#[clap(name = "app")]
 	App(Box<AppArgs>),
-	#[cfg(feature = "app")]
+	#[cfg(feature = "tangram_app")]
 	#[clap(name = "migrate")]
 	Migrate(Box<MigrateArgs>),
 }
@@ -104,7 +104,7 @@ pub struct PredictArgs {
 	probabilities: Option<bool>,
 }
 
-#[cfg(feature = "app")]
+#[cfg(feature = "tangram_app")]
 #[derive(Clap)]
 #[clap(about = "Run the app.", long_about = "Run the app.")]
 pub struct AppArgs {
@@ -112,7 +112,7 @@ pub struct AppArgs {
 	config: Option<PathBuf>,
 }
 
-#[cfg(feature = "app")]
+#[cfg(feature = "tangram_app")]
 #[derive(Clap)]
 #[clap(
 	about = "Migrate your app database.",
@@ -131,9 +131,9 @@ fn main() {
 		Args::Train(args) => self::train::train(*args),
 		#[cfg(feature = "train")]
 		Args::Predict(args) => self::predict::predict(*args),
-		#[cfg(feature = "app")]
+		#[cfg(feature = "tangram_app")]
 		Args::App(args) => self::app::app(*args),
-		#[cfg(feature = "app")]
+		#[cfg(feature = "tangram_app")]
 		Args::Migrate(args) => self::migrate::migrate(*args),
 	};
 	if let Err(error) = result {
