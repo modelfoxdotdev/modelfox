@@ -19,7 +19,8 @@ pub struct Context {
 	pub options: self::options::Options,
 	pub smtp_transport: Option<lettre::AsyncSmtpTransport<lettre::Tokio1Executor>>,
 	pub storage: self::storage::Storage,
-	pub include_out_dir: Option<include_out_dir::IncludeOutDir>,
+	#[cfg(not(debug_assertions))]
+	pub include_out_dir: include_out_dir::IncludeOutDir,
 }
 
 pub type HandleOutput<'a> =

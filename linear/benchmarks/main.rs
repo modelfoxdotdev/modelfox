@@ -209,7 +209,7 @@ fn run_benchmarks(libraries: &[Library], datasets: &[Dataset]) {
 
 fn run_benchmark(dataset: &Dataset, library: &Library) -> BenchmarkOutput {
 	let output = match library {
-		Library::Tangram => std::process::Command::new(time_cmd_name())
+		Library::Tangram => std::process::Command::new("time")
 			.arg("-f")
 			.arg("%M")
 			.arg(format!(
@@ -218,7 +218,7 @@ fn run_benchmark(dataset: &Dataset, library: &Library) -> BenchmarkOutput {
 			))
 			.output()
 			.unwrap(),
-		_ => std::process::Command::new(time_cmd_name())
+		_ => std::process::Command::new("time")
 			.arg("-f")
 			.arg("%M")
 			.arg("python")
@@ -235,12 +235,4 @@ fn run_benchmark(dataset: &Dataset, library: &Library) -> BenchmarkOutput {
 	let mut output: BenchmarkOutput = serde_json::from_str(stdout.lines().last().unwrap()).unwrap();
 	output.memory(memory);
 	output
-}
-
-fn time_cmd_name() -> &'static str {
-	if cfg!(target_os = "macos") {
-		"gtime"
-	} else {
-		"time"
-	}
 }

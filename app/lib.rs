@@ -61,16 +61,13 @@ async fn run_inner(options: Options) -> Result<()> {
 	// Start the server.
 	let host = options.host;
 	let port = options.port;
-	#[cfg(debug_assertions)]
-	let include_out_dir = None;
-	#[cfg(not(debug_assertions))]
-	let include_out_dir = Some(include_out_dir::include_out_dir!("output"));
 	let context = Context {
 		database_pool,
 		options,
 		smtp_transport,
 		storage,
-		include_out_dir,
+		#[cfg(not(debug_assertions))]
+		include_out_dir: include_out_dir::include_out_dir!("output"),
 	};
 	let context_layer = AddExtensionLayer::new(Arc::new(context));
 	let request_id_layer = RequestIdLayer::new();
@@ -106,7 +103,6 @@ async fn run_inner(options: Options) -> Result<()> {
 async fn handle(
 	mut request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>, http::Error> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	let path = request.uri().path();
 	let path_components: Vec<_> = path.split('/').skip(1).collect();
 	#[rustfmt::skip]
@@ -117,6 +113,9 @@ async fn handle(
 		["track"] => {
 			tangram_app_track::handle(&mut request)
 		},
+		["repos", _, "models", _, "download"] => {
+			tangram_app_layouts::model_layout::download(&mut request)
+		}
 		#[cfg(feature = "tangram_app_login_server")]
 		["login"] => {
 			tangram_app_login_server::handle(&mut request)
@@ -144,9 +143,6 @@ async fn handle(
 		#[cfg(feature = "tangram_app_model_index_server")]
 		["repos", _, "models", _, ""] => {
 			tangram_app_model_index_server::handle(&mut request)
-		}
-		["repos", _, "models", _, "download"] => {
-			tangram_app_layouts::model_layout::download(&mut request)
 		}
 		#[cfg(feature = "tangram_app_training_grid_index_server")]
 		["repos", _, "models", _, "training_grid", ""] => {
@@ -241,19 +237,17 @@ async fn handle(
 			tangram_app_organization_member_server::handle(&mut request)
 		}
 		_ => async {
-			let response =
-			if cfg!(debug_assertions) {
-				tangram_serve::dir::serve_from_dir(
-					&std::path::Path::new(env!("OUT_DIR")).join("output"),
-					&request,
-				)
-				.await?
-			} else {
-				tangram_serve::dir::serve_from_include_out_dir(
-					context.include_out_dir.as_ref().unwrap(),
-					&request,
-				).await?
-			};
+			#[cfg(debug_assertions)]
+			let response = tangram_serve::dir::serve_from_dir(
+				&std::path::Path::new(env!("OUT_DIR")).join("output"),
+				&request,
+			)
+			.await?;
+			#[cfg(not(debug_assertions))]
+			let response = tangram_serve::dir::serve_from_include_out_dir(
+				&request.extensions().get::<Arc<Context>>().unwrap().include_out_dir,
+				&request,
+			).await?;
 			let response = response.unwrap_or_else(|| {
 				http::Response::builder()
 					.status(http::StatusCode::NOT_FOUND)
