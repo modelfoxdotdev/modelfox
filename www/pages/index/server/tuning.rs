@@ -2,11 +2,7 @@ use pinwheel::prelude::*;
 use tangram_ui as ui;
 use tangram_www_index_common::{self as common, tuning::ThresholdMetrics};
 
-#[derive(ComponentBuilder)]
-pub struct Tuning {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Tuning;
 
 impl Component for Tuning {
 	fn into_node(self) -> Node {
@@ -224,10 +220,6 @@ impl Component for Tuning {
 		let title = div()
 			.class("index-step-title")
 			.child("Tune your model to get the best performance.");
-		// let text = div().attribute("class","index-step-text")
-		// 	.child("Tune binary classification models to your preferred tradeoff between precision and recall. To use your selected threshold, update the ")
-		// 	.child(ui::InlineCode::new().child("predict"))
-		// 	.child(" call in your code.");
 		let text = ui::Markdown::new(ui::doc!(
 			r#"
 				Tune binary classification models to your preferred tradeoff between precision and recall. To use your selected threshold, update the `predict` call in your code.

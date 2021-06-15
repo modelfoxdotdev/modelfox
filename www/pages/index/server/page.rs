@@ -27,27 +27,23 @@ impl Component for Page {
 				Layout::new().child(
 					div()
 						.class("index-grid")
-						.child(Hero::new())
-						.child(Video::new())
-						.child(Train::new())
-						.child(Predict::new())
-						.child(Inspection::new())
-						.child(Tuning::new())
-						.child(Monitoring::new())
-						.child(ProductionExplanations::new())
-						.child(ProductionStats::new())
-						.child(ProductionMetrics::new()),
+						.child(Hero)
+						.child(Video)
+						.child(Train)
+						.child(Predict)
+						.child(Inspection)
+						.child(Tuning)
+						.child(Monitoring)
+						.child(ProductionExplanations)
+						.child(ProductionStats)
+						.child(ProductionMetrics),
 				),
 			)
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
-pub struct Hero {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Hero;
 
 impl Component for Hero {
 	fn into_node(self) -> Node {
@@ -86,7 +82,6 @@ impl Component for Hero {
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct Video;
 
 impl Component for Video {

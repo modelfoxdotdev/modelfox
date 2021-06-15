@@ -7,11 +7,7 @@ use tangram_charts::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
-pub struct ProductionExplanations {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct ProductionExplanations;
 
 impl Component for ProductionExplanations {
 	fn into_node(self) -> Node {
@@ -24,7 +20,7 @@ impl Component for ProductionExplanations {
 		let p1 = div()
 			.class("index-step-text")
 			.child("After calling ")
-			.child(ui::InlineCode::new().child("logPrediction"))
+			.child(ui::InlineCode::new("logPrediction"))
 			.child(", look up any prediction in the app by its identifier.");
 		let p2 = "Every prediction will display its input and output, as well as a detailed explanation showing how each feature contributed to the output.";
 		let p2 = div().class("index-step-text").child(p2);

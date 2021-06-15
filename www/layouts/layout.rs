@@ -13,14 +13,13 @@ impl Component for Layout {
 	fn into_node(self) -> Node {
 		div()
 			.class("layout")
-			.child(header().child(Topbar::new()))
+			.child(header().child(Topbar))
 			.child(main().child(self.children))
-			.child(footer().child(Footer::new()))
+			.child(footer().child(Footer))
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct Topbar;
 
 impl Component for Topbar {

@@ -20,7 +20,7 @@ impl Component for Page {
 					ui::S1::new()
 						.child(PageHeading::new().child(ui::H1::new().child(self.title.clone())))
 						.child(UpdateTitleForm::new(self.title))
-						.child(DangerZone::new()),
+						.child(DangerZone),
 				),
 			)
 			.into_node()
@@ -61,7 +61,6 @@ impl Component for UpdateTitleForm {
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct DangerZone;
 
 impl Component for DangerZone {

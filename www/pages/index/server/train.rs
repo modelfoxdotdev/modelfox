@@ -2,11 +2,7 @@ use pinwheel::prelude::*;
 use std::borrow::Cow;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
-pub struct Train {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Train;
 
 impl Component for Train {
 	fn into_node(self) -> Node {
@@ -16,9 +12,9 @@ impl Component for Train {
 		let p1 = div()
 			.class("index-step-text")
 			.child("Train a machine learning model by running ")
-			.child(ui::InlineCode::new().child("tangram train"))
+			.child(ui::InlineCode::new("tangram train"))
 			.child(" with the path to a CSV file and the name of the column you want to predict.");
-		let p2 = div().attribute("class","index-step-text").child("The CLI automatically transforms your data into features, trains a number of models to predict the target column, and writes the best model to a ").child(ui::InlineCode::new().child(".tangram")).child(" file.");
+		let p2 = div().attribute("class","index-step-text").child("The CLI automatically transforms your data into features, trains a number of models to predict the target column, and writes the best model to a ").child(ui::InlineCode::new(".tangram")).child(" file.");
 		let p3 = div()
 			.class("index-step-text")
 			.child("If you want more control, you can provide a config file.");

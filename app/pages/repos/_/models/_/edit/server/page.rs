@@ -25,7 +25,7 @@ impl Component for Page {
 						.child(PageHeading::new().child(ui::H1::new().child(self.model_heading)))
 						.child(ModelInfoTable::new(self.model_id, self.created_at))
 						.child(UpdateTagForm::new(self.tag))
-						.child(DangerZone::new()),
+						.child(DangerZone),
 				),
 			)
 			.into_node()
@@ -92,7 +92,6 @@ impl Component for UpdateTagForm {
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct DangerZone;
 
 impl Component for DangerZone {

@@ -1,11 +1,7 @@
 use pinwheel::prelude::*;
 use tangram_www_ui::logo::{Logo, LogoScheme};
 
-#[derive(ComponentBuilder)]
-pub struct Footer {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Footer;
 
 impl Component for Footer {
 	fn into_node(self) -> Node {

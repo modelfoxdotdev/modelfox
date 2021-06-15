@@ -28,7 +28,7 @@ impl Component for Page {
 						.child(self.members_section)
 						.child(self.repos_section)
 						.child(if self.can_delete {
-							Some(DangerZoneSection::new())
+							Some(DangerZoneSection)
 						} else {
 							None
 						}),
@@ -236,7 +236,6 @@ impl Component for ReposTable {
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct DangerZoneSection;
 
 impl Component for DangerZoneSection {

@@ -1,11 +1,7 @@
 use pinwheel::prelude::*;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
-pub struct Predict {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Predict;
 
 impl Component for Predict {
 	fn into_node(self) -> Node {

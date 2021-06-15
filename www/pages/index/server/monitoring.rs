@@ -1,11 +1,7 @@
 use pinwheel::prelude::*;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
-pub struct Monitoring {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Monitoring;
 
 impl Component for Monitoring {
 	fn into_node(self) -> Node {
@@ -138,12 +134,12 @@ impl Component for Monitoring {
 		let p2 = div()
 			.class("index-step-text")
 			.child("Opt in to logging by calling ")
-			.child(ui::InlineCode::new().child("logPrediction"))
+			.child(ui::InlineCode::new("logPrediction"))
 			.child(".");
 		let p3 = div()
 			.class("index-step-text")
 			.child("Later on, if you find out the true value for a prediction, call ")
-			.child(ui::InlineCode::new().child("logTrueValue"))
+			.child(ui::InlineCode::new("logTrueValue"))
 			.child(".");
 		let left = div()
 			.child(title)

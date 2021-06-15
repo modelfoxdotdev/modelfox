@@ -94,10 +94,10 @@ pub struct ColumnTypeToken {
 impl Component for ColumnTypeToken {
 	fn into_node(self) -> Node {
 		match self.column_type {
-			InputTableColumnType::Unknown => UnknownColumnToken::new().into(),
-			InputTableColumnType::Number => NumberColumnToken::new().into(),
-			InputTableColumnType::Enum => EnumColumnToken::new().into(),
-			InputTableColumnType::Text => TextColumnToken::new().into(),
+			InputTableColumnType::Unknown => UnknownColumnToken.into(),
+			InputTableColumnType::Number => NumberColumnToken.into(),
+			InputTableColumnType::Enum => EnumColumnToken.into(),
+			InputTableColumnType::Text => TextColumnToken.into(),
 		}
 	}
 }

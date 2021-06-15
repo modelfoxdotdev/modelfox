@@ -7,11 +7,7 @@ use tangram_charts::{
 use tangram_finite::Finite;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
-pub struct ProductionMetrics {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct ProductionMetrics;
 
 impl Component for ProductionMetrics {
 	fn into_node(self) -> Node {

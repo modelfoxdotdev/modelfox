@@ -14,6 +14,7 @@ use crate::{
 use futures::FutureExt;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
+use std::borrow::Cow;
 use tangram_finite::Finite;
 use tangram_number_formatter::NumberFormatter;
 use wasm_bindgen::JsCast;
@@ -75,7 +76,7 @@ impl Component for BarChart {
 				})
 			})
 			.collect();
-		let title = self.title.map(|title| ChartTitle::new().child(title));
+		let title = self.title.map(ChartTitle::new);
 		let legend = if !hide_legend {
 			Some(ChartLegend::new(legend_items))
 		} else {
@@ -159,7 +160,7 @@ impl Component for BoxChart {
 				})
 			})
 			.collect();
-		let title = self.title.map(|title| ChartTitle::new().child(title));
+		let title = self.title.map(ChartTitle::new);
 		let legend = if !hide_legend {
 			Some(ChartLegend::new(legend_items))
 		} else {
@@ -250,7 +251,7 @@ impl Component for FeatureContributionsChart {
 			0.0
 		} + label_padding
 			+ font_size + bottom_padding;
-		let title = self.title.map(|title| ChartTitle::new().child(title));
+		let title = self.title.map(ChartTitle::new);
 		let chart = div()
 			.style(style::WIDTH, "100%")
 			.style(style::HEIGHT, format!("{}px", height))
@@ -342,7 +343,7 @@ impl Component for LineChart {
 				})
 			})
 			.collect();
-		let title = self.title.map(|title| ChartTitle::new().child(title));
+		let title = self.title.map(ChartTitle::new);
 		let legend = if !hide_legend {
 			Some(ChartLegend::new(legend_items))
 		} else {
@@ -374,15 +375,21 @@ impl Component for LineChart {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ChartTitle {
-	#[children]
-	pub children: Vec<Node>,
+	pub title: Cow<'static, str>,
+}
+
+impl ChartTitle {
+	pub fn new(title: impl Into<Cow<'static, str>>) -> ChartTitle {
+		ChartTitle {
+			title: title.into(),
+		}
+	}
 }
 
 impl Component for ChartTitle {
 	fn into_node(self) -> Node {
-		div().class("chart-title").child(self.children).into_node()
+		div().class("chart-title").child(self.title).into_node()
 	}
 }
 

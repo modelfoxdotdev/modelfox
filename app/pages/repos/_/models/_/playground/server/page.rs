@@ -112,7 +112,7 @@ impl Component for UnknownField {
 			.child(
 				div()
 					.class("predict-field-wrapper")
-					.child(div().child(UnknownColumnToken::new()))
+					.child(div().child(UnknownColumnToken))
 					.child(
 						ui::TextField::new()
 							.label(Some(self.name.clone()))
@@ -158,7 +158,7 @@ impl Component for NumberField {
 			.child(
 				div()
 					.class("predict-field-wrapper")
-					.child(div().child(NumberColumnToken::new()))
+					.child(div().child(NumberColumnToken))
 					.child(
 						ui::TextField::new()
 							.label(Some(self.name.clone()))
@@ -222,7 +222,7 @@ impl Component for EnumField {
 			.child(
 				div()
 					.class("predict-field-wrapper")
-					.child(div().child(EnumColumnToken::new()))
+					.child(div().child(EnumColumnToken))
 					.child(
 						ui::SelectField::new()
 							.label(Some(self.name.clone()))
@@ -259,7 +259,7 @@ impl Component for TextField {
 			.child(
 				div()
 					.class("predict-field-wrapper")
-					.child(div().child(TextColumnToken::new()))
+					.child(div().child(TextColumnToken))
 					.child(
 						ui::TextField::new()
 							.label(Some(self.name.clone()))

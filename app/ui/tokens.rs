@@ -2,11 +2,7 @@ use crate::column_type::ColumnType;
 use pinwheel::prelude::*;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
-pub struct UnknownColumnToken {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct UnknownColumnToken;
 
 impl Component for UnknownColumnToken {
 	fn into_node(self) -> Node {
@@ -17,11 +13,7 @@ impl Component for UnknownColumnToken {
 	}
 }
 
-#[derive(ComponentBuilder)]
-pub struct NumberColumnToken {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct NumberColumnToken;
 
 impl Component for NumberColumnToken {
 	fn into_node(self) -> Node {
@@ -32,11 +24,7 @@ impl Component for NumberColumnToken {
 	}
 }
 
-#[derive(ComponentBuilder)]
-pub struct EnumColumnToken {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct EnumColumnToken;
 
 impl Component for EnumColumnToken {
 	fn into_node(self) -> Node {
@@ -47,11 +35,7 @@ impl Component for EnumColumnToken {
 	}
 }
 
-#[derive(ComponentBuilder)]
-pub struct TextColumnToken {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct TextColumnToken;
 
 impl Component for TextColumnToken {
 	fn into_node(self) -> Node {
@@ -70,10 +54,10 @@ pub struct ColumnTypeToken {
 impl Component for ColumnTypeToken {
 	fn into_node(self) -> Node {
 		match self.column_type {
-			ColumnType::Unknown => UnknownColumnToken::new().into_node(),
-			ColumnType::Number => NumberColumnToken::new().into_node(),
-			ColumnType::Enum => EnumColumnToken::new().into_node(),
-			ColumnType::Text => TextColumnToken::new().into_node(),
+			ColumnType::Unknown => UnknownColumnToken.into_node(),
+			ColumnType::Number => NumberColumnToken.into_node(),
+			ColumnType::Enum => EnumColumnToken.into_node(),
+			ColumnType::Text => TextColumnToken.into_node(),
 		}
 	}
 }

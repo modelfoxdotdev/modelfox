@@ -55,7 +55,7 @@ impl Component for Auth {
 			details_section,
 		} = self;
 		ui::S1::new()
-			.child(Header::new())
+			.child(Header)
 			.child(details_section)
 			.child(organizations_section)
 			.child(repos_section)
@@ -63,7 +63,6 @@ impl Component for Auth {
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct Header;
 
 impl Component for Header {

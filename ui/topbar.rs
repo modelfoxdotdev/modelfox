@@ -37,7 +37,7 @@ impl Component for Topbar {
 				.collect();
 			details()
 				.class("topbar-details")
-				.child(summary().child(TopbarHamburger::new()))
+				.child(summary().child(TopbarHamburger))
 				.child(
 					TopbarDropdown::new(items)
 						.background_color(self.dropdown_background_color.clone()),
@@ -118,7 +118,6 @@ impl Component for TopbarItemsWrapper {
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct TopbarHamburger;
 
 impl Component for TopbarHamburger {

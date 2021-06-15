@@ -16,63 +16,59 @@ impl Component for Page {
 				DocsLayout::new(DocsPage::Install, None).child(
 					ui::S1::new()
 						.child(ui::H1::new().child("Install"))
-						.child(Homebrew::new())
-						.child(Deb::new(
-							"ubuntu".to_owned(),
-							"groovy".to_owned(),
-							"Ubuntu 20.10 (Groovy Gorilla)".to_owned(),
-						))
-						.child(Deb::new(
-							"ubuntu".to_owned(),
-							"focal".to_owned(),
-							"Ubuntu 20.04 LTS (Focal Fossa)".to_owned(),
-						))
-						.child(Deb::new(
-							"ubuntu".to_owned(),
-							"bionic".to_owned(),
-							"Ubuntu 18.04 LTS (Bionic Beaver)".to_owned(),
-						))
-						.child(Deb::new(
-							"debian".to_owned(),
-							"sid".to_owned(),
-							"Debian Sid (unstable)".to_owned(),
-						))
-						.child(Deb::new(
-							"debian".to_owned(),
-							"bullseye".to_owned(),
-							"Debian Bullseye (testing)".to_owned(),
-						))
-						.child(Deb::new(
-							"debian".to_owned(),
-							"buster".to_owned(),
-							"Debian Buster (stable)".to_owned(),
-						))
-						.child(Deb::new(
-							"debian".to_owned(),
-							"stretch".to_owned(),
-							"Debian Stretch (oldstable)".to_owned(),
-						))
-						.child(Alpine::new())
-						.child(Arch::new())
-						.child(AmazonLinux2::new())
-						.child(Centos7::new())
-						.child(Centos8::new())
-						.child(Fedora::new())
-						.child(Rhel::new())
-						.child(Scoop::new())
-						.child(Docker::new())
-						.child(Manual::new()),
+						.child(Homebrew)
+						.child(Deb {
+							distribution: "ubuntu".to_owned(),
+							version: "groovy".to_owned(),
+							title: "Ubuntu 20.10 (Groovy Gorilla)".to_owned(),
+						})
+						.child(Deb {
+							distribution: "ubuntu".to_owned(),
+							version: "focal".to_owned(),
+							title: "Ubuntu 20.04 LTS (Focal Fossa)".to_owned(),
+						})
+						.child(Deb {
+							distribution: "ubuntu".to_owned(),
+							version: "bionic".to_owned(),
+							title: "Ubuntu 18.04 LTS (Bionic Beaver)".to_owned(),
+						})
+						.child(Deb {
+							distribution: "debian".to_owned(),
+							version: "sid".to_owned(),
+							title: "Debian Sid (unstable)".to_owned(),
+						})
+						.child(Deb {
+							distribution: "debian".to_owned(),
+							version: "bullseye".to_owned(),
+							title: "Debian Bullseye (testing)".to_owned(),
+						})
+						.child(Deb {
+							distribution: "debian".to_owned(),
+							version: "buster".to_owned(),
+							title: "Debian Buster (stable)".to_owned(),
+						})
+						.child(Deb {
+							distribution: "debian".to_owned(),
+							version: "stretch".to_owned(),
+							title: "Debian Stretch (oldstable)".to_owned(),
+						})
+						.child(Alpine)
+						.child(Arch)
+						.child(AmazonLinux2)
+						.child(Centos7)
+						.child(Centos8)
+						.child(Fedora)
+						.child(Rhel)
+						.child(Scoop)
+						.child(Docker)
+						.child(Manual),
 				),
 			)
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
-struct Homebrew {
-	#[children]
-	pub children: Vec<Node>,
-}
+struct Homebrew;
 
 impl Component for Homebrew {
 	fn into_node(self) -> Node {
@@ -100,11 +96,7 @@ impl Component for Homebrew {
 	}
 }
 
-#[derive(ComponentBuilder)]
-struct Alpine {
-	#[children]
-	pub children: Vec<Node>,
-}
+struct Alpine;
 
 impl Component for Alpine {
 	fn into_node(self) -> Node {
@@ -131,7 +123,6 @@ impl Component for Alpine {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct Deb {
 	distribution: String,
 	version: String,
@@ -165,11 +156,7 @@ impl Component for Deb {
 	}
 }
 
-#[derive(ComponentBuilder)]
-struct AmazonLinux2 {
-	#[children]
-	pub children: Vec<Node>,
-}
+struct AmazonLinux2;
 
 impl Component for AmazonLinux2 {
 	fn into_node(self) -> Node {
@@ -194,11 +181,7 @@ impl Component for AmazonLinux2 {
 	}
 }
 
-#[derive(ComponentBuilder)]
-struct Centos7 {
-	#[children]
-	pub children: Vec<Node>,
-}
+struct Centos7;
 
 impl Component for Centos7 {
 	fn into_node(self) -> Node {
@@ -223,11 +206,7 @@ impl Component for Centos7 {
 	}
 }
 
-#[derive(ComponentBuilder)]
-struct Fedora {
-	#[children]
-	pub children: Vec<Node>,
-}
+struct Fedora;
 
 impl Component for Fedora {
 	fn into_node(self) -> Node {
@@ -252,11 +231,7 @@ impl Component for Fedora {
 	}
 }
 
-#[derive(ComponentBuilder)]
-struct Rhel {
-	#[children]
-	pub children: Vec<Node>,
-}
+struct Rhel;
 
 impl Component for Rhel {
 	fn into_node(self) -> Node {
@@ -281,11 +256,7 @@ impl Component for Rhel {
 	}
 }
 
-#[derive(ComponentBuilder)]
-struct Centos8 {
-	#[children]
-	pub children: Vec<Node>,
-}
+struct Centos8;
 
 impl Component for Centos8 {
 	fn into_node(self) -> Node {
@@ -310,11 +281,7 @@ impl Component for Centos8 {
 	}
 }
 
-#[derive(ComponentBuilder)]
-struct Arch {
-	#[children]
-	pub children: Vec<Node>,
-}
+struct Arch;
 
 impl Component for Arch {
 	fn into_node(self) -> Node {
@@ -342,11 +309,7 @@ impl Component for Arch {
 	}
 }
 
-#[derive(ComponentBuilder)]
-struct Scoop {
-	#[children]
-	pub children: Vec<Node>,
-}
+struct Scoop;
 
 impl Component for Scoop {
 	fn into_node(self) -> Node {
@@ -379,11 +342,7 @@ impl Component for Scoop {
 	}
 }
 
-#[derive(ComponentBuilder)]
-struct Docker {
-	#[children]
-	pub children: Vec<Node>,
-}
+struct Docker;
 
 impl Component for Docker {
 	fn into_node(self) -> Node {
@@ -412,11 +371,7 @@ impl Component for Docker {
 	}
 }
 
-#[derive(ComponentBuilder)]
-struct Manual {
-	#[children]
-	pub children: Vec<Node>,
-}
+struct Manual;
 
 impl Component for Manual {
 	fn into_node(self) -> Node {
@@ -424,7 +379,7 @@ impl Component for Manual {
 			.child("If none of the above methods works for you, you can download the tarball for your CPU architecture and operating system from ")
 			.child(ui::Link::new().href("https://github.com/tangramxyz/tangram/releases/".to_owned()).child("GitHub Releases"))
 			.child(". Untar the file and place the tangram executable somewhere on your ")
-			.child(ui::InlineCode::new().child("PATH"))
+			.child(ui::InlineCode::new("PATH"))
 			.child(". If you do this, please email us at ")
 			.child(ui::Link::new().href("mailto:hello@tangram.xyz".to_owned())
 			.child("hello@tangram.xyz"))

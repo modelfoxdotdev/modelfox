@@ -18,11 +18,7 @@ struct HeartDiseaseRow {
 	thallium_stress_test: String,
 }
 
-#[derive(ComponentBuilder)]
-pub struct DatasetPreview {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct DatasetPreview;
 
 impl Component for DatasetPreview {
 	fn into_node(self) -> Node {

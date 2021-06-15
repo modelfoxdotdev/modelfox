@@ -258,14 +258,14 @@ impl Component for Page {
 			.child(
 				ui::S2::new()
 					.child(m1)
-					.child(TrainingMetrics::new())
+					.child(TrainingMetrics)
 					.child(m2)
 					.child(
 						ui::Window::new()
 							.child(Dehydrate::new("tuning", Tuning { threshold_metrics })),
 					)
 					.child(m3)
-					.child(TuningCode::new()),
+					.child(TuningCode),
 			)
 			.child(prev_next_buttons);
 		let layout = DocsLayout::new(DocsPage::GettingStarted(GettingStartedPage::Inspect), None)
@@ -277,11 +277,7 @@ impl Component for Page {
 	}
 }
 
-#[derive(ComponentBuilder)]
-pub struct TrainingMetrics {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct TrainingMetrics;
 
 impl Component for TrainingMetrics {
 	fn into_node(self) -> Node {
@@ -301,11 +297,7 @@ impl Component for TrainingMetrics {
 	}
 }
 
-#[derive(ComponentBuilder)]
-pub struct TuningCode {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct TuningCode;
 
 impl Component for TuningCode {
 	fn into_node(self) -> Node {

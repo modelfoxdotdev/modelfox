@@ -6,11 +6,7 @@ use tangram_charts::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
-pub struct ProductionStats {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct ProductionStats;
 
 impl Component for ProductionStats {
 	fn into_node(self) -> Node {

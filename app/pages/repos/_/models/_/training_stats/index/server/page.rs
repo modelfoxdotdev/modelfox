@@ -206,9 +206,9 @@ pub struct ColumnTypeToken {
 impl Component for ColumnTypeToken {
 	fn into_node(self) -> Node {
 		match self.column_type {
-			ColumnType::Number => Some(NumberColumnToken::new().into_node()),
-			ColumnType::Enum => Some(EnumColumnToken::new().into_node()),
-			ColumnType::Text => Some(TextColumnToken::new().into_node()),
+			ColumnType::Number => Some(NumberColumnToken.into_node()),
+			ColumnType::Enum => Some(EnumColumnToken.into_node()),
+			ColumnType::Text => Some(TextColumnToken.into_node()),
 			ColumnType::Unknown => None,
 		}
 		.into_node()

@@ -24,10 +24,10 @@ impl Component for Page {
 						.child(
 							ui::S2::new()
 								.child(ui::H2::new().child("1. Install."))
-								.child(Install::new())
+								.child(Install)
 								.child(ui::H2::new().child("2. Predict."))
 								.child(predict_text)
-								.child(Predict::new()),
+								.child(Predict),
 						)
 						.child(
 							div()
@@ -49,29 +49,21 @@ impl Component for Page {
 	}
 }
 
-#[derive(ComponentBuilder)]
-pub struct Install {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Install;
 
 impl Component for Install {
 	fn into_node(self) -> Node {
 		ui::P::new()
 			.child("Add the ")
-			.child(ui::InlineCode::new().child("tangram"))
+			.child(ui::InlineCode::new("tangram"))
 			.child(" package to your ")
-			.child(ui::InlineCode::new().child("mix.exs"))
+			.child(ui::InlineCode::new("mix.exs"))
 			.child(".")
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
-pub struct Predict {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Predict;
 
 impl Component for Predict {
 	fn into_node(self) -> Node {

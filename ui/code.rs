@@ -247,15 +247,19 @@ impl Component for LineNumbers {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct InlineCode {
-	#[children]
-	pub children: Vec<Node>,
+	pub code: Cow<'static, str>,
+}
+
+impl InlineCode {
+	pub fn new(code: impl Into<Cow<'static, str>>) -> InlineCode {
+		InlineCode { code: code.into() }
+	}
 }
 
 impl Component for InlineCode {
 	fn into_node(self) -> Node {
-		span().class("inline-code").child(self.children).into_node()
+		span().class("inline-code").child(self.code).into_node()
 	}
 }
 

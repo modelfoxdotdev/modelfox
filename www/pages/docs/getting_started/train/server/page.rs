@@ -31,25 +31,25 @@ impl Component for Page {
 			.child("The heart disease dataset contains information from cardiac patients such as their age, cholesterol, and stress test results. Below are some example rows.");
 		let data_p3 = ui::P::new()
 			.child("The last column, called ")
-			.child(ui::InlineCode::new().child("diagnosis"))
+			.child(ui::InlineCode::new("diagnosis"))
 			.child(", is either ")
-			.child(ui::InlineCode::new().child("Positive"))
+			.child(ui::InlineCode::new("Positive"))
 			.child(" if the patient has heart disease or ")
-			.child(ui::InlineCode::new().child("Negative"))
+			.child(ui::InlineCode::new("Negative"))
 			.child(" if they don't.");
 		let data = ui::S2::new()
 			.child(ui::H2::new().child("Get the data"))
 			.child(data_p1)
 			.child(data_p2)
-			.child(DatasetPreview::new())
+			.child(DatasetPreview)
 			.child(data_p3);
 		let train_p1 = ui::P::new()
 			.child("We can train a model to predict the ")
-			.child(ui::InlineCode::new().child("diagnosis"))
+			.child(ui::InlineCode::new("diagnosis"))
 			.child(" column using the ")
-			.child(ui::InlineCode::new().child("tangram train"))
+			.child(ui::InlineCode::new("tangram train"))
 			.child(" command, passing in the path to the CSV file and the name of the column we want to predict, called the ")
-			.child(ui::InlineCode::new().child("target"))
+			.child(ui::InlineCode::new("target"))
 			.child(" column.");
 		let train_window = ui::Window::new().child(
 			ui::Code::new()
@@ -60,7 +60,7 @@ impl Component for Page {
 		);
 		let train_p2 = ui::P::new()
 			.child("The CLI automatically transforms the data into features, trains a number of models to predict the target column, and writes the best model to a ")
-			.child(ui::InlineCode::new().child(".tangram"))
+			.child(ui::InlineCode::new(".tangram"))
 			.child(" file. We can use this file to make predictions from our code.");
 		let train = ui::S2::new()
 			.child(ui::H2::new().child("Train"))

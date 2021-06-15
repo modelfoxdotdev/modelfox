@@ -25,11 +25,11 @@ impl Component for Page {
 	fn into_node(self) -> Node {
 		let p1 = ui::P::new()
 			.child("Once our model is deployed, we want to make sure that it performs as well in production as it did in training. We can opt in to logging by calling ")
-			.child(ui::InlineCode::new().child("logPrediction"))
+			.child(ui::InlineCode::new("logPrediction"))
 			.child(". Later on, as we get official diagnoses for patients, we can call ")
-			.child(ui::InlineCode::new().child("logTrueValue"))
+			.child(ui::InlineCode::new("logTrueValue"))
 			.child(" and use the same identifier as we used in the call to ")
-			.child(ui::InlineCode::new().child("logPrediction"))
+			.child(ui::InlineCode::new("logPrediction"))
 			.child(".");
 		let p2 = ui::P::new().child("Back in the app, we can look up a prediction by its identifier, and get an explanation that shows how each feature affects the output.");
 		let p3 = ui::P::new().child("Now let's see how accurate our model has been in production. Let's open the app and choose Production Metrics in the sidebar.");
@@ -38,15 +38,15 @@ impl Component for Page {
 		let p6 = ui::Markdown::new("Hooray! You made it to the end! In this guide, we learned how to train a model, make predictions from our code, tune our model, and monitor it in production. If you want help using Tangram with your own data, send us an email at [hello@tangram.xyz](mailto:hello@tangram.xyz) or join us on [discord](https://discord.gg/7MjcvRQr).");
 		let section = ui::S2::new()
 			.child(p1)
-			.child(Log::new())
+			.child(Log)
 			.child(p2)
-			.child(ProductionExplanations::new())
+			.child(ProductionExplanations)
 			.child(p3)
-			.child(ProductionMetrics::new())
+			.child(ProductionMetrics)
 			.child(p4)
-			.child(ProductionStats::new())
+			.child(ProductionStats)
 			.child(p5)
-			.child(ProductionColumnStats::new())
+			.child(ProductionColumnStats)
 			.child(p6);
 		let buttons = div().class("docs-prev-next-buttons").child(
 			ui::Link::new()
@@ -71,11 +71,7 @@ impl Component for Page {
 	}
 }
 
-#[derive(ComponentBuilder)]
-pub struct Log {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Log;
 
 impl Component for Log {
 	fn into_node(self) -> Node {
@@ -195,11 +191,7 @@ impl Component for Log {
 	}
 }
 
-#[derive(ComponentBuilder)]
-pub struct ProductionStats {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct ProductionStats;
 
 impl Component for ProductionStats {
 	fn into_node(self) -> Node {
@@ -321,10 +313,7 @@ impl Component for ProductionStats {
 }
 
 #[derive(ComponentBuilder)]
-pub struct ProductionMetrics {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct ProductionMetrics;
 
 impl Component for ProductionMetrics {
 	fn into_node(self) -> Node {
@@ -347,10 +336,7 @@ impl Component for ProductionMetrics {
 }
 
 #[derive(ComponentBuilder)]
-pub struct ProductionColumnStats {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct ProductionColumnStats;
 
 impl Component for ProductionColumnStats {
 	fn into_node(self) -> Node {
@@ -453,11 +439,7 @@ impl Component for ProductionColumnStats {
 	}
 }
 
-#[derive(ComponentBuilder)]
-pub struct ProductionExplanations {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct ProductionExplanations;
 
 impl Component for ProductionExplanations {
 	fn into_node(self) -> Node {

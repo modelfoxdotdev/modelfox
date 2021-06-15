@@ -16,16 +16,13 @@ impl Component for Avatar {
 						.class("avatar-img")
 						.child(img().attribute("alt", "avatar").attribute("src", src))
 				} else {
-					div()
-						.class("avatar-placeholder")
-						.child(DefaultAvatar::new())
+					div().class("avatar-placeholder").child(DefaultAvatar)
 				}
 			})
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct DefaultAvatar;
 
 impl Component for DefaultAvatar {

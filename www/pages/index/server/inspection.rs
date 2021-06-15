@@ -6,11 +6,7 @@ use tangram_charts::{
 use tangram_finite::Finite;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
-pub struct Inspection {
-	#[children]
-	pub children: Vec<Node>,
-}
+pub struct Inspection;
 
 impl Component for Inspection {
 	fn into_node(self) -> Node {
@@ -24,7 +20,7 @@ impl Component for Inspection {
 		let p1 = div()
 			.class("index-step-text")
 			.child("Run ")
-			.child(ui::InlineCode::new().child("tangram app"))
+			.child(ui::InlineCode::new("tangram app"))
 			.child(" and open ")
 			.child(
 				ui::Link::new()
