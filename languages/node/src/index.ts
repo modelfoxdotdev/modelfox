@@ -19,7 +19,7 @@ if (arch === "x64" && platform === "linux") {
 		"Tangram for Node does not yet support your combination of CPU architecture and operating system. Open an issue at https://github.com/tangramxyz/tangram/issues/new or email us at help@tangram.xyz to complain.",
 	)
 }
-let native = require(`../native/dist/${target}/tangram.node`)
+let native = require(`../native/${target}/tangram.node`)
 
 /**
  * This identifies the task a model performs.

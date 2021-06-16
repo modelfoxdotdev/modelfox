@@ -1,11 +1,10 @@
 [workspace]
 resolver = "2"
 members = [
-	"crates/cli",
-	"crates/www",
+	"crates/*",
 	"languages/c",
-	"languages/elixir/native",
-	"languages/node/native",
+	"languages/elixir",
+	"languages/node",
 	"languages/python",
 	"languages/rust",
 	"scripts/crates/*",

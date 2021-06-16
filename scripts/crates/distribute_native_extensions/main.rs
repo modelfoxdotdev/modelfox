@@ -59,7 +59,7 @@ fn main() -> Result<()> {
 	}
 
 	eprintln!("node");
-	let node_dist_path = tangram_path.join("languages/node/native/dist");
+	let node_dist_path = tangram_path.join("languages/node/native");
 	std::fs::remove_dir_all(&node_dist_path)?;
 	for target in &[
 		Target::X8664UnknownLinuxGnu,
