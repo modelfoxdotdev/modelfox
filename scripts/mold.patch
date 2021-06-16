@@ -1,0 +1,13 @@
+diff --git a/Makefile b/Makefile
+index 118c33b..2f7f7e2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -65,7 +65,7 @@ $(MIMALLOC_LIB): mimalloc/CMakeLists.txt
+ 	$(MAKE) -C mimalloc/out/release
+ 
+ mimalloc/CMakeLists.txt:
+-	git submodule update --init --recursive
++	# git submodule update --init --recursive
+ 
+ test tests check: all
+ 	 $(MAKE) -C test --output-sync --no-print-directory

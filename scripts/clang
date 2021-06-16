@@ -1,2 +1,2 @@
 #!/bin/sh
-clang -fuse-ld=lld $@
+clang -fuse-ld=$(which mold) $@
