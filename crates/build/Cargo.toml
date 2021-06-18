@@ -1,0 +1,24 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_build"
+publish = false
+version = "0.0.0"
+
+[lib]
+name = "tangram_build"
+path = "lib.rs"
+
+[[bin]]
+name = "tangram_build"
+path = "main.rs"
+
+[dependencies]
+cbindgen = "0.19"
+clap = { version = "3.0.0-beta.2", features = ["color"] }
+dirs = "3"
+duct = "0.13"
+flate2 = "1"
+tangram_error = { path = "../error" }
+tar = "0.4"
+which = "4"

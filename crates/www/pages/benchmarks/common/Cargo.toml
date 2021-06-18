@@ -1,6 +1,7 @@
 [package]
 edition = "2018"
 name = "tangram_www_benchmarks_common"
+publish = false
 version = "0.0.0"
 
 [lib]
@@ -9,7 +10,7 @@ path = "lib.rs"
 [dependencies]
 futures-signals = "0.3"
 num = "0.4"
-pinwheel = { path = "../../../../pinwheel" }
+pinwheel = "0.1"
 serde = { version = "1", features = ["derive"] }
 tangram_ui = { path = "../../../../ui" }
 tangram_charts = { path = "../../../../charts" }

@@ -1,13 +1,9 @@
 use clap::Clap;
-use pinwheel::prelude::*;
 use std::{path::PathBuf, sync::Arc, time::Duration};
-use tangram_error::{Error, Result};
-use tangram_id::Id;
-use tangram_serve::{request_id::RequestIdLayer, RouteMap};
-use tangram_www_content::{BlogPost, Content, DocsGuide};
+use tangram_error::Result;
 use tower::{make::Shared, ServiceBuilder};
 use tower_http::{add_extension::AddExtensionLayer, trace::TraceLayer};
-use tracing::{error, info, trace_span, Span};
+use tracing::{error, info, Span};
 use tracing_subscriber::prelude::*;
 
 #[derive(Clap)]
@@ -27,7 +23,7 @@ struct ExportArgs {
 async fn main() -> Result<()> {
 	tracing()?;
 	let args = Args::parse();
-	let route_map = route_map();
+	let sunfish = sunfish::init!();
 	match args {
 		Args::Serve => {
 			let host_from_env = if let Ok(host) = std::env::var("HOST") {
@@ -42,18 +38,9 @@ async fn main() -> Result<()> {
 				None
 			};
 			let port = port_from_env.unwrap_or(8080);
-			let context = Context {
-				route_map,
-				#[cfg(not(debug_assertions))]
-				include_out_dir: include_out_dir::include_out_dir!("output"),
-			};
+			let context = Context { sunfish };
 			let context_layer = AddExtensionLayer::new(Arc::new(context));
-			let request_id_layer = RequestIdLayer::new();
 			let trace_layer = TraceLayer::new_for_http()
-				.make_span_with(|request: &http::Request<hyper::Body>| {
-					let id = request.extensions().get::<Id>().unwrap();
-					trace_span!("request", %id)
-				})
 				.on_request(|request: &http::Request<hyper::Body>, _span: &Span| {
 					info!(
 						method = %request.method(),
@@ -69,7 +56,6 @@ async fn main() -> Result<()> {
 				);
 			let service = ServiceBuilder::new()
 				.layer(context_layer)
-				.layer(request_id_layer)
 				.layer(trace_layer)
 				.service_fn(handle);
 			let addr = std::net::SocketAddr::new(host, port);
@@ -80,153 +66,37 @@ async fn main() -> Result<()> {
 			let out_dir = std::path::Path::new(env!("OUT_DIR"));
 			let cwd = std::env::current_dir()?;
 			let dist_path = cwd.join(export_args.path);
-			tangram_serve::export::export(route_map, &out_dir, &dist_path)?;
+			sunfish.export(&out_dir, &dist_path)?;
 		}
 	}
 	Ok(())
 }
 
-fn route_map() -> RouteMap {
-	let mut route_map = RouteMap::new();
-	route_map.insert(
-		"/".into(),
-		Box::new(|| html(tangram_www_index_server::Page::new())),
-	);
-	route_map.insert(
-		"/benchmarks".into(),
-		Box::new(|| html(tangram_www_benchmarks_server::Page::new())),
-	);
-	for slug in BlogPost::slugs().unwrap() {
-		route_map.insert(
-			format!("/blog/{}", slug).into(),
-			Box::new(move || html(tangram_www_blog_post_server::Page::new(slug.clone()))),
-		);
-	}
-	route_map.insert(
-		"/blog/".into(),
-		Box::new(move || html(tangram_www_blog_index_server::Page::new())),
-	);
-	route_map.insert(
-		"/docs/".into(),
-		Box::new(|| html(tangram_www_docs_index_server::Page::new())),
-	);
-	route_map.insert(
-		"/docs/install".into(),
-		Box::new(|| html(tangram_www_docs_install_server::Page::new())),
-	);
-	route_map.insert(
-		"/docs/getting_started/".into(),
-		Box::new(|| html(tangram_www_docs_getting_started_index_server::Page::new())),
-	);
-	route_map.insert(
-		"/docs/getting_started/train".into(),
-		Box::new(|| html(tangram_www_docs_getting_started_train_server::Page::new())),
-	);
-	route_map.insert(
-		"/docs/getting_started/predict/".into(),
-		Box::new(|| html(tangram_www_docs_getting_started_predict_index_server::Page::new())),
-	);
-	route_map.insert(
-		"/docs/getting_started/predict/elixir".into(),
-		Box::new(|| html(tangram_www_docs_getting_started_predict_elixir_server::Page::new())),
-	);
-	route_map.insert(
-		"/docs/getting_started/predict/go".into(),
-		Box::new(|| html(tangram_www_docs_getting_started_predict_go_server::Page::new())),
-	);
-	route_map.insert(
-		"/docs/getting_started/predict/node".into(),
-		Box::new(|| html(tangram_www_docs_getting_started_predict_node_server::Page::new())),
-	);
-	route_map.insert(
-		"/docs/getting_started/predict/python".into(),
-		Box::new(|| html(tangram_www_docs_getting_started_predict_python_server::Page::new())),
-	);
-	route_map.insert(
-		"/docs/getting_started/predict/ruby".into(),
-		Box::new(|| html(tangram_www_docs_getting_started_predict_ruby_server::Page::new())),
-	);
-	route_map.insert(
-		"/docs/getting_started/predict/rust".into(),
-		Box::new(|| html(tangram_www_docs_getting_started_predict_rust_server::Page::new())),
-	);
-	route_map.insert(
-		"/docs/getting_started/inspect".into(),
-		Box::new(|| html(tangram_www_docs_getting_started_inspect_server::Page::new())),
-	);
-	route_map.insert(
-		"/docs/getting_started/monitor".into(),
-		Box::new(|| html(tangram_www_docs_getting_started_monitor_server::Page::new())),
-	);
-	for slug in DocsGuide::slugs().unwrap() {
-		route_map.insert(
-			format!("/docs/guides/{}", slug).into(),
-			Box::new(move || html(tangram_www_docs_guide_server::Page::new(slug.clone()))),
-		);
-	}
-	route_map.insert(
-		"/pricing".into(),
-		Box::new(|| html(tangram_www_pricing_server::Page::new())),
-	);
-	route_map
-}
-
 struct Context {
-	route_map: RouteMap,
-	#[cfg(not(debug_assertions))]
-	include_out_dir: include_out_dir::IncludeOutDir,
+	sunfish: sunfish::Sunfish,
 }
 
 async fn handle(
-	request: http::Request<hyper::Body>,
+	mut request: http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>, http::Error> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
-	let method = request.method().clone();
-	let uri = request.uri().clone();
-	let path_and_query = uri.path_and_query().unwrap();
-	let path = path_and_query.path();
-	let response = async {
-		if method == http::Method::GET {
-			if let Some(page) = context.as_ref().route_map.get(path) {
-				let html = page();
-				return Result::<_, Error>::Ok(
-					http::Response::builder()
-						.status(http::StatusCode::OK)
-						.body(hyper::Body::from(html))
-						.unwrap(),
-				);
-			}
-		}
-		#[cfg(debug_assertions)]
-		let response = tangram_serve::dir::serve_from_dir(
-			&std::path::Path::new(env!("OUT_DIR")).join("output"),
-			&request,
-		)
-		.await?;
-		#[cfg(not(debug_assertions))]
-		let response = tangram_serve::dir::serve_from_include_out_dir(
-			&request
-				.extensions()
-				.get::<Arc<Context>>()
-				.unwrap()
-				.include_out_dir,
-			&request,
-		)
-		.await?;
-		let response = response.unwrap_or_else(|| {
-			http::Response::builder()
-				.status(http::StatusCode::NOT_FOUND)
-				.body(hyper::Body::from("not found"))
-				.unwrap()
+	let response = context
+		.sunfish
+		.handle(&mut request)
+		.await
+		.unwrap_or_else(|error| {
+			error!(%error);
+			Some(
+				http::Response::builder()
+					.status(http::StatusCode::INTERNAL_SERVER_ERROR)
+					.body(hyper::Body::from("internal server error"))
+					.unwrap(),
+			)
 		});
-		Ok(response)
-	}
-	.await
-	.unwrap_or_else(|error| {
-		error!(%error);
+	let response = response.unwrap_or_else(|| {
 		http::Response::builder()
-			.status(http::StatusCode::INTERNAL_SERVER_ERROR)
-			.body(hyper::Body::from("internal server error"))
+			.status(http::StatusCode::NOT_FOUND)
+			.body(hyper::Body::from("not found"))
 			.unwrap()
 	});
 	Ok(response)

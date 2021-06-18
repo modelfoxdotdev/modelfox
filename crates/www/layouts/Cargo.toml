@@ -8,8 +8,8 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
-pinwheel = { path = "../../pinwheel" }
-tangram_serve = { path = "../../serve" }
+pinwheel = "0.1"
+sunfish = { path = "../../sunfish" }
 tangram_ui = { path = "../../ui" }
 tangram_www_content = { path = "../content" }
 tangram_www_ui = { path = "../ui" }

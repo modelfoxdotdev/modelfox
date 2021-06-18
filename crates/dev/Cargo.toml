@@ -1,0 +1,22 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_dev"
+publish = false
+version = "0.0.0"
+
+[[bin]]
+name = "tangram_dev"
+path = "main.rs"
+
+[dependencies]
+clap = { version = "3.0.0-beta.2", features = ["color"] }
+futures-batch = "0.6"
+http = "0.2"
+hyper = { version = "0.14", features = ["full"] }
+notify = "5.0.0-pre.9"
+serde = { version = "1", features = ["derive"] }
+tangram_error = { path = "../error" }
+tokio = { version = "1" ,features = ["full"] }
+tokio-stream = "0.1"
+which = "4"

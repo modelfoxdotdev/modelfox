@@ -1,5 +1,4 @@
 use pinwheel::prelude::*;
-use tangram_serve::hash;
 
 #[derive(ComponentBuilder)]
 pub struct Document {
@@ -41,9 +40,11 @@ impl Component for Document {
 		let timezone_script = script().child(
 			"document.cookie = `tangram_timezone=${Intl.DateTimeFormat().resolvedOptions().timeZone};max-age=31536000;path=/;samesite=lax`");
 		let client_script = self.client.map(|client| {
+			let paths = sunfish::client_paths(client);
 			script().attribute("type", "module").inner_html(format!(
-				r#"import init from "/js/{hash}.js"; init("/js/{hash}_bg.wasm")"#,
-				hash = hash(client),
+				r#"import init from "{path_js}"; init("{path_wasm}")"#,
+				path_js = paths.path_js,
+				path_wasm = paths.path_wasm,
 			))
 		});
 		let body = body()

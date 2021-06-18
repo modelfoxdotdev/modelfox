@@ -1,3 +1,4 @@
+pub use self::{column_stats::*, number_stats::*, prediction_stats::*};
 use chrono::prelude::*;
 use chrono_tz::Tz;
 use num::ToPrimitive;
@@ -10,10 +11,6 @@ use tangram_zip::zip;
 mod column_stats;
 mod number_stats;
 mod prediction_stats;
-
-pub use column_stats::*;
-pub use number_stats::*;
-pub use prediction_stats::*;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 pub struct ProductionStats {

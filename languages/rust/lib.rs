@@ -26,9 +26,8 @@ For more information, [read the docs](https://www.tangram.xyz/docs).
 use std::path::Path;
 use std::{collections::BTreeMap, marker::PhantomData};
 use tangram_error::Result;
-use url::Url;
-
 pub use tangram_macro::{predict_input, PredictInput, PredictInputValue};
+use url::Url;
 
 /// Use this struct to load a model, make predictions, and log events to the app.
 pub struct Model<Input = PredictInput, Output = PredictOutput>

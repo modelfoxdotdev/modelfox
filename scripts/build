@@ -1,1 +1,1 @@
-cargo run --bin tangram_script_build -- $@
+cargo run --bin tangram_build -- $@

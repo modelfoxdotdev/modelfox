@@ -4,6 +4,11 @@ This crate implements machine learning models for regression and classification 
 For an example of regression, see `benchmarks/boston.rs`.rs`. For an example of binary classification, see `benchmarks/heart_disease.rs`. For an example of multiclass classification, see `benchmarks/iris.rs`.
 */
 
+pub use self::{
+	binary_classifier::{BinaryClassifier, BinaryClassifierTrainOutput},
+	multiclass_classifier::{MulticlassClassifier, MulticlassClassifierTrainOutput},
+	regressor::{Regressor, RegressorTrainOutput},
+};
 use bitvec::prelude::*;
 use tangram_progress_counter::ProgressCounter;
 
@@ -23,10 +28,6 @@ mod shap;
 mod timing;
 mod train;
 mod train_tree;
-
-pub use binary_classifier::{BinaryClassifier, BinaryClassifierTrainOutput};
-pub use multiclass_classifier::{MulticlassClassifier, MulticlassClassifierTrainOutput};
-pub use regressor::{Regressor, RegressorTrainOutput};
 
 pub struct Progress<'a> {
 	pub kill_chip: &'a tangram_kill_chip::KillChip,

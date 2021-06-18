@@ -9,7 +9,7 @@ path = "lib.rs"
 
 [dependencies]
 futures = "0.3"
-pinwheel = { path = "../../../../../../../../../pinwheel" }
+pinwheel = "0.1"
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
 num = "0.4"
@@ -21,5 +21,5 @@ tangram_error = { path = "../../../../../../../../../error" }
 tangram_finite = { path = "../../../../../../../../../finite" }
 tangram_id = { path = "../../../../../../../../../id" }
 tangram_model = { path = "../../../../../../../../../model" }
-tangram_serve = { path = "../../../../../../../../../serve" }
+sunfish = { path = "../../../../../../../../../sunfish" }
 tangram_ui = { path = "../../../../../../../../../ui" }

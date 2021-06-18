@@ -29,13 +29,12 @@
 //! [`std::io::Read`]: https://doc.rust-lang.org/std/io/trait.Read.html
 //!
 
-use error::ParseError;
+pub use self::error::Error;
+use self::error::ParseError;
 use std::io::Read;
 
 mod error;
 mod table;
-
-pub use error::Error;
 
 const MAX_INTERMEDIATES: usize = 2;
 const MAX_PARAMS: usize = 16;

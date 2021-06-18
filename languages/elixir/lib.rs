@@ -2,11 +2,11 @@ use once_cell::sync::OnceCell;
 use std::collections::BTreeMap;
 use tangram_error::Result;
 
-erl_nif::init! {
+erl_nif::init!(
 	name: "Elixir.Tangram",
 	funcs: [_load_model_from_path, _load_model_from_binary, _model_id, _predict],
 	load: load,
-}
+);
 
 static MODEL_RESOURCE_TYPE: OnceCell<erl_nif::ResourceType<tangram_core::predict::Model>> =
 	OnceCell::new();

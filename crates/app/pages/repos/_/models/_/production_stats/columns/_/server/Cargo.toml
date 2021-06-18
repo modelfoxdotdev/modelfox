@@ -11,7 +11,7 @@ path = "lib.rs"
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.5", features = ["serde"] }
 futures = "0.3"
-pinwheel = { path = "../../../../../../../../../../pinwheel" }
+pinwheel = "0.1"
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
 num = "0.4"
@@ -28,6 +28,6 @@ tangram_core = { path = "../../../../../../../../../../core" }
 tangram_error = { path = "../../../../../../../../../../error" }
 tangram_id = { path = "../../../../../../../../../../id" }
 tangram_model = { path = "../../../../../../../../../../model" }
-tangram_serve = { path = "../../../../../../../../../../serve" }
+sunfish = { path = "../../../../../../../../../../sunfish" }
 tangram_ui = { path = "../../../../../../../../../../ui" }
 tangram_zip = { path = "../../../../../../../../../../zip" }

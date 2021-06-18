@@ -9,18 +9,20 @@ path = "lib.rs"
 
 [dependencies]
 futures = "0.3"
-pinwheel = { path = "../../../../../../../../pinwheel" }
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
 num = "0.4"
+pinwheel = "0.1"
+serde = { version = "1", features = ["derive"] }
+sunfish = { path = "../../../../../../../../sunfish" }
 tangram_app_common = { path = "../../../../../../../common" }
-tangram_app_ui = { path = "../../../../../../../ui" }
 tangram_app_layouts = { path = "../../../../../../../layouts" }
+tangram_app_playground_common = { path = "../common" }
+tangram_app_ui = { path = "../../../../../../../ui" }
 tangram_charts = { path = "../../../../../../../../charts" }
 tangram_core = { path = "../../../../../../../../core" }
 tangram_error = { path = "../../../../../../../../error" }
 tangram_id = { path = "../../../../../../../../id" }
 tangram_model = { path = "../../../../../../../../model" }
-tangram_serve = { path = "../../../../../../../../serve" }
 tangram_ui = { path = "../../../../../../../../ui" }
 url = { version = "2", features = ["serde"] }

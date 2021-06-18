@@ -1,0 +1,13 @@
+[package]
+edition = "2018"
+name = "tangram_app_playground_common"
+publish = false
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+pinwheel = "0.1"
+serde = { version = "1", features = ["derive"] }
+tangram_charts = { path = "../../../../../../../../charts" }

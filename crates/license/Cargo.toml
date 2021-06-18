@@ -2,7 +2,7 @@
 edition = "2018"
 license = "MIT"
 name = "tangram_license"
-publish = true
+publish = false
 version = "0.0.0"
 
 [lib]

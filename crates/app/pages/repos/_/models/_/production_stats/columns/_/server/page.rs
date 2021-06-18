@@ -1,3 +1,4 @@
+pub use crate::{enum_column::*, number_column::*, text_column::*};
 use pinwheel::prelude::*;
 use tangram_app_layouts::{
 	document::Document,
@@ -5,10 +6,6 @@ use tangram_app_layouts::{
 };
 use tangram_app_ui::{date_window::DateWindow, date_window_select_field::DateWindowSelectField};
 use tangram_ui as ui;
-
-pub use crate::enum_column::*;
-pub use crate::number_column::*;
-pub use crate::text_column::*;
 
 #[derive(ComponentBuilder)]
 pub struct Page {

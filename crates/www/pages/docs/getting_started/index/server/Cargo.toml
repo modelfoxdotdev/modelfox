@@ -5,10 +5,10 @@ publish = false
 version = "0.0.0"
 
 [lib]
-path = "page.rs"
+path = "lib.rs"
 
 [dependencies]
-pinwheel = { path = "../../../../../../pinwheel" }
+pinwheel = "0.1"
 tangram_www_layouts = { path = "../../../../../layouts" }
-tangram_serve = { path = "../../../../../../serve" }
+sunfish = { path = "../../../../../../sunfish" }
 tangram_ui = { path = "../../../../../../ui" }

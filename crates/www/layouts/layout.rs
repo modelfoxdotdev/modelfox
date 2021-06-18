@@ -37,12 +37,7 @@ impl Component for Topbar {
 			},
 			ui::TopbarItem {
 				element: None,
-				href: "/blog/".to_owned(),
-				title: "Blog".to_owned(),
-			},
-			ui::TopbarItem {
-				element: None,
-				href: "/docs/install".to_owned(),
+				href: "/docs/".to_owned(),
 				title: "Docs".to_owned(),
 			},
 			ui::TopbarItem {

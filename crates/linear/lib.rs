@@ -4,6 +4,10 @@ This crate is an implementation of linear machine learning models for regression
 To make training faster on multicore processors, we allow simultaneous read/write access to the model parameters from multiple threads. This means each thread will be reading weights partially updated by other threads and the weights it writes may be clobbered by other threads. This makes training nondeterministic, but in practice we observe little variation in the outcome, because there is feedback control: the change in loss is monitored after each epoch, and training terminates when the loss has stabilized.
 */
 
+pub use self::{
+	binary_classifier::BinaryClassifier, multiclass_classifier::MulticlassClassifier,
+	regressor::Regressor,
+};
 use ndarray::prelude::*;
 use num::ToPrimitive;
 use tangram_progress_counter::ProgressCounter;
@@ -13,10 +17,6 @@ mod multiclass_classifier;
 mod regressor;
 pub mod serialize;
 mod shap;
-
-pub use binary_classifier::BinaryClassifier;
-pub use multiclass_classifier::MulticlassClassifier;
-pub use regressor::Regressor;
 
 /// These are the options passed to `Regressor::train`, `BinaryClassifier::train`, and `MulticlassClassifier::train`.
 #[derive(Clone, Debug)]

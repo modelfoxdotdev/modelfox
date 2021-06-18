@@ -1,0 +1,20 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_generate_license"
+publish = false
+version = "0.0.0"
+
+[[bin]]
+name = "tangram_generate_license"
+path = "main.rs"
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+clap = { version = "3.0.0-beta.2", features = ["color"] }
+duct = "0.13"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tangram_error = { path = "../error" }
+tangram_id = { path = "../id" }
+tangram_license = { path = "../license" }

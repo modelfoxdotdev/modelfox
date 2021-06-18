@@ -4,12 +4,11 @@ name = "tangram_app_new_model_client"
 publish = false
 version = "0.0.0"
 
-[lib]
-crate-type = ["cdylib"]
-path = "lib.rs"
+[[bin]]
+name = "tangram_app_new_model_client"
+path = "main.rs"
 
 [dependencies]
-console_error_panic_hook = "0.1"
 tangram_ui = { path = "../../../../../../../ui" }
-wasm-bindgen = "0.2"
+tangram_client = { path = "../../../../../../../client" }
 web-sys = "0.3"

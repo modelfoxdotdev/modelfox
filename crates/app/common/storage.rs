@@ -3,16 +3,19 @@ use tangram_error::{err, Result};
 use tangram_id::Id;
 use tokio::fs;
 
+#[derive(Debug)]
 #[allow(clippy::large_enum_variant)]
 pub enum Storage {
 	Local(LocalStorage),
 	S3(S3Storage),
 }
 
+#[derive(Debug)]
 pub struct LocalStorage {
 	pub path: PathBuf,
 }
 
+#[derive(Debug)]
 pub struct S3Storage {
 	bucket: s3::Bucket,
 	cache_path: PathBuf,

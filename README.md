@@ -38,9 +38,9 @@ let tangram = require("@tangramxyz/tangram-node");
 let model = new tangram.Model("./heart_disease.tangram");
 
 let input = {
-	age: 63,
-	gender: "male",
-	// ...
+  age: 63,
+  gender: "male",
+  // ...
 };
 
 let output = model.predictSync(input);
@@ -66,16 +66,16 @@ Once your model is deployed, make sure that it performs as well in production as
 ```javascript
 // Log the prediction.
 model.logPrediction({
-	identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
-	input,
-	options,
-	output,
+  identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
+  input,
+  options,
+  output,
 });
 ```
 
 Later on, if you find out the true value for a prediction, call `logTrueValue`.
 
-```
+```javascript
 // Later on, if we get an official diagnosis for the patient, log the true value.
 model.logTrueValue({
   identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
@@ -103,4 +103,4 @@ Before submitting a pull request, please run `scripts/fmt` and `scripts/check` a
 
 ## License
 
-All of this repository is MIT licensed, except for the `app` directory, which is source available and free to use for evaluation and testing, but requires a paid license to use in production. Send us an email at hello@tangram.xyz if you are interested in a license.
+All of this repository is MIT licensed, except for the `app` directory, which is source available and free to use for testing, but requires a paid license to use in production. Send us an email at hello@tangram.xyz if you are interested in a license.

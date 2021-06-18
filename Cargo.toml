@@ -2,12 +2,13 @@
 resolver = "2"
 members = [
 	"crates/*",
+	"crates/www/pages/**/server",
+	"crates/www/pages/**/client",
 	"languages/c",
 	"languages/elixir",
 	"languages/node",
 	"languages/python",
 	"languages/rust",
-	"scripts/crates/*",
 ]
 
 [profile.dev.build-override]
@@ -16,4 +17,4 @@ opt-level = 3
 overflow-checks = false
 
 [profile.release]
-lto = true
+# lto = true

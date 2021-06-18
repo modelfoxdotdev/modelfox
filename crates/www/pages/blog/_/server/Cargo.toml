@@ -1,13 +1,15 @@
 [package]
 edition = "2018"
 name = "tangram_www_blog_post_server"
+publish = false
 version = "0.0.0"
 
 [lib]
-path = "page.rs"
+path = "lib.rs"
 
 [dependencies]
-pinwheel = { path = "../../../../../pinwheel" }
+pinwheel = "0.1"
+sunfish = { path = "../../../../../sunfish" }
 tangram_ui = { path = "../../../../../ui" }
 tangram_www_content = { path = "../../../../content" }
 tangram_www_layouts = { path = "../../../../layouts" }

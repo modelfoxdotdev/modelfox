@@ -2,6 +2,7 @@
 This crate implements two dimensional collections where each column can have a different data type, like a spreadsheet or database.
 */
 
+pub use self::load::{FromCsvOptions, LoadProgressEvent};
 use fnv::FnvHashMap;
 use ndarray::prelude::*;
 use num::ToPrimitive;
@@ -9,8 +10,6 @@ use std::num::NonZeroUsize;
 use tangram_zip::zip;
 
 mod load;
-
-pub use self::load::{FromCsvOptions, LoadProgressEvent};
 
 pub mod prelude {
 	pub use super::{

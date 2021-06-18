@@ -1,1 +1,2 @@
-cargo run --bin tangram_script_dev -- www -- $@
+#!/bin/sh
+cargo run --bin tangram_dev -- www

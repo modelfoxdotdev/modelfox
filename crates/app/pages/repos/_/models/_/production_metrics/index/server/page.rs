@@ -1,12 +1,9 @@
+pub use crate::{binary_classifier::*, multiclass_classifier::*, regressor::*};
 use pinwheel::prelude::*;
 use tangram_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-
-pub use crate::binary_classifier::*;
-pub use crate::multiclass_classifier::*;
-pub use crate::regressor::*;
 
 #[derive(ComponentBuilder)]
 pub struct Page {

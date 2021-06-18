@@ -1,9 +1,9 @@
-pub use crate::binary_classifier::*;
-pub use crate::common::{
-	ClassifierChartEntry, PredictionCountChartEntry, ProductionTrainingHistogram,
+pub use crate::{
+	binary_classifier::*,
+	common::{ClassifierChartEntry, PredictionCountChartEntry, ProductionTrainingHistogram},
+	multiclass_classifier::*,
+	regressor::*,
 };
-pub use crate::multiclass_classifier::*;
-pub use crate::regressor::*;
 use pinwheel::prelude::*;
 use tangram_app_layouts::{
 	document::Document,

@@ -11,7 +11,7 @@ path = "lib.rs"
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
 num = "0.4"
-pinwheel = { path = "../../../../../../../../pinwheel" }
+pinwheel = "0.1"
 tangram_app_common = { path = "../../../../../../../common" }
 tangram_charts = { path = "../../../../../../../../charts" }
 tangram_core = { path = "../../../../../../../../core" }

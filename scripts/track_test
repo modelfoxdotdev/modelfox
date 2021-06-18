@@ -1,1 +1,1 @@
-cargo run -p tangram_script_track_test -- $@
+cargo run -p tangram_track_test -- $@

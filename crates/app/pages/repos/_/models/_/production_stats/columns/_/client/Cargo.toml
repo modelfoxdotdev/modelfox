@@ -4,14 +4,13 @@ name = "tangram_app_production_stats_column_client"
 publish = false
 version = "0.0.0"
 
-[lib]
-crate-type = ["cdylib"]
-path = "lib.rs"
+[[bin]]
+name = "tangram_app_production_stats_column_client"
+path = "main.rs"
 
 [dependencies]
-console_error_panic_hook = "0.1"
-pinwheel = { path = "../../../../../../../../../../pinwheel" }
+pinwheel = "0.1"
 tangram_charts = { path = "../../../../../../../../../../charts" }
 tangram_ui = { path = "../../../../../../../../../../ui" }
-wasm-bindgen = "0.2"
+tangram_client = { path = "../../../../../../../../../../client" }
 web-sys = "0.3"

@@ -1,0 +1,13 @@
+[package]
+edition = "2018"
+name = "tangram_client"
+publish = false
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+console_error_panic_hook = "0.1"
+tracing = "0.1"
+tracing-wasm = "0.2"

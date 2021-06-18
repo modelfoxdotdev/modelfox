@@ -1,0 +1,18 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "sunfish_macro"
+publish = false
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1"
+quote = "1"
+toml = "0.3"
+glob = "0.3"
+syn = { version = "1", features = ["full"] }
+walkdir = "2"

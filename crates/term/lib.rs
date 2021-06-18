@@ -9,7 +9,7 @@ screen.hide_cursor().unwrap();
 loop {
   let event = screen.listen().unwrap();
   match event {
-  Event::Char('q') => break,
+    Event::Char('q') => break,
     _ => {
       screen.clear_row(0);
       screen.put_str(0, 0, Style::default(), &format!("{}", event));

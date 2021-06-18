@@ -2,6 +2,10 @@
 This crate defines the structure of `.tangram` files using the `buffalo` crate.
 */
 
+pub use self::{
+	binary_classifier::*, features::*, grid::*, model_train_options::*, multiclass_classifier::*,
+	regressor::*, stats::*,
+};
 use fnv::FnvHashMap;
 use num::ToPrimitive;
 use std::{convert::TryInto, io::prelude::*, path::Path};
@@ -14,11 +18,6 @@ mod model_train_options;
 mod multiclass_classifier;
 mod regressor;
 mod stats;
-
-pub use self::{
-	binary_classifier::*, features::*, grid::*, model_train_options::*, multiclass_classifier::*,
-	regressor::*, stats::*,
-};
 
 /// A .tangram file is prefixed with this magic number followed by a 4-byte little endian revision number.
 const MAGIC_NUMBER: &[u8] = b"tangram\0";

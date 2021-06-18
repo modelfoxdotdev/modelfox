@@ -5,6 +5,7 @@ use tangram_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
+use tangram_app_playground_common::ColumnChart;
 use tangram_app_ui::tokens::{
 	EnumColumnToken, NumberColumnToken, TextColumnToken, UnknownColumnToken,
 };
@@ -138,7 +139,7 @@ pub struct NumberField {
 
 impl Component for NumberField {
 	fn into_node(self) -> Node {
-		let column_chart_series = vec![BoxChartSeries {
+		let series = vec![BoxChartSeries {
 			color: ui::colors::BLUE.to_owned(),
 			data: vec![BoxChartPoint {
 				label: self.name.to_owned(),
@@ -166,18 +167,16 @@ impl Component for NumberField {
 							.value(Some(value)),
 					),
 			)
-			.child(
-				div()
-					.class("predict-column-chart-wrapper")
-					.child(Dehydrate::new(
-						self.name,
-						BoxChart::new()
-							.hide_legend(Some(true))
-							.series(Some(column_chart_series))
-							.should_draw_x_axis_labels(Some(false))
-							.should_draw_y_axis_labels(Some(false)),
-					)),
-			)
+			.child(Dehydrate::new(
+				self.name,
+				ColumnChart::Box(
+					BoxChart::new()
+						.hide_legend(Some(true))
+						.series(Some(series))
+						.should_draw_x_axis_labels(Some(false))
+						.should_draw_y_axis_labels(Some(false)),
+				),
+			))
 			.into_node()
 	}
 }
@@ -231,18 +230,16 @@ impl Component for EnumField {
 							.value(Some(self.value.to_string())),
 					),
 			)
-			.child(
-				div()
-					.class("predict-column-chart-wrapper")
-					.child(Dehydrate::new(
-						self.name,
-						BarChart::new()
-							.hide_legend(Some(true))
-							.series(Some(series))
-							.should_draw_x_axis_labels(Some(false))
-							.should_draw_y_axis_labels(Some(false)),
-					)),
-			)
+			.child(Dehydrate::new(
+				self.name,
+				ColumnChart::Bar(
+					BarChart::new()
+						.hide_legend(Some(true))
+						.series(Some(series))
+						.should_draw_x_axis_labels(Some(false))
+						.should_draw_y_axis_labels(Some(false)),
+				),
+			))
 			.into_node()
 	}
 }

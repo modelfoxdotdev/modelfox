@@ -1,4 +1,4 @@
-use dataset_preview::DatasetPreview;
+use crate::dataset_preview::DatasetPreview;
 use pinwheel::prelude::*;
 use std::borrow::Cow;
 use tangram_ui as ui;
@@ -6,8 +6,6 @@ use tangram_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage, GettingStartedPage},
 	document::Document,
 };
-
-mod dataset_preview;
 
 #[derive(ComponentBuilder)]
 pub struct Page;

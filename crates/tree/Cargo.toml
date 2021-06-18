@@ -1,9 +1,15 @@
 [package]
+authors = ["Tangram <root@tangram.xyz"]
+description = "Tangram is an automated machine learning framework designed for programmers."
+documentation = "https://docs.rs/tangram"
 edition = "2018"
+homepage = "https://github.com/tangramxyz/tangram"
 license = "MIT"
 name = "tangram_tree"
 publish = true
-version = "0.0.0"
+repository = "https://github.com/tangramxyz/tangram"
+version = "0.4.0"
+
 
 [lib]
 path = "lib.rs"
@@ -46,7 +52,7 @@ path = "benchmarks/iris.rs"
 
 [dependencies]
 bitvec = "0.19"
-buffalo = { path = "../buffalo", features = ["ndarray_0_15", "bitvec_0_19"] }
+buffalo = { version = "0.1", features = ["ndarray_0_15", "bitvec_0_19"] }
 clap = { version = "3.0.0-beta.2", features = ["color"] }
 itertools = "0.10"
 maplit = "1"

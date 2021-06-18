@@ -1,3 +1,12 @@
+pub use self::{
+	alert::*, alert_icon::*, asciicast::*, avatar::*, button::*, callout::*, card::*, code::*,
+	confusion_matrix::*, confusion_matrix_comparison::*, details::*, form::*, image::*, layout::*,
+	link::*, markdown::*, nav::*, number_card::*, number_comparison_card::*, slider::*, tab_bar::*,
+	table::*, theme::*, token::*, topbar::*, window::*,
+};
+pub use indoc::{formatdoc, indoc as doc};
+pub use tangram_number_formatter::*;
+
 mod alert;
 mod alert_icon;
 mod asciicast;
@@ -24,33 +33,3 @@ mod theme;
 mod token;
 mod topbar;
 mod window;
-
-pub use self::alert::*;
-pub use self::alert_icon::*;
-pub use self::asciicast::*;
-pub use self::avatar::*;
-pub use self::button::*;
-pub use self::callout::*;
-pub use self::card::*;
-pub use self::code::*;
-pub use self::confusion_matrix::*;
-pub use self::confusion_matrix_comparison::*;
-pub use self::details::*;
-pub use self::form::*;
-pub use self::image::*;
-pub use self::layout::*;
-pub use self::link::*;
-pub use self::markdown::*;
-pub use self::nav::*;
-pub use self::number_card::*;
-pub use self::number_comparison_card::*;
-pub use self::slider::*;
-pub use self::tab_bar::*;
-pub use self::table::*;
-pub use self::theme::*;
-pub use self::token::*;
-pub use self::topbar::*;
-pub use self::window::*;
-
-pub use indoc::{formatdoc, indoc as doc};
-pub use tangram_number_formatter::*;

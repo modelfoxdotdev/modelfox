@@ -1,16 +1,21 @@
 [package]
+authors = ["Tangram <root@tangram.xyz"]
+description = "Tangram is an automated machine learning framework designed for programmers."
+documentation = "https://docs.rs/tangram"
 edition = "2018"
-license = "UNLICENSED"
+homepage = "https://github.com/tangramxyz/tangram"
+license = "MIT"
 name = "tangram_core"
 publish = true
-version = "0.0.0"
+repository = "https://github.com/tangramxyz/tangram"
+version = "0.4.0"
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
 bitvec = "0.19"
-buffalo = { path = "../buffalo" }
+buffalo = "0.1"
 chrono = { version = "0.4", features = ["serde"] }
 fast-float = "0.2"
 fnv = "1"

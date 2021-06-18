@@ -4,15 +4,12 @@ name = "tangram_app_tuning_client"
 publish = false
 version = "0.0.0"
 
-[lib]
-crate-type = ["cdylib"]
-path = "lib.rs"
+[[bin]]
+name = "tangram_app_tuning_client"
+path = "main.rs"
 
 [dependencies]
-console_error_panic_hook = "0.1"
-pinwheel = { path = "../../../../../../../../pinwheel" }
+pinwheel = "0.1"
 tangram_app_tuning_common = { path = "../common" }
-tracing = "0.1"
-tracing-wasm = "0.2"
-wasm-bindgen = "0.2"
+tangram_client = { path = "../../../../../../../../client" }
 web-sys = "0.3"

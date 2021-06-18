@@ -79,9 +79,9 @@ version = "0.1.50"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b98e84bbb4cbcdd97da190ba0c58a1bb0de2c1fdf67d159e192ed766aeca722"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -102,7 +102,7 @@ dependencies = [
  "http",
  "log",
  "rustls 0.18.1",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "url",
  "webpki",
@@ -143,7 +143,7 @@ dependencies = [
  "attohttpc",
  "dirs",
  "rust-ini",
- "serde",
+ "serde 1.0.126",
  "serde-xml-rs",
  "serde_derive",
  "url",
@@ -252,12 +252,14 @@ dependencies = [
  "lazy_static",
  "memchr",
  "regex-automata",
- "serde",
+ "serde 1.0.126",
 ]
 
 [[package]]
 name = "buffalo"
-version = "0.0.0"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a726c8862d6053536808c773ccf793e2adc0bad4512d4bcc502b86aae734afa8"
 dependencies = [
  "bitvec",
  "buffalo_macro",
@@ -268,12 +270,14 @@ dependencies = [
 
 [[package]]
 name = "buffalo_macro"
-version = "0.0.0"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4f463ff5b355dcdf28672f57ac7ae4c915e601405d71e26fd9e3a54b9798b1d8"
 dependencies = [
  "heck",
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -310,13 +314,13 @@ dependencies = [
  "heck",
  "indexmap",
  "log",
- "proc-macro2",
- "quote",
- "serde",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "serde 1.0.126",
  "serde_json",
- "syn",
+ "syn 1.0.73",
  "tempfile",
- "toml",
+ "toml 0.5.8",
 ]
 
 [[package]]
@@ -346,7 +350,7 @@ dependencies = [
  "libc",
  "num-integer",
  "num-traits",
- "serde",
+ "serde 1.0.126",
  "time",
  "winapi",
 ]
@@ -359,7 +363,7 @@ checksum = "2554a3155fec064362507487171dcc4edc3df60cb10f3a1fb10ed8094822b120"
 dependencies = [
  "chrono",
  "parse-zoneinfo",
- "serde",
+ "serde 1.0.126",
 ]
 
 [[package]]
@@ -404,9 +408,9 @@ checksum = "370f715b81112975b1b69db93e0b56ea4cd4e5002ac43b2da8474106a54096a1"
 dependencies = [
  "heck",
  "proc-macro-error",
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -542,7 +546,7 @@ dependencies = [
  "csv-core",
  "itoa",
  "ryu",
- "serde",
+ "serde 1.0.126",
 ]
 
 [[package]]
@@ -560,8 +564,8 @@ version = "0.1.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5e98e2ad1a782e33928b96fc3948e7c355e5af34ba4de7670fe8bac2a3b2006d"
 dependencies = [
- "quote",
- "syn",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -570,9 +574,9 @@ version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dcdbcee2d9941369faba772587a565f4f534e42cb8d17e5295871de730163b2b"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -582,9 +586,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5cc7b9cef1e351660e5443924e4f43ab25fbbed3e9a5f052df3677deb4d6b320"
 dependencies = [
  "convert_case",
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -630,6 +634,29 @@ name = "discard"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "212d0f5754cb6769937f4501cc0e67f4f4483c8d2c3e1e922ee9edbe4ab4c7c0"
+
+[[package]]
+name = "dlopen"
+version = "0.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "71e80ad39f814a9abe68583cd50a2d45c8a67561c3361ab8da240587dda80937"
+dependencies = [
+ "dlopen_derive",
+ "lazy_static",
+ "libc",
+ "winapi",
+]
+
+[[package]]
+name = "dlopen_derive"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f236d9e1b1fbd81cea0f9cbdc8dcc7e8ebcd80e6659cd7cb2ad5f6c05946c581"
+dependencies = [
+ "libc",
+ "quote 0.6.13",
+ "syn 0.15.44",
+]
 
 [[package]]
 name = "dlv-list"
@@ -687,28 +714,33 @@ dependencies = [
 
 [[package]]
 name = "erl_nif"
-version = "0.0.0"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "14267b703fcf6c005ad1fe617f8ce23f71b6fab9cd83c9ff3e13dc6177ce5074"
 dependencies = [
  "erl_nif_macro",
  "erl_nif_sys",
  "num",
- "serde",
- "tangram_error",
+ "serde 1.0.126",
 ]
 
 [[package]]
 name = "erl_nif_macro"
-version = "0.0.0"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4c1be4eff1271ba32b9916fe63708274beaa8cfe8c97eca39a812178588ee39"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
- "tangram_zip",
+ "itertools",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
 name = "erl_nif_sys"
-version = "0.0.0"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "62480ffaaf4a2338921aeec2e5146f9c076f3c4fc6ee21e1566bd67bf8544317"
 dependencies = [
  "erl_nif_macro",
 ]
@@ -856,9 +888,9 @@ checksum = "a4c40298486cdf52cc00cd6d6987892ba502c7656a16a4192a9992b1ccedd121"
 dependencies = [
  "autocfg 1.0.1",
  "proc-macro-hack",
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -872,7 +904,7 @@ dependencies = [
  "futures-core",
  "futures-util",
  "pin-project",
- "serde",
+ "serde 1.0.126",
 ]
 
 [[package]]
@@ -959,9 +991,9 @@ version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1a5bcf1bbeab73aa4cf2fde60a846858dc036163c7c33bec309f8d17de785479"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -969,6 +1001,12 @@ name = "gimli"
 version = "0.24.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0e4075386626662786ddb0ec9081e7c7eeb1ba31951f447ca780ef9f5d568189"
+
+[[package]]
+name = "glob"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b919933a397b79c37e33b77bb2aa3dc8eb6e165ad809e58ff75bc7db2e34574"
 
 [[package]]
 name = "globset"
@@ -1174,25 +1212,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "include_out_dir"
-version = "0.0.0"
-dependencies = [
- "hex",
- "include_out_dir_macro",
- "sha2",
-]
-
-[[package]]
-name = "include_out_dir_macro"
-version = "0.0.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
- "walkdir",
-]
-
-[[package]]
 name = "indexmap"
 version = "1.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1200,7 +1219,7 @@ checksum = "824845a0bf897a9042383849b02c1bc219c2383772efcd5c6f9766fa4b81aef3"
 dependencies = [
  "autocfg 1.0.1",
  "hashbrown",
- "serde",
+ "serde 1.0.126",
 ]
 
 [[package]]
@@ -1229,9 +1248,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ce046d161f000fffde5f432a0d034d0341dc152643b2598ed5bfce44c4f3a8f0"
 dependencies = [
  "proc-macro-hack",
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
  "unindent",
 ]
 
@@ -1263,7 +1282,7 @@ checksum = "c4a1b21a2971cea49ca4613c0e9fe8225ecaf5de64090fddc6002284726e9244"
 dependencies = [
  "console",
  "lazy_static",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "serde_yaml",
  "similar",
@@ -1296,9 +1315,9 @@ version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "75c094e94816723ab936484666968f5b58060492e880f3c8d00489a1e244fa51"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -1414,7 +1433,7 @@ version = "0.3.0"
 dependencies = [
  "libc",
  "memmap",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "tangram_core",
  "tangram_error",
@@ -1487,9 +1506,9 @@ version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3919783e441e38b0512fae9eebd87c445c42e39508231fba2a8b9fd7ba88e999"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -1629,27 +1648,32 @@ dependencies = [
 
 [[package]]
 name = "node_api"
-version = "0.0.0"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b1765bdb88e3dbbdaf6ce77278e1b9691a68bc7814f4486e35cbe36c57b9c54"
 dependencies = [
  "node_api_macro",
- "node_api_sys",
+ "node_api_system",
  "num",
- "serde",
- "tangram_error",
+ "serde 1.0.126",
 ]
 
 [[package]]
 name = "node_api_macro"
-version = "0.0.0"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5bee8730342764619925c4cb8e7895daaef785aa677f613ef9c7f5744a1f59f7"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
-name = "node_api_sys"
-version = "0.0.0"
+name = "node_api_system"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b032c5b907a28d45b59dc058b15aedee198ae4d5777458176e0eec139910675c"
 dependencies = [
  "reqwest",
 ]
@@ -1948,9 +1972,9 @@ checksum = "99b8db626e31e5b81787b9783425769681b347011cc59471e33ea46d2ea0cf55"
 dependencies = [
  "pest",
  "pest_meta",
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -1979,9 +2003,9 @@ version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "48c950132583b500556b1efd71d45b319029f2b71518d979fcc208e16b42426f"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -1998,14 +2022,16 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
 name = "pinwheel"
-version = "0.0.0"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e5b6809bcaaab3015de6f49ebd0fa3a4d9f8bc48f0cc5baed46f607c917916d4"
 dependencies = [
  "futures",
  "futures-signals",
  "pin-project",
  "pinwheel_elements_macro",
  "pinwheel_macro",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "tracing",
  "wasm-bindgen",
@@ -2015,22 +2041,26 @@ dependencies = [
 
 [[package]]
 name = "pinwheel_elements_macro"
-version = "0.0.0"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "61f09c09c0e8db8ab299729722fc9f94b34d2b5c6a3ca6198959ff62725a593b"
 dependencies = [
  "heck",
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
 name = "pinwheel_macro"
-version = "0.0.0"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "36d6035d7f7d97045cbbd8d444286935c9602bf3d6eb780909be3f5d43bbea48"
 dependencies = [
  "heck",
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -2052,9 +2082,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "da25490ff9892aab3fcf7c36f08cfb902dd3e71ca0f9f9517bea02a73a5ce38c"
 dependencies = [
  "proc-macro-error-attr",
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
  "version_check",
 ]
 
@@ -2064,8 +2094,8 @@ version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a1be40180e52ecc98ad80b184934baf3d0d29f979574e439af5a55274b35f869"
 dependencies = [
- "proc-macro2",
- "quote",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
  "version_check",
 ]
 
@@ -2083,11 +2113,20 @@ checksum = "bc881b2c22681370c6a780e47af9840ef841837bc98118431d4e1868bd0c1086"
 
 [[package]]
 name = "proc-macro2"
+version = "0.4.30"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cf3d2011ab5c909338f7887f4fc896d35932e29146c12c8d01da6b22a80ba759"
+dependencies = [
+ "unicode-xid 0.1.0",
+]
+
+[[package]]
+name = "proc-macro2"
 version = "1.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f0d8caf72986c1a598726adc988bb5984792ef84f5ee5aa50209145ee8077038"
 dependencies = [
- "unicode-xid",
+ "unicode-xid 0.2.2",
 ]
 
 [[package]]
@@ -2139,8 +2178,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a47f2c300ceec3e58064fd5f8f5b61230f2ffd64bde4970c81fdd0563a2db1bb"
 dependencies = [
  "pyo3-macros-backend",
- "quote",
- "syn",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -2149,9 +2188,9 @@ version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "87b097e5d84fcbe3e167f400fbedd657820a375b034c78bd852050749a575d66"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -2165,11 +2204,20 @@ dependencies = [
 
 [[package]]
 name = "quote"
+version = "0.6.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6ce23b6b870e8f94f81fb0a363d65d86675884b34a09043c81e5562f11c1f8e1"
+dependencies = [
+ "proc-macro2 0.4.30",
+]
+
+[[package]]
+name = "quote"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d0b9745dc2debf507c8422de05d7226cc1f0644216dfdfead988f9b1ab32a7"
 dependencies = [
- "proc-macro2",
+ "proc-macro2 1.0.27",
 ]
 
 [[package]]
@@ -2342,7 +2390,7 @@ dependencies = [
  "percent-encoding",
  "pin-project-lite",
  "rustls 0.19.1",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "serde_urlencoded",
  "tokio",
@@ -2388,7 +2436,7 @@ checksum = "723ecff9ad04f4ad92fe1c8ca6c20d2196d9286e9c60727c4cb5511629260e9d"
 dependencies = [
  "byteorder",
  "rmp",
- "serde",
+ "serde 1.0.126",
 ]
 
 [[package]]
@@ -2444,7 +2492,7 @@ dependencies = [
  "minidom",
  "percent-encoding",
  "reqwest",
- "serde",
+ "serde 1.0.126",
  "serde-xml-rs",
  "serde_derive",
  "sha2",
@@ -2524,6 +2572,12 @@ dependencies = [
 
 [[package]]
 name = "serde"
+version = "0.9.15"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "34b623917345a631dc9608d5194cc206b3fe6c3554cd1c75b937e55e285254af"
+
+[[package]]
+name = "serde"
 version = "1.0.126"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec7505abeacaec74ae4778d9d9328fe5a5d04253220a85c4ee022239fc996d03"
@@ -2538,7 +2592,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f0bf1ba0696ccf0872866277143ff1fd14d22eec235d2b23702f95e6660f7dfa"
 dependencies = [
  "log",
- "serde",
+ "serde 1.0.126",
  "thiserror",
  "xml-rs",
 ]
@@ -2549,9 +2603,9 @@ version = "1.0.126"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "963a7dbc9895aeac7ac90e74f34a5d5261828f79df35cbed41e10189d3804d43"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -2562,7 +2616,7 @@ checksum = "799e97dc9fdae36a5c8b8f2cae9ce2ee9fdce2058c57a93e6099d919fd982f79"
 dependencies = [
  "itoa",
  "ryu",
- "serde",
+ "serde 1.0.126",
 ]
 
 [[package]]
@@ -2574,7 +2628,7 @@ dependencies = [
  "form_urlencoded",
  "itoa",
  "ryu",
- "serde",
+ "serde 1.0.126",
 ]
 
 [[package]]
@@ -2585,7 +2639,7 @@ checksum = "15654ed4ab61726bf918a39cb8d98a2e2995b002387807fa6ba58fdf7f59bb23"
 dependencies = [
  "dtoa",
  "linked-hash-map",
- "serde",
+ "serde 1.0.126",
  "yaml-rust",
 ]
 
@@ -2765,7 +2819,7 @@ dependencies = [
  "percent-encoding",
  "rand",
  "rustls 0.19.1",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "sha-1 0.9.6",
  "sha2",
@@ -2791,11 +2845,11 @@ dependencies = [
  "either",
  "futures",
  "heck",
- "proc-macro2",
- "quote",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
  "sqlx-core",
  "sqlx-rt",
- "syn",
+ "syn 1.0.73",
  "url",
 ]
 
@@ -2845,14 +2899,65 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1e81da0851ada1f3e9d4312c704aa4f8806f0f9d69faaf8df2f3464b4a9437c2"
 
 [[package]]
+name = "sunfish"
+version = "0.0.0"
+dependencies = [
+ "backtrace",
+ "dlopen",
+ "duct",
+ "futures",
+ "glob",
+ "hex",
+ "http",
+ "hyper",
+ "ignore",
+ "rayon",
+ "sha2",
+ "sunfish_macro",
+ "tangram_error",
+ "tangram_id",
+ "tangram_zip",
+ "tokio",
+ "toml 0.5.8",
+ "tower",
+ "tower-http",
+ "tracing",
+ "wasm-bindgen-cli-support",
+ "which",
+]
+
+[[package]]
+name = "sunfish_macro"
+version = "0.0.0"
+dependencies = [
+ "glob",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
+ "toml 0.3.2",
+ "walkdir",
+]
+
+[[package]]
+name = "syn"
+version = "0.15.44"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ca4b3b69a77cbe1ffc9e198781b7acb0c7365a883670e8f1c1bc66fba79a5c5"
+dependencies = [
+ "proc-macro2 0.4.30",
+ "quote 0.6.13",
+ "unicode-xid 0.1.0",
+]
+
+[[package]]
 name = "syn"
 version = "1.0.73"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f71489ff30030d2ae598524f61326b902466f72a0fb1a8564c001cc63425bcc7"
 dependencies = [
- "proc-macro2",
- "quote",
- "unicode-xid",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "unicode-xid 0.2.2",
 ]
 
 [[package]]
@@ -2861,20 +2966,20 @@ version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b834f2d66f734cb897113e34aaff2f1ab4719ca946f9a7358dba8f8064148701"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
- "unicode-xid",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
+ "unicode-xid 0.2.2",
 ]
 
 [[package]]
 name = "tangram"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "chrono",
  "memmap",
  "reqwest",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "tangram_core",
  "tangram_error",
@@ -2890,16 +2995,17 @@ version = "0.0.0"
 dependencies = [
  "backtrace",
  "futures",
+ "glob",
  "http",
  "hyper",
- "include_out_dir",
  "lettre",
  "num",
  "once_cell",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_edit_organization_server",
- "tangram_app_health",
+ "tangram_app_health_server",
  "tangram_app_index_server",
  "tangram_app_layouts",
  "tangram_app_login_server",
@@ -2929,7 +3035,7 @@ dependencies = [
  "tangram_app_production_stats_index_server",
  "tangram_app_repo_edit_server",
  "tangram_app_repo_index_server",
- "tangram_app_track",
+ "tangram_app_track_server",
  "tangram_app_training_class_metrics_client",
  "tangram_app_training_class_metrics_server",
  "tangram_app_training_grid_index_server",
@@ -2950,10 +3056,10 @@ dependencies = [
  "tangram_error",
  "tangram_id",
  "tangram_metrics",
- "tangram_serve",
  "tangram_ui",
  "tangram_zip",
  "tokio",
+ "toml 0.5.8",
  "tower",
  "tower-http",
  "tracing",
@@ -2969,7 +3075,6 @@ dependencies = [
  "fnv",
  "http",
  "hyper",
- "include_out_dir",
  "indexmap",
  "insta",
  "itertools",
@@ -2980,9 +3085,10 @@ dependencies = [
  "pinwheel",
  "rand",
  "rust-s3",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "sqlx",
+ "sunfish",
  "tangram_app_ui",
  "tangram_charts",
  "tangram_core",
@@ -3006,9 +3112,10 @@ dependencies = [
  "http",
  "hyper",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_error",
@@ -3017,7 +3124,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tangram_app_health"
+name = "tangram_app_health_server"
 version = "0.0.0"
 dependencies = [
  "chrono",
@@ -3026,9 +3133,10 @@ dependencies = [
  "hyper",
  "memmap",
  "num",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_core",
  "tangram_error",
@@ -3046,9 +3154,10 @@ dependencies = [
  "http",
  "hyper",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_ui",
@@ -3067,13 +3176,13 @@ dependencies = [
  "http",
  "hyper",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_ui",
  "tangram_error",
  "tangram_id",
- "tangram_serve",
  "tangram_ui",
 ]
 
@@ -3089,10 +3198,11 @@ dependencies = [
  "pinwheel",
  "rand",
  "reqwest",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_error",
@@ -3123,10 +3233,11 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_ui",
@@ -3134,7 +3245,6 @@ dependencies = [
  "tangram_error",
  "tangram_id",
  "tangram_model",
- "tangram_serve",
  "tangram_ui",
 ]
 
@@ -3145,6 +3255,7 @@ dependencies = [
  "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
+ "tangram_client",
  "tangram_ui",
  "wasm-bindgen",
 ]
@@ -3158,9 +3269,10 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_ui",
@@ -3170,7 +3282,6 @@ dependencies = [
  "tangram_finite",
  "tangram_id",
  "tangram_model",
- "tangram_serve",
  "tangram_ui",
  "tangram_zip",
 ]
@@ -3185,10 +3296,11 @@ dependencies = [
  "lettre",
  "pinwheel",
  "reqwest",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_error",
@@ -3202,9 +3314,8 @@ dependencies = [
 name = "tangram_app_new_model_client"
 version = "0.0.0"
 dependencies = [
- "console_error_panic_hook",
+ "tangram_client",
  "tangram_ui",
- "wasm-bindgen",
  "web-sys",
 ]
 
@@ -3218,8 +3329,9 @@ dependencies = [
  "multer",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_json",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_ui",
@@ -3227,7 +3339,6 @@ dependencies = [
  "tangram_error",
  "tangram_id",
  "tangram_model",
- "tangram_serve",
  "tangram_ui",
 ]
 
@@ -3239,9 +3350,10 @@ dependencies = [
  "http",
  "hyper",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_error",
@@ -3257,9 +3369,10 @@ dependencies = [
  "http",
  "hyper",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_error",
@@ -3276,9 +3389,10 @@ dependencies = [
  "http",
  "hyper",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_error",
@@ -3297,10 +3411,11 @@ dependencies = [
  "num",
  "pinwheel",
  "reqwest",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_error",
@@ -3314,11 +3429,21 @@ dependencies = [
 name = "tangram_app_playground_client"
 version = "0.0.0"
 dependencies = [
- "console_error_panic_hook",
  "pinwheel",
+ "tangram_app_playground_common",
  "tangram_charts",
+ "tangram_client",
  "wasm-bindgen",
  "web-sys",
+]
+
+[[package]]
+name = "tangram_app_playground_common"
+version = "0.0.0"
+dependencies = [
+ "pinwheel",
+ "serde 1.0.126",
+ "tangram_charts",
 ]
 
 [[package]]
@@ -3330,15 +3455,17 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
+ "serde 1.0.126",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
+ "tangram_app_playground_common",
  "tangram_app_ui",
  "tangram_charts",
  "tangram_core",
  "tangram_error",
  "tangram_id",
  "tangram_model",
- "tangram_serve",
  "tangram_ui",
  "url",
 ]
@@ -3347,11 +3474,10 @@ dependencies = [
 name = "tangram_app_production_class_metrics_client"
 version = "0.0.0"
 dependencies = [
- "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
+ "tangram_client",
  "tangram_ui",
- "wasm-bindgen",
 ]
 
 [[package]]
@@ -3363,8 +3489,9 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_urlencoded",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_production_metrics",
@@ -3376,7 +3503,6 @@ dependencies = [
  "tangram_finite",
  "tangram_id",
  "tangram_model",
- "tangram_serve",
  "tangram_ui",
  "tangram_zip",
 ]
@@ -3392,7 +3518,7 @@ dependencies = [
  "num",
  "pinwheel",
  "rust-s3",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "sqlx",
  "tangram_app_common",
@@ -3409,11 +3535,10 @@ dependencies = [
 name = "tangram_app_production_metrics_index_client"
 version = "0.0.0"
 dependencies = [
- "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
+ "tangram_client",
  "tangram_ui",
- "wasm-bindgen",
  "web-sys",
 ]
 
@@ -3426,8 +3551,9 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_urlencoded",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_production_metrics",
@@ -3438,7 +3564,6 @@ dependencies = [
  "tangram_finite",
  "tangram_id",
  "tangram_model",
- "tangram_serve",
  "tangram_ui",
  "tangram_zip",
 ]
@@ -3447,10 +3572,9 @@ dependencies = [
 name = "tangram_app_production_prediction_client"
 version = "0.0.0"
 dependencies = [
- "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
- "wasm-bindgen",
+ "tangram_client",
  "web-sys",
 ]
 
@@ -3465,9 +3589,10 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_charts",
@@ -3475,7 +3600,6 @@ dependencies = [
  "tangram_error",
  "tangram_id",
  "tangram_model",
- "tangram_serve",
  "tangram_ui",
 ]
 
@@ -3490,10 +3614,11 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_error",
@@ -3515,7 +3640,7 @@ dependencies = [
  "pinwheel",
  "rand",
  "rust-s3",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "sqlx",
  "tangram_app_common",
@@ -3532,11 +3657,10 @@ dependencies = [
 name = "tangram_app_production_stats_column_client"
 version = "0.0.0"
 dependencies = [
- "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
+ "tangram_client",
  "tangram_ui",
- "wasm-bindgen",
  "web-sys",
 ]
 
@@ -3551,10 +3675,11 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_production_stats",
@@ -3564,7 +3689,6 @@ dependencies = [
  "tangram_error",
  "tangram_id",
  "tangram_model",
- "tangram_serve",
  "tangram_ui",
  "tangram_zip",
 ]
@@ -3573,11 +3697,10 @@ dependencies = [
 name = "tangram_app_production_stats_index_client"
 version = "0.0.0"
 dependencies = [
- "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
+ "tangram_client",
  "tangram_ui",
- "wasm-bindgen",
  "web-sys",
 ]
 
@@ -3592,9 +3715,10 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_production_stats",
@@ -3604,7 +3728,6 @@ dependencies = [
  "tangram_error",
  "tangram_id",
  "tangram_model",
- "tangram_serve",
  "tangram_ui",
  "tangram_zip",
 ]
@@ -3619,9 +3742,10 @@ dependencies = [
  "http",
  "hyper",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_ui",
@@ -3641,9 +3765,10 @@ dependencies = [
  "http",
  "hyper",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_ui",
@@ -3654,7 +3779,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tangram_app_track"
+name = "tangram_app_track_server"
 version = "0.0.0"
 dependencies = [
  "chrono",
@@ -3663,9 +3788,10 @@ dependencies = [
  "hyper",
  "memmap",
  "num",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_production_metrics",
  "tangram_app_production_stats",
@@ -3681,9 +3807,8 @@ dependencies = [
 name = "tangram_app_training_class_metrics_client"
 version = "0.0.0"
 dependencies = [
- "console_error_panic_hook",
+ "tangram_client",
  "tangram_ui",
- "wasm-bindgen",
 ]
 
 [[package]]
@@ -3695,8 +3820,9 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_urlencoded",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_ui",
@@ -3704,7 +3830,6 @@ dependencies = [
  "tangram_error",
  "tangram_id",
  "tangram_model",
- "tangram_serve",
  "tangram_ui",
 ]
 
@@ -3734,6 +3859,7 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_training_grid_common",
@@ -3753,6 +3879,7 @@ dependencies = [
  "http",
  "hyper",
  "pinwheel",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_training_grid_common",
@@ -3773,9 +3900,10 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "serde_urlencoded",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_ui",
@@ -3791,10 +3919,9 @@ dependencies = [
 name = "tangram_app_training_metrics_precision_recall_client"
 version = "0.0.0"
 dependencies = [
- "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
- "wasm-bindgen",
+ "tangram_client",
 ]
 
 [[package]]
@@ -3806,6 +3933,7 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_charts",
@@ -3814,7 +3942,6 @@ dependencies = [
  "tangram_finite",
  "tangram_id",
  "tangram_model",
- "tangram_serve",
  "tangram_ui",
 ]
 
@@ -3822,10 +3949,9 @@ dependencies = [
 name = "tangram_app_training_metrics_roc_client"
 version = "0.0.0"
 dependencies = [
- "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
- "wasm-bindgen",
+ "tangram_client",
 ]
 
 [[package]]
@@ -3837,6 +3963,7 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_charts",
@@ -3845,7 +3972,6 @@ dependencies = [
  "tangram_finite",
  "tangram_id",
  "tangram_model",
- "tangram_serve",
  "tangram_ui",
 ]
 
@@ -3856,6 +3982,7 @@ dependencies = [
  "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
+ "tangram_client",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -3869,8 +3996,9 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_urlencoded",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_ui",
@@ -3879,7 +4007,6 @@ dependencies = [
  "tangram_error",
  "tangram_id",
  "tangram_model",
- "tangram_serve",
  "tangram_ui",
 ]
 
@@ -3892,6 +4019,7 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_ui",
@@ -3906,12 +4034,9 @@ dependencies = [
 name = "tangram_app_tuning_client"
 version = "0.0.0"
 dependencies = [
- "console_error_panic_hook",
  "pinwheel",
  "tangram_app_tuning_common",
- "tracing",
- "tracing-wasm",
- "wasm-bindgen",
+ "tangram_client",
  "web-sys",
 ]
 
@@ -3921,7 +4046,7 @@ version = "0.0.0"
 dependencies = [
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "tangram_app_ui",
  "tangram_ui",
@@ -3937,8 +4062,9 @@ dependencies = [
  "hyper",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_json",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_app_tuning_common",
@@ -3946,7 +4072,6 @@ dependencies = [
  "tangram_error",
  "tangram_id",
  "tangram_model",
- "tangram_serve",
  "tangram_ui",
 ]
 
@@ -3957,7 +4082,7 @@ dependencies = [
  "chrono",
  "chrono-tz",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "tangram_ui",
 ]
 
@@ -3969,14 +4094,100 @@ dependencies = [
  "http",
  "hyper",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_urlencoded",
  "sqlx",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
  "tangram_error",
  "tangram_id",
  "tangram_ui",
+]
+
+[[package]]
+name = "tangram_build"
+version = "0.0.0"
+dependencies = [
+ "cbindgen",
+ "clap 3.0.0-beta.2",
+ "dirs",
+ "duct",
+ "flate2",
+ "tangram_error",
+ "tar",
+ "which",
+]
+
+[[package]]
+name = "tangram_build_pkgs"
+version = "0.0.0"
+dependencies = [
+ "chrono",
+ "clap 3.0.0-beta.2",
+ "digest 0.9.0",
+ "dirs",
+ "duct",
+ "flate2",
+ "hex",
+ "indoc 1.0.3",
+ "md-5",
+ "rayon",
+ "reqwest",
+ "serde 1.0.126",
+ "serde_json",
+ "sha-1 0.9.6",
+ "sha2",
+ "tangram_build",
+ "tangram_error",
+ "tar",
+ "tempfile",
+ "url",
+ "which",
+]
+
+[[package]]
+name = "tangram_build_release"
+version = "0.0.0"
+dependencies = [
+ "chrono",
+ "clap 3.0.0-beta.2",
+ "digest 0.9.0",
+ "dirs",
+ "duct",
+ "flate2",
+ "hex",
+ "indoc 1.0.3",
+ "md-5",
+ "rayon",
+ "reqwest",
+ "serde 1.0.126",
+ "serde_json",
+ "sha-1 0.9.6",
+ "sha2",
+ "tangram_build",
+ "tangram_error",
+ "tar",
+ "url",
+ "which",
+]
+
+[[package]]
+name = "tangram_build_word_embedding_models"
+version = "0.0.0"
+dependencies = [
+ "buffalo",
+ "duct",
+ "ndarray",
+ "ndarray-npy",
+ "num",
+ "rand",
+ "rayon",
+ "rmp-serde",
+ "serde 1.0.126",
+ "serde_json",
+ "tangram_error",
+ "tangram_model",
 ]
 
 [[package]]
@@ -3987,7 +4198,7 @@ dependencies = [
  "itertools",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "tangram_finite",
  "tangram_number_formatter",
@@ -3998,7 +4209,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_cli"
-version = "0.3.0"
+version = "0.4.0"
 dependencies = [
  "backtrace",
  "clap 3.0.0-beta.2",
@@ -4011,7 +4222,7 @@ dependencies = [
  "num",
  "once_cell",
  "rayon",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "tangram_app",
  "tangram_core",
@@ -4031,8 +4242,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "tangram_core"
+name = "tangram_client"
 version = "0.0.0"
+dependencies = [
+ "console_error_panic_hook",
+ "tracing",
+ "tracing-wasm",
+]
+
+[[package]]
+name = "tangram_core"
+version = "0.4.0"
 dependencies = [
  "bitvec",
  "buffalo",
@@ -4045,7 +4265,7 @@ dependencies = [
  "num",
  "rand",
  "rand_xoshiro",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "tangram_error",
  "tangram_features",
@@ -4063,13 +4283,37 @@ dependencies = [
 ]
 
 [[package]]
+name = "tangram_dev"
+version = "0.0.0"
+dependencies = [
+ "clap 3.0.0-beta.2",
+ "futures-batch",
+ "http",
+ "hyper",
+ "notify",
+ "serde 1.0.126",
+ "tangram_error",
+ "tokio",
+ "tokio-stream",
+ "which",
+]
+
+[[package]]
+name = "tangram_distribute_native_extensions"
+version = "0.0.0"
+dependencies = [
+ "tangram_build",
+ "tangram_error",
+]
+
+[[package]]
 name = "tangram_elixir"
 version = "0.0.0"
 dependencies = [
  "erl_nif",
  "memmap",
  "once_cell",
- "serde",
+ "serde 1.0.126",
  "tangram_core",
  "tangram_error",
  "tangram_model",
@@ -4077,21 +4321,21 @@ dependencies = [
 
 [[package]]
 name = "tangram_error"
-version = "0.0.0"
+version = "0.4.0"
 dependencies = [
  "backtrace",
 ]
 
 [[package]]
 name = "tangram_features"
-version = "0.0.0"
+version = "0.4.0"
 dependencies = [
  "fnv",
  "indexmap",
  "itertools",
  "ndarray",
  "num",
- "serde",
+ "serde 1.0.126",
  "tangram_error",
  "tangram_metrics",
  "tangram_table",
@@ -4101,23 +4345,37 @@ dependencies = [
 
 [[package]]
 name = "tangram_finite"
-version = "0.0.0"
+version = "0.4.0"
 dependencies = [
  "num",
- "serde",
+ "serde 1.0.126",
+]
+
+[[package]]
+name = "tangram_generate_license"
+version = "0.0.0"
+dependencies = [
+ "chrono",
+ "clap 3.0.0-beta.2",
+ "duct",
+ "serde 1.0.126",
+ "serde_json",
+ "tangram_error",
+ "tangram_id",
+ "tangram_license",
 ]
 
 [[package]]
 name = "tangram_id"
-version = "0.0.0"
+version = "0.4.0"
 dependencies = [
  "rand",
- "serde",
+ "serde 1.0.126",
 ]
 
 [[package]]
 name = "tangram_kill_chip"
-version = "0.0.0"
+version = "0.4.0"
 
 [[package]]
 name = "tangram_license"
@@ -4128,7 +4386,7 @@ dependencies = [
  "pem",
  "rand",
  "rsa",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "sha2",
  "tangram_error",
@@ -4137,7 +4395,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_linear"
-version = "0.0.0"
+version = "0.4.0"
 dependencies = [
  "buffalo",
  "clap 3.0.0-beta.2",
@@ -4145,7 +4403,7 @@ dependencies = [
  "ndarray",
  "num",
  "rayon",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "tangram_features",
  "tangram_kill_chip",
@@ -4157,16 +4415,16 @@ dependencies = [
 
 [[package]]
 name = "tangram_macro"
-version = "0.0.0"
+version = "0.4.0"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
 name = "tangram_metrics"
-version = "0.0.0"
+version = "0.4.0"
 dependencies = [
  "insta",
  "itertools",
@@ -4177,7 +4435,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_model"
-version = "0.0.0"
+version = "0.4.0"
 dependencies = [
  "buffalo",
  "fnv",
@@ -4194,7 +4452,7 @@ version = "0.0.0"
 dependencies = [
  "memmap",
  "node_api",
- "serde",
+ "serde 1.0.126",
  "tangram_core",
  "tangram_error",
  "tangram_model",
@@ -4205,12 +4463,12 @@ name = "tangram_number_formatter"
 version = "0.0.0"
 dependencies = [
  "num",
- "serde",
+ "serde 1.0.126",
 ]
 
 [[package]]
 name = "tangram_progress_counter"
-version = "0.0.0"
+version = "0.4.0"
 dependencies = [
  "rayon",
 ]
@@ -4223,7 +4481,7 @@ dependencies = [
  "memmap",
  "pyo3",
  "reqwest",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "tangram_core",
  "tangram_error",
@@ -4232,180 +4490,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "tangram_script_build"
-version = "0.0.0"
-dependencies = [
- "cbindgen",
- "clap 3.0.0-beta.2",
- "dirs",
- "duct",
- "flate2",
- "tangram_error",
- "tar",
- "which",
-]
-
-[[package]]
-name = "tangram_script_build_pkgs"
-version = "0.0.0"
-dependencies = [
- "chrono",
- "clap 3.0.0-beta.2",
- "digest 0.9.0",
- "dirs",
- "duct",
- "flate2",
- "hex",
- "indoc 1.0.3",
- "md-5",
- "rayon",
- "reqwest",
- "serde",
- "serde_json",
- "sha-1 0.9.6",
- "sha2",
- "tangram_error",
- "tangram_script_build",
- "tar",
- "tempfile",
- "url",
- "which",
-]
-
-[[package]]
-name = "tangram_script_build_release"
-version = "0.0.0"
-dependencies = [
- "chrono",
- "clap 3.0.0-beta.2",
- "digest 0.9.0",
- "dirs",
- "duct",
- "flate2",
- "hex",
- "indoc 1.0.3",
- "md-5",
- "rayon",
- "reqwest",
- "serde",
- "serde_json",
- "sha-1 0.9.6",
- "sha2",
- "tangram_error",
- "tangram_script_build",
- "tar",
- "url",
- "which",
-]
-
-[[package]]
-name = "tangram_script_build_word_embedding_models"
-version = "0.0.0"
-dependencies = [
- "buffalo",
- "duct",
- "ndarray",
- "ndarray-npy",
- "num",
- "rand",
- "rayon",
- "rmp-serde",
- "serde",
- "serde_json",
- "tangram_error",
- "tangram_model",
-]
-
-[[package]]
-name = "tangram_script_dev"
-version = "0.0.0"
-dependencies = [
- "clap 3.0.0-beta.2",
- "futures-batch",
- "http",
- "hyper",
- "notify",
- "serde",
- "tangram_error",
- "tokio",
- "tokio-stream",
- "which",
-]
-
-[[package]]
-name = "tangram_script_distribute_native_extensions"
-version = "0.0.0"
-dependencies = [
- "tangram_error",
- "tangram_script_build",
-]
-
-[[package]]
-name = "tangram_script_generate_license"
-version = "0.0.0"
-dependencies = [
- "chrono",
- "clap 3.0.0-beta.2",
- "duct",
- "serde",
- "serde_json",
- "tangram_error",
- "tangram_id",
- "tangram_license",
-]
-
-[[package]]
-name = "tangram_script_track_test"
-version = "0.0.0"
-dependencies = [
- "base64 0.13.0",
- "chrono",
- "chrono-tz",
- "clap 3.0.0-beta.2",
- "ndarray",
- "num",
- "rand",
- "rayon",
- "reqwest",
- "serde",
- "serde_json",
- "sha2",
- "tangram_app_common",
- "tangram_error",
- "tangram_id",
- "tangram_model",
- "tangram_table",
- "url",
-]
-
-[[package]]
-name = "tangram_serve"
-version = "0.0.0"
-dependencies = [
- "backtrace",
- "futures",
- "hex",
- "http",
- "hyper",
- "ignore",
- "include_out_dir",
- "rayon",
- "sha2",
- "tangram_error",
- "tangram_id",
- "tangram_zip",
- "tokio",
- "toml",
- "tower",
- "tower-http",
- "tracing",
- "wasm-bindgen-cli-support",
- "which",
-]
-
-[[package]]
 name = "tangram_table"
-version = "0.0.0"
+version = "0.4.0"
 dependencies = [
  "csv",
  "fast-float",
@@ -4435,16 +4521,40 @@ dependencies = [
 
 [[package]]
 name = "tangram_text"
-version = "0.0.0"
+version = "0.4.0"
 dependencies = [
  "fnv",
  "indexmap",
- "serde",
+ "serde 1.0.126",
+]
+
+[[package]]
+name = "tangram_track_test"
+version = "0.0.0"
+dependencies = [
+ "base64 0.13.0",
+ "chrono",
+ "chrono-tz",
+ "clap 3.0.0-beta.2",
+ "ndarray",
+ "num",
+ "rand",
+ "rayon",
+ "reqwest",
+ "serde 1.0.126",
+ "serde_json",
+ "sha2",
+ "tangram_app_common",
+ "tangram_error",
+ "tangram_id",
+ "tangram_model",
+ "tangram_table",
+ "url",
 ]
 
 [[package]]
 name = "tangram_tree"
-version = "0.0.0"
+version = "0.4.0"
 dependencies = [
  "bitvec",
  "buffalo",
@@ -4454,7 +4564,7 @@ dependencies = [
  "ndarray",
  "num",
  "rayon",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "tangram_finite",
  "tangram_kill_chip",
@@ -4473,7 +4583,7 @@ dependencies = [
  "once_cell",
  "pinwheel",
  "pulldown-cmark",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "tangram_charts",
  "tangram_finite",
@@ -4493,22 +4603,23 @@ name = "tangram_www"
 version = "0.0.0"
 dependencies = [
  "clap 3.0.0-beta.2",
+ "futures",
  "http",
  "hyper",
- "include_out_dir",
- "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_json",
+ "sunfish",
  "tangram_error",
  "tangram_id",
- "tangram_serve",
  "tangram_www_benchmarks_client",
  "tangram_www_benchmarks_server",
  "tangram_www_blog_index_server",
  "tangram_www_blog_post_server",
  "tangram_www_content",
  "tangram_www_docs_getting_started_index_server",
+ "tangram_www_docs_getting_started_inspect_client",
  "tangram_www_docs_getting_started_inspect_server",
+ "tangram_www_docs_getting_started_monitor_client",
  "tangram_www_docs_getting_started_monitor_server",
  "tangram_www_docs_getting_started_predict_elixir_server",
  "tangram_www_docs_getting_started_predict_go_server",
@@ -4520,9 +4631,7 @@ dependencies = [
  "tangram_www_docs_getting_started_train_server",
  "tangram_www_docs_guide_server",
  "tangram_www_docs_index_server",
- "tangram_www_docs_inspect_client",
  "tangram_www_docs_install_server",
- "tangram_www_docs_monitor_client",
  "tangram_www_index_client",
  "tangram_www_index_server",
  "tangram_www_pricing_server",
@@ -4540,11 +4649,9 @@ dependencies = [
  "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
+ "tangram_client",
  "tangram_ui",
  "tangram_www_benchmarks_common",
- "tracing",
- "tracing-wasm",
- "wasm-bindgen",
  "web-sys",
 ]
 
@@ -4555,7 +4662,7 @@ dependencies = [
  "futures-signals",
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "tangram_charts",
  "tangram_ui",
  "tracing",
@@ -4565,13 +4672,17 @@ dependencies = [
 name = "tangram_www_benchmarks_server"
 version = "0.0.0"
 dependencies = [
+ "futures",
+ "http",
+ "hyper",
  "num",
  "pinwheel",
+ "sunfish",
  "tangram_charts",
- "tangram_serve",
  "tangram_ui",
  "tangram_www_benchmarks_common",
  "tangram_www_layouts",
+ "tracing",
 ]
 
 [[package]]
@@ -4579,6 +4690,7 @@ name = "tangram_www_blog_index_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
+ "sunfish",
  "tangram_ui",
  "tangram_www_content",
  "tangram_www_layouts",
@@ -4589,6 +4701,7 @@ name = "tangram_www_blog_post_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
+ "sunfish",
  "tangram_ui",
  "tangram_www_content",
  "tangram_www_layouts",
@@ -4599,7 +4712,7 @@ name = "tangram_www_content"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "tangram_error",
  "tangram_ui",
@@ -4610,9 +4723,22 @@ name = "tangram_www_docs_getting_started_index_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
- "tangram_serve",
+ "sunfish",
  "tangram_ui",
  "tangram_www_layouts",
+]
+
+[[package]]
+name = "tangram_www_docs_getting_started_inspect_client"
+version = "0.0.0"
+dependencies = [
+ "console_error_panic_hook",
+ "pinwheel",
+ "tangram_charts",
+ "tangram_ui",
+ "tangram_www_docs_inspect_common",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
@@ -4621,7 +4747,7 @@ version = "0.0.0"
 dependencies = [
  "num",
  "pinwheel",
- "tangram_serve",
+ "sunfish",
  "tangram_ui",
  "tangram_www_docs_inspect_common",
  "tangram_www_layouts",
@@ -4629,16 +4755,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "tangram_www_docs_getting_started_monitor_client"
+version = "0.0.0"
+dependencies = [
+ "console_error_panic_hook",
+ "pinwheel",
+ "tangram_charts",
+ "tangram_client",
+ "tangram_ui",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
 name = "tangram_www_docs_getting_started_monitor_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
+ "sunfish",
  "tangram_app_common",
  "tangram_app_production_stats_column_server",
  "tangram_app_production_stats_index_server",
  "tangram_app_ui",
  "tangram_charts",
- "tangram_serve",
  "tangram_ui",
  "tangram_www_layouts",
  "tangram_www_ui",
@@ -4649,7 +4788,7 @@ name = "tangram_www_docs_getting_started_predict_elixir_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
- "tangram_serve",
+ "sunfish",
  "tangram_ui",
  "tangram_www_layouts",
  "tangram_www_ui",
@@ -4660,7 +4799,7 @@ name = "tangram_www_docs_getting_started_predict_go_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
- "tangram_serve",
+ "sunfish",
  "tangram_ui",
  "tangram_www_layouts",
  "tangram_www_ui",
@@ -4671,7 +4810,7 @@ name = "tangram_www_docs_getting_started_predict_index_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
- "tangram_serve",
+ "sunfish",
  "tangram_ui",
  "tangram_www_layouts",
  "tangram_www_ui",
@@ -4682,7 +4821,7 @@ name = "tangram_www_docs_getting_started_predict_node_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
- "tangram_serve",
+ "sunfish",
  "tangram_ui",
  "tangram_www_layouts",
  "tangram_www_ui",
@@ -4693,7 +4832,7 @@ name = "tangram_www_docs_getting_started_predict_python_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
- "tangram_serve",
+ "sunfish",
  "tangram_ui",
  "tangram_www_layouts",
  "tangram_www_ui",
@@ -4704,7 +4843,7 @@ name = "tangram_www_docs_getting_started_predict_ruby_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
- "tangram_serve",
+ "sunfish",
  "tangram_ui",
  "tangram_www_layouts",
  "tangram_www_ui",
@@ -4715,7 +4854,7 @@ name = "tangram_www_docs_getting_started_predict_rust_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
- "tangram_serve",
+ "sunfish",
  "tangram_ui",
  "tangram_www_layouts",
  "tangram_www_ui",
@@ -4726,7 +4865,7 @@ name = "tangram_www_docs_getting_started_train_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
- "tangram_serve",
+ "sunfish",
  "tangram_ui",
  "tangram_www_layouts",
  "tangram_www_ui",
@@ -4737,7 +4876,7 @@ name = "tangram_www_docs_guide_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
- "tangram_serve",
+ "sunfish",
  "tangram_ui",
  "tangram_www_content",
  "tangram_www_layouts",
@@ -4749,24 +4888,11 @@ name = "tangram_www_docs_index_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
+ "sunfish",
  "tangram_app_common",
- "tangram_serve",
  "tangram_ui",
  "tangram_www_layouts",
  "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_inspect_client"
-version = "0.0.0"
-dependencies = [
- "console_error_panic_hook",
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
- "tangram_www_docs_inspect_common",
- "wasm-bindgen",
- "web-sys",
 ]
 
 [[package]]
@@ -4781,36 +4907,21 @@ name = "tangram_www_docs_install_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
- "tangram_serve",
+ "sunfish",
  "tangram_ui",
  "tangram_www_layouts",
  "tangram_www_ui",
 ]
 
 [[package]]
-name = "tangram_www_docs_monitor_client"
-version = "0.0.0"
-dependencies = [
- "console_error_panic_hook",
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
 name = "tangram_www_index_client"
 version = "0.0.0"
 dependencies = [
- "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
+ "tangram_client",
  "tangram_ui",
  "tangram_www_index_common",
- "tracing",
- "tracing-wasm",
- "wasm-bindgen",
  "web-sys",
 ]
 
@@ -4820,7 +4931,7 @@ version = "0.0.0"
 dependencies = [
  "num",
  "pinwheel",
- "serde",
+ "serde 1.0.126",
  "tangram_ui",
  "wasm-bindgen",
  "web-sys",
@@ -4830,10 +4941,11 @@ dependencies = [
 name = "tangram_www_index_server"
 version = "0.0.0"
 dependencies = [
+ "futures",
  "pinwheel",
+ "sunfish",
  "tangram_charts",
  "tangram_finite",
- "tangram_serve",
  "tangram_ui",
  "tangram_www_index_common",
  "tangram_www_layouts",
@@ -4845,7 +4957,7 @@ name = "tangram_www_layouts"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
- "tangram_serve",
+ "sunfish",
  "tangram_ui",
  "tangram_www_content",
  "tangram_www_ui",
@@ -4856,6 +4968,7 @@ name = "tangram_www_pricing_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
+ "sunfish",
  "tangram_ui",
  "tangram_www_layouts",
 ]
@@ -4870,7 +4983,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_zip"
-version = "0.0.0"
+version = "0.4.0"
 
 [[package]]
 name = "tap"
@@ -4955,9 +5068,9 @@ version = "1.0.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a36768c0fbf1bb15eca10defa29526bda730a2376c2ab4393ccfa16fb1a318d"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -5020,9 +5133,9 @@ version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c49e3df43841dafb86046472506755d8501c5615673955f6aa17181125d13c37"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -5063,11 +5176,20 @@ dependencies = [
 
 [[package]]
 name = "toml"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bd86ad9ebee246fdedd610e0f6d0587b754a3d81438db930a244d0480ed7878f"
+dependencies = [
+ "serde 0.9.15",
+]
+
+[[package]]
+name = "toml"
 version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a31142970826733df8241ef35dc040ef98c679ab14d7c3e54d827099b3acecaa"
 dependencies = [
- "serde",
+ "serde 1.0.126",
 ]
 
 [[package]]
@@ -5133,9 +5255,9 @@ version = "0.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c42e6fa53307c8a17e4ccd4dc81cf5ec38db9209f59b222210375b54ee40d1e2"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -5164,7 +5286,7 @@ version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fb65ea441fbb84f9f6748fd496cf7f63ec9af5bca94dd86456978d055e8eb28b"
 dependencies = [
- "serde",
+ "serde 1.0.126",
  "tracing-core",
 ]
 
@@ -5179,7 +5301,7 @@ dependencies = [
  "lazy_static",
  "matchers",
  "regex",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "sharded-slab",
  "smallvec",
@@ -5326,6 +5448,12 @@ checksum = "9337591893a19b88d8d87f2cec1e73fad5cdfd10e5a6f349f498ad6ea2ffb1e3"
 
 [[package]]
 name = "unicode-xid"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fc72304796d0818e357ead4e000d19c9c174ab23dc11093ac919054d20a6a7fc"
+
+[[package]]
+name = "unicode-xid"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ccb82d61f80a663efe1f787a51b16b5a51e3314d6ac365b08639f52387b33f3"
@@ -5358,7 +5486,7 @@ dependencies = [
  "idna",
  "matches",
  "percent-encoding",
- "serde",
+ "serde 1.0.126",
 ]
 
 [[package]]
@@ -5417,9 +5545,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0a6e5bd22c71e77d60140b0bd5be56155a37e5bd14e24f5f87298040d0cc40d7"
 dependencies = [
  "heck",
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
 ]
 
 [[package]]
@@ -5445,7 +5573,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d54ee1d4ed486f78874278e63e4069fc1ab9f6a18ca492076ffb90c5eb2997fd"
 dependencies = [
  "cfg-if 1.0.0",
- "serde",
+ "serde 1.0.126",
  "serde_json",
  "wasm-bindgen-macro",
 ]
@@ -5459,9 +5587,9 @@ dependencies = [
  "bumpalo",
  "lazy_static",
  "log",
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
  "wasm-bindgen-shared",
 ]
 
@@ -5517,7 +5645,7 @@ version = "0.2.74"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "088169ca61430fe1e58b8096c24975251700e7b1f6fd91cc9d59b04fb9b18bd4"
 dependencies = [
- "quote",
+ "quote 1.0.9",
  "wasm-bindgen-macro-support",
 ]
 
@@ -5527,9 +5655,9 @@ version = "0.2.74"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be2241542ff3d9f241f5e2cb6dd09b37efe786df8851c54957683a49f0987a97"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
  "wasm-bindgen-backend",
  "wasm-bindgen-shared",
 ]
@@ -5817,9 +5945,9 @@ version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2c1e130bebaeab2f23886bf9acbaca14b092408c452543c857f66399cd6dab1"
 dependencies = [
- "proc-macro2",
- "quote",
- "syn",
+ "proc-macro2 1.0.27",
+ "quote 1.0.9",
+ "syn 1.0.73",
  "synstructure",
 ]
 

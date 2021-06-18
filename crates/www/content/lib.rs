@@ -13,7 +13,7 @@ pub struct BlogPostFrontMatter {
 }
 
 impl Content for BlogPost {
-	const PATH: &'static str = "www/content/blog";
+	const PATH: &'static str = "crates/www/content/blog";
 	type FrontMatter = BlogPostFrontMatter;
 }
 
@@ -25,7 +25,7 @@ pub struct DocsGuideFrontMatter {
 }
 
 impl Content for DocsGuide {
-	const PATH: &'static str = "www/content/docs_guides";
+	const PATH: &'static str = "crates/www/content/docs_guides";
 	type FrontMatter = DocsGuideFrontMatter;
 }
 

@@ -1,14 +1,13 @@
+pub use crate::{
+	binary_classifier::{BinaryClassifier, BinaryClassifierMetricsSection},
+	multiclass_classifier::{
+		MulticlassClassifier, MulticlassClassifierClassMetrics, MulticlassClassifierMetricsSection,
+	},
+	regressor::{Regressor, RegressorMetricsSection},
+};
 use pinwheel::prelude::*;
 use tangram_app_layouts::document::Document;
 use tangram_app_layouts::model_layout::{ModelLayout, ModelLayoutInfo};
-
-pub use {
-	crate::binary_classifier::{BinaryClassifier, BinaryClassifierMetricsSection},
-	crate::multiclass_classifier::{
-		MulticlassClassifier, MulticlassClassifierClassMetrics, MulticlassClassifierMetricsSection,
-	},
-	crate::regressor::{Regressor, RegressorMetricsSection},
-};
 
 #[derive(ComponentBuilder)]
 pub struct Page {

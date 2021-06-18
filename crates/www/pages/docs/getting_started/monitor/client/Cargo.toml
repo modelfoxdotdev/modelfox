@@ -1,17 +1,18 @@
 [package]
 edition = "2018"
-name = "tangram_www_docs_monitor_client"
+name = "tangram_www_docs_getting_started_monitor_client"
 publish = false
 version = "0.0.0"
 
-[lib]
-crate-type = ["cdylib"]
-path = "lib.rs"
+[[bin]]
+name = "tangram_www_docs_getting_started_monitor_client"
+path = "main.rs"
 
 [dependencies]
 console_error_panic_hook = "0.1"
-pinwheel = { path = "../../../../../../pinwheel" }
+pinwheel = "0.1"
 tangram_charts = { path = "../../../../../../charts" }
+tangram_client = { path = "../../../../../../client" }
 tangram_ui = { path = "../../../../../../ui" }
 wasm-bindgen = "0.2"
 web-sys = "0.3"

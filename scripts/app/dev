@@ -1,1 +1,3 @@
-cargo run --bin tangram_script_dev -- app -- $@
+#!/bin/sh
+cargo run --bin tangram_dev -- app
+# --command "cargo run -p tangram_cli --no-default-features --features tangram_app -- app"

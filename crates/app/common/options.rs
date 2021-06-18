@@ -2,6 +2,7 @@ use std::net::IpAddr;
 use std::path::PathBuf;
 use url::Url;
 
+#[derive(Debug)]
 pub struct Options {
 	pub auth: Option<AuthOptions>,
 	pub cookie_domain: Option<String>,
@@ -13,32 +14,34 @@ pub struct Options {
 	pub url: Option<Url>,
 }
 
+#[derive(Debug)]
 pub struct AuthOptions {}
 
+#[derive(Debug)]
 pub struct DatabaseOptions {
 	pub max_connections: Option<u32>,
 	pub url: Url,
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct SmtpOptions {
 	pub host: String,
 	pub username: String,
 	pub password: String,
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum StorageOptions {
 	Local(LocalStorageOptions),
 	S3(S3StorageOptions),
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct LocalStorageOptions {
 	pub path: PathBuf,
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct S3StorageOptions {
 	pub access_key: String,
 	pub secret_key: String,

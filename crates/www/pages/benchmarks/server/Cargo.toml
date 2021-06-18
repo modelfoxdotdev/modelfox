@@ -1,16 +1,21 @@
 [package]
 edition = "2018"
 name = "tangram_www_benchmarks_server"
+publish = false
 version = "0.0.0"
 
 [lib]
-path = "page.rs"
+path = "lib.rs"
 
 [dependencies]
+futures = "0.3"
+http = "0.2"
+hyper = { version = "0.14", features = ["full"] }
 num = "0.4"
-pinwheel = { path = "../../../../pinwheel" }
+pinwheel = "0.1"
+sunfish = { path = "../../../../sunfish" }
 tangram_charts = { path = "../../../../charts" }
-tangram_serve = { path = "../../../../serve" }
 tangram_ui = { path = "../../../../ui" }
 tangram_www_benchmarks_common = { path = "../common" }
 tangram_www_layouts = { path = "../../../layouts" }
+tracing = "0.1"

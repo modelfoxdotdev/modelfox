@@ -1,20 +1,12 @@
-use self::{
-	inspection::Inspection, monitoring::Monitoring, predict::Predict,
-	production_metrics::ProductionMetrics, production_predictions::ProductionExplanations,
-	production_stats::ProductionStats, train::Train, tuning::Tuning,
-};
 use pinwheel::prelude::*;
 use tangram_ui as ui;
 use tangram_www_layouts::{document::Document, layout::Layout};
 
-mod inspection;
-mod monitoring;
-mod predict;
-mod production_metrics;
-mod production_predictions;
-mod production_stats;
-mod train;
-mod tuning;
+use crate::{
+	inspection::Inspection, monitoring::Monitoring, predict::Predict,
+	production_metrics::ProductionMetrics, production_predictions::ProductionExplanations,
+	production_stats::ProductionStats, train::Train, tuning::Tuning,
+};
 
 #[derive(ComponentBuilder)]
 pub struct Page;

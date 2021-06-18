@@ -10,6 +10,6 @@ path = "lib.rs"
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.5", features = ["serde"] }
-pinwheel = { path = "../../pinwheel" }
+pinwheel = "0.1"
 serde = { version = "1", features = ["derive"] }
 tangram_ui = { path = "../../ui" }

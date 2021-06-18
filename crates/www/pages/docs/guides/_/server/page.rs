@@ -8,7 +8,7 @@ use tangram_www_layouts::{
 
 #[derive(ComponentBuilder)]
 pub struct Page {
-	slug: String,
+	pub slug: String,
 }
 
 impl Component for Page {

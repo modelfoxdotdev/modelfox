@@ -28,7 +28,10 @@
           rustc = rust;
           cargo = rust;
         }).buildRustPackage {
+          CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
           buildInputs = with pkgs; [
+            clang_12
+            lld_12
             python39
           ];
           pname = "tangram";
@@ -38,19 +41,19 @@
       };
       devShell = pkgs.mkShell {
         CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = toString ./. + "/scripts/clang";
+        CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
         buildInputs = with pkgs; [
           (pkgs.stdenv.mkDerivation {
             name = "mold";
             src = pkgs.fetchgit {
               url = "https://github.com/rui314/mold";
-              rev = "1317132548b1b7fb6d495428cc04ad00c9dd37e4";
-              sha256 = "sha256-dHEjjojO7PS9A7iW7tz1GlLYGGIvmrUii6sgVVz7CDo=";
+              rev = "f127281d050d25032b44790a865b8a128a8145e8";
+              sha256 = "sha256-3cYE9/hZtnbCx4Y4I1hbGhUtFRjB/X+uUiJZjxA6Qw4=";
               fetchSubmodules = true;
             };
             nativeBuildInputs = with pkgs; [ clang_12 cmake lld_12 tbb xxHash zlib openssl git ];
             dontUseCmakeConfigure = "true";
             buildPhase = "make -j24";
-            patches = [ ./scripts/mold.patch ];
             installPhase = "mkdir -p $out $out/bin $out/share/man/man1 && PREFIX=$out make install";
           })
           clang_12

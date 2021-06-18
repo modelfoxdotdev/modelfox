@@ -1,1 +1,1 @@
-cargo run --bin tangram_script_build_pkgs -- $@
+cargo run --bin tangram_build_pkgs -- $@
