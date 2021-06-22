@@ -271,7 +271,7 @@ impl Component for Page {
 		let layout = DocsLayout::new(DocsPage::GettingStarted(GettingStartedPage::Inspect), None)
 			.child(content);
 		Document::new()
-			.client("tangram_www_docs_inspect_client")
+			.client("tangram_www_docs_getting_started_inspect_client")
 			.child(layout)
 			.into_node()
 	}

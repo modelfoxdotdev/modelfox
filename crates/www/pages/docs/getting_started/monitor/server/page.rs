@@ -54,7 +54,7 @@ impl Component for Page {
 				.child("< Previous: Inspect your model."),
 		);
 		Document::new()
-			.client("tangram_www_docs_monitor_client")
+			.client("tangram_www_docs_getting_started_monitor_client")
 			.child(
 				DocsLayout::new(
 					DocsPage::GettingStarted(GettingStartedPage::Monitor),
