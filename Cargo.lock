@@ -658,9 +658,9 @@ dependencies = [
 
 [[package]]
 name = "erl_nif"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d7bdf26a4be9c9c5d4ef1f5606a46f2db5aaf9900eda59c4545cdd2020adcba"
+checksum = "a980653d149cae3384e2361668e26a34f75902ddf022039d2e57d0707535e971"
 dependencies = [
  "erl_nif_macro",
  "erl_nif_sys",
@@ -1564,9 +1564,9 @@ dependencies = [
 
 [[package]]
 name = "node_api"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e34086ab0a65d729db8f9da5cdc4307781cac9ba75ee80b0ac9eb07e78d8745"
+checksum = "ac497348e4fc2e4e77fe22a43beea143345be011297cbb675f5b5c6acac43254"
 dependencies = [
  "node_api_macro",
  "node_api_system",
