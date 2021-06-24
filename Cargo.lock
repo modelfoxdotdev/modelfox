@@ -670,9 +670,9 @@ dependencies = [
 
 [[package]]
 name = "erl_nif_macro"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "592047dc28c8becb2090d43451faa16e5a8b481d69e23f0698655f2007757f1b"
+checksum = "b12641bbf82cd47a898e4a73c46a364f7bdca0c5fa36ffdebdc2ff335722c936"
 dependencies = [
  "itertools",
  "proc-macro2",
@@ -682,9 +682,9 @@ dependencies = [
 
 [[package]]
 name = "erl_nif_sys"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9be094f5041b8c244bba4d08e063b4f308a80021059395b328ab2c77d8f02ace"
+checksum = "75284532b48cd2815f3a139b59aa4bd963da61ee8d5d153989e900191f475c70"
 dependencies = [
  "erl_nif_macro",
 ]
@@ -1576,9 +1576,9 @@ dependencies = [
 
 [[package]]
 name = "node_api_macro"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d634d0718e8492d88d8b09db726a6df628d611f63753f4dfaa52fb1e766d9990"
+checksum = "d022b6052711dd72d72c469d854310efcbe3aafb4874497a719fc89e6cd6cb00"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1587,9 +1587,9 @@ dependencies = [
 
 [[package]]
 name = "node_api_system"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "923f7635efb265402611625520fd799b6815637c6ee5a91c465a883c8bb57ff7"
+checksum = "75951d33b04dabfd577d1d2cba0b7ed3287c626165b18b63b869414e0835a80e"
 dependencies = [
  "reqwest",
 ]
