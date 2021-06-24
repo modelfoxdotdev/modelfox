@@ -579,6 +579,7 @@ impl ProgressBar {
 			self.last_change = Instant::now();
 		}
 		let fraction = value.to_f64().unwrap() / total.to_f64().unwrap();
+		let fraction = if fraction.is_nan() { 0.0 } else { fraction };
 		write!(terminal, "{} {}", self.emoji, self.title)?;
 		let elapsed = self.start.elapsed();
 		let eta = if fraction > std::f64::EPSILON {

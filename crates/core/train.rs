@@ -1,6 +1,7 @@
 use crate::{
 	config::{self, Config},
 	grid,
+	heuristics::{MIN_COMPARISON_ROWS, MIN_TEST_ROWS, MIN_TRAIN_ROWS},
 	model::{
 		BinaryClassificationComparisonMetric, BinaryClassificationModel, BinaryClassifier,
 		ComparisonMetric, LinearBinaryClassificationModel, LinearMulticlassClassificationModel,
@@ -83,7 +84,30 @@ impl Trainer {
 			}
 			_ => unreachable!(),
 		};
-		let (table_train, _, table_test) = dataset.split();
+		let (table_train, table_comparison, table_test) = dataset.split();
+
+		// Use heuristics to short-curcuit training.
+		if table_train.nrows() < MIN_TRAIN_ROWS {
+			return Err(anyhow!(
+				"Train split must contain at least {} rows, it had {} rows.",
+				MIN_TRAIN_ROWS,
+				table_train.nrows()
+			));
+		}
+		if table_comparison.nrows() < MIN_COMPARISON_ROWS {
+			return Err(anyhow!(
+				"Comparison dataset split must contain at least {} rows, it had {} rows.",
+				MIN_COMPARISON_ROWS,
+				table_comparison.nrows()
+			));
+		}
+		if table_test.nrows() < MIN_TEST_ROWS {
+			return Err(anyhow!(
+				"Test split must contain at least {} rows, it had {} rows.",
+				MIN_TEST_ROWS,
+				table_test.nrows()
+			));
+		}
 
 		// Retrieve the column names.
 		let column_names: Vec<String> = table_train
