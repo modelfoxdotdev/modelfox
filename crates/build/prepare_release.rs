@@ -214,8 +214,7 @@ pub fn run(args: Args) {
 }
 
 fn clean_and_create(path: &Path) {
-	let path_exists = std::fs::metadata(path).map(|m| m.is_dir()).unwrap_or(false);
-	if path_exists {
+	if std::fs::metadata(path).map(|m| m.is_dir()).unwrap_or(false) {
 		std::fs::remove_dir_all(path).unwrap();
 	}
 	std::fs::create_dir_all(path).unwrap();

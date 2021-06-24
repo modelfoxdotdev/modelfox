@@ -12,7 +12,12 @@ pub fn run(_args: Args) {
 
 	eprintln!("elixir");
 	let elixir_priv_path = tangram_path.join("languages/elixir/priv");
-	std::fs::remove_dir_all(&elixir_priv_path).unwrap();
+	if std::fs::metadata(&elixir_priv_path)
+		.map(|m| m.is_dir())
+		.unwrap_or(false)
+	{
+		std::fs::remove_dir_all(&elixir_priv_path).unwrap();
+	}
 	for target in [
 		Target::X8664UnknownLinuxGnu,
 		Target::AArch64UnknownLinuxGnu,
@@ -36,7 +41,12 @@ pub fn run(_args: Args) {
 
 	eprintln!("go");
 	let go_libtangram_path = tangram_path.join("languages/go/libtangram");
-	std::fs::remove_dir_all(&go_libtangram_path).unwrap();
+	if std::fs::metadata(&go_libtangram_path)
+		.map(|m| m.is_dir())
+		.unwrap_or(false)
+	{
+		std::fs::remove_dir_all(&go_libtangram_path).unwrap();
+	}
 	for target in [
 		Target::X8664UnknownLinuxMusl,
 		Target::AArch64UnknownLinuxMusl,
@@ -67,7 +77,12 @@ pub fn run(_args: Args) {
 
 	eprintln!("node");
 	let node_dist_path = tangram_path.join("languages/node/native");
-	std::fs::remove_dir_all(&node_dist_path).unwrap();
+	if std::fs::metadata(&node_dist_path)
+		.map(|m| m.is_dir())
+		.unwrap_or(false)
+	{
+		std::fs::remove_dir_all(&node_dist_path).unwrap();
+	}
 	for target in [
 		Target::X8664UnknownLinuxGnu,
 		Target::AArch64UnknownLinuxGnu,
@@ -91,7 +106,12 @@ pub fn run(_args: Args) {
 
 	eprintln!("python");
 	let python_dist_path = tangram_path.join("languages/python/dist");
-	std::fs::remove_dir_all(&python_dist_path).unwrap();
+	if std::fs::metadata(&python_dist_path)
+		.map(|m| m.is_dir())
+		.unwrap_or(false)
+	{
+		std::fs::remove_dir_all(&python_dist_path).unwrap();
+	}
 	for target in [
 		Target::X8664UnknownLinuxGnu,
 		Target::AArch64UnknownLinuxGnu,
@@ -115,7 +135,12 @@ pub fn run(_args: Args) {
 
 	eprintln!("ruby");
 	let ruby_libtangram_path = tangram_path.join("languages/ruby/lib/tangram/libtangram");
-	std::fs::remove_dir_all(&ruby_libtangram_path).unwrap();
+	if std::fs::metadata(&ruby_libtangram_path)
+		.map(|m| m.is_dir())
+		.unwrap_or(false)
+	{
+		std::fs::remove_dir_all(&ruby_libtangram_path).unwrap();
+	}
 	for target in [
 		Target::X8664UnknownLinuxGnu,
 		Target::AArch64UnknownLinuxGnu,

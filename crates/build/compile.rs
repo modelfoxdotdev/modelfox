@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use clap::Clap;
 use duct::cmd;
-use std::fs::File;
+use std::{fs::File, path::Path};
 use tangram_build::{Arch, Target, TargetFileNames};
 use which::which;
 
@@ -19,10 +19,10 @@ pub fn run(args: Args) {
 	// Clean and create the dist target path.
 	let dist_path = tangram_path.join("dist");
 	let dist_target_path = dist_path.join(target.as_str());
-	let dist_target_path_exists = std::fs::metadata(&dist_target_path)
+	if std::fs::metadata(&dist_target_path)
 		.map(|m| m.is_dir())
-		.unwrap_or(false);
-	if dist_target_path_exists {
+		.unwrap_or(false)
+	{
 		std::fs::remove_dir_all(&dist_target_path).unwrap();
 	}
 	std::fs::create_dir_all(&dist_target_path).unwrap();
@@ -379,7 +379,13 @@ fn build_python_macos() {
 	)
 	.run()
 	.unwrap();
-	std::fs::remove_dir_all("languages/python/dist").unwrap();
+	let dist_path = Path::new("languages/python/dist");
+	if std::fs::metadata(&dist_path)
+		.map(|m| m.is_dir())
+		.unwrap_or(false)
+	{
+		std::fs::remove_dir_all(&dist_path).unwrap();
+	}
 	cmd!(
 		"python3",
 		"setup.py",
@@ -406,7 +412,13 @@ fn build_python_windows() {
 	)
 	.run()
 	.unwrap();
-	std::fs::remove_dir_all("languages/python/dist").unwrap();
+	let dist_path = Path::new("languages/python/dist");
+	if std::fs::metadata(&dist_path)
+		.map(|m| m.is_dir())
+		.unwrap_or(false)
+	{
+		std::fs::remove_dir_all(&dist_path).unwrap();
+	}
 	cmd!(
 		"python",
 		"setup.py",

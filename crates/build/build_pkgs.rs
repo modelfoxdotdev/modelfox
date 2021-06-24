@@ -62,10 +62,10 @@ pub fn run(args: Args) {
 
 	// Clean and create pkgs_path.
 	let pkgs_path = dist_path.join("pkgs");
-	let pkgs_path_exists = std::fs::metadata(&pkgs_path)
+	if std::fs::metadata(&pkgs_path)
 		.map(|m| m.is_dir())
-		.unwrap_or(false);
-	if pkgs_path_exists {
+		.unwrap_or(false)
+	{
 		std::fs::remove_dir_all(&pkgs_path).unwrap();
 	}
 	std::fs::create_dir_all(&pkgs_path).unwrap();
