@@ -19,7 +19,7 @@ pub fn run(args: Args) {
 	clean_and_create(&release_path);
 
 	eprintln!("tangram_cli");
-	for target in &[
+	for target in [
 		Target::X8664UnknownLinuxGnu,
 		Target::AArch64UnknownLinuxGnu,
 		Target::X8664UnknownLinuxMusl,
@@ -29,7 +29,7 @@ pub fn run(args: Args) {
 		Target::X8664PcWindowsMsvc,
 		Target::X8664PcWindowsGnu,
 	] {
-		let tangram_cli_file_name = TargetFileNames::for_target(*target).tangram_cli_file_name;
+		let tangram_cli_file_name = TargetFileNames::for_target(target).tangram_cli_file_name;
 		let tangram_cli_path = dist_path.join(target.as_str()).join(tangram_cli_file_name);
 		let output_path =
 			release_path.join(format!("tangram_cli_{}_{}.tar.gz", args.version, target));
@@ -42,7 +42,7 @@ pub fn run(args: Args) {
 
 	eprintln!("deb");
 	#[allow(clippy::single_element_loop)]
-	for target in &[Target::X8664UnknownLinuxGnu, Target::AArch64UnknownLinuxGnu] {
+	for target in [Target::X8664UnknownLinuxGnu, Target::AArch64UnknownLinuxGnu] {
 		// Create the deb directory.
 		let deb_path = dist_path.join("deb");
 		clean_and_create(&deb_path);
@@ -50,7 +50,7 @@ pub fn run(args: Args) {
 		let bin_path = deb_path.join("usr/bin");
 		std::fs::create_dir_all(&bin_path).unwrap();
 		// Copy the tangram cli to the deb/usr/bin.
-		let tangram_cli_file_name = TargetFileNames::for_target(*target).tangram_cli_file_name;
+		let tangram_cli_file_name = TargetFileNames::for_target(target).tangram_cli_file_name;
 		let tangram_cli_path = dist_path.join(target.as_str()).join(tangram_cli_file_name);
 		std::fs::copy(tangram_cli_path, bin_path.join(tangram_cli_file_name)).unwrap();
 		// Create the control file.
@@ -86,15 +86,15 @@ pub fn run(args: Args) {
 
 	eprintln!("rpm");
 	#[allow(clippy::single_element_loop)]
-	for target in &[Target::X8664UnknownLinuxGnu, Target::AArch64UnknownLinuxGnu] {
+	for target in [Target::X8664UnknownLinuxGnu, Target::AArch64UnknownLinuxGnu] {
 		// Create the rpm directory.
 		let rpm_path = dist_path.join("rpm");
 		clean_and_create(&rpm_path);
-		for subdir in &["BUILD", "BUILDROOT", "RPMS", "SOURCES", "SPECS", "SRPMS"] {
+		for subdir in ["BUILD", "BUILDROOT", "RPMS", "SOURCES", "SPECS", "SRPMS"] {
 			std::fs::create_dir(rpm_path.join(subdir)).unwrap();
 		}
 		// Make the tar.
-		let tangram_cli_file_name = TargetFileNames::for_target(*target).tangram_cli_file_name;
+		let tangram_cli_file_name = TargetFileNames::for_target(target).tangram_cli_file_name;
 		let tangram_cli_path = dist_path.join(target.as_str()).join(tangram_cli_file_name);
 		let tangram_path_in_tar = PathBuf::from(format!("tangram-{}/tangram", args.version));
 		let sources_path = rpm_path.join("SOURCES");
@@ -181,7 +181,7 @@ pub fn run(args: Args) {
 	std::fs::remove_file(&dockerfile_path).unwrap();
 
 	eprintln!("libtangram");
-	for target in &[
+	for target in [
 		Target::X8664UnknownLinuxGnu,
 		Target::AArch64UnknownLinuxGnu,
 		Target::X8664UnknownLinuxMusl,
@@ -191,7 +191,7 @@ pub fn run(args: Args) {
 		Target::X8664PcWindowsMsvc,
 		Target::X8664PcWindowsGnu,
 	] {
-		let target_file_names = TargetFileNames::for_target(*target);
+		let target_file_names = TargetFileNames::for_target(target);
 		let target_path = dist_path.join(target.as_str());
 		let output_path =
 			release_path.join(format!("libtangram_{}_{}.tar.gz", args.version, target));

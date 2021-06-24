@@ -103,7 +103,7 @@ fn alpine(
 	alpine_public_key_path: &Path,
 	alpine_private_key_path: &Path,
 ) -> Result<()> {
-	for arch in &[Arch::X8664, Arch::AArch64] {
+	for arch in [Arch::X8664, Arch::AArch64] {
 		let repo_path = pkgs_path.join("stable").join("alpine");
 		std::fs::create_dir_all(&repo_path).unwrap();
 		std::fs::copy(alpine_public_key_path, repo_path.join("tangram.rsa")).unwrap();
@@ -398,8 +398,8 @@ fn rpm(
 		let target = components.next().unwrap().to_owned();
 		rpms.push(Rpm { target, path });
 	}
-	let targets = &["x86_64", "aarch64"];
-	for (distribution, distribution_version) in &[
+	let targets = ["x86_64", "aarch64"];
+	for (distribution, distribution_version) in [
 		("amazon-linux", Some("2")),
 		("centos", Some("8")),
 		("centos", Some("7")),
@@ -441,7 +441,7 @@ fn rpm(
 			std::fs::create_dir(&repo_target_path).unwrap();
 			// Copy the .rpm.
 			for rpm in rpms.iter() {
-				if rpm.target == *target {
+				if rpm.target == target {
 					std::fs::copy(
 						&rpm.path,
 						repo_target_path.join(rpm.path.file_name().unwrap()),
