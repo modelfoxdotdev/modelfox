@@ -6,6 +6,7 @@ use crate::{
 		Quantiles, Regressor, RegressorChartEntry,
 	},
 };
+use anyhow::{anyhow, Result};
 use chrono_tz::Tz;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
@@ -33,7 +34,6 @@ use tangram_app_ui::{
 	date_window::DateWindow,
 	date_window::{get_date_window_and_interval, DateWindowInterval},
 };
-use tangram_error::{err, Result};
 use tangram_id::Id;
 
 #[derive(serde::Deserialize, Default)]
@@ -49,7 +49,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	{
 		model_id.to_owned()
 	} else {
-		return Err(err!("unexpected path"));
+		return Err(anyhow!("unexpected path"));
 	};
 	let search_params: Option<SearchParams> = if let Some(query) = request.uri().query() {
 		Some(serde_urlencoded::from_str(query)?)

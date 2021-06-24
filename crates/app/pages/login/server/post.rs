@@ -1,4 +1,5 @@
 use crate::page::Page;
+use anyhow::Result;
 use chrono::prelude::*;
 use lettre::AsyncTransport;
 use pinwheel::prelude::*;
@@ -9,7 +10,6 @@ use tangram_app_common::{
 	error::{bad_request, service_unavailable},
 	Context,
 };
-use tangram_error::Result;
 use tangram_id::Id;
 
 #[derive(serde::Deserialize)]

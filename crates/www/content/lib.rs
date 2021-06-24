@@ -1,8 +1,8 @@
+use anyhow::Result;
 use std::{
 	io::Read,
 	path::{Path, PathBuf},
 };
-use tangram_error::Result;
 
 pub struct BlogPost;
 

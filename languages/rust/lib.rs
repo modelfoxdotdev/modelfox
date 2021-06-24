@@ -8,11 +8,11 @@ The Tangram crate makes it easy to make predictions with your Tangram machine le
 tangram = { version = "*" }
 ```
 
-```rust
-let model = tangram::Model::<Input, Output>::from_path("examples/heart-disease.tangram");
+```rust no_run
+let model: tangram::Model = tangram::Model::from_path("examples/heart-disease.tangram", None).unwrap();
 
 let input = tangram::predict_input! {
-  "age": 63,
+  "age": 63.0,
   "gender": "male",
   // ...
 };
@@ -23,9 +23,9 @@ let output = model.predict_one(input, None);
 For more information, [read the docs](https://www.tangram.xyz/docs).
 */
 
+use anyhow::Result;
 use std::path::Path;
 use std::{collections::BTreeMap, marker::PhantomData};
-use tangram_error::Result;
 pub use tangram_macro::{predict_input, PredictInput, PredictInputValue};
 use url::Url;
 

@@ -12,5 +12,5 @@ path = "lib.rs"
 futures = "0.3"
 once_cell = "1"
 sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }
-tangram_error = { path = "../../error" }
+anyhow = { version = "1", features = ["backtrace"] }
 tangram_zip = { path = "../../zip" }

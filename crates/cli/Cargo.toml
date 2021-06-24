@@ -16,6 +16,7 @@ train = []
 app = ["tangram_app", "tangram_app/default"]
 
 [dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
 backtrace = "0.3"
 clap = { version = "3.0.0-beta.2", features = ["color"] }
 colored = "2"
@@ -30,15 +31,14 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tangram_app = { path = "../app", default-features = false, optional = true }
 tangram_core = { path = "../core" }
-tangram_error = { path = "../error" }
 tangram_id = { path = "../id" }
 tangram_kill_chip = { path = "../kill_chip" }
 tangram_license = { path = "../license" }
 tangram_model = { path = "../model" }
 tangram_progress_counter = { path = "../progress_counter" }
 tangram_table = { path = "../table" }
-tangram_term = { path = "../term" }
 tangram_zip = { path = "../zip" }
+tortoise = "0.1"
 tracing = "0.1"
 tracing-subscriber = "0.2"
 url = { version = "2", features = ["serde"] }

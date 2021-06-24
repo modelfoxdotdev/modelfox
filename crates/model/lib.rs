@@ -6,10 +6,10 @@ pub use self::{
 	binary_classifier::*, features::*, grid::*, model_train_options::*, multiclass_classifier::*,
 	regressor::*, stats::*,
 };
+use anyhow::{anyhow, Result};
 use fnv::FnvHashMap;
 use num::ToPrimitive;
 use std::{convert::TryInto, io::prelude::*, path::Path};
-use tangram_error::{err, Result};
 
 mod binary_classifier;
 mod features;
@@ -30,17 +30,17 @@ pub fn from_bytes(bytes: &[u8]) -> Result<ModelReader> {
 	// Verify the magic number.
 	let magic_number = &bytes[0..MAGIC_NUMBER.len()];
 	if magic_number != MAGIC_NUMBER {
-		return Err(err!("This model did not start with the tangram magic number. Are you sure it is a .tangram file?"));
+		return Err(anyhow!("This model did not start with the tangram magic number. Are you sure it is a .tangram file?"));
 	}
 	let bytes = &bytes[MAGIC_NUMBER.len()..];
 	let revision = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
 	#[allow(clippy::absurd_extreme_comparisons)]
 	if revision > CURRENT_REVISION {
-		return Err(err!("This model has a revision number of {}, which is greater than the revision number of {} used by this version of tangram. Your model is from the future! Please update to the latest version of tangram to use it.", revision, CURRENT_REVISION));
+		return Err(anyhow!("This model has a revision number of {}, which is greater than the revision number of {} used by this version of tangram. Your model is from the future! Please update to the latest version of tangram to use it.", revision, CURRENT_REVISION));
 	}
 	#[allow(clippy::absurd_extreme_comparisons)]
 	if revision < MIN_SUPPORTED_REVISION {
-		return Err(err!("This model has a revision number of {}, which is lower than the minumum supported revision number of {} for this version of tangram. Please downgrade to an earlier version of tangram to use it.", revision, MIN_SUPPORTED_REVISION));
+		return Err(anyhow!("This model has a revision number of {}, which is lower than the minumum supported revision number of {} for this version of tangram. Please downgrade to an earlier version of tangram to use it.", revision, MIN_SUPPORTED_REVISION));
 	}
 	let bytes = &bytes[4..];
 	let model = buffalo::read::<ModelReader>(bytes);

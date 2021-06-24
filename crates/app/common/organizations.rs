@@ -1,5 +1,5 @@
+use anyhow::Result;
 use sqlx::prelude::*;
-use tangram_error::Result;
 use tangram_id::Id;
 
 pub struct GetOrganizationOutput {

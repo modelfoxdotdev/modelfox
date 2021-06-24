@@ -1,2 +1,2 @@
 #!/bin/sh
-cargo run --bin tangram_dev -- www
+cargo run --bin tangram_www_dev

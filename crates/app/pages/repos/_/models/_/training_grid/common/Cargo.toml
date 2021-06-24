@@ -15,7 +15,7 @@ pinwheel = "0.1"
 tangram_app_common = { path = "../../../../../../../common" }
 tangram_charts = { path = "../../../../../../../../charts" }
 tangram_core = { path = "../../../../../../../../core" }
-tangram_error = { path = "../../../../../../../../error" }
+anyhow = { version = "1", features = ["backtrace"] }
 tangram_id = { path = "../../../../../../../../id" }
 tangram_model = { path = "../../../../../../../../model" }
 tangram_ui = { path = "../../../../../../../../ui" }

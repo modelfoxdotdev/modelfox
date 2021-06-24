@@ -1,10 +1,10 @@
+use anyhow::Result;
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
 	user::{authorize_normal_user, NormalUser},
 	Context,
 };
-use tangram_error::Result;
 
 #[derive(serde::Deserialize, Debug)]
 #[serde(tag = "action")]

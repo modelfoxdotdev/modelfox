@@ -1,3 +1,4 @@
+use anyhow::Result;
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -5,7 +6,6 @@ use tangram_app_common::{
 	user::{authorize_user, authorize_user_for_organization},
 	Context,
 };
-use tangram_error::Result;
 use tangram_id::Id;
 
 #[derive(serde::Deserialize)]

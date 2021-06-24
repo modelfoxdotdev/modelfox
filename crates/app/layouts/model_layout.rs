@@ -1,3 +1,4 @@
+use anyhow::Result;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
@@ -8,7 +9,6 @@ use tangram_app_common::{
 	Context,
 };
 use tangram_app_ui::topbar::{Topbar, TopbarAvatar};
-use tangram_error::Result;
 use tangram_id::Id;
 use tangram_ui as ui;
 

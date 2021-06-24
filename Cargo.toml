@@ -17,4 +17,4 @@ opt-level = 3
 overflow-checks = false
 
 [profile.release]
-# lto = true
+lto = true

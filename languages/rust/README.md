@@ -13,10 +13,10 @@ tangram = { version = "*" }
 ```
 
 ```rust
-let model = tangram::Model::<Input, Output>::from_path("examples/heart-disease.tangram");
+let model: tangram::Model = tangram::Model::from_path("examples/heart-disease.tangram", None).unwrap();
 
 let input = tangram::predict_input! {
-  "age": 63,
+  "age": 63.0,
   "gender": "male",
   // ...
 };

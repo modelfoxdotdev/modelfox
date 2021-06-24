@@ -1,4 +1,5 @@
 use crate::page::{ConfusionMatrixSection, Page, PrecisionRecallSection};
+use anyhow::{anyhow, Result};
 use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
@@ -9,7 +10,6 @@ use tangram_app_common::{
 	Context,
 };
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_error::{err, Result};
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
@@ -19,7 +19,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	{
 		model_id.to_owned()
 	} else {
-		return Err(err!("unexpected path"));
+		return Err(anyhow!("unexpected path"));
 	};
 	#[derive(serde::Deserialize, Default)]
 	struct SearchParams {

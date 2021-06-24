@@ -1,0 +1,1 @@
+cargo run --bin tangram_www -- export dist/www

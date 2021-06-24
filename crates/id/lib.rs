@@ -1,5 +1,5 @@
 /*!
-Tangram uses the `Id` type to uniquely identify models, users, and anything that needs a primary key. This type is almost identical to a UUID v4, except there are no bits reserved to specify the version, and the string representation has no dashes. We do not like dashes in our unique identifiers.
+Tangram uses the `Id` type to uniquely identify models, users, and anything that needs a primary key. This type is almost identical to UUID v4, except there are no bits reserved to specify the version, and the string representation has no dashes.
 */
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
@@ -25,7 +25,12 @@ impl std::error::Error for ParseIdError {}
 impl std::str::FromStr for Id {
 	type Err = ParseIdError;
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		Ok(Id(u128::from_str_radix(s, 16).map_err(|_| ParseIdError)?))
+		if s.len() != 32 {
+			return Err(ParseIdError);
+		}
+		let id = u128::from_str_radix(s, 16).map_err(|_| ParseIdError)?;
+		let id = Id(id);
+		Ok(id)
 	}
 }
 

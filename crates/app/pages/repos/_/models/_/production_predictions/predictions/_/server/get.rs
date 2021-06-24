@@ -1,4 +1,5 @@
 use crate::page::{Found, Inner, NotFound, Page};
+use anyhow::{anyhow, Result};
 use chrono::prelude::*;
 use chrono_tz::Tz;
 use pinwheel::prelude::*;
@@ -19,7 +20,6 @@ use tangram_app_common::{
 };
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_core::predict::{PredictInput, PredictOptions};
-use tangram_error::{err, Result};
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
@@ -29,7 +29,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	{
 		(model_id.to_owned(), identifier.to_owned())
 	} else {
-		return Err(err!("unexpected path"));
+		return Err(anyhow!("unexpected path"));
 	};
 	let timezone = get_timezone(&request);
 	let mut db = match context.database_pool.begin().await {

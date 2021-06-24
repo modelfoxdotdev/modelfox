@@ -824,14 +824,11 @@ fn draw_feature_contribution_box(options: DrawFeatureContributionBoxOptions) {
 	}
 
 	// Draw the startpoint.
+	ctx.line_to(rect.x, rect.y + rect.h);
 	if draw_start_arrow {
-		ctx.line_to(rect.x, rect.y + rect.h);
 		ctx.line_to(rect.x + arrow_depth, rect.y + rect.h / 2.0);
-		ctx.line_to(rect.x, rect.y);
-	} else {
-		ctx.line_to(rect.x, rect.y + rect.h);
-		ctx.line_to(rect.x, rect.y);
 	}
+	ctx.line_to(rect.x, rect.y);
 
 	ctx.fill();
 

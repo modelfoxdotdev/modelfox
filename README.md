@@ -38,9 +38,9 @@ let tangram = require("@tangramxyz/tangram-node");
 let model = new tangram.Model("./heart_disease.tangram");
 
 let input = {
-  age: 63,
-  gender: "male",
-  // ...
+	age: 63,
+	gender: "male",
+	// ...
 };
 
 let output = model.predictSync(input);
@@ -66,10 +66,10 @@ Once your model is deployed, make sure that it performs as well in production as
 ```javascript
 // Log the prediction.
 model.logPrediction({
-  identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
-  input,
-  options,
-  output,
+	identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
+	input,
+	options,
+	output,
 });
 ```
 
@@ -78,8 +78,8 @@ Later on, if you find out the true value for a prediction, call `logTrueValue`.
 ```javascript
 // Later on, if we get an official diagnosis for the patient, log the true value.
 model.logTrueValue({
-  identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
-  trueValue: "Positive",
+	identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
+	trueValue: "Positive",
 });
 ```
 
@@ -91,7 +91,7 @@ Now you can:
 
 ## Contributing
 
-This repository is one big Cargo workspace, and does not require anything other than the stable Rust toolchain to get started with.
+This repository is a Cargo workspace, and does not require anything other than the latest stable Rust toolchain to get started with.
 
 1. Install [Rust](rust-lang.org) on Linux, macOS, or Windows.
 2. Clone this repo and `cd` into it.
@@ -100,6 +100,8 @@ This repository is one big Cargo workspace, and does not require anything other 
 If you are working on the app, run `scripts/app/dev`. This rebuilds and reruns the CLI with the `app` subcommand as you make changes.
 
 Before submitting a pull request, please run `scripts/fmt` and `scripts/check` at the root of the repository to confirm that your changes are formatted correctly and do not have any errors.
+
+To install all dependencies necessary to work on the language libraries, install [Nix](https://nixos.org) with [flake support](https://nixos.wiki/wiki/Flakes), then run `nix develop` or set up [direnv](https://github.com/direnv/direnv).
 
 ## License
 

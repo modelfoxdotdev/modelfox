@@ -1,8 +1,8 @@
 use crate::PredictArgs;
+use anyhow::Result;
 use either::Either;
 use itertools::Itertools;
 use tangram_core::predict::{PredictInput, PredictInputValue, PredictOptions};
-use tangram_error::Result;
 use tangram_zip::zip;
 
 const PREDICT_CHUNK_SIZE: usize = 100;

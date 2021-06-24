@@ -27,7 +27,7 @@ reqwest = { version = "0.11", default-features = false, features = ["blocking", 
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tangram_core = { path = "../../crates/core" }
-tangram_error = { path = "../../crates/error" }
+anyhow = { version = "1", features = ["backtrace"] }
 tangram_macro = { path = "macro" }
 tangram_model = { path = "../../crates/model" }
 tokio = { version = "1" ,features = ["full"], optional = true }

@@ -1,6 +1,6 @@
 use crate::cookies::parse_cookies;
+use anyhow::Result;
 use sqlx::prelude::*;
-use tangram_error::Result;
 use tangram_id::Id;
 
 pub enum User {

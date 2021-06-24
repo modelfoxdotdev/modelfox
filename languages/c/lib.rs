@@ -1042,7 +1042,7 @@ pub unsafe extern "C" fn tangram_dealloc(ptr: *mut c_void, size: size_t, align: 
 
 fn handle_error<F>(f: F) -> *mut tangram_error
 where
-	F: FnOnce() -> ::tangram_error::Result<()> + UnwindSafe,
+	F: FnOnce() -> ::anyhow::Result<()> + UnwindSafe,
 {
 	match catch_unwind(f) {
 		Ok(Ok(_)) => null_mut(),

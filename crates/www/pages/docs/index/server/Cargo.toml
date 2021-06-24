@@ -12,5 +12,5 @@ pinwheel = "0.1"
 tangram_app_common = { path = "../../../../../app/common" }
 tangram_www_ui = { path = "../../../../ui" }
 tangram_www_layouts = { path = "../../../../layouts" }
-sunfish = { path = "../../../../../sunfish" }
+sunfish = "0.2"
 tangram_ui = { path = "../../../../../ui" }

@@ -1,5 +1,5 @@
+use anyhow::Result;
 use std::collections::BTreeMap;
-use tangram_error::Result;
 
 node_api::init!(init);
 
@@ -169,8 +169,8 @@ enum PredictOutputSingleOrMultiple {
 	Multiple(PredictOutputMultiple),
 }
 
-impl<'a> node_api::ToNodeAPI<'a> for PredictOutputSingleOrMultiple {
-	fn to_node_api(self, env: node_api::Env<'a>) -> node_api::Result<node_api::Value<'a>> {
+impl<'a> node_api::IntoNodeApi<'a> for PredictOutputSingleOrMultiple {
+	fn into_node_api(self, env: node_api::Env<'a>) -> node_api::Result<node_api::Value<'a>> {
 		serde::Serialize::serialize(&self, env)
 	}
 }

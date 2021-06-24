@@ -1,3 +1,4 @@
+use anyhow::{anyhow, Result};
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -6,7 +7,6 @@ use tangram_app_common::{
 	user::{authorize_user, authorize_user_for_repo},
 	Context,
 };
-use tangram_error::{err, Result};
 use tangram_id::Id;
 
 #[derive(serde::Deserialize)]
@@ -28,7 +28,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	let repo_id = if let ["repos", repo_id, "edit"] = *path_components(&request).as_slice() {
 		repo_id.to_owned()
 	} else {
-		return Err(err!("unexpected path"));
+		return Err(anyhow!("unexpected path"));
 	};
 	let data = match hyper::body::to_bytes(request.body_mut()).await {
 		Ok(data) => data,

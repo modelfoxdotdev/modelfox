@@ -5,9 +5,9 @@ use crate::{
 	},
 	train::{TrainGridItemOutput, TrainModelOutput},
 };
+use anyhow::Result;
 use num::ToPrimitive;
 use std::path::Path;
-use tangram_error::Result;
 use tangram_id::Id;
 use tangram_zip::zip;
 

@@ -1,3 +1,4 @@
+use anyhow::Result;
 use chrono::{Datelike, TimeZone, Timelike, Utc};
 use clap::Clap;
 use num::ToPrimitive;
@@ -8,7 +9,6 @@ use tangram_app_common::monitor_event::{
 	NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,
 	TrueValueMonitorEvent,
 };
-use tangram_error::Result;
 use tangram_id::Id;
 use tangram_table::TableView;
 use url::Url;

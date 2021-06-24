@@ -123,7 +123,7 @@ fn test_tokenizer() {
 			..Default::default()
 		},
 		"Founder/CEO",
-		vec!["Founder", "/", "CEO"],
+		vec!["founder", "/", "ceo"],
 	);
 	test(
 		Tokenizer {

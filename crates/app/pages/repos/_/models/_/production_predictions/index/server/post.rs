@@ -1,3 +1,4 @@
+use anyhow::{anyhow, Result};
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -5,7 +6,6 @@ use tangram_app_common::{
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_error::{err, Result};
 use tangram_id::Id;
 
 #[derive(serde::Deserialize)]
@@ -20,7 +20,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	{
 		model_id.to_owned()
 	} else {
-		return Err(err!("unexpected path"));
+		return Err(anyhow!("unexpected path"));
 	};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,

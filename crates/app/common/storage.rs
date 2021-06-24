@@ -1,5 +1,5 @@
+use anyhow::{anyhow, Result};
 use std::path::PathBuf;
-use tangram_error::{err, Result};
 use tangram_id::Id;
 use tokio::fs;
 
@@ -78,13 +78,13 @@ impl S3Storage {
 	) -> Result<S3Storage> {
 		let credentials =
 			s3::creds::Credentials::new(Some(&access_key), Some(&secret_key), None, None, None)
-				.map_err(|e| err!(e.to_string()))?;
+				.map_err(|e| anyhow!(e.to_string()))?;
 		let bucket = s3::Bucket::new(
 			&bucket,
 			s3::Region::Custom { region, endpoint },
 			credentials,
 		)
-		.map_err(|e| err!(e.to_string()))?;
+		.map_err(|e| anyhow!(e.to_string()))?;
 		Ok(S3Storage { bucket, cache_path })
 	}
 
@@ -100,7 +100,7 @@ impl S3Storage {
 			.bucket
 			.get_object(&key_for_item(entity, id))
 			.await
-			.map_err(|e| err!(e.to_string()))?;
+			.map_err(|e| anyhow!(e.to_string()))?;
 		// Add the item to the cache.
 		fs::create_dir_all(&entity_cache_path).await?;
 		fs::write(&item_cache_path, data).await?;
@@ -115,7 +115,7 @@ impl S3Storage {
 		self.bucket
 			.put_object(&key_for_item(entity, id), data)
 			.await
-			.map_err(|e| err!(e.to_string()))?;
+			.map_err(|e| anyhow!(e.to_string()))?;
 		// Add the item to the cache.
 		fs::write(item_cache_path, data).await?;
 		Ok(())
@@ -132,7 +132,7 @@ impl S3Storage {
 		self.bucket
 			.delete_object(&key_for_item(entity, id))
 			.await
-			.map_err(|e| err!(e.to_string()))?;
+			.map_err(|e| anyhow!(e.to_string()))?;
 		Ok(())
 	}
 }

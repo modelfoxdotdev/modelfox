@@ -1,6 +1,6 @@
 use super::app::default_database_url;
 use crate::MigrateArgs;
-use tangram_error::Result;
+use anyhow::Result;
 
 pub fn migrate(args: MigrateArgs) -> Result<()> {
 	let database_url = match args.database_url {

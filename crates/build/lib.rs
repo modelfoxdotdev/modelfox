@@ -1,4 +1,4 @@
-use tangram_error::{err, Error, Result};
+use anyhow::{anyhow, Error, Result};
 
 pub enum Arch {
 	X8664,
@@ -13,7 +13,7 @@ impl std::str::FromStr for Arch {
 		match s {
 			"x86_64" => Ok(Arch::X8664),
 			"aarch64" => Ok(Arch::AArch64),
-			_ => Err(err!("invalid arch")),
+			_ => Err(anyhow!("invalid arch")),
 		}
 	}
 }
@@ -62,7 +62,7 @@ impl std::str::FromStr for Target {
 			"aarch64-apple-darwin" => Ok(Target::AArch64AppleDarwin),
 			"x86_64-pc-windows-msvc" => Ok(Target::X8664PcWindowsMsvc),
 			"x86_64-pc-windows-gnu" => Ok(Target::X8664PcWindowsGnu),
-			_ => Err(err!("invalid target")),
+			_ => Err(anyhow!("invalid target")),
 		}
 	}
 }

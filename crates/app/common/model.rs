@@ -1,5 +1,5 @@
 use crate::storage::{Storage, StorageEntity};
-use tangram_error::Result;
+use anyhow::Result;
 use tangram_id::Id;
 
 /// Retrieves the model with the specified id.

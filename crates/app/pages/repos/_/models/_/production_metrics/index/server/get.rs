@@ -5,6 +5,7 @@ use crate::page::{
 	MulticlassClassifierProductionMetrics, Page, RegressionProductionMetrics,
 	RegressorProductionMetrics, TrainingProductionMetrics, TrueValuesCountChartEntry,
 };
+use anyhow::{anyhow, Result};
 use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::timezone::get_timezone;
@@ -21,7 +22,6 @@ use tangram_app_ui::{
 	date_window::{get_date_window_and_interval, DateWindow},
 	time::format_date_window_interval,
 };
-use tangram_error::{err, Result};
 use tangram_id::Id;
 use tangram_zip::zip;
 
@@ -32,7 +32,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	{
 		model_id.to_owned()
 	} else {
-		return Err(err!("unexpected path"));
+		return Err(anyhow!("unexpected path"));
 	};
 	#[derive(serde::Deserialize, Default)]
 	struct SearchParams {

@@ -1,7 +1,7 @@
+use anyhow::Result;
 use pinwheel::prelude::*;
 use tangram_app_common::Context;
 use tangram_app_ui::topbar::{Topbar, TopbarAvatar};
-use tangram_error::Result;
 
 pub struct AppLayoutInfo {
 	pub topbar_avatar: Option<TopbarAvatar>,

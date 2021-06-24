@@ -1,6 +1,6 @@
+use anyhow::anyhow;
 use pyo3::{prelude::*, type_object::PyTypeObject, types::PyType};
 use std::collections::BTreeMap;
-use tangram_error::err;
 use url::Url;
 
 /**
@@ -67,7 +67,7 @@ impl Model {
 			.unwrap_or_else(|| "https://app.tangram.xyz".to_owned());
 		let tangram_url = tangram_url
 			.parse()
-			.map_err(|_| TangramError(err!("Failed to parse tangram_url")))?;
+			.map_err(|_| TangramError(anyhow!("Failed to parse tangram_url")))?;
 		let model = Model {
 			model,
 			log_queue: Vec::new(),
@@ -101,7 +101,7 @@ impl Model {
 			.unwrap_or_else(|| "https://app.tangram.xyz".to_owned());
 		let tangram_url = tangram_url
 			.parse()
-			.map_err(|_| TangramError(err!("Failed to parse tangram_url")))?;
+			.map_err(|_| TangramError(anyhow!("Failed to parse tangram_url")))?;
 		let model = Model {
 			model,
 			log_queue: Vec::new(),
@@ -938,7 +938,7 @@ repr!(RegressionPredictOutput);
 repr!(BinaryClassificationPredictOutput);
 repr!(MulticlassClassificationPredictOutput);
 
-struct TangramError(tangram_error::Error);
+struct TangramError(anyhow::Error);
 
 impl std::fmt::Display for TangramError {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {

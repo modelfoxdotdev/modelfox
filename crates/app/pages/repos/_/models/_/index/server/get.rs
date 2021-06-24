@@ -6,6 +6,7 @@ use crate::{
 		RegressorMetricsSection,
 	},
 };
+use anyhow::{anyhow, Result};
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use std::sync::Arc;
@@ -21,7 +22,6 @@ use tangram_app_common::{
 	Context,
 };
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_error::{err, Result};
 use tangram_id::Id;
 use tangram_zip::zip;
 
@@ -31,7 +31,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		if let ["repos", _, "models", model_id, ""] = *path_components(&request).as_slice() {
 			model_id.to_owned()
 		} else {
-			return Err(err!("unexpected path"));
+			return Err(anyhow!("unexpected path"));
 		};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,

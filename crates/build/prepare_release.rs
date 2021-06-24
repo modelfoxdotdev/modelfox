@@ -3,7 +3,6 @@ use duct::cmd;
 use indoc::formatdoc;
 use std::path::{Path, PathBuf};
 use tangram_build::{Target, TargetFileNames};
-use tangram_error::Result;
 
 #[derive(Clap)]
 pub struct Args {
@@ -11,15 +10,13 @@ pub struct Args {
 	version: String,
 }
 
-pub fn main() -> Result<()> {
-	let args = Args::parse();
-
-	let tangram_path = std::env::current_dir()?;
+pub fn run(args: Args) {
+	let tangram_path = std::env::current_dir().unwrap();
 	let dist_path = tangram_path.join("dist");
 
 	eprintln!("clean and create release directory");
 	let release_path = dist_path.join("release");
-	clean_and_create(&release_path)?;
+	clean_and_create(&release_path);
 
 	eprintln!("tangram_cli");
 	for target in &[
@@ -40,7 +37,7 @@ pub fn main() -> Result<()> {
 			tangram_cli_path.clone(),
 			PathBuf::from(tangram_cli_file_name),
 		)];
-		tar(inputs, &output_path)?;
+		tar(inputs, &output_path);
 	}
 
 	eprintln!("deb");
@@ -48,17 +45,17 @@ pub fn main() -> Result<()> {
 	for target in &[Target::X8664UnknownLinuxGnu, Target::AArch64UnknownLinuxGnu] {
 		// Create the deb directory.
 		let deb_path = dist_path.join("deb");
-		clean_and_create(&deb_path)?;
+		clean_and_create(&deb_path);
 		// Create /usr/bin in the deb directory.
 		let bin_path = deb_path.join("usr/bin");
-		std::fs::create_dir_all(&bin_path)?;
+		std::fs::create_dir_all(&bin_path).unwrap();
 		// Copy the tangram cli to the deb/usr/bin.
 		let tangram_cli_file_name = TargetFileNames::for_target(*target).tangram_cli_file_name;
 		let tangram_cli_path = dist_path.join(target.as_str()).join(tangram_cli_file_name);
-		std::fs::copy(tangram_cli_path, bin_path.join(tangram_cli_file_name))?;
+		std::fs::copy(tangram_cli_path, bin_path.join(tangram_cli_file_name)).unwrap();
 		// Create the control file.
 		let debian_path = deb_path.join("DEBIAN");
-		std::fs::create_dir_all(&debian_path)?;
+		std::fs::create_dir_all(&debian_path).unwrap();
 		let control_path = debian_path.join("control");
 		let architecture = match target {
 			Target::X8664UnknownLinuxGnu => "amd64",
@@ -77,12 +74,14 @@ pub fn main() -> Result<()> {
 			architecture,
 			args.version,
 		);
-		std::fs::write(&control_path, &control)?;
+		std::fs::write(&control_path, &control).unwrap();
 		// Run dpkg-deb
 		let deb_file_name = format!("tangram_{}_{}.deb", args.version, architecture);
 		let deb_output_path = release_path.join(&deb_file_name);
-		cmd!("dpkg-deb", "--build", &deb_path, &deb_output_path).run()?;
-		std::fs::remove_dir_all(&deb_path)?;
+		cmd!("dpkg-deb", "--build", &deb_path, &deb_output_path)
+			.run()
+			.unwrap();
+		std::fs::remove_dir_all(&deb_path).unwrap();
 	}
 
 	eprintln!("rpm");
@@ -90,9 +89,9 @@ pub fn main() -> Result<()> {
 	for target in &[Target::X8664UnknownLinuxGnu, Target::AArch64UnknownLinuxGnu] {
 		// Create the rpm directory.
 		let rpm_path = dist_path.join("rpm");
-		clean_and_create(&rpm_path)?;
+		clean_and_create(&rpm_path);
 		for subdir in &["BUILD", "BUILDROOT", "RPMS", "SOURCES", "SPECS", "SRPMS"] {
-			std::fs::create_dir(rpm_path.join(subdir))?;
+			std::fs::create_dir(rpm_path.join(subdir)).unwrap();
 		}
 		// Make the tar.
 		let tangram_cli_file_name = TargetFileNames::for_target(*target).tangram_cli_file_name;
@@ -100,7 +99,7 @@ pub fn main() -> Result<()> {
 		let tangram_path_in_tar = PathBuf::from(format!("tangram-{}/tangram", args.version));
 		let sources_path = rpm_path.join("SOURCES");
 		let tar_path = sources_path.join("tangram.tar.gz");
-		tar(vec![(tangram_cli_path, tangram_path_in_tar)], &tar_path)?;
+		tar(vec![(tangram_cli_path, tangram_path_in_tar)], &tar_path);
 		// Write the spec file.
 		let spec = formatdoc!(
 			r#"
@@ -127,7 +126,7 @@ pub fn main() -> Result<()> {
 			args.version,
 		);
 		let spec_path = rpm_path.join("SPECS/tangram.spec");
-		std::fs::write(&spec_path, spec)?;
+		std::fs::write(&spec_path, spec).unwrap();
 		// Run rpmbuild.
 		let target = match target {
 			Target::X8664UnknownLinuxGnu => "x86_64",
@@ -143,15 +142,17 @@ pub fn main() -> Result<()> {
 			"-bb",
 			spec_path,
 		)
-		.run()?;
+		.run()
+		.unwrap();
 		// Move the rpm to the release directory.
 		let src_rpm_file_name = format!("tangram-{}-1.{}.rpm", args.version, target);
 		let dst_rpm_file_name = format!("tangram_{}_{}.rpm", args.version, target);
 		std::fs::copy(
 			rpm_path.join("RPMS").join(target).join(&src_rpm_file_name),
 			release_path.join(&dst_rpm_file_name),
-		)?;
-		std::fs::remove_dir_all(rpm_path)?;
+		)
+		.unwrap();
+		std::fs::remove_dir_all(rpm_path).unwrap();
 	}
 
 	eprintln!("container");
@@ -172,10 +173,12 @@ pub fn main() -> Result<()> {
 		"#,
 		tangram_cli_path.display(),
 	);
-	std::fs::write(&dockerfile_path, &dockerfile)?;
+	std::fs::write(&dockerfile_path, &dockerfile).unwrap();
 	let tag = format!("docker.io/tangramxyz/tangram:{}", args.version);
-	cmd!("docker", "build", "-t", tag, &tangram_path).run()?;
-	std::fs::remove_file(&dockerfile_path)?;
+	cmd!("docker", "build", "-t", tag, &tangram_path)
+		.run()
+		.unwrap();
+	std::fs::remove_file(&dockerfile_path).unwrap();
 
 	eprintln!("libtangram");
 	for target in &[
@@ -206,28 +209,24 @@ pub fn main() -> Result<()> {
 				PathBuf::from(target_file_names.libtangram_static_file_name),
 			),
 		];
-		tar(inputs, &output_path)?;
+		tar(inputs, &output_path);
 	}
-
-	Ok(())
 }
 
-fn clean_and_create(path: &Path) -> Result<()> {
+fn clean_and_create(path: &Path) {
 	let path_exists = std::fs::metadata(path).map(|m| m.is_dir()).unwrap_or(false);
 	if path_exists {
-		std::fs::remove_dir_all(path)?;
+		std::fs::remove_dir_all(path).unwrap();
 	}
-	std::fs::create_dir_all(path)?;
-	Ok(())
+	std::fs::create_dir_all(path).unwrap();
 }
 
-fn tar(input_paths: Vec<(PathBuf, PathBuf)>, output_path: &Path) -> Result<()> {
-	let output_file = std::fs::File::create(output_path)?;
+fn tar(input_paths: Vec<(PathBuf, PathBuf)>, output_path: &Path) {
+	let output_file = std::fs::File::create(output_path).unwrap();
 	let gz = flate2::write::GzEncoder::new(output_file, flate2::Compression::default());
 	let mut tar = tar::Builder::new(gz);
 	for (path, name) in input_paths.iter() {
-		tar.append_path_with_name(path, name)?;
+		tar.append_path_with_name(path, name).unwrap();
 	}
-	tar.finish()?;
-	Ok(())
+	tar.finish().unwrap();
 }

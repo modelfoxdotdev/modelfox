@@ -1,4 +1,5 @@
 use crate::page::Page;
+use anyhow::{anyhow, Result};
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
@@ -11,7 +12,6 @@ use tangram_app_common::{
 	Context,
 };
 use tangram_app_layouts::app_layout::app_layout_info;
-use tangram_error::{err, Result};
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
@@ -21,7 +21,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	{
 		(organization_id.to_owned(), member_id.to_owned())
 	} else {
-		return Err(err!("unexpected path"));
+		return Err(anyhow!("unexpected path"));
 	};
 	if !context.options.auth_enabled() {
 		return Ok(not_found());

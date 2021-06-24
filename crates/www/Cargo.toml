@@ -9,6 +9,10 @@ version = "0.0.0"
 name = "tangram_www"
 path = "main.rs"
 
+[[bin]]
+name = "tangram_www_dev"
+path = "dev.rs"
+
 [features]
 default = [
   "tangram_www_index_server",
@@ -39,8 +43,8 @@ default = [
 ]
 
 [build-dependencies]
-tangram_error = { path = "../error" }
-sunfish = { path = "../sunfish" }
+anyhow = { version = "1", features = ["backtrace"] }
+sunfish = "0.2"
 
 [dependencies]
 clap = { version = "3.0.0-beta.2", features = ["color"] }
@@ -49,8 +53,8 @@ http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-sunfish = { path = "../sunfish" }
-tangram_error = { path = "../error" }
+sunfish = "0.2"
+anyhow = { version = "1", features = ["backtrace"] }
 tangram_id = { path = "../id" }
 tangram_www_content = { path = "content" }
 tokio = { version = "1", features = ["full"] }
@@ -58,6 +62,7 @@ tower = { version = "0.4", features = ["make", "util"] }
 tower-http = { version = "0.1", features = ["add-extension", "trace"] }
 tracing = "0.1"
 tracing-subscriber = "0.2"
+watchserve = "0.1"
 
 tangram_www_benchmarks_server = { path = "pages/benchmarks/server", optional = true }
 tangram_www_blog_index_server = { path = "pages/blog/index/server", optional = true }

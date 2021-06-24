@@ -1,3 +1,4 @@
+use anyhow::{anyhow, Result};
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
@@ -6,7 +7,6 @@ use tangram_app_common::{
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 	Context,
 };
-use tangram_error::{err, Result};
 use tangram_id::Id;
 
 #[derive(serde::Deserialize)]
@@ -22,7 +22,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		if let ["organizations", organization_id, ""] = *path_components(&request).as_slice() {
 			organization_id.to_owned()
 		} else {
-			return Err(err!("unexpected path"));
+			return Err(anyhow!("unexpected path"));
 		};
 	if !context.options.auth_enabled() {
 		return Ok(not_found());

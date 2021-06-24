@@ -1,4 +1,4 @@
-use tangram_error::Result;
+use anyhow::Result;
 
 #[derive(Clone, Debug, tangram::PredictInput)]
 pub struct Input {

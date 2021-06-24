@@ -23,5 +23,5 @@ serde = { version = "1", features = ["derive"] }
 tangram_metrics = { path = "../metrics" }
 tangram_table = { path = "../table" }
 tangram_text = { path = "../text" }
-tangram_error = { path = "../error" }
+anyhow = { version = "1", features = ["backtrace"] }
 tangram_zip = { path = "../zip" }

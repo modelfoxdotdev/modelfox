@@ -1,4 +1,5 @@
 use crate::page::{Page, TrainedModel};
+use anyhow::{anyhow, Result};
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use std::sync::Arc;
@@ -12,7 +13,6 @@ use tangram_app_common::{
 };
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_app_training_grid_common::hyperparameters_for_grid_item;
-use tangram_error::{err, Result};
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
@@ -22,7 +22,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	{
 		model_id.to_owned()
 	} else {
-		return Err(err!("unexpected path"));
+		return Err(anyhow!("unexpected path"));
 	};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,

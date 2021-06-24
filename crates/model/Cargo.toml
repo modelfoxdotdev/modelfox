@@ -17,7 +17,7 @@ path = "lib.rs"
 buffalo = "0.1"
 fnv = "1"
 num = "0.4"
-tangram_error = { path = "../error" }
+anyhow = { version = "1", features = ["backtrace"] }
 tangram_linear = { path = "../linear" }
 tangram_text = { path = "../text" }
 tangram_tree = { path = "../tree" }

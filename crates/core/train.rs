@@ -16,6 +16,7 @@ use crate::{
 	stats::{ColumnStatsOutput, Stats, StatsSettings},
 	test,
 };
+use anyhow::{anyhow, Result};
 use ndarray::prelude::*;
 use num::ToPrimitive;
 use rand::{seq::SliceRandom, SeedableRng};
@@ -27,7 +28,6 @@ use std::{
 	time::{Duration, Instant},
 	unreachable,
 };
-use tangram_error::{err, Result};
 use tangram_id::Id;
 use tangram_kill_chip::KillChip;
 use tangram_progress_counter::ProgressCounter;
@@ -127,7 +127,7 @@ impl Trainer {
 			.iter()
 			.position(|column_name| *column_name == target_column_name)
 			.ok_or_else(|| {
-				err!(
+				anyhow!(
 					"did not find target column \"{}\" among column names \"{}\"",
 					target_column_name,
 					column_names.join(", ")
@@ -146,16 +146,16 @@ impl Trainer {
 				2 => Task::BinaryClassification,
 				_ => Task::MulticlassClassification,
 			},
-			_ => return Err(err!("invalid target column type")),
+			_ => return Err(anyhow!("invalid target column type")),
 		};
 
 		// Determine whether the target column contains invalid values.
 		match overall_target_column_stats {
 			ColumnStatsOutput::Number(stats) if stats.invalid_count != 0 => {
-				return Err(err!("The target column contains invalid values."));
+				return Err(anyhow!("The target column contains invalid values."));
 			}
 			ColumnStatsOutput::Enum(stats) if stats.invalid_count != 0 => {
-				return Err(err!("The target column contains invalid values."));
+				return Err(anyhow!("The target column contains invalid values."));
 			}
 			_ => {}
 		};
@@ -851,7 +851,7 @@ pub struct TrainGridItemOutput {
 	pub duration: Duration,
 }
 
-#[allow(clippy::clippy::too_many_arguments)]
+#[allow(clippy::too_many_arguments)]
 fn train_grid_item(
 	grid_item_count: usize,
 	grid_item_index: usize,
@@ -1474,7 +1474,7 @@ fn choose_comparison_metric(config: &Config, task: &Task) -> Result<ComparisonMe
 					config::ComparisonMetric::R2 => {
 						Ok(ComparisonMetric::Regression(RegressionComparisonMetric::R2))
 					}
-					metric => Err(err!(
+					metric => Err(anyhow!(
 						"{} is an invalid model comparison metric for regression",
 						metric
 					)),
@@ -1493,7 +1493,7 @@ fn choose_comparison_metric(config: &Config, task: &Task) -> Result<ComparisonMe
 							BinaryClassificationComparisonMetric::AucRoc,
 						))
 					}
-					metric => Err(err!(
+					metric => Err(anyhow!(
 						"{} is an invalid model comparison metric for binary classification",
 						metric,
 					)),
@@ -1512,7 +1512,7 @@ fn choose_comparison_metric(config: &Config, task: &Task) -> Result<ComparisonMe
 							MulticlassClassificationComparisonMetric::Accuracy,
 						))
 					}
-					metric => Err(err!(
+					metric => Err(anyhow!(
 						"{} is an invalid model comparison metric for multiclass classification",
 						metric,
 					)),

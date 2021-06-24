@@ -1,4 +1,5 @@
 use crate::page::Page;
+use anyhow::{anyhow, Result};
 use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
@@ -8,7 +9,6 @@ use tangram_app_common::{
 	Context,
 };
 use tangram_app_layouts::app_layout::app_layout_info;
-use tangram_error::{err, Result};
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
@@ -17,7 +17,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	{
 		repo_id.to_owned()
 	} else {
-		return Err(err!("unexpected path"));
+		return Err(anyhow!("unexpected path"));
 	};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,

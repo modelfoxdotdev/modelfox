@@ -1,9 +1,9 @@
+use anyhow::{anyhow, Result};
 use indoc::indoc;
 use rsa::{PublicKey, RSAPrivateKey, RSAPublicKey};
 use serde_json::json;
 use sha2::Digest;
 use std::convert::TryFrom;
-use tangram_error::{err, Result};
 use tangram_id::Id;
 
 pub const TANGRAM_LICENSE_PUBLIC_KEY: &str = indoc!(
@@ -41,9 +41,9 @@ pub fn generate(private_key: &str) -> Result<String> {
 pub fn verify(license: &str, public_key: &str) -> Result<bool> {
 	let public_key = RSAPublicKey::try_from(pem::parse(public_key)?)?;
 	let mut sections = license.split(|c| c == ':');
-	let license_data = sections.next().ok_or_else(|| err!("invalid license"))?;
+	let license_data = sections.next().ok_or_else(|| anyhow!("invalid license"))?;
 	let license_data = base64::decode(&license_data)?;
-	let signature = sections.next().ok_or_else(|| err!("invalid license"))?;
+	let signature = sections.next().ok_or_else(|| anyhow!("invalid license"))?;
 	let signature = base64::decode(&signature)?;
 	let mut digest = sha2::Sha256::new();
 	digest.update(&license_data);

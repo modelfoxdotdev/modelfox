@@ -1,6 +1,6 @@
 use crate::AppArgs;
+use anyhow::{anyhow, Result};
 use std::path::PathBuf;
-use tangram_error::{err, Result};
 use url::Url;
 
 #[derive(Clone, serde::Deserialize)]
@@ -152,8 +152,8 @@ pub fn app(args: AppArgs) -> Result<()> {
 			#[cfg(debug_assertions)]
 			None => {}
 			#[cfg(not(debug_assertions))]
-			None => return Err(err!("a license is required to enable authentication")),
-			Some(false) => return Err(err!("failed to verify license")),
+			None => return Err(anyhow!("a license is required to enable authentication")),
+			Some(false) => return Err(anyhow!("failed to verify license")),
 			Some(true) => {}
 		}
 	}
@@ -187,10 +187,11 @@ pub fn app(args: AppArgs) -> Result<()> {
 /// Retrieve the user cache directory using the `dirs` crate.
 #[cfg(feature = "tangram_app")]
 fn cache_path() -> Result<PathBuf> {
-	let cache_dir = dirs::cache_dir().ok_or_else(|| err!("failed to find user cache directory"))?;
+	let cache_dir =
+		dirs::cache_dir().ok_or_else(|| anyhow!("failed to find user cache directory"))?;
 	let tangram_cache_dir = cache_dir.join("tangram");
 	std::fs::create_dir_all(&tangram_cache_dir).map_err(|_| {
-		err!(
+		anyhow!(
 			"failed to create tangram cache directory in {}",
 			tangram_cache_dir.display()
 		)
@@ -201,10 +202,10 @@ fn cache_path() -> Result<PathBuf> {
 /// Retrieve the user data directory using the `dirs` crate.
 #[cfg(feature = "tangram_app")]
 fn data_path() -> Result<PathBuf> {
-	let data_dir = dirs::data_dir().ok_or_else(|| err!("failed to find user data directory"))?;
+	let data_dir = dirs::data_dir().ok_or_else(|| anyhow!("failed to find user data directory"))?;
 	let tangram_data_dir = data_dir.join("tangram");
 	std::fs::create_dir_all(&tangram_data_dir).map_err(|_| {
-		err!(
+		anyhow!(
 			"failed to create tangram data directory in {}",
 			tangram_data_dir.display()
 		)

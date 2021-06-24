@@ -24,7 +24,7 @@ tangram_ui = { path = "../../ui" }
 tangram_app_ui = { path = "../ui" }
 tangram_app_common = { path = "../common" }
 tangram_app_production_stats = { path = "../production_stats" }
-tangram_error = { path = "../../error" }
+anyhow = { version = "1", features = ["backtrace"] }
 tangram_metrics = { path = "../../metrics" }
 tangram_model = { path = "../../model" }
 tangram_zip = { path = "../../zip" }

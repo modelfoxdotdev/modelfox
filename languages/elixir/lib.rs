@@ -1,6 +1,6 @@
+use anyhow::Result;
 use once_cell::sync::OnceCell;
 use std::collections::BTreeMap;
-use tangram_error::Result;
 
 erl_nif::init!(
 	name: "Elixir.Tangram",
@@ -174,8 +174,8 @@ enum PredictOutputSingleOrMultiple {
 	Multiple(PredictOutputMultiple),
 }
 
-impl<'a> erl_nif::ToErlNif<'a> for PredictOutputSingleOrMultiple {
-	fn to_erl_nif(self, env: erl_nif::Env<'a>) -> erl_nif::Result<erl_nif::Term<'a>> {
+impl<'a> erl_nif::IntoErlNif<'a> for PredictOutputSingleOrMultiple {
+	fn into_erl_nif(self, env: erl_nif::Env<'a>) -> erl_nif::Result<erl_nif::Term<'a>> {
 		serde::Serialize::serialize(&self, env)
 	}
 }

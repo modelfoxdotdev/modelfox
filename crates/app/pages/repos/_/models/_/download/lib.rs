@@ -1,4 +1,3 @@
-
 // pub fn download(request: &mut http::Request<hyper::Body>) -> HandleOutput {
 // 	download_inner(request).boxed()
 // }
@@ -12,7 +11,7 @@
 // 	{
 // 		model_id.to_owned()
 // 	} else {
-// 		return Err(err!("unexpected path"));
+// 		return Err(anyhow!("unexpected path"));
 // 	};
 // 	let mut db = match context.database_pool.begin().await {
 // 		Ok(db) => db,

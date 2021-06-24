@@ -56,6 +56,7 @@
             buildPhase = "make -j24";
             installPhase = "mkdir -p $out $out/bin $out/share/man/man1 && PREFIX=$out make install";
           })
+          cargo-insta
           clang_12
           createrepo_c
           dpkg

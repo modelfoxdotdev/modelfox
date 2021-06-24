@@ -1,3 +1,4 @@
+use anyhow::{anyhow, Result};
 use chrono::prelude::*;
 use memmap::Mmap;
 use num::ToPrimitive;
@@ -16,7 +17,6 @@ use tangram_app_common::{
 };
 use tangram_app_production_metrics::ProductionMetrics;
 use tangram_app_production_stats::ProductionStats;
-use tangram_error::{err, Result};
 use tangram_id::Id;
 use tracing::error;
 
@@ -290,7 +290,7 @@ async fn insert_or_update_production_metrics_for_monitor_event(
 	.await?;
 	let row = rows
 		.get(0)
-		.ok_or_else(|| err!("Failed to find prediction with identifier {}", identifier))?;
+		.ok_or_else(|| anyhow!("Failed to find prediction with identifier {}", identifier))?;
 	let output: String = row.get(0);
 	let output: PredictOutput = serde_json::from_str(&output)?;
 	let prediction = match output {

@@ -1,6 +1,6 @@
+use anyhow::Result;
 use std::sync::Arc;
 use tangram_app_common::Context;
-use tangram_error::Result;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();

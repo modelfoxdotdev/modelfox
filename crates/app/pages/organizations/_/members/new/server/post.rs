@@ -1,3 +1,4 @@
+use anyhow::{anyhow, Result};
 use lettre::AsyncTransport;
 use sqlx::prelude::*;
 use std::sync::Arc;
@@ -8,7 +9,6 @@ use tangram_app_common::{
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 	Context,
 };
-use tangram_error::{err, Result};
 use tangram_id::Id;
 use url::Url;
 
@@ -24,7 +24,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		if let ["organizations", organization_id, ""] = *path_components(&request).as_slice() {
 			organization_id.to_owned()
 		} else {
-			return Err(err!("unexpected path"));
+			return Err(anyhow!("unexpected path"));
 		};
 	if !context.options.auth_enabled() {
 		return Ok(not_found());
@@ -118,7 +118,7 @@ async fn add_member(
 			.options
 			.url
 			.clone()
-			.ok_or_else(|| err!("url option is required when smtp is enabled"))?;
+			.ok_or_else(|| anyhow!("url option is required when smtp is enabled"))?;
 		tokio::spawn(send_invitation_email(
 			smtp_transport,
 			action.email.clone(),

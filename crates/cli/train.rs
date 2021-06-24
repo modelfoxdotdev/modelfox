@@ -1,4 +1,5 @@
 use crate::TrainArgs;
+use anyhow::{anyhow, Result};
 use backtrace::Backtrace;
 use num::ToPrimitive;
 use once_cell::sync::Lazy;
@@ -17,9 +18,8 @@ use tangram_core::progress::{
 	LoadProgressEvent, ProgressEvent, StatsProgressEvent, TrainGridItemProgressEvent,
 	TrainProgressEvent,
 };
-use tangram_error::{err, Result};
 use tangram_progress_counter::ProgressCounter;
-use tangram_term::{
+use tortoise::{
 	style::Color,
 	terminal::{Clear, Terminal},
 };
@@ -92,7 +92,7 @@ pub fn train(args: TrainArgs) -> Result<()> {
 		Err(_) => {
 			let panic_info = PANIC_MESSAGE_AND_BACKTRACE.lock().unwrap();
 			let (message, backtrace) = panic_info.as_ref().unwrap();
-			Err(err!("{}\n{:?}", message, backtrace))
+			Err(anyhow!("{}\n{:?}", message, backtrace))
 		}
 	}?;
 
@@ -703,7 +703,7 @@ impl std::fmt::Display for DisplayDuration {
 #[cfg(unix)]
 mod ctrl_c {
 
-	use tangram_error::Result;
+	use anyhow::Result;
 	use tangram_kill_chip::KillChip;
 
 	static mut KILL_CHIP: KillChip = KillChip::new();
@@ -735,7 +735,7 @@ mod ctrl_c {
 #[cfg(windows)]
 mod ctrl_c {
 
-	use tangram_error::Result;
+	use anyhow::Result;
 	use tangram_kill_chip::KillChip;
 	use winapi::{
 		shared::minwindef::{BOOL, DWORD, FALSE, TRUE},

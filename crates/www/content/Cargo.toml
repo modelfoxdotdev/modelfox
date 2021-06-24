@@ -11,5 +11,5 @@ path = "lib.rs"
 pinwheel = "0.1"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tangram_error = { path = "../../error" }
+anyhow = { version = "1", features = ["backtrace"] }
 tangram_ui = { path = "../../ui" }

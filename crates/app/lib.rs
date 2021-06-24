@@ -1,3 +1,4 @@
+use anyhow::{anyhow, Result};
 use request_id::RequestIdLayer;
 use std::{sync::Arc, time::Duration};
 pub use tangram_app_common::options;
@@ -6,7 +7,6 @@ use tangram_app_common::{
 	storage::{LocalStorage, S3Storage, Storage},
 	Context,
 };
-use tangram_error::{err, Result};
 use tangram_id::Id;
 use tower::{make::Shared, ServiceBuilder};
 use tower_http::{add_extension::AddExtensionLayer, trace::TraceLayer};
@@ -168,7 +168,7 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 		let pool_max_connections = options.database_max_connections.unwrap_or(10);
 		(pool_options, pool_max_connections)
 	} else {
-		return Err(err!(
+		return Err(anyhow!(
 			"The database url must start with sqlite: or postgres:."
 		));
 	};

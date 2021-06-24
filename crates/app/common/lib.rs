@@ -1,5 +1,5 @@
+use anyhow::Result;
 use std::{future::Future, pin::Pin};
-use tangram_error::Result;
 
 pub mod cookies;
 pub mod error;

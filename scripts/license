@@ -1,0 +1,1 @@
+cargo run -p tangram_license --release -- $@

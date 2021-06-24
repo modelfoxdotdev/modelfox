@@ -1,8 +1,8 @@
+use anyhow::{anyhow, Result};
 use futures::prelude::future::*;
 use once_cell::sync::Lazy;
 use sqlx::prelude::*;
 use std::collections::BTreeMap;
-use tangram_error::{err, Result};
 use tangram_zip::zip;
 
 mod migration_2020_01_01_000000;
@@ -45,17 +45,17 @@ pub async fn verify(db: &sqlx::AnyPool) -> Result<()> {
 			migration_row.get::<String, usize>(0) == *migration_name
 		});
 	if !migrations_consistent {
-		return Err(err!(
+		return Err(anyhow!(
 			"There was a mismatch between the migrations your database has run and the migrations this version of tangram expects. This should not happen unless you are hacking on tangram. Please contact us at help@tangram.xyz."
 		));
 	}
 	if migration_rows.len() > MIGRATIONS.len() {
-		return Err(err!(
+		return Err(anyhow!(
 			"Your database has run migrations from a newer version of tangram. Please update to the latest version of tangram."
 		));
 	}
 	if migration_rows.len() < MIGRATIONS.len() {
-		return Err(err!(
+		return Err(anyhow!(
 			"Please run `tangram migrate` to update your database to the latest schema."
 		));
 	}
@@ -74,12 +74,12 @@ pub async fn run(db: &sqlx::AnyPool) -> Result<()> {
 			migration_row.get::<String, usize>(0) == *migration_name
 		});
 	if !migrations_consistent {
-		return Err(err!(
+		return Err(anyhow!(
 			"Database migration consistency error. Please contact us at help@tangram.xyz."
 		));
 	}
 	if migration_rows.len() > MIGRATIONS.len() {
-		return Err(err!(
+		return Err(anyhow!(
 			"Your database has run migrations from a newer version of tangram."
 		));
 	}

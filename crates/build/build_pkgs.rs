@@ -1,3 +1,4 @@
+use anyhow::Result;
 use clap::Clap;
 use digest::Digest;
 use duct::cmd;
@@ -7,7 +8,6 @@ use sha1::Sha1;
 use sha2::Sha256;
 use std::path::{Path, PathBuf};
 use tangram_build::{Arch, Target, TargetFileNames};
-use tangram_error::Result;
 
 #[derive(Clap)]
 pub struct Args {
@@ -17,32 +17,48 @@ pub struct Args {
 	url: String,
 }
 
-pub fn main() -> Result<()> {
-	let args = Args::parse();
-
-	let tangram_path = std::env::current_dir()?;
+pub fn run(args: Args) {
+	let tangram_path = std::env::current_dir().unwrap();
 	let dist_path = tangram_path.join("dist");
 
 	// Retrieve the keys from the password store.
-	let alpine_public_key = cmd!("pass", "tangram/keys/alpine.public.rsa").run()?.stdout;
-	let alpine_private_key = cmd!("pass", "tangram/keys/alpine.public.rsa").run()?.stdout;
-	let deb_public_key = cmd!("pass", "tangram/keys/deb.public.gpg").run()?.stdout;
-	let deb_private_key = cmd!("pass", "tangram/keys/deb.private.gpg").run()?.stdout;
-	let rpm_public_key = cmd!("pass", "tangram/keys/rpm.public.gpg").run()?.stdout;
-	let rpm_private_key = cmd!("pass", "tangram/keys/rpm.private.gpg").run()?.stdout;
+	let alpine_public_key = cmd!("pass", "tangram/keys/alpine.public.rsa")
+		.run()
+		.unwrap()
+		.stdout;
+	let alpine_private_key = cmd!("pass", "tangram/keys/alpine.public.rsa")
+		.run()
+		.unwrap()
+		.stdout;
+	let deb_public_key = cmd!("pass", "tangram/keys/deb.public.gpg")
+		.run()
+		.unwrap()
+		.stdout;
+	let deb_private_key = cmd!("pass", "tangram/keys/deb.private.gpg")
+		.run()
+		.unwrap()
+		.stdout;
+	let rpm_public_key = cmd!("pass", "tangram/keys/rpm.public.gpg")
+		.run()
+		.unwrap()
+		.stdout;
+	let rpm_private_key = cmd!("pass", "tangram/keys/rpm.private.gpg")
+		.run()
+		.unwrap()
+		.stdout;
 
-	let alpine_public_key_path = tempfile::NamedTempFile::new()?.into_temp_path();
-	std::fs::write(&alpine_public_key_path, alpine_public_key)?;
-	let alpine_private_key_path = tempfile::NamedTempFile::new()?.into_temp_path();
-	std::fs::write(&alpine_private_key_path, alpine_private_key)?;
-	let deb_public_key_path = tempfile::NamedTempFile::new()?.into_temp_path();
-	std::fs::write(&deb_public_key_path, deb_public_key)?;
-	let deb_private_key_path = tempfile::NamedTempFile::new()?.into_temp_path();
-	std::fs::write(&deb_private_key_path, deb_private_key)?;
-	let rpm_public_key_path = tempfile::NamedTempFile::new()?.into_temp_path();
-	std::fs::write(&rpm_public_key_path, rpm_public_key)?;
-	let rpm_private_key_path = tempfile::NamedTempFile::new()?.into_temp_path();
-	std::fs::write(&rpm_private_key_path, rpm_private_key)?;
+	let alpine_public_key_path = tempfile::NamedTempFile::new().unwrap().into_temp_path();
+	std::fs::write(&alpine_public_key_path, alpine_public_key).unwrap();
+	let alpine_private_key_path = tempfile::NamedTempFile::new().unwrap().into_temp_path();
+	std::fs::write(&alpine_private_key_path, alpine_private_key).unwrap();
+	let deb_public_key_path = tempfile::NamedTempFile::new().unwrap().into_temp_path();
+	std::fs::write(&deb_public_key_path, deb_public_key).unwrap();
+	let deb_private_key_path = tempfile::NamedTempFile::new().unwrap().into_temp_path();
+	std::fs::write(&deb_private_key_path, deb_private_key).unwrap();
+	let rpm_public_key_path = tempfile::NamedTempFile::new().unwrap().into_temp_path();
+	std::fs::write(&rpm_public_key_path, rpm_public_key).unwrap();
+	let rpm_private_key_path = tempfile::NamedTempFile::new().unwrap().into_temp_path();
+	std::fs::write(&rpm_private_key_path, rpm_private_key).unwrap();
 
 	// Clean and create pkgs_path.
 	let pkgs_path = dist_path.join("pkgs");
@@ -50,9 +66,9 @@ pub fn main() -> Result<()> {
 		.map(|m| m.is_dir())
 		.unwrap_or(false);
 	if pkgs_path_exists {
-		std::fs::remove_dir_all(&pkgs_path)?;
+		std::fs::remove_dir_all(&pkgs_path).unwrap();
 	}
-	std::fs::create_dir_all(&pkgs_path)?;
+	std::fs::create_dir_all(&pkgs_path).unwrap();
 
 	alpine(
 		&args,
@@ -60,23 +76,24 @@ pub fn main() -> Result<()> {
 		&pkgs_path,
 		&alpine_public_key_path,
 		&alpine_private_key_path,
-	)?;
+	)
+	.unwrap();
 	deb(
 		&args,
 		&dist_path,
 		&pkgs_path,
 		&deb_public_key_path,
 		&deb_private_key_path,
-	)?;
+	)
+	.unwrap();
 	rpm(
 		&args,
 		&dist_path,
 		&pkgs_path,
 		&rpm_public_key_path,
 		&rpm_private_key_path,
-	)?;
-
-	Ok(())
+	)
+	.unwrap();
 }
 
 fn alpine(
@@ -88,8 +105,8 @@ fn alpine(
 ) -> Result<()> {
 	for arch in &[Arch::X8664, Arch::AArch64] {
 		let repo_path = pkgs_path.join("stable").join("alpine");
-		std::fs::create_dir_all(&repo_path)?;
-		std::fs::copy(alpine_public_key_path, repo_path.join("tangram.rsa"))?;
+		std::fs::create_dir_all(&repo_path).unwrap();
+		std::fs::copy(alpine_public_key_path, repo_path.join("tangram.rsa")).unwrap();
 		let apkbuild_path = repo_path.join("APKBUILD");
 		let apkbuild = formatdoc!(
 			r#"
@@ -118,7 +135,7 @@ fn alpine(
 				Arch::AArch64 => "aarch64",
 			},
 		);
-		std::fs::write(&apkbuild_path, &apkbuild)?;
+		std::fs::write(&apkbuild_path, &apkbuild).unwrap();
 		let tangram_cli_dst_path = repo_path.join("tangram");
 		let target = match arch {
 			Arch::X8664 => Target::X8664UnknownLinuxGnu,
@@ -127,7 +144,7 @@ fn alpine(
 		let tangram_cli_path = dist_path
 			.join(target.as_str())
 			.join(TargetFileNames::for_target(target).tangram_cli_file_name);
-		std::fs::copy(tangram_cli_path, &tangram_cli_dst_path)?;
+		std::fs::copy(tangram_cli_path, &tangram_cli_dst_path).unwrap();
 		let script = r#"
 			apk add build-base abuild
 			echo "PACKAGER_PUBKEY=/tangram.public.rsa" >> /etc/abuild.conf
@@ -164,9 +181,10 @@ fn alpine(
 			"alpine:3.13",
 		)
 		.stdin_bytes(script)
-		.run()?;
-		std::fs::remove_file(&apkbuild_path)?;
-		std::fs::remove_file(&tangram_cli_dst_path)?;
+		.run()
+		.unwrap();
+		std::fs::remove_file(&apkbuild_path).unwrap();
+		std::fs::remove_file(&tangram_cli_dst_path).unwrap();
 	}
 	Ok(())
 }
@@ -184,8 +202,8 @@ fn deb(
 		path: PathBuf,
 	}
 	let mut debs = Vec::new();
-	for entry in std::fs::read_dir(dist_path.join("release"))? {
-		let path = entry?.path();
+	for entry in std::fs::read_dir(dist_path.join("release")).unwrap() {
+		let path = entry.unwrap().path();
 		let is_deb = path
 			.extension()
 			.and_then(|e| e.to_str())
@@ -207,7 +225,7 @@ fn deb(
 	let archs = vec!["amd64", "arm64"];
 	for distribution in distributions {
 		let repo_path = pkgs_path.join("stable").join(distribution);
-		std::fs::create_dir_all(&repo_path)?;
+		std::fs::create_dir_all(&repo_path).unwrap();
 		// Create the list files.
 		let distribution_versions = match *distribution {
 			"debian" => &debian_versions,
@@ -226,34 +244,34 @@ fn deb(
 				distribution,
 				distribution_version
 			);
-			std::fs::write(list_path, list_file)?;
+			std::fs::write(list_path, list_file).unwrap();
 			// Copy the public key.
 			let public_key_path = repo_path.join(format!("{}.gpg", distribution_version));
-			std::fs::copy(deb_public_key_path, public_key_path)?;
+			std::fs::copy(deb_public_key_path, public_key_path).unwrap();
 		}
 		let pool_path = repo_path.join("pool");
-		std::fs::create_dir(&pool_path)?;
+		std::fs::create_dir(&pool_path).unwrap();
 		// Copy all the .debs into the pool.
 		for deb in debs.iter() {
-			std::fs::copy(&deb.path, pool_path.join(&deb.path.file_name().unwrap()))?;
+			std::fs::copy(&deb.path, pool_path.join(&deb.path.file_name().unwrap())).unwrap();
 		}
 		let dists_path = repo_path.join("dists");
-		std::fs::create_dir(&dists_path)?;
+		std::fs::create_dir(&dists_path).unwrap();
 		for distribution_version in distribution_versions {
 			let distribution_path = dists_path.join(distribution_version);
-			std::fs::create_dir(&distribution_path)?;
+			std::fs::create_dir(&distribution_path).unwrap();
 			let mut md5_lines = Vec::new();
 			let mut sha1_lines = Vec::new();
 			let mut sha256_lines = Vec::new();
 			for arch in &archs {
 				let component_path = distribution_path.join("main");
-				std::fs::create_dir(&component_path)?;
+				std::fs::create_dir(&component_path).unwrap();
 				let binary_arch_path = component_path.join(format!("binary-{}", arch));
-				std::fs::create_dir(&binary_arch_path)?;
+				std::fs::create_dir(&binary_arch_path).unwrap();
 				let packages_path = binary_arch_path.join("Packages");
 				let mut packages_file = String::new();
 				for deb in debs.iter() {
-					let deb_bytes = std::fs::read(&deb.path)?;
+					let deb_bytes = std::fs::read(&deb.path).unwrap();
 					let packages_entry = formatdoc!(
 						r#"
 							Package: tangram
@@ -278,7 +296,7 @@ fn deb(
 					packages_file.push_str(&packages_entry);
 					packages_file.push('\n');
 				}
-				std::fs::write(&packages_path, &packages_file)?;
+				std::fs::write(&packages_path, &packages_file).unwrap();
 				let packages_file_len = packages_file.len();
 				let packages_relative_path = packages_path
 					.strip_prefix(&distribution_path)
@@ -320,7 +338,7 @@ fn deb(
 				sha1_lines.join("\n"),
 				sha256_lines.join("\n"),
 			);
-			std::fs::write(&release_file_path, &release_file)?;
+			std::fs::write(&release_file_path, &release_file).unwrap();
 			// Write the Release.gpg file.
 			cmd!(
 				"sq",
@@ -331,7 +349,8 @@ fn deb(
 			)
 			.stdin_path(&release_file_path)
 			.stdout_path(distribution_path.join("Release.gpg"))
-			.read()?;
+			.read()
+			.unwrap();
 			// Write the InRelease file.
 			cmd!(
 				"sq",
@@ -342,7 +361,8 @@ fn deb(
 			)
 			.stdin_path(&release_file_path)
 			.stdout_path(distribution_path.join("InRelease"))
-			.read()?;
+			.read()
+			.unwrap();
 		}
 	}
 	Ok(())
@@ -361,8 +381,8 @@ fn rpm(
 		path: PathBuf,
 	}
 	let mut rpms = Vec::new();
-	for entry in std::fs::read_dir(dist_path.join("release"))? {
-		let path = entry?.path();
+	for entry in std::fs::read_dir(dist_path.join("release")).unwrap() {
+		let path = entry.unwrap().path();
 		let is_rpm = path
 			.extension()
 			.and_then(|e| e.to_str())
@@ -390,7 +410,7 @@ fn rpm(
 			.join("stable")
 			.join(distribution)
 			.join(distribution_version.unwrap_or(""));
-		std::fs::create_dir_all(&repo_path)?;
+		std::fs::create_dir_all(&repo_path).unwrap();
 		// Create the .repo file.
 		let repo_file_path = repo_path.join("tangram.repo");
 		let distribution_version_with_leading_slash = distribution_version
@@ -411,25 +431,26 @@ fn rpm(
 			distribution,
 			distribution_version_with_leading_slash,
 		);
-		std::fs::write(repo_file_path, repo_file)?;
+		std::fs::write(repo_file_path, repo_file).unwrap();
 		// Copy the rpm public key.
-		std::fs::copy(rpm_public_key_path, repo_path.join("repo.gpg"))?;
+		std::fs::copy(rpm_public_key_path, repo_path.join("repo.gpg")).unwrap();
 		#[allow(clippy::single_element_loop)]
 		for target in targets {
 			// Create the target dir.
 			let repo_target_path = repo_path.join(target);
-			std::fs::create_dir(&repo_target_path)?;
+			std::fs::create_dir(&repo_target_path).unwrap();
 			// Copy the .rpm.
 			for rpm in rpms.iter() {
 				if rpm.target == *target {
 					std::fs::copy(
 						&rpm.path,
 						repo_target_path.join(rpm.path.file_name().unwrap()),
-					)?;
+					)
+					.unwrap();
 				}
 			}
 			// Run createrepo.
-			cmd!("createrepo_c", &repo_target_path).run()?;
+			cmd!("createrepo_c", &repo_target_path).run().unwrap();
 			// Write the signature.
 			cmd!(
 				"sq",
@@ -440,7 +461,8 @@ fn rpm(
 			)
 			.stdin_path(repo_target_path.join("repodata/repomd.xml"))
 			.stdout_path(repo_target_path.join("repodata/repomd.xml.asc"))
-			.read()?;
+			.read()
+			.unwrap();
 		}
 	}
 	Ok(())

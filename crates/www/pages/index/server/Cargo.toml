@@ -11,7 +11,7 @@ path = "lib.rs"
 pinwheel = "0.1"
 futures = "0.3"
 tangram_charts = { path = "../../../../charts" }
-sunfish = { path = "../../../../sunfish" }
+sunfish = "0.2"
 tangram_ui = { path = "../../../../ui" }
 tangram_finite = { path = "../../../../finite" }
 tangram_www_ui = { path = "../../../ui" }

@@ -220,7 +220,6 @@ fn test_two() {
      precision_weighted: 0.6318681,
      recall_unweighted: 0.6125,
      recall_weighted: 0.61538464,
-     baseline_accuracy: 0.61538464,
  }
  "###);
 }
@@ -336,7 +335,6 @@ fn test_three() {
      precision_weighted: 0.7363316,
      recall_unweighted: 0.65705127,
      recall_weighted: 0.7037037,
-     baseline_accuracy: 0.4814815,
  }
  "###);
 }
