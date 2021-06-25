@@ -2697,9 +2697,9 @@ checksum = "1e81da0851ada1f3e9d4312c704aa4f8806f0f9d69faaf8df2f3464b4a9437c2"
 
 [[package]]
 name = "sunfish"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "797a2120a97f5f25494690fe05696d6a7688dd07746331a59d449d7f6c5363c5"
+checksum = "5652eb889b9076e57a277fb6ed34113d0aee508ff3726c4276c954427017448c"
 dependencies = [
  "anyhow",
  "futures",
@@ -2719,9 +2719,9 @@ dependencies = [
 
 [[package]]
 name = "sunfish_macro"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "73ffc096b072cf7a01dc6070e3f6a947d5a3fbb822ef54970d17b4758bd2a6bf"
+checksum = "d1994f67e59f5e284e36a2296709945e86fe3c1602d7375642f287ef6e2f76b1"
 dependencies = [
  "glob",
  "proc-macro2",
