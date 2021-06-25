@@ -10,6 +10,14 @@ pub fn run(_args: Args) {
 	let tangram_path = std::env::current_dir().unwrap();
 	let dist_path = tangram_path.join("dist");
 
+	eprintln!("c");
+	let c_path = tangram_path.join("languages/c");
+	install(
+		&dist_path.join("x86_64-unknown-linux-gnu/tangram.h"),
+		&c_path.join("tangram.h"),
+	)
+	.unwrap();
+
 	eprintln!("elixir");
 	let elixir_priv_path = tangram_path.join("languages/elixir/priv");
 	if std::fs::metadata(&elixir_priv_path)

@@ -217,6 +217,12 @@ impl Component for PageNav {
 				ui::NavSection::new("Languages")
 					.child(
 						ui::NavItem::new()
+							.title("C".to_owned())
+							.href("/docs/languages/c".to_owned())
+							.selected(Some(false)),
+					)
+					.child(
+						ui::NavItem::new()
 							.title("Elixir".to_owned())
 							.href("/docs/languages/elixir".to_owned())
 							.selected(Some(false)),

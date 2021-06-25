@@ -59,6 +59,7 @@
           cargo-insta
           clang_12
           createrepo_c
+          doxygen
           dpkg
           elixir
           go
