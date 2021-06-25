@@ -2697,14 +2697,12 @@ checksum = "1e81da0851ada1f3e9d4312c704aa4f8806f0f9d69faaf8df2f3464b4a9437c2"
 
 [[package]]
 name = "sunfish"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3ce90e1c803db3e8b333c4e520cec1a350d2b6d7bad0ddc3c4430f9f85aa3fb"
+checksum = "797a2120a97f5f25494690fe05696d6a7688dd07746331a59d449d7f6c5363c5"
 dependencies = [
  "anyhow",
- "duct",
  "futures",
- "glob",
  "hex",
  "http",
  "hyper",
@@ -2714,8 +2712,6 @@ dependencies = [
  "sunfish_macro",
  "tokio",
  "toml",
- "tower",
- "tower-http",
  "tracing",
  "wasm-bindgen-cli-support",
  "which",
@@ -2723,9 +2719,9 @@ dependencies = [
 
 [[package]]
 name = "sunfish_macro"
-version = "0.2.0"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e536d6dfe638dc50c5698590962d797117072d844880337c618d72bfa0cd5378"
+checksum = "73ffc096b072cf7a01dc6070e3f6a947d5a3fbb822ef54970d17b4758bd2a6bf"
 dependencies = [
  "glob",
  "proc-macro2",
