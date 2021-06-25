@@ -2,10 +2,12 @@ use clap::Clap;
 use duct::cmd;
 
 #[derive(Clap)]
-pub struct Args {}
+pub struct Args {
+	machines: Vec<String>,
+}
 
-pub fn run(_args: Args) {
-	for machine in ["mba", "win"] {
+pub fn run(args: Args) {
+	for machine in args.machines {
 		cmd!(
 			"rsync",
 			"--archive",
