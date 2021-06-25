@@ -21,14 +21,14 @@ tokio_1 = ["tokio"]
 tokio = { version = "1" ,features = ["full"] }
 
 [dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
 chrono = { version = "0.4", features = ["serde"] }
 memmap = "0.7"
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tangram_core = { path = "../../crates/core" }
-anyhow = { version = "1", features = ["backtrace"] }
-tangram_macro = { path = "macro" }
-tangram_model = { path = "../../crates/model" }
+tangram_core = { version = "0.4", path = "../../crates/core" }
+tangram_macro = { version = "0.4", path = "macro" }
+tangram_model = { version = "0.4", path = "../../crates/model" }
 tokio = { version = "1" ,features = ["full"], optional = true }
 url = { version = "2", features = ["serde"] }

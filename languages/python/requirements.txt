@@ -1,5 +1,6 @@
+pdoc
 pip
-wheel
 setuptools
 setuptools-rust
-pdoc
+twine
+wheel

@@ -1,7 +1,7 @@
 if [ ! -e dist ]; then 
 	git clone git@github.com:tangramxyz/tangram-go dist
 fi
-rsync --archive --delete --exclude .git --exclude .gitignore --exclude scripts --exclude dist . dist
+rsync --archive --delete --exclude .git --exclude .gitignore --exclude dist --exclude docs --exclude scripts . dist
 git -C dist add --all
 git -C dist commit
 git -C dist push

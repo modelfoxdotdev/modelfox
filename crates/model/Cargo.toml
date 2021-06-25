@@ -14,10 +14,10 @@ version = "0.4.0"
 path = "lib.rs"
 
 [dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
 buffalo = "0.1"
 fnv = "1"
 num = "0.4"
-anyhow = { version = "1", features = ["backtrace"] }
-tangram_linear = { path = "../linear" }
-tangram_text = { path = "../text" }
-tangram_tree = { path = "../tree" }
+tangram_linear = { version = "0.4", path = "../linear" }
+tangram_text = { version = "0.4", path = "../text" }
+tangram_tree = { version = "0.4", path = "../tree" }

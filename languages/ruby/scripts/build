@@ -1,3 +1,0 @@
-gem build tangram.gemspec
-mkdir -p dist
-mv *.gem dist

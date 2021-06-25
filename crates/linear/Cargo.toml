@@ -46,7 +46,7 @@ name = "tangram_linear_benchmark_iris"
 path = "benchmarks/iris.rs"
 
 [dependencies]
-buffalo = "0.1"
+buffalo = { version = "0.1", features = ["ndarray_0_15"] }
 clap = { version = "3.0.0-beta.2", features = ["color"] }
 maplit = "1"
 ndarray = { version = "0.15", features = ["rayon"] }
@@ -54,9 +54,9 @@ num = "0.4"
 rayon = "1.5"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tangram_features = { path = "../features" }
-tangram_kill_chip = { path = "../kill_chip" }
-tangram_metrics = { path = "../metrics" }
-tangram_progress_counter = { path = "../progress_counter" }
-tangram_table = { path = "../table" }
-tangram_zip = { path = "../zip" }
+tangram_features = { version = "0.4", path = "../features" }
+tangram_kill_chip = { version = "0.4", path = "../kill_chip" }
+tangram_metrics = { version = "0.4", path = "../metrics" }
+tangram_progress_counter = { version = "0.4", path = "../progress_counter" }
+tangram_table = { version = "0.4", path = "../table" }
+tangram_zip = { version = "0.4", path = "../zip" }

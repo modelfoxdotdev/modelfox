@@ -1,1 +1,5 @@
+gem build tangram.gemspec
+rm -rf dist
+mkdir -p dist
+mv *.gem dist
 gem push dist/*
