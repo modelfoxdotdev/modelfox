@@ -29,7 +29,7 @@ For more information, [read the docs](https://www.tangram.xyz/docs).
 
 ## Platform Support
 
-Tangram for Python is currently supported on Linux, macOS, and Windows with AMD64 CPUs. Are you interested in another platform? [Open an issue](https://github.com/tangramxyz/tangram/issues/new) or send us an email at [help@tangram.xyz](mailto:help@tangram.xyz).
+Tangram for Python is currently supported on Linux, macOS, and Windows with ARM64 and AMD64 CPUs. Are you interested in another platform? [Open an issue](https://github.com/tangramxyz/tangram/issues/new) or send us an email at [help@tangram.xyz](mailto:help@tangram.xyz).
 
 ## Examples
 

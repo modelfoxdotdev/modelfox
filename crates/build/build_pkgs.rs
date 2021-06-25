@@ -23,29 +23,15 @@ pub fn run(args: Args) {
 
 	// Retrieve the keys from the password store.
 	let alpine_public_key = cmd!("pass", "tangram/keys/alpine.public.rsa")
-		.run()
-		.unwrap()
-		.stdout;
+		.read()
+		.unwrap();
 	let alpine_private_key = cmd!("pass", "tangram/keys/alpine.public.rsa")
-		.run()
-		.unwrap()
-		.stdout;
-	let deb_public_key = cmd!("pass", "tangram/keys/deb.public.gpg")
-		.run()
-		.unwrap()
-		.stdout;
-	let deb_private_key = cmd!("pass", "tangram/keys/deb.private.gpg")
-		.run()
-		.unwrap()
-		.stdout;
-	let rpm_public_key = cmd!("pass", "tangram/keys/rpm.public.gpg")
-		.run()
-		.unwrap()
-		.stdout;
-	let rpm_private_key = cmd!("pass", "tangram/keys/rpm.private.gpg")
-		.run()
-		.unwrap()
-		.stdout;
+		.read()
+		.unwrap();
+	let deb_public_key = cmd!("pass", "tangram/keys/deb.public.gpg").read().unwrap();
+	let deb_private_key = cmd!("pass", "tangram/keys/deb.private.gpg").read().unwrap();
+	let rpm_public_key = cmd!("pass", "tangram/keys/rpm.public.gpg").read().unwrap();
+	let rpm_private_key = cmd!("pass", "tangram/keys/rpm.private.gpg").read().unwrap();
 
 	let alpine_public_key_path = tempfile::NamedTempFile::new().unwrap().into_temp_path();
 	std::fs::write(&alpine_public_key_path, alpine_public_key).unwrap();
@@ -250,24 +236,24 @@ fn deb(
 			std::fs::copy(deb_public_key_path, public_key_path).unwrap();
 		}
 		let pool_path = repo_path.join("pool");
-		std::fs::create_dir(&pool_path).unwrap();
+		std::fs::create_dir_all(&pool_path).unwrap();
 		// Copy all the .debs into the pool.
 		for deb in debs.iter() {
 			std::fs::copy(&deb.path, pool_path.join(&deb.path.file_name().unwrap())).unwrap();
 		}
 		let dists_path = repo_path.join("dists");
-		std::fs::create_dir(&dists_path).unwrap();
+		std::fs::create_dir_all(&dists_path).unwrap();
 		for distribution_version in distribution_versions {
 			let distribution_path = dists_path.join(distribution_version);
-			std::fs::create_dir(&distribution_path).unwrap();
+			std::fs::create_dir_all(&distribution_path).unwrap();
 			let mut md5_lines = Vec::new();
 			let mut sha1_lines = Vec::new();
 			let mut sha256_lines = Vec::new();
 			for arch in &archs {
 				let component_path = distribution_path.join("main");
-				std::fs::create_dir(&component_path).unwrap();
+				std::fs::create_dir_all(&component_path).unwrap();
 				let binary_arch_path = component_path.join(format!("binary-{}", arch));
-				std::fs::create_dir(&binary_arch_path).unwrap();
+				std::fs::create_dir_all(&binary_arch_path).unwrap();
 				let packages_path = binary_arch_path.join("Packages");
 				let mut packages_file = String::new();
 				for deb in debs.iter() {
@@ -438,7 +424,7 @@ fn rpm(
 		for target in targets {
 			// Create the target dir.
 			let repo_target_path = repo_path.join(target);
-			std::fs::create_dir(&repo_target_path).unwrap();
+			std::fs::create_dir_all(&repo_target_path).unwrap();
 			// Copy the .rpm.
 			for rpm in rpms.iter() {
 				if rpm.target == target {

@@ -35,7 +35,9 @@ For more information, [read the docs](https://www.tangram.xyz/docs).
 Tangram for Go is currently supported on the following combinations of `$GOARCH` and `$GOOS`:
 
 - `amd64` `linux`
+- `arm64` `linux`
 - `amd64` `darwin`
+- `arm64` `darwin`
 - `amd64` `windows`
 
 Are you interested in another platform? [Open an issue](https://github.com/tangramxyz/tangram/issues/new) or send us an email at [help@tangram.xyz](mailto:help@tangram.xyz).
