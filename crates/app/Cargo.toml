@@ -69,6 +69,7 @@ default = [
 ]
 
 [dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
 backtrace = "0.3"
 base64 = "0.13"
 chrono = { version = "0.4", features = ["serde"] }
@@ -95,7 +96,6 @@ tangram_app_layouts = { path = "layouts" }
 tangram_app_migrations = { path = "migrations" }
 tangram_charts = { path = "../charts" }
 tangram_core = { path = "../core" }
-anyhow = { version = "1", features = ["backtrace"] }
 tangram_id = { path = "../id" }
 tangram_metrics = { path = "../metrics" }
 tangram_model = { path = "../model" }
@@ -143,7 +143,6 @@ tangram_app_training_stats_index_server = { path = "pages/repos/_/models/_/train
 tangram_app_tuning_server = { path = "pages/repos/_/models/_/tuning/server", optional = true }
 tangram_app_user_server = { path = "pages/user/server", optional = true }
 
-[target.wasm32-unknown-unknown.dependencies]
 tangram_app_model_index_client = { path = "pages/repos/_/models/_/index/client", optional = true }
 tangram_app_new_model_client = { path = "pages/repos/_/models/new/client", optional = true }
 tangram_app_playground_client = { path = "pages/repos/_/models/_/playground/client", optional = true }

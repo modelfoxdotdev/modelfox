@@ -15,18 +15,15 @@ path = "dev.rs"
 
 [features]
 default = [
-  "tangram_www_index_server",
-  "tangram_www_index_client",
-  "tangram_www_docs_install_server",
-  "tangram_www_benchmarks_server",
   "tangram_www_benchmarks_client",
-  "tangram_www_blog_post_server",
+  "tangram_www_benchmarks_server",
   "tangram_www_blog_index_server",
+  "tangram_www_blog_post_server",
   "tangram_www_docs_getting_started_index_server",
-  "tangram_www_docs_getting_started_inspect_server",
   "tangram_www_docs_getting_started_inspect_client",
-  "tangram_www_docs_getting_started_monitor_server",
+  "tangram_www_docs_getting_started_inspect_server",
   "tangram_www_docs_getting_started_monitor_client",
+  "tangram_www_docs_getting_started_monitor_server",
   "tangram_www_docs_getting_started_predict_elixir_server",
   "tangram_www_docs_getting_started_predict_go_server",
   "tangram_www_docs_getting_started_predict_index_server",
@@ -36,8 +33,8 @@ default = [
   "tangram_www_docs_getting_started_predict_rust_server",
   "tangram_www_docs_getting_started_train_server",
   "tangram_www_docs_guide_server",
-  "tangram_www_docs_index_server",
   "tangram_www_docs_install_server",
+  "tangram_www_index_client",
   "tangram_www_index_server",
   "tangram_www_pricing_server"
 ]
@@ -47,6 +44,7 @@ anyhow = { version = "1", features = ["backtrace"] }
 sunfish = "0.2"
 
 [dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
 clap = { version = "3.0.0-beta.2", features = ["color"] }
 futures = "0.3"
 http = "0.2"
@@ -54,7 +52,6 @@ hyper = { version = "0.14", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sunfish = "0.2"
-anyhow = { version = "1", features = ["backtrace"] }
 tangram_id = { path = "../id" }
 tangram_www_content = { path = "content" }
 tokio = { version = "1", features = ["full"] }
@@ -84,8 +81,7 @@ tangram_www_docs_install_server = { path = "pages/docs/install/server" , optiona
 tangram_www_index_server = { path = "pages/index/server" , optional = true}
 tangram_www_pricing_server = { path = "pages/pricing/server" , optional = true}
 
-[target.wasm32-unknown-unknown.dependencies]
 tangram_www_benchmarks_client = { path = "pages/benchmarks/client", optional = true }
-tangram_www_index_client = { path = "pages/index/client", optional = true}
 tangram_www_docs_getting_started_inspect_client = {path = "pages/docs/getting_started/inspect/client", optional = true}
 tangram_www_docs_getting_started_monitor_client = {path = "pages/docs/getting_started/monitor/client", optional = true}
+tangram_www_index_client = { path = "pages/index/client", optional = true}
