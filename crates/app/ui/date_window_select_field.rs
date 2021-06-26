@@ -2,9 +2,14 @@ use crate::date_window::DateWindow;
 use pinwheel::prelude::*;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct DateWindowSelectField {
 	pub date_window: DateWindow,
+}
+
+impl DateWindowSelectField {
+	pub fn new(date_window: DateWindow) -> DateWindowSelectField {
+		DateWindowSelectField { date_window }
+	}
 }
 
 impl Component for DateWindowSelectField {

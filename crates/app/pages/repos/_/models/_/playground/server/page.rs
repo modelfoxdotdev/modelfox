@@ -17,7 +17,6 @@ use tangram_charts::{
 use tangram_core::predict::PredictInputValue;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub model_layout_info: ModelLayoutInfo,
 	pub inner: Inner,
@@ -28,7 +27,6 @@ pub enum Inner {
 	Output(PredictOutput),
 }
 
-#[derive(ComponentBuilder)]
 pub struct Form {
 	pub fields: Vec<Field>,
 }
@@ -101,7 +99,6 @@ impl Component for Form {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct UnknownField {
 	pub name: String,
 	pub value: FieldValue,
@@ -126,7 +123,6 @@ impl Component for UnknownField {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct NumberField {
 	pub name: String,
 	pub max: f32,
@@ -181,7 +177,6 @@ impl Component for NumberField {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct EnumField {
 	pub name: String,
 	pub options: Vec<String>,
@@ -244,7 +239,6 @@ impl Component for EnumField {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct TextField {
 	pub name: String,
 	pub value: FieldValue,

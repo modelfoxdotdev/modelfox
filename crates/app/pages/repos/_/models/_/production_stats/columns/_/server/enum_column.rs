@@ -12,7 +12,6 @@ use tangram_charts::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct EnumColumn {
 	pub alert: Option<String>,
 	pub counts_section: EnumColumnCountsSection,
@@ -43,7 +42,6 @@ impl Component for EnumColumn {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct EnumColumnStatsSection {
 	pub overall_chart_data: Vec<(String, EnumColumnOverallHistogramEntry)>,
 	pub column_name: String,
@@ -103,7 +101,6 @@ impl Component for EnumColumnStatsSection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct EnumColumnCountsSection {
 	pub absent_count: u64,
 	pub invalid_count: u64,
@@ -129,7 +126,6 @@ impl Component for EnumColumnCountsSection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct EnumColumnUniqueValuesSection {
 	pub enum_unique_values_table: EnumUniqueValuesTable,
 }
@@ -138,14 +134,13 @@ impl Component for EnumColumnUniqueValuesSection {
 	fn into_node(self) -> Node {
 		ui::S2::new()
 			.child(ui::H2::new().child("Unique Values"))
-			.child(EnumUniqueValuesTable::new(
-				self.enum_unique_values_table.rows,
-			))
+			.child(EnumUniqueValuesTable {
+				rows: self.enum_unique_values_table.rows,
+			})
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct EnumUniqueValuesTable {
 	pub rows: Vec<EnumUniqueValuesTableRow>,
 }
@@ -187,7 +182,6 @@ impl Component for EnumUniqueValuesTable {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct EnumColumnInvalidValuesSection {
 	pub enum_invalid_values_table: Option<EnumInvalidValuesTable>,
 }
@@ -207,7 +201,6 @@ impl Component for EnumColumnInvalidValuesSection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct EnumInvalidValuesTable {
 	pub rows: Vec<EnumInvalidValuesTableRow>,
 }

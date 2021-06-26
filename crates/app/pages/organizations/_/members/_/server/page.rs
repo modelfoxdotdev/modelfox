@@ -5,12 +5,11 @@ use tangram_app_layouts::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub app_layout_info: AppLayoutInfo,
-	pub member_email: String,
-	pub is_admin: bool,
 	pub can_delete: bool,
+	pub is_admin: bool,
+	pub member_email: String,
 	pub remove_button_text: String,
 }
 
@@ -38,7 +37,9 @@ impl Component for Page {
 								),
 						)
 						.child(if self.can_delete {
-							Some(DangerZone::new(self.remove_button_text))
+							Some(DangerZone {
+								remove_button_text: self.remove_button_text,
+							})
 						} else {
 							None
 						}),
@@ -48,7 +49,6 @@ impl Component for Page {
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct DangerZone {
 	remove_button_text: String,
 }

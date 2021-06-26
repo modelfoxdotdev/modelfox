@@ -29,7 +29,6 @@ pub struct ClassifierChartEntry {
 	pub histogram: ProductionTrainingHistogram,
 }
 
-#[derive(ComponentBuilder)]
 pub struct ClassificationProductionStatsIntervalChart {
 	pub chart_data: Vec<ClassifierChartEntry>,
 	pub date_window_interval: DateWindowInterval,
@@ -87,7 +86,6 @@ impl Component for ClassificationProductionStatsIntervalChart {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ClassificationProductionStatsChart {
 	pub chart_data: ClassifierChartEntry,
 	pub date_window: DateWindow,
@@ -140,7 +138,6 @@ impl Component for ClassificationProductionStatsChart {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct PredictionCountChart {
 	pub chart_data: Vec<PredictionCountChartEntry>,
 	pub date_window_interval: DateWindowInterval,
@@ -177,7 +174,6 @@ impl Component for PredictionCountChart {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ColumnStatsTable {
 	pub rows: Vec<ColumnStatsTableRow>,
 }
@@ -231,7 +227,6 @@ impl Component for ColumnStatsTable {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct DateWindowSelectForm {
 	pub date_window: DateWindow,
 }

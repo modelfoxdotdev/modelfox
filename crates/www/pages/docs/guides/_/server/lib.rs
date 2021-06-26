@@ -19,7 +19,7 @@ pub fn init() -> sunfish::Page {
 			} else {
 				panic!()
 			};
-			html(self::page::Page::new(slug))
+			html(self::page::Page::new(slug.to_owned()))
 		},
 	)
 }

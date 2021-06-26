@@ -13,7 +13,6 @@ use tangram_charts::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Regressor {
 	pub date_window: DateWindow,
 	pub date_window_interval: DateWindowInterval,
@@ -27,27 +26,28 @@ impl Component for Regressor {
 	fn into_node(self) -> Node {
 		ui::S1::new()
 			.child(ui::H1::new().child("Production Stats"))
-			.child(DateWindowSelectForm::new(self.date_window))
+			.child(DateWindowSelectForm {
+				date_window: self.date_window,
+			})
 			.child(
-				ui::Card::new().child(RegressionProductionStatsIntervalChart::new(
-					self.prediction_stats_interval_chart,
-					self.date_window_interval,
-				)),
+				ui::Card::new().child(RegressionProductionStatsIntervalChart {
+					chart_data: self.prediction_stats_interval_chart,
+					date_window_interval: self.date_window_interval,
+				}),
 			)
-			.child(ui::Card::new().child(PredictionCountChart::new(
-				self.prediction_count_chart,
-				self.date_window_interval,
-			)))
-			.child(ui::Card::new().child(RegressionProductionStatsChart::new(
-				self.prediction_stats_chart,
-				self.date_window,
-			)))
+			.child(ui::Card::new().child(PredictionCountChart {
+				chart_data: self.prediction_count_chart,
+				date_window_interval: self.date_window_interval,
+			}))
+			.child(ui::Card::new().child(RegressionProductionStatsChart {
+				chart_data: self.prediction_stats_chart,
+				date_window: self.date_window,
+			}))
 			.child(self.overall_column_stats_table)
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct RegressionProductionStatsChart {
 	pub chart_data: RegressorChartEntry,
 	pub date_window: DateWindow,
@@ -121,7 +121,6 @@ impl Component for RegressionProductionStatsChart {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct RegressionProductionStatsIntervalChart {
 	pub chart_data: Vec<RegressorChartEntry>,
 	pub date_window_interval: DateWindowInterval,

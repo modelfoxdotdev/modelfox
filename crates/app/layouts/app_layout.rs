@@ -21,7 +21,7 @@ impl Component for AppLayout {
 		});
 		div()
 			.class("app-layout-topbar-grid")
-			.child(Topbar::new(topbar_avatar))
+			.child(Topbar::new().topbar_avatar(topbar_avatar))
 			.child(div().class("app-layout").child(self.children))
 			.into_node()
 	}

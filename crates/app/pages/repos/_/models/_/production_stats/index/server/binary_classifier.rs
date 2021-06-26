@@ -7,7 +7,6 @@ use pinwheel::prelude::*;
 use tangram_app_ui::date_window::{DateWindow, DateWindowInterval};
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct BinaryClassifier {
 	pub date_window: DateWindow,
 	pub date_window_interval: DateWindowInterval,
@@ -21,23 +20,23 @@ impl Component for BinaryClassifier {
 	fn into_node(self) -> Node {
 		ui::S1::new()
 			.child(ui::H1::new().child("Production Stats"))
-			.child(DateWindowSelectForm::new(self.date_window))
+			.child(DateWindowSelectForm {
+				date_window: self.date_window,
+			})
 			.child(
-				ui::Card::new().child(ClassificationProductionStatsIntervalChart::new(
-					self.prediction_stats_interval_chart,
-					self.date_window_interval,
-				)),
+				ui::Card::new().child(ClassificationProductionStatsIntervalChart {
+					chart_data: self.prediction_stats_interval_chart,
+					date_window_interval: self.date_window_interval,
+				}),
 			)
-			.child(ui::Card::new().child(PredictionCountChart::new(
-				self.prediction_count_chart,
-				self.date_window_interval,
-			)))
-			.child(
-				ui::Card::new().child(ClassificationProductionStatsChart::new(
-					self.prediction_stats_chart,
-					self.date_window,
-				)),
-			)
+			.child(ui::Card::new().child(PredictionCountChart {
+				chart_data: self.prediction_count_chart,
+				date_window_interval: self.date_window_interval,
+			}))
+			.child(ui::Card::new().child(ClassificationProductionStatsChart {
+				chart_data: self.prediction_stats_chart,
+				date_window: self.date_window,
+			}))
 			.child(self.overall_column_stats_table)
 			.into_node()
 	}

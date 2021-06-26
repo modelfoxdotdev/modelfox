@@ -5,7 +5,6 @@ use tangram_app_layouts::{
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub inner: Inner,
 	pub model_layout_info: ModelLayoutInfo,

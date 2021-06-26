@@ -3,7 +3,6 @@ use tangram_app_ui::colors::{BASELINE_COLOR, TRAINING_COLOR};
 use tangram_ui as ui;
 use tangram_zip::zip;
 
-#[derive(ComponentBuilder)]
 pub struct MulticlassClassifier {
 	pub warning: Option<String>,
 	pub accuracy: f32,

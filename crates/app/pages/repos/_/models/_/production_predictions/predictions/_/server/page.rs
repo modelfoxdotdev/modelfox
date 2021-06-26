@@ -59,13 +59,15 @@ pub struct Found {
 impl Component for Found {
 	fn into_node(self) -> Node {
 		fragment()
-			.child(PredictionTable::new(self.identifier, self.date))
+			.child(PredictionTable {
+				identifier: self.identifier,
+				date: self.date,
+			})
 			.child(self.predict_output)
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct PredictionTable {
 	pub date: String,
 	pub identifier: String,

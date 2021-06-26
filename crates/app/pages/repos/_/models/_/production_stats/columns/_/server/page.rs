@@ -7,7 +7,6 @@ use tangram_app_layouts::{
 use tangram_app_ui::{date_window::DateWindow, date_window_select_field::DateWindowSelectField};
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub column_name: String,
 	pub date_window: DateWindow,
@@ -61,7 +60,9 @@ impl Component for Page {
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
 						.child(ui::H1::new().child(self.column_name))
-						.child(DateWindowSelectForm::new(self.date_window))
+						.child(DateWindowSelectForm {
+							date_window: self.date_window,
+						})
 						.child(inner),
 				),
 			)
@@ -69,7 +70,6 @@ impl Component for Page {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct DateWindowSelectForm {
 	date_window: DateWindow,
 }

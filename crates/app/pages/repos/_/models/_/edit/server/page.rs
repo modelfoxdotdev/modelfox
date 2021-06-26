@@ -7,13 +7,12 @@ use tangram_app_ui::page_heading::PageHeading;
 use tangram_id::Id;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub app_layout_info: AppLayoutInfo,
-	pub model_id: Id,
-	pub model_heading: String,
-	pub tag: Option<String>,
 	pub created_at: String,
+	pub model_heading: String,
+	pub model_id: Id,
+	pub tag: Option<String>,
 }
 
 impl Component for Page {
@@ -23,8 +22,11 @@ impl Component for Page {
 				AppLayout::new(self.app_layout_info).child(
 					ui::S1::new()
 						.child(PageHeading::new().child(ui::H1::new().child(self.model_heading)))
-						.child(ModelInfoTable::new(self.model_id, self.created_at))
-						.child(UpdateTagForm::new(self.tag))
+						.child(ModelInfoTable {
+							model_id: self.model_id,
+							created_at: self.created_at,
+						})
+						.child(UpdateTagForm { tag: self.tag })
 						.child(DangerZone),
 				),
 			)
@@ -32,7 +34,6 @@ impl Component for Page {
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct ModelInfoTable {
 	model_id: Id,
 	created_at: String,
@@ -58,7 +59,6 @@ impl Component for ModelInfoTable {
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct UpdateTagForm {
 	tag: Option<String>,
 }

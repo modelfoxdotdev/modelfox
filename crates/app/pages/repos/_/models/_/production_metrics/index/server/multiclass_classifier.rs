@@ -18,7 +18,6 @@ use tangram_charts::{
 use tangram_finite::Finite;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct MulticlassClassifierProductionMetrics {
 	pub date_window: DateWindow,
 	pub date_window_interval: DateWindowInterval,
@@ -30,7 +29,7 @@ pub struct MulticlassClassifierProductionMetrics {
 
 pub struct MulticlassClassificationOverallProductionMetrics {
 	pub accuracy: TrainingProductionMetrics,
-	pub class_metrics_table: Vec<ClassMetricsTableEntry>,
+	pub class_metrics_table_rows: Vec<ClassMetricsTableEntry>,
 	pub true_values_count: u64,
 }
 
@@ -151,12 +150,13 @@ impl Component for MulticlassClassifierProductionMetrics {
 						)),
 					),
 			)
-			.child(ClassMetricsTable::new(self.overall.class_metrics_table))
+			.child(ClassMetricsTable {
+				rows: self.overall.class_metrics_table_rows,
+			})
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ClassMetricsTable {
 	rows: Vec<ClassMetricsTableEntry>,
 }

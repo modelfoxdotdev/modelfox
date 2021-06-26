@@ -1,9 +1,10 @@
-use crate::logo::{Logo, LogoScheme};
+use crate::logo::{Logo, LogoColorScheme};
 use pinwheel::prelude::*;
 use tangram_ui as ui;
 
 #[derive(ComponentBuilder)]
 pub struct Topbar {
+	#[optional]
 	pub topbar_avatar: Option<TopbarAvatar>,
 }
 
@@ -28,7 +29,7 @@ impl Component for Topbar {
 		} else {
 			None
 		};
-		let logo = Some(Logo::new(LogoScheme::Multi).into_node());
+		let logo = Some(Logo::new().color_scheme(LogoColorScheme::Multi).into_node());
 		ui::Topbar::new()
 			.background_color(ui::colors::HEADER.to_owned())
 			.dropdown_background_color(ui::colors::SURFACE.to_owned())

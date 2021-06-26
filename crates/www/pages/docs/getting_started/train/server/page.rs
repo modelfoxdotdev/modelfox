@@ -7,7 +7,6 @@ use tangram_www_layouts::{
 	document::Document,
 };
 
-#[derive(ComponentBuilder)]
 pub struct Page;
 
 impl Component for Page {

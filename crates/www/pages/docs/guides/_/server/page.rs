@@ -6,9 +6,14 @@ use tangram_www_layouts::{
 	document::Document,
 };
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub slug: String,
+}
+
+impl Page {
+	pub fn new(slug: String) -> Page {
+		Page { slug }
+	}
 }
 
 impl Component for Page {

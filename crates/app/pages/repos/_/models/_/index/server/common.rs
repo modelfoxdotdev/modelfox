@@ -6,7 +6,6 @@ use tangram_charts::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct TrainingSummarySection {
 	pub chosen_model_type_name: String,
 	pub column_count: usize,
@@ -39,7 +38,6 @@ impl Component for TrainingSummarySection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct FeatureImportancesSection {
 	pub n_columns: usize,
 	pub n_features: usize,
@@ -60,17 +58,16 @@ impl Component for FeatureImportancesSection {
 		ui::S2::new()
 			.child(ui::H2::new().child("Feature Importances"))
 			.child(ui::P::new().child(description))
-			.child(FeatureImportancesChart::new(
-				self.feature_importances_chart_values,
-			))
-			.child(FeatureImportancesTable::new(
-				self.feature_importances_table_rows,
-			))
+			.child(FeatureImportancesChart {
+				values: self.feature_importances_chart_values,
+			})
+			.child(FeatureImportancesTable {
+				rows: self.feature_importances_table_rows,
+			})
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct FeatureImportancesChart {
 	values: Vec<FeatureImportance>,
 }
@@ -114,7 +111,6 @@ impl Component for FeatureImportancesChart {
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct FeatureImportancesTable {
 	rows: Vec<FeatureImportance>,
 }

@@ -5,7 +5,6 @@ use tangram_app_layouts::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub app_layout_info: AppLayoutInfo,
 	pub inner: Inner,
@@ -16,14 +15,12 @@ pub enum Inner {
 	NoAuth(NoAuth),
 }
 
-#[derive(ComponentBuilder)]
 pub struct Auth {
 	pub details_section: DetailsSection,
 	pub organizations_section: OrganizationsSection,
 	pub repos_section: ReposSection,
 }
 
-#[derive(ComponentBuilder)]
 pub struct NoAuth {
 	pub repos_section: ReposSection,
 }
@@ -89,7 +86,6 @@ impl Component for Header {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct DetailsSection {
 	pub email: String,
 }
@@ -109,7 +105,6 @@ impl Component for DetailsSection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ReposSection {
 	pub repos_table: Option<ReposTable>,
 }
@@ -139,7 +134,6 @@ impl Component for ReposSection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ReposTable {
 	pub rows: Vec<ReposTableRow>,
 }
@@ -172,7 +166,6 @@ impl Component for ReposTable {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct OrganizationsSection {
 	pub organizations_table: Option<OrganizationsTable>,
 }
@@ -202,7 +195,6 @@ impl Component for OrganizationsSection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct OrganizationsTable {
 	pub rows: Vec<OrganizationsTableRow>,
 }

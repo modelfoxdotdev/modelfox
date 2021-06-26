@@ -121,7 +121,6 @@ impl Component for BinaryClassifier {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ConfusionMatrixSection {
 	pub class: String,
 	pub false_negatives: u64,

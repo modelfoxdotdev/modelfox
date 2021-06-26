@@ -10,7 +10,6 @@ use tangram_app_ui::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub model_layout_info: ModelLayoutInfo,
 	pub target_column_stats_table: TargetColumnStatsTable,
@@ -65,7 +64,6 @@ impl Component for Page {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct TargetColumnStatsTable {
 	pub target_column_stats_table_row: ColumnStatsTableRow,
 }
@@ -123,9 +121,9 @@ impl Component for TargetColumnStatsTable {
 						.child(self.target_column_stats_table_row.name),
 				),
 			)
-			.child(ui::TableCell::new().child(ColumnTypeToken::new(
-				self.target_column_stats_table_row.column_type,
-			)))
+			.child(ui::TableCell::new().child(ColumnTypeToken {
+				column_type: self.target_column_stats_table_row.column_type,
+			}))
 			.child(
 				ui::TableCell::new().child(
 					self.target_column_stats_table_row
@@ -142,7 +140,6 @@ impl Component for TargetColumnStatsTable {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ColumnStatsTable {
 	pub column_stats_table_rows: Vec<ColumnStatsTableRow>,
 }
@@ -170,7 +167,9 @@ impl Component for ColumnStatsTable {
 			};
 			ui::TableRow::new()
 				.child(ui::TableCell::new().child(link))
-				.child(ui::TableCell::new().child(ColumnTypeToken::new(column_stats.column_type)))
+				.child(ui::TableCell::new().child(ColumnTypeToken {
+					column_type: column_stats.column_type,
+				}))
 				.child(
 					ui::TableCell::new().child(
 						column_stats
@@ -198,7 +197,6 @@ impl Component for ColumnStatsTable {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ColumnTypeToken {
 	column_type: ColumnType,
 }

@@ -13,7 +13,6 @@ use tangram_charts::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct PredictOutput {
 	pub inner: PredictOutputInner,
 	pub input_table: InputTable,
@@ -43,7 +42,6 @@ impl Component for PredictOutput {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct InputTable {
 	pub rows: Vec<InputTableRow>,
 }
@@ -78,7 +76,9 @@ impl Component for InputTable {
 				ui::TableBody::new().children(self.rows.into_iter().map(|row| {
 					ui::TableRow::new()
 						.child(ui::TableCell::new().child(row.column_name.to_owned()))
-						.child(ui::TableCell::new().child(ColumnTypeToken::new(row.column_type)))
+						.child(ui::TableCell::new().child(ColumnTypeToken {
+							column_type: row.column_type,
+						}))
 						.child(ui::TableCell::new().child(row.value))
 				})),
 			)
@@ -86,7 +86,6 @@ impl Component for InputTable {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ColumnTypeToken {
 	column_type: InputTableColumnType,
 }
@@ -174,10 +173,9 @@ pub fn compute_input_table(
 			}
 		})
 		.collect::<Vec<_>>();
-	InputTable::new(rows)
+	InputTable { rows }
 }
 
-#[derive(ComponentBuilder)]
 pub struct RegressionPredictOutput {
 	pub feature_contributions_chart_series: FeatureContributionsChartSeries,
 	pub value: f32,
@@ -212,7 +210,6 @@ impl Component for RegressionPredictOutput {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct BinaryClassificationPredictOutput {
 	pub class_name: String,
 	pub feature_contributions_chart_series: FeatureContributionsChartSeries,
@@ -254,7 +251,6 @@ impl Component for BinaryClassificationPredictOutput {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct MulticlassClassificationPredictOutput {
 	pub class_name: String,
 	pub feature_contributions_chart_series: Vec<FeatureContributionsChartSeries>,

@@ -3,9 +3,14 @@ use tangram_ui as ui;
 use tangram_www_content::{BlogPost, Content};
 use tangram_www_layouts::{document::Document, page_layout::PageLayout};
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	slug: String,
+}
+
+impl Page {
+	pub fn new(slug: String) -> Page {
+		Page { slug }
+	}
 }
 
 impl Component for Page {

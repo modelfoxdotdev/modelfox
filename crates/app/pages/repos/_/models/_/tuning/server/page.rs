@@ -6,7 +6,6 @@ use tangram_app_layouts::{
 use tangram_app_tuning_common::Tuning;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub model_layout_info: ModelLayoutInfo,
 	pub tuning: Option<Tuning>,

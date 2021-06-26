@@ -46,9 +46,14 @@ impl Component for TextColumnToken {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ColumnTypeToken {
 	column_type: ColumnType,
+}
+
+impl ColumnTypeToken {
+	pub fn new(column_type: ColumnType) -> ColumnTypeToken {
+		ColumnTypeToken { column_type }
+	}
 }
 
 impl Component for ColumnTypeToken {

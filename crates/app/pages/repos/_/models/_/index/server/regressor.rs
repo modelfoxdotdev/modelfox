@@ -9,7 +9,6 @@ use tangram_charts::{
 use tangram_finite::Finite;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Regressor {
 	pub id: String,
 	pub warning: Option<String>,
@@ -34,7 +33,6 @@ impl Component for Regressor {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct RegressorMetricsSection {
 	pub baseline_mse: f32,
 	pub baseline_rmse: f32,

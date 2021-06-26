@@ -10,7 +10,6 @@ use tangram_charts::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct TextColumn {
 	pub alert: Option<String>,
 	pub text_column_counts_section: TextColumnCountsSection,
@@ -32,7 +31,6 @@ impl Component for TextColumn {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct TextColumnStatsSection {
 	pub column_name: String,
 	pub date_window: DateWindow,
@@ -75,7 +73,6 @@ impl Component for TextColumnStatsSection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct TextColumnCountsSection {
 	pub absent_count: u64,
 	pub invalid_count: u64,
@@ -104,7 +101,6 @@ impl Component for TextColumnCountsSection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct TextColumnTokensSection {
 	pub text_ngrams_table: TextNGramsTable,
 }
@@ -127,7 +123,6 @@ impl Component for TextColumnTokensSection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct TextNGramsTable {
 	pub rows: Vec<TextNGramsTableRow>,
 }

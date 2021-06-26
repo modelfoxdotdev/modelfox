@@ -8,7 +8,6 @@ use crate::{
 	production_stats::ProductionStats, train::Train, tuning::Tuning,
 };
 
-#[derive(ComponentBuilder)]
 pub struct Page;
 
 impl Component for Page {

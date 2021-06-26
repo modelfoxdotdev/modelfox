@@ -5,7 +5,6 @@ use tangram_app_layouts::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub id: String,
 	pub model_layout_info: ModelLayoutInfo,
@@ -36,25 +35,27 @@ impl Component for Page {
 						.child(
 							ui::S2::new()
 								.child(ui::H2::new().child("Best Model Metrics"))
-								.child(WinningModelMetricsTable::new(
-									self.best_model_metrics,
-									self.model_comparison_metric_name.clone(),
-								)),
+								.child(WinningModelMetricsTable {
+									best_model: self.best_model_metrics,
+									model_comparison_metric_name: self
+										.model_comparison_metric_name
+										.clone(),
+								}),
 						)
 						.child(
 							ui::S2::new()
 								.child(ui::H2::new().child("Best Model Hyperparameters"))
-								.child(ModelHyperparametersTable::new(
-									self.best_model_hyperparameters,
-								)),
+								.child(ModelHyperparametersTable {
+									hyperparameters: self.best_model_hyperparameters,
+								}),
 						)
 						.child(
 							ui::S2::new()
 								.child(ui::H2::new().child("All Models"))
-								.child(AllTrainedModelsMetricsTable::new(
-									self.trained_models_metrics,
-									self.model_comparison_metric_name,
-								)),
+								.child(AllTrainedModelsMetricsTable {
+									trained_models: self.trained_models_metrics,
+									model_comparison_metric_name: self.model_comparison_metric_name,
+								}),
 						),
 				),
 			)
@@ -62,7 +63,6 @@ impl Component for Page {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct WinningModelMetricsTable {
 	best_model: TrainedModel,
 	model_comparison_metric_name: String,
@@ -94,7 +94,6 @@ impl Component for WinningModelMetricsTable {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct AllTrainedModelsMetricsTable {
 	trained_models: Vec<TrainedModel>,
 	model_comparison_metric_name: String,
@@ -132,7 +131,6 @@ impl Component for AllTrainedModelsMetricsTable {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ModelHyperparametersTable {
 	hyperparameters: Vec<(String, String)>,
 }

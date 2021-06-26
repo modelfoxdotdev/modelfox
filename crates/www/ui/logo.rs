@@ -3,15 +3,18 @@ use tangram_ui as ui;
 
 #[derive(ComponentBuilder)]
 pub struct Logo {
+	#[optional]
+	pub color_scheme: Option<LogoColorScheme>,
+	#[optional]
 	pub class: Option<String>,
+	#[optional]
 	pub color: Option<String>,
-	pub color_scheme: LogoScheme,
 }
 
 #[derive(PartialEq)]
-pub enum LogoScheme {
-	Multi,
+pub enum LogoColorScheme {
 	Solid,
+	Multi,
 }
 
 impl Component for Logo {
@@ -25,8 +28,21 @@ impl Component for Logo {
 			large_triangle1: String,
 			large_triangle2: String,
 		}
-		let shapes_colors = if self.color_scheme == LogoScheme::Multi {
-			ShapesColors {
+		let color_scheme = self.color_scheme.unwrap_or(LogoColorScheme::Solid);
+		let shapes_colors = match color_scheme {
+			LogoColorScheme::Solid => {
+				let color = self.color.unwrap_or_else(|| ui::colors::ACCENT.to_owned());
+				ShapesColors {
+					trapezoid: color.clone(),
+					square: color.clone(),
+					medium_triangle: color.clone(),
+					small_triangle1: color.clone(),
+					small_triangle2: color.clone(),
+					large_triangle1: color.clone(),
+					large_triangle2: color,
+				}
+			}
+			LogoColorScheme::Multi => ShapesColors {
 				trapezoid: ui::colors::PINK.to_owned(),
 				square: ui::colors::YELLOW.to_owned(),
 				medium_triangle: ui::colors::TEAL.to_owned(),
@@ -34,18 +50,7 @@ impl Component for Logo {
 				small_triangle2: ui::colors::INDIGO.to_owned(),
 				large_triangle1: ui::colors::BLUE.to_owned(),
 				large_triangle2: ui::colors::GREEN.to_owned(),
-			}
-		} else {
-			let color = self.color.unwrap_or_else(|| ui::colors::ACCENT.to_owned());
-			ShapesColors {
-				trapezoid: color.clone(),
-				square: color.clone(),
-				medium_triangle: color.clone(),
-				small_triangle1: color.clone(),
-				small_triangle2: color.clone(),
-				large_triangle1: color.clone(),
-				large_triangle2: color,
-			}
+			},
 		};
 		svg()
 			.class(self.class)

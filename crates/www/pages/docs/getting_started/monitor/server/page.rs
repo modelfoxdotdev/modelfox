@@ -18,7 +18,6 @@ use tangram_www_layouts::{
 	document::Document,
 };
 
-#[derive(ComponentBuilder)]
 pub struct Page;
 
 impl Component for Page {
@@ -306,13 +305,12 @@ impl Component for ProductionStats {
 				ui::S1::new()
 					.child(ui::H1::new().child("Production Stats"))
 					.child(ui::H2::new().child("Column Stats"))
-					.child(ColumnStatsTable::new(rows)),
+					.child(ColumnStatsTable { rows }),
 			)
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ProductionMetrics;
 
 impl Component for ProductionMetrics {
@@ -335,12 +333,11 @@ impl Component for ProductionMetrics {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ProductionColumnStats;
 
 impl Component for ProductionColumnStats {
 	fn into_node(self) -> Node {
-		let chart_data = vec![
+		let overall_chart_data = vec![
 			(
 				"asymptomatic".to_owned(),
 				EnumColumnOverallHistogramEntry {
@@ -423,17 +420,17 @@ impl Component for ProductionColumnStats {
 				ui::S1::new()
 					.child(ui::Alert::new(ui::Level::Danger).child("High Invalid Values Count"))
 					.child(ui::H1::new().child("chest_pain"))
-					.child(EnumColumnStatsSection::new(
-						chart_data,
-						"chest_pain".to_owned(),
-						DateWindow::ThisMonth,
-					))
-					.child(EnumColumnUniqueValuesSection::new(
-						enum_unique_values_table_props,
-					))
-					.child(EnumColumnInvalidValuesSection::new(
-						enum_invalid_values_table_props,
-					)),
+					.child(EnumColumnStatsSection {
+						overall_chart_data,
+						column_name: "chest_pain".to_owned(),
+						date_window: DateWindow::ThisMonth,
+					})
+					.child(EnumColumnUniqueValuesSection {
+						enum_unique_values_table: enum_unique_values_table_props,
+					})
+					.child(EnumColumnInvalidValuesSection {
+						enum_invalid_values_table: Some(enum_invalid_values_table_props),
+					}),
 			)
 			.into_node()
 	}

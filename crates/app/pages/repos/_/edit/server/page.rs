@@ -6,7 +6,6 @@ use tangram_app_layouts::{
 use tangram_app_ui::page_heading::PageHeading;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub app_layout_info: AppLayoutInfo,
 	pub title: String,
@@ -19,7 +18,7 @@ impl Component for Page {
 				AppLayout::new(self.app_layout_info).child(
 					ui::S1::new()
 						.child(PageHeading::new().child(ui::H1::new().child(self.title.clone())))
-						.child(UpdateTitleForm::new(self.title))
+						.child(UpdateTitleForm { title: self.title })
 						.child(DangerZone),
 				),
 			)
@@ -27,7 +26,6 @@ impl Component for Page {
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct UpdateTitleForm {
 	title: String,
 }

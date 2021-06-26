@@ -2,7 +2,6 @@ use pinwheel::prelude::*;
 use tangram_ui as ui;
 use tangram_www_layouts::{document::Document, page_layout::PageLayout};
 
-#[derive(ComponentBuilder)]
 pub struct Page;
 
 impl Component for Page {
@@ -41,7 +40,6 @@ impl Component for Page {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct PricingCards {
 	pub free_cta: Node,
 	pub free_selected: bool,

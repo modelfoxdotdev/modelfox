@@ -20,13 +20,11 @@ use tangram_charts::{
 use tangram_finite::Finite;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub model_layout_info: ModelLayoutInfo,
 	pub inner: Inner,
 }
 
-#[derive(ComponentBuilder)]
 pub struct Inner {
 	pub class_metrics: Vec<ClassMetricsEntry>,
 	pub class: String,
@@ -136,10 +134,10 @@ impl Component for Inner {
 			.child(
 				ui::Form::new()
 					.child(DateWindowSelectField::new(self.date_window))
-					.child(ClassSelectField::new(
-						self.class.clone(),
-						self.classes.clone(),
-					))
+					.child(ClassSelectField {
+						class: self.class.clone(),
+						classes: self.classes.clone(),
+					})
 					.child(
 						noscript().child(
 							ui::Button::new()
@@ -148,25 +146,25 @@ impl Component for Inner {
 						),
 					),
 			)
-			.child(PrecisionRecallSection::new(
-				self.date_window_interval,
+			.child(PrecisionRecallSection {
+				date_window_interval: self.date_window_interval,
 				intervals,
 				overall_training_metrics,
 				overall_production_metrics,
-			))
-			.child(ConfusionMatrixSection::new(
-				self.class.to_owned(),
-				selected_class_overall_metrics.confusion_matrix,
-			))
-			.child(ProductionTrainingSection::new(
-				self.class,
-				selected_class_overall_metrics.confusion_matrix_training_production_comparison,
-			))
+			})
+			.child(ConfusionMatrixSection {
+				class: self.class.to_owned(),
+				confusion_matrix: selected_class_overall_metrics.confusion_matrix,
+			})
+			.child(ProductionTrainingSection {
+				class: self.class,
+				confusion_matrix_training_production_comparison: selected_class_overall_metrics
+					.confusion_matrix_training_production_comparison,
+			})
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct PrecisionRecallSection {
 	date_window_interval: DateWindowInterval,
 	intervals: Vec<IntervalEntry>,
@@ -383,7 +381,6 @@ impl Component for PrecisionRecallSection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct ConfusionMatrixSection {
 	class: String,
 	confusion_matrix: ConfusionMatrix,
@@ -404,7 +401,6 @@ impl Component for ConfusionMatrixSection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 struct ProductionTrainingSection {
 	class: String,
 	confusion_matrix_training_production_comparison: ConfusionMatrixTrainingProductionComparison,

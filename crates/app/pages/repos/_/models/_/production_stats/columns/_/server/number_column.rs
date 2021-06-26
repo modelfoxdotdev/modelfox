@@ -114,7 +114,6 @@ impl Component for NumberColumn {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct NumberColumnCountsSection {
 	pub absent_count: u64,
 	pub invalid_count: u64,
@@ -140,7 +139,6 @@ impl Component for NumberColumnCountsSection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct NumberColumnStatsSection {
 	pub max_comparison: NumberTrainingProductionComparison,
 	pub mean_comparison: NumberTrainingProductionComparison,

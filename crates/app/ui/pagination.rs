@@ -8,7 +8,6 @@ pub struct Pagination {
 	pub last_offset: Option<usize>,
 }
 
-#[derive(ComponentBuilder)]
 pub struct PaginationButtons {
 	pub pagination: Pagination,
 	pub form_action: Option<String>,

@@ -5,7 +5,6 @@ use tangram_app_layouts::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub id: String,
 	pub model_grid_item_identifier: String,
@@ -20,14 +19,15 @@ impl Component for Page {
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
 						.child(ui::H1::new().child("Hyperparameters"))
-						.child(ModelHyperparametersTable::new(self.model_hyperparameters)),
+						.child(ModelHyperparametersTable {
+							hyperparameters: self.model_hyperparameters,
+						}),
 				),
 			)
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ModelHyperparametersTable {
 	hyperparameters: Vec<(String, String)>,
 }

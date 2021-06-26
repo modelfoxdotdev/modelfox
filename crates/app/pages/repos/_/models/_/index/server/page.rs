@@ -9,7 +9,6 @@ use pinwheel::prelude::*;
 use tangram_app_layouts::document::Document;
 use tangram_app_layouts::model_layout::{ModelLayout, ModelLayoutInfo};
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub id: String,
 	pub inner: Inner,

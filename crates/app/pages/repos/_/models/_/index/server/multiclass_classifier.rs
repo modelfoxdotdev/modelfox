@@ -9,7 +9,6 @@ use tangram_charts::{
 use tangram_finite::Finite;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct MulticlassClassifier {
 	pub id: String,
 	pub warning: Option<String>,
@@ -34,7 +33,6 @@ impl Component for MulticlassClassifier {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct MulticlassClassifierMetricsSection {
 	pub accuracy: f32,
 	pub baseline_accuracy: f32,

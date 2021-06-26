@@ -190,7 +190,7 @@ impl Component for ModelLayout {
 			});
 		let topbar = div()
 			.style(style::GRID_AREA, "topbar")
-			.child(Topbar::new(topbar_avatar));
+			.child(Topbar::new().topbar_avatar(topbar_avatar));
 		let top = ModelLayoutTop {
 			model_id: self.info.model_id,
 			model_tag: self.info.model_tag,
@@ -200,11 +200,11 @@ impl Component for ModelLayout {
 			repo_title: self.info.repo_title,
 			selected_model_version_id: selected_model_version_id.to_string(),
 		};
-		let left = div().class("model-layout-left").child(ModelNav::new(
-			self.info.repo_id.to_string(),
-			self.info.model_id.to_string(),
-			self.info.selected_item,
-		));
+		let left = div().class("model-layout-left").child(ModelNav {
+			repo_id: self.info.repo_id.to_string(),
+			model_id: self.info.model_id.to_string(),
+			selected_item: self.info.selected_item,
+		});
 		let center = div().class("model-layout-center").child(self.children);
 		let right = div().class("model-layout-right");
 		div()
@@ -218,7 +218,6 @@ impl Component for ModelLayout {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ModelLayoutTop {
 	pub model_id: Id,
 	pub model_tag: Option<String>,
@@ -307,7 +306,6 @@ impl Component for ModelLayoutTop {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ModelNav {
 	repo_id: String,
 	model_id: String,

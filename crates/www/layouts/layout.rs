@@ -1,7 +1,7 @@
 use crate::footer::Footer;
 use pinwheel::prelude::*;
 use tangram_ui as ui;
-use tangram_www_ui::logo::{Logo, LogoScheme};
+use tangram_www_ui::logo::{Logo, LogoColorScheme};
 
 #[derive(ComponentBuilder)]
 pub struct Layout {
@@ -60,7 +60,9 @@ impl Component for Topbar {
 			.background_color(ui::colors::BACKGROUND.to_owned())
 			.dropdown_background_color(ui::colors::BACKGROUND.to_owned())
 			.items(Some(topbar_items))
-			.logo(Some(Logo::new(None, None, LogoScheme::Multi).into()))
+			.logo(Some(
+				Logo::new().color_scheme(LogoColorScheme::Multi).into(),
+			))
 			.title(Some("tangram".to_owned()))
 			.into_node()
 	}

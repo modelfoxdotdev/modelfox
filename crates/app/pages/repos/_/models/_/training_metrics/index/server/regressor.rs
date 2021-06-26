@@ -2,7 +2,6 @@ use pinwheel::prelude::*;
 use tangram_app_ui::colors::{BASELINE_COLOR, TRAINING_COLOR};
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Regressor {
 	pub warning: Option<String>,
 	pub baseline_mse: f32,

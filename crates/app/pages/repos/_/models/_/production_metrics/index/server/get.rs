@@ -332,7 +332,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 					production: production_accuracy,
 					training: training_metrics.accuracy(),
 				},
-				class_metrics_table,
+				class_metrics_table_rows: class_metrics_table,
 				true_values_count,
 			};
 			Inner::MulticlassClassifier(MulticlassClassifierProductionMetrics {

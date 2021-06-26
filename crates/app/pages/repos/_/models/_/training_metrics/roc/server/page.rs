@@ -11,7 +11,6 @@ use tangram_charts::{
 use tangram_finite::Finite;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub id: String,
 	pub roc_curve_data: Vec<RocCurveData>,

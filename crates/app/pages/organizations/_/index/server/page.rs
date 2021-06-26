@@ -6,7 +6,6 @@ use tangram_app_layouts::{
 use tangram_id::Id;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub app_layout_info: AppLayoutInfo,
 	pub details_section: DetailsSection,
@@ -141,7 +140,6 @@ impl Component for MembersTable {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct MemberDeleteForm {
 	member_id: String,
 }
@@ -172,7 +170,6 @@ impl Component for MemberDeleteForm {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ReposSection {
 	pub repos_table: Option<ReposTable>,
 }
@@ -202,7 +199,6 @@ impl Component for ReposSection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ReposTable {
 	pub rows: Vec<ReposTableRow>,
 }

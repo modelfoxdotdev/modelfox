@@ -10,7 +10,6 @@ use tangram_app_layouts::{
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub model_id: String,
 	pub model_layout_info: ModelLayoutInfo,

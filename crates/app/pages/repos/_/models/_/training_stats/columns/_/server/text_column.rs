@@ -6,7 +6,6 @@ use tangram_charts::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct TextColumn {
 	pub name: String,
 	pub ngram_count: usize,

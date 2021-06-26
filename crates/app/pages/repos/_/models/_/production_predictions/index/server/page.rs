@@ -5,7 +5,6 @@ use tangram_app_layouts::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub model_layout_info: ModelLayoutInfo,
 	pub pagination: Pagination,

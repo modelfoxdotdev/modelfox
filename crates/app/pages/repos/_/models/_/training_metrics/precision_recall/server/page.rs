@@ -11,7 +11,6 @@ use tangram_charts::{
 use tangram_finite::Finite;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub class: String,
 	pub precision_recall_curve_series: Vec<PrecisionRecallPoint>,

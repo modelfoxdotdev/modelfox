@@ -1,7 +1,6 @@
 use pinwheel::prelude::*;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct ClassSelectField {
 	pub class: String,
 	pub classes: Vec<String>,

@@ -7,7 +7,6 @@ use tangram_charts::{
 };
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct EnumColumn {
 	pub unique_values_chart_data: Option<Vec<(String, u64)>>,
 	pub unique_values_table_rows: Option<Vec<(String, u64, f64)>>,
@@ -36,14 +35,15 @@ impl Component for EnumColumn {
 					)
 					.child(
 						self.unique_values_chart_data
-							.map(|unique_values_chart_data| {
-								EnumColumnUniqueValuesChart::new(name, unique_values_chart_data)
+							.map(|unique_values_chart_data| EnumColumnUniqueValuesChart {
+								name,
+								unique_values_chart_data,
 							}),
 					)
 					.child(
 						self.unique_values_table_rows
-							.map(|unique_values_table_rows| {
-								EnumColumnUniqueValuesTable::new(unique_values_table_rows)
+							.map(|unique_values_table_rows| EnumColumnUniqueValuesTable {
+								unique_values_table_rows,
 							}),
 					),
 			)
@@ -51,7 +51,6 @@ impl Component for EnumColumn {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct EnumColumnUniqueValuesChart {
 	name: String,
 	unique_values_chart_data: Vec<(String, u64)>,
@@ -90,7 +89,6 @@ impl Component for EnumColumnUniqueValuesChart {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct EnumColumnUniqueValuesTable {
 	unique_values_table_rows: Vec<(String, u64, f64)>,
 }

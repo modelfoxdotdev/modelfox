@@ -4,7 +4,7 @@ use std::rc::Rc;
 use tangram_app_ui::colors::{BASELINE_COLOR, SELECTED_THRESHOLD_COLOR};
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder, serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Tuning {
 	pub default_threshold: f32,
 	pub metrics: Vec<Metrics>,

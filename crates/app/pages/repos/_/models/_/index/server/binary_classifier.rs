@@ -9,13 +9,12 @@ use tangram_charts::{
 use tangram_finite::Finite;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct BinaryClassifier {
-	pub id: String,
-	pub warning: Option<String>,
-	pub training_summary_section: TrainingSummarySection,
-	pub training_metrics_section: BinaryClassifierMetricsSection,
 	pub feature_importances_section: FeatureImportancesSection,
+	pub id: String,
+	pub training_metrics_section: BinaryClassifierMetricsSection,
+	pub training_summary_section: TrainingSummarySection,
+	pub warning: Option<String>,
 }
 
 impl Component for BinaryClassifier {
@@ -34,7 +33,6 @@ impl Component for BinaryClassifier {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct BinaryClassifierMetricsSection {
 	pub baseline_accuracy: f32,
 	pub auc_roc: f32,

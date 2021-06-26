@@ -6,7 +6,6 @@ use tangram_app_layouts::{
 use tangram_app_ui::page_heading::{PageHeading, PageHeadingButtons};
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub app_layout_info: AppLayoutInfo,
 	pub models_table: Option<ModelsTable>,
@@ -51,7 +50,6 @@ impl Component for Page {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ModelsTable {
 	pub rows: Vec<ModelsTableRow>,
 }

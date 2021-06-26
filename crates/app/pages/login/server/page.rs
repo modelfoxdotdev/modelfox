@@ -2,7 +2,6 @@ use pinwheel::prelude::*;
 use tangram_app_layouts::{auth_layout::AuthLayout, document::Document};
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub code: bool,
 	pub email: Option<String>,

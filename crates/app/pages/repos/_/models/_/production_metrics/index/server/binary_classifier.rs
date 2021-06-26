@@ -16,7 +16,6 @@ use tangram_charts::{
 use tangram_finite::Finite;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct BinaryClassifierProductionMetrics {
 	pub date_window: DateWindow,
 	pub date_window_interval: DateWindowInterval,

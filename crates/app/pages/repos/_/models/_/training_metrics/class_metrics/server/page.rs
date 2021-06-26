@@ -7,7 +7,6 @@ use tangram_app_layouts::{
 use tangram_app_ui::{class_select_field::ClassSelectField, metrics_row::MetricsRow};
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
 pub struct Page {
 	pub classes: Vec<String>,
 	pub class: String,
@@ -35,7 +34,10 @@ impl Component for Page {
 						)
 						.child(
 							ui::Form::new()
-								.child(ClassSelectField::new(self.class.clone(), self.classes))
+								.child(ClassSelectField {
+									class: self.class.clone(),
+									classes: self.classes,
+								})
 								.child(noscript().child(ui::Button::new().child("Submit"))),
 						)
 						.child(self.precision_recall_section)
@@ -46,7 +48,6 @@ impl Component for Page {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct PrecisionRecallSection {
 	pub class: String,
 	pub f1_score: f32,
@@ -79,7 +80,6 @@ impl Component for PrecisionRecallSection {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ConfusionMatrixSection {
 	pub class: String,
 	pub false_negatives: u64,

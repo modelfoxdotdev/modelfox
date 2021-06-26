@@ -1,5 +1,5 @@
 use pinwheel::prelude::*;
-use tangram_app_ui::logo::{Logo, LogoScheme};
+use tangram_app_ui::logo::{Logo, LogoColorScheme};
 use tangram_ui as ui;
 
 #[derive(ComponentBuilder)]
@@ -15,7 +15,7 @@ impl Component for AuthLayout {
 			.child(
 				div()
 					.class("auth-layout-logo-wrapper")
-					.child(Logo::new(LogoScheme::Multi)),
+					.child(Logo::new().color_scheme(LogoColorScheme::Multi)),
 			)
 			.child(
 				div()
