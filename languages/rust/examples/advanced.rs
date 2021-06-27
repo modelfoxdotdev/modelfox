@@ -133,7 +133,7 @@ fn main() -> Result<()> {
 		exercise_induced_angina: ExerciseInducedAngina::No,
 		exercise_st_depression: 2.3,
 		exercise_st_slope: ExerciseStSlope::Downsloping,
-		fluoroscopy_vessels_colored: FluoroscopyVesselsColored::One,
+		fluoroscopy_vessels_colored: FluoroscopyVesselsColored::Zero,
 		thallium_stress_test: ThalliumStressTest::FixedDefect,
 	};
 
