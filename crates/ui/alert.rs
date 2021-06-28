@@ -1,11 +1,12 @@
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, new)]
 pub struct Alert {
 	pub level: Level,
-	#[optional]
+	#[builder]
+	#[new(default)]
 	pub title: Option<String>,
-	#[children]
+	#[new(default)]
 	pub children: Vec<Node>,
 }
 
@@ -24,12 +25,12 @@ impl Component for Alert {
 			Level::Warning => "alert-level-warning",
 			Level::Danger => "alert-level-danger",
 		};
-		let class = classes!("alert-wrapper", level_class);
 		let title = self
 			.title
 			.map(|title| div().class("alert-title").child(title).into_node());
 		div()
-			.class(class)
+			.class("alert-wrapper")
+			.class(level_class)
 			.child(title)
 			.child(self.children)
 			.into_node()

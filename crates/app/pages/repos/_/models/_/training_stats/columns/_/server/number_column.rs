@@ -95,7 +95,7 @@ impl Component for NumberColumn {
 						ui::Card::new().child(Dehydrate::new(
 							"number_quantiles",
 							BoxChart::new()
-								.series(Some(quantiles_chart_series))
+								.series(quantiles_chart_series)
 								.title(number_quantiles_title),
 						)),
 					),

@@ -9,8 +9,7 @@ name = "tangram_app_production_stats_column_client"
 path = "main.rs"
 
 [dependencies]
-pinwheel = "0.1"
+pinwheel = "0.2"
 tangram_charts = { path = "../../../../../../../../../../charts" }
 tangram_ui = { path = "../../../../../../../../../../ui" }
-tangram_client = { path = "../../../../../../../../../../client" }
 web-sys = "0.3"

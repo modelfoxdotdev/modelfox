@@ -11,7 +11,7 @@ use crate::{
 	},
 	line_chart::{LineChartOptions, LineChartSeries},
 };
-use futures::FutureExt;
+use futures::future::pending;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use std::borrow::Cow;
@@ -19,29 +19,30 @@ use tangram_finite::Finite;
 use tangram_number_formatter::NumberFormatter;
 use wasm_bindgen::JsCast;
 
-#[derive(ComponentBuilder, serde::Serialize, serde::Deserialize)]
+#[derive(builder, Default, new, serde::Serialize, serde::Deserialize)]
+#[new(default)]
 pub struct BarChart {
-	#[optional]
+	#[builder]
 	pub group_gap: Option<f64>,
-	#[optional]
+	#[builder]
 	pub hide_legend: Option<bool>,
-	#[optional]
+	#[builder]
 	pub series: Option<Vec<BarChartSeries>>,
-	#[optional]
+	#[builder]
 	pub should_draw_x_axis_labels: Option<bool>,
-	#[optional]
+	#[builder]
 	pub should_draw_y_axis_labels: Option<bool>,
-	#[optional]
+	#[builder]
 	pub title: Option<String>,
-	#[optional]
+	#[builder]
 	pub x_axis_title: Option<String>,
-	#[optional]
+	#[builder]
 	pub y_axis_grid_line_interval: Option<GridLineInterval>,
-	#[optional]
+	#[builder]
 	pub y_axis_title: Option<String>,
-	#[optional]
+	#[builder]
 	pub y_max: Option<f64>,
-	#[optional]
+	#[builder]
 	pub y_min: Option<f64>,
 }
 
@@ -78,7 +79,9 @@ impl Component for BarChart {
 			.collect();
 		let title = self.title.map(ChartTitle::new);
 		let legend = if !hide_legend {
-			Some(ChartLegend::new(legend_items))
+			Some(ChartLegend {
+				items: legend_items,
+			})
 		} else {
 			None
 		};
@@ -86,11 +89,14 @@ impl Component for BarChart {
 			.style(style::PADDING_TOP, "50%")
 			.style(style::WIDTH, "100%")
 			.future(|chart| {
-				pending_with(Chart::<crate::bar_chart::BarChart>::new(
+				let chart = Chart::<crate::bar_chart::BarChart>::new(
 					chart.dom_element().unchecked_into(),
 					options,
-				))
-				.map(|_| ())
+				);
+				async move {
+					pending::<()>().await;
+					drop(chart);
+				}
 			})
 			.child(
 				noscript().child(
@@ -108,25 +114,26 @@ impl Component for BarChart {
 	}
 }
 
-#[derive(ComponentBuilder, serde::Serialize, serde::Deserialize)]
+#[derive(builder, Default, new, serde::Serialize, serde::Deserialize)]
+#[new(default)]
 pub struct BoxChart {
-	#[optional]
+	#[builder]
 	pub hide_legend: Option<bool>,
-	#[optional]
+	#[builder]
 	pub series: Option<Vec<BoxChartSeries>>,
-	#[optional]
+	#[builder]
 	pub should_draw_x_axis_labels: Option<bool>,
-	#[optional]
+	#[builder]
 	pub should_draw_y_axis_labels: Option<bool>,
-	#[optional]
+	#[builder]
 	pub title: Option<String>,
-	#[optional]
+	#[builder]
 	pub x_axis_title: Option<String>,
-	#[optional]
+	#[builder]
 	pub y_axis_title: Option<String>,
-	#[optional]
+	#[builder]
 	pub y_max: Option<f64>,
-	#[optional]
+	#[builder]
 	pub y_min: Option<f64>,
 }
 
@@ -162,7 +169,9 @@ impl Component for BoxChart {
 			.collect();
 		let title = self.title.map(ChartTitle::new);
 		let legend = if !hide_legend {
-			Some(ChartLegend::new(legend_items))
+			Some(ChartLegend {
+				items: legend_items,
+			})
 		} else {
 			None
 		};
@@ -170,11 +179,14 @@ impl Component for BoxChart {
 			.style(style::PADDING_TOP, "50%")
 			.style(style::WIDTH, "100%")
 			.future(|chart| {
-				pending_with(Chart::<crate::box_chart::BoxChart>::new(
+				let chart = Chart::<crate::box_chart::BoxChart>::new(
 					chart.dom_element().unchecked_into(),
 					options,
-				))
-				.map(|_| ())
+				);
+				async move {
+					pending::<()>().await;
+					drop(chart);
+				}
 			})
 			.child(
 				noscript().child(
@@ -192,21 +204,22 @@ impl Component for BoxChart {
 	}
 }
 
-#[derive(ComponentBuilder, serde::Serialize, serde::Deserialize)]
+#[derive(builder, Default, new, serde::Serialize, serde::Deserialize)]
+#[new(default)]
 pub struct FeatureContributionsChart {
-	#[optional]
+	#[builder]
 	pub series: Option<Vec<FeatureContributionsChartSeries>>,
-	#[optional]
+	#[builder]
 	pub negative_color: Option<String>,
-	#[optional]
+	#[builder]
 	pub positive_color: Option<String>,
-	#[optional]
+	#[builder]
 	pub include_x_axis_title: Option<bool>,
-	#[optional]
+	#[builder]
 	pub include_y_axis_labels: Option<bool>,
-	#[optional]
+	#[builder]
 	pub include_y_axis_title: Option<bool>,
-	#[optional]
+	#[builder]
 	pub title: Option<String>,
 }
 
@@ -252,22 +265,26 @@ impl Component for FeatureContributionsChart {
 		} + label_padding
 			+ font_size + bottom_padding;
 		let title = self.title.map(ChartTitle::new);
-		let chart = div()
-			.style(style::WIDTH, "100%")
-			.style(style::HEIGHT, format!("{}px", height))
-			.future(|chart| {
-				pending_with(Chart::<
-					crate::feature_contributions_chart::FeatureContributionsChart,
-				>::new(chart.dom_element().unchecked_into(), options))
-				.map(|_| ())
-			})
-			.child(
-				noscript().child(
-					div()
-						.class("chart-noscript")
-						.child("Please enable JavaScript to view charts."),
-				),
-			);
+		let chart =
+			div()
+				.style(style::WIDTH, "100%")
+				.style(style::HEIGHT, format!("{}px", height))
+				.future(|chart| {
+					let chart = Chart::<
+						crate::feature_contributions_chart::FeatureContributionsChart,
+					>::new(chart.dom_element().unchecked_into(), options);
+					async move {
+						pending::<()>().await;
+						drop(chart);
+					}
+				})
+				.child(
+					noscript().child(
+						div()
+							.class("chart-noscript")
+							.child("Please enable JavaScript to view charts."),
+					),
+				);
 		div()
 			.class("chart-wrapper")
 			.child(title)
@@ -276,35 +293,36 @@ impl Component for FeatureContributionsChart {
 	}
 }
 
-#[derive(ComponentBuilder, serde::Serialize, serde::Deserialize)]
+#[derive(builder, Default, new, serde::Serialize, serde::Deserialize)]
+#[new(default)]
 pub struct LineChart {
-	#[optional]
+	#[builder]
 	pub hide_legend: Option<bool>,
-	#[optional]
+	#[builder]
 	pub labels: Option<Vec<String>>,
-	#[optional]
+	#[builder]
 	pub series: Option<Vec<LineChartSeries>>,
-	#[optional]
+	#[builder]
 	pub should_draw_x_axis_labels: Option<bool>,
-	#[optional]
+	#[builder]
 	pub should_draw_y_axis_labels: Option<bool>,
-	#[optional]
+	#[builder]
 	pub title: Option<String>,
-	#[optional]
+	#[builder]
 	pub x_axis_grid_line_interval: Option<GridLineInterval>,
-	#[optional]
+	#[builder]
 	pub x_axis_title: Option<String>,
-	#[optional]
+	#[builder]
 	pub x_max: Option<Finite<f64>>,
-	#[optional]
+	#[builder]
 	pub x_min: Option<Finite<f64>>,
-	#[optional]
+	#[builder]
 	pub y_axis_grid_line_interval: Option<GridLineInterval>,
-	#[optional]
+	#[builder]
 	pub y_axis_title: Option<String>,
-	#[optional]
+	#[builder]
 	pub y_max: Option<Finite<f64>>,
-	#[optional]
+	#[builder]
 	pub y_min: Option<Finite<f64>>,
 }
 
@@ -345,7 +363,9 @@ impl Component for LineChart {
 			.collect();
 		let title = self.title.map(ChartTitle::new);
 		let legend = if !hide_legend {
-			Some(ChartLegend::new(legend_items))
+			Some(ChartLegend {
+				items: legend_items,
+			})
 		} else {
 			None
 		};
@@ -353,11 +373,14 @@ impl Component for LineChart {
 			.style(style::PADDING_TOP, "50%")
 			.style(style::WIDTH, "100%")
 			.future(|chart| {
-				pending_with(Chart::<crate::line_chart::LineChart>::new(
+				let chart = Chart::<crate::line_chart::LineChart>::new(
 					chart.dom_element().unchecked_into(),
 					options,
-				))
-				.map(|_| ())
+				);
+				async move {
+					pending::<()>().await;
+					drop(chart);
+				}
 			})
 			.child(
 				noscript().child(
@@ -393,7 +416,6 @@ impl Component for ChartTitle {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ChartLegend {
 	pub items: Vec<ChartLegendItem>,
 }
@@ -402,16 +424,11 @@ impl Component for ChartLegend {
 	fn into_node(self) -> Node {
 		div()
 			.class("chart-legend-wrapper")
-			.children(
-				self.items
-					.into_iter()
-					.map(|item| ChartLegendItem::new(item.color, item.title)),
-			)
+			.children(self.items)
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ChartLegendItem {
 	pub color: String,
 	pub title: String,

@@ -78,12 +78,12 @@ impl Component for EnumColumnUniqueValuesChart {
 			.child(Dehydrate::new(
 				"enum_histogram",
 				BarChart::new()
-					.hide_legend(Some(true))
-					.series(Some(chart_series))
+					.hide_legend(true)
+					.series(chart_series)
 					.title(enum_histogram_title)
-					.x_axis_title(Some(self.name))
+					.x_axis_title(self.name)
 					.y_axis_title("Count".to_owned())
-					.y_min(Some(0.0)),
+					.y_min(0.0),
 			))
 			.into_node()
 	}

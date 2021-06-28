@@ -16,7 +16,7 @@ use tangram_number_formatter::format_option_percent;
 // |           ||       |                  |                   |
 // |-----------------------------------------------------------|
 
-#[derive(ComponentBuilder)]
+#[derive(builder)]
 pub struct ConfusionMatrixComparison {
 	pub class_label: String,
 	pub color_a: String,
@@ -40,22 +40,24 @@ impl Component for ConfusionMatrixComparison {
 		div()
 			.class("confusion-matrix-comparison-wrapper")
 			.child(
-				ConfusionMatrixLabel::new("actual-true-label", None)
+				ConfusionMatrixLabel::new("actual-true-label".to_owned())
 					.child(div().child("Actual"))
 					.child(ui::Token::new().child(self.class_label.clone())),
 			)
 			.child(
-				ConfusionMatrixLabel::new("actual-false-label", None)
+				ConfusionMatrixLabel::new("actual-false-label".to_owned())
 					.child(div().child("Actual Not"))
 					.child(ui::Token::new().child(self.class_label.clone())),
 			)
 			.child(
-				ConfusionMatrixLabel::new("predicted-true-label".to_owned(), Some(true))
+				ConfusionMatrixLabel::new("predicted-true-label".to_owned())
+					.left(true)
 					.child(div().child("Predicted"))
 					.child(ui::Token::new().child(self.class_label.clone())),
 			)
 			.child(
-				ConfusionMatrixLabel::new("predicted-false-label".to_owned(), Some(true))
+				ConfusionMatrixLabel::new("predicted-false-label".to_owned())
+					.left(true)
 					.child(div().child("Predicted Not"))
 					.child(ui::Token::new().child(self.class_label)),
 			)
@@ -126,11 +128,11 @@ impl Component for ConfusionMatrixComparisonItem {
 		} else {
 			"confusion-matrix-comparison-item-incorrect-wrapper"
 		};
-		let class = classes!("confusion-matrix-comparison-item-wrapper", class);
 		let value_a = format_option_percent(self.value_a);
 		let value_b = format_option_percent(self.value_b);
 		div()
-			.attribute("class", class)
+			.class("confusion-matrix-comparison-item-wrapper")
+			.class(class)
 			.style(style::GRID_AREA, self.area.clone())
 			.attribute("data-area", self.area)
 			.child(
@@ -140,10 +142,7 @@ impl Component for ConfusionMatrixComparisonItem {
 			)
 			.child(
 				div()
-					.attribute(
-						"class",
-						"confusion-matrix-comparison-number-comparison-wrapper",
-					)
+					.class("confusion-matrix-comparison-number-comparison-wrapper")
 					.child(
 						div()
 							.class("confusion-matrix-comparison-item-value")
@@ -159,14 +158,14 @@ impl Component for ConfusionMatrixComparisonItem {
 					.child(
 						div().child(
 							ui::Token::new()
-								.color(Some(self.color_a))
+								.color(self.color_a)
 								.child(self.value_a_title),
 						),
 					)
 					.child(
 						div().child(
 							ui::Token::new()
-								.color(Some(self.color_b))
+								.color(self.color_b)
 								.child(self.value_b_title),
 						),
 					),
@@ -175,12 +174,22 @@ impl Component for ConfusionMatrixComparisonItem {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children)]
 pub struct ConfusionMatrixLabel {
-	pub area: String,
-	pub left: Option<bool>,
-	#[children]
+	area: String,
+	#[builder]
+	left: Option<bool>,
 	children: Vec<Node>,
+}
+
+impl ConfusionMatrixLabel {
+	pub fn new(area: String) -> ConfusionMatrixLabel {
+		ConfusionMatrixLabel {
+			area,
+			left: None,
+			children: Vec::new(),
+		}
+	}
 }
 
 impl Component for ConfusionMatrixLabel {

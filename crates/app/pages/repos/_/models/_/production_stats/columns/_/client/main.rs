@@ -3,7 +3,7 @@ use tangram_ui as ui;
 use web_sys as dom;
 
 pub fn main() {
-	tangram_client::client_start();
+	tangram_ui::client_start();
 	let document = dom::window().unwrap().document().unwrap();
 	ui::select_field_submit_on_change("date_window_select_field".to_owned());
 	if document.get_element_by_id("number_intervals").is_some() {

@@ -6,25 +6,21 @@ pub enum WindowShade {
 	Default,
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct Window {
-	#[optional]
+	#[builder]
 	pub padding: Option<bool>,
-	#[children]
 	pub children: Vec<Node>,
 }
 
 impl Component for Window {
 	fn into_node(self) -> Node {
-		let padding = self.padding.unwrap_or(true);
-		let window_body_class = classes!(
-			"window-body",
-			if padding {
-				Some("window-body-padding")
-			} else {
-				None
-			},
-		);
+		let padding_class = if self.padding.unwrap_or(true) {
+			Some("window-body-padding")
+		} else {
+			None
+		};
 		div()
 			.class("window-wrapper")
 			.child(
@@ -48,7 +44,8 @@ impl Component for Window {
 			)
 			.child(
 				div()
-					.attribute("class", window_body_class)
+					.class("window-body")
+					.class(padding_class)
 					.child(self.children),
 			)
 			.into_node()

@@ -24,7 +24,8 @@ impl Component for Page {
 					.child(list),
 			)
 			.child(prev_next_buttons);
-		let layout = DocsLayout::new(DocsPage::GettingStarted(GettingStartedPage::Index), None)
+		let layout = DocsLayout::new()
+			.selected_page(DocsPage::GettingStarted(GettingStartedPage::Index))
 			.child(content);
 		Document::new().child(layout).into_node()
 	}

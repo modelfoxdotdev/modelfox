@@ -13,36 +13,36 @@ impl Component for Page {
 		let predict_text = ui::P::new().child("First, import the tangram library and load the model file. Then, make an object with info for a new patient that matches the CSV, excluding the diagnosis column. Finally, call predict and print out the result.");
 		Document::new()
 			.child(
-				DocsLayout::new(
-					DocsPage::GettingStarted(GettingStartedPage::Predict(PredictPage::Ruby)),
-					None,
-				)
-				.child(
-					ui::S1::new()
-						.child(ui::H1::new().child("Predict with Ruby"))
-						.child(
-							ui::S2::new()
-								.child(ui::H2::new().child("1. Install."))
-								.child(Install)
-								.child(ui::H2::new().child("2. Predict."))
-								.child(predict_text)
-								.child(Predict),
-						)
-						.child(
-							div()
-								.class("docs-prev-next-buttons")
-								.child(
-									ui::Link::new()
-										.href("../train".to_owned())
-										.child("< Previous: Train a model."),
-								)
-								.child(
-									ui::Link::new()
-										.href("../inspect".to_owned())
-										.child("Next: Inspect your model. >"),
-								),
-						),
-				),
+				DocsLayout::new()
+					.selected_page(DocsPage::GettingStarted(GettingStartedPage::Predict(
+						PredictPage::Ruby,
+					)))
+					.child(
+						ui::S1::new()
+							.child(ui::H1::new().child("Predict with Ruby"))
+							.child(
+								ui::S2::new()
+									.child(ui::H2::new().child("1. Install."))
+									.child(Install)
+									.child(ui::H2::new().child("2. Predict."))
+									.child(predict_text)
+									.child(Predict),
+							)
+							.child(
+								div()
+									.class("docs-prev-next-buttons")
+									.child(
+										ui::Link::new()
+											.href("../train".to_owned())
+											.child("< Previous: Train a model."),
+									)
+									.child(
+										ui::Link::new()
+											.href("../inspect".to_owned())
+											.child("Next: Inspect your model. >"),
+									),
+							),
+					),
 			)
 			.into_node()
 	}
@@ -62,7 +62,7 @@ impl Component for Install {
 			.child(
 				ui::Code::new()
 					.code(Cow::Owned(code))
-					.hide_line_numbers(Some(true)),
+					.hide_line_numbers(true),
 			)
 			.into_node()
 	}

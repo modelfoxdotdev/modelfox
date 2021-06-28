@@ -34,7 +34,7 @@ impl Component for Page {
 		let p3 = ui::P::new().child("Now let's see how accurate our model has been in production. Let's open the app and choose Production Metrics in the sidebar.");
 		let p4 = ui::P::new().child(r#"Uh oh! It's a bit lower than we expected. Let's try to find the cause. Under "Production Stats", we see that the "chest_pain" column has an alert and a high invalid values count. Click on the column to view more details."#);
 		let p5 = ui::P::new().child(r#"It looks like there is a large discrepancy between the value "asymptomatic" in production versus training. In the table below, we see a high number of invalid values with the string "asx". It looks like we are accidentally using the string "asx" in our code instead of "asymptomatic" for the chest pain column. We can update our code to use the correct value and follow the metrics going forward to confirm they bounce back."#);
-		let p6 = ui::Markdown::new("Hooray! You made it to the end! In this guide, we learned how to train a model, make predictions from our code, tune our model, and monitor it in production. If you want help using Tangram with your own data, send us an email at [hello@tangram.xyz](mailto:hello@tangram.xyz) or ask a question on [GitHub Discussions](https://github.com/tangramxyz/tangram/discussions).");
+		let p6 = ui::Markdown::new("Hooray! You made it to the end! In this guide, we learned how to train a model, make predictions from our code, tune our model, and monitor it in production. If you want help using Tangram with your own data, send us an email at [hello@tangram.xyz](mailto:hello@tangram.xyz) or ask a question on [GitHub Discussions](https://github.com/tangramxyz/tangram/discussions).".into());
 		let section = ui::S2::new()
 			.child(p1)
 			.child(Log)
@@ -55,16 +55,14 @@ impl Component for Page {
 		Document::new()
 			.client("tangram_www_docs_getting_started_monitor_client")
 			.child(
-				DocsLayout::new(
-					DocsPage::GettingStarted(GettingStartedPage::Monitor),
-					Vec::new(),
-				)
-				.child(
-					ui::S1::new()
-						.child(ui::H1::new().child("Monitor"))
-						.child(section)
-						.child(buttons),
-				),
+				DocsLayout::new()
+					.selected_page(DocsPage::GettingStarted(GettingStartedPage::Monitor))
+					.child(
+						ui::S1::new()
+							.child(ui::H1::new().child("Monitor"))
+							.child(section)
+							.child(buttons),
+					),
 			)
 			.into_node()
 	}
@@ -520,13 +518,14 @@ impl Component for ProductionExplanations {
 					.child(
 						div()
 							.class("production-explanations-grid")
-							.child(
-								div()
-									.style(style::GRID_AREA, "prediction")
-									.child(ui::NumberCard::new("Predicted Class", class_name)),
-							)
+							.child(div().style(style::GRID_AREA, "prediction").child(
+								ui::NumberCard::new("Predicted Class".to_owned(), class_name),
+							))
 							.child(div().style(style::GRID_AREA, "probability").child(
-								ui::NumberCard::new("Probability", ui::format_percent(probability)),
+								ui::NumberCard::new(
+									"Probability".to_owned(),
+									ui::format_percent(probability),
+								),
 							))
 							.child(
 								div()

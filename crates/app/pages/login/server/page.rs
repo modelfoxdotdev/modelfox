@@ -14,7 +14,7 @@ impl Component for Page {
 			.child(
 				AuthLayout::new().child(
 					ui::Form::new()
-						.post(Some(true))
+						.post(true)
 						.child(
 							self.error
 								.map(|error| ui::Alert::new(ui::Level::Danger).child(error)),
@@ -22,7 +22,7 @@ impl Component for Page {
 						.child(
 							ui::TextField::new()
 								.autocomplete("username".to_owned())
-								.name(Some("email".to_owned()))
+								.name("email".to_owned())
 								.placeholder("Email".to_owned())
 								.value(self.email),
 						)
@@ -37,7 +37,7 @@ impl Component for Page {
 						})
 						.child(
 							ui::Button::new()
-								.button_type(Some(ui::ButtonType::Submit))
+								.button_type(ui::ButtonType::Submit)
 								.child("Login"),
 						)
 						.child(if self.code {

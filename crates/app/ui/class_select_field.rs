@@ -20,8 +20,8 @@ impl Component for ClassSelectField {
 			.id("class_select_field".to_owned())
 			.label("Select Class".to_owned())
 			.name("class".to_owned())
-			.options(Some(options))
-			.value(Some(self.class))
+			.options(options)
+			.value(self.class)
 			.into_node()
 	}
 }

@@ -9,9 +9,8 @@ name = "tangram_www_index_client"
 path = "main.rs"
 
 [dependencies]
-pinwheel = "0.1"
+pinwheel = "0.2"
 tangram_charts = { path = "../../../../charts" }
 tangram_ui = { path = "../../../../ui" }
-tangram_client = { path = "../../../../client" }
 tangram_www_index_common = { path = "../common" }
 web-sys = "0.3"

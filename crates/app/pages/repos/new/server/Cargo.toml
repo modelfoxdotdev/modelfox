@@ -11,7 +11,7 @@ path = "lib.rs"
 futures = "0.3"
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
-pinwheel = "0.1"
+pinwheel = "0.2"
 serde = { version = "1", features = ["derive"] }
 serde_urlencoded = "0.7"
 sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }

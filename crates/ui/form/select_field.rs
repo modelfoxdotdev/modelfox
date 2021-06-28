@@ -3,25 +3,26 @@ use pinwheel::prelude::*;
 use wasm_bindgen::{prelude::*, JsCast};
 use web_sys as dom;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, Default, new)]
+#[new(default)]
 pub struct SelectField {
-	#[optional]
+	#[builder]
 	pub disabled: Option<bool>,
-	#[optional]
+	#[builder]
 	pub id: Option<String>,
-	#[optional]
+	#[builder]
 	pub label: Option<String>,
-	#[optional]
+	#[builder]
 	pub name: Option<String>,
-	#[optional]
+	#[builder]
 	pub options: Option<Vec<SelectFieldOption>>,
-	#[optional]
+	#[builder]
 	pub placeholder: Option<String>,
-	#[optional]
+	#[builder]
 	pub required: Option<bool>,
-	#[optional]
+	#[builder]
 	pub value: Option<String>,
-	#[optional]
+	#[builder]
 	pub on_change: Option<Box<dyn Fn(String)>>,
 }
 
@@ -50,7 +51,7 @@ impl Component for SelectField {
 				}
 			}
 		};
-		FieldLabel::new(None)
+		FieldLabel::new()
 			.child(self.label)
 			.child(
 				select()

@@ -68,7 +68,7 @@ impl Component for Header {
 			.child(ui::H1::new().child("User"))
 			.child(
 				ui::Form::new()
-					.post(Some(true))
+					.post(true)
 					.child(
 						input()
 							.attribute("name", "action")
@@ -78,7 +78,7 @@ impl Component for Header {
 					.child(
 						ui::Button::new()
 							.color(ui::colors::RED.to_owned())
-							.button_type(Some(ui::ButtonType::Submit))
+							.button_type(ui::ButtonType::Submit)
 							.child("Logout"),
 					),
 			)
@@ -97,8 +97,8 @@ impl Component for DetailsSection {
 				ui::Form::new().child(
 					ui::TextField::new()
 						.label("Email".to_owned())
-						.readonly(Some(true))
-						.value(Some(self.email)),
+						.readonly(true)
+						.value(self.email),
 				),
 			)
 			.into_node()

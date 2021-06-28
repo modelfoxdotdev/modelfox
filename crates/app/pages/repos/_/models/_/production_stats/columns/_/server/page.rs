@@ -81,7 +81,7 @@ impl Component for DateWindowSelectForm {
 			.child(
 				noscript().child(
 					ui::Button::new()
-						.button_type(Some(ui::ButtonType::Submit))
+						.button_type(ui::ButtonType::Submit)
 						.child("Submit"),
 				),
 			)

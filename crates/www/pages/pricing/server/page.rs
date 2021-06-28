@@ -108,14 +108,11 @@ pub struct PricingCard {
 
 impl Component for PricingCard {
 	fn into_node(self) -> Node {
-		let class = classes!(
-			"pricing-card-grid",
-			if self.selected {
-				Some("pricing-card-grid-selected")
-			} else {
-				None
-			},
-		);
+		let selected_class = if self.selected {
+			Some("pricing-card-grid-selected")
+		} else {
+			None
+		};
 		let token = div().child(ui::Token::new().color(self.color).child(self.title));
 		let price = div()
 			.class("pricing-card-price-wrapper")
@@ -131,7 +128,8 @@ impl Component for PricingCard {
 				.map(|feature| div().class("pricing-card-feature").child(feature)),
 		);
 		div()
-			.class(class)
+			.class("pricing-card-grid")
+			.class(selected_class)
 			.child(
 				div()
 					.class("pricing-card-content-grid")

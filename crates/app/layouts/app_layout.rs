@@ -7,10 +7,10 @@ pub struct AppLayoutInfo {
 	pub topbar_avatar: Option<TopbarAvatar>,
 }
 
-#[derive(ComponentBuilder)]
+#[derive(children, new)]
 pub struct AppLayout {
 	pub info: AppLayoutInfo,
-	#[children]
+	#[new(default)]
 	pub children: Vec<Node>,
 }
 

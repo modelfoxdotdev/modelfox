@@ -22,7 +22,7 @@ impl Component for Page {
 						.child(
 							ui::Form::new()
 								.enc_type("multipart/form-data".to_owned())
-								.post(Some(true))
+								.post(true)
 								.child(
 									self.error.map(|error| {
 										ui::Alert::new(ui::Level::Danger).child(error)
@@ -36,7 +36,7 @@ impl Component for Page {
 								)
 								.child(
 									ui::Button::new()
-										.button_type(Some(ui::ButtonType::Submit))
+										.button_type(ui::ButtonType::Submit)
 										.child("Upload"),
 								),
 						),

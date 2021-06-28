@@ -1,12 +1,11 @@
 use crate as ui;
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder)]
 pub struct Callout {
 	pub level: ui::Level,
-	#[optional]
+	#[builder]
 	pub title: Option<String>,
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -18,9 +17,9 @@ impl Component for Callout {
 			ui::Level::Warning => "callout-wrapper-warning",
 			ui::Level::Success => "callout-wrapper-success",
 		};
-		let class = classes!("callout-wrapper", level_class);
 		div()
-			.attribute("class", class)
+			.class("callout-wrapper")
+			.class(level_class)
 			.child({
 				self.title
 					.map(|title| div().class("callout-title").child(title))

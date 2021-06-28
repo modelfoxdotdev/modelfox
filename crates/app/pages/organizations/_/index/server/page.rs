@@ -51,21 +51,18 @@ impl Component for DetailsSection {
 					.child(ui::H2::new().child("Details"))
 					.child(
 						ui::Button::new()
-							.href(Some(format!(
-								"/organizations/{}/edit",
-								self.organization_id
-							)))
+							.href(format!("/organizations/{}/edit", self.organization_id))
 							.color(ui::colors::GRAY.to_owned())
-							.disabled(Some(false))
+							.disabled(false)
 							.child("Edit"),
 					),
 			)
 			.child(
 				ui::TextField::new()
-					.disabled(Some(true))
-					.value(Some(self.organization_name))
+					.disabled(true)
+					.value(self.organization_name)
 					.label("Organization Name".to_owned())
-					.readonly(Some(true)),
+					.readonly(true),
 			)
 			.into_node()
 	}
@@ -84,10 +81,10 @@ impl Component for MembersSection {
 					.child(ui::H2::new().child("Members"))
 					.child(
 						ui::Button::new()
-							.href(Some(format!(
+							.href(format!(
 								"/organizations/{}/members/new",
 								self.organization_id,
-							)))
+							))
 							.child("Invite Team Member"),
 					),
 			)
@@ -147,7 +144,7 @@ pub struct MemberDeleteForm {
 impl Component for MemberDeleteForm {
 	fn into_node(self) -> Node {
 		ui::Form::new()
-			.post(Some(true))
+			.post(true)
 			.child(
 				input()
 					.attribute("name", "action")
@@ -162,7 +159,7 @@ impl Component for MemberDeleteForm {
 			)
 			.child(
 				ui::Button::new()
-					.button_type(Some(ui::ButtonType::Submit))
+					.button_type(ui::ButtonType::Submit)
 					.color(ui::colors::RED.to_owned())
 					.child("Remove"),
 			)
@@ -240,7 +237,7 @@ impl Component for DangerZoneSection {
 			.child(ui::H2::new().child("Danger Zone"))
 			.child(
 				ui::Form::new()
-					.post(Some(true))
+					.post(true)
 					.onsubmit("return confirm(\"Are you sure?\")".to_owned())
 					.child(
 						input()
@@ -250,7 +247,7 @@ impl Component for DangerZoneSection {
 					)
 					.child(
 						ui::Button::new()
-							.button_type(Some(ui::ButtonType::Submit))
+							.button_type(ui::ButtonType::Submit)
 							.color(ui::colors::RED.to_owned())
 							.child("Delete Organization"),
 					),

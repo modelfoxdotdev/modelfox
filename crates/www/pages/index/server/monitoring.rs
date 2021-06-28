@@ -130,7 +130,7 @@ impl Component for Monitoring {
 		let title = div()
 			.class("index-step-title")
 			.child("Monitor your models in production.");
-		let p1 = div().attribute("class","index-step-text").child("Once your model is deployed, make sure that it performs as well in production as it did in training.");
+		let p1 = div().class("index-step-text").child("Once your model is deployed, make sure that it performs as well in production as it did in training.");
 		let p2 = div()
 			.class("index-step-text")
 			.child("Opt in to logging by calling ")
@@ -149,7 +149,7 @@ impl Component for Monitoring {
 			.child(br())
 			.child(p3);
 		let right = ui::Window::new()
-			.child(ui::CodeSelect::new(code_for_language).hide_line_numbers(Some(false)));
+			.child(ui::CodeSelect::new(code_for_language).hide_line_numbers(false));
 		div()
 			.class("index-step")
 			.child(left)

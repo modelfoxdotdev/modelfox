@@ -92,7 +92,7 @@ impl Component for Form {
 			.child(div().class("predict-form-grid").children(fields))
 			.child(
 				ui::Button::new()
-					.button_type(Some(ui::ButtonType::Submit))
+					.button_type(ui::ButtonType::Submit)
 					.child("Predict"),
 			)
 			.into_node()
@@ -113,9 +113,9 @@ impl Component for UnknownField {
 					.child(div().child(UnknownColumnToken))
 					.child(
 						ui::TextField::new()
-							.label(Some(self.name.clone()))
-							.name(Some(self.name))
-							.value(Some(self.value.to_string())),
+							.label(self.name.clone())
+							.name(self.name)
+							.value(self.value.to_string()),
 					),
 			)
 			.child(div())
@@ -158,19 +158,19 @@ impl Component for NumberField {
 					.child(div().child(NumberColumnToken))
 					.child(
 						ui::TextField::new()
-							.label(Some(self.name.clone()))
-							.name(Some(self.name.clone()))
-							.value(Some(value)),
+							.label(self.name.clone())
+							.name(self.name.clone())
+							.value(value),
 					),
 			)
 			.child(Dehydrate::new(
 				self.name,
 				ColumnChart::Box(
 					BoxChart::new()
-						.hide_legend(Some(true))
-						.series(Some(series))
-						.should_draw_x_axis_labels(Some(false))
-						.should_draw_y_axis_labels(Some(false)),
+						.hide_legend(true)
+						.series(series)
+						.should_draw_x_axis_labels(false)
+						.should_draw_y_axis_labels(false),
 				),
 			))
 			.into_node()
@@ -219,20 +219,20 @@ impl Component for EnumField {
 					.child(div().child(EnumColumnToken))
 					.child(
 						ui::SelectField::new()
-							.label(Some(self.name.clone()))
-							.name(Some(self.name.clone()))
-							.options(Some(options))
-							.value(Some(self.value.to_string())),
+							.label(self.name.clone())
+							.name(self.name.clone())
+							.options(options)
+							.value(self.value.to_string()),
 					),
 			)
 			.child(Dehydrate::new(
 				self.name,
 				ColumnChart::Bar(
 					BarChart::new()
-						.hide_legend(Some(true))
-						.series(Some(series))
-						.should_draw_x_axis_labels(Some(false))
-						.should_draw_y_axis_labels(Some(false)),
+						.hide_legend(true)
+						.series(series)
+						.should_draw_x_axis_labels(false)
+						.should_draw_y_axis_labels(false),
 				),
 			))
 			.into_node()
@@ -253,9 +253,9 @@ impl Component for TextField {
 					.child(div().child(TextColumnToken))
 					.child(
 						ui::TextField::new()
-							.label(Some(self.name.clone()))
-							.name(Some(self.name))
-							.value(Some(self.value.to_string())),
+							.label(self.name.clone())
+							.name(self.name)
+							.value(self.value.to_string()),
 					),
 			)
 			.child(div())

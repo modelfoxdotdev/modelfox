@@ -1,13 +1,14 @@
 use pinwheel::prelude::*;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, Default, new)]
+#[new(default)]
 pub struct Logo {
-	#[optional]
+	#[builder]
 	pub color_scheme: Option<LogoColorScheme>,
-	#[optional]
+	#[builder]
 	pub class: Option<String>,
-	#[optional]
+	#[builder]
 	pub color: Option<String>,
 }
 

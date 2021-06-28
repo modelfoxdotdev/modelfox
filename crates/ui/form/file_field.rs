@@ -3,21 +3,22 @@ use pinwheel::prelude::*;
 use wasm_bindgen::{prelude::*, JsCast};
 use web_sys as dom;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, Default, new)]
+#[new(default)]
 pub struct FileField {
-	#[optional]
+	#[builder]
 	pub disabled: Option<bool>,
-	#[optional]
+	#[builder]
 	pub label: Option<String>,
-	#[optional]
+	#[builder]
 	pub name: Option<String>,
-	#[optional]
+	#[builder]
 	pub required: Option<bool>,
 }
 
 impl Component for FileField {
 	fn into_node(self) -> Node {
-		FieldLabel::new(None)
+		FieldLabel::new()
 			.child(self.label)
 			.child(
 				div().class("form-file-wrapper").child("Choose File").child(

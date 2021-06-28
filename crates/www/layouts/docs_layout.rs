@@ -3,11 +3,13 @@ use pinwheel::prelude::*;
 use tangram_ui as ui;
 use tangram_www_content::{Content, DocsGuide};
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct DocsLayout {
-	pub selected_page: DocsPage,
+	#[builder]
+	pub selected_page: Option<DocsPage>,
+	#[builder]
 	pub headings: Option<Vec<Heading>>,
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -50,25 +52,22 @@ impl Component for DocsLayout {
 			.child(
 				div()
 					.class("docs-layout")
-					.child(
-						div()
-							.class("docs-layout-left")
-							.child(PageNav::new(self.selected_page)),
-					)
+					.child(div().class("docs-layout-left").child(PageNav {
+						selected_page: self.selected_page,
+					}))
 					.child(div().class("docs-layout-center").child(self.children))
 					.child(
 						div()
 							.class("docs-layout-right")
-							.child(self.headings.map(Headings::new)),
+							.child(self.headings.map(|headings| Headings { headings })),
 					),
 			)
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct PageNav {
-	pub selected_page: DocsPage,
+	pub selected_page: Option<DocsPage>,
 }
 
 impl Component for PageNav {
@@ -80,189 +79,188 @@ impl Component for PageNav {
 					ui::NavItem::new()
 						.title("Overview".to_owned())
 						.href("/docs/".to_owned())
-						.selected(Some(matches!(self.selected_page, DocsPage::Overview))),
+						.selected(matches!(self.selected_page, Some(DocsPage::Overview))),
 				),
 			)
 			.child(
-				ui::NavSection::new("Install").child(
+				ui::NavSection::new("Install".to_owned()).child(
 					ui::NavItem::new()
 						.title("Install".to_owned())
 						.href("/docs/install".to_owned())
-						.selected(Some(matches!(self.selected_page, DocsPage::Install))),
+						.selected(matches!(self.selected_page, Some(DocsPage::Install))),
 				),
 			)
 			.child(
-				ui::NavSection::new("Getting Started")
+				ui::NavSection::new("Getting Started".to_owned())
 					.child(
 						ui::NavItem::new()
 							.title("Overview".to_owned())
 							.href("/docs/getting_started/".to_owned())
-							.selected(Some(matches!(
+							.selected(matches!(
 								self.selected_page,
-								DocsPage::GettingStarted(GettingStartedPage::Index),
-							))),
+								Some(DocsPage::GettingStarted(GettingStartedPage::Index)),
+							)),
 					)
 					.child(
 						ui::NavItem::new()
 							.title("Train".to_owned())
 							.href("/docs/getting_started/train".to_owned())
-							.selected(Some(matches!(
+							.selected(matches!(
 								self.selected_page,
-								DocsPage::GettingStarted(GettingStartedPage::Train),
-							))),
+								Some(DocsPage::GettingStarted(GettingStartedPage::Train)),
+							)),
 					)
 					.child(
 						ui::NavItem::new()
 							.title("Predict".to_owned())
 							.href("/docs/getting_started/predict/".to_owned())
-							.selected(Some(matches!(
+							.selected(matches!(
 								self.selected_page,
-								DocsPage::GettingStarted(GettingStartedPage::Predict(_))
-							)))
+								Some(DocsPage::GettingStarted(GettingStartedPage::Predict(_)))
+							))
 							.child(
 								ui::NavItem::new()
 									.title("Elixir".to_owned())
 									.href("/docs/getting_started/predict/elixir".to_owned())
-									.selected(Some(matches!(
+									.selected(matches!(
 										self.selected_page,
-										DocsPage::GettingStarted(GettingStartedPage::Predict(
-											PredictPage::Elixir,
+										Some(DocsPage::GettingStarted(
+											GettingStartedPage::Predict(PredictPage::Elixir,)
 										)),
-									))),
+									)),
 							)
 							.child(
 								ui::NavItem::new()
 									.title("Go".to_owned())
 									.href("/docs/getting_started/predict/go".to_owned())
-									.selected(Some(matches!(
+									.selected(matches!(
 										self.selected_page,
-										DocsPage::GettingStarted(GettingStartedPage::Predict(
-											PredictPage::Go
-										),)
-									))),
+										Some(DocsPage::GettingStarted(
+											GettingStartedPage::Predict(PredictPage::Go)
+										))
+									)),
 							)
 							.child(
 								ui::NavItem::new()
 									.title("Node".to_owned())
 									.href("/docs/getting_started/predict/node".to_owned())
-									.selected(Some(matches!(
+									.selected(matches!(
 										self.selected_page,
-										DocsPage::GettingStarted(GettingStartedPage::Predict(
-											PredictPage::Node,
+										Some(DocsPage::GettingStarted(
+											GettingStartedPage::Predict(PredictPage::Node,)
 										)),
-									))),
+									)),
 							)
 							.child(
 								ui::NavItem::new()
 									.title("Python".to_owned())
 									.href("/docs/getting_started/predict/python".to_owned())
-									.selected(Some(matches!(
+									.selected(matches!(
 										self.selected_page,
-										DocsPage::GettingStarted(GettingStartedPage::Predict(
-											PredictPage::Python,
+										Some(DocsPage::GettingStarted(
+											GettingStartedPage::Predict(PredictPage::Python,)
 										)),
-									))),
+									)),
 							)
 							.child(
 								ui::NavItem::new()
 									.title("Ruby".to_owned())
 									.href("/docs/getting_started/predict/ruby".to_owned())
-									.selected(Some(matches!(
+									.selected(matches!(
 										self.selected_page,
-										DocsPage::GettingStarted(GettingStartedPage::Predict(
-											PredictPage::Ruby,
+										Some(DocsPage::GettingStarted(
+											GettingStartedPage::Predict(PredictPage::Ruby,)
 										)),
-									))),
+									)),
 							)
 							.child(
 								ui::NavItem::new()
 									.title("Rust".to_owned())
 									.href("/docs/getting_started/predict/rust".to_owned())
-									.selected(Some(matches!(
+									.selected(matches!(
 										self.selected_page,
-										DocsPage::GettingStarted(GettingStartedPage::Predict(
-											PredictPage::Rust,
+										Some(DocsPage::GettingStarted(
+											GettingStartedPage::Predict(PredictPage::Rust,)
 										)),
-									))),
+									)),
 							),
 					)
 					.child(
 						ui::NavItem::new()
 							.title("Inspect".to_owned())
 							.href("/docs/getting_started/inspect".to_owned())
-							.selected(Some(matches!(
+							.selected(matches!(
 								self.selected_page,
-								DocsPage::GettingStarted(GettingStartedPage::Inspect),
-							))),
+								Some(DocsPage::GettingStarted(GettingStartedPage::Inspect)),
+							)),
 					)
 					.child(
 						ui::NavItem::new()
 							.title("Monitor".to_owned())
 							.href("/docs/getting_started/monitor".to_owned())
-							.selected(Some(matches!(
+							.selected(matches!(
 								self.selected_page,
-								DocsPage::GettingStarted(GettingStartedPage::Monitor),
-							))),
+								Some(DocsPage::GettingStarted(GettingStartedPage::Monitor)),
+							)),
 					),
 			)
-			.child(ui::NavSection::new("Guides").children(
+			.child(ui::NavSection::new("Guides".to_owned()).children(
 				DocsGuide::list().unwrap().into_iter().map(|guide| {
 					ui::NavItem::new()
 						.title(guide.front_matter.title)
 						.href(format!("/docs/guides/{}", guide.slug))
-						.selected(Some(self.selected_page == DocsPage::Guides(guide.slug)))
+						.selected(self.selected_page == Some(DocsPage::Guides(guide.slug)))
 				}),
 			))
 			.child(
-				ui::NavSection::new("Languages")
+				ui::NavSection::new("Languages".to_owned())
 					.child(
 						ui::NavItem::new()
 							.title("C".to_owned())
 							.href("/docs/languages/c".to_owned())
-							.selected(Some(false)),
+							.selected(false),
 					)
 					.child(
 						ui::NavItem::new()
 							.title("Elixir".to_owned())
 							.href("/docs/languages/elixir".to_owned())
-							.selected(Some(false)),
+							.selected(false),
 					)
 					.child(
 						ui::NavItem::new()
 							.title("Go".to_owned())
 							.href("/docs/languages/go".to_owned())
-							.selected(Some(false)),
+							.selected(false),
 					)
 					.child(
 						ui::NavItem::new()
 							.title("Node.js".to_owned())
 							.href("/docs/languages/node".to_owned())
-							.selected(Some(false)),
+							.selected(false),
 					)
 					.child(
 						ui::NavItem::new()
 							.title("Python".to_owned())
 							.href("/docs/languages/python".to_owned())
-							.selected(Some(false)),
+							.selected(false),
 					)
 					.child(
 						ui::NavItem::new()
 							.title("Ruby".to_owned())
 							.href("/docs/languages/ruby".to_owned())
-							.selected(Some(false)),
+							.selected(false),
 					)
 					.child(
 						ui::NavItem::new()
 							.title("Rust".to_owned())
 							.href("/docs/languages/rust".to_owned())
-							.selected(Some(false)),
+							.selected(false),
 					),
 			)
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct Headings {
 	headings: Vec<Heading>,
 }
@@ -273,8 +271,8 @@ impl Component for Headings {
 			.children(self.headings.into_iter().map(|heading| {
 				ui::NavItem::new()
 					.title(heading.title)
-					.href(Some(format!("#{}", heading.id)))
-					.selected(Some(false))
+					.href(format!("#{}", heading.id))
+					.selected(false)
 			}))
 			.into_node()
 	}

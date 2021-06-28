@@ -9,10 +9,6 @@ version = "0.0.0"
 path = "lib.rs"
 
 [[bin]]
-name = "tangram_app_dev"
-path = "dev.rs"
-
-[[bin]]
 name = "tangram_app_seed"
 path = "seed.rs"
 
@@ -29,6 +25,7 @@ default = [
   "tangram_app_model_edit_server",
   "tangram_app_model_index_client",
   "tangram_app_model_index_server",
+  "tangram_app_model_download_server",
   "tangram_app_new_member_server",
   "tangram_app_new_model_client",
   "tangram_app_new_model_server",
@@ -116,6 +113,7 @@ tangram_app_index_server = { path = "pages/index/server", optional = true }
 tangram_app_login_server = { path = "pages/login/server", optional = true }
 tangram_app_model_edit_server = { path = "pages/repos/_/models/_/edit/server", optional = true }
 tangram_app_model_index_server = { path = "pages/repos/_/models/_/index/server", optional = true }
+tangram_app_model_download_server = { path = "pages/repos/_/models/_/download/server", optional = true }
 tangram_app_new_member_server = { path = "pages/organizations/_/members/new/server", optional = true }
 tangram_app_new_model_server = { path = "pages/repos/_/models/new/server", optional = true }
 tangram_app_new_organization_server = { path = "pages/organizations/new/server", optional = true }

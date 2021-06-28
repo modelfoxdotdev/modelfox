@@ -229,17 +229,17 @@ impl Component for Page {
 
 				Click Training Metrics in the sidebar and have a look at the confusion matrix.
 			"#
-		));
+		).into());
 		let m2 = ui::Markdown::new(ui::doc!(
 			r#"
 				It looks like false negatives are a bit high. This means we are predicting people are healthy when they actually aren't. It would be better if the model had fewer false negatives, even if it means more false positives, because doctors can rule out heart disease with further testing. Let's make that change by going to the Tuning page. Drag the tuning slider to see how different thresholds affect precision and recall.
 			"#
-		));
+		).into());
 		let m3 = ui::Markdown::new(ui::doc!(
 			r#"
 				When we lower the threhold, we predict that more people have heart disease which results in lower precision but higher recall. Once you've chosen a threshold, you can update your prediction code to use it.
 			"#
-		));
+		).into());
 		let prev_next_buttons = div()
 			.class("docs-prev-next-buttons")
 			.child(
@@ -267,7 +267,8 @@ impl Component for Page {
 					.child(TuningCode),
 			)
 			.child(prev_next_buttons);
-		let layout = DocsLayout::new(DocsPage::GettingStarted(GettingStartedPage::Inspect), None)
+		let layout = DocsLayout::new()
+			.selected_page(DocsPage::GettingStarted(GettingStartedPage::Inspect))
 			.child(content);
 		Document::new()
 			.client("tangram_www_docs_getting_started_inspect_client")
@@ -284,13 +285,13 @@ impl Component for TrainingMetrics {
 			.child(
 				ui::S1::new()
 					.child(ui::H1::new().child("Training Metrics"))
-					.child(ui::ConfusionMatrix::new(
-						"positive",
-						Some(20),
-						Some(19),
-						Some(299),
-						Some(400),
-					)),
+					.child(ui::ConfusionMatrix {
+						class_label: "positive".to_owned(),
+						false_negatives: Some(20),
+						false_positives: Some(19),
+						true_negatives: Some(299),
+						true_positives: Some(400),
+					}),
 			)
 			.into_node()
 	}

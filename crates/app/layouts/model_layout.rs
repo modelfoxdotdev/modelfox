@@ -28,11 +28,19 @@ pub enum Owner {
 	Organization { id: Id, name: String },
 }
 
-#[derive(ComponentBuilder)]
+#[derive(children)]
 pub struct ModelLayout {
 	pub info: ModelLayoutInfo,
-	#[children]
 	pub children: Vec<Node>,
+}
+
+impl ModelLayout {
+	pub fn new(info: ModelLayoutInfo) -> ModelLayout {
+		ModelLayout {
+			info,
+			children: Vec::new(),
+		}
+	}
 }
 
 pub async fn model_layout_info(
@@ -68,11 +76,11 @@ pub async fn model_layout_info(
 	let repo_id: Id = repo_id.parse()?;
 	let repo_title: String = row.get(1);
 	let model_tag: Option<String> = row.get(2);
+	let owner_user_id: Option<String> = row.get(3);
+	let owner_user_email: Option<String> = row.get(4);
+	let owner_organization_id: Option<String> = row.get(5);
+	let owner_organization_name: Option<String> = row.get(6);
 	let model_version_ids = get_model_version_ids(&mut db, repo_id).await?;
-	let owner_organization_id: Option<String> = row.get(3);
-	let owner_organization_name: Option<String> = row.get(4);
-	let owner_user_id: Option<String> = row.get(5);
-	let owner_user_email: Option<String> = row.get(6);
 	#[allow(clippy::manual_map)]
 	let owner = if let Some(owner_user_id) = owner_user_id {
 		Some(Owner::User {
@@ -235,21 +243,21 @@ impl Component for ModelLayoutTop {
 		let model_heading = self.model_tag.unwrap_or_else(|| model_id.to_string());
 		struct OwnerInfo {
 			title: String,
-			url: String,
+			href: String,
 		}
 		let owner_info = self.owner.map(|owner| match owner {
-			Owner::Organization { name, id } => OwnerInfo {
-				title: name,
-				url: format!("/organizations/{}", id),
-			},
 			Owner::User { email, .. } => OwnerInfo {
 				title: email,
-				url: "/user".to_owned(),
+				href: "/user".to_owned(),
+			},
+			Owner::Organization { name, id } => OwnerInfo {
+				title: name,
+				href: format!("/organizations/{}/", id),
 			},
 		});
 		let owner_segment = owner_info.map(|owner_info| {
 			a().class("model-layout-top-title-segment")
-				.attribute("href", owner_info.url)
+				.attribute("href", owner_info.href)
 				.attribute("title", "owner")
 				.child(owner_info.title)
 		});
@@ -282,20 +290,17 @@ impl Component for ModelLayoutTop {
 			.class("model-layout-top-buttons-wrapper")
 			.child(
 				ui::Button::new()
-					.color(Some(ui::colors::GRAY.to_owned()))
-					.href(Some(format!(
-						"/repos/{}/models/{}/edit",
-						repo_id, self.model_id
-					)))
+					.color(ui::colors::GRAY.to_owned())
+					.href(format!("/repos/{}/models/{}/edit", repo_id, self.model_id))
 					.child("Edit"),
 			)
 			.child(
 				ui::Button::new()
-					.href(Some(format!(
+					.href(format!(
 						"/repos/{}/models/{}/download",
 						repo_id, self.model_id
-					)))
-					.download(Some(format!("{}.tangram", self.repo_title)))
+					))
+					.download(format!("{}.tangram", self.repo_title))
 					.child("Download"),
 			);
 		div()
@@ -317,87 +322,82 @@ impl Component for ModelNav {
 		let overview = ui::NavSection::new("Overview".to_owned()).child(
 			ui::NavItem::new()
 				.title("Overview".to_owned())
-				.href(Some(format!(
-					"/repos/{}/models/{}/",
-					self.repo_id, self.model_id
-				)))
-				.selected(Some(self.selected_item == ModelNavItem::Overview)),
+				.href(format!("/repos/{}/models/{}/", self.repo_id, self.model_id))
+				.selected(self.selected_item == ModelNavItem::Overview),
 		);
 		let training = ui::NavSection::new("Training".to_owned())
 			.child(
 				ui::NavItem::new()
 					.title("Grid".to_owned())
-					.href(Some(format!(
+					.href(format!(
 						"/repos/{}/models/{}/training_grid/",
 						self.repo_id, self.model_id
-					)))
-					.selected(Some(self.selected_item == ModelNavItem::TrainingGrid)),
+					))
+					.selected(self.selected_item == ModelNavItem::TrainingGrid),
 			)
 			.child(
 				ui::NavItem::new()
 					.title("Stats".to_owned())
-					.href(Some(format!(
+					.href(format!(
 						"/repos/{}/models/{}/training_stats/",
 						self.repo_id, self.model_id
-					)))
-					.selected(Some(self.selected_item == ModelNavItem::TrainingStats)),
+					))
+					.selected(self.selected_item == ModelNavItem::TrainingStats),
 			)
 			.child(
 				ui::NavItem::new()
 					.title("Metrics".to_owned())
-					.href(Some(format!(
+					.href(format!(
 						"/repos/{}/models/{}/training_metrics/",
 						self.repo_id, self.model_id
-					)))
-					.selected(Some(self.selected_item == ModelNavItem::TrainingMetrics)),
+					))
+					.selected(self.selected_item == ModelNavItem::TrainingMetrics),
 			);
 		let playground = ui::NavSection::new("Playground".to_owned()).child(
 			ui::NavItem::new()
 				.title("Playground".to_owned())
-				.href(Some(format!(
+				.href(format!(
 					"/repos/{}/models/{}/playground",
 					self.repo_id, self.model_id
-				)))
-				.selected(Some(self.selected_item == ModelNavItem::Playground)),
+				))
+				.selected(self.selected_item == ModelNavItem::Playground),
 		);
 		let tuning = ui::NavSection::new("Tuning".to_owned()).child(
 			ui::NavItem::new()
 				.title("Tuning".to_owned())
-				.href(Some(format!(
+				.href(format!(
 					"/repos/{}/models/{}/tuning",
 					self.repo_id, self.model_id
-				)))
-				.selected(Some(self.selected_item == ModelNavItem::Tuning)),
+				))
+				.selected(self.selected_item == ModelNavItem::Tuning),
 		);
 		let production = ui::NavSection::new("Production".to_owned())
 			.child(
 				ui::NavItem::new()
 					.title("Predictions".to_owned())
-					.href(Some(format!(
+					.href(format!(
 						"/repos/{}/models/{}/production_predictions/",
 						self.repo_id, self.model_id
-					)))
-					.selected(Some(
-						self.selected_item == ModelNavItem::ProductionPredictions,
-					)),
+					))
+					.selected(self.selected_item == ModelNavItem::ProductionPredictions),
 			)
 			.child(
 				ui::NavItem::new()
 					.title("Stats".to_owned())
-					.href(Some(format!(
+					.href(format!(
 						"/repos/{}/models/{}/production_stats/",
 						self.repo_id, self.model_id
-					)))
-					.selected(Some(self.selected_item == ModelNavItem::ProductionStats)),
+					))
+					.selected(self.selected_item == ModelNavItem::ProductionStats),
 			)
 			.child(
 				ui::NavItem::new()
 					.title("Metrics".to_owned())
-					.href(Some(format!(
+					.href(format!(
 						"/repos/{}/models/{}/production_metrics/",
 						self.repo_id, self.model_id
-					)))
-					.selected(Some(self.selected_item == ModelNavItem::ProductionMetrics)),
+					))
+					.selected(self.selected_item == ModelNavItem::ProductionMetrics),
 			);
 		ui::Nav::new()
 			.title("Pages".to_owned())

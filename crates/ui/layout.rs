@@ -1,8 +1,8 @@
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct S1 {
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -12,9 +12,9 @@ impl Component for S1 {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct S2 {
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -24,9 +24,9 @@ impl Component for S2 {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct SpaceBetween {
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -39,11 +39,11 @@ impl Component for SpaceBetween {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct H1 {
-	#[optional]
+	#[builder]
 	pub center: Option<bool>,
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -54,16 +54,18 @@ impl Component for H1 {
 		} else {
 			None
 		};
-		let class = classes!("h1", center);
-		h1().class(class).child(self.children).into_node()
+		h1().class("h1")
+			.class(center)
+			.child(self.children)
+			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct H2 {
-	#[optional]
+	#[builder]
 	pub center: Option<bool>,
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -74,14 +76,16 @@ impl Component for H2 {
 		} else {
 			None
 		};
-		let class = classes!("h2", center);
-		h2().class(class).child(self.children).into_node()
+		h2().class("h2")
+			.class(center)
+			.child(self.children)
+			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct P {
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -91,9 +95,9 @@ impl Component for P {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct UnorderedList {
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -105,9 +109,9 @@ impl Component for UnorderedList {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct OrderedList {
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -117,9 +121,9 @@ impl Component for OrderedList {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct ListItem {
-	#[children]
 	pub children: Vec<Node>,
 }
 

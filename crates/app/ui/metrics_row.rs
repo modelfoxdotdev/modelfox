@@ -1,8 +1,8 @@
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(children, Default, new)]
+#[new(default)]
 pub struct MetricsRow {
-	#[children]
 	pub children: Vec<Node>,
 }
 

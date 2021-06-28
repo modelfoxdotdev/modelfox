@@ -1,2 +1,7 @@
 #!/bin/sh
-cargo run --bin tangram_www_dev
+cargo run --bin tangram_dev -- \
+  --watch . \
+  --ignore languages \
+  --ignore target \
+  --ignore target_check \
+  --command "cargo run -p tangram_www -- serve"

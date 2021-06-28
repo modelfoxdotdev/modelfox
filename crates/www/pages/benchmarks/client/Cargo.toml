@@ -10,9 +10,8 @@ path = "main.rs"
 
 [dependencies]
 console_error_panic_hook = "0.1"
-pinwheel = "0.1"
+pinwheel = "0.2"
 tangram_charts = { path = "../../../../charts" }
 tangram_ui = { path = "../../../../ui" }
-tangram_client = { path = "../../../../client" }
 tangram_www_benchmarks_common = { path = "../common" }
 web-sys = "0.3"

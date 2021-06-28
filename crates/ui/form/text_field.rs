@@ -1,31 +1,32 @@
 use super::FieldLabel;
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, Default, new)]
+#[new(default)]
 pub struct TextField {
-	#[optional]
+	#[builder]
 	pub autocomplete: Option<String>,
-	#[optional]
+	#[builder]
 	pub id: Option<String>,
-	#[optional]
+	#[builder]
 	pub disabled: Option<bool>,
-	#[optional]
+	#[builder]
 	pub label: Option<String>,
-	#[optional]
+	#[builder]
 	pub name: Option<String>,
-	#[optional]
+	#[builder]
 	pub placeholder: Option<String>,
-	#[optional]
+	#[builder]
 	pub readonly: Option<bool>,
-	#[optional]
+	#[builder]
 	pub required: Option<bool>,
-	#[optional]
+	#[builder]
 	pub value: Option<String>,
 }
 
 impl Component for TextField {
 	fn into_node(self) -> Node {
-		FieldLabel::new(None)
+		FieldLabel::new()
 			.child(self.label)
 			.child(
 				input()

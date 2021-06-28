@@ -23,7 +23,9 @@ impl Component for Page {
 		let content = ui::S1::new()
 			.child(ui::H1::new().child("Overview"))
 			.child(ui::S2::new().child(p1).child(p2).child(list));
-		let layout = DocsLayout::new(DocsPage::Overview, None).child(content);
+		let layout = DocsLayout::new()
+			.selected_page(DocsPage::Overview)
+			.child(content);
 		Document::new().child(layout).into_node()
 	}
 }

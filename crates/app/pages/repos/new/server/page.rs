@@ -28,7 +28,7 @@ impl Component for Page {
 						.child(ui::H1::new().child("Create New Repo"))
 						.child(
 							ui::Form::new()
-								.post(Some(true))
+								.post(true)
 								.child(
 									self.error.map(|error| {
 										ui::Alert::new(ui::Level::Danger).child(error)
@@ -38,14 +38,14 @@ impl Component for Page {
 									ui::TextField::new()
 										.label("Title".to_owned())
 										.name("title".to_owned())
-										.required(Some(true))
+										.required(true)
 										.value(self.title),
 								)
 								.child(self.owners.map(|owners| {
 									ui::SelectField::new()
 										.label("Owner".to_owned())
 										.name("owner".to_owned())
-										.options(Some(
+										.options(
 											owners
 												.into_iter()
 												.map(|owner| ui::SelectFieldOption {
@@ -53,13 +53,13 @@ impl Component for Page {
 													value: owner.value,
 												})
 												.collect::<Vec<_>>(),
-										))
-										.required(Some(true))
+										)
+										.required(true)
 										.value(owner)
 								}))
 								.child(
 									ui::Button::new()
-										.button_type(Some(ui::ButtonType::Submit))
+										.button_type(ui::ButtonType::Submit)
 										.child("Submit"),
 								),
 						),

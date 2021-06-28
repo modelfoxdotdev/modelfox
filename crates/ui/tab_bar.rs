@@ -1,8 +1,8 @@
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct TabBar {
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -12,12 +12,13 @@ impl Component for TabBar {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct Tab {
+	#[builder]
 	pub selected: bool,
-	#[optional]
+	#[builder]
 	pub disabled: Option<bool>,
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -33,24 +34,30 @@ impl Component for Tab {
 		} else {
 			None
 		};
-		let class = classes!("tab-bar-tab", selected, disabled);
-		div().class(class).child(self.children).into_node()
+		div()
+			.class("tab-bar-tab")
+			.class(selected)
+			.class(disabled)
+			.child(self.children)
+			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, new)]
 pub struct TabLink {
 	pub href: String,
 	pub selected: bool,
-	#[optional]
+	#[builder]
+	#[new(default)]
 	pub disabled: Option<bool>,
-	#[children]
+	#[new(default)]
 	pub children: Vec<Node>,
 }
 
 impl Component for TabLink {
 	fn into_node(self) -> Node {
-		Tab::new(self.selected)
+		Tab::new()
+			.selected(self.selected)
 			.disabled(self.disabled)
 			.child(
 				a().class("tab-bar-tab-link")

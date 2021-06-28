@@ -8,7 +8,7 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
-pinwheel = "0.1"
+pinwheel = "0.2"
 tangram_app_common = { path = "../../../../../../app/common" }
 tangram_app_production_stats_column_server = { path = "../../../../../../app/pages/repos/_/models/_/production_stats/columns/_/server"}
 tangram_app_production_stats_index_server = { path = "../../../../../../app/pages/repos/_/models/_/production_stats/index/server"}

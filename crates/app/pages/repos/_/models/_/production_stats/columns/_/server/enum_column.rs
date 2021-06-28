@@ -90,12 +90,12 @@ impl Component for EnumColumnStatsSection {
 			.child(Dehydrate::new(
 				"enum_overall",
 				BarChart::new()
-					.series(Some(overall_chart_series))
-					.title(Some(overall_distribution_chart_title))
-					.x_axis_title(Some(self.column_name))
+					.series(overall_chart_series)
+					.title(overall_distribution_chart_title)
+					.x_axis_title(self.column_name)
 					.y_axis_title("Percent".to_owned())
-					.y_max(Some(1.0))
-					.y_min(Some(0.0)),
+					.y_max(1.0)
+					.y_min(0.0),
 			))
 			.into_node()
 	}

@@ -39,8 +39,8 @@ impl Component for Inspection {
 		let left = div().child(title).child(p1).child(br()).child(p2);
 		let accuracy = div().style(style::GRID_AREA, "accuracy").child(
 			ui::NumberComparisonCard::new(Some(baseline_accuracy), Some(accuracy))
-				.color_a(Some(ui::colors::GRAY.to_owned()))
-				.color_b(Some(ui::colors::BLUE.to_owned()))
+				.color_a(ui::colors::GRAY.to_owned())
+				.color_b(ui::colors::BLUE.to_owned())
 				.number_formatter(ui::NumberFormatter::default())
 				.title("Accuracy".to_owned())
 				.value_a_title("Baseline".to_owned())
@@ -50,25 +50,25 @@ impl Component for Inspection {
 			ui::Card::new().child(Dehydrate::new(
 				"pr-curve",
 				LineChart::new()
-					.series(Some(pr_chart_series))
+					.series(pr_chart_series)
 					.title("PR Curve".to_owned())
 					.x_axis_title("Precision".to_owned())
-					.x_max(Some(Finite::new(1.0).unwrap()))
-					.x_min(Some(Finite::new(0.0).unwrap()))
+					.x_max(Finite::new(1.0).unwrap())
+					.x_min(Finite::new(0.0).unwrap())
 					.y_axis_title("Recall".to_owned())
-					.y_max(Some(Finite::new(1.0).unwrap()))
-					.y_min(Some(Finite::new(0.0).unwrap())),
+					.y_max(Finite::new(1.0).unwrap())
+					.y_min(Finite::new(0.0).unwrap()),
 			)),
 		);
 		let roc = div().style(style::GRID_AREA, "roc").child(
 			ui::Card::new().child(Dehydrate::new(
 				"roc-curve",
 				LineChart::new()
-					.x_max(Some(Finite::new(1.0).unwrap()))
-					.x_min(Some(Finite::new(0.0).unwrap()))
-					.y_max(Some(Finite::new(1.0).unwrap()))
-					.y_min(Some(Finite::new(0.0).unwrap()))
-					.series(Some(roc_chart_series))
+					.x_max(Finite::new(1.0).unwrap())
+					.x_min(Finite::new(0.0).unwrap())
+					.y_max(Finite::new(1.0).unwrap())
+					.y_min(Finite::new(0.0).unwrap())
+					.series(roc_chart_series)
 					.title("ROC Curve".to_owned())
 					.x_axis_title("FPR".to_owned())
 					.y_axis_title("TPR".to_owned()),

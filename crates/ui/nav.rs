@@ -1,10 +1,10 @@
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct Nav {
-	#[optional]
+	#[builder]
 	title: Option<String>,
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -21,46 +21,45 @@ impl Component for Nav {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct NavItem {
-	#[optional]
+	#[builder]
 	pub title: Option<String>,
-	#[optional]
+	#[builder]
 	pub href: Option<String>,
-	#[optional]
+	#[builder]
 	pub selected: Option<bool>,
-	#[children]
 	pub children: Vec<Node>,
 }
 
 impl Component for NavItem {
 	fn into_node(self) -> Node {
 		let selected = self.selected.unwrap_or(false);
-		let class = classes!(
-			"nav-item",
-			if selected {
-				Some("nav-item-selected")
-			} else {
-				None
-			},
-			if self.href.is_some() {
-				Some("nav-item-clickable")
-			} else {
-				None
-			}
-		);
+		let selected_class = if selected {
+			Some("nav-item-selected")
+		} else {
+			None
+		};
+		let clickable_class = if self.href.is_some() {
+			Some("nav-item-clickable")
+		} else {
+			None
+		};
 		div()
-			.attribute("class", class)
+			.class("nav-item")
+			.class(selected_class)
+			.class(clickable_class)
 			.child(a().attribute("href", self.href).child(self.title))
 			.child(self.children)
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, new)]
 pub struct NavSection {
 	pub title: String,
-	#[children]
+	#[new(default)]
 	pub children: Vec<Node>,
 }
 

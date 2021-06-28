@@ -97,16 +97,16 @@ impl Component for NumberColumn {
 				ui::Card::new().child(Dehydrate::new(
 					"number_overall",
 					BoxChart::new()
-						.series(Some(overall_box_chart_series))
-						.title(Some(stats_overall_chart_title)),
+						.series(overall_box_chart_series)
+						.title(stats_overall_chart_title),
 				)),
 			)
 			.child(
 				ui::Card::new().child(Dehydrate::new(
 					"number_intervals",
 					BoxChart::new()
-						.series(Some(interval_box_chart_series))
-						.title(Some(stats_interval_chart_title)),
+						.series(interval_box_chart_series)
+						.title(stats_interval_chart_title),
 				)),
 			)
 			.child(self.number_column_stats_section)
@@ -158,8 +158,8 @@ impl Component for NumberColumnStatsSection {
 									Some(self.min_comparison.training),
 									self.min_comparison.production,
 								)
-								.color_a(Some(TRAINING_COLOR.to_owned()))
-								.color_b(Some(PRODUCTION_COLOR.to_owned()))
+								.color_a(TRAINING_COLOR.to_owned())
+								.color_b(PRODUCTION_COLOR.to_owned())
 								.title("Min".to_owned())
 								.value_a_title("Training".to_owned())
 								.value_b_title("Production".to_owned())
@@ -170,8 +170,8 @@ impl Component for NumberColumnStatsSection {
 									Some(self.max_comparison.training),
 									self.max_comparison.production,
 								)
-								.color_a(Some(TRAINING_COLOR.to_owned()))
-								.color_b(Some(PRODUCTION_COLOR.to_owned()))
+								.color_a(TRAINING_COLOR.to_owned())
+								.color_b(PRODUCTION_COLOR.to_owned())
 								.title("Max".to_owned())
 								.value_a_title("Training".to_owned())
 								.value_b_title("Production".to_owned())
@@ -185,8 +185,8 @@ impl Component for NumberColumnStatsSection {
 									Some(self.mean_comparison.training),
 									self.mean_comparison.production,
 								)
-								.color_a(Some(TRAINING_COLOR.to_owned()))
-								.color_b(Some(PRODUCTION_COLOR.to_owned()))
+								.color_a(TRAINING_COLOR.to_owned())
+								.color_b(PRODUCTION_COLOR.to_owned())
 								.title("Mean".to_owned())
 								.value_a_title("Training".to_owned())
 								.value_b_title("Production".to_owned())
@@ -197,8 +197,8 @@ impl Component for NumberColumnStatsSection {
 									Some(self.std_comparison.training),
 									self.std_comparison.production,
 								)
-								.color_a(Some(TRAINING_COLOR.to_owned()))
-								.color_b(Some(PRODUCTION_COLOR.to_owned()))
+								.color_a(TRAINING_COLOR.to_owned())
+								.color_b(PRODUCTION_COLOR.to_owned())
 								.title("Standard Deviation".to_owned())
 								.value_a_title("Training".to_owned())
 								.value_b_title("Production".to_owned())

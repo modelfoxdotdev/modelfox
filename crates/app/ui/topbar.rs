@@ -2,9 +2,10 @@ use crate::logo::{Logo, LogoColorScheme};
 use pinwheel::prelude::*;
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, Default, new)]
+#[new(default)]
 pub struct Topbar {
-	#[optional]
+	#[builder]
 	pub topbar_avatar: Option<TopbarAvatar>,
 }
 
@@ -19,7 +20,7 @@ impl Component for Topbar {
 				element: Some(
 					ui::Link::new()
 						.href("/user".to_owned())
-						.child(ui::Avatar::new(topbar_avatar.avatar_url))
+						.child(ui::Avatar::new().src(topbar_avatar.avatar_url))
 						.into_node(),
 				),
 				href: "/user".to_owned(),

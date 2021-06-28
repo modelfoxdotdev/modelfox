@@ -19,16 +19,16 @@ impl Component for Page {
 						.child(ui::H1::new().child("Create New Organization"))
 						.child(
 							ui::Form::new()
-								.post(Some(true))
+								.post(true)
 								.child(
 									ui::TextField::new()
 										.label("Name".to_owned())
 										.name("name".to_owned())
-										.required(Some(true)),
+										.required(true),
 								)
 								.child(
 									ui::Button::new()
-										.button_type(Some(ui::ButtonType::Submit))
+										.button_type(ui::ButtonType::Submit)
 										.child("Create"),
 								),
 						),

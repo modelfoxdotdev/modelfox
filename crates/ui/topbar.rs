@@ -1,21 +1,22 @@
 use crate as ui;
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, Default, new)]
+#[new(default)]
 pub struct Topbar {
-	#[optional]
+	#[builder]
 	pub background_color: Option<String>,
-	#[optional]
+	#[builder]
 	pub dropdown_background_color: Option<String>,
-	#[optional]
+	#[builder]
 	pub items: Option<Vec<TopbarItem>>,
-	#[optional]
+	#[builder]
 	pub logo_href: Option<String>,
-	#[optional]
+	#[builder]
 	pub logo_img_url: Option<String>,
-	#[optional]
+	#[builder]
 	pub logo: Option<Node>,
-	#[optional]
+	#[builder]
 	pub title: Option<String>,
 }
 
@@ -58,19 +59,18 @@ impl Component for Topbar {
 		div()
 			.class("topbar-wrapper")
 			.style(style::BACKGROUND_COLOR, self.background_color)
-			.child(TopbarBrand::new(
-				self.logo,
-				self.logo_href,
-				self.logo_img_url,
-				self.title,
-			))
+			.child(TopbarBrand {
+				logo_element: self.logo,
+				logo_href: self.logo_href,
+				logo_img_url: self.logo_img_url,
+				title: self.title,
+			})
 			.child(items)
 			.child(dropdown)
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct TopbarBrand {
 	logo_element: Option<Node>,
 	logo_href: Option<String>,
@@ -103,9 +103,9 @@ impl Component for TopbarBrand {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(children, Default, new)]
+#[new(default)]
 struct TopbarItemsWrapper {
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -176,12 +176,14 @@ impl Component for TopbarHamburger {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, new)]
 pub struct TopbarDropdown {
 	items: Vec<TopbarDropdownItem>,
-	#[optional]
+	#[builder]
+	#[new(default)]
 	background_color: Option<String>,
-	#[optional]
+	#[builder]
+	#[new(default)]
 	cta: Option<TopbarItem>,
 }
 
@@ -203,7 +205,8 @@ impl Component for TopbarDropdown {
 			.child(self.cta.map(|cta| {
 				div()
 					.class("topbar-dropdown-item")
-					.child(ui::Button::new().href(Some(cta.href)).child(cta.title))
+					.child(ui::Button::new().href(cta.href))
+					.child(cta.title)
 			}))
 			.into_node()
 	}

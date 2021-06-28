@@ -201,9 +201,9 @@ impl Component for RegressionPredictOutput {
 						.series(vec![self.feature_contributions_chart_series])
 						.negative_color(ui::colors::RED.to_owned())
 						.positive_color(ui::colors::GREEN.to_owned())
-						.include_x_axis_title(Some(true))
-						.include_y_axis_labels(Some(false))
-						.include_y_axis_title(Some(false)),
+						.include_x_axis_title(true)
+						.include_y_axis_labels(false)
+						.include_y_axis_title(false),
 				)),
 			)
 			.into_node()
@@ -242,9 +242,9 @@ impl Component for BinaryClassificationPredictOutput {
 						.series(vec![self.feature_contributions_chart_series])
 						.negative_color(ui::colors::RED.to_owned())
 						.positive_color(ui::colors::GREEN.to_owned())
-						.include_x_axis_title(Some(true))
-						.include_y_axis_labels(Some(true))
-						.include_y_axis_title(Some(true)),
+						.include_x_axis_title(true)
+						.include_y_axis_labels(true)
+						.include_y_axis_title(true),
 				)),
 			);
 		fragment().child(output).child(explanation).into_node()
@@ -293,9 +293,9 @@ impl Component for MulticlassClassificationPredictOutput {
 			.child(Dehydrate::new(
 				"probabilities",
 				BarChart::new()
-					.series(Some(probability_series))
+					.series(probability_series)
 					.title("Predicted Probabilities".to_owned())
-					.y_min(Some(0.0)),
+					.y_min(0.0),
 			))
 			.child(ui::H2::new().child("Explanation"))
 			.child(
@@ -308,9 +308,9 @@ impl Component for MulticlassClassificationPredictOutput {
 					.series(series)
 					.negative_color(ui::colors::RED.to_owned())
 					.positive_color(ui::colors::GREEN.to_owned())
-					.include_x_axis_title(Some(true))
-					.include_y_axis_labels(Some(false))
-					.include_y_axis_title(Some(true)),
+					.include_x_axis_title(true)
+					.include_y_axis_labels(false)
+					.include_y_axis_title(true),
 			))
 			.into_node()
 	}

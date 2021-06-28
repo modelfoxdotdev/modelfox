@@ -1,9 +1,9 @@
 use crate::layout::Layout;
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(children, Default, new)]
+#[new(default)]
 pub struct PageLayout {
-	#[children]
 	pub children: Vec<Node>,
 }
 

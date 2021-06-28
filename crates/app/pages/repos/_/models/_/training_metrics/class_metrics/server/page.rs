@@ -94,13 +94,13 @@ impl Component for ConfusionMatrixSection {
 		ui::S2::new()
 			.child(ui::H2::new().child("Confusion Matrix"))
 			.child(ui::P::new().child(confusion_matrix_definition))
-			.child(ui::ConfusionMatrix::new(
-				self.class,
-				self.false_negatives.to_usize(),
-				self.false_positives.to_usize(),
-				self.true_negatives.to_usize(),
-				self.true_positives.to_usize(),
-			))
+			.child(ui::ConfusionMatrix {
+				class_label: self.class,
+				false_negatives: self.false_negatives.to_usize(),
+				false_positives: self.false_positives.to_usize(),
+				true_negatives: self.true_negatives.to_usize(),
+				true_positives: self.true_positives.to_usize(),
+			})
 			.into_node()
 	}
 }

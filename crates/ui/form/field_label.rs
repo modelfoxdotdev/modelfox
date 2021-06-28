@@ -1,9 +1,10 @@
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct FieldLabel {
+	#[builder]
 	pub html_for: Option<String>,
-	#[children]
 	children: Vec<Node>,
 }
 

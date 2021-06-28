@@ -108,9 +108,9 @@ impl Component for ProductionStats {
 			ui::Card::new().child(Dehydrate::new(
 				"production-stats-number",
 				BoxChart::new()
-					.series(Some(box_chart_series))
+					.series(box_chart_series)
 					.title("exercise_max_heart_rate".to_owned())
-					.should_draw_x_axis_labels(Some(false)),
+					.should_draw_x_axis_labels(false),
 			)),
 		);
 		let enum_alert = div()
@@ -120,12 +120,12 @@ impl Component for ProductionStats {
 			ui::Card::new().child(Dehydrate::new(
 				"production-stats-enum",
 				BarChart::new()
-					.series(Some(bar_chart_series))
+					.series(bar_chart_series)
 					.title("chest_pain".to_owned())
 					.x_axis_title("chest_pain".to_owned())
 					.y_axis_title("Percent".to_owned())
-					.y_max(Some(1.0))
-					.y_min(Some(0.0)),
+					.y_max(1.0)
+					.y_min(0.0),
 			)),
 		);
 		let right = ui::Window::new().child(

@@ -224,7 +224,7 @@ impl Component for Tuning {
 			r#"
 				Tune binary classification models to your preferred tradeoff between precision and recall. To use your selected threshold, update the `predict` call in your code.
 			"#
-		));
+		).into());
 		let left = div().child(title).child(text);
 		let right = ui::Window::new().child(Dehydrate::new(
 			"tuning",

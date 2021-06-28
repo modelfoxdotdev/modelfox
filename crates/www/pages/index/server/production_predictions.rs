@@ -43,7 +43,7 @@ impl Component for ProductionExplanations {
 						.series(series)
 						.negative_color(ui::colors::RED.to_owned())
 						.positive_color(ui::colors::GREEN.to_owned())
-						.include_x_axis_title(Some(true)),
+						.include_x_axis_title(true),
 				)),
 			);
 		let right = ui::Window::new().child(

@@ -1,10 +1,11 @@
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, Default, new)]
+#[new(default)]
 pub struct Img {
-	#[optional]
+	#[builder]
 	pub alt: Option<String>,
-	#[optional]
+	#[builder]
 	pub src: Option<String>,
 }
 

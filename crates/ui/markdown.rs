@@ -3,7 +3,7 @@ use pinwheel::prelude::*;
 use pulldown_cmark::{escape::escape_html, Alignment, CodeBlockKind, Event, Options, Parser, Tag};
 use std::{borrow::Cow, fmt::Write};
 
-#[derive(ComponentBuilder)]
+#[derive(builder, new)]
 pub struct Markdown {
 	string: Cow<'static, str>,
 }

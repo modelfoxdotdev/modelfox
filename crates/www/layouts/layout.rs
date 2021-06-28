@@ -3,9 +3,9 @@ use pinwheel::prelude::*;
 use tangram_ui as ui;
 use tangram_www_ui::logo::{Logo, LogoColorScheme};
 
-#[derive(ComponentBuilder)]
+#[derive(children, Default, new)]
+#[new(default)]
 pub struct Layout {
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -48,7 +48,7 @@ impl Component for Topbar {
 			ui::TopbarItem {
 				element: Some({
 					ui::Button::new()
-						.href(Some("/docs/install".to_owned()))
+						.href("/docs/install".to_owned())
 						.child("Install the CLI")
 						.into()
 				}),
@@ -59,16 +59,13 @@ impl Component for Topbar {
 		ui::Topbar::new()
 			.background_color(ui::colors::BACKGROUND.to_owned())
 			.dropdown_background_color(ui::colors::BACKGROUND.to_owned())
-			.items(Some(topbar_items))
-			.logo(Some(
-				Logo::new().color_scheme(LogoColorScheme::Multi).into(),
-			))
-			.title(Some("tangram".to_owned()))
+			.items(topbar_items)
+			.logo(Logo::new().color_scheme(LogoColorScheme::Multi).into_node())
+			.title("tangram".to_owned())
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct GithubIconLink {
 	color: String,
 }

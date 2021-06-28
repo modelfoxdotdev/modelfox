@@ -1,11 +1,11 @@
 use super::alert::Level;
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, new)]
 pub struct AlertIcon {
 	pub alert: String,
 	pub level: Level,
-	#[children]
+	#[new(default)]
 	pub children: Vec<Node>,
 }
 
@@ -17,12 +17,20 @@ impl Component for AlertIcon {
 			Level::Warning => "alert-icon-level-warning",
 			Level::Danger => "alert-icon-level-danger",
 		};
-		let alert_message_class = classes!("alert-icon-message", level_class);
-		let alert_icon_class = classes!("alert-icon", level_class);
 		div()
 			.class("alert-icon-container")
-			.child(div().class(alert_message_class).child(self.alert))
-			.child(div().class(alert_icon_class).child(self.children))
+			.child(
+				div()
+					.class("alert-icon-message")
+					.class(level_class)
+					.child(self.alert),
+			)
+			.child(
+				div()
+					.class("alert-icon")
+					.class(level_class)
+					.child(self.children),
+			)
 			.into_node()
 	}
 }

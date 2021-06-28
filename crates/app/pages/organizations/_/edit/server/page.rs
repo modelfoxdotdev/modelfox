@@ -19,7 +19,7 @@ impl Component for Page {
 						.child(ui::H1::new().child("Edit Organization"))
 						.child(
 							ui::Form::new()
-								.post(Some(true))
+								.post(true)
 								.child(
 									ui::TextField::new()
 										.label("Organization Name".to_owned())
@@ -27,7 +27,7 @@ impl Component for Page {
 								)
 								.child(
 									ui::Button::new()
-										.button_type(Some(ui::ButtonType::Submit))
+										.button_type(ui::ButtonType::Submit)
 										.child("Submit"),
 								),
 						),

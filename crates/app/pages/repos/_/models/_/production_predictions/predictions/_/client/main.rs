@@ -2,7 +2,7 @@ use pinwheel::prelude::*;
 use web_sys as dom;
 
 pub fn main() {
-	tangram_client::client_start();
+	tangram_ui::client_start();
 	let window = dom::window().unwrap();
 	let document = window.document().unwrap();
 	if document.get_element_by_id("probabilities").is_some() {

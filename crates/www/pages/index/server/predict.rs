@@ -144,10 +144,10 @@ impl Component for Predict {
 					.child("Rust"),
 			)
 			.child(".");
-		let p2 = div().attribute("class","index-step-text").child("Tangram is written in Rust and exposed to each langauge via native extensions, so predictions are fast and your data never travels over the network.");
+		let p2 = div().class("index-step-text").child("Tangram is written in Rust and exposed to each langauge via native extensions, so predictions are fast and your data never travels over the network.");
 		let left = div().child(title).child(p1).child(br()).child(p2);
 		let right = ui::Window::new()
-			.child(ui::CodeSelect::new(code_for_language).hide_line_numbers(Some(false)));
+			.child(ui::CodeSelect::new(code_for_language).hide_line_numbers(false));
 		div()
 			.class("index-step")
 			.child(left)

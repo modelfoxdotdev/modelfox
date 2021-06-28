@@ -184,6 +184,7 @@ fn deb(
 ) -> Result<()> {
 	// Find all the .debs in args.debs.
 	struct Deb {
+		arch: String,
 		version: String,
 		path: PathBuf,
 	}
@@ -202,8 +203,8 @@ fn deb(
 		let mut components = stem.split('_');
 		let _ = components.next().unwrap();
 		let version = components.next().unwrap().to_owned();
-		let _ = components.next().unwrap().to_owned();
-		debs.push(Deb { version, path });
+		let arch = components.next().unwrap().to_owned();
+		debs.push(Deb { arch, version, path });
 	}
 	let distributions = &["debian", "ubuntu"];
 	let debian_versions = vec!["sid", "bullseye", "buster", "stretch"];
@@ -256,7 +257,7 @@ fn deb(
 				std::fs::create_dir_all(&binary_arch_path).unwrap();
 				let packages_path = binary_arch_path.join("Packages");
 				let mut packages_file = String::new();
-				for deb in debs.iter() {
+				for deb in debs.iter().filter(|deb| deb.arch == *arch) {
 					let deb_bytes = std::fs::read(&deb.path).unwrap();
 					let packages_entry = formatdoc!(
 						r#"
@@ -307,7 +308,7 @@ fn deb(
 			let release_file = formatdoc!(
 				r#"
 					Codename: {}
-					Architectures: amd64
+					Architectures: amd64 arm64
 					Components: main
 					Date: {}
 					Description: Packages from Tangram, Inc. (https://www.tangram.xyz)

@@ -54,10 +54,10 @@ impl Component for Tuning {
 				selected_index.signal().map(move |selected_index| {
 					ui::NumberComparisonCard::new(
 						Some(baseline_metrics.accuracy),
-						metrics[selected_index].accuracy,
+						Some(metrics[selected_index].accuracy),
 					)
-					.color_a(Some(BASELINE_COLOR.to_owned()))
-					.color_b(Some(SELECTED_THRESHOLD_COLOR.to_owned()))
+					.color_a(BASELINE_COLOR.to_owned())
+					.color_b(SELECTED_THRESHOLD_COLOR.to_owned())
 					.title("Accuracy".to_owned())
 					.value_a_title("Baseline".to_owned())
 					.value_b_title("Selected Threshold".to_owned())
@@ -71,8 +71,8 @@ impl Component for Tuning {
 						Some(baseline_metrics.f1_score.unwrap()),
 						metrics[selected_index].f1_score,
 					)
-					.color_a(Some(BASELINE_COLOR.to_owned()))
-					.color_b(Some(SELECTED_THRESHOLD_COLOR.to_owned()))
+					.color_a(BASELINE_COLOR.to_owned())
+					.color_b(SELECTED_THRESHOLD_COLOR.to_owned())
 					.title("F1 Score".to_owned())
 					.value_a_title("Baseline".to_owned())
 					.value_b_title("Selected Threshold".to_owned())
@@ -86,8 +86,8 @@ impl Component for Tuning {
 						baseline_metrics.precision,
 						metrics[selected_index].precision,
 					)
-					.color_a(Some(BASELINE_COLOR.to_owned()))
-					.color_b(Some(SELECTED_THRESHOLD_COLOR.to_owned()))
+					.color_a(BASELINE_COLOR.to_owned())
+					.color_b(SELECTED_THRESHOLD_COLOR.to_owned())
 					.title("Precision".to_owned())
 					.value_a_title("Baseline".to_owned())
 					.value_b_title("Selected Threshold".to_owned())
@@ -101,8 +101,8 @@ impl Component for Tuning {
 						baseline_metrics.recall,
 						metrics[selected_index].recall,
 					)
-					.color_a(Some(BASELINE_COLOR.to_owned()))
-					.color_b(Some(SELECTED_THRESHOLD_COLOR.to_owned()))
+					.color_a(BASELINE_COLOR.to_owned())
+					.color_b(SELECTED_THRESHOLD_COLOR.to_owned())
 					.title("Recall".to_owned())
 					.value_a_title("Baseline".to_owned())
 					.value_b_title("Selected Threshold".to_owned())
@@ -112,38 +112,38 @@ impl Component for Tuning {
 		let confusion_comparison_matrix = {
 			let class = self.class;
 			clone!(baseline_metrics, metrics);
-			selected_index.signal().map(move |selected_index| {
-				ui::ConfusionMatrixComparison::new(
-					class.to_owned(),
-					BASELINE_COLOR.to_owned(),
-					SELECTED_THRESHOLD_COLOR.to_owned(),
-					Some(ui::ConfusionMatrixComparisonValue {
+			selected_index
+				.signal()
+				.map(move |selected_index| ui::ConfusionMatrixComparison {
+					class_label: class.to_owned(),
+					color_a: BASELINE_COLOR.to_owned(),
+					color_b: SELECTED_THRESHOLD_COLOR.to_owned(),
+					value_a: Some(ui::ConfusionMatrixComparisonValue {
 						false_negative: baseline_metrics.false_negatives_fraction,
 						false_positive: baseline_metrics.false_positives_fraction,
 						true_negative: baseline_metrics.true_negatives_fraction,
 						true_positive: baseline_metrics.true_positives_fraction,
 					}),
-					"Baseline".to_owned(),
-					Some(ui::ConfusionMatrixComparisonValue {
+					value_a_title: "Baseline".to_owned(),
+					value_b: Some(ui::ConfusionMatrixComparisonValue {
 						false_negative: metrics[selected_index].false_negatives_fraction,
 						false_positive: metrics[selected_index].false_positives_fraction,
 						true_negative: metrics[selected_index].true_negatives_fraction,
 						true_positive: metrics[selected_index].true_positives_fraction,
 					}),
-					"Selected Threshold".to_owned(),
-				)
-			})
+					value_b_title: "Selected Threshold".to_owned(),
+				})
 		};
 		ui::S1::new()
 			.child(ui::H1::new().child("Tuning"))
 			.child(ui::P::new().child("Drag the silder to choose a threshold."))
 			.child(
-				ui::Slider::new(
-					0.0,
-					(metrics.len() - 1).to_f32().unwrap(),
-					1.0,
-					Box::new(selected_index.signal().map(|i| i.to_f32().unwrap())) as BoxSignal<_>,
-				)
+				ui::Slider::new(ui::SliderInit {
+					min: 0.0,
+					max: (metrics.len() - 1).to_f32().unwrap(),
+					step: 1.0,
+					value: selected_index.signal().map(|i| i.to_f32().unwrap()),
+				})
 				.tooltip_number_formatter(tooltip_number_formatter)
 				.on_change(on_change),
 			)

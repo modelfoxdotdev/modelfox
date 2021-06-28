@@ -42,12 +42,12 @@ impl Component for Tuning {
 			clone!(selected_index);
 			Box::new(move |value: f32| selected_index.set(value.to_usize().unwrap()))
 		};
-		let slider = ui::Slider::new(
-			0.0,
-			(threshold_metrics.len() - 1).to_f32().unwrap(),
-			1.0,
-			Box::new(selected_index.signal().map(|i| i.to_f32().unwrap())) as BoxSignal<_>,
-		)
+		let slider = ui::Slider::new(ui::SliderInit {
+			min: 0.0,
+			max: (threshold_metrics.len() - 1).to_f32().unwrap(),
+			step: 1.0,
+			value: selected_index.signal().map(|i| i.to_f32().unwrap()),
+		})
 		.tooltip_number_formatter(tooltip_number_formatter)
 		.on_change(on_change);
 		let accuracy = {

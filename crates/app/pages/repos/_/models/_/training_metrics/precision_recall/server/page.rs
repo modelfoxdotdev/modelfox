@@ -91,15 +91,15 @@ impl Component for Page {
 						ui::Card::new().child(Dehydrate::new(
 							"parametric_pr",
 							LineChart::new()
-								.hide_legend(Some(true))
-								.series(Some(parametric_series))
+								.hide_legend(true)
+								.series(parametric_series)
 								.title("Parametric Precision Recall Curve".to_owned())
 								.x_axis_title("Recall".to_owned())
 								.y_axis_title("Precision".to_owned())
-								.x_max(Some(Finite::new(1.0).unwrap()))
-								.x_min(Some(Finite::new(0.0).unwrap()))
-								.y_max(Some(Finite::new(1.0).unwrap()))
-								.y_min(Some(Finite::new(0.0).unwrap())),
+								.x_max(Finite::new(1.0).unwrap())
+								.x_min(Finite::new(0.0).unwrap())
+								.y_max(Finite::new(1.0).unwrap())
+								.y_min(Finite::new(0.0).unwrap()),
 						)),
 					),
 			)
@@ -111,15 +111,15 @@ impl Component for Page {
 						ui::Card::new().child(Dehydrate::new(
 							"non_parametric_pr",
 							LineChart::new()
-								.hide_legend(Some(true))
-								.series(Some(non_parametric_series))
+								.hide_legend(true)
+								.series(non_parametric_series)
 								.title("Non-Parametric Precision Recall Curve".to_owned())
 								.x_axis_title("Threshold".to_owned())
 								.y_axis_title("Precision/Recall".to_owned())
-								.x_max(Some(Finite::new(1.0).unwrap()))
-								.x_min(Some(Finite::new(0.0).unwrap()))
-								.y_max(Some(Finite::new(1.0).unwrap()))
-								.y_min(Some(Finite::new(0.0).unwrap())),
+								.x_max(Finite::new(1.0).unwrap())
+								.x_min(Finite::new(0.0).unwrap())
+								.y_max(Finite::new(1.0).unwrap())
+								.y_min(Finite::new(0.0).unwrap()),
 						)),
 					),
 			);

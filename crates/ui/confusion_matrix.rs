@@ -17,7 +17,6 @@ use tangram_number_formatter::PercentFormatter;
 // |           ||     |                  |                   |
 // |---------------------------------------------------------|
 
-#[derive(ComponentBuilder)]
 pub struct ConfusionMatrix {
 	pub class_label: String,
 	pub false_negatives: Option<usize>,
@@ -46,58 +45,59 @@ impl Component for ConfusionMatrix {
 		div()
 			.class("confusion-matrix-wrapper")
 			.child(
-				ConfusionMatrixLabel::new("actual-true-label".to_owned(), None)
+				ConfusionMatrixLabel::new("actual-true-label".to_owned())
 					.child(div().child("Actual"))
 					.child(ui::Token::new().child(self.class_label.clone())),
 			)
 			.child(
-				ConfusionMatrixLabel::new("actual-false-label".to_owned(), None)
+				ConfusionMatrixLabel::new("actual-false-label".to_owned())
 					.child(div().child("Actual Not"))
 					.child(ui::Token::new().child(self.class_label.clone())),
 			)
 			.child(
-				ConfusionMatrixLabel::new("predicted-true-label".to_owned(), Some(true))
+				ConfusionMatrixLabel::new("predicted-true-label".to_owned())
+					.left(true)
 					.child(div().child("Predicted"))
 					.child(ui::Token::new().child(self.class_label.clone())),
 			)
 			.child(
-				ConfusionMatrixLabel::new("predicted-false-label".to_owned(), Some(true))
+				ConfusionMatrixLabel::new("predicted-false-label".to_owned())
+					.left(true)
 					.child(div().child("Predicted Not"))
 					.child(ui::Token::new().child(self.class_label)),
 			)
-			.child(ConfusionMatrixItem::new(
-				"true-positive".to_owned(),
-				true,
-				"True Positives".to_owned(),
+			.child(ConfusionMatrixItem {
+				area: "true-positive".to_owned(),
+				correct: true,
+				title: "True Positives".to_owned(),
 				total,
-				self.true_positives,
-			))
-			.child(ConfusionMatrixItem::new(
-				"false-positive".to_owned(),
-				false,
-				"False Positives".to_owned(),
+				value: self.true_positives,
+			})
+			.child(ConfusionMatrixItem {
+				area: "false-positive".to_owned(),
+				correct: false,
+				title: "False Positives".to_owned(),
 				total,
-				self.false_positives,
-			))
-			.child(ConfusionMatrixItem::new(
-				"false-negative".to_owned(),
-				false,
-				"False Negatives".to_owned(),
+				value: self.false_positives,
+			})
+			.child(ConfusionMatrixItem {
+				area: "false-negative".to_owned(),
+				correct: false,
+				title: "False Negatives".to_owned(),
 				total,
-				self.false_negatives,
-			))
-			.child(ConfusionMatrixItem::new(
-				"true-negative".to_owned(),
-				true,
-				"True Negatives".to_owned(),
+				value: self.false_negatives,
+			})
+			.child(ConfusionMatrixItem {
+				area: "true-negative".to_owned(),
+				correct: true,
+				title: "True Negatives".to_owned(),
 				total,
-				self.true_negatives,
-			))
+				value: self.true_negatives,
+			})
 			.into_node()
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct ConfusionMatrixItem {
 	area: String,
 	correct: bool,
@@ -112,7 +112,6 @@ impl Component for ConfusionMatrixItem {
 			true => "confusion-matrix-item-correct-wrapper",
 			false => "confusion-matrix-item-incorrect-wrapper",
 		};
-		let class = classes!("confusion-matrix-item-wrapper", class);
 		let percent = if let (Some(value), Some(total)) = (self.value, self.total) {
 			Some(value.to_f32().unwrap() / total.to_f32().unwrap())
 		} else {
@@ -124,7 +123,8 @@ impl Component for ConfusionMatrixItem {
 			.unwrap_or_else(|| "N/A".to_owned());
 		let percent = PercentFormatter::default().format_option(percent);
 		div()
-			.attribute("class", class)
+			.class("confusion-matrix-item-wrapper")
+			.class(class)
 			.style(style::GRID_AREA, self.area)
 			.child(div().class("confusion-matrix-item-title").child(self.title))
 			.child(div().class("confusion-matrix-item-value").child(value))
@@ -133,12 +133,22 @@ impl Component for ConfusionMatrixItem {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children)]
 pub struct ConfusionMatrixLabel {
 	pub area: String,
+	#[builder]
 	pub left: Option<bool>,
-	#[children]
 	pub children: Vec<Node>,
+}
+
+impl ConfusionMatrixLabel {
+	pub fn new(area: String) -> ConfusionMatrixLabel {
+		ConfusionMatrixLabel {
+			area,
+			left: None,
+			children: Vec::new(),
+		}
+	}
 }
 
 impl Component for ConfusionMatrixLabel {

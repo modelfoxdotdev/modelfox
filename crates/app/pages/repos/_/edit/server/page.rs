@@ -36,7 +36,7 @@ impl Component for UpdateTitleForm {
 			.child(ui::H2::new().child("Title"))
 			.child(
 				ui::Form::new()
-					.post(Some(true))
+					.post(true)
 					.child(
 						input()
 							.attribute("name", "action")
@@ -47,11 +47,11 @@ impl Component for UpdateTitleForm {
 						ui::TextField::new()
 							.label("Title".to_owned())
 							.name("title".to_owned())
-							.value(Some(self.title)),
+							.value(self.title),
 					)
 					.child(
 						ui::Button::new()
-							.button_type(Some(ui::ButtonType::Submit))
+							.button_type(ui::ButtonType::Submit)
 							.child("Update"),
 					),
 			)
@@ -67,7 +67,7 @@ impl Component for DangerZone {
 			.child(ui::H2::new().child("Danger Zone"))
 			.child(
 				ui::Form::new()
-					.post(Some(true))
+					.post(true)
 					.onsubmit("return confirm(\"Are you sure?\")".to_owned())
 					.child(
 						input()
@@ -77,8 +77,8 @@ impl Component for DangerZone {
 					)
 					.child(
 						ui::Button::new()
-							.button_type(Some(ui::ButtonType::Submit))
-							.color(Some(ui::colors::RED.to_owned()))
+							.button_type(ui::ButtonType::Submit)
+							.color(ui::colors::RED.to_owned())
 							.child("Delete"),
 					),
 			)

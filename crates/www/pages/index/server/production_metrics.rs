@@ -261,24 +261,24 @@ impl Component for ProductionMetrics {
 			ui::Card::new().child(Dehydrate::new(
 				"production-accuracy",
 				LineChart::new()
-					.labels(Some(month_labels.clone()))
-					.series(Some(accuracy_data))
+					.labels(month_labels.clone())
+					.series(accuracy_data)
 					.title("Monthly Accuracy".to_owned())
-					.x_axis_grid_line_interval(Some(GridLineInterval { k: 1.0, p: 0.0 }))
-					.y_max(Some(Finite::new(1.0).unwrap()))
-					.y_min(Some(Finite::new(0.0).unwrap())),
+					.x_axis_grid_line_interval(GridLineInterval { k: 1.0, p: 0.0 })
+					.y_max(Finite::new(1.0).unwrap())
+					.y_min(Finite::new(0.0).unwrap()),
 			)),
 		);
 		let precision = div().style(style::GRID_AREA, "precision").child(
 			ui::Card::new().child(Dehydrate::new(
 				"production-precision",
 				LineChart::new()
-					.labels(Some(month_labels))
-					.series(Some(precision_data))
+					.labels(month_labels)
+					.series(precision_data)
 					.title("Monthly Precision".to_owned())
-					.x_axis_grid_line_interval(Some(GridLineInterval { k: 1.0, p: 0.0 }))
-					.y_max(Some(Finite::new(1.0).unwrap()))
-					.y_min(Some(Finite::new(0.0).unwrap())),
+					.x_axis_grid_line_interval(GridLineInterval { k: 1.0, p: 0.0 })
+					.y_max(Finite::new(1.0).unwrap())
+					.y_min(Finite::new(0.0).unwrap()),
 			)),
 		);
 		let right = ui::Window::new().child(

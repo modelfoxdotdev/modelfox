@@ -77,10 +77,7 @@ impl Component for ClassificationProductionStatsIntervalChart {
 			.collect::<Vec<_>>();
 		Dehydrate::new(
 			"histogram_intervals",
-			BarChart::new()
-				.series(Some(series))
-				.title(Some(title))
-				.y_min(Some(0.0)),
+			BarChart::new().series(series).title(title).y_min(0.0),
 		)
 		.into_node()
 	}
@@ -129,10 +126,7 @@ impl Component for ClassificationProductionStatsChart {
 			.collect::<Vec<_>>();
 		Dehydrate::new(
 			"histogram_overall",
-			BarChart::new()
-				.series(Some(series))
-				.title(Some(title))
-				.y_min(Some(0.0)),
+			BarChart::new().series(series).title(title).y_min(0.0),
 		)
 		.into_node()
 	}
@@ -166,9 +160,9 @@ impl Component for PredictionCountChart {
 		Dehydrate::new(
 			"prediction_count",
 			BarChart::new()
-				.series(Some(prediction_count_chart_series))
-				.title(Some(prediction_count_title))
-				.y_min(Some(0.0)),
+				.series(prediction_count_chart_series)
+				.title(prediction_count_title)
+				.y_min(0.0),
 		)
 		.into_node()
 	}
@@ -238,7 +232,7 @@ impl Component for DateWindowSelectForm {
 			.child(
 				noscript().child(
 					ui::Button::new()
-						.button_type(Some(ui::ButtonType::Submit))
+						.button_type(ui::ButtonType::Submit)
 						.child("Submit"),
 				),
 			)

@@ -3,7 +3,7 @@ use wasm_bindgen::JsCast;
 use web_sys as dom;
 
 pub fn main() {
-	tangram_client::client_start();
+	tangram_ui::client_start();
 	let window = dom::window().unwrap();
 	let document = window.document().unwrap();
 	let charts_query = document

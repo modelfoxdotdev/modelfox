@@ -1,10 +1,10 @@
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, Default, children, new)]
+#[new(default)]
 pub struct Document {
-	#[optional]
+	#[builder]
 	pub client: Option<&'static str>,
-	#[children]
 	pub children: Vec<Node>,
 }
 

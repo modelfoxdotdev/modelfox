@@ -11,7 +11,7 @@ path = "lib.rs"
 futures = "0.3"
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
-pinwheel = "0.1"
+pinwheel = "0.2"
 sunfish = "0.2"
 tangram_app_common = { path = "../../../../../../../../../common" }
 tangram_app_layouts = { path = "../../../../../../../../../layouts" }

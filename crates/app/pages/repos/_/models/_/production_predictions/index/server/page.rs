@@ -66,8 +66,8 @@ impl Component for Page {
 					}))
 					.child(
 						ui::Button::new()
-							.button_type(Some(ui::ButtonType::Submit))
-							.disabled(Some(self.pagination.after.is_none()))
+							.button_type(ui::ButtonType::Submit)
+							.disabled(self.pagination.after.is_none())
 							.child("Newer"),
 					),
 			)
@@ -81,8 +81,8 @@ impl Component for Page {
 					}))
 					.child(
 						ui::Button::new()
-							.button_type(Some(ui::ButtonType::Submit))
-							.disabled(Some(self.pagination.before.is_none()))
+							.button_type(ui::ButtonType::Submit)
+							.disabled(self.pagination.before.is_none())
 							.child("Older"),
 					),
 			);
@@ -93,7 +93,7 @@ impl Component for Page {
 		} else {
 			fragment()
 				.child(
-					ui::Form::new().post(Some(true)).child(
+					ui::Form::new().post(true).child(
 						div()
 							.class("search-bar-wrapper")
 							.child(
@@ -104,7 +104,7 @@ impl Component for Page {
 							)
 							.child(
 								ui::Button::new()
-									.button_type(Some(ui::ButtonType::Submit))
+									.button_type(ui::ButtonType::Submit)
 									.child("Lookup"),
 							),
 					),

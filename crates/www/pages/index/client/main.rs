@@ -2,7 +2,7 @@ use pinwheel::prelude::*;
 use tangram_ui as ui;
 
 fn main() {
-	tangram_client::client_start();
+	tangram_ui::client_start();
 	ui::boot_code_select();
 	hydrate::<tangram_charts::components::LineChart>("pr-curve");
 	hydrate::<tangram_charts::components::LineChart>("roc-curve");

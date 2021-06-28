@@ -1,10 +1,10 @@
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct Table {
-	#[optional]
+	#[builder]
 	pub width: Option<String>,
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -20,9 +20,9 @@ impl Component for Table {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct TableHeader {
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -32,9 +32,9 @@ impl Component for TableHeader {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct TableBody {
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -44,13 +44,13 @@ impl Component for TableBody {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct TableRow {
-	#[optional]
+	#[builder]
 	pub color: Option<String>,
-	#[optional]
+	#[builder]
 	pub text_color: Option<String>,
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -63,15 +63,15 @@ impl Component for TableRow {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct TableHeaderCell {
-	#[optional]
+	#[builder]
 	pub color: Option<String>,
-	#[optional]
+	#[builder]
 	pub width: Option<String>,
-	#[optional]
+	#[builder]
 	pub align: Option<Align>,
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -99,15 +99,15 @@ impl Component for TableHeaderCell {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct TableCell {
-	#[optional]
+	#[builder]
 	pub color: Option<String>,
-	#[optional]
+	#[builder]
 	pub width: Option<String>,
-	#[optional]
+	#[builder]
 	pub align: Option<Align>,
-	#[children]
 	pub children: Vec<Node>,
 }
 

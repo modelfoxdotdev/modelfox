@@ -10,7 +10,7 @@ path = "lib.rs"
 [dependencies]
 futures-signals = "0.3"
 num = "0.4"
-pinwheel = "0.1"
+pinwheel = "0.2"
 serde = { version = "1", features = ["derive"] }
 tangram_ui = { path = "../../../../ui" }
 tangram_charts = { path = "../../../../charts" }

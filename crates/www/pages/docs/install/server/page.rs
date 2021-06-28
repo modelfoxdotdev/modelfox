@@ -12,7 +12,7 @@ impl Component for Page {
 	fn into_node(self) -> Node {
 		Document::new()
 			.child(
-				DocsLayout::new(DocsPage::Install, None).child(
+				DocsLayout::new().selected_page(DocsPage::Install).child(
 					ui::S1::new()
 						.child(ui::H1::new().child("Install"))
 						.child(Homebrew)
@@ -88,7 +88,7 @@ impl Component for Homebrew {
 				ui::Window::new().child(
 					ui::Code::new()
 						.code(Cow::Borrowed(code))
-						.hide_line_numbers(Some(true)),
+						.hide_line_numbers(true),
 				),
 			)
 			.into_node()
@@ -115,7 +115,7 @@ impl Component for Alpine {
 				ui::Window::new().child(
 					ui::Code::new()
 						.code(Cow::Borrowed(code))
-						.hide_line_numbers(Some(true)),
+						.hide_line_numbers(true),
 				),
 			)
 			.into_node()
@@ -148,7 +148,7 @@ impl Component for Deb {
 				ui::Window::new().child(
 					ui::Code::new()
 						.code(Cow::Owned(code))
-						.hide_line_numbers(Some(true)),
+						.hide_line_numbers(true),
 				),
 			)
 			.into_node()
@@ -173,7 +173,7 @@ impl Component for AmazonLinux2 {
 				ui::Window::new().child(
 					ui::Code::new()
 						.code(Cow::Borrowed(code))
-						.hide_line_numbers(Some(true)),
+						.hide_line_numbers(true),
 				),
 			)
 			.into_node()
@@ -198,7 +198,7 @@ impl Component for Centos7 {
 				ui::Window::new().child(
 					ui::Code::new()
 						.code(Cow::Borrowed(code))
-						.hide_line_numbers(Some(true)),
+						.hide_line_numbers(true),
 				),
 			)
 			.into_node()
@@ -223,7 +223,7 @@ impl Component for Fedora {
 				ui::Window::new().child(
 					ui::Code::new()
 						.code(Cow::Borrowed(code))
-						.hide_line_numbers(Some(true)),
+						.hide_line_numbers(true),
 				),
 			)
 			.into_node()
@@ -248,7 +248,7 @@ impl Component for Rhel {
 				ui::Window::new().child(
 					ui::Code::new()
 						.code(Cow::Borrowed(code))
-						.hide_line_numbers(Some(true)),
+						.hide_line_numbers(true),
 				),
 			)
 			.into_node()
@@ -273,7 +273,7 @@ impl Component for Centos8 {
 				ui::Window::new().child(
 					ui::Code::new()
 						.code(Cow::Borrowed(code))
-						.hide_line_numbers(Some(true)),
+						.hide_line_numbers(true),
 				),
 			)
 			.into_node()
@@ -301,7 +301,7 @@ impl Component for Arch {
 				ui::Window::new().child(
 					ui::Code::new()
 						.code(Cow::Borrowed(code))
-						.hide_line_numbers(Some(true)),
+						.hide_line_numbers(true),
 				),
 			)
 			.into_node()
@@ -334,7 +334,7 @@ impl Component for Scoop {
 				ui::Window::new().child(
 					ui::Code::new()
 						.code(Cow::Borrowed(code))
-						.hide_line_numbers(Some(true)),
+						.hide_line_numbers(true),
 				),
 			)
 			.into_node()
@@ -363,7 +363,7 @@ impl Component for Docker {
 				ui::Window::new().child(
 					ui::Code::new()
 						.code(Cow::Borrowed(code))
-						.hide_line_numbers(Some(true)),
+						.hide_line_numbers(true),
 				),
 			)
 			.into_node()

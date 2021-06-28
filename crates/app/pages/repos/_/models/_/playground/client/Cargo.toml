@@ -9,9 +9,9 @@ name = "tangram_app_playground_client"
 path = "main.rs"
 
 [dependencies]
-pinwheel = "0.1"
+pinwheel = "0.2"
 tangram_app_playground_common = { path = "../common" }
 tangram_charts = { path = "../../../../../../../../charts" }
-tangram_client = { path = "../../../../../../../../client" }
+tangram_ui = { path = "../../../../../../../../ui" }
 wasm-bindgen = "0.2"
 web-sys = "0.3"

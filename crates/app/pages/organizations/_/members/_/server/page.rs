@@ -25,15 +25,15 @@ impl Component for Page {
 								.child(
 									ui::TextField::new()
 										.label("Email".to_owned())
-										.disabled(Some(true))
-										.value(Some(self.member_email)),
+										.disabled(true)
+										.value(self.member_email),
 								)
 								.child(
 									ui::CheckboxField::new()
 										.label("Admin".to_owned())
-										.disabled(Some(true))
+										.disabled(true)
 										.name("is_admin".to_owned())
-										.checked(Some(self.is_admin)),
+										.checked(self.is_admin),
 								),
 						)
 						.child(if self.can_delete {
@@ -59,7 +59,7 @@ impl Component for DangerZone {
 			.child(ui::H2::new().child("Danger Zone"))
 			.child(
 				ui::Form::new()
-					.post(Some(true))
+					.post(true)
 					.onsubmit("return confirm(\"Are you sure?\")".to_owned())
 					.child(
 						input()
@@ -69,8 +69,8 @@ impl Component for DangerZone {
 					)
 					.child(
 						ui::Button::new()
-							.button_type(Some(ui::ButtonType::Submit))
-							.color(Some(ui::colors::RED.to_owned()))
+							.button_type(ui::ButtonType::Submit)
+							.color(ui::colors::RED.to_owned())
 							.child(self.remove_button_text),
 					),
 			)

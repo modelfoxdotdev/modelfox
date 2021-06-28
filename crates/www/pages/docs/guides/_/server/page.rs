@@ -6,14 +6,9 @@ use tangram_www_layouts::{
 	document::Document,
 };
 
+#[derive(new)]
 pub struct Page {
 	pub slug: String,
-}
-
-impl Page {
-	pub fn new(slug: String) -> Page {
-		Page { slug }
-	}
 }
 
 impl Component for Page {
@@ -21,8 +16,10 @@ impl Component for Page {
 		let guide = DocsGuide::from_slug(self.slug).unwrap();
 		let content = ui::S1::new()
 			.child(ui::H1::new().child(guide.front_matter.title))
-			.child(ui::Markdown::new(guide.markdown));
-		let layout = DocsLayout::new(DocsPage::Guides(guide.slug), None).child(content);
+			.child(ui::Markdown::new(guide.markdown.into()));
+		let layout = DocsLayout::new()
+			.selected_page(DocsPage::Guides(guide.slug))
+			.child(content);
 		Document::new().child(layout).into_node()
 	}
 }

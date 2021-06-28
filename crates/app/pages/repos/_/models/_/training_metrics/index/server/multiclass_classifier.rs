@@ -40,8 +40,8 @@ impl Component for MulticlassClassifier {
 							Some(self.baseline_accuracy),
 							Some(self.accuracy),
 						)
-						.color_a(Some(BASELINE_COLOR.to_owned()))
-						.color_b(Some(TRAINING_COLOR.to_owned()))
+						.color_a(BASELINE_COLOR.to_owned())
+						.color_b(TRAINING_COLOR.to_owned())
 						.title("Accuracy".to_owned())
 						.value_a_title("Baseline".to_owned())
 						.value_b_title("Training".to_owned())

@@ -7,21 +7,21 @@ mod file_field;
 mod select_field;
 mod text_field;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct Form {
-	#[optional]
+	#[builder]
 	pub action: Option<String>,
-	#[optional]
+	#[builder]
 	pub autocomplete: Option<String>,
-	#[optional]
+	#[builder]
 	pub enc_type: Option<String>,
-	#[optional]
+	#[builder]
 	pub id: Option<String>,
-	#[optional]
+	#[builder]
 	pub onsubmit: Option<String>,
-	#[optional]
+	#[builder]
 	pub post: Option<bool>,
-	#[children]
 	pub children: Vec<Node>,
 }
 

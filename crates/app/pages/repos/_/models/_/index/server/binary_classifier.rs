@@ -85,11 +85,11 @@ impl Component for BinaryClassifierMetricsSection {
 			ui::Card::new().child(Dehydrate::new(
 				"loss",
 				LineChart::new()
-					.series(Some(losses_chart_series))
+					.series(losses_chart_series)
 					.title("Training Loss By Round or Epoch".to_owned())
 					.x_axis_title("Round or Epoch".to_owned())
 					.y_axis_title("Loss".to_owned())
-					.y_min(Some(Finite::new(0.0).unwrap())),
+					.y_min(Finite::new(0.0).unwrap()),
 			))
 		});
 		ui::S2::new()

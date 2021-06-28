@@ -4,13 +4,14 @@ use std::borrow::Cow;
 use wasm_bindgen::{prelude::*, JsCast};
 use web_sys as dom;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, Default, new)]
+#[new(default)]
 pub struct Code {
-	#[optional]
+	#[builder]
 	pub code: Option<Cow<'static, str>>,
-	#[optional]
+	#[builder]
 	pub language: Option<Language>,
-	#[optional]
+	#[builder]
 	pub hide_line_numbers: Option<bool>,
 }
 
@@ -32,7 +33,9 @@ impl Component for Code {
 		}
 		let hide_line_numbers = self.hide_line_numbers.unwrap_or(false);
 		let line_numbers = if !hide_line_numbers {
-			Some(LineNumbers::new(count_lines(&code)))
+			Some(LineNumbers {
+				count: count_lines(&code),
+			})
 		} else {
 			None
 		};
@@ -44,12 +47,14 @@ impl Component for Code {
 	}
 }
 
-#[derive(ComponentBuilder)]
+#[derive(builder, new)]
 pub struct CodeSelect {
 	pub code_for_language: CodeForLanguage,
-	#[optional]
+	#[builder]
+	#[new(default)]
 	pub hide_line_numbers: Option<bool>,
-	#[optional]
+	#[builder]
+	#[new(default)]
 	pub language: Option<Language>,
 }
 
@@ -109,9 +114,9 @@ impl Component for CodeSelect {
 			.class("code-select-grid")
 			.child(
 				ui::SelectField::new()
-					.id(Some("code_select".to_owned()))
-					.options(Some(options))
-					.value(Some(language_str)),
+					.id("code_select".to_owned())
+					.options(options)
+					.value(language_str),
 			)
 			.child(
 				div()
@@ -229,7 +234,6 @@ impl Component for CodeSelect {
 	}
 }
 
-#[derive(ComponentBuilder)]
 pub struct LineNumbers {
 	pub count: usize,
 }

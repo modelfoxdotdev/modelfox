@@ -76,8 +76,8 @@ impl Component for BinaryClassifier {
 							Some(self.baseline_accuracy),
 							Some(self.accuracy),
 						)
-						.color_a(Some(BASELINE_COLOR.to_owned()))
-						.color_b(Some(TRAINING_COLOR.to_owned()))
+						.color_a(BASELINE_COLOR.to_owned())
+						.color_b(TRAINING_COLOR.to_owned())
 						.title("Accuracy".to_owned())
 						.value_a_title("Baseline".to_owned())
 						.value_b_title("Training".to_owned())
@@ -135,13 +135,13 @@ impl Component for ConfusionMatrixSection {
 		ui::S2::new()
 			.child(ui::H2::new().child("Confusion Matrix"))
 			.child(ui::P::new().child(definition))
-			.child(ui::ConfusionMatrix::new(
-				self.class,
-				self.false_negatives.to_usize(),
-				self.false_positives.to_usize(),
-				self.true_negatives.to_usize(),
-				self.true_positives.to_usize(),
-			))
+			.child(ui::ConfusionMatrix {
+				class_label: self.class,
+				false_negatives: self.false_negatives.to_usize(),
+				false_positives: self.false_positives.to_usize(),
+				true_negatives: self.true_negatives.to_usize(),
+				true_positives: self.true_positives.to_usize(),
+			})
 			.into_node()
 	}
 }

@@ -2,9 +2,9 @@ use pinwheel::prelude::*;
 use tangram_app_ui::logo::{Logo, LogoColorScheme};
 use tangram_ui as ui;
 
-#[derive(ComponentBuilder)]
+#[derive(children, Default, new)]
+#[new(default)]
 pub struct AuthLayout {
-	#[children]
 	pub children: Vec<Node>,
 }
 

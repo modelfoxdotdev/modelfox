@@ -15,7 +15,7 @@ chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.5", features = ["serde"] }
 num = "0.4"
 ndarray = { version = "0.15", features = ["rayon"] }
-pinwheel = "0.1"
+pinwheel = "0.2"
 rust-s3 = { version = "0.27.0-rc4" , default-features = false, features = ["tokio-rustls-tls"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"

@@ -1,7 +1,7 @@
 use crate as ui;
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, new)]
 pub struct NumberCard {
 	pub title: String,
 	pub value: String,

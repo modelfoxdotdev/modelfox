@@ -32,8 +32,8 @@ impl Component for DateWindowSelectField {
 			.id("date_window_select_field".to_owned())
 			.label("Date Window".to_owned())
 			.name("date_window".to_owned())
-			.options(Some(options))
-			.value(Some(self.date_window.to_string()))
+			.options(options)
+			.value(self.date_window.to_string())
 			.into_node()
 	}
 }

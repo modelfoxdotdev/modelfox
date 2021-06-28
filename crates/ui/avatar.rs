@@ -1,8 +1,10 @@
 use crate as ui;
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, Default, new)]
+#[new(default)]
 pub struct Avatar {
+	#[builder]
 	pub src: Option<String>,
 }
 

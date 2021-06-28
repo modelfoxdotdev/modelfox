@@ -1,22 +1,22 @@
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct Button {
-	#[optional]
+	#[builder]
 	pub button_type: Option<ButtonType>,
-	#[optional]
+	#[builder]
 	pub color: Option<String>,
-	#[optional]
+	#[builder]
 	pub disabled: Option<bool>,
-	#[optional]
+	#[builder]
 	pub download: Option<String>,
-	#[optional]
+	#[builder]
 	pub href: Option<String>,
-	#[optional]
+	#[builder]
 	pub open_new_window: bool,
-	#[optional]
+	#[builder]
 	pub id: Option<String>,
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -44,10 +44,7 @@ impl Component for Button {
 				.download(self.download)
 				.href(href)
 				.target(target)
-				.style(
-					style::BACKGROUND_COLOR,
-					self.color.unwrap_or_else(|| "".to_owned()),
-				)
+				.style(style::BACKGROUND_COLOR, self.color)
 				.child(self.children)
 				.into_node()
 		} else {
@@ -55,10 +52,7 @@ impl Component for Button {
 				.class("button")
 				.disabled(self.disabled)
 				.id(self.id)
-				.style(
-					style::BACKGROUND_COLOR,
-					self.color.unwrap_or_else(|| "".to_owned()),
-				)
+				.style(style::BACKGROUND_COLOR, self.color)
 				.attribute("type", button_type)
 				.child(self.children)
 				.into_node()

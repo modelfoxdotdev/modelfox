@@ -1,6 +1,6 @@
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder)]
 pub struct Details {
 	pub options: Vec<DetailsOption>,
 	pub summary: Option<String>,

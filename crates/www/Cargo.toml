@@ -9,10 +9,6 @@ version = "0.0.0"
 name = "tangram_www"
 path = "main.rs"
 
-[[bin]]
-name = "tangram_www_dev"
-path = "dev.rs"
-
 [features]
 default = [
   "tangram_www_benchmarks_client",

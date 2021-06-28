@@ -77,17 +77,10 @@ impl Component for TextColumn {
 		ui::S1::new()
 			.child(ui::H1::new().child(self.name))
 			.child(ui::S2::new().child(ui::P::new().child(description)))
-			.child(
-				ui::S2::new().child(
-					ui::Card::new().child(Dehydrate::new(
-						"ngram_histogram",
-						BarChart::new()
-							.series(Some(series))
-							.title(Some(chart_title))
-							.y_min(Some(0.0)),
-					)),
-				),
-			)
+			.child(ui::S2::new().child(ui::Card::new().child(Dehydrate::new(
+				"ngram_histogram",
+				BarChart::new().series(series).title(chart_title).y_min(0.0),
+			))))
 			.child(ui::S2::new().child(table_section))
 			.into_node()
 	}

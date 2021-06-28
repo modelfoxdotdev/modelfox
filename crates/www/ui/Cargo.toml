@@ -8,5 +8,5 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
-pinwheel = "0.1"
+pinwheel = "0.2"
 tangram_ui = { path = "../../ui" }

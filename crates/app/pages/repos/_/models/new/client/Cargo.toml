@@ -10,5 +10,4 @@ path = "main.rs"
 
 [dependencies]
 tangram_ui = { path = "../../../../../../../ui" }
-tangram_client = { path = "../../../../../../../client" }
 web-sys = "0.3"

@@ -107,7 +107,7 @@ impl Component for Benchmark {
 					r#"
 						The allstate dataset contains 35 columns. There are 10,547,432 rows in the train dataset and 2,636,858 rows in the test dataset. The target column is `claim_amount` and it is a regression task.
 					"#
-				));
+				).into());
 				let duration = ui::S2::new()
 					.child(ui::H2::new().child("Training Time (lower is better)"))
 					.child(
@@ -162,7 +162,7 @@ impl Component for Benchmark {
 					r#"
 						The flights dataset contains 9 columns. There are 10,000,000 rows in the train dataset and 100,000 rows in the test dataset. The target column is `dep_delayed_15min` and it is a binary classification task.
 					"#
-				));
+				).into());
 				let duration = ui::S2::new()
 					.child(ui::H2::new().child("Training Time (lower is better)"))
 					.child(
@@ -217,7 +217,7 @@ impl Component for Benchmark {
 					r#"
 						The higgs dataset contains 28 numeric columns and the target column `signal`. There are 10,500,000 rows in the train dataset and 500,000 rows in the test dataset. It is a binary classifiation task.
 					"#
-				));
+				).into());
 				let duration = ui::S2::new()
 					.child(ui::H2::new().child("Training Time (lower is better)"))
 					.child(
@@ -341,11 +341,11 @@ impl Component for DurationChart {
 			})
 			.collect();
 		BarChart::new()
-			.group_gap(Some(10.0))
-			.series(Some(chart_data))
+			.group_gap(10.0)
+			.series(chart_data)
 			.x_axis_title("Dataset".to_owned())
 			.y_axis_title("Training Time (seconds)".to_owned())
-			.y_min(Some(0.0))
+			.y_min(0.0)
 			.into_node()
 	}
 }
@@ -420,11 +420,11 @@ impl Component for MemoryChart {
 			})
 			.collect();
 		BarChart::new()
-			.group_gap(Some(10.0))
-			.series(Some(chart_data))
+			.group_gap(10.0)
+			.series(chart_data)
 			.x_axis_title("Dataset".to_owned())
 			.y_axis_title("Memory Usage (GB)".to_owned())
-			.y_min(Some(0.0))
+			.y_min(0.0)
 			.into_node()
 	}
 }
@@ -499,11 +499,11 @@ impl Component for AucChart {
 			})
 			.collect();
 		BarChart::new()
-			.group_gap(Some(10.0))
-			.series(Some(chart_data))
+			.group_gap(10.0)
+			.series(chart_data)
 			.x_axis_title("Dataset".to_owned())
 			.y_axis_title("AUC".to_owned())
-			.y_min(Some(0.0))
+			.y_min(0.0)
 			.into_node()
 	}
 }
@@ -578,11 +578,11 @@ impl Component for MseChart {
 			})
 			.collect();
 		BarChart::new()
-			.group_gap(Some(10.0))
-			.series(Some(chart_data))
+			.group_gap(10.0)
+			.series(chart_data)
 			.x_axis_title("Dataset".to_owned())
 			.y_axis_title("MSE".to_owned())
-			.y_min(Some(0.0))
+			.y_min(0.0)
 			.into_node()
 	}
 }

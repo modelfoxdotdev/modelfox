@@ -98,14 +98,14 @@ impl Component for FeatureImportancesChart {
 			.child(Dehydrate::new(
 				"feature_importances",
 				BarChart::new()
-					.series(Some(bar_chart_series))
-					.title(Some(format!(
+					.series(bar_chart_series)
+					.title(format!(
 						"Feature Importances for Top {} Features",
 						n_feature_importances_to_show_in_chart
-					)))
+					))
 					.x_axis_title("Feature Name".to_owned())
 					.y_axis_title("Feature Importance Value".to_owned())
-					.y_min(Some(0.0)),
+					.y_min(0.0),
 			))
 			.into_node()
 	}

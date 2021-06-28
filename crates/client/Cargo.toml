@@ -8,6 +8,3 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
-console_error_panic_hook = "0.1"
-tracing = "0.1"
-tracing-wasm = "0.2"

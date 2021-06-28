@@ -4,7 +4,6 @@ use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen::{prelude::*, JsCast};
 use web_sys as dom;
 
-#[derive(ComponentBuilder)]
 pub struct Asciicast {
 	pub id: String,
 	pub height: String,

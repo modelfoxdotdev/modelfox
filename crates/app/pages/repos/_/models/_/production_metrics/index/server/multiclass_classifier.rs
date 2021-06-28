@@ -99,7 +99,7 @@ impl Component for MulticlassClassifierProductionMetrics {
 							.child(
 								noscript().child(
 									ui::Button::new()
-										.button_type(Some(ui::ButtonType::Submit))
+										.button_type(ui::ButtonType::Submit)
 										.child("Submit"),
 								),
 							),
@@ -127,8 +127,8 @@ impl Component for MulticlassClassifierProductionMetrics {
 							Some(self.overall.accuracy.training),
 							self.overall.accuracy.production,
 						)
-						.color_a(Some(TRAINING_COLOR.to_owned()))
-						.color_b(Some(PRODUCTION_COLOR.to_owned()))
+						.color_a(TRAINING_COLOR.to_owned())
+						.color_b(PRODUCTION_COLOR.to_owned())
 						.title("Accuracy".to_owned())
 						.value_a_title("Training".to_owned())
 						.value_b_title("Production".to_owned())
@@ -138,15 +138,12 @@ impl Component for MulticlassClassifierProductionMetrics {
 						ui::Card::new().child(Dehydrate::new(
 							"accuracy",
 							LineChart::new()
-								.labels(Some(chart_labels))
-								.series(Some(accuracy_series))
-								.title(Some(accuracy_chart_title))
-								.x_axis_grid_line_interval(Some(GridLineInterval {
-									k: 1.0,
-									p: 0.0,
-								}))
-								.y_max(Some(Finite::new(1.0).unwrap()))
-								.y_min(Some(Finite::new(0.0).unwrap())),
+								.labels(chart_labels)
+								.series(accuracy_series)
+								.title(accuracy_chart_title)
+								.x_axis_grid_line_interval(GridLineInterval { k: 1.0, p: 0.0 })
+								.y_max(Finite::new(1.0).unwrap())
+								.y_min(Finite::new(0.0).unwrap()),
 						)),
 					),
 			)

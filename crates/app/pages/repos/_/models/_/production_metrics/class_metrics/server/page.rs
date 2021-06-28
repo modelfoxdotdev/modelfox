@@ -141,7 +141,7 @@ impl Component for Inner {
 					.child(
 						noscript().child(
 							ui::Button::new()
-								.button_type(Some(ui::ButtonType::Submit))
+								.button_type(ui::ButtonType::Submit)
 								.child("Submit"),
 						),
 					),
@@ -302,8 +302,8 @@ impl Component for PrecisionRecallSection {
 								.as_ref()
 								.map(|value| value.precision),
 						)
-						.color_a(Some(TRAINING_COLOR.to_owned()))
-						.color_b(Some(PRODUCTION_COLOR.to_owned()))
+						.color_a(TRAINING_COLOR.to_owned())
+						.color_b(PRODUCTION_COLOR.to_owned())
 						.title("Precision".to_owned())
 						.value_a_title("Training".to_owned())
 						.value_b_title("Production".to_owned())
@@ -316,8 +316,8 @@ impl Component for PrecisionRecallSection {
 								.as_ref()
 								.map(|value| value.recall),
 						)
-						.color_a(Some(TRAINING_COLOR.to_owned()))
-						.color_b(Some(PRODUCTION_COLOR.to_owned()))
+						.color_a(TRAINING_COLOR.to_owned())
+						.color_b(PRODUCTION_COLOR.to_owned())
 						.title("Recall".to_owned())
 						.value_a_title("Training".to_owned())
 						.value_b_title("Production".to_owned())
@@ -328,24 +328,24 @@ impl Component for PrecisionRecallSection {
 				ui::Card::new().child(Dehydrate::new(
 					"precision_intervals",
 					LineChart::new()
-						.labels(Some(chart_labels.clone()))
-						.series(Some(precision_chart_series))
-						.title(Some(precision_interval_chart_title))
-						.x_axis_grid_line_interval(Some(GridLineInterval { k: 1.0, p: 0.0 }))
-						.y_max(Some(Finite::new(1.0).unwrap()))
-						.y_min(Some(Finite::new(0.0).unwrap())),
+						.labels(chart_labels.clone())
+						.series(precision_chart_series)
+						.title(precision_interval_chart_title)
+						.x_axis_grid_line_interval(GridLineInterval { k: 1.0, p: 0.0 })
+						.y_max(Finite::new(1.0).unwrap())
+						.y_min(Finite::new(0.0).unwrap())
 				)),
 			)
 			.child(
 				ui::Card::new().child(Dehydrate::new(
 					"recall_intervals",
 					LineChart::new()
-						.x_axis_grid_line_interval(Some(GridLineInterval { k: 1.0, p: 0.0 }))
-						.y_max(Some(Finite::new(1.0).unwrap()))
-						.y_min(Some(Finite::new(0.0).unwrap()))
-						.labels(Some(chart_labels.clone()))
-						.series(Some(recall_chart_series))
-						.title(Some(recall_interval_chart_title)),
+						.x_axis_grid_line_interval(GridLineInterval { k: 1.0, p: 0.0 })
+						.y_max(Finite::new(1.0).unwrap())
+						.y_min(Finite::new(0.0).unwrap())
+						.labels(chart_labels.clone())
+						.series(recall_chart_series)
+						.title(recall_interval_chart_title)
 				)),
 			)
 			.child(
@@ -356,8 +356,8 @@ impl Component for PrecisionRecallSection {
 							.as_ref()
 							.map(|value| value.f1_score),
 					)
-					.color_a(Some(TRAINING_COLOR.to_owned()))
-					.color_b(Some(PRODUCTION_COLOR.to_owned()))
+					.color_a(TRAINING_COLOR.to_owned())
+					.color_b(PRODUCTION_COLOR.to_owned())
 					.title("F1 Score".to_owned())
 					.value_a_title("Training".to_owned())
 					.value_b_title("Production".to_owned())
@@ -368,13 +368,13 @@ impl Component for PrecisionRecallSection {
 				ui::Card::new().child(Dehydrate::new(
 					"f1_intervals",
 					LineChart::new()
-						.x_axis_grid_line_interval(Some(GridLineInterval { k: 1.0, p: 0.0 }))
+						.x_axis_grid_line_interval(GridLineInterval { k: 1.0, p: 0.0 })
 						.y_axis_grid_line_interval(None)
-						.labels(Some(chart_labels))
-						.series(Some(f1_score_chart_series))
-						.title(Some(f1_score_interval_chart_title))
-						.y_min(Some(Finite::new(0.0).unwrap()))
-						.y_max(Some(Finite::new(1.0).unwrap())),
+						.labels(chart_labels)
+						.series(f1_score_chart_series)
+						.title(f1_score_interval_chart_title)
+						.y_min(Finite::new(0.0).unwrap())
+						.y_max(Finite::new(1.0).unwrap())
 				)),
 			)
 			.into_node()
@@ -390,13 +390,13 @@ impl Component for ConfusionMatrixSection {
 	fn into_node(self) -> Node {
 		ui::S2::new()
 			.child(ui::H2::new().child("Confusion Matrix"))
-			.child(ui::ConfusionMatrix::new(
-				self.class.to_owned(),
-				self.confusion_matrix.false_negatives,
-				self.confusion_matrix.false_positives,
-				self.confusion_matrix.true_negatives,
-				self.confusion_matrix.true_positives,
-			))
+			.child(ui::ConfusionMatrix {
+				class_label: self.class,
+				false_negatives: self.confusion_matrix.false_negatives,
+				false_positives: self.confusion_matrix.false_positives,
+				true_negatives: self.confusion_matrix.true_negatives,
+				true_positives: self.confusion_matrix.true_positives,
+			})
 			.into_node()
 	}
 }
@@ -408,42 +408,45 @@ struct ProductionTrainingSection {
 
 impl Component for ProductionTrainingSection {
 	fn into_node(self) -> Node {
+		let value_a = Some(ui::ConfusionMatrixComparisonValue {
+			false_negative: self
+				.confusion_matrix_training_production_comparison
+				.training
+				.false_negative_fraction,
+			false_positive: self
+				.confusion_matrix_training_production_comparison
+				.training
+				.false_positive_fraction,
+			true_negative: self
+				.confusion_matrix_training_production_comparison
+				.training
+				.true_negative_fraction,
+			true_positive: self
+				.confusion_matrix_training_production_comparison
+				.training
+				.true_positive_fraction,
+		});
+		let value_b = self
+			.confusion_matrix_training_production_comparison
+			.production
+			.as_ref()
+			.map(|production| ui::ConfusionMatrixComparisonValue {
+				false_negative: production.false_negative_fraction,
+				false_positive: production.false_positive_fraction,
+				true_negative: production.true_negative_fraction,
+				true_positive: production.true_positive_fraction,
+			});
 		ui::S2::new()
 			.child(ui::H2::new().child("Production v. Training Confusion Matrix"))
-			.child(ui::ConfusionMatrixComparison::new(
-				self.class.to_owned(),
-				TRAINING_COLOR.to_owned(),
-				PRODUCTION_COLOR.to_owned(),
-				Some(ui::ConfusionMatrixComparisonValue {
-					false_negative: self
-						.confusion_matrix_training_production_comparison
-						.training
-						.false_negative_fraction,
-					false_positive: self
-						.confusion_matrix_training_production_comparison
-						.training
-						.false_positive_fraction,
-					true_negative: self
-						.confusion_matrix_training_production_comparison
-						.training
-						.true_negative_fraction,
-					true_positive: self
-						.confusion_matrix_training_production_comparison
-						.training
-						.true_positive_fraction,
-				}),
-				"Training".to_owned(),
-				self.confusion_matrix_training_production_comparison
-					.production
-					.as_ref()
-					.map(|production| ui::ConfusionMatrixComparisonValue {
-						false_negative: production.false_negative_fraction,
-						false_positive: production.false_positive_fraction,
-						true_negative: production.true_negative_fraction,
-						true_positive: production.true_positive_fraction,
-					}),
-				"Production".to_owned(),
-			))
+			.child(ui::ConfusionMatrixComparison {
+				class_label: self.class,
+				color_a: TRAINING_COLOR.to_owned(),
+				color_b: PRODUCTION_COLOR.to_owned(),
+				value_a,
+				value_a_title: "Training".to_owned(),
+				value_b,
+				value_b_title: "Production".to_owned(),
+			})
 			.into_node()
 	}
 }

@@ -1,8 +1,8 @@
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(children, Default, new)]
+#[new(default)]
 pub struct PageHeading {
-	#[children]
 	pub children: Vec<Node>,
 }
 
@@ -11,9 +11,10 @@ impl Component for PageHeading {
 		div().class("page-heading").child(self.children).into_node()
 	}
 }
-#[derive(ComponentBuilder)]
+
+#[derive(children, Default, new)]
+#[new(default)]
 pub struct PageHeadingButtons {
-	#[children]
 	pub children: Vec<Node>,
 }
 

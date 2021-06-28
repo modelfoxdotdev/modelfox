@@ -2,23 +2,30 @@ use crate as ui;
 use pinwheel::prelude::*;
 use tangram_number_formatter::NumberFormatter;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, new)]
 pub struct NumberComparisonCard {
 	pub value_a: Option<f32>,
 	pub value_b: Option<f32>,
-	#[optional]
+	#[builder]
+	#[new(default)]
 	pub id: Option<String>,
-	#[optional]
+	#[builder]
+	#[new(default)]
 	pub color_a: Option<String>,
-	#[optional]
+	#[builder]
+	#[new(default)]
 	pub color_b: Option<String>,
-	#[optional]
+	#[builder]
+	#[new(default)]
 	pub number_formatter: NumberFormatter,
-	#[optional]
+	#[builder]
+	#[new(default)]
 	pub title: Option<String>,
-	#[optional]
+	#[builder]
+	#[new(default)]
 	pub value_a_title: Option<String>,
-	#[optional]
+	#[builder]
+	#[new(default)]
 	pub value_b_title: Option<String>,
 }
 
@@ -27,10 +34,6 @@ impl Component for NumberComparisonCard {
 		let number_formatter = self.number_formatter;
 		let number_formatter_string = serde_json::to_string(&number_formatter).unwrap();
 		let difference_string = difference_string(self.value_a, self.value_b, &number_formatter);
-		let difference_class = classes!(
-			"number-comparison-card-difference",
-			difference_class(self.value_a, self.value_b)
-		);
 		let content = div()
 			.class("number-comparison-card-wrapper")
 			.attribute("id", self.id)
@@ -40,7 +43,12 @@ impl Component for NumberComparisonCard {
 					.class("number-comparison-card-title")
 					.child(self.title),
 			)
-			.child(div().class(difference_class).child(difference_string))
+			.child(
+				div()
+					.class("number-comparison-card-difference")
+					.class(difference_class(self.value_a, self.value_b))
+					.child(difference_string),
+			)
 			.child(
 				div()
 					.class("number-comparison-card-value a")

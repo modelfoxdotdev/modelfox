@@ -2,19 +2,51 @@ use pinwheel::{prelude::*, signal::Broadcaster};
 use wasm_bindgen::JsCast;
 use web_sys as dom;
 
-#[derive(ComponentBuilder)]
-pub struct Slider {
+#[derive(builder)]
+pub struct Slider<V>
+where
+	V: 'static + Signal<Item = f32>,
+{
 	pub min: f32,
 	pub max: f32,
 	pub step: f32,
-	pub value: BoxSignal<f32>,
-	#[optional]
+	pub value: V,
+	#[builder]
 	pub on_change: Option<Box<dyn Fn(f32)>>,
-	#[optional]
+	#[builder]
 	pub tooltip_number_formatter: Option<Box<dyn Fn(f32) -> String>>,
 }
 
-impl Component for Slider {
+pub struct SliderInit<V>
+where
+	V: 'static + Signal<Item = f32>,
+{
+	pub min: f32,
+	pub max: f32,
+	pub step: f32,
+	pub value: V,
+}
+
+impl<V> Slider<V>
+where
+	V: 'static + Signal<Item = f32>,
+{
+	pub fn new(init: SliderInit<V>) -> Slider<V> {
+		Slider {
+			min: init.min,
+			max: init.max,
+			step: init.step,
+			value: init.value,
+			on_change: None,
+			tooltip_number_formatter: None,
+		}
+	}
+}
+
+impl<V> Component for Slider<V>
+where
+	V: 'static + Signal<Item = f32>,
+{
 	fn into_node(self) -> Node {
 		let Slider {
 			min,
@@ -25,10 +57,11 @@ impl Component for Slider {
 			..
 		} = self;
 		let value = Broadcaster::new(value);
-		let percent = value
-			.signal()
-			.map(move |value| ((value - min) / (max - min)) * 100.0);
-		let percent = Broadcaster::new(percent);
+		let percent = Broadcaster::new(
+			value
+				.signal()
+				.map(move |value| ((value - min) / (max - min)) * 100.0),
+		);
 		let tooltip_value = value
 			.signal()
 			.map(move |value| match &tooltip_number_formatter {

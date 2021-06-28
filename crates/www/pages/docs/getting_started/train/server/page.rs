@@ -53,7 +53,7 @@ impl Component for Page {
 				.code(Cow::Borrowed(
 					"$ tangram train --file heart_disease.csv --target diagnosis",
 				))
-				.hide_line_numbers(Some(true)),
+				.hide_line_numbers(true),
 		);
 		let train_p2 = ui::P::new()
 			.child("The CLI automatically transforms the data into features, trains a number of models to predict the target column, and writes the best model to a ")
@@ -82,7 +82,8 @@ impl Component for Page {
 			.child(data)
 			.child(train)
 			.child(prev_next_buttons);
-		let layout = DocsLayout::new(DocsPage::GettingStarted(GettingStartedPage::Train), None)
+		let layout = DocsLayout::new()
+			.selected_page(DocsPage::GettingStarted(GettingStartedPage::Train))
 			.child(content);
 		Document::new().child(layout).into_node()
 	}

@@ -86,14 +86,14 @@ impl Component for Page {
 						ui::Card::new().child(Dehydrate::new(
 							"roc",
 							LineChart::new()
-								.series(Some(roc_series))
+								.series(roc_series)
 								.title("Receiver Operating Characteristic Curve".to_owned())
 								.x_axis_title("False Positive Rate".to_owned())
 								.y_axis_title("True Positive Rate".to_owned())
-								.x_max(Some(Finite::new(1.0).unwrap()))
-								.x_min(Some(Finite::new(0.0).unwrap()))
-								.y_max(Some(Finite::new(1.0).unwrap()))
-								.y_min(Some(Finite::new(0.0).unwrap())),
+								.x_max(Finite::new(1.0).unwrap())
+								.x_min(Finite::new(0.0).unwrap())
+								.y_max(Finite::new(1.0).unwrap())
+								.y_min(Finite::new(0.0).unwrap()),
 						)),
 					),
 			);

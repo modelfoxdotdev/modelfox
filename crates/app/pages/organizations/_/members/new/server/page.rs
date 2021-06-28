@@ -17,7 +17,7 @@ impl Component for Page {
 				AppLayout::new(self.app_layout_info).child(
 					ui::S1::new().child(ui::H1::new().child("Invite")).child(
 						ui::Form::new()
-							.post(Some(true))
+							.post(true)
 							.child(
 								ui::TextField::new()
 									.label("Email".to_owned())
@@ -30,7 +30,7 @@ impl Component for Page {
 							)
 							.child(
 								ui::Button::new()
-									.button_type(Some(ui::ButtonType::Submit))
+									.button_type(ui::ButtonType::Submit)
 									.child("Invite"),
 							),
 					),

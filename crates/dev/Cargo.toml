@@ -1,0 +1,14 @@
+[package]
+edition = "2018"
+name = "tangram_dev"
+publish = false
+version = "0.0.0"
+
+[[bin]]
+name = "tangram_dev"
+path = "main.rs"
+
+[dependencies]
+clap = { version = "3.0.0-beta.2", features = ["color"] }
+tokio = { version = "1" ,features = ["full"] }
+watchserve = "0.1"

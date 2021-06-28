@@ -3,14 +3,9 @@ use tangram_ui as ui;
 use tangram_www_content::{BlogPost, Content};
 use tangram_www_layouts::{document::Document, page_layout::PageLayout};
 
+#[derive(new)]
 pub struct Page {
 	slug: String,
-}
-
-impl Page {
-	pub fn new(slug: String) -> Page {
-		Page { slug }
-	}
 }
 
 impl Component for Page {
@@ -28,7 +23,7 @@ impl Component for Page {
 				PageLayout::new().child(
 					ui::S1::new()
 						.child(heading)
-						.child(ui::Markdown::new(blog_post.markdown)),
+						.child(ui::Markdown::new(blog_post.markdown.into())),
 				),
 			)
 			.into_node()

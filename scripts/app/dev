@@ -1,2 +1,7 @@
 #!/bin/sh
-cargo run --bin tangram_app_dev
+cargo run --bin tangram_dev -- \
+  --watch . \
+  --ignore languages \
+  --ignore target \
+  --ignore target_check \
+  --command "cargo run -p tangram_cli -- app"

@@ -71,8 +71,8 @@ impl Component for RegressorMetricsSection {
 			.child(p)
 			.child(
 				ui::NumberComparisonCard::new(Some(self.baseline_rmse), Some(self.rmse))
-					.color_a(Some(BASELINE_COLOR.to_owned()))
-					.color_b(Some(TRAINING_COLOR.to_owned()))
+					.color_a(BASELINE_COLOR.to_owned())
+					.color_b(TRAINING_COLOR.to_owned())
 					.title("Root Mean Squared Error".to_owned())
 					.value_a_title("Baseline".to_owned())
 					.value_b_title("Training".to_owned())
@@ -82,11 +82,11 @@ impl Component for RegressorMetricsSection {
 				ui::Card::new().child(Dehydrate::new(
 					"loss",
 					LineChart::new()
-						.series(Some(losses_chart_series))
+						.series(losses_chart_series)
 						.title("Training Loss By Round or Epoch".to_owned())
 						.x_axis_title("Round or Epoch".to_owned())
 						.y_axis_title("Loss".to_owned())
-						.y_min(Some(Finite::new(0.0).unwrap())),
+						.y_min(Finite::new(0.0).unwrap()),
 				))
 			}))
 			.into_node()

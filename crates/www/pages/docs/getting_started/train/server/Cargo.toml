@@ -8,7 +8,7 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
-pinwheel = "0.1"
+pinwheel = "0.2"
 tangram_www_ui = { path = "../../../../../ui" }
 tangram_www_layouts = { path = "../../../../../layouts" }
 sunfish = "0.2"

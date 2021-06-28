@@ -28,8 +28,8 @@ impl Component for PaginationButtons {
 					}))
 					.child(
 						ui::Button::new()
-							.button_type(Some(ui::ButtonType::Submit))
-							.disabled(Some(self.pagination.first_offset.is_none()))
+							.button_type(ui::ButtonType::Submit)
+							.disabled(self.pagination.first_offset.is_none())
 							.child("First"),
 					),
 			)
@@ -44,8 +44,8 @@ impl Component for PaginationButtons {
 					}))
 					.child(
 						ui::Button::new()
-							.button_type(Some(ui::ButtonType::Submit))
-							.disabled(Some(self.pagination.previous_offset.is_none()))
+							.button_type(ui::ButtonType::Submit)
+							.disabled(self.pagination.previous_offset.is_none())
 							.child("<"),
 					),
 			)
@@ -60,8 +60,8 @@ impl Component for PaginationButtons {
 					}))
 					.child(
 						ui::Button::new()
-							.button_type(Some(ui::ButtonType::Submit))
-							.disabled(Some(self.pagination.next_offset.is_none()))
+							.button_type(ui::ButtonType::Submit)
+							.disabled(self.pagination.next_offset.is_none())
 							.child(">"),
 					),
 			)
@@ -76,8 +76,8 @@ impl Component for PaginationButtons {
 					}))
 					.child(
 						ui::Button::new()
-							.button_type(Some(ui::ButtonType::Submit))
-							.disabled(Some(self.pagination.last_offset.is_none()))
+							.button_type(ui::ButtonType::Submit)
+							.disabled(self.pagination.last_offset.is_none())
 							.child("Last"),
 					),
 			)

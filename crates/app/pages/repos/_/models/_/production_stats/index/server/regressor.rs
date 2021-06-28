@@ -115,7 +115,7 @@ impl Component for RegressionProductionStatsChart {
 		);
 		Dehydrate::new(
 			"quantiles_overall",
-			BoxChart::new().series(Some(series)).title(Some(title)),
+			BoxChart::new().series(series).title(title),
 		)
 		.into_node()
 	}
@@ -154,7 +154,7 @@ impl Component for RegressionProductionStatsIntervalChart {
 		);
 		Dehydrate::new(
 			"quantiles_intervals",
-			BoxChart::new().series(Some(series)).title(Some(title)),
+			BoxChart::new().series(series).title(title),
 		)
 		.into_node()
 	}

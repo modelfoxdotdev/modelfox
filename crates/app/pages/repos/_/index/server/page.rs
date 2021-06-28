@@ -32,7 +32,7 @@ impl Component for Page {
 									PageHeadingButtons::new()
 										.child(
 											ui::Button::new()
-												.color(Some(ui::colors::GRAY.to_owned()))
+												.color(ui::colors::GRAY.to_owned())
 												.href("edit".to_owned())
 												.child("Edit"),
 										)

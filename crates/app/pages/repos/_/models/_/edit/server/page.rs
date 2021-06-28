@@ -47,12 +47,12 @@ impl Component for ModelInfoTable {
 					.child(
 						ui::TableRow::new()
 							.child(ui::TableHeaderCell::new().child("Model Id"))
-							.child(ui::TableCell::new().child(Some(self.model_id.to_string()))),
+							.child(ui::TableCell::new().child(self.model_id.to_string())),
 					)
 					.child(
 						ui::TableRow::new()
 							.child(ui::TableHeaderCell::new().child("Uploaded At"))
-							.child(ui::TableCell::new().child(Some(self.created_at))),
+							.child(ui::TableCell::new().child(self.created_at)),
 					),
 			)
 			.into_node()
@@ -69,7 +69,7 @@ impl Component for UpdateTagForm {
 			.child(ui::H2::new().child("Tag"))
 			.child(
 				ui::Form::new()
-					.post(Some(true))
+					.post(true)
 					.child(
 						input()
 							.attribute("name", "action")
@@ -84,7 +84,7 @@ impl Component for UpdateTagForm {
 					)
 					.child(
 						ui::Button::new()
-							.button_type(Some(ui::ButtonType::Submit))
+							.button_type(ui::ButtonType::Submit)
 							.child("Update"),
 					),
 			)
@@ -100,7 +100,7 @@ impl Component for DangerZone {
 			.child(ui::H2::new().child("Danger Zone"))
 			.child(
 				ui::Form::new()
-					.post(Some(true))
+					.post(true)
 					.onsubmit("return confirm(\"Are you sure?\")".to_owned())
 					.child(
 						input()
@@ -110,8 +110,8 @@ impl Component for DangerZone {
 					)
 					.child(
 						ui::Button::new()
-							.button_type(Some(ui::ButtonType::Submit))
-							.color(Some(ui::colors::RED.to_owned()))
+							.button_type(ui::ButtonType::Submit)
+							.color(ui::colors::RED.to_owned())
 							.child("Delete"),
 					),
 			)

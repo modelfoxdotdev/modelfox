@@ -1,25 +1,26 @@
 use super::FieldLabel;
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, Default, new)]
+#[new(default)]
 pub struct CheckboxField {
-	#[optional]
+	#[builder]
 	pub label: Option<String>,
-	#[optional]
+	#[builder]
 	pub name: Option<String>,
-	#[optional]
+	#[builder]
 	pub placeholder: Option<String>,
-	#[optional]
+	#[builder]
 	pub disabled: Option<bool>,
-	#[optional]
+	#[builder]
 	pub value: Option<String>,
-	#[optional]
+	#[builder]
 	pub checked: Option<bool>,
 }
 
 impl Component for CheckboxField {
 	fn into_node(self) -> Node {
-		FieldLabel::new(None)
+		FieldLabel::new()
 			.child(self.label)
 			.child(
 				input()

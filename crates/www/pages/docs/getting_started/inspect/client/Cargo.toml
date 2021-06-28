@@ -13,6 +13,6 @@ console_error_panic_hook = "0.1"
 tangram_charts = { path = "../../../../../../charts" }
 tangram_ui = { path = "../../../../../../ui" }
 tangram_www_docs_inspect_common = { path = "../common" }
-pinwheel = "0.1"
+pinwheel = "0.2"
 wasm-bindgen = "0.2"
 web-sys = "0.3"

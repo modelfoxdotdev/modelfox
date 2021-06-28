@@ -1,23 +1,23 @@
 use pinwheel::prelude::*;
 
-#[derive(ComponentBuilder)]
+#[derive(builder, children, Default, new)]
+#[new(default)]
 pub struct Link {
-	#[optional]
+	#[builder]
 	pub class: Option<String>,
-	#[optional]
+	#[builder]
 	pub href: Option<String>,
-	#[optional]
+	#[builder]
 	pub target: Option<String>,
-	#[optional]
+	#[builder]
 	pub title: Option<String>,
-	#[children]
 	pub children: Vec<Node>,
 }
 
 impl Component for Link {
 	fn into_node(self) -> Node {
-		let class = classes!("link", self.class);
-		a().class(class)
+		a().class("link")
+			.class(self.class)
 			.href(self.href)
 			.target(self.target)
 			.title(self.title)

@@ -1889,9 +1889,7 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
 name = "pinwheel"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5b6809bcaaab3015de6f49ebd0fa3a4d9f8bc48f0cc5baed46f607c917916d4"
+version = "0.2.0"
 dependencies = [
  "futures",
  "futures-signals",
@@ -1908,9 +1906,7 @@ dependencies = [
 
 [[package]]
 name = "pinwheel_elements_macro"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "61f09c09c0e8db8ab299729722fc9f94b34d2b5c6a3ca6198959ff62725a593b"
+version = "0.2.0"
 dependencies = [
  "heck",
  "proc-macro2",
@@ -1920,9 +1916,7 @@ dependencies = [
 
 [[package]]
 name = "pinwheel_macro"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36d6035d7f7d97045cbbd8d444286935c9602bf3d6eb780909be3f5d43bbea48"
+version = "0.2.0"
 dependencies = [
  "heck",
  "proc-macro2",
@@ -2804,6 +2798,7 @@ dependencies = [
  "tangram_app_layouts",
  "tangram_app_login_server",
  "tangram_app_migrations",
+ "tangram_app_model_download_server",
  "tangram_app_model_edit_server",
  "tangram_app_model_index_client",
  "tangram_app_model_index_server",
@@ -3019,6 +3014,32 @@ dependencies = [
 ]
 
 [[package]]
+name = "tangram_app_model_download_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+ "tangram_app_common",
+ "tangram_app_layouts",
+ "tangram_app_ui",
+ "tangram_core",
+ "tangram_id",
+ "tangram_model",
+ "tangram_ui",
+]
+
+[[package]]
 name = "tangram_app_model_edit_server"
 version = "0.0.0"
 dependencies = [
@@ -3051,7 +3072,6 @@ dependencies = [
  "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
- "tangram_client",
  "tangram_ui",
  "wasm-bindgen",
 ]
@@ -3110,7 +3130,6 @@ dependencies = [
 name = "tangram_app_new_model_client"
 version = "0.0.0"
 dependencies = [
- "tangram_client",
  "tangram_ui",
  "web-sys",
 ]
@@ -3228,7 +3247,7 @@ dependencies = [
  "pinwheel",
  "tangram_app_playground_common",
  "tangram_charts",
- "tangram_client",
+ "tangram_ui",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -3272,7 +3291,6 @@ version = "0.0.0"
 dependencies = [
  "pinwheel",
  "tangram_charts",
- "tangram_client",
  "tangram_ui",
 ]
 
@@ -3333,7 +3351,6 @@ version = "0.0.0"
 dependencies = [
  "pinwheel",
  "tangram_charts",
- "tangram_client",
  "tangram_ui",
  "web-sys",
 ]
@@ -3370,7 +3387,7 @@ version = "0.0.0"
 dependencies = [
  "pinwheel",
  "tangram_charts",
- "tangram_client",
+ "tangram_ui",
  "web-sys",
 ]
 
@@ -3455,7 +3472,6 @@ version = "0.0.0"
 dependencies = [
  "pinwheel",
  "tangram_charts",
- "tangram_client",
  "tangram_ui",
  "web-sys",
 ]
@@ -3495,7 +3511,6 @@ version = "0.0.0"
 dependencies = [
  "pinwheel",
  "tangram_charts",
- "tangram_client",
  "tangram_ui",
  "web-sys",
 ]
@@ -3603,7 +3618,6 @@ dependencies = [
 name = "tangram_app_training_class_metrics_client"
 version = "0.0.0"
 dependencies = [
- "tangram_client",
  "tangram_ui",
 ]
 
@@ -3717,7 +3731,7 @@ version = "0.0.0"
 dependencies = [
  "pinwheel",
  "tangram_charts",
- "tangram_client",
+ "tangram_ui",
 ]
 
 [[package]]
@@ -3747,7 +3761,7 @@ version = "0.0.0"
 dependencies = [
  "pinwheel",
  "tangram_charts",
- "tangram_client",
+ "tangram_ui",
 ]
 
 [[package]]
@@ -3778,7 +3792,7 @@ dependencies = [
  "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
- "tangram_client",
+ "tangram_ui",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -3832,7 +3846,7 @@ version = "0.0.0"
 dependencies = [
  "pinwheel",
  "tangram_app_tuning_common",
- "tangram_client",
+ "tangram_ui",
  "web-sys",
 ]
 
@@ -3982,11 +3996,6 @@ dependencies = [
 [[package]]
 name = "tangram_client"
 version = "0.0.0"
-dependencies = [
- "console_error_panic_hook",
- "tracing",
- "tracing-wasm",
-]
 
 [[package]]
 name = "tangram_core"
@@ -4018,6 +4027,15 @@ dependencies = [
  "tangram_text",
  "tangram_tree",
  "tangram_zip",
+]
+
+[[package]]
+name = "tangram_dev"
+version = "0.0.0"
+dependencies = [
+ "clap 3.0.0-beta.2",
+ "tokio",
+ "watchserve",
 ]
 
 [[package]]
@@ -4235,6 +4253,7 @@ dependencies = [
 name = "tangram_ui"
 version = "0.0.0"
 dependencies = [
+ "console_error_panic_hook",
  "indoc 1.0.3",
  "num",
  "once_cell",
@@ -4246,6 +4265,7 @@ dependencies = [
  "tangram_finite",
  "tangram_number_formatter",
  "tracing",
+ "tracing-wasm",
  "tree-sitter",
  "tree-sitter-highlight",
  "tree-sitter-javascript",
@@ -4307,7 +4327,6 @@ dependencies = [
  "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
- "tangram_client",
  "tangram_ui",
  "tangram_www_benchmarks_common",
  "web-sys",
@@ -4419,7 +4438,6 @@ dependencies = [
  "console_error_panic_hook",
  "pinwheel",
  "tangram_charts",
- "tangram_client",
  "tangram_ui",
  "wasm-bindgen",
  "web-sys",
@@ -4577,7 +4595,6 @@ version = "0.0.0"
 dependencies = [
  "pinwheel",
  "tangram_charts",
- "tangram_client",
  "tangram_ui",
  "tangram_www_index_common",
  "web-sys",
