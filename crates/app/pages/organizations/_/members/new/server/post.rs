@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use lettre::AsyncTransport;
 use sqlx::prelude::*;
 use std::sync::Arc;
@@ -24,7 +24,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		if let ["organizations", organization_id, ""] = *path_components(&request).as_slice() {
 			organization_id.to_owned()
 		} else {
-			return Err(anyhow!("unexpected path"));
+			bail!("unexpected path");
 		};
 	if !context.options.auth_enabled() {
 		return Ok(not_found());

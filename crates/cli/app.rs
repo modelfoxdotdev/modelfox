@@ -1,5 +1,5 @@
 use crate::AppArgs;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use std::path::PathBuf;
 use url::Url;
 
@@ -152,8 +152,8 @@ pub fn app(args: AppArgs) -> Result<()> {
 			#[cfg(debug_assertions)]
 			None => {}
 			#[cfg(not(debug_assertions))]
-			None => return Err(anyhow!("a license is required to enable authentication")),
-			Some(false) => return Err(anyhow!("failed to verify license")),
+			None => bail!("a license is required to enable authentication"),
+			Some(false) => bail!("failed to verify license"),
 			Some(true) => {}
 		}
 	}

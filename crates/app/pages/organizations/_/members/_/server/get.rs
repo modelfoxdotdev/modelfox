@@ -1,5 +1,5 @@
 use crate::page::Page;
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
@@ -21,7 +21,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	{
 		(organization_id.to_owned(), member_id.to_owned())
 	} else {
-		return Err(anyhow!("unexpected path"));
+		bail!("unexpected path");
 	};
 	if !context.options.auth_enabled() {
 		return Ok(not_found());

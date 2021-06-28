@@ -1,5 +1,5 @@
 use crate::page::Page;
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use multer::Multipart;
 use pinwheel::prelude::*;
 use std::sync::Arc;
@@ -19,7 +19,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	{
 		repo_id.to_owned()
 	} else {
-		return Err(anyhow!("unexpected path"));
+		bail!("unexpected path");
 	};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,

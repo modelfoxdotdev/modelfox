@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -19,7 +19,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		if let ["organizations", organization_id, "edit"] = *path_components(&request).as_slice() {
 			organization_id.to_owned()
 		} else {
-			return Err(anyhow!("unexpected path"));
+			bail!("unexpected path");
 		};
 	if !context.options.auth_enabled() {
 		return Ok(not_found());

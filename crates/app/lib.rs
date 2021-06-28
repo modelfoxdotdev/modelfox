@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use request_id::RequestIdLayer;
 use std::{sync::Arc, time::Duration};
 pub use tangram_app_common::options;
@@ -168,9 +168,7 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 		let pool_max_connections = options.database_max_connections.unwrap_or(10);
 		(pool_options, pool_max_connections)
 	} else {
-		return Err(anyhow!(
-			"The database url must start with sqlite: or postgres:."
-		));
+		bail!("The database url must start with sqlite: or postgres:.");
 	};
 	let pool = sqlx::any::AnyPoolOptions::default()
 		.max_connections(pool_max_connections)

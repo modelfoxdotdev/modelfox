@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -30,7 +30,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	{
 		(repo_id.to_owned(), model_id.to_owned())
 	} else {
-		return Err(anyhow!("unexpected path"));
+		bail!("unexpected path");
 	};
 	let data = match hyper::body::to_bytes(request.body_mut()).await {
 		Ok(data) => data,

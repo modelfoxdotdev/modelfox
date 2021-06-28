@@ -1,5 +1,5 @@
 use crate::page::Page;
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
@@ -17,7 +17,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let repo_id = if let ["repos", repo_id, "edit"] = *path_components(&request).as_slice() {
 		repo_id.to_owned()
 	} else {
-		return Err(anyhow!("unexpected path"));
+		bail!("unexpected path");
 	};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,

@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use futures::prelude::future::*;
 use once_cell::sync::Lazy;
 use sqlx::prelude::*;
@@ -45,19 +45,17 @@ pub async fn verify(db: &sqlx::AnyPool) -> Result<()> {
 			migration_row.get::<String, usize>(0) == *migration_name
 		});
 	if !migrations_consistent {
-		return Err(anyhow!(
+		bail!(
 			"There was a mismatch between the migrations your database has run and the migrations this version of tangram expects. This should not happen unless you are hacking on tangram. Please contact us at help@tangram.xyz."
-		));
+		);
 	}
 	if migration_rows.len() > MIGRATIONS.len() {
-		return Err(anyhow!(
+		bail!(
 			"Your database has run migrations from a newer version of tangram. Please update to the latest version of tangram."
-		));
+		);
 	}
 	if migration_rows.len() < MIGRATIONS.len() {
-		return Err(anyhow!(
-			"Please run `tangram migrate` to update your database to the latest schema."
-		));
+		bail!("Please run `tangram migrate` to update your database to the latest schema.");
 	}
 	Ok(())
 }
@@ -74,14 +72,10 @@ pub async fn run(db: &sqlx::AnyPool) -> Result<()> {
 			migration_row.get::<String, usize>(0) == *migration_name
 		});
 	if !migrations_consistent {
-		return Err(anyhow!(
-			"Database migration consistency error. Please contact us at help@tangram.xyz."
-		));
+		bail!("Database migration consistency error. Please contact us at help@tangram.xyz.");
 	}
 	if migration_rows.len() > MIGRATIONS.len() {
-		return Err(anyhow!(
-			"Your database has run migrations from a newer version of tangram."
-		));
+		bail!("Your database has run migrations from a newer version of tangram.");
 	}
 	// Apply each outstanding migration in a transaction.
 	for (migration_name, migration) in MIGRATIONS.iter().skip(migration_rows.len()) {

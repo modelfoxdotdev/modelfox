@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use chrono::prelude::*;
 use memmap::Mmap;
 use num::ToPrimitive;
@@ -149,9 +149,7 @@ async fn write_prediction_monitor_event(
 	.await?;
 	let prediction_count: i64 = row.get(0);
 	if prediction_count > 0 {
-		return Err(anyhow!(
-			"A prediction has already been logged with this identifier."
-		));
+		bail!("A prediction has already been logged with this identifier.");
 	}
 	let prediction_monitor_event_id = Id::generate();
 	let date = &monitor_event.date;
@@ -198,9 +196,7 @@ async fn write_true_value_monitor_event(
 	.await?;
 	let true_value_count: i64 = row.get(0);
 	if true_value_count > 0 {
-		return Err(anyhow!(
-			"A prediction has already been logged with this identifier."
-		));
+		bail!("A prediction has already been logged with this identifier.");
 	}
 	let true_value_monitor_event_id = Id::generate();
 	let date = monitor_event.date;
@@ -317,11 +313,8 @@ async fn insert_or_update_production_metrics_for_monitor_event(
 	.bind(&identifier)
 	.fetch_all(&mut *db)
 	.await?;
-	if rows.len() == 0 {
-		return Err(anyhow!(
-			"Failed to find prediction with identifier {}",
-			identifier
-		));
+	if rows.is_empty() {
+		bail!("Failed to find prediction with identifier {}", identifier);
 	}
 	let true_value = match &monitor_event.true_value {
 		serde_json::Value::Number(value) => {

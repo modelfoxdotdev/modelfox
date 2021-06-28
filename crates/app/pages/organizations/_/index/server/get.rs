@@ -2,7 +2,7 @@ use crate::page::{
 	DetailsSection, MembersSection, MembersTable, MembersTableRow, Page, ReposSection, ReposTable,
 	ReposTableRow,
 };
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
@@ -22,7 +22,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		if let ["organizations", organization_id, ""] = *path_components(&request).as_slice() {
 			organization_id.to_owned()
 		} else {
-			return Err(anyhow!("unexpected path"));
+			bail!("unexpected path");
 		};
 	if !context.options.auth_enabled() {
 		return Ok(not_found());

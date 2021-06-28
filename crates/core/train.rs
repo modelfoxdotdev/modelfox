@@ -17,7 +17,7 @@ use crate::{
 	stats::{ColumnStatsOutput, Stats, StatsSettings},
 	test,
 };
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use ndarray::prelude::*;
 use num::ToPrimitive;
 use rand::{seq::SliceRandom, SeedableRng};
@@ -86,27 +86,30 @@ impl Trainer {
 		};
 		let (table_train, table_comparison, table_test) = dataset.split();
 
-		// Use heuristics to short-curcuit training.
-		if table_train.nrows() < MIN_TRAIN_ROWS {
-			return Err(anyhow!(
-				"Train split must contain at least {} rows, it had {} rows.",
-				MIN_TRAIN_ROWS,
-				table_train.nrows()
-			));
+		// Do not allow training if any dataset has no rows, or emit warnings if any dataset is too small.
+		if table_train.nrows() == 0 {
+			bail!("The train dataset must contain at least one row.");
+		} else if table_train.nrows() < MIN_TRAIN_ROWS {
+			handle_progress_event(ProgressEvent::Warning(format!(
+				"The train dataset is very small. It has only {} row(s).",
+				table_train.nrows(),
+			)));
 		}
-		if table_comparison.nrows() < MIN_COMPARISON_ROWS {
-			return Err(anyhow!(
-				"Comparison dataset split must contain at least {} rows, it had {} rows.",
-				MIN_COMPARISON_ROWS,
-				table_comparison.nrows()
-			));
+		if table_comparison.nrows() == 0 {
+			bail!("The comparison dataset must contain at least one row.");
+		} else if table_comparison.nrows() < MIN_COMPARISON_ROWS {
+			handle_progress_event(ProgressEvent::Warning(format!(
+				"The comparison dataset is very small. It has only {} row(s).",
+				table_comparison.nrows(),
+			)));
 		}
-		if table_test.nrows() < MIN_TEST_ROWS {
-			return Err(anyhow!(
-				"Test split must contain at least {} rows, it had {} rows.",
-				MIN_TEST_ROWS,
-				table_test.nrows()
-			));
+		if table_test.nrows() == 0 {
+			bail!("The test dataset must contain at least one row.");
+		} else if table_test.nrows() < MIN_TEST_ROWS {
+			handle_progress_event(ProgressEvent::Warning(format!(
+				"The test dataset is very small. It has only {} row(s).",
+				table_test.nrows(),
+			)));
 		}
 
 		// Retrieve the column names.
@@ -170,16 +173,16 @@ impl Trainer {
 				2 => Task::BinaryClassification,
 				_ => Task::MulticlassClassification,
 			},
-			_ => return Err(anyhow!("invalid target column type")),
+			_ => bail!("invalid target column type"),
 		};
 
 		// Determine whether the target column contains invalid values.
 		match overall_target_column_stats {
 			ColumnStatsOutput::Number(stats) if stats.invalid_count != 0 => {
-				return Err(anyhow!("The target column contains invalid values."));
+				bail!("The target column contains invalid values.");
 			}
 			ColumnStatsOutput::Enum(stats) if stats.invalid_count != 0 => {
-				return Err(anyhow!("The target column contains invalid values."));
+				bail!("The target column contains invalid values.");
 			}
 			_ => {}
 		};

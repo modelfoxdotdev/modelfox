@@ -1,5 +1,5 @@
 use super::page::Page;
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
@@ -20,7 +20,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	{
 		(model_id.to_owned(), grid_item_id.to_owned())
 	} else {
-		return Err(anyhow!("unexpected path"));
+		bail!("unexpected path");
 	};
 
 	let mut db = match context.database_pool.begin().await {

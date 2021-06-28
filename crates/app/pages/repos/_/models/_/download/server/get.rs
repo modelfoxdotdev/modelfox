@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -22,7 +22,7 @@ pub async fn download_inner(
 	{
 		model_id.to_owned()
 	} else {
-		return Err(anyhow!("unexpected path"));
+		bail!("unexpected path");
 	};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,

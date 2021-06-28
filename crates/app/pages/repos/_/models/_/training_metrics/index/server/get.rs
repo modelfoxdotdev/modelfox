@@ -2,7 +2,7 @@ use crate::page::{
 	BinaryClassifier, ClassMetrics, ConfusionMatrixSection, Inner, MulticlassClassifier, Page,
 	Regressor,
 };
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
@@ -22,7 +22,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	{
 		model_id.to_owned()
 	} else {
-		return Err(anyhow!("unexpected path"));
+		bail!("unexpected path");
 	};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,

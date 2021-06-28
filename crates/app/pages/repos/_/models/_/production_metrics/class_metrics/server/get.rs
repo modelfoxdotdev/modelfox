@@ -3,7 +3,7 @@ use crate::page::{
 	ConfusionMatrixTrainingProductionComparison, Inner, IntervalEntry, Metrics,
 	OverallClassMetrics, OverallClassMetricsEntry, Page, TrainingProductionMetrics,
 };
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use std::sync::Arc;
@@ -33,7 +33,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	{
 		model_id.to_owned()
 	} else {
-		return Err(anyhow!("unexpected path"));
+		bail!("unexpected path");
 	};
 	#[derive(serde::Deserialize, Default)]
 	struct SearchParams {

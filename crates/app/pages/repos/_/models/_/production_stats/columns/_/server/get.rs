@@ -10,7 +10,7 @@ use crate::{
 		TextColumnStatsSection, TextColumnTokensSection, TextNGramsTable, TextNGramsTableRow,
 	},
 };
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use chrono_tz::Tz;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
@@ -42,7 +42,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	{
 		(model_id.to_owned(), column_name.to_owned())
 	} else {
-		return Err(anyhow!("unexpected path"));
+		bail!("unexpected path");
 	};
 	#[derive(serde::Deserialize, Default)]
 	struct SearchParams {

@@ -1,5 +1,5 @@
 use crate::page::{ModelsTable, ModelsTableRow, Page};
-use anyhow::{anyhow, Result};
+use anyhow::{bail, Result};
 use chrono::prelude::*;
 use chrono_tz::Tz;
 use pinwheel::prelude::*;
@@ -21,7 +21,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let repo_id = if let ["repos", repo_id, ""] = *path_components(&request).as_slice() {
 		repo_id.to_owned()
 	} else {
-		return Err(anyhow!("unexpected path"));
+		bail!("unexpected path");
 	};
 	let timezone = get_timezone(&request);
 	let mut db = match context.database_pool.begin().await {
