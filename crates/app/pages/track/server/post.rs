@@ -300,18 +300,11 @@ async fn insert_or_update_production_metrics_for_monitor_event(
 	monitor_event: TrueValueMonitorEvent,
 ) -> Result<()> {
 	let identifier = monitor_event.identifier.as_string().to_string();
-	let hour = monitor_event
-		.date
-		.with_minute(0)
-		.unwrap()
-		.with_second(0)
-		.unwrap()
-		.with_nanosecond(0)
-		.unwrap();
 	let rows = sqlx::query(
 		"
 			select
-				predictions.output
+				output,
+				date
 			from
 				predictions
 			where
@@ -324,10 +317,32 @@ async fn insert_or_update_production_metrics_for_monitor_event(
 	.bind(&identifier)
 	.fetch_all(&mut *db)
 	.await?;
+	if rows.len() == 0 {
+		return Err(anyhow!(
+			"Failed to find prediction with identifier {}",
+			identifier
+		));
+	}
+	let true_value = match &monitor_event.true_value {
+		serde_json::Value::Number(value) => {
+			NumberOrString::Number(value.as_f64().unwrap().to_f32().unwrap())
+		}
+		serde_json::Value::String(value) => NumberOrString::String(value.clone()),
+		_ => unimplemented!(),
+	};
 	let row = rows
 		.get(0)
 		.ok_or_else(|| anyhow!("Failed to find prediction with identifier {}", identifier))?;
 	let output: String = row.get(0);
+	let date = row.get::<i64, _>(1);
+	let date = Utc.timestamp(date, 0);
+	let hour = date
+		.with_minute(0)
+		.unwrap()
+		.with_second(0)
+		.unwrap()
+		.with_nanosecond(0)
+		.unwrap();
 	let output: PredictOutput = serde_json::from_str(&output)?;
 	let prediction = match output {
 		PredictOutput::Regression(RegressionPredictOutput { value }) => {
@@ -342,14 +357,7 @@ async fn insert_or_update_production_metrics_for_monitor_event(
 			..
 		}) => NumberOrString::String(class_name),
 	};
-	let true_value = match &monitor_event.true_value {
-		serde_json::Value::Number(value) => {
-			NumberOrString::Number(value.as_f64().unwrap().to_f32().unwrap())
-		}
-		serde_json::Value::String(value) => NumberOrString::String(value.clone()),
-		_ => unimplemented!(),
-	};
-	let rows = sqlx::query(
+	let row = sqlx::query(
 		"
 			select
 				data
@@ -362,9 +370,9 @@ async fn insert_or_update_production_metrics_for_monitor_event(
 	)
 	.bind(&model_id.to_string())
 	.bind(&hour.timestamp())
-	.fetch_all(&mut *db)
+	.fetch_optional(&mut *db)
 	.await?;
-	if let Some(row) = rows.get(0) {
+	if let Some(row) = row {
 		let data: String = row.get(0);
 		let mut production_metrics: ProductionMetrics = serde_json::from_str(&data)?;
 		production_metrics.update((prediction, true_value));
