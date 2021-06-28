@@ -134,8 +134,26 @@ async fn write_prediction_monitor_event(
 	model_id: Id,
 	monitor_event: &PredictionMonitorEvent,
 ) -> Result<()> {
-	let prediction_monitor_event_id = Id::generate();
 	let identifier = monitor_event.identifier.as_string();
+	let row = sqlx::query(
+		"
+			select count(*) from predictions
+			where
+				model_id = $1
+			and identifier = $2
+		",
+	)
+	.bind(&model_id.to_string())
+	.bind(&identifier.to_string())
+	.fetch_one(&mut *db)
+	.await?;
+	let prediction_count: i64 = row.get(0);
+	if prediction_count > 0 {
+		return Err(anyhow!(
+			"A prediction has already been logged with this identifier."
+		));
+	}
+	let prediction_monitor_event_id = Id::generate();
 	let date = &monitor_event.date;
 	let input = serde_json::to_string(&monitor_event.input)?;
 	let output = serde_json::to_string(&monitor_event.output)?;
@@ -165,9 +183,27 @@ async fn write_true_value_monitor_event(
 	model_id: Id,
 	monitor_event: &TrueValueMonitorEvent,
 ) -> Result<()> {
+	let identifier = monitor_event.identifier.as_string();
+	let row = sqlx::query(
+		"
+			select count(*) from true_values
+			where
+				model_id = $1
+			and identifier = $2
+		",
+	)
+	.bind(&model_id.to_string())
+	.bind(&identifier.to_string())
+	.fetch_one(&mut *db)
+	.await?;
+	let true_value_count: i64 = row.get(0);
+	if true_value_count > 0 {
+		return Err(anyhow!(
+			"A prediction has already been logged with this identifier."
+		));
+	}
 	let true_value_monitor_event_id = Id::generate();
 	let date = monitor_event.date;
-	let identifier = monitor_event.identifier.as_string();
 	let true_value = &monitor_event.true_value.to_string();
 	sqlx::query(
 		"
