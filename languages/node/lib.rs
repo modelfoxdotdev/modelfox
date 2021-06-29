@@ -1,4 +1,5 @@
 use anyhow::Result;
+use memmap::Mmap;
 use std::collections::BTreeMap;
 
 node_api::init!(init);
@@ -30,7 +31,7 @@ fn load_model_from_path<'a>(
 	path: String,
 ) -> Result<node_api::External<'a, tangram_core::predict::Model>> {
 	let file = std::fs::File::open(path)?;
-	let bytes = unsafe { memmap::Mmap::map(&file)? };
+	let bytes = unsafe { Mmap::map(&file)? };
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model = tangram_core::predict::Model::from(model);
 	let model = node_api::External::new(env, model)?;

@@ -8,6 +8,7 @@ This crate implements the C API for libtangram, the Tangram C library.
 	non_camel_case_types
 )]
 
+use memmap::Mmap;
 use std::{
 	ffi::CStr,
 	mem::transmute,
@@ -82,7 +83,7 @@ pub unsafe extern "C" fn tangram_model_from_path(
 	handle_error(|| {
 		let path = std::path::Path::new(CStr::from_ptr(path).to_str()?);
 		let file = std::fs::File::open(path)?;
-		let bytes = memmap::Mmap::map(&file)?;
+		let bytes = Mmap::map(&file)?;
 		let model = ::tangram_model::from_bytes(&bytes)?;
 		let model = tangram_core::predict::Model::from(model);
 		*model_ptr = Box::into_raw(Box::new(tangram_model(model)));

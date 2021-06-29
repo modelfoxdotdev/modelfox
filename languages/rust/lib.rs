@@ -24,6 +24,7 @@ For more information, [read the docs](https://www.tangram.xyz/docs).
 */
 
 use anyhow::Result;
+use memmap::Mmap;
 use std::path::Path;
 use std::{collections::BTreeMap, marker::PhantomData};
 pub use tangram_macro::{predict_input, PredictInput, PredictInputValue};
@@ -585,7 +586,7 @@ where
 		options: Option<LoadModelOptions>,
 	) -> Result<Model<Input, Output>> {
 		let file = std::fs::File::open(path)?;
-		let bytes = unsafe { memmap::Mmap::map(&file)? };
+		let bytes = unsafe { Mmap::map(&file)? };
 		Model::from_bytes(&bytes, options)
 	}
 

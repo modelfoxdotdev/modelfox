@@ -1,4 +1,5 @@
 use anyhow::Result;
+use memmap::Mmap;
 use once_cell::sync::OnceCell;
 use std::collections::BTreeMap;
 
@@ -26,7 +27,7 @@ fn _load_model_from_path<'a>(
 	path: Option<String>,
 ) -> Result<erl_nif::Term<'a>> {
 	let file = std::fs::File::open(path.unwrap())?;
-	let bytes = unsafe { memmap::Mmap::map(&file)? };
+	let bytes = unsafe { Mmap::map(&file)? };
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model = tangram_core::predict::Model::from(model);
 	let resource_type = MODEL_RESOURCE_TYPE.get().unwrap();

@@ -1,4 +1,5 @@
 use anyhow::anyhow;
+use memmap::Mmap;
 use pyo3::{prelude::*, type_object::PyTypeObject, types::PyType};
 use std::collections::BTreeMap;
 use url::Url;
@@ -59,7 +60,7 @@ impl Model {
 		options: Option<LoadModelOptions>,
 	) -> PyResult<Model> {
 		let file = std::fs::File::open(path)?;
-		let bytes = unsafe { memmap::Mmap::map(&file)? };
+		let bytes = unsafe { Mmap::map(&file)? };
 		let model = tangram_model::from_bytes(&bytes).map_err(TangramError)?;
 		let model = tangram_core::predict::Model::from(model);
 		let tangram_url = options
