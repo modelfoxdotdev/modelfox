@@ -8,6 +8,7 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
 futures = "0.3"
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
@@ -19,7 +20,6 @@ sunfish = "0.2"
 tangram_app_common = { path = "../../../common" }
 tangram_app_layouts = { path = "../../../layouts" }
 tangram_app_ui = { path = "../../../ui" }
-anyhow = { version = "1", features = ["backtrace"] }
 tangram_id = { path = "../../../../id" }
 tangram_ui = { path = "../../../../ui" }
 tracing = "0.1"

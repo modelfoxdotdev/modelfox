@@ -8,6 +8,7 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
 chrono = { version = "0.4", features = ["serde"] }
 futures = "0.3"
 http = "0.2"
@@ -22,7 +23,6 @@ tangram_app_common = { path = "../../../common" }
 tangram_app_production_metrics = { path = "../../../production_metrics" }
 tangram_app_production_stats = { path = "../../../production_stats" }
 tangram_core = { path = "../../../../core" }
-anyhow = { version = "1", features = ["backtrace"] }
 tangram_id = { path = "../../../../id" }
 tangram_model = { path = "../../../../model" }
 tracing = "0.1"

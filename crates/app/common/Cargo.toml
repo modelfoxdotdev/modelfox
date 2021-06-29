@@ -11,6 +11,7 @@ path = "lib.rs"
 insta = "1"
 
 [dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.5", features = ["serde"] }
 fnv = "1"
@@ -32,7 +33,6 @@ sunfish = "0.2"
 tangram_app_ui = { path = "../../app/ui" }
 tangram_charts = { path = "../../charts" }
 tangram_core = { path = "../../core" }
-anyhow = { version = "1", features = ["backtrace"] }
 tangram_finite = { path = "../../finite" }
 tangram_id = { path = "../../id" }
 tangram_model = { path = "../../model" }

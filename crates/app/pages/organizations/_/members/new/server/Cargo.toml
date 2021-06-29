@@ -8,6 +8,7 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
 futures = "0.3"
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
@@ -21,7 +22,6 @@ sqlx = { version = "0.5", default-features = false, features = ["any", "chrono",
 sunfish = "0.2"
 tangram_app_common = { path = "../../../../../../common" }
 tangram_app_layouts = { path = "../../../../../../layouts" }
-anyhow = { version = "1", features = ["backtrace"] }
 tangram_id = { path = "../../../../../../../id" }
 tangram_ui = { path = "../../../../../../../ui" }
 tokio = { version = "1" ,features = ["full"] }

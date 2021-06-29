@@ -8,19 +8,19 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
 futures = "0.3"
-pinwheel = "0.2"
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
 num = "0.4"
+pinwheel = "0.2"
 serde = { version = "1", features = ["derive"] }
 serde_urlencoded = "0.7"
+sunfish = "0.2"
 tangram_app_common = { path = "../../../../../../../../common" }
-tangram_app_ui = { path = "../../../../../../../../ui" }
 tangram_app_layouts = { path = "../../../../../../../../layouts" }
+tangram_app_ui = { path = "../../../../../../../../ui" }
 tangram_core = { path = "../../../../../../../../../core" }
-anyhow = { version = "1", features = ["backtrace"] }
 tangram_id = { path = "../../../../../../../../../id" }
 tangram_model = { path = "../../../../../../../../../model" }
-sunfish = "0.2"
 tangram_ui = { path = "../../../../../../../../../ui" }

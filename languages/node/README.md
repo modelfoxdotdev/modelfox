@@ -1,4 +1,4 @@
-# Tangram + Node.js
+# Tangram for Node.js
 
 - [Watch the Video](https://www.tangram.xyz)
 - [Read the Docs](https://www.tangram.xyz/docs)
