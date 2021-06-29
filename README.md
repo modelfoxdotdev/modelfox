@@ -105,4 +105,4 @@ To install all dependencies necessary to work on the language libraries, install
 
 ## License
 
-All of this repository is MIT licensed, except for the `app` directory, which is source available and free to use for testing, but requires a paid license to use in production. Send us an email at hello@tangram.xyz if you are interested in a license.
+All of this repository is MIT licensed, except for the `crates/app` directory, which is source available and free to use for testing, but requires a paid license to use in production. Send us an email at hello@tangram.xyz if you are interested in a license.
