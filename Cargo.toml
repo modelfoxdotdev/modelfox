@@ -18,6 +18,3 @@ overflow-checks = false
 
 [profile.release]
 lto = true
-
-[patch.crates-io]
-pinwheel = { path = "../pinwheel" }
