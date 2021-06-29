@@ -28,6 +28,7 @@ default = [
   "tangram_www_docs_getting_started_predict_ruby_server",
   "tangram_www_docs_getting_started_predict_rust_server",
   "tangram_www_docs_getting_started_train_server",
+  "tangram_www_docs_index_server",
   "tangram_www_docs_guide_server",
   "tangram_www_docs_install_server",
   "tangram_www_index_client",
