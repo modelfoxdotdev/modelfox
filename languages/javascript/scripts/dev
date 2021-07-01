@@ -1,0 +1,25 @@
+set -e
+npm install
+cargo build -p tangram_node
+install -D ../../target/debug/libtangram_node.so node/dist/x86_64-unknown-linux-gnu/tangram.node
+cargo build --target wasm32-unknown-unknown -p tangram_wasm
+wasm-bindgen \
+  --target bundler \
+  --out-dir wasm/dist/bundler \
+  ../../target/wasm32-unknown-unknown/debug/tangram_wasm.wasm
+wasm-bindgen \
+  --target deno \
+  --out-dir wasm/dist/deno \
+  ../../target/wasm32-unknown-unknown/debug/tangram_wasm.wasm
+wasm-bindgen \
+  --target nodejs \
+  --out-dir wasm/dist/node \
+  ../../target/wasm32-unknown-unknown/debug/tangram_wasm.wasm
+mv wasm/dist/node/tangram_wasm.js wasm/dist/node/tangram_wasm.cjs
+wasm-bindgen \
+  --target web \
+  --out-dir wasm/dist/web \
+  ../../target/wasm32-unknown-unknown/debug/tangram_wasm.wasm
+npx tsc
+sed -i '1s/^/\/\/\/ <reference types=".\/deno.d.ts" \/>\n/' dist/deno.js
+sed -i '1s/^/\/\/\/ <reference types=".\/model.d.ts" \/>\n/' dist/model.js

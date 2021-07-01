@@ -31,7 +31,10 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	let bytes = match hyper::body::to_bytes(request.body_mut()).await {
 		Ok(bytes) => bytes,
-		Err(_) => return Ok(bad_request()),
+		Err(e) => {
+			error!(%e);
+			return Ok(bad_request());
+		}
 	};
 	let monitor_events: MonitorEventSet = match serde_json::from_slice(&bytes) {
 		Ok(monitor_events) => monitor_events,
@@ -59,7 +62,8 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 					monitor_event,
 				)
 				.await;
-				if handle_prediction_result.is_err() {
+				if let Err(e) = handle_prediction_result {
+					error!(%e);
 					return Ok(bad_request());
 				}
 			}

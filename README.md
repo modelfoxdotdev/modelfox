@@ -7,7 +7,7 @@
 Tangram is an automated machine learning framework designed for programmers.
 
 - Run `tangram train` to train a model from a CSV file on the command line.
-- Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramxyz/tangram-go), [Node.js](https://www.npmjs.com/package/@tangramxyz/tangram-node), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](lib.rs/tangram).
+- Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramxyz/tangram-go), [JavaScript](https://www.npmjs.com/package/@tangramxyz/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](lib.rs/tangram).
 - Run `tangram app` to learn more about your models and monitor them in production.
 
 ### Install
@@ -30,21 +30,21 @@ The CLI automatically transforms your data into features, trains a number of mod
 
 ### Predict
 
-Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramxyz/tangram-go), [Node.js](https://www.npmjs.com/package/@tangramxyz/tangram-node), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](https://lib.rs/tangram).
+Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramxyz/tangram-go), [JavaScript](https://www.npmjs.com/package/@tangramxyz/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](https://lib.rs/tangram).
 
 ```javascript
-let tangram = require("@tangramxyz/tangram-node");
+let tangram = require("@tangramxyz/tangram")
 
-let model = new tangram.Model("./heart_disease.tangram");
+let model = new tangram.Model("./heart_disease.tangram")
 
 let input = {
 	age: 63,
 	gender: "male",
 	// ...
-};
+}
 
-let output = model.predictSync(input);
-console.log(output);
+let output = model.predict(input)
+console.log(output)
 ```
 
 ```javascript
@@ -70,7 +70,7 @@ model.logPrediction({
 	input,
 	options,
 	output,
-});
+})
 ```
 
 Later on, if you find out the true value for a prediction, call `logTrueValue`.
@@ -80,7 +80,7 @@ Later on, if you find out the true value for a prediction, call `logTrueValue`.
 model.logTrueValue({
 	identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
 	trueValue: "Positive",
-});
+})
 ```
 
 Now you can:

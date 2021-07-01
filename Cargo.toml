@@ -2,13 +2,13 @@
 resolver = "2"
 members = [
 	"crates/*",
-	"crates/www/pages/**/server",
-	"crates/www/pages/**/client",
 	"languages/c",
 	"languages/elixir",
-	"languages/node",
+	"languages/javascript/node",
+	"languages/javascript/wasm",
 	"languages/python",
 	"languages/rust",
+	"languages/rust/examples/*",
 ]
 
 [profile.dev.build-override]

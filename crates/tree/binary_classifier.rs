@@ -61,13 +61,13 @@ impl BinaryClassifier {
 		probabilities.fill(self.bias);
 		let probabilities = probabilities.as_slice_mut().unwrap();
 		for tree in self.trees.iter() {
-			pzip!(features.axis_iter(Axis(0)), probabilities.par_iter_mut()).for_each(
+			zip!(features.axis_iter(Axis(0)), probabilities.iter_mut()).for_each(
 				|(example, logit)| {
 					*logit += tree.predict(example.as_slice().unwrap());
 				},
 			);
 		}
-		probabilities.par_iter_mut().for_each(|probability| {
+		probabilities.iter_mut().for_each(|probability| {
 			*probability = 1.0 / (probability.neg().exp() + 1.0);
 		});
 	}

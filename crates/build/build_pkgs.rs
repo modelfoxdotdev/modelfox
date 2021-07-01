@@ -119,6 +119,7 @@ fn alpine(
 			arch = match arch {
 				Arch::X8664 => "x86_64",
 				Arch::AArch64 => "aarch64",
+				Arch::Wasm32 => unreachable!(),
 			},
 		);
 		std::fs::write(&apkbuild_path, &apkbuild).unwrap();
@@ -126,6 +127,7 @@ fn alpine(
 		let target = match arch {
 			Arch::X8664 => Target::X8664UnknownLinuxGnu,
 			Arch::AArch64 => Target::AArch64UnknownLinuxGnu,
+			Arch::Wasm32 => unreachable!(),
 		};
 		let tangram_cli_path = dist_path
 			.join(target.as_str())
@@ -204,7 +206,11 @@ fn deb(
 		let _ = components.next().unwrap();
 		let version = components.next().unwrap().to_owned();
 		let arch = components.next().unwrap().to_owned();
-		debs.push(Deb { arch, version, path });
+		debs.push(Deb {
+			arch,
+			version,
+			path,
+		});
 	}
 	let distributions = &["debian", "ubuntu"];
 	let debian_versions = vec!["sid", "bullseye", "buster", "stretch"];

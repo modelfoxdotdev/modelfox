@@ -1,3 +1,8 @@
 {
-  "useTabs": true
+	"arrowParens": "avoid",
+	"bracketSpacing": true,
+	"jsxBracketSameLine": false,
+	"semi": false,
+	"trailingComma": "all",
+	"useTabs": true
 }

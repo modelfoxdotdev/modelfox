@@ -83,8 +83,8 @@ pub fn run(_args: Args) {
 		.unwrap();
 	}
 
-	eprintln!("node");
-	let node_dist_path = tangram_path.join("languages/node/native");
+	eprintln!("javascript");
+	let node_dist_path = tangram_path.join("languages/javascript/node/dist");
 	if std::fs::metadata(&node_dist_path)
 		.map(|m| m.is_dir())
 		.unwrap_or(false)
@@ -111,6 +111,20 @@ pub fn run(_args: Args) {
 		)
 		.unwrap();
 	}
+	let wasm_dist_path = tangram_path.join("languages/javascript/wasm/dist");
+	if std::fs::metadata(&wasm_dist_path)
+		.map(|m| m.is_dir())
+		.unwrap_or(false)
+	{
+		std::fs::remove_dir_all(&wasm_dist_path).unwrap();
+	}
+	install(
+		&dist_path
+			.join("wasm32-unknown-unknown")
+			.join("tangram_wasm.wasm"),
+		&wasm_dist_path.join("tangram_wasm.wasm"),
+	)
+	.unwrap();
 
 	eprintln!("python");
 	let python_dist_path = tangram_path.join("languages/python/dist");

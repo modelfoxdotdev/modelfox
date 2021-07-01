@@ -1,0 +1,14 @@
+[package]
+edition = "2018"
+license = "MIT"
+name = "tangram_example_advanced"
+publish = false
+version = "0.0.0"
+
+[[bin]]
+name = "tangram_example_advanced"
+path = "main.rs"
+
+[dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
+tangram = { version = "0.4", path = "../../" }

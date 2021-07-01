@@ -57,7 +57,7 @@ impl MulticlassClassifier {
 
 	// Make predictions.
 	pub fn predict(&self, features: ArrayView2<TableValue>, mut probabilities: ArrayViewMut2<f32>) {
-		pzip!(
+		zip!(
 			probabilities.axis_iter_mut(Axis(0)),
 			features.axis_iter(Axis(0))
 		)

@@ -3,6 +3,7 @@ use anyhow::{anyhow, Error, Result};
 pub enum Arch {
 	X8664,
 	AArch64,
+	Wasm32,
 }
 
 pub const ARCHS: [Arch; 2] = [Arch::X8664, Arch::AArch64];
@@ -23,6 +24,7 @@ impl Arch {
 		match self {
 			Arch::X8664 => "x86_64",
 			Arch::AArch64 => "aarch64",
+			Arch::Wasm32 => "wasm32",
 		}
 	}
 }
@@ -37,9 +39,10 @@ pub enum Target {
 	AArch64AppleDarwin,
 	X8664PcWindowsMsvc,
 	X8664PcWindowsGnu,
+	Wasm32UnknownUnknown,
 }
 
-pub const TARGETS: [Target; 8] = [
+pub const TARGETS: [Target; 9] = [
 	Target::X8664UnknownLinuxGnu,
 	Target::AArch64UnknownLinuxGnu,
 	Target::X8664UnknownLinuxMusl,
@@ -48,6 +51,7 @@ pub const TARGETS: [Target; 8] = [
 	Target::AArch64AppleDarwin,
 	Target::X8664PcWindowsMsvc,
 	Target::X8664PcWindowsGnu,
+	Target::Wasm32UnknownUnknown,
 ];
 
 impl std::str::FromStr for Target {
@@ -62,6 +66,7 @@ impl std::str::FromStr for Target {
 			"aarch64-apple-darwin" => Ok(Target::AArch64AppleDarwin),
 			"x86_64-pc-windows-msvc" => Ok(Target::X8664PcWindowsMsvc),
 			"x86_64-pc-windows-gnu" => Ok(Target::X8664PcWindowsGnu),
+			"wasm32-unknown-unknown" => Ok(Target::Wasm32UnknownUnknown),
 			_ => Err(anyhow!("invalid target")),
 		}
 	}
@@ -78,6 +83,7 @@ impl Target {
 			Target::AArch64AppleDarwin => "aarch64-apple-darwin",
 			Target::X8664PcWindowsMsvc => "x86_64-pc-windows-msvc",
 			Target::X8664PcWindowsGnu => "x86_64-pc-windows-gnu",
+			Target::Wasm32UnknownUnknown => "wasm32-unknown-unknown",
 		}
 	}
 
@@ -91,6 +97,7 @@ impl Target {
 			Target::AArch64UnknownLinuxGnu
 			| Target::AArch64UnknownLinuxMusl
 			| Target::AArch64AppleDarwin => Arch::AArch64,
+			Target::Wasm32UnknownUnknown => Arch::Wasm32,
 		}
 	}
 }
@@ -158,6 +165,7 @@ impl TargetFileNames {
 				tangram_node_src_file_name: "tangram_node.dll",
 				tangram_node_dst_file_name: "tangram.node",
 			},
+			Target::Wasm32UnknownUnknown => unreachable!(),
 		}
 	}
 }

@@ -28,32 +28,34 @@
           rustc = rust;
           cargo = rust;
         }).buildRustPackage {
-          CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
-          buildInputs = with pkgs; [
+          pname = "tangram";
+          version = "0.4.0";
+          src = ./.;
+          doCheck = false;
+          nativeBuildInputs = with pkgs; [
             clang_12
             lld_12
-            python39
           ];
-          pname = "tangram";
-          src = ./.;
-          cargoSha256 = pkgs.lib.fakeSha256;
+          cargoSha256 = "sha256-wV518+LTFRtOE4EYJxZzmXR3k3VvSEvpIa42DB5b+EE=";
+          cargoBuildFlags = [ "--bin" "tangram" ];
+          CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
         };
       };
       devShell = pkgs.mkShell {
         CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = toString ./. + "/scripts/clang";
         CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
         buildInputs = with pkgs; [
-          (pkgs.stdenv.mkDerivation {
-            name = "mold";
-            src = pkgs.fetchgit {
+          (stdenv.mkDerivation {
+            pname = "mold";
+            version = "0.9.1";
+            src = fetchgit {
               url = "https://github.com/rui314/mold";
-              rev = "f127281d050d25032b44790a865b8a128a8145e8";
-              sha256 = "sha256-3cYE9/hZtnbCx4Y4I1hbGhUtFRjB/X+uUiJZjxA6Qw4=";
-              fetchSubmodules = true;
+              rev = "v0.9.1";
+              sha256 = "sha256-yIkW6OCXhlHZ1jC8/yMAdJbSgY9K40POT2zWv6wYr5E=";
             };
-            nativeBuildInputs = with pkgs; [ clang_12 cmake lld_12 tbb xxHash zlib openssl git ];
+            nativeBuildInputs = [ clang_12 cmake lld_12 tbb xxHash zlib openssl git ];
             dontUseCmakeConfigure = "true";
-            buildPhase = "make -j24";
+            buildPhase = "make -j $NIX_BUILD_CORES";
             installPhase = "mkdir -p $out $out/bin $out/share/man/man1 && PREFIX=$out make install";
           })
           cargo-insta

@@ -78,7 +78,7 @@ impl Component for Predict {
 				fn main() {
 					// Load the model from the path.
 					let model: tangram::Model =
-						tangram::Model::from_path("examples/heart_disease.tangram", None).unwrap();
+						tangram::Model::from_path("heart_disease.tangram", None).unwrap();
 
 					// Create an example input matching the schema of the CSV file the model was trained on.
 					// Here the data is just hard-coded, but in your application you will probably get this

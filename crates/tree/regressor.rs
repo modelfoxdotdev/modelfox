@@ -57,7 +57,7 @@ impl Regressor {
 		predictions.fill(self.bias);
 		let predictions = predictions.as_slice_mut().unwrap();
 		for tree in self.trees.iter() {
-			pzip!(features.axis_iter(Axis(0)), predictions.par_iter_mut()).for_each(
+			zip!(features.axis_iter(Axis(0)), predictions.iter_mut()).for_each(
 				|(example, prediction)| {
 					*prediction += tree.predict(example.as_slice().unwrap());
 				},

@@ -328,7 +328,7 @@ impl Component for TuningCode {
 						threshold: 0.5,
 						computeFeatureContributions: true
 					}
-					let output = model.predictSync(input, options)
+					let output = model.predict(input, options)
 				"#
 			)
 			.into(),

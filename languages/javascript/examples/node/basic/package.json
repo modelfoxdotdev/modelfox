@@ -1,0 +1,14 @@
+{
+	"author": "Tangram",
+	"dependencies": {
+		"@tangramxyz/tangram": "*"
+	},
+	"license": "MIT",
+	"main": "main.js",
+	"name": "@tangramxyz/tangram-example-node-basic",
+	"scripts": {
+		"start": "node main.js"
+	},
+	"type": "module",
+	"version": "0.0.0"
+}

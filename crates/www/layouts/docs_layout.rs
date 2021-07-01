@@ -234,8 +234,8 @@ impl Component for PageNav {
 					)
 					.child(
 						ui::NavItem::new()
-							.title("Node.js".to_owned())
-							.href("/docs/languages/node".to_owned())
+							.title("JavaScript".to_owned())
+							.href("/docs/languages/javascript".to_owned())
 							.selected(false),
 					)
 					.child(

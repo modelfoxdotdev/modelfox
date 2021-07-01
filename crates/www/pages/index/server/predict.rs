@@ -37,7 +37,7 @@ impl Component for Predict {
 
 				const model = new tangram.Model("./heart_disease.tangram");
 
-				const output = model.predictSync({
+				const output = model.predict({
 					age: 63,
 					gender: "male",
 					// ...
@@ -118,9 +118,9 @@ impl Component for Predict {
 			.child(", ")
 			.child(
 				ui::Link::new()
-					.href("https://www.npmjs.com/package/@tangramxyz/tangram-node".to_owned())
-					.title("Node.js".to_owned())
-					.child("Node.js"),
+					.href("https://www.npmjs.com/package/@tangramxyz/tangram".to_owned())
+					.title("JavaScript".to_owned())
+					.child("JavaScript"),
 			)
 			.child(", ")
 			.child(

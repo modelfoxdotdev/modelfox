@@ -5,7 +5,7 @@ The Tangram crate makes it easy to make predictions with your Tangram machine le
 
 ```toml
 [dependencies]
-tangram = { version = "*" }
+tangram = "*"
 ```
 
 ```rust no_run

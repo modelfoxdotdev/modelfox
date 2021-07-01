@@ -55,7 +55,7 @@ impl Component for Install {
 		let code = ui::doc!(
 			r#"
 				dependencies: {
-					"@tangramxyz/tangram-node": "*",
+					"@tangramxyz/tangram": "*",
 				}
 			"#
 		);
@@ -106,7 +106,7 @@ impl Component for Predict {
 				};
 
 				// Make the prediction!
-				const output = model.predictSync(input);
+				const output = model.predict(input);
 
 				// Print the output.
 				console.log("Output:", output);

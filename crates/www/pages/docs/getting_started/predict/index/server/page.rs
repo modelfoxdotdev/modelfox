@@ -38,9 +38,9 @@ impl Component for Page {
 									.child(
 										ui::ListItem::new().child(
 											ui::Link::new()
-												.href("node".to_owned())
-												.title("Node.js".to_owned())
-												.child("Node.js"),
+												.href("javascript".to_owned())
+												.title("JavaScript".to_owned())
+												.child("JavaScript"),
 										),
 									)
 									.child(

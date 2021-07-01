@@ -1,0 +1,23 @@
+set -e
+npm install
+wasm-bindgen \
+  --target bundler \
+  --out-dir wasm/dist/bundler \
+  wasm/dist/tangram_wasm.wasm
+wasm-bindgen \
+  --target deno \
+  --out-dir wasm/dist/deno \
+  wasm/dist/tangram_wasm.wasm
+wasm-bindgen \
+  --target nodejs \
+  --out-dir wasm/dist/node \
+  wasm/dist/tangram_wasm.wasm
+mv wasm/dist/node/tangram_wasm.js wasm/dist/node/tangram_wasm.cjs
+wasm-bindgen \
+  --target web \
+  --out-dir wasm/dist/web \
+  wasm/dist/tangram_wasm.wasm
+npx tsc
+sed -i '1s/^/\/\/\/ <reference types=".\/deno.d.ts" \/>\n/' dist/deno.js
+sed -i '1s/^/\/\/\/ <reference types=".\/model.d.ts" \/>\n/' dist/model.js
+npm publish --access public

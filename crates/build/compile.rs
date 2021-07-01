@@ -55,6 +55,23 @@ pub fn run(args: Args) {
 		Target::X8664PcWindowsGnu => {
 			build_gnu(target, Some(vec!["g++-mingw-w64-x86-64".to_owned()]));
 		}
+		Target::Wasm32UnknownUnknown => {
+			build_wasm(target);
+		}
+	}
+
+	if matches!(target, Target::Wasm32UnknownUnknown) {
+		let cargo_artifact_path = tangram_path
+			.join("target")
+			.join(target.as_str())
+			.join("release");
+		let tangram_wasm_artifact_path = cargo_artifact_path.join("tangram_wasm.wasm");
+		std::fs::copy(
+			tangram_wasm_artifact_path,
+			dist_target_path.join("tangram_wasm.wasm"),
+		)
+		.unwrap();
+		return;
 	}
 
 	eprintln!("generating tangram.h");
@@ -105,6 +122,7 @@ pub fn run(args: Args) {
 				cargo_artifact_path_dynamic.join(target_file_names.tangram_node_src_file_name),
 			)
 		}
+		Target::Wasm32UnknownUnknown => unreachable!(),
 	};
 	std::fs::copy(
 		tangram_cli_artifact_path,
@@ -142,6 +160,7 @@ pub fn run(args: Args) {
 		Target::AArch64AppleDarwin => build_python_macos(),
 		Target::X8664PcWindowsMsvc => build_python_windows(),
 		Target::X8664PcWindowsGnu => {}
+		Target::Wasm32UnknownUnknown => unreachable!(),
 	}
 
 	// Move the python wheels to the dist target path.
@@ -165,6 +184,7 @@ pub fn run(args: Args) {
 		Target::X8664UnknownLinuxMusl
 		| Target::AArch64UnknownLinuxMusl
 		| Target::X8664PcWindowsGnu => {}
+		Target::Wasm32UnknownUnknown => unreachable!(),
 	}
 }
 
@@ -197,6 +217,7 @@ fn build_gnu(target: Target, apt_packages: Option<Vec<String>>) {
 	let docker_platform = match arch {
 		Arch::X8664 => "linux/amd64",
 		Arch::AArch64 => "linux/arm64",
+		Arch::Wasm32 => unreachable!(),
 	};
 	let apt_packages = apt_packages
 		.map(|apt_packages| apt_packages.join(" "))
@@ -259,6 +280,7 @@ fn build_musl(target: Target) {
 	let docker_platform = match arch {
 		Arch::X8664 => "linux/amd64",
 		Arch::AArch64 => "linux/arm64",
+		Arch::Wasm32 => unreachable!(),
 	};
 	let script = format!(
 		r#"
@@ -323,6 +345,7 @@ fn build_python_manylinux(arch: Arch) {
 	let docker_platform = match arch {
 		Arch::X8664 => "linux/amd64",
 		Arch::AArch64 => "linux/arm64",
+		Arch::Wasm32 => unreachable!(),
 	};
 	let script = r#"
 		set -ex
@@ -428,6 +451,20 @@ fn build_python_windows() {
 	)
 	.env("CARGO_TARGET_DIR", "../../target_python")
 	.dir("languages/python")
+	.run()
+	.unwrap();
+}
+
+fn build_wasm(target: Target) {
+	cmd!(
+		which("cargo").unwrap(),
+		"build",
+		"--release",
+		"--target",
+		target.as_str(),
+		"--package",
+		"tangram_wasm",
+	)
 	.run()
 	.unwrap();
 }
