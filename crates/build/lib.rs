@@ -6,14 +6,13 @@ pub enum Arch {
 	Wasm32,
 }
 
-pub const ARCHS: [Arch; 2] = [Arch::X8664, Arch::AArch64];
-
 impl std::str::FromStr for Arch {
 	type Err = Error;
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		match s {
 			"x86_64" => Ok(Arch::X8664),
 			"aarch64" => Ok(Arch::AArch64),
+			"wasm32" => Ok(Arch::Wasm32),
 			_ => Err(anyhow!("invalid arch")),
 		}
 	}
@@ -41,18 +40,6 @@ pub enum Target {
 	X8664PcWindowsGnu,
 	Wasm32UnknownUnknown,
 }
-
-pub const TARGETS: [Target; 9] = [
-	Target::X8664UnknownLinuxGnu,
-	Target::AArch64UnknownLinuxGnu,
-	Target::X8664UnknownLinuxMusl,
-	Target::AArch64UnknownLinuxMusl,
-	Target::X8664AppleDarwin,
-	Target::AArch64AppleDarwin,
-	Target::X8664PcWindowsMsvc,
-	Target::X8664PcWindowsGnu,
-	Target::Wasm32UnknownUnknown,
-];
 
 impl std::str::FromStr for Target {
 	type Err = Error;

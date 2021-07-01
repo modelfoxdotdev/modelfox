@@ -29,7 +29,7 @@
           cargo = rust;
         }).buildRustPackage {
           pname = "tangram";
-          version = "0.4.0";
+          version = "0.5.0";
           src = ./.;
           doCheck = false;
           nativeBuildInputs = with pkgs; [

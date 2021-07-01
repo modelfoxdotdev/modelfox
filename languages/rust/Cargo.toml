@@ -8,7 +8,7 @@ license = "MIT"
 name = "tangram"
 publish = true
 repository = "https://github.com/tangramxyz/tangram"
-version = "0.4.0"
+version = "0.5.0"
 
 [lib]
 path = "lib.rs"
@@ -27,8 +27,8 @@ memmap = "0.7"
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tangram_core = { version = "0.4", path = "../../crates/core" }
-tangram_macro = { version = "0.4", path = "macro" }
-tangram_model = { version = "0.4", path = "../../crates/model" }
+tangram_core = { version = "=0.5.0", path = "../../crates/core" }
+tangram_macro = { version = "=0.5.0", path = "macro" }
+tangram_model = { version = "=0.5.0", path = "../../crates/model" }
 tokio = { version = "1" ,features = ["full"], optional = true }
 url = { version = "2", features = ["serde"] }

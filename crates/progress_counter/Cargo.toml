@@ -8,7 +8,7 @@ license = "MIT"
 name = "tangram_progress_counter"
 publish = true
 repository = "https://github.com/tangramxyz/tangram"
-version = "0.4.0"
+version = "0.5.0"
 
 [lib]
 path = "lib.rs"

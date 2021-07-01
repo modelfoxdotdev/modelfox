@@ -8,7 +8,7 @@ license = "MIT"
 name = "tangram_tree"
 publish = true
 repository = "https://github.com/tangramxyz/tangram"
-version = "0.4.0"
+version = "0.5.0"
 
 
 [lib]
@@ -61,9 +61,9 @@ num = "0.4"
 rayon = "1.5"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tangram_finite = { version = "0.4", path = "../finite" }
-tangram_kill_chip = { version = "0.4", path = "../kill_chip" }
-tangram_metrics = { version = "0.4", path = "../metrics" }
-tangram_progress_counter = { version = "0.4", path = "../progress_counter" }
-tangram_table = { version = "0.4", path = "../table" }
-tangram_zip = { version = "0.4", path = "../zip" }
+tangram_finite = { version = "=0.5.0", path = "../finite" }
+tangram_kill_chip = { version = "=0.5.0", path = "../kill_chip" }
+tangram_metrics = { version = "=0.5.0", path = "../metrics" }
+tangram_progress_counter = { version = "=0.5.0", path = "../progress_counter" }
+tangram_table = { version = "=0.5.0", path = "../table" }
+tangram_zip = { version = "=0.5.0", path = "../zip" }

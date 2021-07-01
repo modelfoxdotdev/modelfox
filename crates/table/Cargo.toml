@@ -8,7 +8,7 @@ license = "MIT"
 name = "tangram_table"
 publish = true
 repository = "https://github.com/tangramxyz/tangram"
-version = "0.4.0"
+version = "0.5.0"
 
 [lib]
 path = "lib.rs"
@@ -23,5 +23,5 @@ fast-float = "0.2"
 fnv = "1"
 ndarray = { version = "0.15", features = ["rayon"] }
 num = "0.4"
-tangram_progress_counter = { version = "0.4", path = "../progress_counter" }
-tangram_zip = { version = "0.4", path = "../zip" }
+tangram_progress_counter = { version = "=0.5.0", path = "../progress_counter" }
+tangram_zip = { version = "=0.5.0", path = "../zip" }
