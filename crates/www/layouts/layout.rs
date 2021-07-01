@@ -42,6 +42,11 @@ impl Component for Topbar {
 			},
 			ui::TopbarItem {
 				element: None,
+				href: "/benchmarks".to_owned(),
+				title: "Benchmarks".to_owned(),
+			},
+			ui::TopbarItem {
+				element: None,
 				href: "https://app.tangram.xyz".to_owned(),
 				title: "Sign In".to_owned(),
 			},
