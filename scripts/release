@@ -1,0 +1,5 @@
+set -e
+for path in id zip table metrics features kill_chip finite model linear tree core
+do
+pushd $path && cargo publish && popd
+done

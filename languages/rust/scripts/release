@@ -1,0 +1,3 @@
+set -e
+pushd macro && cargo publish && popd
+cargo publish
