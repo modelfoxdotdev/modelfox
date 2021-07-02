@@ -16,10 +16,6 @@ wasm-bindgen \
   --out-dir wasm/dist/node \
   ../../target/wasm32-unknown-unknown/debug/tangram_wasm.wasm
 mv wasm/dist/node/tangram_wasm.js wasm/dist/node/tangram_wasm.cjs
-wasm-bindgen \
-  --target web \
-  --out-dir wasm/dist/web \
-  ../../target/wasm32-unknown-unknown/debug/tangram_wasm.wasm
 npx tsc
 sed -i '1s/^/\/\/\/ <reference types=".\/deno.d.ts" \/>\n/' dist/deno.js
 sed -i '1s/^/\/\/\/ <reference types=".\/model.d.ts" \/>\n/' dist/model.js

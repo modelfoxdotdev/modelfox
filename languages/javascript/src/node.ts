@@ -23,7 +23,6 @@ if (arch === "x64" && platform === "linux") {
 } else if (arch === "x64" && platform === "win32") {
 	target = "x86_64-pc-windows-msvc"
 }
-target = null
 
 if (target !== null) {
 	setNative(require(`../node/dist/${target}/tangram.node`))

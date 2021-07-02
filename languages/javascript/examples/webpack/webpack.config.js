@@ -1,14 +1,15 @@
 module.exports = {
+	mode: "production",
 	entry: "./index.js",
 	experiments: {
-		topLevelAwait: true,
 		asyncWebAssembly: true,
+		topLevelAwait: true,
 	},
 	module: {
 		rules: [
 			{
 				test: /\.tangram$/,
-				use: "file-loader",
+				type: "asset/resource",
 			},
 		],
 	},

@@ -1,14 +1,11 @@
-import * as path from "https://deno.land/std/node/path.ts"
-import * as tangram from "https://deno.land/x/tangram"
-import * as url from "https://deno.land/std/node/url.ts"
+import * as tangram from "https://js.tangram.xyz"
 
-// Get the path to the .tangram file.
-let modelPath = path.join(
-	path.dirname(url.fileURLToPath(import.meta.url)),
-	"heart_disease.tangram",
-)
-// Load the model from the path.
-let modelData = await Deno.readFile(modelPath)
+console.log(tangram)
+
+// Download the model.
+let modelResponse = await fetch("/heart_disease.tangram")
+let modelData = await modelResponse.arrayBuffer()
+// Load the model.
 let model = new tangram.Model(modelData)
 
 // Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
@@ -32,4 +29,4 @@ let input = {
 let output = model.predict(input)
 
 // Print the output.
-console.log("Output:", output)
+document.body.appendChild(document.createTextNode(JSON.stringify(output)))

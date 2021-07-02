@@ -19,6 +19,8 @@ let tangram = require("@tangramxyz/tangram")
 
 ### Deno
 
+_not yet implemented_
+
 ```javascript
 import tangram from "https://deno.land/x/tangram"
 ```
@@ -35,7 +37,9 @@ $ npm install @tangramxyz/tangram
 import tangram from "@tangramxyz/tangram"
 ```
 
-### ES Module
+### ES Modules
+
+_not yet implemented_
 
 If you are targeting a modern browser with support for ES Modules, WebAssembly, and top-level await, you can import the tangram library from https://js.tangram.xyz.
 

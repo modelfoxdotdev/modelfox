@@ -5,5 +5,5 @@ This example demonstrates loading a model from a `.tangram` file and making a pr
 To run the example:
 
 ```
-$ deno run --allow-read main.ts
+$ npx http-server
 ```
