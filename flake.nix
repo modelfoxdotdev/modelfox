@@ -76,9 +76,6 @@
           sqlite
         ];
       };
-      overlay = final: prev: rec {
-        tangramxyz = defaultApp;
-      };
     }
   );
 }
