@@ -27,8 +27,6 @@ pub fn run(args: Args) {
 	}
 	std::fs::create_dir_all(&dist_target_path).unwrap();
 
-	let target_file_names = TargetFileNames::for_target(target);
-
 	eprintln!("compiling");
 	match target {
 		Target::X8664UnknownLinuxGnu => {
@@ -73,6 +71,8 @@ pub fn run(args: Args) {
 		.unwrap();
 		return;
 	}
+
+	let target_file_names = TargetFileNames::for_target(target);
 
 	eprintln!("generating tangram.h");
 	cbindgen::generate(tangram_path.join("languages/c"))
