@@ -12,7 +12,7 @@ pub struct Code {
 	#[builder]
 	pub language: Option<Language>,
 	#[builder]
-	pub hide_line_numbers: Option<bool>,
+	pub line_numbers: Option<bool>,
 }
 
 #[derive(Clone, Copy, PartialEq)]
@@ -31,8 +31,8 @@ impl Component for Code {
 		if let Some(language) = self.language {
 			code = highlight(code.as_ref(), language).into();
 		}
-		let hide_line_numbers = self.hide_line_numbers.unwrap_or(false);
-		let line_numbers = if !hide_line_numbers {
+		let line_numbers = self.line_numbers.unwrap_or(false);
+		let line_numbers = if line_numbers {
 			Some(LineNumbers {
 				count: count_lines(&code),
 			})
@@ -52,7 +52,7 @@ pub struct CodeSelect {
 	pub code_for_language: CodeForLanguage,
 	#[builder]
 	#[new(default)]
-	pub hide_line_numbers: Option<bool>,
+	pub line_numbers: Option<bool>,
 	#[builder]
 	#[new(default)]
 	pub language: Option<Language>,
@@ -136,7 +136,7 @@ impl Component for CodeSelect {
 							.child(
 								Code::new()
 									.code(code_elixir)
-									.hide_line_numbers(self.hide_line_numbers),
+									.line_numbers(self.line_numbers),
 							),
 					)
 					.child(
@@ -151,11 +151,7 @@ impl Component for CodeSelect {
 							)
 							.class("code-select-code-wrapper")
 							.attribute("data-lang", "go")
-							.child(
-								Code::new()
-									.code(code_go)
-									.hide_line_numbers(self.hide_line_numbers),
-							),
+							.child(Code::new().code(code_go).line_numbers(self.line_numbers)),
 					)
 					.child(
 						div()
@@ -172,7 +168,7 @@ impl Component for CodeSelect {
 							.child(
 								Code::new()
 									.code(code_javascript)
-									.hide_line_numbers(self.hide_line_numbers),
+									.line_numbers(self.line_numbers),
 							),
 					)
 					.child(
@@ -190,7 +186,7 @@ impl Component for CodeSelect {
 							.child(
 								Code::new()
 									.code(code_python)
-									.hide_line_numbers(self.hide_line_numbers),
+									.line_numbers(self.line_numbers),
 							),
 					)
 					.child(
@@ -205,11 +201,7 @@ impl Component for CodeSelect {
 							)
 							.class("code-select-code-wrapper")
 							.attribute("data-lang", "ruby")
-							.child(
-								Code::new()
-									.code(code_ruby)
-									.hide_line_numbers(self.hide_line_numbers),
-							),
+							.child(Code::new().code(code_ruby).line_numbers(self.line_numbers)),
 					)
 					.child(
 						div()
@@ -223,11 +215,7 @@ impl Component for CodeSelect {
 							)
 							.class("code-select-code-wrapper")
 							.attribute("data-lang", "rust")
-							.child(
-								Code::new()
-									.code(code_rust)
-									.hide_line_numbers(self.hide_line_numbers),
-							),
+							.child(Code::new().code(code_rust).line_numbers(self.line_numbers)),
 					),
 			)
 			.into_node()

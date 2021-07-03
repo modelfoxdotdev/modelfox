@@ -29,11 +29,8 @@ impl Component for Train {
 			.child(p2)
 			.child(br())
 			.child(p3);
-		let right = ui::Window::new().child(
-			ui::Code::new()
-				.code(Cow::Borrowed(include_str!("./train.txt")))
-				.hide_line_numbers(true),
-		);
+		let right = ui::Window::new()
+			.child(ui::Code::new().code(Cow::Borrowed(include_str!("./train.txt"))));
 		div()
 			.class("index-step")
 			.child(left)

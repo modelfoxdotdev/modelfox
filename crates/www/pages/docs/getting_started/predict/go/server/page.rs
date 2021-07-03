@@ -58,11 +58,7 @@ impl Component for Install {
 			"#
 		);
 		ui::Window::new()
-			.child(
-				ui::Code::new()
-					.code(Cow::Borrowed(code))
-					.hide_line_numbers(true),
-			)
+			.child(ui::Code::new().code(Cow::Borrowed(code)))
 			.into_node()
 	}
 }
@@ -111,7 +107,7 @@ impl Component for Predict {
 		);
 		let code = ui::highlight(code, ui::Language::Go);
 		ui::Window::new()
-			.child(ui::Code::new().code(Cow::Owned(code)))
+			.child(ui::Code::new().code(Cow::Owned(code)).line_numbers(true))
 			.into_node()
 	}
 }

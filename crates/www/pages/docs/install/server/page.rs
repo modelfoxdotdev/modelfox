@@ -57,6 +57,7 @@ impl Component for Page {
 						.child(Centos7)
 						.child(Centos8)
 						.child(Fedora)
+						.child(Nix)
 						.child(Rhel)
 						.child(Scoop)
 						.child(Docker)
@@ -84,13 +85,7 @@ impl Component for Homebrew {
 					)
 					.child(":"),
 			)
-			.child(
-				ui::Window::new().child(
-					ui::Code::new()
-						.code(Cow::Borrowed(code))
-						.hide_line_numbers(true),
-				),
-			)
+			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
 }
@@ -111,13 +106,7 @@ impl Component for Alpine {
 		);
 		ui::S2::new()
 			.child(ui::H2::new().child("Alpine"))
-			.child(
-				ui::Window::new().child(
-					ui::Code::new()
-						.code(Cow::Borrowed(code))
-						.hide_line_numbers(true),
-				),
-			)
+			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
 }
@@ -144,13 +133,7 @@ impl Component for Deb {
 		);
 		ui::S2::new()
 			.child(ui::H2::new().child(self.title))
-			.child(
-				ui::Window::new().child(
-					ui::Code::new()
-						.code(Cow::Owned(code))
-						.hide_line_numbers(true),
-				),
-			)
+			.child(ui::Window::new().child(ui::Code::new().code(Cow::Owned(code))))
 			.into_node()
 	}
 }
@@ -169,13 +152,7 @@ impl Component for AmazonLinux2 {
 		);
 		ui::S2::new()
 			.child(ui::H2::new().child("Amazon Linux 2"))
-			.child(
-				ui::Window::new().child(
-					ui::Code::new()
-						.code(Cow::Borrowed(code))
-						.hide_line_numbers(true),
-				),
-			)
+			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
 }
@@ -194,13 +171,7 @@ impl Component for Centos7 {
 		);
 		ui::S2::new()
 			.child(ui::H2::new().child("Centos 7"))
-			.child(
-				ui::Window::new().child(
-					ui::Code::new()
-						.code(Cow::Borrowed(code))
-						.hide_line_numbers(true),
-				),
-			)
+			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
 }
@@ -219,13 +190,23 @@ impl Component for Fedora {
 		);
 		ui::S2::new()
 			.child(ui::H2::new().child("Fedora"))
-			.child(
-				ui::Window::new().child(
-					ui::Code::new()
-						.code(Cow::Borrowed(code))
-						.hide_line_numbers(true),
-				),
-			)
+			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
+			.into_node()
+	}
+}
+
+struct Nix;
+
+impl Component for Nix {
+	fn into_node(self) -> Node {
+		let code = ui::doc!(
+			r#"
+				nix run github:tangramxyz/tangram
+			"#
+		);
+		ui::S2::new()
+			.child(ui::H2::new().child("Nix"))
+			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
 }
@@ -244,13 +225,7 @@ impl Component for Rhel {
 		);
 		ui::S2::new()
 			.child(ui::H2::new().child("RHEL 8"))
-			.child(
-				ui::Window::new().child(
-					ui::Code::new()
-						.code(Cow::Borrowed(code))
-						.hide_line_numbers(true),
-				),
-			)
+			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
 }
@@ -269,13 +244,7 @@ impl Component for Centos8 {
 		);
 		ui::S2::new()
 			.child(ui::H2::new().child("Centos 8"))
-			.child(
-				ui::Window::new().child(
-					ui::Code::new()
-						.code(Cow::Borrowed(code))
-						.hide_line_numbers(true),
-				),
-			)
+			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
 }
@@ -297,13 +266,7 @@ impl Component for Arch {
 					)
 					.child(":"),
 			)
-			.child(
-				ui::Window::new().child(
-					ui::Code::new()
-						.code(Cow::Borrowed(code))
-						.hide_line_numbers(true),
-				),
-			)
+			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
 }
@@ -330,13 +293,7 @@ impl Component for Scoop {
 					)
 					.child(":"),
 			)
-			.child(
-				ui::Window::new().child(
-					ui::Code::new()
-						.code(Cow::Borrowed(code))
-						.hide_line_numbers(true),
-				),
-			)
+			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
 }
@@ -359,13 +316,7 @@ impl Component for Docker {
 					)
 					.child(":"),
 			)
-			.child(
-				ui::Window::new().child(
-					ui::Code::new()
-						.code(Cow::Borrowed(code))
-						.hide_line_numbers(true),
-				),
-			)
+			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
 }

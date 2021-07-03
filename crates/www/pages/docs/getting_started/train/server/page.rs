@@ -48,13 +48,9 @@ impl Component for Page {
 			.child(" command, passing in the path to the CSV file and the name of the column we want to predict, called the ")
 			.child(ui::InlineCode::new("target"))
 			.child(" column.");
-		let train_window = ui::Window::new().child(
-			ui::Code::new()
-				.code(Cow::Borrowed(
-					"$ tangram train --file heart_disease.csv --target diagnosis",
-				))
-				.hide_line_numbers(true),
-		);
+		let train_window = ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(
+			"$ tangram train --file heart_disease.csv --target diagnosis",
+		)));
 		let train_p2 = ui::P::new()
 			.child("The CLI automatically transforms the data into features, trains a number of models to predict the target column, and writes the best model to a ")
 			.child(ui::InlineCode::new(".tangram"))

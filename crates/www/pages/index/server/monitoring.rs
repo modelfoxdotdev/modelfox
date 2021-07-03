@@ -148,8 +148,8 @@ impl Component for Monitoring {
 			.child(p2)
 			.child(br())
 			.child(p3);
-		let right = ui::Window::new()
-			.child(ui::CodeSelect::new(code_for_language).hide_line_numbers(false));
+		let right =
+			ui::Window::new().child(ui::CodeSelect::new(code_for_language).line_numbers(true));
 		div()
 			.class("index-step")
 			.child(left)

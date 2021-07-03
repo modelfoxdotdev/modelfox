@@ -89,7 +89,12 @@ impl Component for Tuning {
 				)
 			})
 		};
-		let code = code.map(|code| ui::Code::new().code(Cow::Owned(code)).into_node());
+		let code = code.map(|code| {
+			ui::Code::new()
+				.code(Cow::Owned(code))
+				.line_numbers(true)
+				.into_node()
+		});
 		div()
 			.class("tuning-grid")
 			.child(slider)

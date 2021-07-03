@@ -105,7 +105,7 @@ impl Component for Predict {
 		);
 		let code = ui::highlight(code, ui::Language::Elixir);
 		ui::Window::new()
-			.child(ui::Code::new().code(Cow::Owned(code)))
+			.child(ui::Code::new().code(Cow::Owned(code)).line_numbers(true))
 			.into_node()
 	}
 }
