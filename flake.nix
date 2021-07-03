@@ -24,22 +24,23 @@
       ]);
     in rec {
       defaultApp = flake-utils.lib.mkApp {
-        drv = (pkgs.makeRustPlatform {
-          rustc = rust;
-          cargo = rust;
-        }).buildRustPackage {
-          pname = "tangram";
-          version = "0.5.0";
-          src = ./.;
-          doCheck = false;
-          nativeBuildInputs = with pkgs; [
-            clang_12
-            lld_12
-          ];
-          cargoSha256 = "sha256-wV518+LTFRtOE4EYJxZzmXR3k3VvSEvpIa42DB5b+EE=";
-          cargoBuildFlags = [ "--bin" "tangram" ];
-          CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
-        };
+        drv = defaultPackage;
+      };
+      defaultPackage = (pkgs.makeRustPlatform {
+        rustc = rust;
+        cargo = rust;
+      }).buildRustPackage {
+        pname = "tangram";
+        version = "0.5.0";
+        src = ./.;
+        doCheck = false;
+        nativeBuildInputs = with pkgs; [
+          clang_12
+          lld_12
+        ];
+        cargoSha256 = "sha256-75Pm18fv4JVreRCPmJ9/X9Oh5sxT02pOczDmbn4Yj0M=";
+        cargoBuildFlags = [ "--bin" "tangram" ];
+        CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
       };
       devShell = pkgs.mkShell {
         CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = toString ./. + "/scripts/clang";
