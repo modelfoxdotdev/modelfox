@@ -25,7 +25,7 @@
 	"name": "@tangramxyz/tangram",
 	"type": "module",
 	"types": "./dist/node.d.ts",
-	"version": "0.5.0",
+	"version": "0.5.1",
 	"workspaces": [
 		".",
 		"examples/node/advanced",
