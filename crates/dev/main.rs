@@ -30,7 +30,7 @@ pub async fn main() {
 		ignore_paths,
 		command,
 	} = Args::parse();
-	let config = watchserve::Config {
+	let config = sunfish::watchserve::Config {
 		host,
 		port,
 		child_host,
@@ -39,5 +39,5 @@ pub async fn main() {
 		ignore_paths,
 		command,
 	};
-	watchserve::run(config).await;
+	sunfish::watchserve::run(config).await;
 }

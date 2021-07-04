@@ -2686,20 +2686,24 @@ checksum = "1e81da0851ada1f3e9d4312c704aa4f8806f0f9d69faaf8df2f3464b4a9437c2"
 
 [[package]]
 name = "sunfish"
-version = "0.2.3"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2367f651f8042e3c4d27b25d6ea1550cd0e2af0adbd3d5e76efc5150d543fcfa"
+checksum = "a5b6503ed4a73b6ab05b108cf16ee40888a62905f487049b537549d53fc30fb9"
 dependencies = [
  "anyhow",
+ "clap 3.0.0-beta.2",
  "futures",
+ "futures-batch",
  "hex",
  "http",
  "hyper",
  "ignore",
+ "notify",
  "rayon",
  "sha2",
  "sunfish_macro",
  "tokio",
+ "tokio-stream",
  "toml",
  "tracing",
  "wasm-bindgen-cli-support",
@@ -2708,9 +2712,9 @@ dependencies = [
 
 [[package]]
 name = "sunfish_macro"
-version = "0.2.3"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a44787841e89d499cbffe84a286eee6e7de9b83fbca5c6d9fe0a1b2f810dc5e"
+checksum = "f8e3709c4657f6dc464a95854491cb6d6130b58ceeb77a106dded06f62280be5"
 dependencies = [
  "glob",
  "proc-macro2",
@@ -2849,7 +2853,6 @@ dependencies = [
  "tower-http",
  "tracing",
  "url",
- "watchserve",
 ]
 
 [[package]]
@@ -4030,8 +4033,8 @@ name = "tangram_dev"
 version = "0.0.0"
 dependencies = [
  "clap 3.0.0-beta.2",
+ "sunfish",
  "tokio",
- "watchserve",
 ]
 
 [[package]]
@@ -4341,7 +4344,6 @@ dependencies = [
  "tower-http",
  "tracing",
  "tracing-subscriber",
- "watchserve",
 ]
 
 [[package]]
@@ -5425,22 +5427,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b1844f66a2bc8526d71690104c0e78a8e59ffa1597b7245769d174ebb91deb5"
 dependencies = [
  "leb128",
-]
-
-[[package]]
-name = "watchserve"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f9948f009b8ce8b182217310f3ec20cb0e1dd45d9f6805657d041448764396c6"
-dependencies = [
- "clap 3.0.0-beta.2",
- "futures-batch",
- "http",
- "hyper",
- "notify",
- "tokio",
- "tokio-stream",
- "which",
 ]
 
 [[package]]

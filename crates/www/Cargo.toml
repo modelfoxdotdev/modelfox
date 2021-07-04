@@ -56,7 +56,6 @@ tower = { version = "0.4", features = ["make", "util"] }
 tower-http = { version = "0.1", features = ["add-extension", "trace"] }
 tracing = "0.1"
 tracing-subscriber = "0.2"
-watchserve = "0.1"
 
 tangram_www_benchmarks_server = { path = "pages/benchmarks/server", optional = true }
 tangram_www_blog_index_server = { path = "pages/blog/index/server", optional = true }

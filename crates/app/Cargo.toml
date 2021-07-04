@@ -105,7 +105,6 @@ tower = { version = "0.4", features = ["make", "util"] }
 tower-http = { version = "0.1", features = ["add-extension", "trace"] }
 tracing = "0.1"
 url = { version = "2", features = ["serde"] }
-watchserve = "0.1"
 
 tangram_app_edit_organization_server = { path = "pages/organizations/_/edit/server", optional = true }
 tangram_app_health_server = { path = "pages/health/server", optional = true }
