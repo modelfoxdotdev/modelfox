@@ -53,7 +53,7 @@ impl Model {
 	*/
 	#[classmethod]
 	#[args(options = "None")]
-	#[text_signature = "(path, options=None)"]
+	#[pyo3(text_signature = "(path, options=None)")]
 	fn from_path(
 		_cls: &PyType,
 		path: String,
@@ -89,7 +89,7 @@ impl Model {
 	*/
 	#[classmethod]
 	#[args(options = "None")]
-	#[text_signature = "(bytes, options=None)"]
+	#[pyo3(text_signature = "(bytes, options=None)")]
 	fn from_bytes(
 		_cls: &PyType,
 		bytes: Vec<u8>,
@@ -129,7 +129,7 @@ impl Model {
 	Returns:
 		[Union[List[`PredictOutput`], `PredictOutput`]). Return a single output if `input` was a single input, or an array if `input` was an array of `input`s.
 	*/
-	#[text_signature = "(input, options=None)"]
+	#[pyo3(text_signature = "(input, options=None)")]
 	fn predict(
 		&self,
 		input: PredictInputSingleOrMultiple,
@@ -164,7 +164,7 @@ impl Model {
 		options (Optional[`PredictOptions`]): This is the same `PredictOptions` value that you passed to `predict`.
 	  */
 	#[args(identifier, input, output, options = "None")]
-	#[text_signature = "(identifier, input, output, options=None)"]
+	#[pyo3(text_signature = "(identifier, input, output, options=None)")]
 	fn log_prediction(
 		&mut self,
 		identifier: NumberOrString,
@@ -185,7 +185,7 @@ impl Model {
 		output (`PredictOutput`): A single `PredictOutput`.
 		options (`PredictOptions`): This is the same `predictOptions` value that you passed to `predict`.
 	*/
-	#[text_signature = "(identifier, input, output, options=None)"]
+	#[pyo3(text_signature = "(identifier, input, output, options=None)")]
 	fn enqueue_log_prediction(
 		&mut self,
 		identifier: NumberOrString,
@@ -204,7 +204,7 @@ impl Model {
 		identifier (Union[str, float]): This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
 		true_value (Union[str, float]): This is the true value for the prediction.
 	*/
-	#[text_signature = "(identifier, true_value)"]
+	#[pyo3(text_signature = "(identifier, true_value)")]
 	fn log_true_value(
 		&mut self,
 		identifier: NumberOrString,
@@ -222,7 +222,7 @@ impl Model {
 		identifier (Union[str, float]): This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
 		true_value (Union[str, float]): This is the true value for the prediction.
 	*/
-	#[text_signature = "(identifier, true_value)"]
+	#[pyo3(text_signature = "(identifier, true_value)")]
 	fn enqueue_log_true_value(&mut self, identifier: NumberOrString, true_value: NumberOrString) {
 		let event = Event::TrueValue(self.true_value_event(identifier, true_value));
 		self.log_queue.push(event);
@@ -231,7 +231,7 @@ impl Model {
 	/**
 	Send all events in the queue to the app.
 	*/
-	#[text_signature = "()"]
+	#[pyo3(text_signature = "()")]
 	fn flush_log_queue(&mut self) -> PyResult<()> {
 		let events = self.log_queue.drain(0..self.log_queue.len()).collect();
 		self.log_events(events)

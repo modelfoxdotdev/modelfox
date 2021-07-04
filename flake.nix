@@ -20,7 +20,9 @@
       rust = (with fenix.packages.${system}; combine [
         stable.rustc
         stable.cargo
+        stable.rust-src
         targets.wasm32-unknown-unknown.stable.rust-std
+        rust-analyzer
       ]);
     in rec {
       defaultApp = flake-utils.lib.mkApp {
