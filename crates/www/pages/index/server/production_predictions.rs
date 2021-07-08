@@ -16,7 +16,7 @@ impl Component for ProductionExplanations {
 		let series = feature_contributions_chart_series();
 		let title = div()
 			.class("index-step-title")
-			.child("Monitor production predictions.");
+			.child("Monitor predictions.");
 		let p1 = div()
 			.class("index-step-text")
 			.child("After calling ")
