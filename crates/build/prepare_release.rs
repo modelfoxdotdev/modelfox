@@ -69,7 +69,7 @@ pub fn run(args: Args) {
 				Version: {}
 				Maintainer: Tangram <root@tangram.xyz>
 				Homepage: https://www.tangram.xyz
-				Description: Tangram is an automated machine learning framework designed for programmers.
+				Description: Tangram is an all-in-one automated machine learning framework.
 			"#,
 			architecture,
 			args.version,
@@ -106,7 +106,7 @@ pub fn run(args: Args) {
 				Name: tangram
 				Version: {}
 				Release: 1
-				Summary: Tangram is an automated machine learning framework designed for programmers.
+				Summary: Tangram is an all-in-one automated machine learning framework.
 				License: MIT
 				Source0: tangram.tar.gz
 

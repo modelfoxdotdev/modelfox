@@ -1,6 +1,6 @@
 [package]
 authors = ["Tangram <root@tangram.xyz"]
-description = "Tangram is an automated machine learning framework designed for programmers."
+description = "Tangram is an all-in-one automated machine learning framework."
 documentation = "https://docs.rs/tangram"
 edition = "2018"
 homepage = "https://github.com/tangramxyz/tangram"

@@ -21,7 +21,7 @@ defmodule Tangram.MixProject do
       name: "tangram",
       package: [
         description:
-          "Tangram is an all-in-one machine learning toolkit designed for programmers.",
+          "Tangram is an all-in-one automated machine learning framework.",
         licenses: ["MIT"],
         links: %{homepage: "https://www.tangram.xyz"}
       ],

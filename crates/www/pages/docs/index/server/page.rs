@@ -10,9 +10,11 @@ pub struct Page;
 impl Component for Page {
 	fn into_node(self) -> Node {
 		let p1 = ui::P::new().child("Welcome to the documentation for Tangram!");
-		let p2 = ui::P::new().child("Tangram is an automated machine learning framework designed for programmers. With Tangram, you:");
+		let p2 = ui::P::new().child(
+			"Tangram is an all-in-one automated machine learning framework. With Tangram, you:",
+		);
 		let list = ui::UnorderedList::new()
-			.child(ui::ListItem::new().child("Train a model from a CSV on the command line."))
+			.child(ui::ListItem::new().child("Train a model from a CSV file on the command line."))
 			.child(
 				ui::ListItem::new()
 					.child("Make predictions from Elixir, Go, JavaScript, Python, Ruby, or Rust."),

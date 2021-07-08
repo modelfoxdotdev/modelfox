@@ -4,7 +4,7 @@
 
 # Tangram
 
-Tangram is an automated machine learning framework designed for programmers.
+Tangram is an all-in-one automated machine learning framework.
 
 - Run `tangram train` to train a model from a CSV file on the command line.
 - Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramxyz/tangram-go), [JavaScript](https://www.npmjs.com/package/@tangramxyz/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](lib.rs/tangram).
@@ -38,9 +38,9 @@ let tangram = require("@tangramxyz/tangram")
 let model = new tangram.Model("./heart_disease.tangram")
 
 let input = {
-  age: 63,
-  gender: "male",
-  // ...
+	age: 63,
+	gender: "male",
+	// ...
 }
 
 let output = model.predict(input)
@@ -66,10 +66,10 @@ Once your model is deployed, make sure that it performs as well in production as
 ```javascript
 // Log the prediction.
 model.logPrediction({
-  identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
-  input,
-  options,
-  output,
+	identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
+	input,
+	options,
+	output,
 })
 ```
 
@@ -78,8 +78,8 @@ Later on, if you find out the true value for a prediction, call `logTrueValue`.
 ```javascript
 // Later on, if we get an official diagnosis for the patient, log the true value.
 model.logTrueValue({
-  identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
-  trueValue: "Positive",
+	identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
+	trueValue: "Positive",
 })
 ```
 

@@ -33,7 +33,7 @@ impl Component for Document {
 				meta()
 					.attribute(
 						"content",
-						"All-In-One Machine Learning Toolkit Designed for Programmers",
+						"Tangram is an all-in-one automated machine learning framework.",
 					)
 					.attribute("name", "description"),
 			);

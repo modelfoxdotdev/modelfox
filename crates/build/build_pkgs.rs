@@ -101,7 +101,7 @@ fn alpine(
 				pkgname=tangram
 				pkgver={version}
 				pkgrel=1
-				pkgdesc="Tangram is an automated machine learning framework designed for programmers."
+				pkgdesc="Tangram is an all-in-one automated machine learning framework."
 				url="https://www.tangram.xyz"
 				arch={arch}
 				license="MIT"
@@ -277,7 +277,7 @@ fn deb(
 							SHA1: {sha1}
 							SHA256: {sha256}
 							Homepage: https://www.tangram.xyz
-							Description: Tangram is an automated machine learning framework designed for programmers.
+							Description: Tangram is an all-in-one automated machine learning framework.
 						"#,
 						version = deb.version,
 						arch = arch,
