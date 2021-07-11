@@ -80,7 +80,7 @@ impl Component for Predict {
 				const modelPath = path.join(__dirname, "heart_disease.tangram");
 				// Load the model from the path.
 				const modelData = fs.readFileSync(modelPath);
-				const model = new tangram.Model(modelData);
+				const model = new tangram.Model(modelData.buffer);
 
 				// Create an example input matching the schema of the CSV file the model was trained on.
 				// Here the data is just hard-coded, but in your application you will probably get this
