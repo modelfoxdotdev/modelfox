@@ -1,8 +1,7 @@
 {
 	"author": "Tangram",
-	"browser": "./dist/bundler.js",
 	"dependencies": {
-		"node-fetch": "^2"
+		"node-fetch": "^2.6.1"
 	},
 	"devDependencies": {
 		"@types/node-fetch": "^2.5.10",
@@ -20,12 +19,20 @@
 	"eslintConfig": {
 		"extends": "plugin:@tangramxyz/recommended"
 	},
+	"exports": {
+		"browser": {
+			"import": "./bundler.js"
+		},
+		"node": {
+			"import": "./node.js",
+			"require": "./node.cjs"
+		}
+	},
 	"license": "MIT",
-	"main": "./dist/node.js",
 	"name": "@tangramxyz/tangram",
 	"type": "module",
-	"types": "./dist/node.d.ts",
-	"version": "0.5.1",
+	"types": "./model.d.ts",
+	"version": "0.5.2",
 	"workspaces": [
 		".",
 		"examples/node/advanced",

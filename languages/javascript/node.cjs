@@ -1,15 +1,12 @@
-import { createRequire } from "module"
-import { setNative } from "./model.js"
-import * as os from "os"
+let { setNative } = require("./common.cjs")
+let os = require("os")
 
-export * from "./model.js"
-
-let require = createRequire(import.meta.url)
+module.exports = require("./common.cjs")
 
 if (!globalThis.fetch) {
 	globalThis.fetch = require("node-fetch")
 }
-let target: string | null = null
+let target = null
 let arch = os.arch()
 let platform = os.platform()
 if (arch === "x64" && platform === "linux") {
@@ -25,7 +22,7 @@ if (arch === "x64" && platform === "linux") {
 }
 
 if (target !== null) {
-	setNative(require(`../node/dist/${target}/tangram.node`))
+	setNative(require(`./node/dist/${target}/tangram.node`))
 } else {
-	setNative(require("../wasm/dist/node/tangram_wasm.cjs"))
+	setNative(require("./wasm/dist/node/tangram_wasm.cjs"))
 }

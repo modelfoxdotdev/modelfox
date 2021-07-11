@@ -1,1 +1,1 @@
-npx typedoc src/model.ts
+npx typedoc common.ts

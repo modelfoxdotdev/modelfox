@@ -1,5 +1,7 @@
 let native: any
-
+/**
+ * @ignore
+ */
 export function setNative(newNative: any) {
 	native = newNative
 }

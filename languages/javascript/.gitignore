@@ -1,3 +1,7 @@
-/dist
+/common.cjs
+/common.cjs.map
+/common.d.ts
+/common.js
+/common.js.map
 /docs
 /node_modules

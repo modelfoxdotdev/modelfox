@@ -4,12 +4,10 @@
 		"lib": ["esnext", "dom"],
 		"module": "esnext",
 		"moduleResolution": "node",
-		"outDir": "dist",
-		"rootDir": "src",
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
 		"target": "esnext"
 	},
-	"include": ["src/*", "bundler.ts", "deno.ts", "web.ts", "node.js"]
+	"include": ["common.ts"]
 }
