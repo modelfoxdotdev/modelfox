@@ -31,7 +31,7 @@
 	"license": "MIT",
 	"name": "@tangramxyz/tangram",
 	"type": "module",
-	"types": "./model.d.ts",
+	"types": "./common.d.ts",
 	"version": "0.5.2",
 	"workspaces": [
 		".",
