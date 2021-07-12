@@ -2,7 +2,7 @@
 "title": "Train with Custom Configuration."
 }
 
-The Tangram CLI's default settings are designed to produce good results for most datasets. If you want more control over the training process, you can provide a configuration file. When you run `tangram train`, include your configuration file with `--config path/to/config.json`. The best reference for all the options available is in the source code: [core/config.rs](https://github.com/tangramxyz/tangram/blob/main/core/config.rs).
+The Tangram CLI's default settings are designed to produce good results for most datasets. If you want more control over the training process, you can provide a configuration file. When you run `tangram train`, include your configuration file with `--config path/to/config.json`. The best reference for all the options available is in the source code: [crates/core/config.rs](https://github.com/tangramxyz/tangram/blob/main/crates/core/config.rs).
 
 Below is an example configuration file for the heart disease dataset.
 
