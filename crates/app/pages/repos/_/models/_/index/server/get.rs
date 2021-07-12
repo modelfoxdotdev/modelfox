@@ -22,6 +22,7 @@ use tangram_app_common::{
 	Context,
 };
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use tangram_finite::{Finite, FiniteF32};
 use tangram_id::Id;
 use tangram_zip::zip;
 
@@ -291,7 +292,7 @@ fn model_type_name(model: tangram_model::ModelReader) -> String {
 
 fn compute_feature_importances_section(
 	model: tangram_model::ModelReader,
-) -> FeatureImportancesSection {
+) -> Option<FeatureImportancesSection> {
 	let n_columns = match model.inner() {
 		tangram_model::ModelInnerReader::Regressor(regressor) => {
 			regressor.read().overall_column_stats().len()
@@ -308,15 +309,19 @@ fn compute_feature_importances_section(
 			tangram_model::RegressionModelReader::Linear(inner_model) => {
 				let inner_model = inner_model.read();
 				let feature_names = compute_feature_names(inner_model.feature_groups().iter());
-				let mut feature_importances =
-					zip!(feature_names, inner_model.feature_importances().iter())
-						.map(
-							|(feature_name, feature_importance_value)| FeatureImportance {
-								feature_importance_value,
-								feature_name,
-							},
-						)
-						.collect::<Vec<_>>();
+				let feature_importance_values = inner_model
+					.feature_importances()
+					.iter()
+					.map(|value| Finite::new(value).ok())
+					.collect::<Option<Vec<FiniteF32>>>()?;
+				let mut feature_importances = zip!(feature_names, feature_importance_values)
+					.map(
+						|(feature_name, feature_importance_value)| FeatureImportance {
+							feature_importance_value,
+							feature_name,
+						},
+					)
+					.collect::<Vec<_>>();
 				feature_importances.sort_by(|a, b| {
 					a.feature_importance_value
 						.partial_cmp(&b.feature_importance_value)
@@ -329,15 +334,19 @@ fn compute_feature_importances_section(
 			tangram_model::RegressionModelReader::Tree(inner_model) => {
 				let inner_model = inner_model.read();
 				let feature_names = compute_feature_names(inner_model.feature_groups().iter());
-				let mut feature_importances =
-					zip!(feature_names, inner_model.feature_importances().iter())
-						.map(
-							|(feature_name, feature_importance_value)| FeatureImportance {
-								feature_importance_value,
-								feature_name,
-							},
-						)
-						.collect::<Vec<_>>();
+				let feature_importance_values = inner_model
+					.feature_importances()
+					.iter()
+					.map(|value| Finite::new(value).ok())
+					.collect::<Option<Vec<FiniteF32>>>()?;
+				let mut feature_importances = zip!(feature_names, feature_importance_values)
+					.map(
+						|(feature_name, feature_importance_value)| FeatureImportance {
+							feature_importance_value,
+							feature_name,
+						},
+					)
+					.collect::<Vec<_>>();
 				feature_importances.sort_by(|a, b| {
 					a.feature_importance_value
 						.partial_cmp(&b.feature_importance_value)
@@ -353,15 +362,19 @@ fn compute_feature_importances_section(
 				tangram_model::BinaryClassificationModelReader::Linear(inner_model) => {
 					let inner_model = inner_model.read();
 					let feature_names = compute_feature_names(inner_model.feature_groups().iter());
-					let mut feature_importances =
-						zip!(feature_names, inner_model.feature_importances().iter())
-							.map(
-								|(feature_name, feature_importance_value)| FeatureImportance {
-									feature_importance_value,
-									feature_name,
-								},
-							)
-							.collect::<Vec<_>>();
+					let feature_importance_values = inner_model
+						.feature_importances()
+						.iter()
+						.map(|value| Finite::new(value).ok())
+						.collect::<Option<Vec<FiniteF32>>>()?;
+					let mut feature_importances = zip!(feature_names, feature_importance_values)
+						.map(
+							|(feature_name, feature_importance_value)| FeatureImportance {
+								feature_importance_value,
+								feature_name,
+							},
+						)
+						.collect::<Vec<_>>();
 					feature_importances.sort_by(|a, b| {
 						a.feature_importance_value
 							.partial_cmp(&b.feature_importance_value)
@@ -374,15 +387,19 @@ fn compute_feature_importances_section(
 				tangram_model::BinaryClassificationModelReader::Tree(inner_model) => {
 					let inner_model = inner_model.read();
 					let feature_names = compute_feature_names(inner_model.feature_groups().iter());
-					let mut feature_importances =
-						zip!(feature_names, inner_model.feature_importances().iter())
-							.map(
-								|(feature_name, feature_importance_value)| FeatureImportance {
-									feature_importance_value,
-									feature_name,
-								},
-							)
-							.collect::<Vec<_>>();
+					let feature_importance_values = inner_model
+						.feature_importances()
+						.iter()
+						.map(|value| Finite::new(value).ok())
+						.collect::<Option<Vec<FiniteF32>>>()?;
+					let mut feature_importances = zip!(feature_names, feature_importance_values)
+						.map(
+							|(feature_name, feature_importance_value)| FeatureImportance {
+								feature_importance_value,
+								feature_name,
+							},
+						)
+						.collect::<Vec<_>>();
 					feature_importances.sort_by(|a, b| {
 						a.feature_importance_value
 							.partial_cmp(&b.feature_importance_value)
@@ -399,15 +416,19 @@ fn compute_feature_importances_section(
 				tangram_model::MulticlassClassificationModelReader::Linear(inner_model) => {
 					let inner_model = inner_model.read();
 					let feature_names = compute_feature_names(inner_model.feature_groups().iter());
-					let mut feature_importances =
-						zip!(feature_names, inner_model.feature_importances().iter())
-							.map(
-								|(feature_name, feature_importance_value)| FeatureImportance {
-									feature_importance_value,
-									feature_name,
-								},
-							)
-							.collect::<Vec<_>>();
+					let feature_importance_values = inner_model
+						.feature_importances()
+						.iter()
+						.map(|value| Finite::new(value).ok())
+						.collect::<Option<Vec<FiniteF32>>>()?;
+					let mut feature_importances = zip!(feature_names, feature_importance_values)
+						.map(
+							|(feature_name, feature_importance_value)| FeatureImportance {
+								feature_importance_value,
+								feature_name,
+							},
+						)
+						.collect::<Vec<_>>();
 					feature_importances.sort_by(|a, b| {
 						a.feature_importance_value
 							.partial_cmp(&b.feature_importance_value)
@@ -420,15 +441,19 @@ fn compute_feature_importances_section(
 				tangram_model::MulticlassClassificationModelReader::Tree(inner_model) => {
 					let inner_model = inner_model.read();
 					let feature_names = compute_feature_names(inner_model.feature_groups().iter());
-					let mut feature_importances =
-						zip!(feature_names, inner_model.feature_importances().iter())
-							.map(
-								|(feature_name, feature_importance_value)| FeatureImportance {
-									feature_importance_value,
-									feature_name,
-								},
-							)
-							.collect::<Vec<_>>();
+					let feature_importance_values = inner_model
+						.feature_importances()
+						.iter()
+						.map(|value| Finite::new(value).ok())
+						.collect::<Option<Vec<FiniteF32>>>()?;
+					let mut feature_importances = zip!(feature_names, feature_importance_values)
+						.map(
+							|(feature_name, feature_importance_value)| FeatureImportance {
+								feature_importance_value,
+								feature_name,
+							},
+						)
+						.collect::<Vec<_>>();
 					feature_importances.sort_by(|a, b| {
 						a.feature_importance_value
 							.partial_cmp(&b.feature_importance_value)
@@ -451,12 +476,12 @@ fn compute_feature_importances_section(
 		.collect();
 	feature_importances.truncate(TRAINING_IMPORTANCES_MAX_FEATURE_IMPORTANCES_TO_SHOW_IN_CHART);
 	let feature_importances_chart_values = feature_importances;
-	FeatureImportancesSection {
+	Some(FeatureImportancesSection {
 		n_columns,
 		n_features,
 		feature_importances_chart_values,
 		feature_importances_table_rows,
-	}
+	})
 }
 
 fn compute_feature_names<'a>(

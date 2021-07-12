@@ -14,7 +14,7 @@ pub struct MulticlassClassifier {
 	pub warning: Option<String>,
 	pub training_summary_section: TrainingSummarySection,
 	pub training_metrics_section: MulticlassClassifierMetricsSection,
-	pub feature_importances_section: FeatureImportancesSection,
+	pub feature_importances_section: Option<FeatureImportancesSection>,
 }
 
 impl Component for MulticlassClassifier {

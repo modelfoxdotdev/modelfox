@@ -10,7 +10,7 @@ use tangram_finite::Finite;
 use tangram_ui as ui;
 
 pub struct BinaryClassifier {
-	pub feature_importances_section: FeatureImportancesSection,
+	pub feature_importances_section: Option<FeatureImportancesSection>,
 	pub id: String,
 	pub training_metrics_section: BinaryClassifierMetricsSection,
 	pub training_summary_section: TrainingSummarySection,

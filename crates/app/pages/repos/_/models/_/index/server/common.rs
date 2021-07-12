@@ -4,6 +4,7 @@ use tangram_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	components::BarChart,
 };
+use tangram_finite::FiniteF32;
 use tangram_ui as ui;
 
 pub struct TrainingSummarySection {
@@ -47,7 +48,7 @@ pub struct FeatureImportancesSection {
 
 #[derive(Clone, Debug)]
 pub struct FeatureImportance {
-	pub feature_importance_value: f32,
+	pub feature_importance_value: FiniteF32,
 	pub feature_name: String,
 }
 
