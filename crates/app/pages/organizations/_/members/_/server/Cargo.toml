@@ -25,5 +25,5 @@ tangram_app_common = { path = "../../../../../../common" }
 tangram_app_layouts = { path = "../../../../../../layouts" }
 tangram_id = { path = "../../../../../../../id" }
 tangram_ui = { path = "../../../../../../../ui" }
-tokio = { version = "1" ,features = ["full"] }
+tokio = { version = "1", features = ["full"] }
 url = "2"

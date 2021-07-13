@@ -18,7 +18,7 @@ default = []
 tokio_1 = ["tokio"]
 
 [dev-dependencies]
-tokio = { version = "1" ,features = ["full"] }
+tokio = { version = "1", features = ["full"] }
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
@@ -30,5 +30,5 @@ serde_json = "1"
 tangram_core = { version = "=0.5.0", path = "../../crates/core" }
 tangram_macro = { version = "=0.5.0", path = "macro" }
 tangram_model = { version = "=0.5.0", path = "../../crates/model" }
-tokio = { version = "1" ,features = ["full"], optional = true }
+tokio = { version = "1", features = ["full"], optional = true }
 url = { version = "2", features = ["serde"] }
