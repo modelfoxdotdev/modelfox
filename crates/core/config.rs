@@ -4,32 +4,26 @@ This module defines the `Config` struct, which is used to configure training a m
 
 /// This is a configuration used for training.
 #[derive(Debug, Default, serde::Deserialize)]
-#[serde(deny_unknown_fields)]
+#[serde(default, deny_unknown_fields)]
 pub struct Config {
 	/// Use this field to configure the loading, shuffling, and interpretation of your dataset.
-	#[serde(default)]
 	pub dataset: Dataset,
 	/// Use this field to configure feature engineering.
-	#[serde(default)]
 	pub features: Features,
 	// Use this field to configure training.
-	#[serde(default)]
 	pub train: Train,
 }
 
 #[derive(Debug, serde::Deserialize)]
-#[serde(deny_unknown_fields)]
+#[serde(default, deny_unknown_fields)]
 pub struct Dataset {
 	/// This option controls shuffling of the dataset before splitting and training.
-	#[serde(default)]
 	pub shuffle: Shuffle,
 	/// This is the fraction of the train dataset that will be set aside for choosing the best model. The default value is `0.1`.
 	pub comparison_fraction: f32,
 	/// If you do not provide a separate test dataset, this is the fraction of the train dataset that will be set aside after shuffling to evalute your model. The default value is `0.2`.
-	#[serde(default)]
 	pub test_fraction: f32,
 	/// Use this field to specify the column types for a subset of the columns. If you do not configure a column here, its configuration will be inferred.
-	#[serde(default)]
 	pub columns: Vec<Column>,
 }
 
