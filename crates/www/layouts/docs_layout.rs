@@ -125,7 +125,7 @@ impl Component for PageNav {
 									.selected(matches!(
 										self.selected_page,
 										Some(DocsPage::GettingStarted(
-											GettingStartedPage::Predict(PredictPage::Elixir,)
+											GettingStartedPage::Predict(PredictPage::Elixir)
 										)),
 									)),
 							)
@@ -142,12 +142,12 @@ impl Component for PageNav {
 							)
 							.child(
 								ui::NavItem::new()
-									.title("Node".to_owned())
-									.href("/docs/getting_started/predict/node".to_owned())
+									.title("JavaScript".to_owned())
+									.href("/docs/getting_started/predict/javascript".to_owned())
 									.selected(matches!(
 										self.selected_page,
 										Some(DocsPage::GettingStarted(
-											GettingStartedPage::Predict(PredictPage::Node,)
+											GettingStartedPage::Predict(PredictPage::Node)
 										)),
 									)),
 							)
@@ -158,7 +158,7 @@ impl Component for PageNav {
 									.selected(matches!(
 										self.selected_page,
 										Some(DocsPage::GettingStarted(
-											GettingStartedPage::Predict(PredictPage::Python,)
+											GettingStartedPage::Predict(PredictPage::Python)
 										)),
 									)),
 							)
@@ -169,7 +169,7 @@ impl Component for PageNav {
 									.selected(matches!(
 										self.selected_page,
 										Some(DocsPage::GettingStarted(
-											GettingStartedPage::Predict(PredictPage::Ruby,)
+											GettingStartedPage::Predict(PredictPage::Ruby)
 										)),
 									)),
 							)
@@ -180,7 +180,7 @@ impl Component for PageNav {
 									.selected(matches!(
 										self.selected_page,
 										Some(DocsPage::GettingStarted(
-											GettingStartedPage::Predict(PredictPage::Rust,)
+											GettingStartedPage::Predict(PredictPage::Rust)
 										)),
 									)),
 							),

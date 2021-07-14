@@ -1,6 +1,6 @@
 [package]
 edition = "2018"
-name = "tangram_www_docs_getting_started_predict_node_server"
+name = "tangram_www_docs_getting_started_predict_javascript_server"
 publish = false
 version = "0.0.0"
 

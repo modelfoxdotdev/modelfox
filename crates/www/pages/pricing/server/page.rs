@@ -70,8 +70,8 @@ impl Component for PricingCards {
 				"Everything in the Free plan.".to_owned(),
 				"Use the hosted app.".to_owned(),
 			],
-			price: "$299".to_owned(),
-			price_subtitle: "per user per month".to_owned(),
+			price: "contact us".to_owned(),
+			price_subtitle: "hello@tangram.xyz".to_owned(),
 			selected: false,
 			title: "Team".to_owned(),
 		};

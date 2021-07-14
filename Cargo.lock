@@ -4328,7 +4328,7 @@ dependencies = [
  "tangram_www_docs_getting_started_predict_elixir_server",
  "tangram_www_docs_getting_started_predict_go_server",
  "tangram_www_docs_getting_started_predict_index_server",
- "tangram_www_docs_getting_started_predict_node_server",
+ "tangram_www_docs_getting_started_predict_javascript_server",
  "tangram_www_docs_getting_started_predict_python_server",
  "tangram_www_docs_getting_started_predict_ruby_server",
  "tangram_www_docs_getting_started_predict_rust_server",
@@ -4519,7 +4519,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tangram_www_docs_getting_started_predict_node_server"
+name = "tangram_www_docs_getting_started_predict_javascript_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
