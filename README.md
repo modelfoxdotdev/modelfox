@@ -99,7 +99,7 @@ Now you can:
 
 ![metrics](./readme/metrics.png)
 
-## Contributing
+## Building from Source
 
 This repository is a Cargo workspace, and does not require anything other than the latest stable Rust toolchain to get started with.
 
@@ -109,9 +109,9 @@ This repository is a Cargo workspace, and does not require anything other than t
 
 If you are working on the app, run `scripts/app/dev`. This rebuilds and reruns the CLI with the `app` subcommand as you make changes.
 
-Before submitting a pull request, please run `scripts/fmt` and `scripts/check` at the root of the repository to confirm that your changes are formatted correctly and do not have any errors.
+To install all dependencies necessary to work on the language libraries and build releases, install [Nix](https://nixos.org) with [flake support](https://nixos.wiki/wiki/Flakes), then run `nix develop` or set up [direnv](https://github.com/direnv/direnv).
 
-To install all dependencies necessary to work on the language libraries, install [Nix](https://nixos.org) with [flake support](https://nixos.wiki/wiki/Flakes), then run `nix develop` or set up [direnv](https://github.com/direnv/direnv).
+If you want to submit a pull request, please run `scripts/fmt` and `scripts/check` at the root of the repository to confirm that your changes are formatted correctly and do not have any errors.
 
 ## License
 
