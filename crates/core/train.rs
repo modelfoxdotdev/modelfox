@@ -290,7 +290,7 @@ impl Trainer {
 
 		// Choose the best model.
 		let (train_model_output, best_grid_item_index) =
-			choose_best_model(&train_grid_item_outputs, &comparison_metric);
+			choose_best_model(&train_grid_item_outputs, &comparison_metric)?;
 
 		// Test the best model.
 		let test_metrics = test_model(&train_model_output, &table_test, &mut |progress_event| {
@@ -1658,7 +1658,7 @@ fn compute_comparison_metrics(
 fn choose_best_model(
 	outputs: &[TrainGridItemOutput],
 	comparison_metric: &ComparisonMetric,
-) -> (TrainModelOutput, usize) {
+) -> Result<(TrainModelOutput, usize)> {
 	match comparison_metric {
 		ComparisonMetric::Regression(comparison_metric) => {
 			choose_best_model_regression(outputs, comparison_metric)
@@ -1675,41 +1675,37 @@ fn choose_best_model(
 fn choose_best_model_regression(
 	outputs: &[TrainGridItemOutput],
 	comparison_metric: &RegressionComparisonMetric,
-) -> (TrainModelOutput, usize) {
+) -> Result<(TrainModelOutput, usize)> {
 	outputs
 		.iter()
 		.enumerate()
-		.max_by(|(_, output_a), (_, output_b)| {
-			let metrics_a = match &output_a.comparison_metrics {
+		.filter_map(|(index, output)| {
+			let metrics = match &output.comparison_metrics {
 				Metrics::Regression(metrics) => metrics,
 				_ => unreachable!(),
 			};
-			let metrics_b = match &output_b.comparison_metrics {
-				Metrics::Regression(metrics) => metrics,
-				_ => unreachable!(),
+			let metric = match comparison_metric {
+				RegressionComparisonMetric::MeanAbsoluteError => -metrics.mae,
+				RegressionComparisonMetric::RootMeanSquaredError => -metrics.rmse,
+				RegressionComparisonMetric::MeanSquaredError => -metrics.mse,
+				RegressionComparisonMetric::R2 => metrics.r2,
 			};
-			match comparison_metric {
-				RegressionComparisonMetric::MeanAbsoluteError => {
-					metrics_b.mae.partial_cmp(&metrics_a.mae).unwrap()
-				}
-				RegressionComparisonMetric::RootMeanSquaredError => {
-					metrics_b.rmse.partial_cmp(&metrics_a.rmse).unwrap()
-				}
-				RegressionComparisonMetric::MeanSquaredError => {
-					metrics_b.mse.partial_cmp(&metrics_a.mse).unwrap()
-				}
-				RegressionComparisonMetric::R2 => metrics_a.r2.partial_cmp(&metrics_b.r2).unwrap(),
+			if metric.is_finite() {
+				Some((index, output, metric))
+			} else {
+				None
 			}
 		})
-		.map(|(index, output)| (output.train_model_output.clone(), index))
-		.unwrap()
+		.max_by(|(_, _, metric_a), (_, _, metric_b)| metric_a.partial_cmp(metric_b).unwrap())
+		.ok_or_else(|| anyhow!("None of the models trained had a finite comparison metric value."))
+		.map(|(index, output, _)| (output.train_model_output.clone(), index))
 }
 
 fn choose_best_model_binary_classification(
 	outputs: &[TrainGridItemOutput],
 	comparison_metric: &BinaryClassificationComparisonMetric,
-) -> (TrainModelOutput, usize) {
-	outputs
+) -> Result<(TrainModelOutput, usize)> {
+	Ok(outputs
 		.iter()
 		.enumerate()
 		.max_by(|(_, output_a), (_, output_b)| {
@@ -1729,14 +1725,14 @@ fn choose_best_model_binary_classification(
 			}
 		})
 		.map(|(index, output)| (output.train_model_output.clone(), index))
-		.unwrap()
+		.unwrap())
 }
 
 fn choose_best_model_multiclass_classification(
 	outputs: &[TrainGridItemOutput],
 	comparison_metric: &MulticlassClassificationComparisonMetric,
-) -> (TrainModelOutput, usize) {
-	outputs
+) -> Result<(TrainModelOutput, usize)> {
+	Ok(outputs
 		.iter()
 		.enumerate()
 		.max_by(|(_, output_a), (_, output_b)| {
@@ -1755,7 +1751,7 @@ fn choose_best_model_multiclass_classification(
 			}
 		})
 		.map(|(index, output)| (output.train_model_output.clone(), index))
-		.unwrap()
+		.unwrap())
 }
 
 fn test_model(
