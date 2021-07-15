@@ -5,39 +5,75 @@ import * as url from "url"
 
 // Define the type for the input to the model.
 type Input = {
-	age: number | null | undefined
-	chest_pain:
-		| "asymptomatic"
-		| "non-angina pain"
-		| "atypical angina"
-		| "typical angina"
-		| null
-		| undefined
-	cholesterol: number | null | undefined
-	exercise_induced_angina: "no" | "yes" | null | undefined
-	exercise_max_heart_rate: number | null | undefined
-	exercise_st_depression: number | null | undefined
-	exercise_st_slope: "upsloping" | "flat" | "downsloping" | null | undefined
-	fasting_blood_sugar_greater_than_120: "false" | "true" | null | undefined
-	fluoroscopy_vessels_colored: "0" | "1" | "2" | "3" | null | undefined
-	gender: "female" | "male" | null | undefined
-	resting_blood_pressure: number | null | undefined
-	resting_ecg_result:
-		| "normal"
-		| "probable or definite left ventricular hypertrophy"
-		| "ST-T wave abnormality"
-		| null
-		| undefined
-	thallium_stress_test:
-		| "normal"
-		| "reversible defect"
-		| "fixed defect"
-		| null
-		| undefined
+	age?: number
+	chest_pain?: ChestPain
+	cholesterol?: number
+	exercise_induced_angina?: ExerciseInducedAngina
+	exercise_max_heart_rate?: number
+	exercise_st_depression?: number
+	exercise_st_slope?: ExerciseStSlope
+	fasting_blood_sugar_greater_than_120?: FastingBloodSugarGreaterThan120
+	fluoroscopy_vessels_colored?: FluoroscopyVesselsColored
+	gender?: Gender
+	resting_blood_pressure?: number
+	resting_ecg_result?: RestingEcgResult
+	thallium_stress_test?: ThalliumStressTest
+}
+
+enum Gender {
+	Male = "male",
+	Female = "female",
+}
+
+enum ChestPain {
+	Asymptomatic = "asymptomatic",
+	NonAnginaPain = "non-angina pain",
+	AtypicalAngina = "atypical angina",
+	TypicalAngina = "typical angina",
+}
+
+enum FastingBloodSugarGreaterThan120 {
+	False = "false",
+	True = "true",
+}
+
+enum RestingEcgResult {
+	Normal = "normal",
+	Lvh = "probable or definite left ventricular hypertrophy",
+	SttWaveAbnormality = "ST-T wave abnormality",
+}
+
+enum ExerciseInducedAngina {
+	No = "no",
+	Yes = "yes",
+}
+
+enum ExerciseStSlope {
+	Upsloping = "upsloping",
+	Flat = "flat",
+	Downsloping = "downsloping",
+}
+
+enum FluoroscopyVesselsColored {
+	Zero = "0",
+	One = "1",
+	Two = "2",
+	Three = "3",
+}
+
+enum ThalliumStressTest {
+	Normal = "normal",
+	ReversibleDefect = "reversible defect",
+	FixedDefect = "fixed defect",
 }
 
 // Define the type for the output of the model.
-type Output = tangram.BinaryClassificationPredictOutput<"Positive" | "Negative">
+type Output = tangram.BinaryClassificationPredictOutput<Diagnosis>
+
+enum Diagnosis {
+	Negative = "Negative",
+	Positive = "Positive",
+}
 
 // If you are running the Tangram app on your own server you can pass the URL to it with the TANGRAM_URL environment variable.
 let tangramUrl = process.env.TANGRAM_URL || "https://app.tangram.xyz"
@@ -59,18 +95,18 @@ let model = new tangram.Model<tangram.Task.BinaryClassification, Input, Output>(
 // Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
 let input: Input = {
 	age: 63,
-	chest_pain: "typical angina",
+	chest_pain: ChestPain.TypicalAngina,
 	cholesterol: 233,
-	exercise_induced_angina: "no",
+	exercise_induced_angina: ExerciseInducedAngina.No,
 	exercise_max_heart_rate: 150,
 	exercise_st_depression: 2.3,
-	exercise_st_slope: "downsloping",
-	fasting_blood_sugar_greater_than_120: "true",
-	fluoroscopy_vessels_colored: "0",
-	gender: "male",
+	exercise_st_slope: ExerciseStSlope.Downsloping,
+	fasting_blood_sugar_greater_than_120: FastingBloodSugarGreaterThan120.True,
+	fluoroscopy_vessels_colored: FluoroscopyVesselsColored.Zero,
+	gender: Gender.Male,
 	resting_blood_pressure: 145,
-	resting_ecg_result: "probable or definite left ventricular hypertrophy",
-	thallium_stress_test: "fixed defect",
+	resting_ecg_result: RestingEcgResult.Lvh,
+	thallium_stress_test: ThalliumStressTest.FixedDefect,
 }
 
 // Make the prediction using a custom threshold chosen on the "Tuning" page of the Tangram app.

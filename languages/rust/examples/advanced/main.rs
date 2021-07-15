@@ -95,15 +95,15 @@ pub enum ThalliumStressTest {
 	FixedDefect,
 }
 
-// type Output = tangram_core::ClassificationOutput<Diagnosis>;
+type Output = tangram::BinaryClassificationPredictOutput<Diagnosis>;
 
-// #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, serde::Deserialize)]
-// enum Diagnosis {
-// 	#[tangram(value = "negative")]
-// 	Negative,
-// 	#[tangram(value = "positive")]
-// 	Positive,
-// }
+#[derive(Clone, Debug, tangram::ClassificationOutputValue)]
+enum Diagnosis {
+	#[tangram(value = "Negative")]
+	Negative,
+	#[tangram(value = "Positive")]
+	Positive,
+}
 
 fn main() -> Result<()> {
 	// If you are running the Tangram app on your own server you can pass the URL to it with the TANGRAM_URL environment variable.
@@ -115,10 +115,8 @@ fn main() -> Result<()> {
 
 	// Load the model from the path.
 	let options = tangram::LoadModelOptions { tangram_url };
-	let mut model = tangram::Model::<Input, tangram::BinaryClassificationPredictOutput>::from_path(
-		"heart_disease.tangram",
-		Some(options),
-	)?;
+	let mut model =
+		tangram::Model::<Input, Output>::from_path("heart_disease.tangram", Some(options))?;
 
 	// Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
 	let input = Input {

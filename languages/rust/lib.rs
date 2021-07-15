@@ -27,7 +27,9 @@ use anyhow::Result;
 use memmap::Mmap;
 use std::path::Path;
 use std::{collections::BTreeMap, marker::PhantomData};
-pub use tangram_macro::{predict_input, PredictInput, PredictInputValue};
+pub use tangram_macro::{
+	predict_input, ClassificationOutputValue, PredictInput, PredictInputValue,
+};
 use url::Url;
 
 /// Use this struct to load a model, make predictions, and log events to the app.
@@ -146,15 +148,30 @@ impl From<RegressionPredictOutput> for PredictOutput {
 	}
 }
 
-impl From<BinaryClassificationPredictOutput> for PredictOutput {
-	fn from(value: BinaryClassificationPredictOutput) -> Self {
-		PredictOutput::BinaryClassification(value)
+impl<T> From<BinaryClassificationPredictOutput<T>> for PredictOutput
+where
+	T: ClassificationOutputValue,
+{
+	fn from(value: BinaryClassificationPredictOutput<T>) -> Self {
+		PredictOutput::BinaryClassification(BinaryClassificationPredictOutput {
+			class_name: value.class_name.as_str().to_owned(),
+			probability: value.probability,
+			feature_contributions: value.feature_contributions,
+		})
 	}
 }
 
-impl From<MulticlassClassificationPredictOutput> for PredictOutput {
-	fn from(value: MulticlassClassificationPredictOutput) -> Self {
-		PredictOutput::MulticlassClassification(value)
+impl<T> From<MulticlassClassificationPredictOutput<T>> for PredictOutput
+where
+	T: ClassificationOutputValue,
+{
+	fn from(value: MulticlassClassificationPredictOutput<T>) -> Self {
+		PredictOutput::MulticlassClassification(MulticlassClassificationPredictOutput {
+			class_name: value.class_name.as_str().to_owned(),
+			probability: value.probability,
+			probabilities: value.probabilities,
+			feature_contributions: value.feature_contributions,
+		})
 	}
 }
 
@@ -201,52 +218,103 @@ impl From<PredictOutput> for RegressionPredictOutput {
 	}
 }
 
-impl From<PredictOutput> for BinaryClassificationPredictOutput {
+impl<T> From<PredictOutput> for MulticlassClassificationPredictOutput<T>
+where
+	T: ClassificationOutputValue,
+{
 	fn from(value: PredictOutput) -> Self {
 		match value {
-			PredictOutput::BinaryClassification(value) => value,
-			_ => panic!("expected binary classification predict output"),
-		}
-	}
-}
-
-impl From<PredictOutput> for MulticlassClassificationPredictOutput {
-	fn from(value: PredictOutput) -> Self {
-		match value {
-			PredictOutput::MulticlassClassification(value) => value,
+			PredictOutput::MulticlassClassification(value) => {
+				MulticlassClassificationPredictOutput {
+					class_name: T::from_str(&value.class_name),
+					probability: value.probability,
+					probabilities: value.probabilities,
+					feature_contributions: value.feature_contributions,
+				}
+			}
 			_ => panic!("expected multiclass classification predict output"),
 		}
 	}
 }
 
+pub trait ClassificationOutputValue {
+	fn from_str(value: &str) -> Self;
+	fn as_str(&self) -> &str;
+}
+
+impl ClassificationOutputValue for String {
+	fn from_str(value: &str) -> Self {
+		value.to_owned()
+	}
+	fn as_str(&self) -> &str {
+		self
+	}
+}
+
 /// This is the output of calling [`Model::predict`] on a `Model` whose task is binary classification.
 #[derive(Debug, serde::Serialize)]
-pub struct BinaryClassificationPredictOutput {
+pub struct BinaryClassificationPredictOutput<T = String>
+where
+	T: ClassificationOutputValue,
+{
 	/// This is the name of the predicted class.
-	pub class_name: String,
+	pub class_name: T,
 	/// This is the probability the model assigned to the predicted class.
 	pub probability: f32,
 	/// If computing feature contributions was enabled in the predict options, this value will explain the model's output, showing how much each feature contributed to the output.
 	pub feature_contributions: Option<FeatureContributions>,
 }
 
-impl From<tangram_core::predict::BinaryClassificationPredictOutput>
-	for BinaryClassificationPredictOutput
+impl<T> From<tangram_core::predict::BinaryClassificationPredictOutput>
+	for BinaryClassificationPredictOutput<T>
+where
+	T: ClassificationOutputValue,
 {
 	fn from(value: tangram_core::predict::BinaryClassificationPredictOutput) -> Self {
 		BinaryClassificationPredictOutput {
-			class_name: value.class_name,
+			class_name: T::from_str(&value.class_name),
 			probability: value.probability,
 			feature_contributions: value.feature_contributions.map(Into::into),
 		}
 	}
 }
 
+impl<T> From<tangram_core::predict::PredictOutput> for BinaryClassificationPredictOutput<T>
+where
+	T: ClassificationOutputValue,
+{
+	fn from(value: tangram_core::predict::PredictOutput) -> Self {
+		match value {
+			tangram_core::predict::PredictOutput::BinaryClassification(value) => value.into(),
+			_ => panic!("expected binary classification predict output"),
+		}
+	}
+}
+
+impl<T> From<PredictOutput> for BinaryClassificationPredictOutput<T>
+where
+	T: ClassificationOutputValue,
+{
+	fn from(value: PredictOutput) -> Self {
+		match value {
+			PredictOutput::BinaryClassification(value) => BinaryClassificationPredictOutput {
+				class_name: T::from_str(&value.class_name),
+				probability: value.probability,
+				feature_contributions: value.feature_contributions,
+			},
+			_ => panic!("expected binary classification predict output"),
+		}
+	}
+}
+
 /// This is the output of calling [`Model::predict`] on a `Model` whose task is multiclass classification.
 #[derive(Debug, serde::Serialize)]
-pub struct MulticlassClassificationPredictOutput {
+pub struct MulticlassClassificationPredictOutput<T = String>
+where
+	T: ClassificationOutputValue,
+{
 	/// This is the name of the predicted class.
-	pub class_name: String,
+	pub class_name: T,
 	/// This is the probability the model assigned to the predicted class.
 	pub probability: f32,
 	/// This value maps from class names to the probability the model assigned to each class.
@@ -255,12 +323,14 @@ pub struct MulticlassClassificationPredictOutput {
 	pub feature_contributions: Option<BTreeMap<String, FeatureContributions>>,
 }
 
-impl From<tangram_core::predict::MulticlassClassificationPredictOutput>
-	for MulticlassClassificationPredictOutput
+impl<T> From<tangram_core::predict::MulticlassClassificationPredictOutput>
+	for MulticlassClassificationPredictOutput<T>
+where
+	T: ClassificationOutputValue,
 {
 	fn from(value: tangram_core::predict::MulticlassClassificationPredictOutput) -> Self {
 		MulticlassClassificationPredictOutput {
-			class_name: value.class_name,
+			class_name: T::from_str(&value.class_name),
 			probability: value.probability,
 			probabilities: value.probabilities,
 			feature_contributions: value.feature_contributions.map(|feature_contributions| {
@@ -269,6 +339,18 @@ impl From<tangram_core::predict::MulticlassClassificationPredictOutput>
 					.map(|(key, value)| (key, value.into()))
 					.collect()
 			}),
+		}
+	}
+}
+
+impl<T> From<tangram_core::predict::PredictOutput> for MulticlassClassificationPredictOutput<T>
+where
+	T: ClassificationOutputValue,
+{
+	fn from(value: tangram_core::predict::PredictOutput) -> Self {
+		match value {
+			tangram_core::predict::PredictOutput::MulticlassClassification(value) => value.into(),
+			_ => panic!("expected multiclass classification predict output"),
 		}
 	}
 }
@@ -501,7 +583,7 @@ impl From<tangram_core::predict::WordEmbeddingFeatureContribution>
 pub struct LogPredictionArgs<Input, Output>
 where
 	Input: Into<PredictInput>,
-	Output: From<PredictOutput>,
+	Output: From<PredictOutput> + Into<PredictOutput>,
 {
 	/// This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
 	pub identifier: NumberOrString,
@@ -574,7 +656,7 @@ impl From<&str> for NumberOrString {
 	}
 }
 
-/// Use this class to load a model, make predictions, and log events to the app.
+/// Use this struct to load a model, make predictions, and log events to the app.
 impl<Input, Output> Model<Input, Output>
 where
 	Input: Into<PredictInput>,

@@ -58,7 +58,7 @@ impl Component for Benchmarks {
 		let tangram_tree_benchmarks_description = ui::Markdown::new("Tangram Tree is a pure Rust implementation of Gradient Boosted Decision Trees. It has the smallest memory footprint of the leading GBDT implementations and achieves state of the art speed and accuracy. Check it out on [GitHub](https://github.com/tangramxyz/tangram/blob/main/crates/tree).".into());
 		ui::S1::new()
 			.child(ui::H1::new().child("Tangram Tree Benchmarks"))
-			.child(ui::P::new().child(tangram_tree_benchmarks_description))
+			.child(tangram_tree_benchmarks_description)
 			.child_signal(self.dataset.signal().map({
 				let dataset = self.dataset.clone();
 				clone!(dataset_select_field_options);

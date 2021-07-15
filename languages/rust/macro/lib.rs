@@ -240,3 +240,112 @@ fn predict_input_value_variant_value(variant: &syn::Variant) -> syn::Result<Opti
 	let input_value = input_value.value();
 	Ok(Some(input_value))
 }
+
+#[proc_macro_derive(ClassificationOutputValue, attributes(tangram))]
+pub fn classification_output_value_derive_macro(
+	input: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
+	classification_output_value_derive_macro_impl(input.into())
+		.unwrap_or_else(|e| e.to_compile_error())
+		.into()
+}
+
+fn classification_output_value_derive_macro_impl(
+	input: proc_macro2::TokenStream,
+) -> syn::Result<proc_macro2::TokenStream> {
+	let input: syn::DeriveInput = syn::parse2(input)?;
+	let ident = &input.ident;
+	let data = match &input.data {
+		syn::Data::Enum(data) => data,
+		_ => {
+			return Err(syn::Error::new(
+				input.span(),
+				"this macro can only be used on an enum",
+			))
+		}
+	};
+	let from_str_match_arms = data
+		.variants
+		.iter()
+		.map(|variant| {
+			let variant_ident = &variant.ident;
+			let variant_value = classification_output_value_variant_value(variant)?
+				.unwrap_or_else(|| variant_ident.to_string());
+			let code = quote! { #variant_value => #ident::#variant_ident };
+			Ok(code)
+		})
+		.collect::<syn::Result<Vec<_>>>()?;
+	let as_str_match_arms = data
+		.variants
+		.iter()
+		.map(|variant| {
+			let variant_ident = &variant.ident;
+			let variant_value = classification_output_value_variant_value(variant)?
+				.unwrap_or_else(|| variant_ident.to_string());
+			let code = quote! { #ident::#variant_ident => #variant_value };
+			Ok(code)
+		})
+		.collect::<syn::Result<Vec<_>>>()?;
+	let code = quote! {
+		impl tangram::ClassificationOutputValue for #ident {
+			fn from_str(value: &str) -> Self {
+				match value {
+					#(#from_str_match_arms,)*
+					_ => panic!("unexpected value"),
+				}
+			}
+			fn as_str(&self) -> &str {
+				match self {
+					#(#as_str_match_arms,)*
+				}
+			}
+		}
+	};
+	Ok(code)
+}
+
+fn classification_output_value_variant_value(
+	variant: &syn::Variant,
+) -> syn::Result<Option<String>> {
+	let attr = variant
+		.attrs
+		.iter()
+		.find(|attr| attr.path.is_ident("tangram"));
+	let attr = if let Some(attr) = attr {
+		attr
+	} else {
+		return Ok(None);
+	};
+	let meta = attr.parse_meta()?;
+	let list = match meta {
+		syn::Meta::List(list) => list,
+		_ => {
+			return Err(syn::Error::new_spanned(
+				attr,
+				"tangram attribute must contain a list",
+			))
+		}
+	};
+	let mut input_value = None;
+	for item in list.nested.iter() {
+		match item {
+			syn::NestedMeta::Meta(syn::Meta::NameValue(item)) if item.path.is_ident("value") => {
+				let value = if let syn::Lit::Str(value) = &item.lit {
+					Some(value)
+				} else {
+					None
+				};
+				let value = value.ok_or_else(|| {
+					syn::Error::new_spanned(&item, "value for attribute \"value\" must be a string")
+				})?;
+				input_value = Some(value);
+			}
+			_ => {}
+		}
+	}
+	let input_value = input_value.ok_or_else(|| {
+		syn::Error::new_spanned(&list.nested, "an attribute with key \"value\" is required")
+	})?;
+	let input_value = input_value.value();
+	Ok(Some(input_value))
+}

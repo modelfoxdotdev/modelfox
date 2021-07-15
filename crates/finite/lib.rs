@@ -9,7 +9,6 @@ use tangram_finite::Finite;
 let n = <Finite<f32>>::new(1.0).unwrap();
 assert!(Finite::new(n.get() / 0.0).is_err());
 ```
-
 */
 
 use num::Float;
