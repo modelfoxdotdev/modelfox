@@ -439,7 +439,7 @@ fn progress_thread_handle_progress_event(
 						tangram_core::progress::ModelTestProgressEvent::Test(progress_counter) => {
 							let progress_bar = ProgressBar::new(
 								"️⚖️",
-								"Computing model comparison metric.".into(),
+								"Computing comparison metric.".into(),
 								progress_counter,
 								ProgressValueFormatter::Normal,
 							);

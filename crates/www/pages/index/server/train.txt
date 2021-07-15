@@ -13,7 +13,7 @@ $ tangram train --file heart_disease.csv --target diagnosis
 ✅ Training model 2 of 8.
 ✅ Training model 3 of 8.
 ✅ Computing model comparison features.
-✅ Computing model comparison metric.
+✅ Computing comparison metric.
 ✅ Computing features.
 🚂 Training model 4 of 8.
 [==========================================>                         ]

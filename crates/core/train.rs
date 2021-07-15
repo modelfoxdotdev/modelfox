@@ -231,7 +231,7 @@ impl Trainer {
 		Ok(trainer)
 	}
 
-	/// Train each model in the grid and compute model comparison metrics.
+	/// Train each model in the grid and compute comparison metrics.
 	pub fn train_grid(
 		&mut self,
 		kill_chip: &KillChip,
@@ -1499,7 +1499,7 @@ fn choose_comparison_metric(config: &Config, task: &Task) -> Result<ComparisonMe
 						Ok(ComparisonMetric::Regression(RegressionComparisonMetric::R2))
 					}
 					metric => Err(anyhow!(
-						"{} is an invalid model comparison metric for regression",
+						"{} is an invalid comparison metric for regression",
 						metric
 					)),
 				}
@@ -1518,7 +1518,7 @@ fn choose_comparison_metric(config: &Config, task: &Task) -> Result<ComparisonMe
 						))
 					}
 					metric => Err(anyhow!(
-						"{} is an invalid model comparison metric for binary classification",
+						"{} is an invalid comparison metric for binary classification",
 						metric,
 					)),
 				}
@@ -1537,7 +1537,7 @@ fn choose_comparison_metric(config: &Config, task: &Task) -> Result<ComparisonMe
 						))
 					}
 					metric => Err(anyhow!(
-						"{} is an invalid model comparison metric for multiclass classification",
+						"{} is an invalid comparison metric for multiclass classification",
 						metric,
 					)),
 				}
