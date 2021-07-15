@@ -10,7 +10,7 @@ use tangram_ui as ui;
 pub struct TrainingSummarySection {
 	pub chosen_model_type_name: String,
 	pub column_count: usize,
-	pub model_comparison_metric_type_name: String,
+	pub comparison_metric_type_name: String,
 	pub train_row_count: usize,
 	pub test_row_count: usize,
 }
@@ -30,7 +30,7 @@ impl Component for TrainingSummarySection {
 					.child(" rows were used in training and ")
 					.child(b().child(self.test_row_count.to_string()))
 					.child(" rows were used in testing. The model with the highest ")
-					.child(b().child(self.model_comparison_metric_type_name))
+					.child(b().child(self.comparison_metric_type_name))
 					.child(" was chosen. The best model is a ")
 					.child(b().child(self.chosen_model_type_name))
 					.child("."),

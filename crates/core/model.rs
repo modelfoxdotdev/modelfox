@@ -887,7 +887,7 @@ fn serialize_train_grid_item_output(
 		}
 	};
 	let train_grid_item_output_writer = tangram_model::TrainGridItemOutputWriter {
-		model_comparison_metric_value: train_grid_item_output.model_comparison_metric_value,
+		comparison_metric_value: train_grid_item_output.comparison_metric_value,
 		hyperparameters,
 		duration: train_grid_item_output.duration.as_secs_f32(),
 	};

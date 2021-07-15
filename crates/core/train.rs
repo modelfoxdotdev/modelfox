@@ -873,8 +873,8 @@ fn compute_baseline_metrics(
 
 pub struct TrainGridItemOutput {
 	pub train_model_output: TrainModelOutput,
-	pub model_comparison_metrics: Metrics,
-	pub model_comparison_metric_value: f32,
+	pub comparison_metrics: Metrics,
+	pub comparison_metric_value: f32,
 	pub duration: Duration,
 }
 
@@ -898,8 +898,8 @@ fn train_grid_item(
 		}))
 	});
 	let duration = start.elapsed();
-	let model_comparison_metrics =
-		compute_model_comparison_metrics(&train_model_output, &table_comparison, &mut |progress| {
+	let comparison_metrics =
+		compute_comparison_metrics(&train_model_output, &table_comparison, &mut |progress| {
 			handle_progress_event(ProgressEvent::Train(TrainProgressEvent {
 				grid_item_index,
 				grid_item_count,
@@ -908,20 +908,17 @@ fn train_grid_item(
 				),
 			}))
 		});
-	let model_comparison_metric_value =
-		get_model_comparison_metric_value(&model_comparison_metrics, comparison_metric);
+	let comparison_metric_value =
+		get_comparison_metric_value(&comparison_metrics, comparison_metric);
 	TrainGridItemOutput {
 		train_model_output,
-		model_comparison_metrics,
-		model_comparison_metric_value,
+		comparison_metrics,
+		comparison_metric_value,
 		duration,
 	}
 }
 
-fn get_model_comparison_metric_value(
-	metrics: &Metrics,
-	comparison_metric: ComparisonMetric,
-) -> f32 {
+fn get_comparison_metric_value(metrics: &Metrics, comparison_metric: ComparisonMetric) -> f32 {
 	match (comparison_metric, metrics) {
 		(ComparisonMetric::Regression(comparison_metric), Metrics::Regression(metrics)) => {
 			match comparison_metric {
@@ -1553,7 +1550,7 @@ fn choose_comparison_metric(config: &Config, task: &Task) -> Result<ComparisonMe
 	}
 }
 
-fn compute_model_comparison_metrics(
+fn compute_comparison_metrics(
 	train_model_output: &TrainModelOutput,
 	table_comparison: &TableView,
 	handle_progress_event: &mut dyn FnMut(ModelTestProgressEvent),
@@ -1683,11 +1680,11 @@ fn choose_best_model_regression(
 		.iter()
 		.enumerate()
 		.max_by(|(_, output_a), (_, output_b)| {
-			let metrics_a = match &output_a.model_comparison_metrics {
+			let metrics_a = match &output_a.comparison_metrics {
 				Metrics::Regression(metrics) => metrics,
 				_ => unreachable!(),
 			};
-			let metrics_b = match &output_b.model_comparison_metrics {
+			let metrics_b = match &output_b.comparison_metrics {
 				Metrics::Regression(metrics) => metrics,
 				_ => unreachable!(),
 			};
@@ -1716,11 +1713,11 @@ fn choose_best_model_binary_classification(
 		.iter()
 		.enumerate()
 		.max_by(|(_, output_a), (_, output_b)| {
-			let metrics_a = match &output_a.model_comparison_metrics {
+			let metrics_a = match &output_a.comparison_metrics {
 				Metrics::BinaryClassification(metrics) => metrics,
 				_ => unreachable!(),
 			};
-			let metrics_b = match &output_b.model_comparison_metrics {
+			let metrics_b = match &output_b.comparison_metrics {
 				Metrics::BinaryClassification(metrics) => metrics,
 				_ => unreachable!(),
 			};
@@ -1743,11 +1740,11 @@ fn choose_best_model_multiclass_classification(
 		.iter()
 		.enumerate()
 		.max_by(|(_, output_a), (_, output_b)| {
-			let metrics_a = match &output_a.model_comparison_metrics {
+			let metrics_a = match &output_a.comparison_metrics {
 				Metrics::MulticlassClassification(metrics) => metrics,
 				_ => unreachable!(),
 			};
-			let metrics_b = match &output_b.model_comparison_metrics {
+			let metrics_b = match &output_b.comparison_metrics {
 				Metrics::MulticlassClassification(metrics) => metrics,
 				_ => unreachable!(),
 			};

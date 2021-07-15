@@ -189,7 +189,7 @@ fn compute_summary_section(model: tangram_model::ModelReader) -> TrainingSummary
 			TrainingSummarySection {
 				chosen_model_type_name,
 				column_count: regressor.overall_column_stats().len() + 1,
-				model_comparison_metric_type_name: regression_model_comparison_type_name(
+				comparison_metric_type_name: regression_comparison_type_name(
 					&regressor.comparison_metric(),
 				),
 				train_row_count: regressor.train_row_count().to_usize().unwrap(),
@@ -201,7 +201,7 @@ fn compute_summary_section(model: tangram_model::ModelReader) -> TrainingSummary
 			TrainingSummarySection {
 				chosen_model_type_name,
 				column_count: binary_classifier.overall_column_stats().len() + 1,
-				model_comparison_metric_type_name: binary_classification_model_comparison_type_name(
+				comparison_metric_type_name: binary_classification_comparison_type_name(
 					&binary_classifier.comparison_metric(),
 				),
 				train_row_count: binary_classifier.train_row_count().to_usize().unwrap(),
@@ -213,10 +213,9 @@ fn compute_summary_section(model: tangram_model::ModelReader) -> TrainingSummary
 			TrainingSummarySection {
 				chosen_model_type_name,
 				column_count: multiclass_classifier.overall_column_stats().len() + 1,
-				model_comparison_metric_type_name:
-					multiclass_classification_model_comparison_type_name(
-						&multiclass_classifier.comparison_metric(),
-					),
+				comparison_metric_type_name: multiclass_classification_comparison_type_name(
+					&multiclass_classifier.comparison_metric(),
+				),
 				train_row_count: multiclass_classifier.train_row_count().to_usize().unwrap(),
 				test_row_count: multiclass_classifier.test_row_count().to_usize().unwrap(),
 			}
@@ -224,7 +223,7 @@ fn compute_summary_section(model: tangram_model::ModelReader) -> TrainingSummary
 	}
 }
 
-fn regression_model_comparison_type_name(
+fn regression_comparison_type_name(
 	comparison_metric: &tangram_model::RegressionComparisonMetricReader,
 ) -> String {
 	match comparison_metric {
@@ -241,7 +240,7 @@ fn regression_model_comparison_type_name(
 	}
 }
 
-fn binary_classification_model_comparison_type_name(
+fn binary_classification_comparison_type_name(
 	comparison_metric: &tangram_model::BinaryClassificationComparisonMetricReader,
 ) -> String {
 	match comparison_metric {
@@ -251,7 +250,7 @@ fn binary_classification_model_comparison_type_name(
 	}
 }
 
-fn multiclass_classification_model_comparison_type_name(
+fn multiclass_classification_comparison_type_name(
 	comparison_metric: &tangram_model::MulticlassClassificationComparisonMetricReader,
 ) -> String {
 	match comparison_metric {

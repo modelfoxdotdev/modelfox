@@ -11,14 +11,14 @@ pub struct Page {
 	pub num_models: usize,
 	pub trained_models_metrics: Vec<TrainedModel>,
 	pub best_model_metrics: TrainedModel,
-	pub model_comparison_metric_name: String,
+	pub comparison_metric_name: String,
 	pub best_model_hyperparameters: Vec<(String, String)>,
 }
 
 #[derive(Clone, Debug)]
 pub struct TrainedModel {
 	pub identifier: String,
-	pub model_comparison_metric_value: f32,
+	pub comparison_metric_value: f32,
 	pub model_type: String,
 	pub time: String,
 }
@@ -37,9 +37,7 @@ impl Component for Page {
 								.child(ui::H2::new().child("Best Model Metrics"))
 								.child(WinningModelMetricsTable {
 									best_model: self.best_model_metrics,
-									model_comparison_metric_name: self
-										.model_comparison_metric_name
-										.clone(),
+									comparison_metric_name: self.comparison_metric_name.clone(),
 								}),
 						)
 						.child(
@@ -54,7 +52,7 @@ impl Component for Page {
 								.child(ui::H2::new().child("All Models"))
 								.child(AllTrainedModelsMetricsTable {
 									trained_models: self.trained_models_metrics,
-									model_comparison_metric_name: self.model_comparison_metric_name,
+									comparison_metric_name: self.comparison_metric_name,
 								}),
 						),
 				),
@@ -65,7 +63,7 @@ impl Component for Page {
 
 pub struct WinningModelMetricsTable {
 	best_model: TrainedModel,
-	model_comparison_metric_name: String,
+	comparison_metric_name: String,
 }
 
 impl Component for WinningModelMetricsTable {
@@ -78,7 +76,7 @@ impl Component for WinningModelMetricsTable {
 						.child(ui::TableHeaderCell::new().child("Model Number"))
 						.child(ui::TableHeaderCell::new().child("Model Type"))
 						.child(ui::TableHeaderCell::new().child("Training Time"))
-						.child(ui::TableHeaderCell::new().child(self.model_comparison_metric_name)),
+						.child(ui::TableHeaderCell::new().child(self.comparison_metric_name)),
 				),
 			)
 			.child(
@@ -86,9 +84,10 @@ impl Component for WinningModelMetricsTable {
 					.child(ui::TableCell::new().child(self.best_model.identifier))
 					.child(ui::TableCell::new().child(self.best_model.model_type))
 					.child(ui::TableCell::new().child(self.best_model.time))
-					.child(ui::TableCell::new().child(ui::format_float(
-						self.best_model.model_comparison_metric_value,
-					))),
+					.child(
+						ui::TableCell::new()
+							.child(ui::format_float(self.best_model.comparison_metric_value)),
+					),
 			)
 			.into_node()
 	}
@@ -96,7 +95,7 @@ impl Component for WinningModelMetricsTable {
 
 pub struct AllTrainedModelsMetricsTable {
 	trained_models: Vec<TrainedModel>,
-	model_comparison_metric_name: String,
+	comparison_metric_name: String,
 }
 
 impl Component for AllTrainedModelsMetricsTable {
@@ -109,7 +108,7 @@ impl Component for AllTrainedModelsMetricsTable {
 						.child(ui::TableHeaderCell::new().child("Model Number"))
 						.child(ui::TableHeaderCell::new().child("Model Type"))
 						.child(ui::TableHeaderCell::new().child("Training Time"))
-						.child(ui::TableHeaderCell::new().child(self.model_comparison_metric_name)),
+						.child(ui::TableHeaderCell::new().child(self.comparison_metric_name)),
 				),
 			)
 			.children(self.trained_models.into_iter().map(|trained_model| {
@@ -123,9 +122,10 @@ impl Component for AllTrainedModelsMetricsTable {
 					)
 					.child(ui::TableCell::new().child(trained_model.model_type))
 					.child(ui::TableCell::new().child(trained_model.time))
-					.child(ui::TableCell::new().child(ui::format_float(
-						trained_model.model_comparison_metric_value,
-					)))
+					.child(
+						ui::TableCell::new()
+							.child(ui::format_float(trained_model.comparison_metric_value)),
+					)
 			}))
 			.into_node()
 	}

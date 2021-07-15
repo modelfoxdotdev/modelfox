@@ -43,7 +43,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model_layout_info =
 		model_layout_info(&mut db, &context, model_id, ModelNavItem::TrainingGrid).await?;
-	let model_comparison_metric_name = match model.inner() {
+	let comparison_metric_name = match model.inner() {
 		tangram_model::ModelInnerReader::Regressor(regressor) => {
 			match regressor.read().comparison_metric() {
 				tangram_model::RegressionComparisonMetricReader::MeanAbsoluteError(_) => {
@@ -148,7 +148,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let best_model_hyperparameters = hyperparameters_for_grid_item(&best_model);
 	let page = Page {
 		id: model_id.to_string(),
-		model_comparison_metric_name,
+		comparison_metric_name,
 		num_models: trained_models_metrics.len(),
 		trained_models_metrics,
 		best_model_metrics,
@@ -175,7 +175,7 @@ fn trained_model_metrics_for_grid_item(
 	let time = format!("{:?}", duration);
 	TrainedModel {
 		identifier,
-		model_comparison_metric_value: train_grid_item_output.model_comparison_metric_value(),
+		comparison_metric_value: train_grid_item_output.comparison_metric_value(),
 		model_type,
 		time,
 	}
