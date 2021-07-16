@@ -33,14 +33,14 @@
         cargo = rust;
       }).buildRustPackage {
         pname = "tangram";
-        version = "0.5.0";
+        version = "0.6.0-dev";
         src = ./.;
         doCheck = false;
         nativeBuildInputs = with pkgs; [
           clang_12
           lld_12
         ];
-        cargoSha256 = "sha256-75Pm18fv4JVreRCPmJ9/X9Oh5sxT02pOczDmbn4Yj0M=";
+        cargoSha256 = "sha256-hjRL1jBY3aC8BrczWu0PKiu5adQ95JlmB0Ltl7oNEeU=";
         cargoBuildFlags = [ "--bin" "tangram" ];
         CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
       };
