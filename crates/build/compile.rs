@@ -1,6 +1,7 @@
 use anyhow::anyhow;
 use clap::Clap;
 use duct::cmd;
+use indoc::formatdoc;
 use std::{fs::File, path::Path};
 use tangram_build::{Arch, Target, TargetFileNames};
 use which::which;
@@ -15,6 +16,7 @@ pub fn run(args: Args) {
 	let Args { target } = args;
 
 	let tangram_path = std::env::current_dir().unwrap();
+	let target_path = tangram_path.join(format!("target_{}", target.as_str()));
 
 	// Clean and create the dist target path.
 	let dist_path = tangram_path.join("dist");
@@ -59,10 +61,7 @@ pub fn run(args: Args) {
 	}
 
 	if matches!(target, Target::Wasm32UnknownUnknown) {
-		let cargo_artifact_path = tangram_path
-			.join("target")
-			.join(target.as_str())
-			.join("release");
+		let cargo_artifact_path = target_path.join(target.as_str()).join("release");
 		let tangram_wasm_artifact_path = cargo_artifact_path.join("tangram_wasm.wasm");
 		std::fs::copy(
 			tangram_wasm_artifact_path,
@@ -93,10 +92,7 @@ pub fn run(args: Args) {
 		| Target::AArch64AppleDarwin
 		| Target::X8664PcWindowsMsvc
 		| Target::X8664PcWindowsGnu => {
-			let cargo_artifact_path = tangram_path
-				.join("target")
-				.join(target.as_str())
-				.join("release");
+			let cargo_artifact_path = target_path.join(target.as_str()).join("release");
 			(
 				cargo_artifact_path.join(target_file_names.tangram_cli_file_name),
 				cargo_artifact_path.join(target_file_names.libtangram_dynamic_file_name),
@@ -107,11 +103,11 @@ pub fn run(args: Args) {
 		}
 		Target::X8664UnknownLinuxMusl | Target::AArch64UnknownLinuxMusl => {
 			let cargo_artifact_path_dynamic = tangram_path
-				.join("target_musl_dynamic")
+				.join(format!("target_{}_dynamic", target.as_str()))
 				.join(target.as_str())
 				.join("release");
 			let cargo_artifact_path_static = tangram_path
-				.join("target_musl_static")
+				.join(format!("target_{}_static", target.as_str()))
 				.join(target.as_str())
 				.join("release");
 			(
@@ -152,13 +148,13 @@ pub fn run(args: Args) {
 
 	// Build the python wheels.
 	match target {
-		Target::X8664UnknownLinuxGnu => build_python_manylinux(Arch::X8664),
-		Target::AArch64UnknownLinuxGnu => build_python_manylinux(Arch::AArch64),
+		Target::X8664UnknownLinuxGnu => build_python_manylinux(target),
+		Target::AArch64UnknownLinuxGnu => build_python_manylinux(target),
 		Target::X8664UnknownLinuxMusl => {}
 		Target::AArch64UnknownLinuxMusl => {}
 		Target::X8664AppleDarwin => {}
-		Target::AArch64AppleDarwin => build_python_macos(),
-		Target::X8664PcWindowsMsvc => build_python_windows(),
+		Target::AArch64AppleDarwin => build_python_macos(target),
+		Target::X8664PcWindowsMsvc => build_python_windows(target),
 		Target::X8664PcWindowsGnu => {}
 		Target::Wasm32UnknownUnknown => unreachable!(),
 	}
@@ -204,6 +200,7 @@ fn build_local(target: Target) {
 		"--package",
 		"tangram_node",
 	)
+	.env("CARGO_TARGET_DIR", format!("target_{}", target.as_str()))
 	.run()
 	.unwrap();
 }
@@ -229,6 +226,7 @@ fn build_gnu(target: Target, apt_packages: Option<Vec<String>>) {
 			curl -sSf https://sh.rustup.rs | sh -s -- -y
 			export PATH="$HOME/.cargo/bin:$PATH"
 			rustup target add {target}
+			CARGO_TARGET_DIR=target_{target} \
 			cargo build \
 				--release \
 				--target {target} \
@@ -288,7 +286,7 @@ fn build_musl(target: Target) {
 			curl -sSf https://sh.rustup.rs | sh -s -- -y
 			export PATH="$HOME/.cargo/bin:$PATH"
 			# build dynamic libraries with -crt-static
-			CARGO_TARGET_DIR=target_musl_dynamic \
+			CARGO_TARGET_DIR=target_{target}_dynamic \
 			RUSTFLAGS="-C target-feature=-crt-static" \
 			cargo build \
 				--release \
@@ -297,7 +295,7 @@ fn build_musl(target: Target) {
 				--package tangram_elixir \
 				--package tangram_node
 			# build tangram_cli and libtangram static with +crt-static
-			CARGO_TARGET_DIR=target_musl_static \
+			CARGO_TARGET_DIR=target_{target}_static \
 			cargo build \
 				--release \
 				--target {target} \
@@ -337,29 +335,33 @@ fn build_musl(target: Target) {
 	.unwrap();
 }
 
-fn build_python_manylinux(arch: Arch) {
+fn build_python_manylinux(target: Target) {
 	let cwd = std::env::current_dir().unwrap();
 	let home_dir = dirs::home_dir()
 		.ok_or_else(|| anyhow!("could not get home dir"))
 		.unwrap();
+	let arch = target.arch();
 	let docker_platform = match arch {
 		Arch::X8664 => "linux/amd64",
 		Arch::AArch64 => "linux/arm64",
 		Arch::Wasm32 => unreachable!(),
 	};
-	let script = r#"
-		set -ex
-		curl -sSf https://sh.rustup.rs | sh -s -- -y
-		export PATH="$HOME/.cargo/bin:$PATH"
-		/opt/python/cp36-cp36m/bin/pip install -U setuptools wheel setuptools-rust
-		rm -rf dist
-		CARGO_TARGET_DIR="../../target_python" /opt/python/cp36-cp36m/bin/python setup.py bdist_wheel --py-limited-api=cp36
-		for WHEEL in dist/*.whl; do
-			auditwheel repair $WHEEL -w dist
-			rm $WHEEL
-		done
-		rm -rf build tangram.egg-info
-	"#;
+	let script = formatdoc!(
+		r#"
+			set -ex
+			curl -sSf https://sh.rustup.rs | sh -s -- -y
+			export PATH="$HOME/.cargo/bin:$PATH"
+			/opt/python/cp36-cp36m/bin/pip install -U setuptools wheel setuptools-rust
+			rm -rf dist
+			CARGO_TARGET_DIR="../../target_{target}_python" /opt/python/cp36-cp36m/bin/python setup.py bdist_wheel --py-limited-api=cp36
+			for WHEEL in dist/*.whl; do
+				auditwheel repair $WHEEL -w dist
+				rm $WHEEL
+			done
+			rm -rf build tangram.egg-info
+		"#,
+		target = target,
+	);
 	cmd!(
 		"docker",
 		"run",
@@ -391,7 +393,7 @@ fn build_python_manylinux(arch: Arch) {
 	.unwrap();
 }
 
-fn build_python_macos() {
+fn build_python_macos(target: Target) {
 	cmd!(
 		"pip3",
 		"install",
@@ -416,7 +418,10 @@ fn build_python_macos() {
 		"--py-limited-api",
 		"cp36"
 	)
-	.env("CARGO_TARGET_DIR", "../../target_python")
+	.env(
+		"CARGO_TARGET_DIR",
+		format!("../../target_{}_python", target.as_str()),
+	)
 	.env("ARCHFLAGS", "-arch x86_64 -arch arm64")
 	.env("PYO3_NO_PYTHON", "")
 	.dir("languages/python")
@@ -424,7 +429,7 @@ fn build_python_macos() {
 	.unwrap();
 }
 
-fn build_python_windows() {
+fn build_python_windows(target: Target) {
 	cmd!(
 		"pip",
 		"install",
@@ -449,7 +454,10 @@ fn build_python_windows() {
 		"--py-limited-api",
 		"cp36"
 	)
-	.env("CARGO_TARGET_DIR", "../../target_python")
+	.env(
+		"CARGO_TARGET_DIR",
+		format!("../../target_{}_python", target.as_str()),
+	)
 	.dir("languages/python")
 	.run()
 	.unwrap();
@@ -464,6 +472,10 @@ fn build_wasm(target: Target) {
 		target.as_str(),
 		"--package",
 		"tangram_wasm",
+	)
+	.env(
+		"CARGO_TARGET_DIR",
+		format!("../../target_{}", target.as_str()),
 	)
 	.run()
 	.unwrap();
