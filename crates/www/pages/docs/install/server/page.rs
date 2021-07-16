@@ -201,6 +201,9 @@ impl Component for Nix {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
+				# To avoid having to build from scratch, use the tangram cachix cache:
+				# https://tangram.cachix.org
+				# tangram.cachix.org-1:NQ5Uzhhbrgi4R6A0JoljrMg8X4a2doTv3WrSnajJANs=
 				nix run github:tangramxyz/tangram
 			"#
 		);

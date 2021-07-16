@@ -1,1 +1,1 @@
-nix build --no-link && nix path-info --json | jq -r '.[].path' | CACHIX_AUTH_TOKEN=$(pass tangram/cachix_auth_token) cachix push tangram
+nix build --no-link && nix path-info | CACHIX_AUTH_TOKEN=$(pass tangram/cachix_auth_token) cachix push tangram
