@@ -40,7 +40,7 @@
           clang_12
           lld_12
         ];
-        cargoSha256 = "sha256-hjRL1jBY3aC8BrczWu0PKiu5adQ95JlmB0Ltl7oNEeU=";
+        cargoSha256 = "sha256-M6d0Lc+0NHqskmwM2NTFyOfHkvDfNYyniwM34T0aACI=";
         cargoBuildFlags = [ "--bin" "tangram" ];
         CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
       };
@@ -61,6 +61,7 @@
             buildPhase = "make -j $NIX_BUILD_CORES";
             installPhase = "mkdir -p $out $out/bin $out/share/man/man1 && PREFIX=$out make install";
           })
+          cachix
           cargo-insta
           clang_12
           createrepo_c
