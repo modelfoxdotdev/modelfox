@@ -4,11 +4,11 @@
 
 ## Task Types
 
-Tangram supports training supervised machine learning models. Tangram determines the task type based on the type of the target column. If the target column is type `Number`, Tangram will train a regression model. If the target column is type `Enum` with two unique variants, Tangram will train a binary classification model. If the target column is type `Enum` with more than two variants, Tangram will train a multiclass classification model.
+Tangram determines the task, either regression, binary classification, or multiclass classification, based on the type of the target column. If the target column is a `Number` column, the task will be regression. If the target column is an `Enum` column with two variants, the task will be binary classification. If the target column is an `Enum` column with more than two variants, the task will be multiclass classification. Tangram will automatically infer the column types or you can provide the column types explicitly in a JSON configuration file passed tot tangram train with the `--config` flag. See the guide [Train with Custom Configuration](../guides/train_with_custom_configuration).
 
 ## Model Types
 
-Tangram trains a hyperparameter grid consisting of both _Linear Models_ and _Gradient Boosted Decision Trees_ (GBDT).
+Tangram trains a grid of _Linear_ and _Gradient Boosted Decision Tree_ (GBDT) models for the selected task. The definition of the default grid for each task is defined here: [https://github.com/tangramxyz/tangram/blob/main/crates/core/grid.rs](https://github.com/tangramxyz/tangram/blob/main/crates/core/grid.rs). Alternatively, you can specify your own grid in a JSON configuration file passed to tangram train with the `--config` flag. See the guide [Train with Custom Configuration](../guides/train_with_custom_configuration).
 
 ### Linear Models
 

@@ -23,7 +23,7 @@ The feature value `0` is reserved for _Out of Vocabulary_ (OOV) values. These ar
 
 ## One Hot Encoded Feature Groups
 
-_One Hot Encoded_ feature groups are used for _Enum_ columns when training linear models. If we were to use the _Identity_ feature encoding in linear models, we would be assuming an order: Red < Green < Blue. Therefore, we use a _One Hot Encoding_. The feature group consists of _n + 1_ features, one for each of the _Enum_ column's variants and one for the _Out of Vocabulary_ (OOV) value. The feature value at index `i` is 1 if input value is equal to the _i_th_ variant.
+_One Hot Encoded_ feature groups are used for _Enum_ columns when training linear models. If we were to use the _Identity_ feature encoding in linear models, we would be assuming an order: Red < Green < Blue. Therefore, we use a _One Hot Encoding_. The feature group consists of _n + 1_ features, one for each of the _Enum_ column's variants and one for the _Out of Vocabulary_ (OOV) value. The feature value at index _i_ is 1 if input value is equal to the _i_th_ variant.
 
 ### Example
 
@@ -42,4 +42,4 @@ _Normalized_ feature groups are used for _Number_ columns when training linear m
 
 ## Bag of Words Feature Groups
 
-_Bag of Words_ feature groups are used to encode _Text_ columns. _Bag of Words_ feature groups consist of _n_ features, one for each of the unique ngrams in the text column. The feature value for a given ngram depends on the strategy used: `Present`, `Count`, or `TF-IDF`. See [tf-idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) and [Bag of Words Model](https://en.wikipedia.org/wiki/Bag-of-words_model) to learn more. The `Present` strategy assigns a value of 0 or 1 depending on whether the ngram appears in the text. The `Count` strategy assigns a value equal to the count of the number of times an ngram appears in the text. The `TF-IDF` strategy assigns a value equal to the [tf-idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) weighted count of the number of times the ngram appears in the text.
+_Bag of Words_ feature groups are used to encode _Text_ columns. _Bag of Words_ feature groups consist of _n_ features, one for each of the unique ngrams in the text column. The feature value for a given ngram depends on the strategy used: `Present`, `Count`, or `TF-IDF`. The `Present` strategy assigns a value of 0 or 1 depending on whether the ngram appears in the text. The `Count` strategy assigns a value equal to the count of the number of times the ngram appears in the text. The `TF-IDF` strategy assigns a value equal to the [tf-idf](https://en.wikipedia.org/wiki/Tf%E2%80%93idf) weighted count of the number of times the ngram appears in the text. See [Bag of Words Model](https://en.wikipedia.org/wiki/Bag-of-words_model) to learn more.
