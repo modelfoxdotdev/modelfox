@@ -29,6 +29,18 @@ impl Content for DocsGuide {
 	type FrontMatter = DocsGuideFrontMatter;
 }
 
+pub struct DocsInternals;
+
+#[derive(serde::Deserialize)]
+pub struct DocsInternalsFrontMatter {
+	pub title: String,
+}
+
+impl Content for DocsInternals {
+	const PATH: &'static str = "crates/www/content/docs_internals";
+	type FrontMatter = DocsInternalsFrontMatter;
+}
+
 pub struct ContentItem<T> {
 	pub path: PathBuf,
 	pub slug: String,

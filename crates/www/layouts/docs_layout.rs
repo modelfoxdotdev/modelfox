@@ -1,7 +1,7 @@
 use crate::layout::Layout;
 use pinwheel::prelude::*;
 use tangram_ui as ui;
-use tangram_www_content::{Content, DocsGuide};
+use tangram_www_content::{Content, DocsGuide, DocsInternals};
 
 #[derive(builder, children, Default, new)]
 #[new(default)]
@@ -24,6 +24,7 @@ pub enum DocsPage {
 	Install,
 	GettingStarted(GettingStartedPage),
 	Guides(String),
+	Internals(String),
 }
 
 #[derive(PartialEq)]
@@ -210,6 +211,14 @@ impl Component for PageNav {
 						.title(guide.front_matter.title)
 						.href(format!("/docs/guides/{}", guide.slug))
 						.selected(self.selected_page == Some(DocsPage::Guides(guide.slug)))
+				}),
+			))
+			.child(ui::NavSection::new("Internals".to_owned()).children(
+				DocsInternals::list().unwrap().into_iter().map(|internal| {
+					ui::NavItem::new()
+						.title(internal.front_matter.title)
+						.href(format!("/docs/internals/{}", internal.slug))
+						.selected(self.selected_page == Some(DocsPage::Internals(internal.slug)))
 				}),
 			))
 			.child(

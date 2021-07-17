@@ -1,0 +1,16 @@
+[package]
+edition = "2018"
+name = "tangram_www_docs_internals_server"
+publish = false
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+pinwheel = "0.2"
+tangram_www_content = { path = "../../../../../content" }
+tangram_www_ui = { path = "../../../../../ui" }
+tangram_www_layouts = { path = "../../../../../layouts" }
+sunfish = "0.2"
+tangram_ui = { path = "../../../../../../ui" }
