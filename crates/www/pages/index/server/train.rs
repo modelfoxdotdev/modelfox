@@ -16,19 +16,10 @@ impl Component for Train {
 			.child(" with the path to a CSV file and the name of the column you want to predict.");
 		let p2 = div()
 			.class("index-step-text")
-			.child("The CLI automatically transforms your data into features, trains a number of models to predict the target column, and writes the best model to a ")
+			.child("The CLI automatically transforms your data into features, trains a number of linear and gradient boosted decision tree models to predict the target column, and writes the best model to a ")
 			.child(ui::InlineCode::new(".tangram"))
-			.child(" file.");
-		let p3 = div()
-			.class("index-step-text")
-			.child("If you want more control, you can provide a config file.");
-		let left = div()
-			.child(title)
-			.child(p1)
-			.child(br())
-			.child(p2)
-			.child(br())
-			.child(p3);
+			.child(" file. If you want more control, you can provide a config file.");
+		let left = div().child(title).child(p1).child(br()).child(p2);
 		let right = ui::Window::new()
 			.child(ui::Code::new().code(Cow::Borrowed(include_str!("./train.txt"))));
 		div()
