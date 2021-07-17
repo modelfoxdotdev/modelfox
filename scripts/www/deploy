@@ -1,4 +1,4 @@
 scripts/www/build
-ssh root@router-us-east-1.tangram.xyz mkdir -p /srv/www
+ssh root@router-us-east-1.tangram.xyz mkdir -p /srv/www/
 rsync --archive --compress --delete --progress dist/www/ root@router-us-east-1.tangram.xyz:/srv/www/ --exclude docs/languages/
-ssh root@router-us-east-1.tangram.xyz "chown -R root:root /srv/www && chmod -R u=rwX,go=rX /srv/www"
+ssh root@router-us-east-1.tangram.xyz "chown -R root:root /srv/www/ && chmod -R u=rwX,go=rX /srv/www/"

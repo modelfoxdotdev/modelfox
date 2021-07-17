@@ -19,7 +19,7 @@ impl Component for Page {
 					)))
 					.child(
 						ui::S1::new()
-							.child(ui::H1::new().child("Predict with Node"))
+							.child(ui::H1::new().child("Predict with JavaScript"))
 							.child(
 								ui::S2::new()
 									.child(ui::H2::new().child("1. Install."))
