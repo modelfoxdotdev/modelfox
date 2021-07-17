@@ -9,7 +9,7 @@ tangram = "*"
 ```
 
 ```rust no_run
-let model: tangram::Model = tangram::Model::from_path("examples/heart-disease.tangram", None).unwrap();
+let model: tangram::Model = tangram::Model::from_path("heart_disease.tangram", None).unwrap();
 
 let input = tangram::predict_input! {
   "age": 63.0,
