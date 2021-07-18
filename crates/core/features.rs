@@ -23,6 +23,8 @@ pub fn choose_feature_groups_linear(
 		.features
 		.auto
 		.exclude_columns
+		.as_deref()
+		.unwrap_or_default()
 		.iter()
 		.cloned()
 		.collect();
@@ -30,7 +32,7 @@ pub fn choose_feature_groups_linear(
 	if config.features.auto.enable {
 		for column_stats in column_stats.iter() {
 			if !exclude_columns.contains(column_stats.column_name()) {
-				if let Some(feature_group_type) = choose_feature_group_linear(column_stats) {
+				if let Some(feature_group_type) = choose_feature_group_linear(column_stats, None) {
 					result.push(feature_group_type)
 				}
 			}
@@ -51,6 +53,8 @@ pub fn choose_feature_groups_tree(
 		.features
 		.auto
 		.exclude_columns
+		.as_deref()
+		.unwrap_or_default()
 		.iter()
 		.cloned()
 		.collect();
@@ -58,7 +62,7 @@ pub fn choose_feature_groups_tree(
 	if config.features.auto.enable {
 		for column_stats in column_stats.iter() {
 			if !exclude_columns.contains(column_stats.column_name()) {
-				if let Some(feature_group_type) = choose_feature_group_tree(column_stats) {
+				if let Some(feature_group_type) = choose_feature_group_tree(column_stats, None) {
 					result.push(feature_group_type)
 				}
 			}
@@ -75,7 +79,13 @@ pub fn compute_feature_group_types_from_config(
 	config: &config::Config,
 ) -> Vec<tangram_features::FeatureGroup> {
 	let mut result = Vec::new();
-	for feature_group in config.features.include.iter() {
+	for feature_group in config
+		.features
+		.include
+		.as_deref()
+		.unwrap_or_default()
+		.iter()
+	{
 		match feature_group {
 			config::FeatureGroup::Identity(feature_group) => {
 				let column_stats = column_stats
@@ -123,7 +133,10 @@ pub fn compute_feature_group_types_from_config(
 					ColumnStatsOutput::Text(column_stats) => column_stats,
 					_ => panic!(),
 				};
-				result.push(bag_of_words_feature_group_for_column(column_stats))
+				result.push(bag_of_words_feature_group_for_column(
+					column_stats,
+					Some(feature_group),
+				))
 			}
 			config::FeatureGroup::BagOfWordsCosineSimilarity(feature_group) => {
 				let column_stats_a = column_stats
@@ -160,6 +173,7 @@ pub fn compute_feature_group_types_from_config(
 /// Choose feature group for tree models based on the column stats.
 pub fn choose_feature_group_linear(
 	column_stats: &ColumnStatsOutput,
+	feature_group_config: Option<&config::FeatureGroup>,
 ) -> Option<tangram_features::FeatureGroup> {
 	match column_stats {
 		ColumnStatsOutput::Unknown(_) => None,
@@ -170,7 +184,15 @@ pub fn choose_feature_group_linear(
 			Some(choose_feature_group_linear_enum_column(column_stats))
 		}
 		ColumnStatsOutput::Text(column_stats) => {
-			Some(choose_feature_group_linear_text_column(column_stats))
+			let feature_group_config =
+				feature_group_config.map(|feature_group_config| match feature_group_config {
+					config::FeatureGroup::BagOfWords(feature_group_config) => feature_group_config,
+					_ => unreachable!(),
+				});
+			Some(choose_feature_group_linear_text_column(
+				column_stats,
+				feature_group_config,
+			))
 		}
 	}
 }
@@ -189,20 +211,30 @@ fn choose_feature_group_linear_enum_column(
 
 fn choose_feature_group_linear_text_column(
 	column_stats: &TextColumnStatsOutput,
+	feature_group_config: Option<&config::BagOfWordsFeatureGroup>,
 ) -> tangram_features::FeatureGroup {
-	bag_of_words_feature_group_for_column(column_stats)
+	bag_of_words_feature_group_for_column(column_stats, feature_group_config)
 }
 
 /// Choose feature group for tree models based on the column stats.
 fn choose_feature_group_tree(
 	column_stats: &ColumnStatsOutput,
+	feature_group_config: Option<&config::FeatureGroup>,
 ) -> Option<tangram_features::FeatureGroup> {
 	match column_stats {
 		ColumnStatsOutput::Unknown(_) => None,
 		ColumnStatsOutput::Number(_) => Some(choose_feature_group_tree_number_column(column_stats)),
 		ColumnStatsOutput::Enum(_) => Some(choose_feature_group_tree_enum_column(column_stats)),
 		ColumnStatsOutput::Text(column_stats) => {
-			Some(choose_feature_group_tree_text_column(column_stats))
+			let feature_group_config =
+				feature_group_config.map(|feature_group_config| match feature_group_config {
+					config::FeatureGroup::BagOfWords(feature_group_config) => feature_group_config,
+					_ => unreachable!(),
+				});
+			Some(choose_feature_group_tree_text_column(
+				column_stats,
+				feature_group_config,
+			))
 		}
 	}
 }
@@ -221,8 +253,9 @@ fn choose_feature_group_tree_enum_column(
 
 fn choose_feature_group_tree_text_column(
 	column_stats: &TextColumnStatsOutput,
+	feature_group_config: Option<&config::BagOfWordsFeatureGroup>,
 ) -> tangram_features::FeatureGroup {
-	bag_of_words_feature_group_for_column(column_stats)
+	bag_of_words_feature_group_for_column(column_stats, feature_group_config)
 }
 
 fn identity_feature_group_for_column(
@@ -260,8 +293,27 @@ fn one_hot_encoded_feature_group_for_column(
 
 fn bag_of_words_feature_group_for_column(
 	column_stats: &TextColumnStatsOutput,
+	feature_group: Option<&config::BagOfWordsFeatureGroup>,
 ) -> tangram_features::FeatureGroup {
-	let strategy = tangram_features::bag_of_words::BagOfWordsFeatureGroupStrategy::Present;
+	let strategy = feature_group
+		.as_ref()
+		.and_then(|feature_group| {
+			feature_group
+				.strategy
+				.as_ref()
+				.map(|strategy| match strategy {
+					config::BagOfWordsFeatureGroupStrategy::Present => {
+						tangram_features::bag_of_words::BagOfWordsFeatureGroupStrategy::Present
+					}
+					config::BagOfWordsFeatureGroupStrategy::Count => {
+						tangram_features::bag_of_words::BagOfWordsFeatureGroupStrategy::Count
+					}
+					config::BagOfWordsFeatureGroupStrategy::TfIdf => {
+						tangram_features::bag_of_words::BagOfWordsFeatureGroupStrategy::TfIdf
+					}
+				})
+		})
+		.unwrap_or(tangram_features::bag_of_words::BagOfWordsFeatureGroupStrategy::Present);
 	let tokenizer = column_stats.tokenizer.clone();
 	let ngrams = column_stats
 		.top_ngrams

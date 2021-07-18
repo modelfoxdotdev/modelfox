@@ -29,6 +29,7 @@ pub struct Dataset {
 
 /// This option controls whether the dataset should be shuffled before splitting and training.
 #[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Shuffle {
 	pub enable: bool,
 	pub seed: u64,
@@ -73,19 +74,21 @@ pub struct TextColumn {
 }
 
 #[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Features {
 	/// Use this field to control automatic feature engineering.
 	pub auto: AutoFeatures,
 	/// Use this field to include custom feature groups.
-	pub include: Vec<FeatureGroup>,
+	pub include: Option<Vec<FeatureGroup>>,
 }
 
 #[derive(Debug, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct AutoFeatures {
 	/// Enable or disable automatic feature engineering.
 	pub enable: bool,
 	/// Exclude columns from automatic feature engineering.
-	pub exclude_columns: Vec<String>,
+	pub exclude_columns: Option<Vec<String>>,
 }
 
 #[derive(Debug, serde::Deserialize)]
@@ -125,6 +128,17 @@ pub struct OneHotEncodedFeatureGroup {
 #[serde(deny_unknown_fields)]
 pub struct BagOfWordsFeatureGroup {
 	pub source_column_name: String,
+	pub strategy: Option<BagOfWordsFeatureGroupStrategy>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+pub enum BagOfWordsFeatureGroupStrategy {
+	#[serde(rename = "present")]
+	Present,
+	#[serde(rename = "count")]
+	Count,
+	#[serde(rename = "tfidf")]
+	TfIdf,
 }
 
 #[derive(Debug, serde::Deserialize)]
