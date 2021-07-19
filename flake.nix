@@ -1,7 +1,7 @@
 {
   inputs = {
     nixpkgs = {
-      url = "github:nixos/nixpkgs/nixos-unstable";
+      url = "github:nixos/nixpkgs/nixos-unstable-small";
     };
     flake-utils = {
       url = "github:numtide/flake-utils";
@@ -48,19 +48,6 @@
         CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = toString ./. + "/scripts/clang";
         CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
         buildInputs = with pkgs; [
-          (stdenv.mkDerivation {
-            pname = "mold";
-            version = "0.9.1";
-            src = fetchgit {
-              url = "https://github.com/rui314/mold";
-              rev = "v0.9.1";
-              sha256 = "sha256-yIkW6OCXhlHZ1jC8/yMAdJbSgY9K40POT2zWv6wYr5E=";
-            };
-            nativeBuildInputs = [ clang_12 cmake lld_12 tbb xxHash zlib openssl git ];
-            dontUseCmakeConfigure = "true";
-            buildPhase = "make -j $NIX_BUILD_CORES";
-            installPhase = "mkdir -p $out $out/bin $out/share/man/man1 && PREFIX=$out make install";
-          })
           cachix
           cargo-insta
           clang_12
@@ -70,6 +57,7 @@
           elixir
           go
           lld_12
+          mold
           nodejs-16_x
           python39
           rpm
@@ -78,6 +66,7 @@
           rust-cbindgen
           sequoia
           sqlite
+          wasm-bindgen-cli
         ];
       };
     }
