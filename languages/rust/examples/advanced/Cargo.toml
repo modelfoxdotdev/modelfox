@@ -11,4 +11,4 @@ path = "main.rs"
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-tangram = { version = "=0.5.0", path = "../../" }
+tangram = { version = "=0.6.0", path = "../../" }

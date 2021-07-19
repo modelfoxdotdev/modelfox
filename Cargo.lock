@@ -1317,7 +1317,7 @@ dependencies = [
 
 [[package]]
 name = "libtangram"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "libc",
@@ -2749,7 +2749,7 @@ dependencies = [
 
 [[package]]
 name = "tangram"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -3959,7 +3959,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_cli"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "backtrace",
@@ -3997,7 +3997,7 @@ version = "0.0.0"
 
 [[package]]
 name = "tangram_core"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -4067,7 +4067,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_features"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "fnv",
@@ -4084,7 +4084,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_finite"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "num",
  "serde",
@@ -4092,7 +4092,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_id"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "rand",
  "serde",
@@ -4100,7 +4100,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_kill_chip"
-version = "0.5.0"
+version = "0.6.0"
 
 [[package]]
 name = "tangram_license"
@@ -4123,7 +4123,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_linear"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "buffalo",
  "clap 3.0.0-beta.2",
@@ -4143,7 +4143,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_macro"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4152,7 +4152,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_metrics"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "insta",
  "itertools",
@@ -4163,7 +4163,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_model"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "buffalo",
@@ -4196,7 +4196,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_progress_counter"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "rayon",
 ]
@@ -4219,7 +4219,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_table"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "csv",
@@ -4234,7 +4234,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_text"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "fnv",
  "indexmap",
@@ -4243,7 +4243,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_tree"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "bitvec",
  "buffalo",
@@ -4697,7 +4697,7 @@ dependencies = [
 
 [[package]]
 name = "tangram_zip"
-version = "0.5.0"
+version = "0.6.0"
 
 [[package]]
 name = "tap"

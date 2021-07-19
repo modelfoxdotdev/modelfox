@@ -10,4 +10,4 @@ name = "tangram_example_basic"
 path = "main.rs"
 
 [dependencies]
-tangram = { version = "=0.5.0", path = "../../" }
+tangram = { version = "=0.6.0", path = "../../" }
