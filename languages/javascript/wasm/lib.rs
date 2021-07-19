@@ -1,17 +1,17 @@
 use std::collections::BTreeMap;
 use wasm_bindgen::{prelude::*, JsValue};
 
-#[wasm_bindgen(js_name = loadModelFromArrayBuffer)]
-pub fn load_model_from_array_buffer(array_buffer: JsValue) -> Result<Model, JsValue> {
+#[wasm_bindgen(js_name = "loadModelFromArrayBuffer")]
+pub fn load_model_from_array_buffer(bytes: JsValue) -> Result<Model, JsValue> {
 	let bytes: serde_bytes::ByteBuf =
-		serde_wasm_bindgen::from_value(array_buffer).map_err(|e| e.to_string())?;
+		serde_wasm_bindgen::from_value(bytes).map_err(|e| e.to_string())?;
 	let model = tangram_model::from_bytes(&bytes).map_err(|e| e.to_string())?;
 	let model = tangram_core::predict::Model::from(model);
 	let model = Model(model);
 	Ok(model)
 }
 
-#[wasm_bindgen(js_name = modelId)]
+#[wasm_bindgen(js_name = "modelId")]
 pub fn model_id(model: &Model) -> Result<String, JsValue> {
 	Ok(model.0.id.to_string())
 }

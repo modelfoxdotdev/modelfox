@@ -8,7 +8,7 @@
 	},
 	"license": "MIT",
 	"main": "index.js",
-	"name": "@tangramxyz/tangram-example-webpack",
+	"name": "@tangramxyz/tangram-example-bundler-webpack",
 	"scripts": {
 		"start": "webpack serve"
 	},

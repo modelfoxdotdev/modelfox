@@ -5,5 +5,5 @@ This example demonstrates loading a model from a `.tangram` file and making a pr
 To run the example:
 
 ```
-$ npx http-server
+$ npx light-server -s . -p 8080
 ```

@@ -5,6 +5,7 @@ This example shows how to make predictions with your Tangram machine learning mo
 To build and run the example:
 
 ```
+$ npm install
 $ npm run build
 $ npm start
 ```

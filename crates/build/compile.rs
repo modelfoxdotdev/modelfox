@@ -348,7 +348,7 @@ fn build_python_manylinux(target: Target) {
 	};
 	let script = formatdoc!(
 		r#"
-			set -ex
+			set -e
 			curl -sSf https://sh.rustup.rs | sh -s -- -y
 			export PATH="$HOME/.cargo/bin:$PATH"
 			/opt/python/cp36-cp36m/bin/pip install -U setuptools wheel setuptools-rust

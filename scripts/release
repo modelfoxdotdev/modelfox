@@ -1,3 +1,4 @@
+set -e
 for path in id zip progress_counter kill_chip finite table metrics text features model linear tree core
 do
   pushd crates/$path
