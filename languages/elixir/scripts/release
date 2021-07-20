@@ -3,7 +3,7 @@ install -D ../../dist/x86_64-unknown-linux-gnu/libtangram_elixir.so priv/x86_64-
 install -D ../../dist/aarch64-unknown-linux-gnu/libtangram_elixir.so priv/aarch64-unknown-linux-gnu/libtangram_elixir.so
 install -D ../../dist/x86_64-unknown-linux-musl/libtangram_elixir.so priv/x86_64-unknown-linux-musl/libtangram_elixir.so
 install -D ../../dist/aarch64-unknown-linux-musl/libtangram_elixir.so priv/aarch64-unknown-linux-musl/libtangram_elixir.so
-install -D ../../dist/x86_64-apple-darwin/libtangram_elixir.dylib priv/x86_64-apple-darwin/libtangram_elixir.dylib
-install -D ../../dist/aarch64-apple-darwin/libtangram_elixir.dylib priv/aarch64-apple-darwin/libtangram_elixir.dylib
+install -D ../../dist/x86_64-apple-darwin/libtangram_elixir.dylib priv/x86_64-apple-darwin/libtangram_elixir.so
+install -D ../../dist/aarch64-apple-darwin/libtangram_elixir.dylib priv/aarch64-apple-darwin/libtangram_elixir.so
 install -D ../../dist/x86_64-pc-windows-msvc/tangram_elixir.dll priv/x86_64-pc-windows-msvc/tangram_elixir.dll
 mix hex.publish

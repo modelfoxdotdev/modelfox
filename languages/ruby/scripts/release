@@ -1,11 +1,11 @@
 rm -rf lib/tangram/libtangram/
-install -D ../../x86_64-unknown-linux-gnu/libtangram.so lib/tangram/libtangram/x86_64-unknown-linux-gnu/libtangram.so
-install -D ../../aarch64-unknown-linux-gnu/libtangram.so lib/tangram/libtangram/aarch64-unknown-linux-gnu/libtangram.so
-install -D ../../x86_64-unknown-linux-musl/libtangram.so lib/tangram/libtangram/x86_64-unknown-linux-musl/libtangram.so
-install -D ../../aarch64-unknown-linux-musl/libtangram.so lib/tangram/libtangram/aarch64-unknown-linux-musl/libtangram.so
-install -D ../../x86_64-apple-darwin/libtangram.dylib lib/tangram/libtangram/x86_64-apple-darwin/libtangram.dylib
-install -D ../../aarch64-apple-darwin/libtangram.dylib lib/tangram/libtangram/aarch64-apple-darwin/libtangram.dylib
-install -D ../../x86_64-pc-windows-msvc/tangram.dll lib/tangram/libtangram/x86_64-pc-windows-msvc/tangram.dll
+install -D ../../dist/x86_64-unknown-linux-gnu/libtangram.so lib/tangram/libtangram/x86_64-unknown-linux-gnu/libtangram.so
+install -D ../../dist/aarch64-unknown-linux-gnu/libtangram.so lib/tangram/libtangram/aarch64-unknown-linux-gnu/libtangram.so
+install -D ../../dist/x86_64-unknown-linux-musl/libtangram.so lib/tangram/libtangram/x86_64-unknown-linux-musl/libtangram.so
+install -D ../../dist/aarch64-unknown-linux-musl/libtangram.so lib/tangram/libtangram/aarch64-unknown-linux-musl/libtangram.so
+install -D ../../dist/x86_64-apple-darwin/libtangram.dylib lib/tangram/libtangram/x86_64-apple-darwin/libtangram.dylib
+install -D ../../dist/aarch64-apple-darwin/libtangram.dylib lib/tangram/libtangram/aarch64-apple-darwin/libtangram.dylib
+install -D ../../dist/x86_64-pc-windows-msvc/tangram.dll lib/tangram/libtangram/x86_64-pc-windows-msvc/tangram.dll
 gem build tangram.gemspec
 rm -rf dist
 mkdir -p dist

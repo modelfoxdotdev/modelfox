@@ -1,8 +1,6 @@
 set -e
 for path in id zip progress_counter kill_chip finite table metrics text features model linear tree core
 do
-  pushd crates/$path
-  cargo publish
-  popd
+  cargo publish --manifest-path crates/$path/Cargo.toml
   sleep 15
 done

@@ -25,7 +25,7 @@ pub fn run(args: Args) {
 	let alpine_public_key = cmd!("pass", "tangram/keys/alpine.public.rsa")
 		.read()
 		.unwrap();
-	let alpine_private_key = cmd!("pass", "tangram/keys/alpine.public.rsa")
+	let alpine_private_key = cmd!("pass", "tangram/keys/alpine.private.rsa")
 		.read()
 		.unwrap();
 	let deb_public_key = cmd!("pass", "tangram/keys/deb.public.gpg").read().unwrap();
@@ -89,7 +89,7 @@ fn alpine(
 	alpine_public_key_path: &Path,
 	alpine_private_key_path: &Path,
 ) -> Result<()> {
-	for arch in [Arch::X8664, Arch::AArch64] {
+	for target in [Target::X8664UnknownLinuxMusl] {
 		let repo_path = pkgs_path.join("stable").join("alpine");
 		std::fs::create_dir_all(&repo_path).unwrap();
 		std::fs::copy(alpine_public_key_path, repo_path.join("tangram.rsa")).unwrap();
@@ -106,17 +106,18 @@ fn alpine(
 				arch={arch}
 				license="MIT"
 				source="tangram"
-				\n
+				options="!strip"
+
 				check() {{
 					:
 				}}
-				\n
+
 				package() {{
 					install -D -m 755 "$srcdir"/tangram "$pkgdir"/usr/bin/tangram
 				}}
 			"#,
 			version = args.version,
-			arch = match arch {
+			arch = match target.arch() {
 				Arch::X8664 => "x86_64",
 				Arch::AArch64 => "aarch64",
 				Arch::Wasm32 => unreachable!(),
@@ -124,21 +125,17 @@ fn alpine(
 		);
 		std::fs::write(&apkbuild_path, &apkbuild).unwrap();
 		let tangram_cli_dst_path = repo_path.join("tangram");
-		let target = match arch {
-			Arch::X8664 => Target::X8664UnknownLinuxGnu,
-			Arch::AArch64 => Target::AArch64UnknownLinuxGnu,
-			Arch::Wasm32 => unreachable!(),
-		};
 		let tangram_cli_path = dist_path
 			.join(target.as_str())
 			.join(TargetFileNames::for_target(target).tangram_cli_file_name);
 		std::fs::copy(tangram_cli_path, &tangram_cli_dst_path).unwrap();
 		let script = r#"
+			set -e
 			apk add build-base abuild
-			echo "PACKAGER_PUBKEY=/tangram.public.rsa" >> /etc/abuild.conf
-			echo "PACKAGER_PRIVKEY=/tangram.private.rsa" >> /etc/abuild.conf
+			echo "PACKAGER_PUBKEY=/alpine.public.rsa" >> /etc/abuild.conf
+			echo "PACKAGER_PRIVKEY=/alpine.private.rsa" >> /etc/abuild.conf
 			abuild -F checksum
-			abuild -F -P $PWD
+			abuild -f -F -P $PWD
 			rm -rf src pkg
 		"#;
 		cmd!(
@@ -156,13 +153,13 @@ fn alpine(
 			format!(
 				"{}:{}",
 				alpine_public_key_path.canonicalize().unwrap().display(),
-				"/tangram.public.rsa"
+				"/alpine.public.rsa"
 			),
 			"-v",
 			format!(
 				"{}:{}",
 				alpine_private_key_path.canonicalize().unwrap().display(),
-				"/tangram.private.rsa"
+				"/alpine.private.rsa"
 			),
 			"-w",
 			"/tangram",

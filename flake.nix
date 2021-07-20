@@ -40,7 +40,7 @@
           clang_12
           lld_12
         ];
-        cargoSha256 = "sha256-M6d0Lc+0NHqskmwM2NTFyOfHkvDfNYyniwM34T0aACI=";
+        cargoSha256 = "sha256-Gl0iYChLgvG7f3TAuPFClRmLYSjtDq7wHHDCqr8adTQ=";
         cargoBuildFlags = [ "--bin" "tangram" ];
         CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
       };

@@ -103,6 +103,8 @@ pub fn run(args: Args) {
 		// Write the spec file.
 		let spec = formatdoc!(
 			r#"
+				%global __os_install_post %{{nil}}
+
 				Name: tangram
 				Version: {}
 				Release: 1

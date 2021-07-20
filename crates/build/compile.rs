@@ -465,7 +465,7 @@ fn build_python_windows(target: Target) {
 
 fn build_wasm(target: Target) {
 	cmd!(
-		which("cargo").unwrap(),
+		"cargo",
 		"build",
 		"--release",
 		"--target",
@@ -473,10 +473,7 @@ fn build_wasm(target: Target) {
 		"--package",
 		"tangram_wasm",
 	)
-	.env(
-		"CARGO_TARGET_DIR",
-		format!("../../target_{}", target.as_str()),
-	)
+	.env("CARGO_TARGET_DIR", format!("target_{}", target.as_str()))
 	.run()
 	.unwrap();
 }
