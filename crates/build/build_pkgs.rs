@@ -181,45 +181,49 @@ fn deb(
 	deb_public_key_path: &Path,
 	deb_private_key_path: &Path,
 ) -> Result<()> {
-	// Find all the .debs in args.debs.
 	struct Deb {
-		arch: String,
+		arch: DebArch,
 		version: String,
 		path: PathBuf,
 	}
-	let mut debs = Vec::new();
-	for entry in std::fs::read_dir(dist_path.join("release")).unwrap() {
-		let path = entry.unwrap().path();
-		let is_deb = path
-			.extension()
-			.and_then(|e| e.to_str())
-			.map(|e| e == "deb")
-			.unwrap_or(false);
-		if !is_deb {
-			continue;
-		}
-		let stem = path.file_stem().unwrap().to_str().unwrap();
-		let mut components = stem.split('_');
-		let _ = components.next().unwrap();
-		let version = components.next().unwrap().to_owned();
-		let arch = components.next().unwrap().to_owned();
-		debs.push(Deb {
-			arch,
-			version,
-			path,
-		});
+	#[derive(Clone, Copy, PartialEq)]
+	enum DebArch {
+		Amd64,
+		Arm64,
 	}
-	let distributions = &["debian", "ubuntu"];
-	let debian_versions = vec!["sid", "bullseye", "buster", "stretch"];
-	let ubuntu_versions = vec!["groovy", "focal", "bionic"];
-	let archs = vec!["amd64", "arm64"];
+	impl std::fmt::Display for DebArch {
+		fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+			match self {
+				DebArch::Amd64 => write!(f, "amd64"),
+				DebArch::Arm64 => write!(f, "arm64"),
+			}
+		}
+	}
+	let archs = [DebArch::Amd64, DebArch::Arm64];
+	let debs: Vec<Deb> = archs
+		.iter()
+		.cloned()
+		.map(|arch| {
+			let path = dist_path
+				.join("release")
+				.join(format!("tangram_{}_{}.deb", args.version, arch));
+			Deb {
+				arch,
+				version: args.version.clone(),
+				path,
+			}
+		})
+		.collect();
+	let distributions = ["debian", "ubuntu"];
+	let debian_versions = ["sid", "bullseye", "buster", "stretch"];
+	let ubuntu_versions = ["hirsute", "focal", "bionic"];
 	for distribution in distributions {
 		let repo_path = pkgs_path.join("stable").join(distribution);
 		std::fs::create_dir_all(&repo_path).unwrap();
 		// Create the list files.
-		let distribution_versions = match *distribution {
-			"debian" => &debian_versions,
-			"ubuntu" => &ubuntu_versions,
+		let distribution_versions = match distribution {
+			"debian" => &debian_versions[..],
+			"ubuntu" => &ubuntu_versions[..],
 			_ => unreachable!(),
 		};
 		for distribution_version in distribution_versions {
@@ -253,14 +257,14 @@ fn deb(
 			let mut md5_lines = Vec::new();
 			let mut sha1_lines = Vec::new();
 			let mut sha256_lines = Vec::new();
-			for arch in &archs {
+			for arch in archs {
 				let component_path = distribution_path.join("main");
 				std::fs::create_dir_all(&component_path).unwrap();
 				let binary_arch_path = component_path.join(format!("binary-{}", arch));
 				std::fs::create_dir_all(&binary_arch_path).unwrap();
 				let packages_path = binary_arch_path.join("Packages");
 				let mut packages_file = String::new();
-				for deb in debs.iter().filter(|deb| deb.arch == *arch) {
+				for deb in debs.iter().filter(|deb| deb.arch == arch) {
 					let deb_bytes = std::fs::read(&deb.path).unwrap();
 					let packages_entry = formatdoc!(
 						r#"
@@ -367,28 +371,33 @@ fn rpm(
 ) -> Result<()> {
 	// Find all the .rpms in args.rpms.
 	struct Rpm {
-		target: String,
+		target: RpmTarget,
 		path: PathBuf,
 	}
-	let mut rpms = Vec::new();
-	for entry in std::fs::read_dir(dist_path.join("release")).unwrap() {
-		let path = entry.unwrap().path();
-		let is_rpm = path
-			.extension()
-			.and_then(|e| e.to_str())
-			.map(|e| e == "rpm")
-			.unwrap_or(false);
-		if !is_rpm {
-			continue;
-		}
-		let stem = path.file_stem().unwrap().to_str().unwrap();
-		let mut components = stem.split('_');
-		let _ = components.next().unwrap();
-		let _ = components.next().unwrap().to_owned();
-		let target = components.next().unwrap().to_owned();
-		rpms.push(Rpm { target, path });
+	#[derive(Clone, Copy, PartialEq)]
+	enum RpmTarget {
+		X8664,
+		AArch64,
 	}
-	let targets = ["x86_64", "aarch64"];
+	impl std::fmt::Display for RpmTarget {
+		fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+			match self {
+				RpmTarget::X8664 => write!(f, "x86_64"),
+				RpmTarget::AArch64 => write!(f, "aarch64"),
+			}
+		}
+	}
+	let targets = [RpmTarget::X8664, RpmTarget::AArch64];
+	let rpms: Vec<Rpm> = targets
+		.iter()
+		.cloned()
+		.map(|target| {
+			let path = dist_path
+				.join("release")
+				.join(format!("tangram_{}_{}.rpm", args.version, target));
+			Rpm { target, path }
+		})
+		.collect();
 	for (distribution, distribution_version) in [
 		("amazon-linux", Some("2")),
 		("centos", Some("8")),
@@ -427,7 +436,7 @@ fn rpm(
 		#[allow(clippy::single_element_loop)]
 		for target in targets {
 			// Create the target dir.
-			let repo_target_path = repo_path.join(target);
+			let repo_target_path = repo_path.join(target.to_string());
 			std::fs::create_dir_all(&repo_target_path).unwrap();
 			// Copy the .rpm.
 			for rpm in rpms.iter() {

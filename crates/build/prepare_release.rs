@@ -47,9 +47,9 @@ pub fn run(args: Args) {
 		let deb_path = dist_path.join("deb");
 		clean_and_create(&deb_path);
 		// Create /usr/bin in the deb directory.
-		let bin_path = deb_path.join("usr/bin");
+		let bin_path = deb_path.join("usr").join("bin");
 		std::fs::create_dir_all(&bin_path).unwrap();
-		// Copy the tangram cli to the deb/usr/bin.
+		// Copy the tangram cli to the deb's /usr/bin.
 		let tangram_cli_file_name = TargetFileNames::for_target(target).tangram_cli_file_name;
 		let tangram_cli_path = dist_path.join(target.as_str()).join(tangram_cli_file_name);
 		std::fs::copy(tangram_cli_path, bin_path.join(tangram_cli_file_name)).unwrap();
@@ -103,7 +103,7 @@ pub fn run(args: Args) {
 		// Write the spec file.
 		let spec = formatdoc!(
 			r#"
-				%global __os_install_post %{{nil}}
+				%global __strip true
 
 				Name: tangram
 				Version: {}
@@ -119,11 +119,11 @@ pub fn run(args: Args) {
 				%setup -q
 
 				%install
-				mkdir -p %buildroot/%_bindir
-				install -m 755 tangram %buildroot/%_bindir/tangram
+				mkdir -p %buildroot/usr/bin
+				install -m 755 tangram %buildroot/usr/bin/tangram
 
 				%files
-				%attr(0755, root, root) %_bindir/tangram
+				%attr(0755, root, root) /usr/bin/tangram
 			"#,
 			args.version,
 		);

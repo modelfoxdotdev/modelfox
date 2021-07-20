@@ -18,8 +18,8 @@ impl Component for Page {
 						.child(Homebrew)
 						.child(Deb {
 							distribution: "ubuntu".to_owned(),
-							version: "groovy".to_owned(),
-							title: "Ubuntu 20.10 (Groovy Gorilla)".to_owned(),
+							version: "hirsute".to_owned(),
+							title: "Ubuntu 21.04 (Hirsute Hippo)".to_owned(),
 						})
 						.child(Deb {
 							distribution: "ubuntu".to_owned(),
