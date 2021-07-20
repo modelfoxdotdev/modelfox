@@ -768,15 +768,15 @@ module Tangram
   module LibTangram
     cpu = RbConfig::CONFIG['host_cpu']
     os = RbConfig::CONFIG['host_os']
-    if (cpu == 'x86_64') && os =~ (/linux/)
+    if cpu == 'x86_64' && os =~ /linux/
       library_path = 'libtangram/x86_64-unknown-linux-gnu/libtangram.so'
-    elsif (cpu == 'aarch64') && os =~ (/linux/)
+    elsif cpu == 'aarch64' && os =~ /linux/
       library_path = 'libtangram/aarch64-unknown-linux-gnu/libtangram.so'
-    elsif (cpu == 'x86_64') && os =~ (/darwin/)
+    elsif cpu == 'x86_64' && os =~ /darwin/
       library_path = 'libtangram/x86_64-apple-darwin/libtangram.dylib'
-    elsif (cpu == 'aarch64') && os =~ (/darwin/)
+    elsif (cpu == 'arm' || cpu == 'arm64') && os =~ /darwin/
       library_path = 'libtangram/aarch64-apple-darwin/libtangram.dylib'
-    elsif (cpu == 'x86_64') && os =~ (/mingw/)
+    elsif cpu == 'x86_64' && os =~ /mingw/
       library_path = 'libtangram/x86_64-pc-windows-msvc/tangram.dll'
     else
       raise 'Tangram for Ruby does not yet support your combination of CPU architecture and operating system. Open an issue at https://github.com/tangramxyz/tangram/issues/new or email us at help@tangram.xyz to complain.'
