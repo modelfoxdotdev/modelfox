@@ -3992,10 +3992,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tangram_client"
-version = "0.0.0"
-
-[[package]]
 name = "tangram_core"
 version = "0.6.0"
 dependencies = [
