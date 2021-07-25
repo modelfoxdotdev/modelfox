@@ -314,7 +314,7 @@ impl Component for Docker {
 					.child("Run the tangramxyz/tangram docker image from ")
 					.child(
 						ui::Link::new()
-							.href("https://hub.docker.com/tangramxyz/tangram".to_owned())
+							.href("https://hub.docker.com/r/tangramxyz/tangram".to_owned())
 							.child("Docker Hub"),
 					)
 					.child(":"),

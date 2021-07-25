@@ -421,7 +421,7 @@ module Tangram
         elsif is_string
           LibTangram.tangram_predict_input_set_value_string(c_input, key.to_s, value)
         else
-          raise 'tangram error'
+          raise 'value for key %s is not a float or a string' % key
         end
       end
       c_input

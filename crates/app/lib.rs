@@ -95,6 +95,7 @@ async fn run_inner(options: Options) -> Result<()> {
 		.service_fn(handle);
 	let addr = std::net::SocketAddr::new(host, port);
 	let server = hyper::server::Server::try_bind(&addr)?;
+	eprintln!("🚀 Server running at {}", addr);
 	server.serve(Shared::new(service)).await?;
 	Ok(())
 }
