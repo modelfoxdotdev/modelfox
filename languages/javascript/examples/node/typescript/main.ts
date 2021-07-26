@@ -1,6 +1,6 @@
 import * as fs from "fs/promises"
 import * as path from "path"
-import * as tangram from "@tangramxyz/tangram"
+import * as tangram from "@tangramdotdev/tangram"
 import * as url from "url"
 
 // Define the type for the input to the model.
@@ -76,7 +76,7 @@ enum Diagnosis {
 }
 
 // If you are running the Tangram app on your own server you can pass the URL to it with the TANGRAM_URL environment variable.
-let tangramUrl = process.env.TANGRAM_URL || "https://app.tangram.xyz"
+let tangramUrl = process.env.TANGRAM_URL
 
 // Get the path to the .tangram file.
 let modelPath = path.join(

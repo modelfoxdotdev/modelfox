@@ -17,7 +17,7 @@
 		"node": ">=14.8.0"
 	},
 	"eslintConfig": {
-		"extends": "plugin:@tangramxyz/recommended"
+		"extends": "plugin:@tangramdotdev/recommended"
 	},
 	"exports": {
 		"browser": {
@@ -29,7 +29,7 @@
 		}
 	},
 	"license": "MIT",
-	"name": "@tangramxyz/tangram",
+	"name": "@tangramdotdev/tangram",
 	"type": "module",
 	"types": "./dist/node/common.d.ts",
 	"version": "0.6.0",

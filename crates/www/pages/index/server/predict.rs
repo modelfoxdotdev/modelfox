@@ -19,7 +19,7 @@ impl Component for Predict {
 		.into();
 		let go = ui::doc!(
 			r#"
-				import "github.com/tangramxyz/tangram/languages/go"
+				import "github.com/tangramdotdev/tangram/languages/go"
 
 				model, _ := tangram.LoadModelFromPath("./heart_disease.tangram", nil)
 
@@ -33,7 +33,7 @@ impl Component for Predict {
 		.into();
 		let javascript = ui::doc!(
 			r#"
-				const tangram = require("@tangramxyz/tangram");
+				const tangram = require("@tangramdotdev/tangram");
 
 				const model = new tangram.Model("./heart_disease.tangram");
 
@@ -111,14 +111,14 @@ impl Component for Predict {
 			.child(", ")
 			.child(
 				ui::Link::new()
-					.href("https://pkg.go.dev/github.com/tangramxyz/tangram-go".to_owned())
+					.href("https://pkg.go.dev/github.com/tangramdotdev/tangram-go".to_owned())
 					.title("Go".to_owned())
 					.child("Go"),
 			)
 			.child(", ")
 			.child(
 				ui::Link::new()
-					.href("https://www.npmjs.com/package/@tangramxyz/tangram".to_owned())
+					.href("https://www.npmjs.com/package/@tangramdotdev/tangram".to_owned())
 					.title("JavaScript".to_owned())
 					.child("JavaScript"),
 			)

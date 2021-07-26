@@ -55,7 +55,7 @@ impl Component for Install {
 		let code = ui::doc!(
 			r#"
 				dependencies: {
-					"@tangramxyz/tangram": "*",
+					"@tangramdotdev/tangram": "*",
 				}
 			"#
 		);
@@ -74,7 +74,7 @@ impl Component for Predict {
 			r#"
 				const fs = require("fs");
 				const path = require("path");
-				const tangram = require("@tangramxyz/tangram");
+				const tangram = require("@tangramdotdev/tangram");
 
 				// Get the path to the .tangram file.
 				const modelPath = path.join(__dirname, "heart_disease.tangram");

@@ -213,7 +213,7 @@ async fn send_code_email(
 	code: String,
 ) -> Result<()> {
 	let email = lettre::Message::builder()
-		.from("Tangram <noreply@tangram.xyz>".parse()?)
+		.from("Tangram <noreply@tangram.dev>".parse()?)
 		.to(email.parse()?)
 		.subject("Tangram Login Code")
 		.body(format!("Your Tangram login code is {}.", code))?;

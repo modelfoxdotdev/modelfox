@@ -27,7 +27,7 @@ impl Component for Topbar {
 		let topbar_items = vec![
 			ui::TopbarItem {
 				element: None,
-				href: "https://github.com/tangramxyz/tangram".to_owned(),
+				href: "https://github.com/tangramdotdev/tangram".to_owned(),
 				title: "GitHub".to_owned(),
 			},
 			ui::TopbarItem {
@@ -47,7 +47,7 @@ impl Component for Topbar {
 			},
 			ui::TopbarItem {
 				element: None,
-				href: "https://app.tangram.xyz".to_owned(),
+				href: "https://app.tangram.dev".to_owned(),
 				title: "Sign In".to_owned(),
 			},
 			ui::TopbarItem {
@@ -87,7 +87,7 @@ impl Component for GithubIconLink {
 			.child(svg::desc().child("github"))
 			.child(svg::path().attribute("d", path));
 		ui::Link::new()
-			.href("https://github.com/tangramxyz".to_owned())
+			.href("https://github.com/tangramdotdev".to_owned())
 			.child(icon)
 			.into_node()
 	}

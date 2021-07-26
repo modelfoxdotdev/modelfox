@@ -46,7 +46,7 @@ pub async fn verify(db: &sqlx::AnyPool) -> Result<()> {
 		});
 	if !migrations_consistent {
 		bail!(
-			"There was a mismatch between the migrations your database has run and the migrations this version of tangram expects. This should not happen unless you are hacking on tangram. Please contact us at help@tangram.xyz."
+			"There was a mismatch between the migrations your database has run and the migrations this version of tangram expects. This should not happen unless you are hacking on tangram. Please contact us at help@tangram.dev."
 		);
 	}
 	if migration_rows.len() > MIGRATIONS.len() {
@@ -72,7 +72,7 @@ pub async fn run(db: &sqlx::AnyPool) -> Result<()> {
 			migration_row.get::<String, usize>(0) == *migration_name
 		});
 	if !migrations_consistent {
-		bail!("Database migration consistency error. Please contact us at help@tangram.xyz.");
+		bail!("Database migration consistency error. Please contact us at help@tangram.dev.");
 	}
 	if migration_rows.len() > MIGRATIONS.len() {
 		bail!("Your database has run migrations from a newer version of tangram.");

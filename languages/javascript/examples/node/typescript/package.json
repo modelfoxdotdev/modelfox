@@ -1,7 +1,7 @@
 {
 	"author": "Tangram",
 	"dependencies": {
-		"@tangramxyz/tangram": "*"
+		"@tangramdotdev/tangram": "*"
 	},
 	"devDependencies": {
 		"@types/node": "^16.3.2",
@@ -9,7 +9,7 @@
 	},
 	"license": "MIT",
 	"main": "main.js",
-	"name": "@tangramxyz/tangram-example-node-typescript",
+	"name": "@tangramdotdev/tangram-example-node-typescript",
 	"scripts": {
 		"build": "tsc",
 		"start": "node main.js"

@@ -8,7 +8,7 @@ defmodule Example.MixProject do
       elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
       deps: [
-        {:tangram, "~> 0.5.0"}
+        {:tangram, "~> 0.6.1"}
       ]
     ]
   end

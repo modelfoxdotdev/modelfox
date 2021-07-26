@@ -1,5 +1,5 @@
 import * as path from "https://deno.land/std/node/path.ts"
-import * as tangram from "https://js.tangram.xyz/deno"
+import * as tangram from "https://js.tangram.dev/deno"
 import * as url from "https://deno.land/std/node/url.ts"
 
 // Get the path to the .tangram file.

@@ -1,5 +1,5 @@
 {
 	"imports": {
-		"https://js.tangram.xyz/": "../../../dist/js.tangram.xyz/"
+		"https://js.tangram.dev/": "../../../dist/js.tangram.dev/"
 	}
 }

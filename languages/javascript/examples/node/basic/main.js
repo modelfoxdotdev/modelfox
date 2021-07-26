@@ -1,6 +1,6 @@
 import * as fs from "fs/promises"
 import * as path from "path"
-import * as tangram from "@tangramxyz/tangram"
+import * as tangram from "@tangramdotdev/tangram"
 import * as url from "url"
 
 // Get the path to the .tangram file.

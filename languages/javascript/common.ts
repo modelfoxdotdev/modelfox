@@ -20,7 +20,7 @@ export enum Task {
  */
 export type LoadModelOptions = {
 	/**
-	 * If you are running the app locally or on your own server, use this field to provide a url that points to it. If not specified, the default value is https://app.tangram.xyz.
+	 * If you are running the app locally or on your own server, use this field to provide a url that points to it. If not specified, the default value is https://app.tangram.dev.
 	 */
 	tangramUrl?: string
 }
@@ -374,7 +374,7 @@ export class Model<
 		} else {
 			this.model = native.loadModelFromArrayBuffer(input)
 		}
-		this.tangramUrl = options?.tangramUrl ?? "https://app.tangram.xyz"
+		this.tangramUrl = options?.tangramUrl ?? "https://app.tangram.dev"
 	}
 
 	/**

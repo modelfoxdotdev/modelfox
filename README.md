@@ -7,12 +7,12 @@
 Tangram is an all-in-one automated machine learning framework.
 
 - Run `tangram train` to train a model from a CSV file on the command line.
-- Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramxyz/tangram-go), [JavaScript](https://www.npmjs.com/package/@tangramxyz/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](lib.rs/tangram).
+- Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramdotdev/tangram-go), [JavaScript](https://www.npmjs.com/package/@tangramdotdev/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](lib.rs/tangram).
 - Run `tangram app` to learn more about your models and monitor them in production.
 
 ### Install
 
-[Install the `tangram` CLI](https://www.tangram.xyz/docs/install)
+[Install the `tangram` CLI](https://www.tangram.dev/docs/install)
 
 ### Train
 
@@ -30,10 +30,10 @@ The CLI automatically transforms your data into features, trains a number of mod
 
 ### Predict
 
-Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramxyz/tangram-go), [JavaScript](https://www.npmjs.com/package/@tangramxyz/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](https://lib.rs/tangram).
+Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramdotdev/tangram-go), [JavaScript](https://www.npmjs.com/package/@tangramdotdev/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](https://lib.rs/tangram).
 
 ```javascript
-let tangram = require("@tangramxyz/tangram")
+let tangram = require("@tangramdotdev/tangram")
 
 let model = new tangram.Model("./heart_disease.tangram")
 
@@ -115,4 +115,4 @@ If you want to submit a pull request, please run `scripts/fmt` and `scripts/chec
 
 ## License
 
-All of this repository is MIT licensed, except for the `crates/app` directory, which is source available and free to use for testing, but requires a paid license to use in production. Send us an email at hello@tangram.xyz if you are interested in a license.
+All of this repository is MIT licensed, except for the `crates/app` directory, which is source available and free to use for testing, but requires a paid license to use in production. Send us an email at hello@tangram.dev if you are interested in a license.

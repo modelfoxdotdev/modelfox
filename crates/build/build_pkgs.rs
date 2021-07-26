@@ -13,7 +13,7 @@ use tangram_build::{Arch, Target, TargetFileNames};
 pub struct Args {
 	#[clap(long, env)]
 	version: String,
-	#[clap(long, env, default_value = "https://pkgs.tangram.xyz")]
+	#[clap(long, env, default_value = "https://pkgs.tangram.dev")]
 	url: String,
 }
 
@@ -96,13 +96,13 @@ fn alpine(
 		let apkbuild_path = repo_path.join("APKBUILD");
 		let apkbuild = formatdoc!(
 			r#"
-				# Contributor: Tangram <root@tangram.xyz>
-				# Maintainer: Tangram <root@tangram.xyz>
+				# Contributor: Tangram <root@tangram.dev>
+				# Maintainer: Tangram <root@tangram.dev>
 				pkgname=tangram
 				pkgver={version}
 				pkgrel=1
 				pkgdesc="Tangram is an all-in-one automated machine learning framework."
-				url="https://www.tangram.xyz"
+				url="https://www.tangram.dev"
 				arch={arch}
 				license="MIT"
 				source="tangram"
@@ -271,13 +271,13 @@ fn deb(
 							Package: tangram
 							Version: {version}
 							Architecture: {arch}
-							Maintainer: Tangram <root@tangram.xyz>
+							Maintainer: Tangram <root@tangram.dev>
 							Filename: pool/tangram_{version}_{arch}.deb
 							Size: {size}
 							MD5sum: {md5}
 							SHA1: {sha1}
 							SHA256: {sha256}
-							Homepage: https://www.tangram.xyz
+							Homepage: https://www.tangram.dev
 							Description: Tangram is an all-in-one automated machine learning framework.
 						"#,
 						version = deb.version,
@@ -318,7 +318,7 @@ fn deb(
 					Architectures: amd64 arm64
 					Components: main
 					Date: {}
-					Description: Packages from Tangram, Inc. (https://www.tangram.xyz)
+					Description: Packages from Tangram, Inc. (https://www.tangram.dev)
 					MD5Sum:
 					{}
 					SHA1:

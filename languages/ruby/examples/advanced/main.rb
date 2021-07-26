@@ -1,7 +1,7 @@
 require 'tangram'
 
 # If you are running the Tangram app on your own server you can pass the URL to it with the TANGRAM_URL environment variable.
-tangram_url = ENV['TANGRAM_URL'] || 'https://app.tangram.xyz'
+tangram_url = ENV['TANGRAM_URL'] || 'https://app.tangram.dev'
 
 # Get the path to the `.tangram` file.
 model_path = File.join(File.dirname(__FILE__), 'heart_disease.tangram')

@@ -8,7 +8,7 @@ Tangram determines the task, either regression, binary classification, or multic
 
 ## Model Types
 
-Tangram trains a grid of _Linear_ and _Gradient Boosted Decision Tree_ (GBDT) models for the selected task. The definition of the default grid for each task is defined here: [https://github.com/tangramxyz/tangram/blob/main/crates/core/grid.rs](https://github.com/tangramxyz/tangram/blob/main/crates/core/grid.rs). Alternatively, you can specify your own grid in a JSON configuration file passed to tangram train with the `--config` flag. See the guide [Train with Custom Configuration](../guides/train_with_custom_configuration).
+Tangram trains a grid of _Linear_ and _Gradient Boosted Decision Tree_ (GBDT) models for the selected task. The definition of the default grid for each task is defined here: [https://github.com/tangramdotdev/tangram/blob/main/crates/core/grid.rs](https://github.com/tangramdotdev/tangram/blob/main/crates/core/grid.rs). Alternatively, you can specify your own grid in a JSON configuration file passed to tangram train with the `--config` flag. See the guide [Train with Custom Configuration](../guides/train_with_custom_configuration).
 
 ### Linear Models
 
@@ -16,4 +16,4 @@ _Linear models_ are models where the relationship between the target column and 
 
 ### Gradient Boosted Decision Trees
 
-_Gradient Boosted Decision Trees_ (GBDT) consist of many decision tree models where each subsequent decision tree is trained to learn the error of the previous trees. GBDT's can learn non-linear relationships between the features and the target column and are among the best perfoming models for tabular data. Tangram's GBDT implementation is written entirely in Rust and has the lowest memory footprint and fastest training times as compared with the most well known GBDT implementations. See [benchmarks](https://www.tangram.xyz/benchmarks).
+_Gradient Boosted Decision Trees_ (GBDT) consist of many decision tree models where each subsequent decision tree is trained to learn the error of the previous trees. GBDT's can learn non-linear relationships between the features and the target column and are among the best perfoming models for tabular data. Tangram's GBDT implementation is written entirely in Rust and has the lowest memory footprint and fastest training times as compared with the most well known GBDT implementations. See [benchmarks](https://www.tangram.dev/benchmarks).

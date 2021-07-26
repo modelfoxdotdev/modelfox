@@ -1,7 +1,7 @@
 # Tangram for JavaScript
 
-- [Watch the Video](https://www.tangram.xyz)
-- [Read the Docs](https://www.tangram.xyz/docs)
+- [Watch the Video](https://www.tangram.dev)
+- [Read the Docs](https://www.tangram.dev/docs)
 
 The Tangram JavaScript package makes it easy to make predictions with your Tangram machine learning model from JavaScript.
 
@@ -10,17 +10,17 @@ The Tangram JavaScript package makes it easy to make predictions with your Tangr
 ### Node.js
 
 ```
-$ npm install @tangramxyz/tangram
+$ npm install @tangramdotdev/tangram
 ```
 
 ```javascript
-let tangram = require("@tangramxyz/tangram")
+let tangram = require("@tangramdotdev/tangram")
 ```
 
 ### Deno
 
 ```javascript
-import tangram from "https://js.tangram.xyz/deno"
+import tangram from "https://js.tangram.dev/deno"
 ```
 
 ### Bundler
@@ -28,19 +28,19 @@ import tangram from "https://js.tangram.xyz/deno"
 If you are using a bundler that supports WebAssembly modules such as Webpack >= 4, you can use the package from npm.
 
 ```
-$ npm install @tangramxyz/tangram
+$ npm install @tangramdotdev/tangram
 ```
 
 ```javascript
-import tangram from "@tangramxyz/tangram"
+import tangram from "@tangramdotdev/tangram"
 ```
 
 ### Browser
 
-If you are targeting a modern browser with support for ES Modules, WebAssembly, and top-level await, you can import the tangram library from https://js.tangram.xyz.
+If you are targeting a modern browser with support for ES Modules, WebAssembly, and top-level await, you can import the tangram library from https://js.tangram.dev.
 
 ```javascript
-import tangram from "https://js.tangram.xyz"
+import tangram from "https://js.tangram.dev"
 ```
 
 ## Usage
@@ -57,7 +57,7 @@ let input = {
 let output = model.predict(input)
 ```
 
-For more information, [read the docs](https://www.tangram.xyz/docs).
+For more information, [read the docs](https://www.tangram.dev/docs).
 
 ## Examples
 

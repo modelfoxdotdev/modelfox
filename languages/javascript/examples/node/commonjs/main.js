@@ -1,6 +1,6 @@
 let fs = require("fs")
 let path = require("path")
-let tangram = require("@tangramxyz/tangram")
+let tangram = require("@tangramdotdev/tangram")
 let url = require("url")
 
 // Get the path to the .tangram file.

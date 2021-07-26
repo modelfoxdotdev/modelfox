@@ -119,7 +119,7 @@ pub fn train(args: TrainArgs) -> Result<()> {
 	// Announce that everything worked!
 	eprintln!("Your model was written to {}.", output_path.display());
 	eprintln!(
-		"For help making predictions in your code, read the docs at https://www.tangram.xyz/docs."
+		"For help making predictions in your code, read the docs at https://www.tangram.dev/docs."
 	);
 	eprintln!(
 		"To learn more about how your model works and set up production monitoring, run `tangram app`."

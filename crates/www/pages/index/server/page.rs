@@ -48,7 +48,7 @@ impl Component for Hero {
 			.child(
 				ui::Button::new()
 					.color(ui::colors::RED.to_owned())
-					.href("https://github.com/tangramxyz/tangram".to_owned())
+					.href("https://github.com/tangramdotdev/tangram".to_owned())
 					.child("View on GitHub"),
 			)
 			.child(

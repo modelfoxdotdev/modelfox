@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/tangramxyz/tangram-go"
+	"github.com/tangramdotdev/tangram-go"
 )
 
 func main() {

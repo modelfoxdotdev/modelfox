@@ -5,14 +5,14 @@ import (
 	"log"
 	"os"
 
-	"github.com/tangramxyz/tangram-go"
+	"github.com/tangramdotdev/tangram-go"
 )
 
 func main() {
 	// If you are running the Tangram app on your own server you can pass the URL to it with the TANGRAM_URL environment variable.
 	tangramURL, present := os.LookupEnv("TANGRAM_URL")
 	if !present {
-		tangramURL = "https://app.tangram.xyz"
+		tangramURL = "https://app.tangram.dev"
 	}
 
 	// Load the model from the path.

@@ -14,12 +14,12 @@ impl Component for Page {
 			.into_node();
 		let team_cta = ui::Button::new()
 			.color(ui::colors::GREEN.to_owned())
-			.href("https://app.tangram.xyz/login".to_owned())
+			.href("https://app.tangram.dev/login".to_owned())
 			.child("Free Trial")
 			.into_node();
 		let enterprise_cta = ui::Button::new()
 			.color(ui::colors::BLUE.to_owned())
-			.href("mailto:hello@tangram.xyz".to_owned())
+			.href("mailto:hello@tangram.dev".to_owned())
 			.child("Contact Us")
 			.into_node();
 		let cards = PricingCards {
@@ -71,7 +71,7 @@ impl Component for PricingCards {
 				"Use the hosted app.".to_owned(),
 			],
 			price: "contact us".to_owned(),
-			price_subtitle: "hello@tangram.xyz".to_owned(),
+			price_subtitle: "hello@tangram.dev".to_owned(),
 			selected: false,
 			title: "Team".to_owned(),
 		};
@@ -83,7 +83,7 @@ impl Component for PricingCards {
 				"Run the app on your own servers.".to_owned(),
 			],
 			price: "contact us".to_owned(),
-			price_subtitle: "hello@tangram.xyz".to_owned(),
+			price_subtitle: "hello@tangram.dev".to_owned(),
 			selected: false,
 			title: "Enterprise".to_owned(),
 		};

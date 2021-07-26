@@ -11,4 +11,4 @@ $ TANGRAM_URL=http://localhost:8080 ruby main.rb
 
 Now if you refresh the production stats or production metrics tabs for the model you uploaded, you should see predictions and true values.
 
-For more information, [read the docs](https://www.tangram.xyz/docs).
+For more information, [read the docs](https://www.tangram.dev/docs).

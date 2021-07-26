@@ -147,7 +147,7 @@ async fn send_invitation_email(
 	href.set_path("/login");
 	href.set_query(Some(&format!("email={}", invitee_email)));
 	let email = lettre::Message::builder()
-		.from("Tangram <noreply@tangram.xyz>".parse()?)
+		.from("Tangram <noreply@tangram.dev>".parse()?)
 		.to(invitee_email.parse()?)
 		.subject("Tangram Invitation")
 		.body(format!(

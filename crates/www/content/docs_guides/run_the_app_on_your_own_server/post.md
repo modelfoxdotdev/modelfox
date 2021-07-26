@@ -2,7 +2,7 @@
 "title": "Run the App on Your Own Server."
 }
 
-If you do not want to use the cloud hosted tangram app at https://app.tangram.xyz, you can run it yourself!
+If you do not want to use the cloud hosted tangram app at https://app.tangram.dev, you can run it yourself!
 
 To get started, install the Tangram CLI and run `tangram app`. This runs the app in a configuration suitable for testing on a single computer. It stores data in the local filesystem and in a local SQLite database.
 
@@ -11,7 +11,7 @@ To run the app in production, you will need:
 - A PostgreSQL database.
 - An S3-compatible storage bucket.
 - An SMTP server such as Amazon SES.
-- A license. Send us an email at hello@tangram.xyz to get one.
+- A license. Send us an email at hello@tangram.dev to get one.
 
 ## Configuration
 
@@ -65,7 +65,7 @@ Use the `smtp` key to configure the SMTP server used to send authentication and 
 ```json
 {
 	"smtp": {
-		"host": "smtp.tangram.xyz",
+		"host": "smtp.tangram.dev",
 		"username": "username",
 		"password": "password"
 	}
@@ -113,6 +113,6 @@ Use the `url` key to specify the URL at which the app is accessible to users. Th
 
 ```json
 {
-	"url": "https://app.tangram.xyz"
+	"url": "https://app.tangram.dev"
 }
 ```

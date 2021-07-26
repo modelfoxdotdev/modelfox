@@ -24,7 +24,7 @@ defmodule Tangram do
     These are the options passed when loading a model.
 
     ## `tangram_url`
-    If you are running the app locally or on your own server, use this field to provide the url to it. If not specified, the default value is https://app.tangram.xyz.
+    If you are running the app locally or on your own server, use this field to provide the url to it. If not specified, the default value is https://app.tangram.dev.
     """
     @type t :: %__MODULE__{
             tangram_url: String.t()
@@ -476,7 +476,7 @@ defmodule Tangram do
           "x86_64-pc-windows-msvc/tangram_elixir"
 
         true ->
-          raise "Tangram for Elixir does not yet support your combination of CPU architecture and operating system. Open an issue at https://github.com/tangramxyz/tangram/issues/new or email us at help@tangram.xyz to complain."
+          raise "Tangram for Elixir does not yet support your combination of CPU architecture and operating system. Open an issue at https://github.com/tangramdotdev/tangram/issues/new or email us at help@tangram.dev to complain."
       end
 
     path = :filename.join(:code.priv_dir(:tangram), nif_path)
@@ -489,7 +489,7 @@ defmodule Tangram do
   @spec load_model_from_path(String.t(), LoadModelOptions | nil) :: Model.t()
   def load_model_from_path(path, options \\ nil) do
     model = _load_model_from_path(path)
-    tangram_url = if options, do: options.tangram_url, else: "https://app.tangram.xyz"
+    tangram_url = if options, do: options.tangram_url, else: "https://app.tangram.dev"
 
     %Model{
       model: model,
@@ -504,7 +504,7 @@ defmodule Tangram do
   @spec load_model_from_binary(String.t(), LoadModelOptions | nil) :: Model.t()
   def load_model_from_binary(binary, options \\ nil) do
     model = _load_model_from_binary(binary)
-    tangram_url = if options, do: options.tangram_url, else: "https://app.tangram.xyz"
+    tangram_url = if options, do: options.tangram_url, else: "https://app.tangram.dev"
 
     %Model{
       model: model,

@@ -67,8 +67,8 @@ pub fn run(args: Args) {
 				Package: tangram
 				Architecture: {}
 				Version: {}
-				Maintainer: Tangram <root@tangram.xyz>
-				Homepage: https://www.tangram.xyz
+				Maintainer: Tangram <root@tangram.dev>
+				Homepage: https://www.tangram.dev
 				Description: Tangram is an all-in-one automated machine learning framework.
 			"#,
 			architecture,
@@ -176,7 +176,7 @@ pub fn run(args: Args) {
 		tangram_cli_path.display(),
 	);
 	std::fs::write(&dockerfile_path, &dockerfile).unwrap();
-	let tag = format!("docker.io/tangramxyz/tangram:{}", args.version);
+	let tag = format!("docker.io/tangramdotdev/tangram:{}", args.version);
 	cmd!("docker", "build", "-t", tag, &tangram_path)
 		.run()
 		.unwrap();

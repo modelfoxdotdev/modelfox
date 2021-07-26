@@ -1,4 +1,4 @@
-module github.com/tangramxyz/tangram-go
+module github.com/tangramdotdev/tangram-go
 
 go 1.16
 

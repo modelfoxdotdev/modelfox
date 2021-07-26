@@ -1,14 +1,14 @@
 {
 	"author": "Tangram",
 	"devDependencies": {
-		"@tangramxyz/tangram": "*",
+		"@tangramdotdev/tangram": "*",
 		"webpack": "^5.41.1",
 		"webpack-cli": "^4.7.2",
 		"webpack-dev-server": "^3.11.2"
 	},
 	"license": "MIT",
 	"main": "index.js",
-	"name": "@tangramxyz/tangram-example-bundler-webpack",
+	"name": "@tangramdotdev/tangram-example-bundler-webpack",
 	"scripts": {
 		"start": "webpack serve"
 	},

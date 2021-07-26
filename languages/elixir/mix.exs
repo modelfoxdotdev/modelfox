@@ -17,17 +17,17 @@ defmodule Tangram.MixProject do
         main: "readme"
       ],
       elixir: "~> 1.11",
-      homepage_url: "https://www.tangram.xyz",
+      homepage_url: "https://www.tangram.dev",
       name: "tangram",
       package: [
         description:
           "Tangram is an all-in-one automated machine learning framework.",
         licenses: ["MIT"],
-        links: %{homepage: "https://www.tangram.xyz"}
+        links: %{homepage: "https://www.tangram.dev"}
       ],
-      source_url: "https://github.com/tangramxyz/tangram/tree/master/languages/elixir",
+      source_url: "https://github.com/tangramdotdev/tangram/tree/master/languages/elixir",
       start_permanent: Mix.env() == :prod,
-      version: "0.6.0"
+      version: "0.6.1"
     ]
   end
 end

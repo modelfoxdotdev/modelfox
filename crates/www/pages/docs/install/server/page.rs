@@ -72,7 +72,7 @@ struct Homebrew;
 
 impl Component for Homebrew {
 	fn into_node(self) -> Node {
-		let code = "brew install tangramxyz/tap/tangram";
+		let code = "brew install tangramdotdev/tap/tangram";
 		ui::S2::new()
 			.child(ui::H2::new().child("Homebrew"))
 			.child(
@@ -80,7 +80,7 @@ impl Component for Homebrew {
 					.child("Install the tangram package from the ")
 					.child(
 						ui::Link::new()
-							.href("https://github.com/tangramxyz/homebrew-tap".to_owned())
+							.href("https://github.com/tangramdotdev/homebrew-tap".to_owned())
 							.child("homebrew tap"),
 					)
 					.child(":"),
@@ -97,9 +97,9 @@ impl Component for Alpine {
 		let code = ui::doc!(
 			r#"
 				# Add the tangram rsa key.
-				curl -fsSL https://pkgs.tangram.xyz/stable/alpine/tangram.rsa | tee /etc/apk/keys/tangram.rsa
+				curl -fsSL https://pkgs.tangram.dev/stable/alpine/tangram.rsa | tee /etc/apk/keys/tangram.rsa
 				# Add the tangram repository.
-				echo "https://pkgs.tangram.xyz/stable/alpine" | tee /etc/apk/repositories
+				echo "https://pkgs.tangram.dev/stable/alpine" | tee /etc/apk/repositories
 				# Install!
 				apk add tangram
 			"#
@@ -122,9 +122,9 @@ impl Component for Deb {
 		let code = ui::formatdoc!(
 			r#"
 				# Add the tangram gpg key.
-				curl -fsSL https://pkgs.tangram.xyz/stable/{distribution}/{version}.gpg | sudo apt-key add -
+				curl -fsSL https://pkgs.tangram.dev/stable/{distribution}/{version}.gpg | sudo apt-key add -
 				# Add the tangram repository.
-				curl -fsSL https://pkgs.tangram.xyz/stable/{distribution}/{version}.list | sudo tee /etc/apt/sources.list.d/tangram.list
+				curl -fsSL https://pkgs.tangram.dev/stable/{distribution}/{version}.list | sudo tee /etc/apt/sources.list.d/tangram.list
 				# Install!
 				sudo apt-get update && sudo apt-get install tangram
 			"#,
@@ -145,7 +145,7 @@ impl Component for AmazonLinux2 {
 		let code = ui::doc!(
 			r#"
 				# Add the tangram repository.
-				sudo yum-config-manager --add-repo https://pkgs.tangram.xyz/stable/amazon-linux/2/tangram.repo
+				sudo yum-config-manager --add-repo https://pkgs.tangram.dev/stable/amazon-linux/2/tangram.repo
 				# Install!
 				sudo yum install tangram
 			"#
@@ -164,7 +164,7 @@ impl Component for Centos7 {
 		let code = ui::doc!(
 			r#"
 				# Add the tangram repository.
-				sudo yum-config-manager --add-repo https://pkgs.tangram.xyz/stable/centos/7/tangram.repo
+				sudo yum-config-manager --add-repo https://pkgs.tangram.dev/stable/centos/7/tangram.repo
 				# Install!
 				sudo yum install tangram
 			"#
@@ -183,7 +183,7 @@ impl Component for Fedora {
 		let code = ui::doc!(
 			r#"
 				# Add the tangram repository.
-				sudo dnf config-manager --add-repo https://pkgs.tangram.xyz/stable/fedora/tangram.repo
+				sudo dnf config-manager --add-repo https://pkgs.tangram.dev/stable/fedora/tangram.repo
 				# Install!
 				sudo dnf install tangram
 			"#
@@ -204,7 +204,7 @@ impl Component for Nix {
 				# To avoid having to build from scratch, use the tangram cachix cache:
 				# https://tangram.cachix.org
 				# tangram.cachix.org-1:NQ5Uzhhbrgi4R6A0JoljrMg8X4a2doTv3WrSnajJANs=
-				nix run github:tangramxyz/tangram
+				nix run github:tangramdotdev/tangram
 			"#
 		);
 		ui::S2::new()
@@ -221,7 +221,7 @@ impl Component for Rhel {
 		let code = ui::doc!(
 			r#"
 				# Add the tangram repository.
-				sudo dnf config-manager --add-repo https://pkgs.tangram.xyz/stable/rhel/8/tangram.repo
+				sudo dnf config-manager --add-repo https://pkgs.tangram.dev/stable/rhel/8/tangram.repo
 				# Install!
 				sudo dnf install tangram
 			"#
@@ -240,7 +240,7 @@ impl Component for Centos8 {
 		let code = ui::doc!(
 			r#"
 				# Add the tangram repository.
-				sudo dnf config-manager --add-repo https://pkgs.tangram.xyz/stable/centos/8/tangram.repo
+				sudo dnf config-manager --add-repo https://pkgs.tangram.dev/stable/centos/8/tangram.repo
 				# Install!
 				sudo dnf install tangram
 			"#
@@ -280,7 +280,7 @@ impl Component for Scoop {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				scoop bucket add tangram https://github.com/tangramxyz/scoop.git
+				scoop bucket add tangram https://github.com/tangramdotdev/scoop.git
 				scoop install tangram
 			"#
 		);
@@ -306,15 +306,15 @@ struct Docker;
 impl Component for Docker {
 	fn into_node(self) -> Node {
 		let code =
-		"docker run --rm -it tangramxyz/tangram train --file heart_disease.csv --target diagnosis";
+		"docker run --rm -it tangramdotdev/tangram train --file heart_disease.csv --target diagnosis";
 		ui::S2::new()
 			.child(ui::H2::new().child("Docker"))
 			.child(
 				ui::P::new()
-					.child("Run the tangramxyz/tangram docker image from ")
+					.child("Run the tangramdotdev/tangram docker image from ")
 					.child(
 						ui::Link::new()
-							.href("https://hub.docker.com/r/tangramxyz/tangram".to_owned())
+							.href("https://hub.docker.com/r/tangramdotdev/tangram".to_owned())
 							.child("Docker Hub"),
 					)
 					.child(":"),
@@ -330,12 +330,12 @@ impl Component for Manual {
 	fn into_node(self) -> Node {
 		let p = ui::P::new()
 			.child("If none of the above methods works for you, you can download the tarball for your CPU architecture and operating system from ")
-			.child(ui::Link::new().href("https://github.com/tangramxyz/tangram/releases/".to_owned()).child("GitHub Releases"))
+			.child(ui::Link::new().href("https://github.com/tangramdotdev/tangram/releases/".to_owned()).child("GitHub Releases"))
 			.child(". Untar the file and place the tangram executable somewhere on your ")
 			.child(ui::InlineCode::new("PATH"))
 			.child(". If you do this, please email us at ")
-			.child(ui::Link::new().href("mailto:hello@tangram.xyz".to_owned())
-			.child("hello@tangram.xyz"))
+			.child(ui::Link::new().href("mailto:hello@tangram.dev".to_owned())
+			.child("hello@tangram.dev"))
 			.child(" so we can consider supporting your preferred installation method.");
 		ui::S2::new()
 			.child(ui::H2::new().child("Install Manually"))

@@ -20,7 +20,7 @@ let input = tangram::predict_input! {
 let output = model.predict_one(input, None);
 ```
 
-For more information, [read the docs](https://www.tangram.xyz/docs).
+For more information, [read the docs](https://www.tangram.dev/docs).
 */
 
 use anyhow::Result;
@@ -47,7 +47,7 @@ where
 
 /// These are the options passed when loading a [`Model`].
 pub struct LoadModelOptions {
-	/// If you are running the app locally or on your own server, use this field to provide a url that points to it. If not specified, the default value is https://app.tangram.xyz.
+	/// If you are running the app locally or on your own server, use this field to provide a url that points to it. If not specified, the default value is `https://app.tangram.dev`.
 	pub tangram_url: Option<Url>,
 }
 
@@ -681,7 +681,7 @@ where
 		let model = tangram_core::predict::Model::from(model);
 		let tangram_url = options
 			.and_then(|options| options.tangram_url)
-			.unwrap_or_else(|| "https://app.tangram.xyz".parse().unwrap());
+			.unwrap_or_else(|| "https://app.tangram.dev".parse().unwrap());
 		Ok(Model {
 			model,
 			log_queue: Vec::new(),

@@ -11,7 +11,7 @@ install -D ../../dist/aarch64-apple-darwin/tangram.h libtangram/aarch64-apple-da
 install -D ../../dist/x86_64-pc-windows-gnu/libtangram.a libtangram/x86_64-pc-windows-gnu/libtangram.a
 install -D ../../dist/x86_64-pc-windows-gnu/tangram.h libtangram/x86_64-pc-windows-gnu/tangram.h
 if [ ! -e dist ]; then
-	git clone git@github.com:tangramxyz/tangram-go dist
+	git clone git@github.com:tangramdotdev/tangram-go dist
 fi
 rsync --archive --delete --exclude .git --exclude .gitignore --exclude dist --exclude docs --exclude scripts . dist
 git -C dist add --all

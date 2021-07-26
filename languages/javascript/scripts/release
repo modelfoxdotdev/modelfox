@@ -49,8 +49,8 @@ cp entrypoints/deno.ts dist/deno/mod.ts
 # publish npm package
 npm publish --access public
 
-# publish js.tangram.xyz
-ssh root@router-us-east-1.tangram.xyz mkdir -p /srv/js/
-rsync --archive --compress --delete --progress dist/web/ root@router-us-east-1.tangram.xyz:/srv/js/web/
-rsync --archive --compress --delete --progress dist/deno/ root@router-us-east-1.tangram.xyz:/srv/js/deno/
-ssh root@router-us-east-1.tangram.xyz "chown -R root:root /srv/js/ && chmod -R u=rwX,go=rX /srv/js/"
+# publish js.tangram.dev
+ssh root@router-us-east-1.tangram.dev mkdir -p /srv/js/
+rsync --archive --compress --delete --progress dist/web/ root@router-us-east-1.tangram.dev:/srv/js/web/
+rsync --archive --compress --delete --progress dist/deno/ root@router-us-east-1.tangram.dev:/srv/js/deno/
+ssh root@router-us-east-1.tangram.dev "chown -R root:root /srv/js/ && chmod -R u=rwX,go=rX /srv/js/"

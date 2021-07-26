@@ -30,8 +30,8 @@ impl Component for Inspection {
 			.child(", or go to ")
 			.child(
 				ui::Link::new()
-					.href("https://app.tangram.xyz".to_owned())
-					.child("https://app.tangram.xyz"),
+					.href("https://app.tangram.dev".to_owned())
+					.child("https://app.tangram.dev"),
 			)
 			.child(", and upload the model you trained.");
 		let p2 = "The app shows you dataset statistics, a summary of all the models that the CLI trained, the features that were most important to your model, and metrics showing how the best model performed on the test set.";

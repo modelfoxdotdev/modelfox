@@ -1,11 +1,11 @@
 {
 	"author": "Tangram",
 	"dependencies": {
-		"@tangramxyz/tangram": "*"
+		"@tangramdotdev/tangram": "*"
 	},
 	"license": "MIT",
 	"main": "main.js",
-	"name": "@tangramxyz/tangram-example-node-advanced",
+	"name": "@tangramdotdev/tangram-example-node-advanced",
 	"scripts": {
 		"start": "node main.js"
 	},

@@ -65,7 +65,7 @@ impl Model {
 		let model = tangram_core::predict::Model::from(model);
 		let tangram_url = options
 			.and_then(|options| options.tangram_url)
-			.unwrap_or_else(|| "https://app.tangram.xyz".to_owned());
+			.unwrap_or_else(|| "https://app.tangram.dev".to_owned());
 		let tangram_url = tangram_url
 			.parse()
 			.map_err(|_| TangramError(anyhow!("Failed to parse tangram_url")))?;
@@ -99,7 +99,7 @@ impl Model {
 		let model = tangram_core::predict::Model::from(model);
 		let tangram_url = options
 			.and_then(|options| options.tangram_url)
-			.unwrap_or_else(|| "https://app.tangram.xyz".to_owned());
+			.unwrap_or_else(|| "https://app.tangram.dev".to_owned());
 		let tangram_url = tangram_url
 			.parse()
 			.map_err(|_| TangramError(anyhow!("Failed to parse tangram_url")))?;

@@ -9,7 +9,7 @@ module Tangram
 
   # These are the options passed when loading a model.
   class LoadModelOptions
-    # If you are running the app locally or on your own server, use this field to provide the url to it. If not specified, the default value is https://app.tangram.xyz.
+    # If you are running the app locally or on your own server, use this field to provide the url to it. If not specified, the default value is https://app.tangram.dev.
     attr_reader :tangram_url
     def initialize(tangram_url:)
       @tangram_url = tangram_url
@@ -255,7 +255,7 @@ module Tangram
     end
 
     def initialize(c_model, options: nil)
-      @tangram_url = options&.tangram_url.nil? ? 'https://app.tangram.xyz' : options&.tangram_url
+      @tangram_url = options&.tangram_url.nil? ? 'https://app.tangram.dev' : options&.tangram_url
       @log_queue = []
       @model = FFI::AutoPointer.new(c_model.read_pointer, LibTangram.method(:tangram_model_delete))
     end
@@ -779,7 +779,7 @@ module Tangram
     elsif cpu == 'x86_64' && os =~ /mingw/
       library_path = 'libtangram/x86_64-pc-windows-msvc/tangram.dll'
     else
-      raise 'Tangram for Ruby does not yet support your combination of CPU architecture and operating system. Open an issue at https://github.com/tangramxyz/tangram/issues/new or email us at help@tangram.xyz to complain.'
+      raise 'Tangram for Ruby does not yet support your combination of CPU architecture and operating system. Open an issue at https://github.com/tangramdotdev/tangram/issues/new or email us at help@tangram.dev to complain.'
     end
     extend FFI::Library
     ffi_lib File.expand_path(library_path.to_s, __dir__)

@@ -35,7 +35,7 @@ type Model struct {
 
 // These are the options passed when loading a model.
 type LoadModelOptions struct {
-	// If you are running the app locally or on your own server, use this field to provide the url to it. If not specified, the default value is https://app.tangram.xyz.
+	// If you are running the app locally or on your own server, use this field to provide the url to it. If not specified, the default value is https://app.tangram.dev.
 	TangramURL string
 }
 

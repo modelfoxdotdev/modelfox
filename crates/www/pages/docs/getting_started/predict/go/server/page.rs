@@ -54,7 +54,7 @@ impl Component for Install {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				go get -u github.com/tangramxyz/tangram-go
+				go get -u github.com/tangramdotdev/tangram-go
 			"#
 		);
 		ui::Window::new()
@@ -69,7 +69,7 @@ impl Component for Predict {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				import "github.com/tangramxyz/tangram/languages/go"
+				import "github.com/tangramdotdev/tangram/languages/go"
 
 				// Load the model from the path.
 				model, err := tangram.LoadModelFromPath("./heart_disease.tangram", nil)

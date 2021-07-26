@@ -1,4 +1,4 @@
-import * as tangram from "@tangramxyz/tangram"
+import * as tangram from "@tangramdotdev/tangram"
 import heartDiseaseModelUrl from "./heart_disease.tangram"
 
 // Download the model.
