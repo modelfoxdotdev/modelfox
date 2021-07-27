@@ -14,8 +14,8 @@ impl Component for Page {
 			.into_node();
 		let team_cta = ui::Button::new()
 			.color(ui::colors::GREEN.to_owned())
-			.href("https://app.tangram.dev/login".to_owned())
-			.child("Free Trial")
+			.href("mailto:hello@tangram.dev".to_owned())
+			.child("Contact Us")
 			.into_node();
 		let enterprise_cta = ui::Button::new()
 			.color(ui::colors::BLUE.to_owned())
@@ -70,8 +70,8 @@ impl Component for PricingCards {
 				"Everything in the Free plan.".to_owned(),
 				"Use the hosted app.".to_owned(),
 			],
-			price: "contact us".to_owned(),
-			price_subtitle: "hello@tangram.dev".to_owned(),
+			price: "$299".to_owned(),
+			price_subtitle: "per user per month".to_owned(),
 			selected: false,
 			title: "Team".to_owned(),
 		};
@@ -82,8 +82,8 @@ impl Component for PricingCards {
 				"Everything in the Team plan.".to_owned(),
 				"Run the app on your own servers.".to_owned(),
 			],
-			price: "contact us".to_owned(),
-			price_subtitle: "hello@tangram.dev".to_owned(),
+			price: "$499".to_owned(),
+			price_subtitle: "per user per month".to_owned(),
 			selected: false,
 			title: "Enterprise".to_owned(),
 		};
