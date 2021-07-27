@@ -54,7 +54,7 @@ impl Component for Hero {
 			.child(
 				ui::Button::new()
 					.color(ui::colors::GREEN.to_owned())
-					.href("https://cozycal.com/tangram/demo".to_owned())
+					.href("https://calendly.com/tangramdotdev/demo".to_owned())
 					.open_new_window(true)
 					.child("Schedule a Demo"),
 			)
