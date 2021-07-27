@@ -53,8 +53,10 @@ impl Component for Topbar {
 			ui::TopbarItem {
 				element: Some({
 					ui::Button::new()
-						.href("/docs/install".to_owned())
-						.child("Install the CLI")
+						.color(ui::colors::GREEN.to_owned())
+						.href("https://cozycal.com/tangram/demo".to_owned())
+						.open_new_window(true)
+						.child("Schedule a Demo")
 						.into()
 				}),
 				href: "/docs/install".to_owned(),
