@@ -1,4 +1,3 @@
-#!/bin/sh
 cargo run --bin tangram_dev -- \
   --watch . \
   --ignore languages \

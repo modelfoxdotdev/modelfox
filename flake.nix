@@ -20,8 +20,11 @@
       rust = (with fenix.packages.${system}; combine [
         stable.rustc
         stable.cargo
-        stable.rust-src
+        stable.clippy-preview
+        stable.rustfmt-preview
+        stable.rust-std
         targets.wasm32-unknown-unknown.stable.rust-std
+        stable.rust-src
         rust-analyzer
       ]);
     in rec {
