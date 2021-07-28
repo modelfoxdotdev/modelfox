@@ -1,2 +1,1 @@
-# pyo3 is incompatible with `cargo test` until #341 is fixed: https://github.com/PyO3/pyo3/issues/341.
-RUST_BACKTRACE=1 cargo test --workspace --exclude tangram_python $@
+RUST_BACKTRACE=1 cargo test --workspace $@
