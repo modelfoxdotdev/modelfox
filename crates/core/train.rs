@@ -537,7 +537,12 @@ impl Trainer {
 fn load_config(config_path: Option<&Path>) -> Result<Config> {
 	if let Some(config_path) = config_path {
 		let config = std::fs::read_to_string(config_path)?;
-		let config = serde_json::from_str(&config)?;
+		let extension = config_path.extension().and_then(|s| s.to_str());
+		let config = match extension {
+			Some("json") => serde_json::from_str(&config)?,
+			Some("yaml") => serde_yaml::from_str(&config)?,
+			_ => bail!("the config path must have either .json or .yaml as its extension."),
+		};
 		Ok(config)
 	} else {
 		Ok(Config::default())

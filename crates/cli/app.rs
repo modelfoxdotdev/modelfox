@@ -69,6 +69,12 @@ pub fn app(args: AppArgs) -> Result<()> {
 	{
 		let config = std::fs::read(config_path)?;
 		Some(serde_json::from_slice(&config)?)
+	} else if let Some(config_path) = dirs::config_dir()
+		.map(|config_dir_path| config_dir_path.join("tangram").join("app.yaml"))
+		.filter(|config_path| config_path.exists())
+	{
+		let config = std::fs::read(config_path)?;
+		Some(serde_yaml::from_slice(&config)?)
 	} else {
 		None
 	};
