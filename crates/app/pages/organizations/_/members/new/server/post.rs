@@ -20,12 +20,13 @@ struct Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
-	let organization_id =
-		if let ["organizations", organization_id, ""] = *path_components(&request).as_slice() {
-			organization_id.to_owned()
-		} else {
-			bail!("unexpected path");
-		};
+	let organization_id = if let ["organizations", organization_id, "members", "new"] =
+		*path_components(&request).as_slice()
+	{
+		organization_id.to_owned()
+	} else {
+		bail!("unexpected path");
+	};
 	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}

@@ -1239,6 +1239,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "kqueue"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "512705bfcaeb3d46379771adc69deab978355fc68fdf960f9fb11abc8d678a96"
+dependencies = [
+ "kqueue-sys",
+ "libc",
+]
+
+[[package]]
+name = "kqueue-sys"
+version = "1.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9803ae382091c10a5c7297ffb9fde284dbc9662b249f86eacef605d97ae92d99"
+dependencies = [
+ "bitflags",
+ "libc",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1568,15 +1588,16 @@ dependencies = [
 
 [[package]]
 name = "notify"
-version = "5.0.0-pre.10"
+version = "5.0.0-pre.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51f18203a26893ca1d3526cf58084025d5639f91c44f8b70ab3b724f60e819a0"
+checksum = "c614e7ed2b1cf82ec99aeffd8cf6225ef5021b9951148eb161393c394855032c"
 dependencies = [
  "bitflags",
  "crossbeam-channel",
  "filetime",
  "fsevent-sys",
  "inotify",
+ "kqueue",
  "libc",
  "mio",
  "walkdir",
@@ -2686,9 +2707,9 @@ checksum = "1e81da0851ada1f3e9d4312c704aa4f8806f0f9d69faaf8df2f3464b4a9437c2"
 
 [[package]]
 name = "sunfish"
-version = "0.2.4"
+version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a5b6503ed4a73b6ab05b108cf16ee40888a62905f487049b537549d53fc30fb9"
+checksum = "0114cfa9eeccbdfc81d9eb2b70c4d71f103a127efdee9ae8ccfd1b8b3a9a7ccd"
 dependencies = [
  "anyhow",
  "clap 3.0.0-beta.2",
@@ -2712,9 +2733,9 @@ dependencies = [
 
 [[package]]
 name = "sunfish_macro"
-version = "0.2.4"
+version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f8e3709c4657f6dc464a95854491cb6d6130b58ceeb77a106dded06f62280be5"
+checksum = "7e03d7d127bd6997967b4a13cbacac0bb54f84a79a0c52f024b694929f23e2c9"
 dependencies = [
  "glob",
  "proc-macro2",
@@ -2769,7 +2790,6 @@ name = "tangram_app"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "backtrace",
  "base64 0.13.0",
  "chrono",
  "chrono-tz",

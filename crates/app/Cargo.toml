@@ -67,7 +67,6 @@ default = [
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-backtrace = "0.3"
 base64 = "0.13"
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.5", features = ["serde"] }

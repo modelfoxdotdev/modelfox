@@ -10,7 +10,7 @@ use tangram_app_common::{
 use tangram_id::Id;
 use tower::{make::Shared, ServiceBuilder};
 use tower_http::{add_extension::AddExtensionLayer, trace::TraceLayer};
-use tracing::{error, info, trace_span, Span};
+use tracing::{error, info, trace, trace_span, Span};
 use url::Url;
 
 mod request_id;
@@ -110,7 +110,7 @@ async fn handle(
 		.handle(&mut request)
 		.await
 		.unwrap_or_else(|error| {
-			error!(%error);
+			error!(%error, backtrace = %error.backtrace());
 			Some(
 				http::Response::builder()
 					.status(http::StatusCode::INTERNAL_SERVER_ERROR)

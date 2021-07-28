@@ -24,7 +24,7 @@ pub async fn get_repo(db: &mut sqlx::Transaction<'_, sqlx::Any>, id: Id) -> Resu
 		",
 	)
 	.bind(&id.to_string())
-	.fetch_one(db)
+	.fetch_one(&mut *db)
 	.await?;
 	let id: String = row.get(0);
 	let id: Id = id.parse().unwrap();
@@ -67,7 +67,7 @@ pub async fn repos_for_root(db: &mut sqlx::Transaction<'_, sqlx::Any>) -> Result
 			from repos
 		",
 	)
-	.fetch_all(db)
+	.fetch_all(&mut *db)
 	.await?;
 	let repos = rows
 		.iter()
