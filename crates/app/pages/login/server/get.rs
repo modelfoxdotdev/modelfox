@@ -11,10 +11,10 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	}
 	#[derive(serde::Deserialize)]
 	struct SearchParams {
-		stage: SearchParamsStage,
-		email: String,
+		stage: Option<SearchParamsStage>,
+		email: Option<String>,
 	}
-	#[derive(serde::Deserialize)]
+	#[derive(Clone, Copy, serde::Deserialize)]
 	enum SearchParamsStage {
 		#[serde(rename = "email")]
 		Email,
@@ -28,10 +28,11 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	};
 	let email = search_params
 		.as_ref()
-		.map(|search_params| search_params.email.clone());
+		.and_then(|search_params| search_params.email.clone());
 	let stage = search_params
 		.as_ref()
-		.map(|search_params| match search_params.stage {
+		.and_then(|search_params| search_params.stage)
+		.map(|stage| match stage {
 			SearchParamsStage::Email => Stage::Email,
 			SearchParamsStage::Code => Stage::Code,
 		});
