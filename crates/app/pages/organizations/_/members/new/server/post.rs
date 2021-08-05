@@ -152,7 +152,7 @@ async fn send_invitation_email(
 		.to(invitee_email.parse()?)
 		.subject("Tangram Invitation")
 		.body(format!(
-			"{} invited you to join their team on Tangram. Click the link below to accept the invitation.\n\n{}",
+			"{} invited you to join their team on Tangram. Click the link below to login.\n\n{}",
 			inviter_email, href
 		))?;
 	smtp_transport.send(email).await?;

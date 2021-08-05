@@ -1,4 +1,4 @@
-use crate::page::Page;
+use crate::page::{Page, Stage};
 use anyhow::Result;
 use pinwheel::prelude::*;
 use std::sync::Arc;
@@ -9,18 +9,34 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
-	#[derive(serde::Deserialize, Default)]
+	#[derive(serde::Deserialize)]
 	struct SearchParams {
+		stage: SearchParamsStage,
 		email: String,
+	}
+	#[derive(serde::Deserialize)]
+	enum SearchParamsStage {
+		#[serde(rename = "email")]
+		Email,
+		#[serde(rename = "code")]
+		Code,
 	}
 	let search_params: Option<SearchParams> = if let Some(query) = request.uri().query() {
 		Some(serde_urlencoded::from_str(query)?)
 	} else {
 		None
 	};
-	let email = search_params.map(|search_params| search_params.email);
+	let email = search_params
+		.as_ref()
+		.map(|search_params| search_params.email.clone());
+	let stage = search_params
+		.as_ref()
+		.map(|search_params| match search_params.stage {
+			SearchParamsStage::Email => Stage::Email,
+			SearchParamsStage::Code => Stage::Code,
+		});
 	let page = Page {
-		code: email.is_some(),
+		stage,
 		error: None,
 		email,
 	};

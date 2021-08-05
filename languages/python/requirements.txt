@@ -1,3 +1,5 @@
+black
+mypy
 pdoc
 pip
 setuptools

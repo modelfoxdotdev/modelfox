@@ -4,7 +4,7 @@
 
 # Tangram
 
-Tangram is an all-in-one automated machine learning framework.
+Tangram makes machine learning easy.
 
 - Run `tangram train` to train a model from a CSV file on the command line.
 - Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramdotdev/tangram-go), [JavaScript](https://www.npmjs.com/package/@tangramdotdev/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](lib.rs/tangram).

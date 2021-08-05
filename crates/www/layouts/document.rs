@@ -31,10 +31,7 @@ impl Component for Document {
 			)
 			.child(
 				meta()
-					.attribute(
-						"content",
-						"Tangram is an all-in-one automated machine learning framework.",
-					)
+					.attribute("content", "Tangram makes machine learning easy.")
 					.attribute("name", "description"),
 			);
 		let client_script = self.client.map(|client| {

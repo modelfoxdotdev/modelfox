@@ -38,8 +38,6 @@ impl Component for BinaryClassifier {
 			.child(b().child(self.positive_class.clone()))
 			.child(" that the model correctly classified as ")
 			.child(b().child(self.positive_class.clone()))
-			.child(b().child(self.positive_class.clone()))
-			.child(b().child(self.positive_class.clone()))
 			.child(".")
 			.into_node();
 		ui::S1::new()

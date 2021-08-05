@@ -1,4 +1,4 @@
-use crate::page::Page;
+use crate::page::{Page, Stage};
 use anyhow::Result;
 use chrono::prelude::*;
 use lettre::AsyncTransport;
@@ -93,7 +93,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				row
 			} else {
 				let page = Page {
-					code: true,
+					stage: Some(Stage::Code),
 					error: Some("invalid code".to_owned()),
 					email: Some(email),
 				};
@@ -146,7 +146,10 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			db.commit().await?;
 			let response = http::Response::builder()
 				.status(http::StatusCode::SEE_OTHER)
-				.header(http::header::LOCATION, format!("/login?email={}", email))
+				.header(
+					http::header::LOCATION,
+					format!("/login?stage=code&email={}", email),
+				)
 				.body(hyper::Body::empty())?;
 			return Ok(response);
 		}

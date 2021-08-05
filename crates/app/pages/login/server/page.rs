@@ -3,13 +3,20 @@ use tangram_app_layouts::{auth_layout::AuthLayout, document::Document};
 use tangram_ui as ui;
 
 pub struct Page {
-	pub code: bool,
+	pub stage: Option<Stage>,
 	pub email: Option<String>,
 	pub error: Option<String>,
 }
 
+#[derive(PartialEq)]
+pub enum Stage {
+	Email,
+	Code,
+}
+
 impl Component for Page {
 	fn into_node(self) -> Node {
+		let stage = self.stage.unwrap_or(Stage::Email);
 		Document::new()
 			.child(
 				AuthLayout::new().child(
@@ -26,7 +33,7 @@ impl Component for Page {
 								.placeholder("Email".to_owned())
 								.value(self.email),
 						)
-						.child(if self.code {
+						.child(if stage == Stage::Code {
 							Some(
 								ui::TextField::new()
 									.name("code".to_owned())
@@ -40,7 +47,7 @@ impl Component for Page {
 								.button_type(ui::ButtonType::Submit)
 								.child("Login"),
 						)
-						.child(if self.code {
+						.child(if stage == Stage::Code {
 							Some(
 								div()
 									.class("login-code-message")
