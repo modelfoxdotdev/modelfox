@@ -4289,6 +4289,7 @@ dependencies = [
  "indoc 1.0.3",
  "num",
  "once_cell",
+ "percent-encoding",
  "pinwheel",
  "pulldown-cmark",
  "serde",

@@ -16,13 +16,6 @@ use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
-	let (organization_id, member_id) = if let ["organizations", organization_id, "members", member_id] =
-		*path_components(&request).as_slice()
-	{
-		(organization_id.to_owned(), member_id.to_owned())
-	} else {
-		bail!("unexpected path");
-	};
 	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}
@@ -33,6 +26,13 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let user = match authorize_normal_user(&request, &mut db).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(unauthorized()),
+	};
+	let (organization_id, member_id) = if let ["organizations", organization_id, "members", member_id] =
+		*path_components(&request).as_slice()
+	{
+		(organization_id.to_owned(), member_id.to_owned())
+	} else {
+		bail!("unexpected path");
 	};
 	let organization_id: Id = match organization_id.parse() {
 		Ok(organization_id) => organization_id,
@@ -105,11 +105,12 @@ async fn get_admin_member_count(
 ) -> Result<usize> {
 	let row = sqlx::query(
 		"
-			select count(*) from
-				organizations_users
+			select
+				count(*)
+			from organizations_users
 			where
 				organization_id = $1
-			and is_admin = true
+				and is_admin = true
 		",
 	)
 	.bind(&organization_id.to_string())

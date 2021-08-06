@@ -3,6 +3,7 @@ use tangram_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
+use tangram_id::Id;
 use tangram_ui as ui;
 
 pub struct Page {
@@ -16,6 +17,7 @@ pub struct PredictionTable {
 }
 
 pub struct PredictionTableRow {
+	pub id: Id,
 	pub date: String,
 	pub identifier: String,
 	pub output: String,
@@ -45,7 +47,7 @@ impl Component for Page {
 							.child(
 								ui::TableCell::new().child(
 									ui::Link::new()
-										.href(format!("./predictions/{}", prediction.identifier))
+										.href(format!("./predictions/{}", prediction.id))
 										.child(prediction.identifier.clone()),
 								),
 							)

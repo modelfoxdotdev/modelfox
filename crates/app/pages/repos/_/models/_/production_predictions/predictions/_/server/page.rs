@@ -4,66 +4,32 @@ use tangram_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
+use tangram_id::Id;
 use tangram_ui as ui;
 
 pub struct Page {
+	pub id: Id,
+	pub date: String,
 	pub identifier: String,
-	pub inner: Inner,
+	pub predict_output: PredictOutput,
 	pub model_layout_info: ModelLayoutInfo,
-}
-
-pub enum Inner {
-	NotFound(Box<NotFound>),
-	Found(Box<Found>),
 }
 
 impl Component for Page {
 	fn into_node(self) -> Node {
-		let inner = match self.inner {
-			Inner::NotFound(inner) => (*inner).into_node(),
-			Inner::Found(inner) => (*inner).into_node(),
-		};
 		Document::new()
 			.client("tangram_app_production_prediction_client")
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
 						.child(ui::H1::new().child("Prediction"))
-						.child(inner),
+						.child(PredictionTable {
+							identifier: self.identifier,
+							date: self.date,
+						})
+						.child(self.predict_output),
 				),
 			)
-			.into_node()
-	}
-}
-
-pub struct NotFound {
-	pub identifier: String,
-}
-
-impl Component for NotFound {
-	fn into_node(self) -> Node {
-		ui::Alert::new(ui::Level::Danger)
-			.child("Prediction with identifier ")
-			.child(b().child(self.identifier))
-			.child(" not found.")
-			.into_node()
-	}
-}
-
-pub struct Found {
-	pub date: String,
-	pub identifier: String,
-	pub predict_output: PredictOutput,
-}
-
-impl Component for Found {
-	fn into_node(self) -> Node {
-		fragment()
-			.child(PredictionTable {
-				identifier: self.identifier,
-				date: self.date,
-			})
-			.child(self.predict_output)
 			.into_node()
 	}
 }

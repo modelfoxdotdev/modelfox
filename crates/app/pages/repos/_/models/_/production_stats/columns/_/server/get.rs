@@ -34,6 +34,7 @@ use tangram_app_ui::{
 	time::format_date_window_interval,
 };
 use tangram_id::Id;
+use tangram_ui as ui;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
@@ -44,6 +45,11 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	} else {
 		bail!("unexpected path");
 	};
+	let model_id: Id = match model_id.parse() {
+		Ok(model_id) => model_id,
+		Err(_) => return Ok(bad_request()),
+	};
+	let column_name = ui::percent_decode(&column_name).to_string();
 	#[derive(serde::Deserialize, Default)]
 	struct SearchParams {
 		date_window: Option<DateWindow>,
@@ -56,10 +62,6 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let date_window = search_params
 		.as_ref()
 		.and_then(|search_params| search_params.date_window);
-	let model_id: Id = match model_id.parse() {
-		Ok(model_id) => model_id,
-		Err(_) => return Ok(bad_request()),
-	};
 	let (date_window, date_window_interval) = match get_date_window_and_interval(&date_window) {
 		Some((date_window, date_window_interval)) => (date_window, date_window_interval),
 		None => return Ok(bad_request()),
@@ -150,7 +152,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	};
 	let page = Page {
 		date_window,
-		column_name: column_name.to_owned(),
+		column_name,
 		id: model_id.to_string(),
 		inner,
 		model_layout_info,

@@ -38,3 +38,11 @@ pub fn client_start() {
 	console_error_panic_hook::set_once();
 	tracing_wasm::set_as_global_default();
 }
+
+pub fn percent_encode(input: &str) -> std::borrow::Cow<str> {
+	percent_encoding::utf8_percent_encode(input, percent_encoding::NON_ALPHANUMERIC).into()
+}
+
+pub fn percent_decode(input: &str) -> std::borrow::Cow<str> {
+	percent_encoding::percent_decode_str(input).decode_utf8_lossy()
+}

@@ -16,16 +16,10 @@ use tangram_app_common::{
 };
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_id::Id;
+use tangram_ui as ui;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
-	let (model_id, column_name) = if let ["repos", _, "models", model_id, "training_stats", "columns", column_name] =
-		path_components(&request).as_slice()
-	{
-		(model_id.to_owned(), column_name.to_owned())
-	} else {
-		bail!("unexpected path");
-	};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
@@ -34,10 +28,18 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
+	let (model_id, column_name) = if let ["repos", _, "models", model_id, "training_stats", "columns", column_name] =
+		path_components(&request).as_slice()
+	{
+		(model_id.to_owned(), column_name.to_owned())
+	} else {
+		bail!("unexpected path");
+	};
 	let model_id: Id = match model_id.parse() {
 		Ok(model_id) => model_id,
 		Err(_) => return Ok(bad_request()),
 	};
+	let column_name = ui::percent_decode(&column_name);
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}

@@ -112,7 +112,10 @@ impl Component for TargetColumnStatsTable {
 			.child(ui::TableHeaderCell::new().child("Type"))
 			.child(ui::TableHeaderCell::new().child("Unique Count"))
 			.children(number_columns_table_header_cells);
-		let href = format!("./columns/{}", self.target_column_stats_table_row.name);
+		let href = format!(
+			"./columns/{}",
+			ui::percent_encode(&self.target_column_stats_table_row.name)
+		);
 		let body = ui::TableRow::new()
 			.child(
 				ui::TableCell::new().child(

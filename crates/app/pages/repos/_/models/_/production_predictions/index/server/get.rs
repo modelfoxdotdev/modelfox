@@ -67,12 +67,14 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 			let rows = sqlx::query(
 				"
 					select
+						id,
 						date,
 						identifier,
 						input,
 						output
 					from (
 						select
+							id,
 							date,
 							identifier,
 							input,
@@ -98,13 +100,14 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 			sqlx::query(
 				"
 				select
+					id,
 					date,
 					identifier,
 					input,
 					output
 				from predictions
-					where
-						model_id = $1
+				where
+					model_id = $1
 				and date < $2
 				order by date desc
 				limit $3
@@ -120,13 +123,14 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 			sqlx::query(
 				"
 					select
+						id,
 						date,
 						identifier,
 						input,
 						output
 					from predictions
-						where
-							model_id = $1
+					where
+						model_id = $1
 					order by date desc
 					limit $2
 				",
@@ -138,16 +142,16 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		}
 		_ => unreachable!(),
 	};
-	let first_row_timestamp = rows.first().map(|row| row.get::<i64, _>(0));
-	let last_row_timestamp = rows.last().map(|row| row.get::<i64, _>(0));
+	let first_row_timestamp = rows.first().map(|row| row.get::<i64, _>(1));
+	let last_row_timestamp = rows.last().map(|row| row.get::<i64, _>(1));
 	let (newer_predictions_exist, older_predictions_exist) =
 		match (first_row_timestamp, last_row_timestamp) {
 			(Some(first_row_timestamp), Some(last_row_timestamp)) => {
 				let newer_predictions_exist: bool = sqlx::query(
 					"
 						select count(*) > 0
-							from predictions
-							where model_id = $1 and date > $2
+						from predictions
+						where model_id = $1 and date > $2
 					",
 				)
 				.bind(&model_id.to_string())
@@ -158,8 +162,8 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				let older_predictions_exist: bool = sqlx::query(
 					"
 						select count(*) > 0
-							from predictions
-							where model_id = $1 and date < $2
+						from predictions
+						where model_id = $1 and date < $2
 					",
 				)
 				.bind(&model_id.to_string())
@@ -174,10 +178,12 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let prediction_table_rows: Vec<PredictionTableRow> = rows
 		.iter()
 		.map(|row| {
-			let date = row.get::<i64, _>(0);
+			let id: String = row.get(0);
+			let id = id.parse().unwrap();
+			let date: i64 = row.get(1);
 			let date: DateTime<Tz> = Utc.timestamp(date, 0).with_timezone(&timezone);
-			let identifier: String = row.get(1);
-			let output: String = row.get(3);
+			let identifier: String = row.get(2);
+			let output: String = row.get(4);
 			let output: PredictOutput = serde_json::from_str(&output).unwrap();
 			let output = match output {
 				PredictOutput::Regression(output) => output.value.to_string(),
@@ -185,6 +191,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				PredictOutput::MulticlassClassification(output) => output.class_name,
 			};
 			PredictionTableRow {
+				id,
 				date: date.to_string(),
 				identifier,
 				output,

@@ -144,7 +144,7 @@ async fn write_prediction_monitor_event(
 			select count(*) from predictions
 			where
 				model_id = $1
-			and identifier = $2
+				and identifier = $2
 		",
 	)
 	.bind(&model_id.to_string())
@@ -191,7 +191,7 @@ async fn write_true_value_monitor_event(
 			select count(*) from true_values
 			where
 				model_id = $1
-			and identifier = $2
+				and identifier = $2
 		",
 	)
 	.bind(&model_id.to_string())
@@ -240,8 +240,7 @@ async fn insert_or_update_production_stats_for_monitor_event(
 			from production_stats
 			where
 				model_id = $1
-			and
-				hour = $2
+				and hour = $2
 		",
 	)
 	.bind(&model_id.to_string())
@@ -261,8 +260,7 @@ async fn insert_or_update_production_stats_for_monitor_event(
 					data = $1
 				where
 					model_id = $2
-				and
-					hour = $3
+					and hour = $3
 			",
 		)
 		.bind(&data)
@@ -309,8 +307,7 @@ async fn insert_or_update_production_metrics_for_monitor_event(
 				predictions
 			where
 				predictions.model_id = $1
-			and
-				predictions.identifier = $2
+				and predictions.identifier = $2
 		",
 	)
 	.bind(&model_id.to_string())
@@ -331,7 +328,7 @@ async fn insert_or_update_production_metrics_for_monitor_event(
 		.get(0)
 		.ok_or_else(|| anyhow!("Failed to find prediction with identifier {}", identifier))?;
 	let output: String = row.get(0);
-	let date = row.get::<i64, _>(1);
+	let date: i64 = row.get(1);
 	let date = Utc.timestamp(date, 0);
 	let hour = date
 		.with_minute(0)
@@ -361,8 +358,7 @@ async fn insert_or_update_production_metrics_for_monitor_event(
 			from production_metrics
 			where
 				model_id = $1
-			and
-				hour = $2
+				and hour = $2
 		",
 	)
 	.bind(&model_id.to_string())
@@ -382,8 +378,7 @@ async fn insert_or_update_production_metrics_for_monitor_event(
 					data = $1
 				where
 					model_id = $2
-				and
-					hour = $3
+					and hour = $3
 			",
 		)
 		.bind(&data)
