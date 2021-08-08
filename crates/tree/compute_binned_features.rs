@@ -54,12 +54,12 @@ pub fn compute_binned_features_row_major(
 	match n_bins_across_all_features {
 		#[allow(clippy::absurd_extreme_comparisons)]
 		n_bins_across_all_features if n_bins_across_all_features <= 65535 => BinnedFeaturesRowMajor::U16(
-			compute_binned_features_row_major_inner(&features, binning_instructions, progress),
+			compute_binned_features_row_major_inner(features, binning_instructions, progress),
 		),
 		#[allow(clippy::absurd_extreme_comparisons)]
 		n_bins_across_all_features if n_bins_across_all_features <= 4294967295 => {
 			BinnedFeaturesRowMajor::U32(compute_binned_features_row_major_inner(
-				&features,
+				features,
 				binning_instructions,
 				progress,
 			))

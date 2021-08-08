@@ -24,12 +24,12 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(&request, &mut db, context.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, context.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
 	let (model_id, column_name) = if let ["repos", _, "models", model_id, "training_stats", "columns", column_name] =
-		path_components(&request).as_slice()
+		path_components(request).as_slice()
 	{
 		(model_id.to_owned(), column_name.to_owned())
 	} else {
@@ -39,7 +39,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		Ok(model_id) => model_id,
 		Err(_) => return Ok(bad_request()),
 	};
-	let column_name = ui::percent_decode(&column_name);
+	let column_name = ui::percent_decode(column_name);
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}

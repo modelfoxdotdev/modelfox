@@ -87,7 +87,7 @@ pub fn train(
 	// Determine how to bin each feature.
 	#[cfg(feature = "timing")]
 	let start = std::time::Instant::now();
-	let binning_instructions = compute_binning_instructions(&features_train, &train_options);
+	let binning_instructions = compute_binning_instructions(&features_train, train_options);
 	#[cfg(feature = "timing")]
 	timing.compute_binning_instructions.inc(start.elapsed());
 
@@ -307,7 +307,7 @@ pub fn train(
 				examples_index_right_buffer: examples_index_right_buffer.as_slice_mut().unwrap(),
 				bin_stats_pool: &bin_stats_pool,
 				hessians_are_constant,
-				train_options: &train_options,
+				train_options,
 				#[cfg(feature = "timing")]
 				timing: &timing,
 			});

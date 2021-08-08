@@ -16,7 +16,7 @@ use tangram_id::Id;
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	let model_id =
-		if let ["repos", _, "models", model_id, "tuning"] = *path_components(&request).as_slice() {
+		if let ["repos", _, "models", model_id, "tuning"] = *path_components(request).as_slice() {
 			model_id.to_owned()
 		} else {
 			bail!("unexpected path");
@@ -25,7 +25,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(&request, &mut db, context.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, context.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};

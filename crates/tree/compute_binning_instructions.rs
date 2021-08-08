@@ -53,7 +53,7 @@ pub fn compute_binning_instructions(
 		.par_iter()
 		.map(|column| match column.view() {
 			TableColumnView::Number(column) => {
-				compute_binning_instructions_for_number_feature(column, &train_options)
+				compute_binning_instructions_for_number_feature(column, train_options)
 			}
 			TableColumnView::Enum(column) => BinningInstruction::Enum {
 				n_variants: column.variants().len(),

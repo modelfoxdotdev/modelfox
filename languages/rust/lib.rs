@@ -677,7 +677,7 @@ where
 		bytes: &[u8],
 		options: Option<LoadModelOptions>,
 	) -> Result<Model<Input, Output>> {
-		let model = tangram_model::from_bytes(&bytes)?;
+		let model = tangram_model::from_bytes(bytes)?;
 		let model = tangram_core::predict::Model::from(model);
 		let tangram_url = options
 			.and_then(|options| options.tangram_url)

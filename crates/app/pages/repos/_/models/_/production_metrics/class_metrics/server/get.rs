@@ -29,7 +29,7 @@ use tangram_zip::zip;
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	let model_id = if let ["repos", _, "models", model_id, "production_metrics", "class_metrics"] =
-		path_components(&request).as_slice()
+		path_components(request).as_slice()
 	{
 		model_id.to_owned()
 	} else {
@@ -52,12 +52,12 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		Some((date_window, date_window_interval)) => (date_window, date_window_interval),
 		None => return Ok(bad_request()),
 	};
-	let timezone = get_timezone(&request);
+	let timezone = get_timezone(request);
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(&request, &mut db, context.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, context.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};

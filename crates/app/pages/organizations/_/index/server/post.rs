@@ -19,7 +19,7 @@ enum Action {
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	let organization_id =
-		if let ["organizations", organization_id, ""] = *path_components(&request).as_slice() {
+		if let ["organizations", organization_id, ""] = *path_components(request).as_slice() {
 			organization_id.to_owned()
 		} else {
 			bail!("unexpected path");
@@ -39,7 +39,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_normal_user(&request, &mut db).await? {
+	let user = match authorize_normal_user(request, &mut db).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(unauthorized()),
 	};

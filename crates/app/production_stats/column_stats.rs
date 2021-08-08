@@ -478,7 +478,7 @@ impl TextProductionColumnStats {
 		let unigram_iter = if ngram_types.contains(&NGramType::Unigram) {
 			Some(
 				tokenizer
-					.tokenize(&value)
+					.tokenize(value)
 					.map(tangram_text::NGramRef::Unigram),
 			)
 		} else {

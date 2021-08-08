@@ -44,7 +44,7 @@ fn load_model_from_array_buffer<'a>(
 	array_buffer: node_api::ArrayBuffer<'a>,
 ) -> Result<node_api::External<'a, tangram_core::predict::Model>> {
 	let bytes = array_buffer.get()?;
-	let model = tangram_model::from_bytes(&bytes)?;
+	let model = tangram_model::from_bytes(bytes)?;
 	let model = tangram_core::predict::Model::from(model);
 	let model = node_api::External::new(env, model)?;
 	Ok(model)

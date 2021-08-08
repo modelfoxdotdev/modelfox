@@ -745,7 +745,7 @@ fn truncate_text<'a>(
 	label: &'a str,
 	width: f64,
 ) -> Cow<'a, str> {
-	if ctx.measure_text(&label).unwrap().width() < width {
+	if ctx.measure_text(label).unwrap().width() < width {
 		return label.into();
 	}
 	let mut longest_truncated_label = "...".to_owned();

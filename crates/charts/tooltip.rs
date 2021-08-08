@@ -166,14 +166,14 @@ pub fn draw_tooltip(options: DrawTooltipOptions) {
 		tooltip_wrapper.style().set_property("left", &left).unwrap();
 		tooltip_wrapper
 			.style()
-			.set_property("transform", &"translateY(-100%)")
+			.set_property("transform", "translateY(-100%)")
 			.unwrap();
 	} else if overflow_left > 0.0 {
 		let left = "0px";
-		tooltip_wrapper.style().set_property("left", &left).unwrap();
+		tooltip_wrapper.style().set_property("left", left).unwrap();
 		tooltip_wrapper
 			.style()
-			.set_property("transform", &"translateY(-100%)")
+			.set_property("transform", "translateY(-100%)")
 			.unwrap();
 	}
 }

@@ -51,7 +51,7 @@ pub fn to_path(path: &Path, bytes: &[u8]) -> Result<()> {
 	// Create the file.
 	let mut file = std::fs::File::create(path)?;
 	// Write the magic number.
-	file.write_all(&MAGIC_NUMBER)?;
+	file.write_all(MAGIC_NUMBER)?;
 	// Write the revision number.
 	file.write_all(&CURRENT_REVISION.to_le_bytes())?;
 	// Write the bytes.
@@ -87,10 +87,10 @@ pub enum ModelInner {
 impl<'a> ColumnStatsReader<'a> {
 	pub fn column_name(&self) -> &str {
 		match &self {
-			ColumnStatsReader::UnknownColumn(c) => &c.read().column_name(),
-			ColumnStatsReader::NumberColumn(c) => &c.read().column_name(),
-			ColumnStatsReader::EnumColumn(c) => &c.read().column_name(),
-			ColumnStatsReader::TextColumn(c) => &c.read().column_name(),
+			ColumnStatsReader::UnknownColumn(c) => c.read().column_name(),
+			ColumnStatsReader::NumberColumn(c) => c.read().column_name(),
+			ColumnStatsReader::EnumColumn(c) => c.read().column_name(),
+			ColumnStatsReader::TextColumn(c) => c.read().column_name(),
 		}
 	}
 }

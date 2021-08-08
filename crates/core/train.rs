@@ -751,20 +751,20 @@ fn compute_hyperparameter_grid(
 			Task::Regression => grid::compute_regression_hyperparameter_grid(
 				grid,
 				target_column_index,
-				&train_column_stats,
+				train_column_stats,
 				config,
 			),
 			Task::BinaryClassification => grid::compute_binary_classification_hyperparameter_grid(
 				grid,
 				target_column_index,
-				&train_column_stats,
+				train_column_stats,
 				config,
 			),
 			Task::MulticlassClassification { .. } => {
 				grid::compute_multiclass_classification_hyperparameter_grid(
 					grid,
 					target_column_index,
-					&train_column_stats,
+					train_column_stats,
 					config,
 				)
 			}
@@ -772,18 +772,18 @@ fn compute_hyperparameter_grid(
 		.unwrap_or_else(|| match &task {
 			Task::Regression => grid::default_regression_hyperparameter_grid(
 				target_column_index,
-				&train_column_stats,
+				train_column_stats,
 				config,
 			),
 			Task::BinaryClassification => grid::default_binary_classification_hyperparameter_grid(
 				target_column_index,
-				&train_column_stats,
+				train_column_stats,
 				config,
 			),
 			Task::MulticlassClassification { .. } => {
 				grid::default_multiclass_classification_hyperparameter_grid(
 					target_column_index,
-					&train_column_stats,
+					train_column_stats,
 					config,
 				)
 			}
@@ -904,7 +904,7 @@ fn train_grid_item(
 	});
 	let duration = start.elapsed();
 	let comparison_metrics =
-		compute_comparison_metrics(&train_model_output, &table_comparison, &mut |progress| {
+		compute_comparison_metrics(&train_model_output, table_comparison, &mut |progress| {
 			handle_progress_event(ProgressEvent::Train(TrainProgressEvent {
 				grid_item_index,
 				grid_item_count,
@@ -1569,7 +1569,7 @@ fn compute_comparison_metrics(
 				..
 			} = &train_model_output;
 			let metrics = test::test_linear_regressor(
-				&table_comparison,
+				table_comparison,
 				*target_column_index,
 				feature_groups,
 				model,
@@ -1585,7 +1585,7 @@ fn compute_comparison_metrics(
 				..
 			} = &train_model_output;
 			let metrics = test::test_tree_regressor(
-				&table_comparison,
+				table_comparison,
 				*target_column_index,
 				feature_groups,
 				model,
@@ -1601,7 +1601,7 @@ fn compute_comparison_metrics(
 				..
 			} = &train_model_output;
 			let metrics = test::test_linear_binary_classifier(
-				&table_comparison,
+				table_comparison,
 				*target_column_index,
 				feature_groups,
 				model,
@@ -1617,7 +1617,7 @@ fn compute_comparison_metrics(
 				..
 			} = &train_model_output;
 			let metrics = test::test_tree_binary_classifier(
-				&table_comparison,
+				table_comparison,
 				*target_column_index,
 				feature_groups,
 				model,
@@ -1633,7 +1633,7 @@ fn compute_comparison_metrics(
 				..
 			} = &train_model_output;
 			let metrics = test::test_linear_multiclass_classifier(
-				&table_comparison,
+				table_comparison,
 				*target_column_index,
 				feature_groups,
 				model,
@@ -1649,7 +1649,7 @@ fn compute_comparison_metrics(
 				..
 			} = &train_model_output;
 			let metrics = test::test_tree_multiclass_classifier(
-				&table_comparison,
+				table_comparison,
 				*target_column_index,
 				feature_groups,
 				model,
@@ -1773,7 +1773,7 @@ fn test_model(
 				..
 			} = &train_model_output;
 			let test_metrics = test::test_linear_regressor(
-				&table_test,
+				table_test,
 				*target_column_index,
 				feature_groups,
 				model,
@@ -1789,7 +1789,7 @@ fn test_model(
 				..
 			} = &train_model_output;
 			let test_metrics = test::test_tree_regressor(
-				&table_test,
+				table_test,
 				*target_column_index,
 				feature_groups,
 				model,
@@ -1805,7 +1805,7 @@ fn test_model(
 				..
 			} = &train_model_output;
 			let test_metrics = test::test_linear_binary_classifier(
-				&table_test,
+				table_test,
 				*target_column_index,
 				feature_groups,
 				model,
@@ -1821,7 +1821,7 @@ fn test_model(
 				..
 			} = &train_model_output;
 			let test_metrics = test::test_tree_binary_classifier(
-				&table_test,
+				table_test,
 				*target_column_index,
 				feature_groups,
 				model,
@@ -1837,7 +1837,7 @@ fn test_model(
 				..
 			} = &train_model_output;
 			let test_metrics = test::test_linear_multiclass_classifier(
-				&table_test,
+				table_test,
 				*target_column_index,
 				feature_groups,
 				model,
@@ -1853,7 +1853,7 @@ fn test_model(
 				..
 			} = &train_model_output;
 			let test_metrics = test::test_tree_multiclass_classifier(
-				&table_test,
+				table_test,
 				*target_column_index,
 				feature_groups,
 				model,

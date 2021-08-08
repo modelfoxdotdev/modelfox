@@ -253,7 +253,7 @@ fn serialize_regressor(
 	let train_column_stats = regressor
 		.train_column_stats
 		.iter()
-		.map(|train_column_stats| serialize_column_stats_output(&train_column_stats, writer))
+		.map(|train_column_stats| serialize_column_stats_output(train_column_stats, writer))
 		.collect::<Vec<_>>();
 	let train_column_stats = writer.write(&train_column_stats);
 	let train_target_column_stats =
@@ -320,7 +320,7 @@ fn serialize_binary_classifier(
 	let train_column_stats = binary_classifier
 		.train_column_stats
 		.iter()
-		.map(|train_column_stats| serialize_column_stats_output(&train_column_stats, writer))
+		.map(|train_column_stats| serialize_column_stats_output(train_column_stats, writer))
 		.collect::<Vec<_>>();
 	let train_column_stats = writer.write(&train_column_stats);
 	let train_target_column_stats =
@@ -328,7 +328,7 @@ fn serialize_binary_classifier(
 	let test_column_stats = binary_classifier
 		.test_column_stats
 		.iter()
-		.map(|test_column_stats| serialize_column_stats_output(&test_column_stats, writer))
+		.map(|test_column_stats| serialize_column_stats_output(test_column_stats, writer))
 		.collect::<Vec<_>>();
 	let test_column_stats = writer.write(&test_column_stats);
 	let test_target_column_stats =
@@ -471,20 +471,20 @@ fn serialize_column_stats_output(
 	match column_stats_output {
 		ColumnStatsOutput::Unknown(unknown_column_stats) => {
 			let unknown_column_stats =
-				serialize_unknown_column_stats_output(&unknown_column_stats, writer);
+				serialize_unknown_column_stats_output(unknown_column_stats, writer);
 			tangram_model::ColumnStatsWriter::UnknownColumn(unknown_column_stats)
 		}
 		ColumnStatsOutput::Number(number_column_stats) => {
 			let number_column_stats =
-				serialize_number_column_stats_output(&number_column_stats, writer);
+				serialize_number_column_stats_output(number_column_stats, writer);
 			tangram_model::ColumnStatsWriter::NumberColumn(number_column_stats)
 		}
 		ColumnStatsOutput::Enum(enum_column_stats) => {
-			let enum_column_stats = serialize_enum_column_stats_output(&enum_column_stats, writer);
+			let enum_column_stats = serialize_enum_column_stats_output(enum_column_stats, writer);
 			tangram_model::ColumnStatsWriter::EnumColumn(enum_column_stats)
 		}
 		ColumnStatsOutput::Text(text_column_stats) => {
-			let text_column_stats = serialize_text_column_stats_output(&text_column_stats, writer);
+			let text_column_stats = serialize_text_column_stats_output(text_column_stats, writer);
 			tangram_model::ColumnStatsWriter::TextColumn(text_column_stats)
 		}
 	}
@@ -572,7 +572,7 @@ fn serialize_text_column_stats_output(
 		.iter()
 		.map(|(ngram, entry)| {
 			(
-				serialize_ngram(&ngram, writer),
+				serialize_ngram(ngram, writer),
 				serialize_text_column_stats_output_top_n_grams_entry(entry, writer),
 			)
 		})
@@ -1123,7 +1123,7 @@ fn serialize_binary_classification_model(
 	match binary_classification_model {
 		BinaryClassificationModel::Linear(model) => {
 			let linear_binary_classifier =
-				serialize_linear_binary_classification_model(&model, writer);
+				serialize_linear_binary_classification_model(model, writer);
 			tangram_model::BinaryClassificationModelWriter::Linear(linear_binary_classifier)
 		}
 		BinaryClassificationModel::Tree(model) => {
@@ -1358,7 +1358,7 @@ fn serialize_multiclass_classification_metrics_output(
 	let class_metrics = multiclass_classification_metrics_output
 		.class_metrics
 		.iter()
-		.map(|class_metric| serialize_class_metrics(&class_metric, writer))
+		.map(|class_metric| serialize_class_metrics(class_metric, writer))
 		.collect::<Vec<_>>();
 	let class_metrics = writer.write(&class_metrics);
 	let metrics = tangram_model::MulticlassClassificationMetricsWriter {

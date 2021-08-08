@@ -18,7 +18,7 @@ pub fn test_linear_regressor(
 		progress_counter.clone(),
 	));
 	let features =
-		tangram_features::compute_features_array_f32(table_test, &feature_groups, &|| {
+		tangram_features::compute_features_array_f32(table_test, feature_groups, &|| {
 			progress_counter.inc(1)
 		});
 	handle_progress_event(ModelTestProgressEvent::ComputeFeaturesDone);
@@ -135,7 +135,7 @@ pub fn test_linear_binary_classifier(
 		progress_counter.clone(),
 	));
 	let features =
-		tangram_features::compute_features_array_f32(table_test, &feature_groups, &|| {
+		tangram_features::compute_features_array_f32(table_test, feature_groups, &|| {
 			progress_counter.inc(1)
 		});
 	handle_progress_event(ModelTestProgressEvent::ComputeFeaturesDone);
@@ -261,7 +261,7 @@ pub fn test_linear_multiclass_classifier(
 		progress_counter.clone(),
 	));
 	let features =
-		tangram_features::compute_features_array_f32(table_test, &feature_groups, &|| {
+		tangram_features::compute_features_array_f32(table_test, feature_groups, &|| {
 			progress_counter.inc(1)
 		});
 	handle_progress_event(ModelTestProgressEvent::ComputeFeaturesDone);

@@ -295,7 +295,7 @@ where
 			.unwrap();
 		ctx.scale(dpr, dpr).unwrap();
 		ctx.clear_rect(0.0, 0.0, width, height);
-		ctx.set_font(&self.chart_config.as_ref().unwrap().font);
+		ctx.set_font(self.chart_config.as_ref().unwrap().font);
 		// Do not draw the chart if the width or height is 0.
 		if width == 0.0 || height == 0.0 {
 			self.hover_regions = None;
@@ -344,7 +344,7 @@ where
 			.unwrap();
 		ctx.scale(dpr, dpr).unwrap();
 		ctx.clear_rect(0.0, 0.0, width, height);
-		ctx.set_font(&self.chart_config.as_ref().unwrap().font);
+		ctx.set_font(self.chart_config.as_ref().unwrap().font);
 		let children = self.overlay_div.child_nodes();
 		for i in 0..children.length() {
 			let child = &children.get(i).unwrap();
@@ -356,8 +356,8 @@ where
 		}
 		T::draw_overlay(DrawOverlayOptions {
 			active_hover_regions: &self.active_hover_regions,
-			chart_colors: &self.chart_colors.as_ref().unwrap(),
-			chart_config: &self.chart_config.as_ref().unwrap(),
+			chart_colors: self.chart_colors.as_ref().unwrap(),
+			chart_config: self.chart_config.as_ref().unwrap(),
 			ctx: &ctx,
 			options: &self.options,
 			overlay_info: self.overlay_info.as_ref().unwrap(),

@@ -231,7 +231,7 @@ impl Stats {
 		let column_stats = table
 			.columns()
 			.iter()
-			.map(|column| ColumnStats::compute(column.view(), &settings, progress))
+			.map(|column| ColumnStats::compute(column.view(), settings, progress))
 			.collect();
 		Stats(column_stats)
 	}
@@ -531,7 +531,7 @@ impl TextColumnStats {
 				Some(
 					stats
 						.tokenizer
-						.tokenize(&value)
+						.tokenize(value)
 						.map(tangram_text::NGramRef::Unigram),
 				)
 			} else {

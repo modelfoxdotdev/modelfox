@@ -709,7 +709,7 @@ fn compute_bin_stats_and_choose_best_splits_not_root_column_major(
 			);
 			// Compute the larger child bin stats by subtraction.
 			compute_bin_stats_subtraction(
-				&smaller_child_bin_stats_for_feature,
+				smaller_child_bin_stats_for_feature,
 				&mut larger_child_bin_stats_for_feature,
 			);
 			let (left_child_bin_stats_for_feature, right_child_bin_stats_for_feature) =
@@ -1040,7 +1040,7 @@ fn choose_best_split_for_feature(
 	match binning_instructions {
 		BinningInstruction::Number { .. } => choose_best_split_for_continuous_feature(
 			feature_index,
-			&binning_instructions,
+			binning_instructions,
 			bin_stats_for_feature,
 			n_examples,
 			sum_gradients,
@@ -1049,7 +1049,7 @@ fn choose_best_split_for_feature(
 		),
 		BinningInstruction::Enum { .. } => choose_best_split_for_discrete_feature(
 			feature_index,
-			&binning_instructions,
+			binning_instructions,
 			bin_stats_for_feature,
 			n_examples,
 			sum_gradients,

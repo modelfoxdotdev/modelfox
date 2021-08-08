@@ -413,15 +413,15 @@ fn draw_bar_chart_overlay(
 		};
 		draw_tooltip(DrawTooltipOptions {
 			center_horizontal: Some(true),
-			chart_colors: &options.chart_colors,
-			chart_config: &options.chart_config,
+			chart_colors: options.chart_colors,
+			chart_config: options.chart_config,
 			container: options.overlay_div,
 			flip_y_offset: None,
 			labels: vec![tooltip_label],
 			origin: active_hover_region.info.tooltip_origin_pixels,
 		});
 		draw_bar(DrawBarOptions {
-			chart_config: &options.chart_config,
+			chart_config: options.chart_config,
 			color: "#00000022",
 			ctx: options.ctx,
 			rect: active_hover_region.info.rect,

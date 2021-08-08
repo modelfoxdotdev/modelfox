@@ -764,7 +764,7 @@ impl<'a> EnumTableColumnView<'a> {
 	}
 
 	pub fn variants(&self) -> &[String] {
-		&self.variants
+		self.variants
 	}
 
 	pub fn is_empty(&self) -> bool {

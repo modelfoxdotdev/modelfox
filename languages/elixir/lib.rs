@@ -42,7 +42,7 @@ fn _load_model_from_binary<'a>(
 	binary: erl_nif::BinaryTerm<'a>,
 ) -> Result<erl_nif::Term<'a>> {
 	let bytes = binary.get()?;
-	let model = tangram_model::from_bytes(&bytes)?;
+	let model = tangram_model::from_bytes(bytes)?;
 	let model = tangram_core::predict::Model::from(model);
 	let resource_type = MODEL_RESOURCE_TYPE.get().unwrap();
 	let model = erl_nif::Resource::new(*resource_type, model);
@@ -77,7 +77,7 @@ fn _predict<'a>(
 	match input {
 		PredictInputSingleOrMultiple::Single(input) => {
 			let input = input.into();
-			let mut output = tangram_core::predict::predict(&model, &[input], &options);
+			let mut output = tangram_core::predict::predict(model, &[input], &options);
 			let output = output.remove(0);
 			let output = output.into();
 			let output = PredictOutputSingleOrMultiple::Single(output);
@@ -85,7 +85,7 @@ fn _predict<'a>(
 		}
 		PredictInputSingleOrMultiple::Multiple(input) => {
 			let input = input.into_iter().map(Into::into).collect::<Vec<_>>();
-			let output = tangram_core::predict::predict(&model, &input, &options);
+			let output = tangram_core::predict::predict(model, &input, &options);
 			let output = output.into_iter().map(Into::into).collect();
 			let output = PredictOutputSingleOrMultiple::Multiple(output);
 			Ok(output)

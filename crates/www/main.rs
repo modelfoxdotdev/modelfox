@@ -99,7 +99,7 @@ async fn handle(
 async fn export(sunfish: Sunfish, path: PathBuf) -> Result<()> {
 	let out_dir = std::path::Path::new(env!("OUT_DIR"));
 	let dist_path = std::env::current_dir()?.join(path);
-	sunfish.export(&out_dir, &dist_path)?;
+	sunfish.export(out_dir, &dist_path)?;
 	Ok(())
 }
 

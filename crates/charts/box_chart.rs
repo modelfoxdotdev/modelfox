@@ -292,7 +292,7 @@ fn draw_box_chart_overlay(
 			text,
 		});
 		draw_line(DrawLineOptions {
-			color: Some(&chart_colors.crosshairs_color),
+			color: Some(chart_colors.crosshairs_color),
 			ctx,
 			dashed: Some(true),
 			end: Point {

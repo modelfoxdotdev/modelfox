@@ -176,7 +176,7 @@ impl std::cmp::PartialOrd for QueueItem {
 
 impl std::cmp::Ord for QueueItem {
 	fn cmp(&self, other: &Self) -> Ordering {
-		self.partial_cmp(&other).unwrap()
+		self.partial_cmp(other).unwrap()
 	}
 }
 

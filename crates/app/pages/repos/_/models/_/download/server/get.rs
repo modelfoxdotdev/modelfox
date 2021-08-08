@@ -17,18 +17,17 @@ pub async fn download_inner(
 	request: &mut http::Request<hyper::Body>,
 ) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
-	let model_id = if let ["repos", _, "models", model_id, "download"] =
-		path_components(&request).as_slice()
-	{
-		model_id.to_owned()
-	} else {
-		bail!("unexpected path");
-	};
+	let model_id =
+		if let ["repos", _, "models", model_id, "download"] = path_components(request).as_slice() {
+			model_id.to_owned()
+		} else {
+			bail!("unexpected path");
+		};
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(&request, &mut db, context.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, context.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};

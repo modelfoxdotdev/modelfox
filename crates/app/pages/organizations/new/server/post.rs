@@ -29,7 +29,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_normal_user(&request, &mut db).await? {
+	let user = match authorize_normal_user(request, &mut db).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(unauthorized()),
 	};

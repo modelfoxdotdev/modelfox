@@ -5,11 +5,9 @@
     };
     flake-utils = {
       url = "github:numtide/flake-utils";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
     fenix = {
       url = "github:nix-community/fenix";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
   outputs = { nixpkgs, flake-utils, fenix, ... }: flake-utils.lib.eachDefaultSystem (system:
@@ -45,11 +43,10 @@
         ];
         cargoSha256 = "sha256-Pc1VyJC6RycHsz5TrLkyXE/jfbz6pdETrtzHkvzHK14=";
         cargoBuildFlags = [ "--bin" "tangram" ];
+        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = "clang";
         CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
       };
       devShell = pkgs.mkShell {
-        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = toString ./. + "/scripts/clang";
-        CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
         buildInputs = with pkgs; [
           cachix
           cargo-insta
@@ -71,6 +68,8 @@
           sqlite
           wasm-bindgen-cli
         ];
+        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = "clang";
+        CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
       };
     }
   );

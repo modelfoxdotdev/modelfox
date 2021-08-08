@@ -99,7 +99,7 @@ impl BagOfWordsFeatureGroup {
 			let unigram_iter = if self.ngram_types.contains(&NGramType::Unigram) {
 				Some(
 					self.tokenizer
-						.tokenize(&value)
+						.tokenize(value)
 						.map(tangram_text::NGramRef::Unigram),
 				)
 			} else {
@@ -175,7 +175,7 @@ impl BagOfWordsFeatureGroup {
 			let unigram_iter = if self.ngram_types.contains(&NGramType::Unigram) {
 				Some(
 					self.tokenizer
-						.tokenize(&value)
+						.tokenize(value)
 						.map(tangram_text::NGramRef::Unigram),
 				)
 			} else {
@@ -250,7 +250,7 @@ impl BagOfWordsFeatureGroup {
 			let unigram_iter = if self.ngram_types.contains(&NGramType::Unigram) {
 				Some(
 					self.tokenizer
-						.tokenize(&value)
+						.tokenize(value)
 						.map(tangram_text::NGramRef::Unigram),
 				)
 			} else {

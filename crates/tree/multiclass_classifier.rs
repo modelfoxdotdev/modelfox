@@ -65,7 +65,7 @@ impl MulticlassClassifier {
 			logits.assign(&self.biases);
 			for trees in self.trees.axis_iter(Axis(0)) {
 				for (logit, tree) in zip!(logits.iter_mut(), trees.iter()) {
-					*logit += tree.predict(&example.as_slice().unwrap());
+					*logit += tree.predict(example.as_slice().unwrap());
 				}
 			}
 			softmax(logits.as_slice_mut().unwrap());

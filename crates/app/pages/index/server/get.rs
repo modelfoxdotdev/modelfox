@@ -16,11 +16,11 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(&request, &mut db, context.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, context.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
-	let app_layout_info = app_layout_info(&context).await?;
+	let app_layout_info = app_layout_info(context).await?;
 	let repos = match user {
 		User::Root => repos_for_root(&mut db).await?,
 		User::Normal(user) => repos_for_user(&mut db, &user).await?,
