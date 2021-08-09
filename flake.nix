@@ -68,7 +68,7 @@
           sqlite
           wasm-bindgen-cli
         ];
-        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = "clang";
+        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = toString ./. + "/scripts/clang";
         CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
       };
     }

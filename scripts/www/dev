@@ -3,4 +3,4 @@ cargo run --bin tangram_dev -- \
   --ignore languages \
   --ignore target \
   --ignore target_check \
-  --command "mold -run cargo run -p tangram_www -- serve"
+  --command "cargo run -p tangram_www -- serve"
