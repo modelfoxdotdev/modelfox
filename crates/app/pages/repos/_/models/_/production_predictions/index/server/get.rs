@@ -85,7 +85,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 						and date > $2
 						order by date asc
 						limit $3
-					)
+					) as subset
 					order by date desc
 				",
 			)
