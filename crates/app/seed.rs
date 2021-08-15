@@ -73,40 +73,44 @@ pub fn main() -> Result<()> {
 	let table =
 		tangram_table::Table::from_path(Path::new(dataset.path), Default::default(), &mut |_| {})?;
 	let mut rng = rand::thread_rng();
-	for _ in 0..args.examples_count {
-		let id = Id::generate();
-		let mut record = get_random_row(table.view());
-		let target = record.remove(dataset.target).unwrap();
-		if dataset.name == "heart_disease" {
-			// Rewrite asymptomatic to asx in 50% of rows.
-			if rng.gen::<bool>() {
-				let chest_pain = record.get_mut("chest_pain").unwrap();
-				if chest_pain == "asymptomatic" {
-					*chest_pain = serde_json::Value::String("asx".to_owned());
+	let events: Vec<MonitorEvent> = (0..args.examples_count)
+		.flat_map(|_| {
+			let id = Id::generate();
+			let mut record = get_random_row(table.view());
+			let target = record.remove(dataset.target).unwrap();
+			if dataset.name == "heart_disease" {
+				// Rewrite asymptomatic to asx in 50% of rows.
+				if rng.gen::<bool>() {
+					let chest_pain = record.get_mut("chest_pain").unwrap();
+					if chest_pain == "asymptomatic" {
+						*chest_pain = serde_json::Value::String("asx".to_owned());
+					}
 				}
 			}
-		}
-		let output = generate_fake_prediction(&target, &dataset);
-		let model_id: &str = args.model_id.as_str();
-		let date = get_random_date();
-		let event: MonitorEvent = MonitorEvent::Prediction(PredictionMonitorEvent {
-			date,
-			identifier: NumberOrString::String(id.to_string()),
-			input: record,
-			model_id: model_id.parse().unwrap(),
-			options: None,
-			output,
-		});
-		track_event(&args.tangram_url, event);
-		if rng.gen::<f32>() > 0.4 {
-			let event = MonitorEvent::TrueValue(TrueValueMonitorEvent {
-				model_id: model_id.parse().unwrap(),
-				identifier: NumberOrString::String(id.to_string()),
-				true_value: target,
+			let output = generate_fake_prediction(&target, &dataset);
+			let model_id: &str = args.model_id.as_str();
+			let date = get_random_date();
+			let mut events = vec![MonitorEvent::Prediction(PredictionMonitorEvent {
 				date,
-			});
-			track_event(&args.tangram_url, event);
-		}
+				identifier: NumberOrString::String(id.to_string()),
+				input: record,
+				model_id: model_id.parse().unwrap(),
+				options: None,
+				output,
+			})];
+			if rng.gen::<f32>() > 0.4 {
+				events.push(MonitorEvent::TrueValue(TrueValueMonitorEvent {
+					model_id: model_id.parse().unwrap(),
+					identifier: NumberOrString::String(id.to_string()),
+					true_value: target,
+					date,
+				}));
+			}
+			events
+		})
+		.collect();
+	for events in events.chunks(100) {
+		track_events(&args.tangram_url, events);
 	}
 	Ok(())
 }
@@ -240,9 +244,9 @@ fn get_random_row(table: TableView) -> HashMap<String, serde_json::Value> {
 		.collect::<HashMap<String, serde_json::Value>>()
 }
 
-fn track_event(tangram_url: &Url, event: MonitorEvent) {
+fn track_events(tangram_url: &Url, events: &[MonitorEvent]) {
 	let client = reqwest::blocking::Client::new();
 	let mut url = tangram_url.clone();
 	url.set_path("/track");
-	client.post(url).json(&event).send().unwrap();
+	client.post(url).json(&events).send().unwrap();
 }
