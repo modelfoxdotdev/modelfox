@@ -226,7 +226,7 @@ fn test() {
 	let metrics = metrics.finalize();
 	insta::assert_debug_snapshot!(metrics, @r###"
  BinaryClassificationMetricsOutput {
-     auc_roc_approx: 0.0,
+     auc_roc_approx: 0.8333334,
      thresholds: [
          BinaryClassificationMetricsOutputForThreshold {
              threshold: 0.25,
