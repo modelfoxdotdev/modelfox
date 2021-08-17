@@ -1,6 +1,6 @@
 use anyhow::Result;
 use chrono::{Datelike, TimeZone, Timelike, Utc};
-use clap::Clap;
+use clap::{ArgEnum, Clap};
 use num::ToPrimitive;
 use rand::Rng;
 use std::{collections::HashMap, path::Path};
@@ -25,7 +25,7 @@ pub struct Args {
 	pub examples_count: usize,
 }
 
-#[derive(Clap)]
+#[derive(ArgEnum)]
 pub enum Dataset {
 	#[clap(name = "boston")]
 	Boston,

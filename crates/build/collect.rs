@@ -3,6 +3,7 @@ use duct::cmd;
 
 #[derive(Clap)]
 pub struct Args {
+	#[clap(multiple_values = true)]
 	machines: Vec<String>,
 }
 

@@ -21,7 +21,7 @@ duct = "0.13"
 indoc = "1"
 pem = "0.8"
 rand = "0.8"
-rsa = "0.4"
+rsa = "0.5"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.9"

@@ -59,13 +59,22 @@
           lld_12
           mold
           nodejs-16_x
-          python39
+          (python39.withPackages(ps: with ps; [
+            catboost
+            lightgbm
+            numpy
+            pandas
+            pytorch
+            scikitlearn
+            xgboost
+          ]))
           rpm
           ruby
           rust
           rust-cbindgen
           sequoia
           sqlite
+          time
           wasm-bindgen-cli
         ];
         CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = toString ./. + "/scripts/clang";

@@ -1,9 +1,11 @@
 use anyhow::{anyhow, Result};
 use indoc::indoc;
-use rsa::{PublicKey, RSAPrivateKey, RSAPublicKey};
+use rsa::{
+	pkcs1::{FromRsaPrivateKey, FromRsaPublicKey},
+	PublicKey, RsaPrivateKey, RsaPublicKey,
+};
 use serde_json::json;
 use sha2::Digest;
-use std::convert::TryFrom;
 use tangram_id::Id;
 
 pub const TANGRAM_LICENSE_PUBLIC_KEY: &str = indoc!(
@@ -20,7 +22,7 @@ pub const TANGRAM_LICENSE_PUBLIC_KEY: &str = indoc!(
 );
 
 pub fn generate(private_key: &str) -> Result<String> {
-	let private_key = RSAPrivateKey::try_from(pem::parse(private_key)?)?;
+	let private_key = RsaPrivateKey::from_pkcs1_pem(private_key)?;
 	let id = Id::generate();
 	let license_data = json!({ "id": id });
 	let license_data = serde_json::to_vec(&license_data)?;
@@ -39,7 +41,7 @@ pub fn generate(private_key: &str) -> Result<String> {
 }
 
 pub fn verify(license: &str, public_key: &str) -> Result<bool> {
-	let public_key = RSAPublicKey::try_from(pem::parse(public_key)?)?;
+	let public_key = RsaPublicKey::from_pkcs1_pem(public_key)?;
 	let mut sections = license.split(|c| c == ':');
 	let license_data = sections.next().ok_or_else(|| anyhow!("invalid license"))?;
 	let license_data = base64::decode(&license_data)?;
@@ -55,11 +57,11 @@ pub fn verify(license: &str, public_key: &str) -> Result<bool> {
 
 #[test]
 fn test() {
-	use rsa::{PrivateKeyPemEncoding, PublicKeyPemEncoding};
-	let private_key = rsa::RSAPrivateKey::new(&mut rand::thread_rng(), 2048).unwrap();
-	let public_key = rsa::RSAPublicKey::from(&private_key);
-	let private_key = private_key.to_pem_pkcs1().unwrap();
-	let public_key = public_key.to_pem_pkcs1().unwrap();
+	use rsa::pkcs1::{ToRsaPrivateKey, ToRsaPublicKey};
+	let private_key = rsa::RsaPrivateKey::new(&mut rand::thread_rng(), 2048).unwrap();
+	let public_key = rsa::RsaPublicKey::from(&private_key);
+	let private_key = private_key.to_pkcs1_pem().unwrap();
+	let public_key = public_key.to_pkcs1_pem().unwrap();
 	let license = generate(&private_key).unwrap();
 	assert!(verify(&license, &public_key).unwrap());
 }

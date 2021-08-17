@@ -1,14 +1,14 @@
-use clap::{self, Clap};
+use clap::{self, ArgEnum, Clap};
 
 #[derive(Clap)]
 struct Args {
-	#[clap(long, arg_enum)]
+	#[clap(long, arg_enum, multiple_values = true)]
 	datasets: Vec<Dataset>,
-	#[clap(long, arg_enum)]
+	#[clap(long, arg_enum, multiple_values = true)]
 	libraries: Vec<Library>,
 }
 
-#[derive(Clap, Clone)]
+#[derive(ArgEnum, Clone)]
 enum Dataset {
 	#[clap(name = "allstate")]
 	Allstate,
@@ -40,7 +40,7 @@ impl std::fmt::Display for Dataset {
 	}
 }
 
-#[derive(Clap, Clone, PartialEq)]
+#[derive(ArgEnum, Clone, PartialEq)]
 enum Library {
 	#[clap(name = "pytorch")]
 	PyTorch,
@@ -222,7 +222,7 @@ fn run_benchmark(dataset: &Dataset, library: &Library) -> BenchmarkOutput {
 			.arg("-f")
 			.arg("%M")
 			.arg("python")
-			.arg(format!("linear/benchmarks/{}.py", dataset))
+			.arg(format!("crates/linear/benchmarks/{}.py", dataset))
 			.arg("--library")
 			.arg(format!("{}", library))
 			.output()

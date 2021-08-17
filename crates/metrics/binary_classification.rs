@@ -190,17 +190,16 @@ impl BinaryClassificationMetrics {
 			})
 			.sum::<f64>() as f32;
 		// Add the area between (0,0) and last threshold on the curve.
-		let last = thresholds.iter().rev().next().unwrap();
+		let last = thresholds.last().unwrap();
 		let y_avg = last.true_positive_rate as f64 / 2.0;
 		let dx = last.false_positive_rate as f64;
 		auc_roc_approx += (y_avg * dx) as f32;
 
 		// Add the area between (1,1) and first threshold on the curve.
-		let first = thresholds.iter().next().unwrap();
+		let first = thresholds.first().unwrap();
 		let y_avg = (first.true_positive_rate as f64 + 1.0) / 2.0;
 		let dx = 1.0 - first.false_positive_rate as f64;
 		auc_roc_approx += (y_avg * dx) as f32;
-
 		BinaryClassificationMetricsOutput {
 			auc_roc_approx,
 			thresholds,
