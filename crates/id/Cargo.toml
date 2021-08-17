@@ -8,7 +8,7 @@ license = "MIT"
 name = "tangram_id"
 publish = true
 repository = "https://github.com/tangramdotdev/tangram"
-version = "0.6.0"
+version = "0.7.0"
 
 [lib]
 path = "lib.rs"

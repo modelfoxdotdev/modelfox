@@ -18,6 +18,6 @@ setuptools.setup(
 	packages=["tangram"],
 	rust_extensions=[RustExtension("tangram.__init__", binding=Binding.PyO3, py_limited_api=True)],
 	url="https://www.tangram.dev",
-	version="0.6.0",
+	version="0.7.0",
 	zip_safe=False,
 )

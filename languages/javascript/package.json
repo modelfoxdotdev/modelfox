@@ -32,7 +32,7 @@
 	"name": "@tangramdotdev/tangram",
 	"type": "module",
 	"types": "./dist/node/common.d.ts",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"workspaces": [
 		".",
 		"examples/bundler/webpack",

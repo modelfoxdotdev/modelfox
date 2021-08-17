@@ -8,7 +8,7 @@ license = "MIT"
 name = "tangram_metrics"
 publish = true
 repository = "https://github.com/tangramdotdev/tangram"
-version = "0.6.0"
+version = "0.7.0"
 
 [lib]
 path = "lib.rs"
@@ -20,4 +20,4 @@ insta = "1"
 itertools = "0.10"
 ndarray = { version = "0.15", features = ["rayon"] }
 num = "0.4"
-tangram_zip = { version = "=0.6.0", path = "../zip" }
+tangram_zip = { version = "0.7.0", path = "../zip" }
