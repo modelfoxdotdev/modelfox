@@ -83,8 +83,8 @@ impl Component for PricingCards {
 				"Everything in the Free plan.".to_owned(),
 				"Use the hosted app.".to_owned(),
 			],
-			price: "$299".to_owned(),
-			price_subtitle: "per user per month".to_owned(),
+			price: "contact us".to_owned(),
+			price_subtitle: "hello@tangram.dev".to_owned(),
 			selected: false,
 			title: "Team".to_owned(),
 		};
@@ -95,8 +95,8 @@ impl Component for PricingCards {
 				"Everything in the Team plan.".to_owned(),
 				"Run the app on your own servers.".to_owned(),
 			],
-			price: "$499".to_owned(),
-			price_subtitle: "per user per month".to_owned(),
+			price: "contact us".to_owned(),
+			price_subtitle: "hello@tangram.dev".to_owned(),
 			selected: false,
 			title: "Enterprise".to_owned(),
 		};
@@ -188,51 +188,51 @@ impl Component for PricingTable {
 			.child(
 				ui::TableRow::new()
 					.child(ui::TableHeaderCell::new().child("Training."))
-					.child(ui::TableCell::new().child("✔"))
-					.child(ui::TableCell::new().child("✔"))
-					.child(ui::TableCell::new().child("✔")),
+					.child(ui::TableCell::new().child("✅"))
+					.child(ui::TableCell::new().child("✅"))
+					.child(ui::TableCell::new().child("✅")),
 			)
 			.child(
 				ui::TableRow::new()
 					.child(ui::TableHeaderCell::new().child("Prediction."))
-					.child(ui::TableCell::new().child("✔"))
-					.child(ui::TableCell::new().child("✔"))
-					.child(ui::TableCell::new().child("✔")),
+					.child(ui::TableCell::new().child("✅"))
+					.child(ui::TableCell::new().child("✅"))
+					.child(ui::TableCell::new().child("✅")),
 			)
 			.child(
 				ui::TableRow::new()
 					.child(ui::TableHeaderCell::new().child("GitHub support."))
-					.child(ui::TableCell::new().child("✔"))
-					.child(ui::TableCell::new().child("✔"))
-					.child(ui::TableCell::new().child("✔")),
+					.child(ui::TableCell::new().child("✅"))
+					.child(ui::TableCell::new().child("✅"))
+					.child(ui::TableCell::new().child("✅")),
 			)
 			.child(
 				ui::TableRow::new()
 					.child(ui::TableHeaderCell::new().child("Cloud hosted app."))
 					.child(ui::TableCell::new().child(""))
-					.child(ui::TableCell::new().child("✔"))
-					.child(ui::TableCell::new().child("✔")),
+					.child(ui::TableCell::new().child("✅"))
+					.child(ui::TableCell::new().child("✅")),
 			)
 			.child(
 				ui::TableRow::new()
 					.child(ui::TableHeaderCell::new().child("Email support."))
 					.child(ui::TableCell::new().child(""))
-					.child(ui::TableCell::new().child("✔"))
-					.child(ui::TableCell::new().child("✔")),
+					.child(ui::TableCell::new().child("✅"))
+					.child(ui::TableCell::new().child("✅")),
 			)
 			.child(
 				ui::TableRow::new()
 					.child(ui::TableHeaderCell::new().child("Self hosted app."))
 					.child(ui::TableCell::new().child(""))
 					.child(ui::TableCell::new().child(""))
-					.child(ui::TableCell::new().child("✔")),
+					.child(ui::TableCell::new().child("✅")),
 			)
 			.child(
 				ui::TableRow::new()
 					.child(ui::TableHeaderCell::new().child("Dedicated Slack support."))
 					.child(ui::TableCell::new().child(""))
 					.child(ui::TableCell::new().child(""))
-					.child(ui::TableCell::new().child("✔")),
+					.child(ui::TableCell::new().child("✅")),
 			);
 		ui::Table::new()
 			.width("100%".to_owned())
