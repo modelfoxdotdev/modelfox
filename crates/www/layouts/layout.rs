@@ -24,9 +24,22 @@ struct Topbar;
 
 impl Component for Topbar {
 	fn into_node(self) -> Node {
+		let gh_button = a()
+			.class("github-button")
+			.class("link")
+			.style("color", "var(--text-color)")
+			.href("https://github.com/tangramdotdev/tangram")
+			.attribute(
+				"data-color-scheme",
+				"no-preference: light; light: light; dark: dark;",
+			)
+			.attribute("data-size", "large")
+			.attribute("data-show-count", "true")
+			.attribute("aria-label", "Star tangramdotdev/tangram on GitHub")
+			.child("GitHub");
 		let topbar_items = vec![
 			ui::TopbarItem {
-				element: None,
+				element: Some(gh_button.into_node()),
 				href: "https://github.com/tangramdotdev/tangram".to_owned(),
 				title: "GitHub".to_owned(),
 			},

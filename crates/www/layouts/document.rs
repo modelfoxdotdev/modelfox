@@ -33,6 +33,12 @@ impl Component for Document {
 				meta()
 					.attribute("content", "Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.")
 					.attribute("name", "description"),
+			)
+			.child(
+				script()
+					.attribute("async", true)
+					.attribute("defer", true)
+					.attribute("src", "https://buttons.github.io/buttons.js"),
 			);
 		let client_script = self.client.map(|client| {
 			let paths = sunfish::client_paths(client);

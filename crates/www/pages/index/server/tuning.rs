@@ -220,11 +220,11 @@ impl Component for Tuning {
 		let title = div()
 			.class("index-step-title")
 			.child("Tune your model to get the best performance.");
-		let text = ui::Markdown::new(ui::doc!(
+		let text = div().class("index-step-text").child(ui::Markdown::new(ui::doc!(
 			r#"
 				Tune binary classification models to your preferred tradeoff between precision and recall. To use your selected threshold, update the `predict` call in your code.
 			"#
-		).into());
+		).into()));
 		let left = div().child(title).child(text);
 		let right = ui::Window::new().child(Dehydrate::new(
 			"tuning",
