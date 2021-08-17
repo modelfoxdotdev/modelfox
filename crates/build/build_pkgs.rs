@@ -101,7 +101,7 @@ fn alpine(
 				pkgname=tangram
 				pkgver={version}
 				pkgrel=1
-				pkgdesc="Tangram makes machine learning easy."
+				pkgdesc="Tangram makes it easy for programmers to train, deploy, and monitor machine learning models."
 				url="https://www.tangram.dev"
 				arch={arch}
 				license="MIT"
@@ -278,7 +278,7 @@ fn deb(
 							SHA1: {sha1}
 							SHA256: {sha256}
 							Homepage: https://www.tangram.dev
-							Description: Tangram makes machine learning easy.
+							Description: Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.
 						"#,
 						version = deb.version,
 						arch = arch,

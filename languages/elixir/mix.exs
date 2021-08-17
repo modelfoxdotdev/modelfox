@@ -21,7 +21,7 @@ defmodule Tangram.MixProject do
       name: "tangram",
       package: [
         description:
-          "Tangram makes machine learning easy.",
+          "Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.",
         licenses: ["MIT"],
         links: %{homepage: "https://www.tangram.dev"}
       ],

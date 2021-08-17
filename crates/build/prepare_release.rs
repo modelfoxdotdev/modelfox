@@ -69,7 +69,7 @@ pub fn run(args: Args) {
 				Version: {}
 				Maintainer: Tangram <root@tangram.dev>
 				Homepage: https://www.tangram.dev
-				Description: Tangram makes machine learning easy.
+				Description: Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.
 			"#,
 			architecture,
 			args.version,
@@ -108,7 +108,7 @@ pub fn run(args: Args) {
 				Name: tangram
 				Version: {}
 				Release: 1
-				Summary: Tangram makes machine learning easy.
+				Summary: Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.
 				License: MIT
 				Source0: tangram.tar.gz
 
