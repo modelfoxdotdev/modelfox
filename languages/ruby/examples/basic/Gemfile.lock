@@ -2,7 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     ffi (1.15.3)
-    tangram (0.5.0)
+    tangram (0.7.0)
       ffi (~> 1)
 
 PLATFORMS

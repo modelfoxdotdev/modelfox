@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "tangram"
-  s.version = "0.6.1"
+  s.version = "0.7.0"
   s.summary = "Tangram for Ruby"
   s.description = "Make predictions with a Tangram model from your Ruby app. Learn more at https://www.tangram.dev/."
   s.authors = ["Tangram"]

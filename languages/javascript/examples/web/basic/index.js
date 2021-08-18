@@ -1,4 +1,4 @@
-import * as tangram from "https://js.tangram.dev/index.js"
+import * as tangram from "https://js.tangram.dev"
 
 // Download the model.
 let modelResponse = await fetch("/heart_disease.tangram")

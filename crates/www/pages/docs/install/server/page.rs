@@ -305,8 +305,7 @@ struct Docker;
 
 impl Component for Docker {
 	fn into_node(self) -> Node {
-		let code =
-		"docker run --rm -it tangramdotdev/tangram train --file heart_disease.csv --target diagnosis";
+		let code = "docker run --rm -it tangramdotdev/tangram";
 		ui::S2::new()
 			.child(ui::H2::new().child("Docker"))
 			.child(

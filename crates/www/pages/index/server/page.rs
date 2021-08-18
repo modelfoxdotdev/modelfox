@@ -82,7 +82,7 @@ impl Component for Video {
 			.child(
 				iframe()
 					.class("index-video")
-					.attribute("allow-full-screen", true)
+					.attribute("allow", "fullscreen")
 					.attribute("src", "https://player.vimeo.com/video/385352664")
 					.title("Tangram Video"),
 			)

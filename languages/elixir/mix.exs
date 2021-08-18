@@ -27,7 +27,7 @@ defmodule Tangram.MixProject do
       ],
       source_url: "https://github.com/tangramdotdev/tangram/tree/master/languages/elixir",
       start_permanent: Mix.env() == :prod,
-      version: "0.6.1"
+      version: "0.7.0"
     ]
   end
 end
