@@ -2,7 +2,7 @@ use pinwheel::prelude::*;
 use tangram_ui as ui;
 use tangram_www_docs_inspect_common::{ThresholdMetrics, Tuning};
 use tangram_www_layouts::{
-	docs_layout::{DocsLayout, DocsPage, GettingStartedPage},
+	docs_layout::{DocsLayout, DocsPage, GettingStartedPage, PrevNextButtons},
 	document::Document,
 };
 
@@ -240,18 +240,9 @@ impl Component for Page {
 				When we lower the threhold, we predict that more people have heart disease which results in lower precision but higher recall. Once you've chosen a threshold, you can update your prediction code to use it.
 			"#
 		).into());
-		let prev_next_buttons = div()
-			.class("docs-prev-next-buttons")
-			.child(
-				ui::Link::new()
-					.href("predict".to_owned())
-					.child("< Previous: Make a prediction."),
-			)
-			.child(
-				ui::Link::new()
-					.href("monitor".to_owned())
-					.child("Next: Monitor your model in production. >"),
-			);
+		let prev_next_buttons = PrevNextButtons::new()
+			.prev("predict", "Make a prediction.")
+			.next("monitor", "Monitor your model in production.");
 		let content = ui::S1::new()
 			.child(ui::H1::new().child("Inspect"))
 			.child(

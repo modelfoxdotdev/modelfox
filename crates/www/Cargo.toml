@@ -20,6 +20,7 @@ default = [
   "tangram_www_docs_getting_started_inspect_server",
   "tangram_www_docs_getting_started_monitor_client",
   "tangram_www_docs_getting_started_monitor_server",
+  "tangram_www_docs_getting_started_predict_cli_server",
   "tangram_www_docs_getting_started_predict_elixir_server",
   "tangram_www_docs_getting_started_predict_go_server",
   "tangram_www_docs_getting_started_predict_index_server",
@@ -64,6 +65,7 @@ tangram_www_blog_post_server = { path = "pages/blog/_/server" , optional = true 
 tangram_www_docs_getting_started_index_server = { path = "pages/docs/getting_started/index/server", optional = true }
 tangram_www_docs_getting_started_inspect_server = { path = "pages/docs/getting_started/inspect/server" , optional = true}
 tangram_www_docs_getting_started_monitor_server = { path = "pages/docs/getting_started/monitor/server" , optional = true}
+tangram_www_docs_getting_started_predict_cli_server = { path = "pages/docs/getting_started/predict/cli/server" , optional = true}
 tangram_www_docs_getting_started_predict_elixir_server = { path = "pages/docs/getting_started/predict/elixir/server" , optional = true}
 tangram_www_docs_getting_started_predict_go_server = { path = "pages/docs/getting_started/predict/go/server" , optional = true}
 tangram_www_docs_getting_started_predict_index_server = { path = "pages/docs/getting_started/predict/index/server" , optional = true}

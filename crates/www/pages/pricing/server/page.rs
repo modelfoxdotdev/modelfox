@@ -40,12 +40,15 @@ impl Component for Page {
 			enterprise_selected: false,
 		};
 		let table = PricingTable;
+		let p = ui::P::new()
+			.child("The cloud hosted and self hosted apps are free to use by an individual for evaluation and testing, but require a license to use as part of a team and in production.");
 		let content = div().class("pricing-grid").child(
 			ui::S1::new()
 				.child(title)
 				.child(subtitle)
 				.child(cards)
-				.child(table),
+				.child(table)
+				.child(p),
 		);
 		Document::new()
 			.child(PageLayout::new().child(content))
@@ -81,7 +84,7 @@ impl Component for PricingCards {
 			cta: self.team_cta,
 			features: vec![
 				"Everything in the Free plan.".to_owned(),
-				"Use the hosted app.".to_owned(),
+				"Use the cloud-hosted app.".to_owned(),
 			],
 			price: "contact us".to_owned(),
 			price_subtitle: "hello@tangram.dev".to_owned(),
@@ -93,7 +96,7 @@ impl Component for PricingCards {
 			cta: self.enterprise_cta,
 			features: vec![
 				"Everything in the Team plan.".to_owned(),
-				"Run the app on your own servers.".to_owned(),
+				"Use the self-hosted app.".to_owned(),
 			],
 			price: "contact us".to_owned(),
 			price_subtitle: "hello@tangram.dev".to_owned(),
@@ -187,49 +190,49 @@ impl Component for PricingTable {
 		let body = ui::TableBody::new()
 			.child(
 				ui::TableRow::new()
-					.child(ui::TableHeaderCell::new().child("Training."))
+					.child(ui::TableHeaderCell::new().child("Training"))
 					.child(ui::TableCell::new().child("✅"))
 					.child(ui::TableCell::new().child("✅"))
 					.child(ui::TableCell::new().child("✅")),
 			)
 			.child(
 				ui::TableRow::new()
-					.child(ui::TableHeaderCell::new().child("Prediction."))
+					.child(ui::TableHeaderCell::new().child("Prediction"))
 					.child(ui::TableCell::new().child("✅"))
 					.child(ui::TableCell::new().child("✅"))
 					.child(ui::TableCell::new().child("✅")),
 			)
 			.child(
 				ui::TableRow::new()
-					.child(ui::TableHeaderCell::new().child("GitHub support."))
+					.child(ui::TableHeaderCell::new().child("GitHub support"))
 					.child(ui::TableCell::new().child("✅"))
 					.child(ui::TableCell::new().child("✅"))
 					.child(ui::TableCell::new().child("✅")),
 			)
 			.child(
 				ui::TableRow::new()
-					.child(ui::TableHeaderCell::new().child("Cloud hosted app."))
+					.child(ui::TableHeaderCell::new().child("Cloud-hosted app"))
 					.child(ui::TableCell::new().child(""))
 					.child(ui::TableCell::new().child("✅"))
 					.child(ui::TableCell::new().child("✅")),
 			)
 			.child(
 				ui::TableRow::new()
-					.child(ui::TableHeaderCell::new().child("Email support."))
+					.child(ui::TableHeaderCell::new().child("Email support"))
 					.child(ui::TableCell::new().child(""))
 					.child(ui::TableCell::new().child("✅"))
 					.child(ui::TableCell::new().child("✅")),
 			)
 			.child(
 				ui::TableRow::new()
-					.child(ui::TableHeaderCell::new().child("Self hosted app."))
+					.child(ui::TableHeaderCell::new().child("Self-hosted app"))
 					.child(ui::TableCell::new().child(""))
 					.child(ui::TableCell::new().child(""))
 					.child(ui::TableCell::new().child("✅")),
 			)
 			.child(
 				ui::TableRow::new()
-					.child(ui::TableHeaderCell::new().child("Dedicated Slack support."))
+					.child(ui::TableHeaderCell::new().child("Slack support"))
 					.child(ui::TableCell::new().child(""))
 					.child(ui::TableCell::new().child(""))
 					.child(ui::TableCell::new().child("✅")),

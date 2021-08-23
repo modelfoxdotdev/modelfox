@@ -39,6 +39,7 @@ pub enum GettingStartedPage {
 #[derive(PartialEq)]
 pub enum PredictPage {
 	Index,
+	CLI,
 	Elixir,
 	Go,
 	Node,
@@ -119,6 +120,17 @@ impl Component for PageNav {
 								self.selected_page,
 								Some(DocsPage::GettingStarted(GettingStartedPage::Predict(_)))
 							))
+							.child(
+								ui::NavItem::new()
+									.title("CLI".to_owned())
+									.href("/docs/getting_started/predict/cli".to_owned())
+									.selected(matches!(
+										self.selected_page,
+										Some(DocsPage::GettingStarted(
+											GettingStartedPage::Predict(PredictPage::CLI)
+										)),
+									)),
+							)
 							.child(
 								ui::NavItem::new()
 									.title("Elixir".to_owned())
@@ -282,6 +294,54 @@ impl Component for Headings {
 					.title(heading.title)
 					.href(format!("#{}", heading.id))
 					.selected(false)
+			}))
+			.into_node()
+	}
+}
+
+#[derive(Default, new)]
+#[new(default)]
+pub struct PrevNextButtons {
+	prev: Option<PrevNextButton>,
+	next: Option<PrevNextButton>,
+}
+
+pub struct PrevNextButton {
+	href: String,
+	title: String,
+}
+
+impl PrevNextButtons {
+	pub fn prev(mut self, href: impl Into<String>, title: impl Into<String>) -> PrevNextButtons {
+		self.prev = Some(PrevNextButton {
+			href: href.into(),
+			title: title.into(),
+		});
+		self
+	}
+
+	pub fn next(mut self, href: impl Into<String>, title: impl Into<String>) -> PrevNextButtons {
+		self.next = Some(PrevNextButton {
+			href: href.into(),
+			title: title.into(),
+		});
+		self
+	}
+}
+
+impl Component for PrevNextButtons {
+	fn into_node(self) -> Node {
+		div()
+			.class("docs-prev-next-buttons")
+			.child(self.prev.map(|button| {
+				ui::Link::new()
+					.href(button.href)
+					.child(format!("< Previous: {}", button.title))
+			}))
+			.child(self.next.map(|button| {
+				ui::Link::new()
+					.href(button.href)
+					.child(format!("Next: {} >", button.title))
 			}))
 			.into_node()
 	}

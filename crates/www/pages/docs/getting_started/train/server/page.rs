@@ -3,7 +3,7 @@ use pinwheel::prelude::*;
 use std::borrow::Cow;
 use tangram_ui as ui;
 use tangram_www_layouts::{
-	docs_layout::{DocsLayout, DocsPage, GettingStartedPage},
+	docs_layout::{DocsLayout, DocsPage, GettingStartedPage, PrevNextButtons},
 	document::Document,
 };
 
@@ -26,52 +26,26 @@ impl Component for Page {
 		);
 		let data_p2 = ui::P::new()
 			.child("The heart disease dataset contains information from cardiac patients such as their age, cholesterol, and stress test results. Below are some example rows.");
-		let data_p3 = ui::P::new()
-			.child("The last column, called ")
-			.child(ui::InlineCode::new("diagnosis"))
-			.child(", is either ")
-			.child(ui::InlineCode::new("Positive"))
-			.child(" if the patient has heart disease or ")
-			.child(ui::InlineCode::new("Negative"))
-			.child(" if they don't.");
+		let data_p3 = ui::Markdown::new("The last column, called `diagnosis`, is either `Positive` if the patient has heart disease or `Negative` if they don't.".into());
 		let data = ui::S2::new()
 			.child(ui::H2::new().child("Get the data"))
 			.child(data_p1)
 			.child(data_p2)
 			.child(DatasetPreview)
 			.child(data_p3);
-		let train_p1 = ui::P::new()
-			.child("We can train a model to predict the ")
-			.child(ui::InlineCode::new("diagnosis"))
-			.child(" column using the ")
-			.child(ui::InlineCode::new("tangram train"))
-			.child(" command, passing in the path to the CSV file and the name of the column we want to predict, called the ")
-			.child(ui::InlineCode::new("target"))
-			.child(" column.");
+		let train_p1 = ui::Markdown::new(r#"We can train a model to predict the `diagnosis` column using the `tangram train` command, passing in the path to the CSV file and the name of the column we want to predict, called the `target` column."#.into());
 		let train_window = ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(
 			"$ tangram train --file heart_disease.csv --target diagnosis",
 		)));
-		let train_p2 = ui::P::new()
-			.child("The CLI automatically transforms the data into features, trains a number of models to predict the target column, and writes the best model to a ")
-			.child(ui::InlineCode::new(".tangram"))
-			.child(" file. We can use this file to make predictions from our code.");
+		let train_p2 = ui::Markdown::new("The CLI automatically transforms the data into features, trains a number of models to predict the target column, and writes the best model to a `.tangram` file. We can use this file to make predictions from our code.".into());
 		let train = ui::S2::new()
 			.child(ui::H2::new().child("Train"))
 			.child(train_p1)
 			.child(train_window)
 			.child(train_p2);
-		let prev_next_buttons = div()
-			.class("docs-prev-next-buttons")
-			.child(
-				ui::Link::new()
-					.href("./".to_owned())
-					.child("< Previous: Overview"),
-			)
-			.child(
-				ui::Link::new()
-					.href("predict/".to_owned())
-					.child("Next: Make a Prediction. >"),
-			);
+		let prev_next_buttons = PrevNextButtons::new()
+			.prev("./", "Overview.")
+			.next("predict/", "Make a Prediction.");
 		let content = ui::S1::new()
 			.child(ui::H1::new().child("Train"))
 			.child(install)

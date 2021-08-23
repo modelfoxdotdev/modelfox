@@ -1,12 +1,14 @@
 .s1 {
 	align-content: start;
 	display: grid;
+	grid: auto / minmax(0, 1fr);
 	row-gap: 2rem;
 }
 
 .s2 {
 	align-content: start;
 	display: grid;
+	grid: auto / minmax(0, 1fr);
 	row-gap: 1rem;
 }
 

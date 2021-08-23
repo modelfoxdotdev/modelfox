@@ -22,6 +22,14 @@ impl Component for Page {
 									.child(
 										ui::ListItem::new().child(
 											ui::Link::new()
+												.href("cli".to_owned())
+												.title("CLI".to_owned())
+												.child("CLI"),
+										),
+									)
+									.child(
+										ui::ListItem::new().child(
+											ui::Link::new()
 												.href("elixir".to_owned())
 												.title("Elixir".to_owned())
 												.child("Elixir"),

@@ -2,7 +2,7 @@ use pinwheel::prelude::*;
 use std::borrow::Cow;
 use tangram_ui as ui;
 use tangram_www_layouts::{
-	docs_layout::{DocsLayout, DocsPage, GettingStartedPage, PredictPage},
+	docs_layout::{DocsLayout, DocsPage, GettingStartedPage, PredictPage, PrevNextButtons},
 	document::Document,
 };
 
@@ -29,18 +29,9 @@ impl Component for Page {
 									.child(Predict),
 							)
 							.child(
-								div()
-									.class("docs-prev-next-buttons")
-									.child(
-										ui::Link::new()
-											.href("../train".to_owned())
-											.child("< Previous: Train a model."),
-									)
-									.child(
-										ui::Link::new()
-											.href("../inspect".to_owned())
-											.child("Next: Inspect your model. >"),
-									),
+								PrevNextButtons::new()
+									.prev("../train", "Train a model.")
+									.next("../inspect", "Inspect your model."),
 							),
 					),
 			)
@@ -52,13 +43,7 @@ pub struct Install;
 
 impl Component for Install {
 	fn into_node(self) -> Node {
-		ui::P::new()
-			.child("Add the ")
-			.child(ui::InlineCode::new("tangram"))
-			.child(" package to your ")
-			.child(ui::InlineCode::new("mix.exs"))
-			.child(".")
-			.into_node()
+		ui::Markdown::new("Add the `tangram` package to your `mix.exs`.".into()).into_node()
 	}
 }
 

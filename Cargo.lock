@@ -4395,6 +4395,7 @@ dependencies = [
  "tangram_www_docs_getting_started_inspect_server",
  "tangram_www_docs_getting_started_monitor_client",
  "tangram_www_docs_getting_started_monitor_server",
+ "tangram_www_docs_getting_started_predict_cli_server",
  "tangram_www_docs_getting_started_predict_elixir_server",
  "tangram_www_docs_getting_started_predict_go_server",
  "tangram_www_docs_getting_started_predict_index_server",
@@ -4551,6 +4552,17 @@ dependencies = [
  "tangram_app_production_stats_index_server",
  "tangram_app_ui",
  "tangram_charts",
+ "tangram_ui",
+ "tangram_www_layouts",
+ "tangram_www_ui",
+]
+
+[[package]]
+name = "tangram_www_docs_getting_started_predict_cli_server"
+version = "0.0.0"
+dependencies = [
+ "pinwheel",
+ "sunfish",
  "tangram_ui",
  "tangram_www_layouts",
  "tangram_www_ui",

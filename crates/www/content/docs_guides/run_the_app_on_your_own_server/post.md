@@ -11,7 +11,7 @@ To run the app in production, you will need:
 - A PostgreSQL database.
 - An S3-compatible storage bucket.
 - An SMTP server such as Amazon SES.
-- A license. Send us an email at hello@tangram.dev to get one.
+- A license. Send us an email at hello@tangram.dev to purchase one.
 
 ## Configuration
 

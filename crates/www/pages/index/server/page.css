@@ -9,14 +9,14 @@
 @media (max-width: 1199px) {
 	.index-grid {
 		row-gap: 2rem;
-		padding: 2rem 1rem;
+		padding: 1rem;
 	}
 }
 
 @media (min-width: 1200px) {
 	.index-grid {
-		row-gap: 4rem;
-		padding: 4rem 1rem;
+		row-gap: 2rem;
+		padding: 1rem;
 	}
 }
 

@@ -14,7 +14,7 @@ use tangram_charts::{
 };
 use tangram_ui as ui;
 use tangram_www_layouts::{
-	docs_layout::{DocsLayout, DocsPage, GettingStartedPage},
+	docs_layout::{DocsLayout, DocsPage, GettingStartedPage, PrevNextButtons},
 	document::Document,
 };
 
@@ -22,14 +22,9 @@ pub struct Page;
 
 impl Component for Page {
 	fn into_node(self) -> Node {
-		let p1 = ui::P::new()
-			.child("Once our model is deployed, we want to make sure that it performs as well in production as it did in training. We can opt in to logging by calling ")
-			.child(ui::InlineCode::new("logPrediction"))
-			.child(". Later on, as we get official diagnoses for patients, we can call ")
-			.child(ui::InlineCode::new("logTrueValue"))
-			.child(" and use the same identifier as we used in the call to ")
-			.child(ui::InlineCode::new("logPrediction"))
-			.child(".");
+		let p1 = ui::Markdown::new(
+			r#"Once our model is deployed, we want to make sure that it performs as well in production as it did in training. We can opt in to logging by calling `logPrediction`. Later on, as we get official diagnoses for patients, we can call `logTrueValue` and use the same identifier as we used in the call to `logPrediction`."#.into(),
+		);
 		let p2 = ui::P::new().child("Back in the app, we can look up a prediction by its identifier, and get an explanation that shows how each feature affects the output.");
 		let p3 = ui::P::new().child("Now let's see how accurate our model has been in production. Let's open the app and choose Production Metrics in the sidebar.");
 		let p4 = ui::P::new().child(r#"Uh oh! It's a bit lower than we expected. Let's try to find the cause. Under "Production Stats", we see that the "chest_pain" column has an alert and a high invalid values count. Click on the column to view more details."#);
@@ -47,11 +42,7 @@ impl Component for Page {
 			.child(p5)
 			.child(ProductionColumnStats)
 			.child(p6);
-		let buttons = div().class("docs-prev-next-buttons").child(
-			ui::Link::new()
-				.href("inspect".to_owned())
-				.child("< Previous: Inspect your model."),
-		);
+		let prev_next_buttons = PrevNextButtons::new().prev("inspect", "Inspect your model.");
 		Document::new()
 			.client("tangram_www_docs_getting_started_monitor_client")
 			.child(
@@ -61,7 +52,7 @@ impl Component for Page {
 						ui::S1::new()
 							.child(ui::H1::new().child("Monitor"))
 							.child(section)
-							.child(buttons),
+							.child(prev_next_buttons),
 					),
 			)
 			.into_node()
