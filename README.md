@@ -26,7 +26,7 @@ $ tangram train --file heart_disease.csv --target diagnosis --output heart_disea
 [==========================================>                         ]
 ```
 
-The CLI automatically transforms your data into features, trains a number of models to predict the target column, and writes the best model to a `.tangram` file. If you want more control, you can provide a config file.
+The CLI automatically transforms your data into features, trains a number of linear and gradient boosted decision tree models to predict the target column, and writes the best model to a `.tangram` file. If you want more control, you can provide a config file.
 
 ### Predict
 
