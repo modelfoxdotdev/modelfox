@@ -4411,7 +4411,7 @@ dependencies = [
  "tangram_www_index_client",
  "tangram_www_index_server",
  "tangram_www_pricing_server",
- "tangram_www_rustconf_server",
+ "tangram_www_rustconf2021_server",
  "tokio",
  "tower",
  "tower-http",
@@ -4771,7 +4771,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tangram_www_rustconf_server"
+name = "tangram_www_rustconf2021_server"
 version = "0.0.0"
 dependencies = [
  "pinwheel",
