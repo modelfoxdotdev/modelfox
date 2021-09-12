@@ -35,7 +35,8 @@ default = [
   "tangram_www_docs_internals_server",
   "tangram_www_index_client",
   "tangram_www_index_server",
-  "tangram_www_pricing_server"
+  "tangram_www_pricing_server",
+  "tangram_www_rustconf_server"
 ]
 
 [build-dependencies]
@@ -80,6 +81,7 @@ tangram_www_docs_internals_server = { path = "pages/docs/internals/_/server", op
 tangram_www_docs_install_server = { path = "pages/docs/install/server" , optional = true}
 tangram_www_index_server = { path = "pages/index/server" , optional = true}
 tangram_www_pricing_server = { path = "pages/pricing/server" , optional = true}
+tangram_www_rustconf_server = { path = "pages/rustconf/server" , optional = true}
 
 tangram_www_benchmarks_client = { path = "pages/benchmarks/client", optional = true }
 tangram_www_docs_getting_started_inspect_client = {path = "pages/docs/getting_started/inspect/client", optional = true}

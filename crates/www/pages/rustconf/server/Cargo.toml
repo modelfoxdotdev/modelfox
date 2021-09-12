@@ -1,0 +1,14 @@
+[package]
+edition = "2018"
+name = "tangram_www_rustconf_server"
+publish = false
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+pinwheel = "0.2"
+tangram_www_layouts = { path = "../../../layouts" }
+tangram_ui = { path = "../../../../ui" }
+sunfish = "0.2"
