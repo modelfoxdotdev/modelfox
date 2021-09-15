@@ -4385,6 +4385,7 @@ dependencies = [
  "serde_json",
  "sunfish",
  "tangram_id",
+ "tangram_www_about_server",
  "tangram_www_benchmarks_client",
  "tangram_www_benchmarks_server",
  "tangram_www_blog_index_server",
@@ -4410,6 +4411,7 @@ dependencies = [
  "tangram_www_docs_internals_server",
  "tangram_www_index_client",
  "tangram_www_index_server",
+ "tangram_www_jobs_server",
  "tangram_www_pricing_server",
  "tangram_www_rustconf2021_server",
  "tokio",
@@ -4417,6 +4419,16 @@ dependencies = [
  "tower-http",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "tangram_www_about_server"
+version = "0.0.0"
+dependencies = [
+ "pinwheel",
+ "sunfish",
+ "tangram_ui",
+ "tangram_www_layouts",
 ]
 
 [[package]]
@@ -4747,6 +4759,16 @@ dependencies = [
  "tangram_www_index_common",
  "tangram_www_layouts",
  "tangram_www_ui",
+]
+
+[[package]]
+name = "tangram_www_jobs_server"
+version = "0.0.0"
+dependencies = [
+ "pinwheel",
+ "sunfish",
+ "tangram_ui",
+ "tangram_www_layouts",
 ]
 
 [[package]]

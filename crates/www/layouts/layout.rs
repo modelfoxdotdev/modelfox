@@ -45,6 +45,16 @@ impl Component for Topbar {
 			},
 			ui::TopbarItem {
 				element: None,
+				href: "/jobs".to_owned(),
+				title: "Jobs".to_owned(),
+			},
+			ui::TopbarItem {
+				element: None,
+				href: "/about".to_owned(),
+				title: "About".to_owned(),
+			},
+			ui::TopbarItem {
+				element: None,
 				href: "/pricing".to_owned(),
 				title: "Pricing".to_owned(),
 			},
