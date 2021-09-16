@@ -35,6 +35,10 @@ impl Component for Document {
 					.attribute("name", "description"),
 			)
 			.child(
+				script().attribute("src", "https://cdn.usefathom.com/script.js")
+				.attribute("data-site", "RDWWWHLA").attribute("defer", true)
+			)
+			.child(
 				script()
 					.attribute("async", true)
 					.attribute("defer", true)
