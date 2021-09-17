@@ -4,6 +4,7 @@
 
 # Tangram
 [Website](https://www.tangram.dev) | [Community](https://discord.gg/RzkUvvg2)
+
 Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.
 
 - Run `tangram train` to train a model from a CSV file on the command line.
