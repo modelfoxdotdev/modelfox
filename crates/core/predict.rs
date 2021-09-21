@@ -59,14 +59,20 @@ impl From<f32> for PredictInputValue {
 	}
 }
 
-impl From<i16> for PredictInputValue {
-	fn from(value: i16) -> Self {
+impl From<i32> for PredictInputValue {
+	fn from(value: i32) -> Self {
 		PredictInputValue::Number(f64::from(value))
 	}
 }
 
-impl From<i8> for PredictInputValue {
-	fn from(value: i8) -> Self {
+impl From<u32> for PredictInputValue {
+	fn from(value: u32) -> Self {
+		PredictInputValue::Number(f64::from(value))
+	}
+}
+
+impl From<i16> for PredictInputValue {
+	fn from(value: i16) -> Self {
 		PredictInputValue::Number(f64::from(value))
 	}
 }
@@ -77,20 +83,13 @@ impl From<u16> for PredictInputValue {
 	}
 }
 
+impl From<i8> for PredictInputValue {
+	fn from(value: i8) -> Self {
+		PredictInputValue::Number(f64::from(value))
+	}
+}
 impl From<u8> for PredictInputValue {
 	fn from(value: u8) -> Self {
-		PredictInputValue::Number(f64::from(value))
-	}
-}
-
-impl From<i32> for PredictInputValue {
-	fn from(value: i32) -> Self {
-		PredictInputValue::Number(f64::from(value))
-	}
-}
-
-impl From<u32> for PredictInputValue {
-	fn from(value: u32) -> Self {
 		PredictInputValue::Number(f64::from(value))
 	}
 }

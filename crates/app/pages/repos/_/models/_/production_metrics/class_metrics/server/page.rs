@@ -333,7 +333,7 @@ impl Component for PrecisionRecallSection {
 						.title(precision_interval_chart_title)
 						.x_axis_grid_line_interval(GridLineInterval { k: 1.0, p: 0.0 })
 						.y_max(Finite::new(1.0).unwrap())
-						.y_min(Finite::new(0.0).unwrap())
+						.y_min(Finite::new(0.0).unwrap()),
 				)),
 			)
 			.child(
@@ -345,7 +345,7 @@ impl Component for PrecisionRecallSection {
 						.y_min(Finite::new(0.0).unwrap())
 						.labels(chart_labels.clone())
 						.series(recall_chart_series)
-						.title(recall_interval_chart_title)
+						.title(recall_interval_chart_title),
 				)),
 			)
 			.child(
@@ -374,7 +374,7 @@ impl Component for PrecisionRecallSection {
 						.series(f1_score_chart_series)
 						.title(f1_score_interval_chart_title)
 						.y_min(Finite::new(0.0).unwrap())
-						.y_max(Finite::new(1.0).unwrap())
+						.y_max(Finite::new(1.0).unwrap()),
 				)),
 			)
 			.into_node()
