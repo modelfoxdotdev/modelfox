@@ -29,10 +29,11 @@
 		}
 	},
 	"license": "MIT",
+	"main": "./dist/node/index.cjs",
 	"name": "@tangramdotdev/tangram",
 	"type": "module",
 	"types": "./dist/node/common.d.ts",
-	"version": "0.7.0",
+	"version": "0.7.1",
 	"workspaces": [
 		".",
 		"examples/bundler/webpack",
