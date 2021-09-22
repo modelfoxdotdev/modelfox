@@ -219,7 +219,9 @@ pub struct TreeGridItem {
 /// This enum defines whether binned features will be layed out in row major or column major order.
 #[derive(Debug, serde::Deserialize)]
 pub enum BinnedFeaturesLayout {
+	#[serde(rename = "row_major")]
 	RowMajor,
+	#[serde(rename = "column_major")]
 	ColumnMajor,
 }
 
