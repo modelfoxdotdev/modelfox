@@ -2,7 +2,7 @@
 
 namespace tangram\tangram;
 
-require dirname(dirname(__FILE__)) . '/vendor/autoload.php';
+require_once(dirname(dirname(__FILE__)) . '/vendor/autoload.php');
 
 $model_path = dirname(dirname(__FILE__)) . '/heart_disease.tangram';
 $model = Model::from_path($model_path);
@@ -22,7 +22,7 @@ $input = [
     'exercise_induced_angina' => 'no',
     'exercise_st_depression' => 2.3,
     'exercise_st_slope' => 'downsloping',
-    'flouroscopy_vessels_colored' => '0',
+    'fluoroscopy_vessels_colored' => '0',
     'thallium_stress_test' => 'fixed defect'
 ];
 

@@ -1,4 +1,4 @@
 composer install
 curl -sfL https://github.com/phpDocumentor/phpDocumentor/releases/download/v3.1.2/phpDocumentor.phar -o vendor/bin/phpdoc
 chmod +x vendor/bin/phpdoc
-vendor/bin/phpdoc -d . -t $(pwd)/docs
+vendor/bin/phpdoc

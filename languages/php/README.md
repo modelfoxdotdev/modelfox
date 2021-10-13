@@ -7,12 +7,10 @@ The Tangram PHP library makes it easy to make predictions with your Tangram mach
 
 ## Usage
 
-Add `tangram/tangram` to your `composer.json`:
+Add `tangram/tangram` to your `composer.json` with this command:
 
 ```json
-	"require": {
-		"tangram/tangram": "0.7.0"
-	},
+$ composer require tangram/tangram
 ```
 
 ```php
