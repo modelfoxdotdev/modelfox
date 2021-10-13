@@ -21,7 +21,7 @@ backtrace = "0.3"
 clap = { version = "3.0.0-beta.2", features = ["color"] }
 colored = "2"
 csv = "1"
-dirs = "3"
+dirs = "4"
 either = "1"
 itertools = "0.10"
 num = "0.4"

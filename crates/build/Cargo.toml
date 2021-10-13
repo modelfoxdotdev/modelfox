@@ -19,7 +19,7 @@ cbindgen = "0.20"
 chrono = { version = "0.4", features = ["serde"] }
 clap = { version = "3.0.0-beta.2", features = ["color"] }
 digest = "0.9"
-dirs = "3"
+dirs = "4"
 duct = "0.13"
 flate2 = "1"
 hex = "0.4"
