@@ -6,9 +6,11 @@ require dirname(dirname(__FILE__)) . '/vendor/autoload.php';
 
 $model_path = dirname(dirname(__FILE__)) . '/heart_disease.tangram';
 
-$tangram_url = "0.0.0.0:8080";
+# If you are running the Tangram app on your own server you can pass the URL to it with the TANGRAM_URL environment variable.
+$tangram_url = getenv('TANGRAM_URL') ?: 'https://app.tangram.dev';
+$load_options = new LoadModelOptions($tangram_url);
 
-$model = Model::from_path($model_path, new LoadModelOptions($tangram_url));
+$model = Model::from_path($model_path, $load_options);
 
 // Create an example input matching the schema of the CSV file the model was trained on.
 //Here the data is just hard-coded, but in your application you will probably get this from a database or user input.

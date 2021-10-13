@@ -1,0 +1,81 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "e4cf329b24d541e0d07916829533bb48",
+    "packages": [
+        {
+            "name": "tangram/tangram",
+            "version": "0.7.0",
+            "dist": {
+                "type": "path",
+                "url": "../..",
+                "reference": "611ca5ba92e6e010ca35dc6c348e9408d16d7526"
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": ">=8.0",
+                "squizlabs/php_codesniffer": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "tangram\\tangram\\": "src"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "tangram\\tangram\\": "tests"
+                }
+            },
+            "scripts": {
+                "test": [
+                    "phpunit"
+                ],
+                "check-style": [
+                    "phpcs src tests"
+                ],
+                "fix-style": [
+                    "phpcbf src tests"
+                ]
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tangram",
+                    "email": "root@tangram.dev",
+                    "homepage": "https://www.tangram.dev",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Make predictions with a Tangram model from your PHP app. Learn more at https://www.tangram.dev/.",
+            "homepage": "https://www.tangram.dev",
+            "keywords": [
+                "tangram"
+            ],
+            "transport-options": {
+                "relative": true
+            }
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.1.0"
+}

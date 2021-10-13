@@ -6,6 +6,6 @@ namespace tangram\tangram;
 
 abstract class TangramNGramType
 {
-  const unigram = 0;
-  const bigram = 1;
+    public const unigram = 0;
+    public const bigram = 1;
 }

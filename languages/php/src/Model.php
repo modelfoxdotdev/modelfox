@@ -59,16 +59,16 @@ final class Model
         if ($cpu == 'x86_64' && $os == 'Linux') {
             $triple = 'x86_64-unknown-linux-gnu';
             $lib = 'libtangram.so';
-        } else if ($cpu == 'aarch64' && $os == 'Linux') {
+        } elseif ($cpu == 'aarch64' && $os == 'Linux') {
             $triple = 'aarch64-unknown-linux-gnu';
             $lib = 'libtangram.so';
-        } else if ($cpu == 'x86_64' && $os == 'Darwin') {
+        } elseif ($cpu == 'x86_64' && $os == 'Darwin') {
             $triple = 'x86_64-apple-darwin';
             $lib = 'libtangram.dylib';
-        } else if (($cpu == 'arm' || $cpu == 'arm64') && $os == 'Darwin') {
+        } elseif (($cpu == 'arm' || $cpu == 'arm64') && $os == 'Darwin') {
             $triple = 'aarch64-apple-darwin';
             $lib = 'libtangram.dylib';
-        } else if ($cpu == 'x86_64' && substr($os, 0, 7) == 'Windows') {
+        } elseif ($cpu == 'x86_64' && substr($os, 0, 7) == 'Windows') {
             $triple = 'x86_64-pc-windows-msvc';
             $lib = 'tangram.dll';
         }
@@ -284,7 +284,7 @@ final class Model
             $is_string = is_string($value);
             if ($is_float) {
                 self::$ffi->tangram_predict_input_set_value_number($c_input, $key, $value);
-            } else if ($is_string) {
+            } elseif ($is_string) {
                 self::$ffi->tangram_predict_input_set_value_string($c_input, $key, $value);
             } else {
                 throw new \Exception('value for key' . $key . 'is not a float or a string');

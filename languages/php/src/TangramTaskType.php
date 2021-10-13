@@ -6,7 +6,7 @@ namespace tangram\tangram;
 
 abstract class TangramTaskType
 {
-  const regression = 0;
-  const binary_classification = 1;
-  const multiclass_classification = 2;
+    public const regression = 0;
+    public const binary_classification = 1;
+    public const multiclass_classification = 2;
 }
