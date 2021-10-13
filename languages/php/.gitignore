@@ -1,0 +1,6 @@
+/src/libtangram
+/composer.phar
+/vendor/
+/docs
+/.phpdoc
+/composer.lock

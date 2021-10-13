@@ -1,0 +1,26 @@
+{
+	"name": "tangramdotdev/basic-example",
+	"description": "Basic usage example for makng Tangram predictions from PHP",
+	"type": "project",
+	"repositories": [
+		{
+			"type": "path",
+			"url": "../.."
+		}
+	],
+	"require": {
+		"tangramdotdev/tangram": "0.7.0"
+	},
+	"license": "MIT",
+	"autoload": {
+		"psr-4": {
+			"Tangramdotdev\\BasicExample\\": "src/"
+		}
+	},
+	"authors": [
+		{
+			"name": "Tangram",
+			"email": "hello@tangram.dev"
+		}
+	]
+}
