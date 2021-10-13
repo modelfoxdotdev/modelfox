@@ -47,7 +47,7 @@ final class Model
         $this->model = $c_model;
     }
 
-    private function __destruct()
+    public function __destruct()
     {
         self::$ffi->tangram_model_delete($this->model);
     }
@@ -666,7 +666,7 @@ final class Model
 
         $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         if ($httpcode != 202) {
-            throw new RuntimeException($result);
+            throw new RuntimeException(json_encode($result));
         }
     }
 
