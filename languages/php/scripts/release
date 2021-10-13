@@ -10,9 +10,10 @@ install -D ../../dist/aarch64-apple-darwin/libtangram.dylib src/libtangram/aarch
 install -D ../../dist/aarch64-apple-darwin/tangram.h src/libtangram/aarch64-apple-darwin/tangram.h
 install -D ../../dist/x86_64-pc-windows-gnu/tangram.dll src/libtangram/x86_64-pc-windows-gnu/tangram.dll
 install -D ../../dist/x86_64-pc-windows-gnu/tangram.h src/libtangram/x86_64-pc-windows-gnu/tangram.h
-rm -rf dist
-mkdir dist
-rsync --archive --delete --exclude .git --exclude .gitignore --exclude dist --exclude docs --exclude scripts . dist
+if [ ! -e dist ]; then
+	git clone git@github.com:tangramdotdev/tangram-php dist
+fi
+rsync --archive --delete --exclude .git --exclude .gitignore --exclude dist --exclude docs --exclude scripts --exclude vendor . dist
 git -C dist add --all
 git -C dist commit
 git -C dist push
