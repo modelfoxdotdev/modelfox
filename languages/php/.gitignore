@@ -1,0 +1,6 @@
+/.phpdoc/
+/composer.phar
+/dist/
+/docs/
+/src/libtangram
+/vendor/

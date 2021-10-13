@@ -1,0 +1,5 @@
+composer install
+rm -rf src/libtangram/x86_64-unknown-linux-gnu
+cargo build -p libtangram
+install -D ../../target/debug/libtangram.so src/libtangram/x86_64-unknown-linux-gnu/libtangram.so
+cbindgen ../c > src/libtangram/x86_64-unknown-linux-gnu/tangram.h

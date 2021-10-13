@@ -1,0 +1,18 @@
+set -e
+rm -rf src/libtangram/
+install -D ../../dist/x86_64-unknown-linux-musl/libtangram.so src/libtangram/x86_64-unknown-linux-musl/libtangram.so
+install -D ../../dist/x86_64-unknown-linux-musl/tangram.h src/libtangram/x86_64-unknown-linux-musl/tangram.h
+install -D ../../dist/aarch64-unknown-linux-musl/libtangram.so src/libtangram/aarch64-unknown-linux-musl/libtangram.so
+install -D ../../dist/aarch64-unknown-linux-musl/tangram.h src/libtangram/aarch64-unknown-linux-musl/tangram.h
+install -D ../../dist/x86_64-apple-darwin/libtangram.dylib src/libtangram/x86_64-apple-darwin/libtangram.dylib
+install -D ../../dist/x86_64-apple-darwin/tangram.h src/libtangram/x86_64-apple-darwin/tangram.h
+install -D ../../dist/aarch64-apple-darwin/libtangram.dylib src/libtangram/aarch64-apple-darwin/libtangram.dylib
+install -D ../../dist/aarch64-apple-darwin/tangram.h src/libtangram/aarch64-apple-darwin/tangram.h
+install -D ../../dist/x86_64-pc-windows-gnu/tangram.dll src/libtangram/x86_64-pc-windows-gnu/tangram.dll
+install -D ../../dist/x86_64-pc-windows-gnu/tangram.h src/libtangram/x86_64-pc-windows-gnu/tangram.h
+rm -rf dist
+mkdir dist
+rsync --archive --delete --exclude .git --exclude .gitignore --exclude dist --exclude docs --exclude scripts . dist
+git -C dist add --all
+git -C dist commit
+git -C dist push
