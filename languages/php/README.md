@@ -18,7 +18,7 @@ $ composer require tangram/tangram
 
 namespace tangram\tangram;
 
-require dirname(dirname(__FILE__)) . '/vendor/autoload.php';
+require_once(dirname(dirname(__FILE__)) . '/vendor/autoload.php');
 
 $model_path = dirname(dirname(__FILE__)) . '/heart_disease.tangram';
 $model = Model::from_path($model_path);
