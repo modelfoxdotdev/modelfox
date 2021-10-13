@@ -38,7 +38,6 @@ default = [
   "tangram_www_pricing_server",
   "tangram_www_about_server",
   "tangram_www_jobs_server",
-  "tangram_www_rustconf2021_server"
 ]
 
 [build-dependencies]
@@ -85,7 +84,6 @@ tangram_www_index_server = { path = "pages/index/server" , optional = true}
 tangram_www_pricing_server = { path = "pages/pricing/server" , optional = true}
 tangram_www_about_server = { path = "pages/about/server" , optional = true}
 tangram_www_jobs_server = { path = "pages/jobs/server" , optional = true}
-tangram_www_rustconf2021_server = { path = "pages/rustconf2021/server" , optional = true}
 
 tangram_www_benchmarks_client = { path = "pages/benchmarks/client", optional = true }
 tangram_www_docs_getting_started_inspect_client = {path = "pages/docs/getting_started/inspect/client", optional = true}

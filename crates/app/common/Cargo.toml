@@ -13,7 +13,7 @@ insta = "1"
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
 chrono = { version = "0.4", features = ["serde"] }
-chrono-tz = { version = "0.5", features = ["serde"] }
+chrono-tz = { version = "0.6", features = ["serde"] }
 fnv = "1"
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }

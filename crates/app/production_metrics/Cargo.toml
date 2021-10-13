@@ -13,7 +13,7 @@ insta = "1"
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
 chrono = { version = "0.4", features = ["serde"] }
-chrono-tz = { version = "0.5", features = ["serde"] }
+chrono-tz = { version = "0.6", features = ["serde"] }
 ndarray = { version = "0.15", features = ["rayon"] }
 num = "0.4"
 pinwheel = "0.2"
