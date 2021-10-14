@@ -59,10 +59,10 @@ final class Model
         if ($os == 'Linux') {
             $ldd_output = null;
             $ldd_retval = null;
-            exec('ldd --version', $ldd_output, $ldd_retval);
+            exec('ldd --version 2>&1', $ldd_output, $ldd_retval);
             $musl = false;
             foreach ($ldd_output as $line) {
-                if (str_contains($line, 'musl')) {
+                if (strpos($line, 'musl') !== false) {
                     $musl = true;
                     break;
                 }
