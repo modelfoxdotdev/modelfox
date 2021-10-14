@@ -13,8 +13,7 @@ impl Component for Page {
 			.href("mailto:hello@tangram.dev".to_string())
 			.title("hello@tangram.dev".to_string())
 			.child("hello@tangram.dev");
-		let p3 = p()
-			.class("p")
+		let p3 = ui::P::new()
 			.child("We would love to hear from you, please don't hesistate to reach out! ")
 			.child(link);
 		let tangram = ui::S2::new()
@@ -24,19 +23,19 @@ impl Component for Page {
 			.child(p3);
 		let david = Person::new()
 			.name("David Yamnitsky")
-			.linked_in("https://www.linkedin.com/in/david-yamnitsky".to_string())
+			.linkedin("https://www.linkedin.com/in/david-yamnitsky".to_string())
 			.github("https://www.github.com/nitsky".to_string())
 			.gravatar("https://gravatar.com/avatar/5833197f9632bacbd8820f3b6cbf82c2?s=100")
 			.twitter("https://twitter.com/davidyamnitsky".to_string());
 		let bella = Person::new()
 			.name("Isabella Tromba")
-			.linked_in("https://www.linkedin.com/in/isabella-tromba".to_string())
+			.linkedin("https://www.linkedin.com/in/isabella-tromba".to_string())
 			.github("https://www.github.com/isabella".to_string())
 			.gravatar("https://gravatar.com/avatar/b5c16153bae7a6fa6663d7f555906dd0?s=100")
 			.twitter("https://twitter.com/isabellatromba".to_string());
 		let ben = Person::new()
 			.name("Ben Lovy")
-			.linked_in("https://www.linkedin.com/in/benlovy".to_string())
+			.linkedin("https://www.linkedin.com/in/benlovy".to_string())
 			.github("https://github.com/deciduously".to_string())
 			.gravatar("https://gravatar.com/avatar/98c040317325f49915f91168ec8805bc?s=100")
 			.twitter("https://twitter.com/ben_deciduously".to_string());
@@ -63,7 +62,7 @@ pub struct Person {
 	#[builder]
 	pub gravatar: String,
 	#[builder]
-	pub linked_in: Option<String>,
+	pub linkedin: Option<String>,
 	#[builder]
 	pub github: Option<String>,
 	#[builder]
@@ -99,7 +98,7 @@ impl Component for Person {
 							.child(
 								ui::Link::new()
 									.target("_blank".to_string())
-									.href(self.linked_in)
+									.href(self.linkedin)
 									.child("LinkedIn"),
 							)
 							.child(
