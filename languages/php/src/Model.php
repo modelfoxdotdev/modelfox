@@ -56,12 +56,24 @@ final class Model
         $cpu = php_uname('m');
         $os = php_uname('s');
 
-        if ($cpu == 'x86_64' && $os == 'Linux') {
-            $triple = 'x86_64-unknown-linux-gnu';
+        if ($os == 'Linux') {
+            $ldd_output = null;
+            $ldd_retval = null;
+            exec('ldd --version', $ldd_output, $ldd_retval);
+            $musl = false;
+            foreach ($ldd_output as $line) {
+                if (str_contains($line, 'musl')) {
+                    $musl = true;
+                    break;
+                }
+            }
+            unset($line);
             $lib = 'libtangram.so';
-        } elseif ($cpu == 'aarch64' && $os == 'Linux') {
-            $triple = 'aarch64-unknown-linux-gnu';
-            $lib = 'libtangram.so';
+            if ($cpu == "x86_64") {
+                $triple = $musl ? 'x86_64-unknown-linux-musl' : 'x86_64-unknown-linux-gnu';
+            } elseif ($cpu == "aarch64") {
+                $triple = $musl ? 'aarch64-unknown-linux-musl' : 'aarch64-unknown-linux-gnu';
+            }
         } elseif ($cpu == 'x86_64' && $os == 'Darwin') {
             $triple = 'x86_64-apple-darwin';
             $lib = 'libtangram.dylib';
