@@ -4460,6 +4460,7 @@ dependencies = [
  "tangram_www_docs_getting_started_predict_go_server",
  "tangram_www_docs_getting_started_predict_index_server",
  "tangram_www_docs_getting_started_predict_javascript_server",
+ "tangram_www_docs_getting_started_predict_php_server",
  "tangram_www_docs_getting_started_predict_python_server",
  "tangram_www_docs_getting_started_predict_ruby_server",
  "tangram_www_docs_getting_started_predict_rust_server",
@@ -4684,6 +4685,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "tangram_www_docs_getting_started_predict_php_server"
+version = "0.0.0"
+dependencies = [
+ "pinwheel",
+ "sunfish",
+ "tangram_ui",
+ "tangram_www_layouts",
+ "tangram_www_ui",
+]
+
+[[package]]
 name = "tangram_www_docs_getting_started_predict_python_server"
 version = "0.0.0"
 dependencies = [
@@ -4833,6 +4845,7 @@ dependencies = [
 name = "tangram_www_layouts"
 version = "0.0.0"
 dependencies = [
+ "chrono",
  "pinwheel",
  "sunfish",
  "tangram_ui",

@@ -8,13 +8,12 @@ impl Component for Page {
 	fn into_node(self) -> Node {
 		let p1 = ui::P::new()
 			.child("Hi, we are David and Isabella, the founders of Tangram. We met as freshman at MIT over a decade ago and Isabella was most recently a machine learning engineer at Slack and David was an engineer at Facebook. We started working on Tangram to give developers best in class tools to train, deploy, and monitor machine learning models.");
-		let p2 = ui::P::new().child("At Tangram, we want to make it really easy for developers to train machine learning models and deploy them directly in their Javascript, Ruby, Elixir, Golang, Python, and Rust apps. We also want to give developers all the tools they need to understand how their model works and monitor it once it is deployed. We feel that developers shouldn't have to sacrifice convenience for high customizability so that is why we designed Tangram's CLI to train machine learning models with good defaults but allow developers to pass a custom configuration file to control every aspect of training, from manually specifying the column types and features generated all the way down to the hyperparameters of the gradient boosted decision tree algorithm.");
+		let p2 = ui::P::new().child("At Tangram, we want to make it really easy for developers to train machine learning models and deploy them directly in their Javascript, Ruby, Elixir, Golang, PHP, Python, and Rust apps. We also want to give developers all the tools they need to understand how their model works and monitor it once it is deployed. We feel that developers shouldn't have to sacrifice convenience for high customizability so that is why we designed Tangram's CLI to train machine learning models with good defaults but allow developers to pass a custom configuration file to control every aspect of training, from manually specifying the column types and features generated all the way down to the hyperparameters of the gradient boosted decision tree algorithm.");
 		let link = ui::Link::new()
 			.href("mailto:hello@tangram.dev".to_string())
 			.title("hello@tangram.dev".to_string())
 			.child("hello@tangram.dev");
-		let p3 = p()
-			.class("p")
+		let p3 = ui::P::new()
 			.child("We would love to hear from you, please don't hesistate to reach out! ")
 			.child(link);
 		let tangram = ui::S2::new()
@@ -24,20 +23,27 @@ impl Component for Page {
 			.child(p3);
 		let david = Person::new()
 			.name("David Yamnitsky")
-			.linked_in("https://www.linkedin.com/in/david-yamnitsky".to_string())
+			.linkedin("https://www.linkedin.com/in/david-yamnitsky".to_string())
 			.github("https://www.github.com/nitsky".to_string())
 			.gravatar("https://gravatar.com/avatar/5833197f9632bacbd8820f3b6cbf82c2?s=100")
 			.twitter("https://twitter.com/davidyamnitsky".to_string());
 		let bella = Person::new()
 			.name("Isabella Tromba")
-			.linked_in("https://www.linkedin.com/in/isabella-tromba".to_string())
+			.linkedin("https://www.linkedin.com/in/isabella-tromba".to_string())
 			.github("https://www.github.com/isabella".to_string())
 			.gravatar("https://gravatar.com/avatar/b5c16153bae7a6fa6663d7f555906dd0?s=100")
 			.twitter("https://twitter.com/isabellatromba".to_string());
+		let ben = Person::new()
+			.name("Ben Lovy")
+			.linkedin("https://www.linkedin.com/in/benlovy".to_string())
+			.github("https://github.com/deciduously".to_string())
+			.gravatar("https://gravatar.com/avatar/98c040317325f49915f91168ec8805bc?s=100")
+			.twitter("https://twitter.com/ben_deciduously".to_string());
 		let team = ui::S2::new()
 			.child(ui::H1::new().child("Team"))
 			.child(david)
-			.child(bella);
+			.child(bella)
+			.child(ben);
 		let content = div()
 			.style("display", "grid")
 			.style("justify-items", "center")
@@ -56,7 +62,7 @@ pub struct Person {
 	#[builder]
 	pub gravatar: String,
 	#[builder]
-	pub linked_in: Option<String>,
+	pub linkedin: Option<String>,
 	#[builder]
 	pub github: Option<String>,
 	#[builder]
@@ -92,7 +98,7 @@ impl Component for Person {
 							.child(
 								ui::Link::new()
 									.target("_blank".to_string())
-									.href(self.linked_in)
+									.href(self.linkedin)
 									.child("LinkedIn"),
 							)
 							.child(

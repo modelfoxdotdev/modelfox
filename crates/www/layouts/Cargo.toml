@@ -8,6 +8,7 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
+chrono = { version = "0.4", features = ["serde"] }
 pinwheel = "0.2"
 sunfish = "0.2"
 tangram_ui = { path = "../../ui" }

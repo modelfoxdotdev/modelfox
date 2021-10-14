@@ -1,0 +1,26 @@
+{
+	"name": "tangram/basic-example",
+	"description": "This example demonstrates loading a model from a `.tangram` file and making a prediction.",
+	"type": "project",
+	"repositories": [
+		{
+			"type": "path",
+			"url": "../.."
+		}
+	],
+	"require": {
+		"tangram/tangram": "0.7.0"
+	},
+	"license": "MIT",
+	"autoload": {
+		"psr-4": {
+			"Tangram\\BasicExample\\": "src/"
+		}
+	},
+	"authors": [
+		{
+			"name": "Tangram",
+			"email": "root@tangram.dev"
+		}
+	]
+}

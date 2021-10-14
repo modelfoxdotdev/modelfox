@@ -1,3 +1,4 @@
+use chrono::Datelike;
 use pinwheel::prelude::*;
 use tangram_www_ui::logo::{Logo, LogoColorScheme};
 
@@ -12,7 +13,10 @@ impl Component for Footer {
 					.class("footer-logo".to_owned())
 					.color_scheme(LogoColorScheme::Multi),
 			)
-			.child(p().class("footer-copyright").child("Tangram © 2020"))
+			.child(
+				p().class("footer-copyright")
+					.child(format!("Tangram © {}", chrono::Utc::now().year())),
+			)
 			.into_node()
 	}
 }

@@ -1,0 +1,26 @@
+{
+	"name": "tangram/advanced-example",
+	"description": "Advanced usage example ",
+	"type": "project",
+	"repositories": [
+		{
+			"type": "path",
+			"url": "../.."
+		}
+	],
+	"require": {
+		"tangram/tangram": "0.7.0"
+	},
+	"license": "MIT",
+	"autoload": {
+		"psr-4": {
+			"Tangram\\AdvancedExample\\": "src/"
+		}
+	},
+	"authors": [
+		{
+			"name": "Tangram",
+			"email": "root@tangram.dev"
+		}
+	]
+}

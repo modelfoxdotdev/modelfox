@@ -54,6 +54,14 @@ impl Component for Page {
 									.child(
 										ui::ListItem::new().child(
 											ui::Link::new()
+												.href("php".to_owned())
+												.title("PHP".to_owned())
+												.child("PHP"),
+										),
+									)
+									.child(
+										ui::ListItem::new().child(
+											ui::Link::new()
 												.href("python".to_owned())
 												.title("Python".to_owned())
 												.child("Python"),

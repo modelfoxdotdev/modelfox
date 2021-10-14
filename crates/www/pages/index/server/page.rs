@@ -41,7 +41,7 @@ impl Component for Hero {
 		let title = h1()
 			.class("index-hero-title")
 			.child("Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.");
-		let subtitle= "Train a model from a CSV file on the command line. Make predictions from Elixir, Go, JavaScript, Python, Ruby, or Rust. Learn about your models and monitor them in production from your browser.";
+		let subtitle= "Train a model from a CSV file on the command line. Make predictions from Elixir, Go, JavaScript, PHP, Python, Ruby, or Rust. Learn about your models and monitor them in production from your browser.";
 		let subtitle = div().class("index-hero-subtitle").child(subtitle);
 		let buttons = div()
 			.class("index-hero-buttons")

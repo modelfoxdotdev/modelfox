@@ -323,6 +323,13 @@ impl Component for TuningCode {
 				"#
 			)
 			.into(),
+			php: ui::doc!(
+				r#"
+					$options = new \tangram::PredictOptions('true', 0.5);
+					$output = model->predict($input, $options);
+				"#
+			)
+			.into(),
 			python: ui::doc!(
 				r#"
 					predict_options = tangram.PredictOptions(

@@ -65,6 +65,15 @@ impl Component for Monitoring {
 			"#
 		)
 		.into();
+		let php = ui::doc!(
+			r#"
+				// Log the predicton
+				$model->log_prediction('71762b29-2296-4bf9-a1d4-59144d74c9d9', $input, $output, $options);
+
+				// Later on, if we get an official diagnosis for the patient, log the true value. Make sure to match the `identifier`.
+				$model->log_true_value('71762b29-2296-4bf9-a1d4-59144d74c9d9', 'Positive');
+			"#
+		).into();
 		let python = ui::doc!(
 			r#"
 				# Log the prediction.
@@ -123,6 +132,7 @@ impl Component for Monitoring {
 			elixir,
 			go,
 			javascript,
+			php,
 			python,
 			ruby,
 			rust,

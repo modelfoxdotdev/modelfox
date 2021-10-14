@@ -59,6 +59,18 @@
           lld_12
           mold
           nodejs-16_x
+          (php.withExtensions ({ all, ...}: with all; [
+            curl
+            dom
+            ffi
+            fileinfo
+            filter
+            iconv
+            mbstring
+            simplexml
+            tokenizer
+          ]))
+          php.packages.composer
           (python39.withPackages(ps: with ps; [
             catboost
             lightgbm

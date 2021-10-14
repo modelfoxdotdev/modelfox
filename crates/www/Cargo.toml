@@ -25,6 +25,7 @@ default = [
   "tangram_www_docs_getting_started_predict_go_server",
   "tangram_www_docs_getting_started_predict_index_server",
   "tangram_www_docs_getting_started_predict_javascript_server",
+  "tangram_www_docs_getting_started_predict_php_server",
   "tangram_www_docs_getting_started_predict_python_server",
   "tangram_www_docs_getting_started_predict_ruby_server",
   "tangram_www_docs_getting_started_predict_rust_server",
@@ -72,6 +73,7 @@ tangram_www_docs_getting_started_predict_elixir_server = { path = "pages/docs/ge
 tangram_www_docs_getting_started_predict_go_server = { path = "pages/docs/getting_started/predict/go/server" , optional = true}
 tangram_www_docs_getting_started_predict_index_server = { path = "pages/docs/getting_started/predict/index/server" , optional = true}
 tangram_www_docs_getting_started_predict_javascript_server = { path = "pages/docs/getting_started/predict/javascript/server" , optional = true}
+tangram_www_docs_getting_started_predict_php_server = { path = "pages/docs/getting_started/predict/php/server" , optional = true}
 tangram_www_docs_getting_started_predict_python_server = { path = "pages/docs/getting_started/predict/python/server" , optional = true}
 tangram_www_docs_getting_started_predict_ruby_server = { path = "pages/docs/getting_started/predict/ruby/server" , optional = true}
 tangram_www_docs_getting_started_predict_rust_server = { path = "pages/docs/getting_started/predict/rust/server" , optional = true}
