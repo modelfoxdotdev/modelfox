@@ -42,9 +42,8 @@ final class MulticlassClassificationPredictOutput
      * Serialize to JSON
      * @return string JSON representation
      */
-    public function to_json(...$args)
+    public function to_json()
     {
-        // TODO args?
         return json_encode($this);
     }
 }
