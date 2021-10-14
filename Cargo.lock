@@ -4845,6 +4845,7 @@ dependencies = [
 name = "tangram_www_layouts"
 version = "0.0.0"
 dependencies = [
+ "chrono",
  "pinwheel",
  "sunfish",
  "tangram_ui",
