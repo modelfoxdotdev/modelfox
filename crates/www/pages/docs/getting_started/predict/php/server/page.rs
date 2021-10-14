@@ -71,8 +71,7 @@ impl Component for Predict {
 				$model = Model::from_path($model_path);
 
 				// Create an example input matching the schema of the CSV file the model was trained on.
-				//Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
-
+				// Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
 				$input = [
 				    'age' => 63.0,
 				    'gender' => 'male',
