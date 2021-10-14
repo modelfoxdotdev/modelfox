@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace tangram\tangram;
 
-final class Bigram
+final class Bigram extends Ngram
 {
     /**
      * This is the first token in the bigram.
@@ -15,7 +15,7 @@ final class Bigram
      */
     public string $token_b;
     /**
-     * Create a new Biigram instance
+     * Create a new Bigram instance
      * @param string $token_a
      * @param string $token_b
      * @return void

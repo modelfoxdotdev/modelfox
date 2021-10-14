@@ -13,11 +13,11 @@ final class OneHotEncodedFeatureContribution
     /**
      * This is the enum variant tha the feature indicates the presence of.
      */
-    public string|null $variant;
+    public ?string $variant;
     /**
      * This is the value the feature.
      */
-    public float $feature_value;
+    public bool $feature_value;
     /**
      * This is the amount that the feature contributed to the output..
      */
@@ -30,7 +30,7 @@ final class OneHotEncodedFeatureContribution
      * @param float $feature_contribution_value
      * @return void
      */
-    public function __construct(string $column_name, string|null $variant, float $feature_value, float $feature_contribution_value)
+    public function __construct(string $column_name, ?string $variant, bool $feature_value, float $feature_contribution_value)
     {
         $this->column_name = $column_name;
         $this->variant = $variant;

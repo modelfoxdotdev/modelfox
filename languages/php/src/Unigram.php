@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace tangram\tangram;
 
-final class Unigram
+final class Unigram extends Ngram
 {
     /**
      * This is the token.

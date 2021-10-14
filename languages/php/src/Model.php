@@ -540,7 +540,7 @@ final class Model
         self::$ffi->tangram_one_hot_encoded_feature_contribution_get_feature_contribution_value($c_one_hot_encoded_feature_contribution, \FFI::addr($c_feature_contribution_value));
         $feature_contribution_value = $c_feature_contribution_value->cdata;
 
-        $c_feature_value = self::$ffi->new('float');
+        $c_feature_value = self::$ffi->new('bool');
         self::$ffi->tangram_one_hot_encoded_feature_contribution_get_feature_value($c_one_hot_encoded_feature_contribution, \FFI::addr($c_feature_value));
         $feature_value = $c_feature_value->cdata;
 

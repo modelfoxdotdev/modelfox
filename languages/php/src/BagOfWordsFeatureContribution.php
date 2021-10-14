@@ -13,7 +13,7 @@ final class BagOfWordsFeatureContribution
     /**
      * This is the ngram for the feature.
      */
-    public Unigram|Bigram $ngram;
+    public Ngram $ngram;
     /**
      * This is the value the feature.
      */
@@ -30,7 +30,7 @@ final class BagOfWordsFeatureContribution
      * @param float $feature_contribution_value
      * @return void
      */
-    public function __construct(string $column_name, Unigram|Bigram $ngram, float $feature_value, float $feature_contribution_value)
+    public function __construct(string $column_name, Ngram $ngram, float $feature_value, float $feature_contribution_value)
     {
         $this->column_name = $column_name;
         $this->ngram = $ngram;
