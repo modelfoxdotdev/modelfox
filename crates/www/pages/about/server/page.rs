@@ -38,7 +38,8 @@ impl Component for Page {
 			.name("Ben Lovy")
 			.linked_in("https://www.linkedin.com/in/benlovy".to_string())
 			.github("https://github.com/deciduously".to_string())
-			.gravatar("https://gravatar.com/avatar/98c040317325f49915f91168ec8805bc?s=100");
+			.gravatar("https://gravatar.com/avatar/98c040317325f49915f91168ec8805bc?s=100")
+			.twitter("https://twitter.com/ben_deciduously".to_string());
 		let team = ui::S2::new()
 			.child(ui::H1::new().child("Team"))
 			.child(david)
