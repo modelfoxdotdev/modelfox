@@ -27,10 +27,10 @@ final class MulticlassClassificationPredictOutput extends PredictOutput
      * @param string $class_name
      * @param float $probability
      * @param array $probabilities
-     * @param FeatureContributions|array $feature_contributions
+     * @param FeatureContributions $feature_contributions
      * @return void
      */
-    public function __construct(string $class_name, float $probability, array $probabilities, FeatureContributions|array $feature_contributions = null)
+    public function __construct(string $class_name, float $probability, array $probabilities, FeatureContributions $feature_contributions = null)
     {
         $this->class_name = $class_name;
         $this->probability = $probability;
