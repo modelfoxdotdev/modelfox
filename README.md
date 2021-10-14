@@ -32,7 +32,7 @@ The CLI automatically transforms your data into features, trains a number of lin
 
 ### Predict
 
-Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramdotdev/tangram-go), [JavaScript](https://www.npmjs.com/package/@tangramdotdev/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](https://lib.rs/tangram).
+Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramdotdev/tangram-go), [JavaScript](https://www.npmjs.com/package/@tangramdotdev/tangram), [PHP](https://packagist.org/packages/tangram/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](https://lib.rs/tangram).
 
 ```javascript
 let tangram = require("@tangramdotdev/tangram")
