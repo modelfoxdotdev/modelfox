@@ -29,7 +29,7 @@ $input = [
     // ..
 ];
 
-$output = $model->predict($input)
+$output = $model->predict($input);
 ```
 
 For more information, [read the docs](https://www.tangram.dev/docs).

@@ -14,8 +14,9 @@ impl Component for Page {
 		let list = ui::UnorderedList::new()
 			.child(ui::ListItem::new().child("Train a model from a CSV file on the command line."))
 			.child(
-				ui::ListItem::new()
-					.child("Make predictions from Elixir, Go, JavaScript, Python, Ruby, or Rust."),
+				ui::ListItem::new().child(
+					"Make predictions from Elixir, Go, JavaScript, PHP, Python, Ruby, or Rust.",
+				),
 			)
 			.child(ui::ListItem::new().child(
 				"Learn about your models and monitor them in production from your browser.",

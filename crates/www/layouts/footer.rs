@@ -12,7 +12,7 @@ impl Component for Footer {
 					.class("footer-logo".to_owned())
 					.color_scheme(LogoColorScheme::Multi),
 			)
-			.child(p().class("footer-copyright").child("Tangram © 2020"))
+			.child(p().class("footer-copyright").child("Tangram © 2021"))
 			.into_node()
 	}
 }

@@ -43,6 +43,7 @@ pub enum PredictPage {
 	Elixir,
 	Go,
 	Node,
+	PHP,
 	Python,
 	Ruby,
 	Rust,
@@ -166,6 +167,17 @@ impl Component for PageNav {
 							)
 							.child(
 								ui::NavItem::new()
+									.title("PHP".to_owned())
+									.href("/docs/getting_started/predict/php".to_owned())
+									.selected(matches!(
+										self.selected_page,
+										Some(DocsPage::GettingStarted(
+											GettingStartedPage::Predict(PredictPage::PHP)
+										)),
+									)),
+							)
+							.child(
+								ui::NavItem::new()
 									.title("Python".to_owned())
 									.href("/docs/getting_started/predict/python".to_owned())
 									.selected(matches!(
@@ -257,6 +269,12 @@ impl Component for PageNav {
 						ui::NavItem::new()
 							.title("JavaScript".to_owned())
 							.href("/docs/languages/javascript".to_owned())
+							.selected(false),
+					)
+					.child(
+						ui::NavItem::new()
+							.title("PHP".to_owned())
+							.href("/docs/languages/php".to_owned())
 							.selected(false),
 					)
 					.child(

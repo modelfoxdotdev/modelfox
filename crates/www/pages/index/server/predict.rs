@@ -45,6 +45,27 @@ impl Component for Predict {
 			"#
 		)
 		.into();
+		let php = ui::doc!(
+			r#"
+			<?php
+
+			namespace tangram\tangram;
+
+			require_once(dirname(dirname(__FILE__)) . '/vendor/autoload.php');
+
+			$model_path = dirname(dirname(__FILE__)) . '/heart_disease.tangram';
+			$model = Model::from_path($model_path);
+
+			$input = [
+			    'age' => 63.0,
+			    'gender' => 'male',
+			    // ..
+			];
+
+			$output = $model->predict($input);
+			"#
+		)
+		.into();
 		let python = ui::doc!(
 			r#"
 				import tangram
@@ -92,6 +113,7 @@ impl Component for Predict {
 			elixir,
 			go,
 			javascript,
+			php,
 			python,
 			ruby,
 			rust,
@@ -121,6 +143,13 @@ impl Component for Predict {
 					.href("https://www.npmjs.com/package/@tangramdotdev/tangram".to_owned())
 					.title("JavaScript".to_owned())
 					.child("JavaScript"),
+			)
+			.child(", ")
+			.child(
+				ui::Link::new()
+					.href("https://packagist.org/packages/tangram/tangram".to_owned())
+					.title("PHP".to_owned())
+					.child("PHP"),
 			)
 			.child(", ")
 			.child(
