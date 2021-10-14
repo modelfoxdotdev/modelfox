@@ -44,6 +44,4 @@ The source for this package contains a number of examples in the `examples` dire
 
 ### Notes
 
-- On Alpine Linux, Tangram for Elixir requires the `libgcc` library to be installed. It is not installed by default in the Alpine Linux docker image, but will very likely be a dependency of software you are already using. If not, you can run `apk add libgcc` to install it. We have opened [this issue](https://github.com/rust-lang/rust/issues/82521) with Rust to hopefully eliminate this requirement in the future.
-
-Additionally, you will need to install `ffi` support for `php` with `apk add php7-ffi`.
+- On Alpine Linux, Tangram for Elixir requires the `libgcc` library to be installed. It is not installed by default in the Alpine Linux docker image, but will very likely be a dependency of software you are already using. If not, you can run `apk add libgcc` to install it. We have opened [this issue](https://github.com/rust-lang/rust/issues/82521) with Rust to hopefully eliminate this requirement in the future. Additionally, you will need to install `ffi` support for `php` with `apk add php7-ffi`.
