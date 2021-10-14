@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace tangram\tangram;
 
-final class MulticlassClassificationPredictOutput
+final class MulticlassClassificationPredictOutput extends PredictOutput
 {
     /**
      * The name of the predicted class.

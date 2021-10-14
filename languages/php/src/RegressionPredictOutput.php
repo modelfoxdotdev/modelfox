@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace tangram\tangram;
 
-final class RegressionPredictOutput
+final class RegressionPredictOutput extends PredictOutput
 {
     /**
      * This is the predicted value.

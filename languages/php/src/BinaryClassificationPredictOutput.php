@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace tangram\tangram;
 
-final class BinaryClassificationPredictOutput
+final class BinaryClassificationPredictOutput extends PredictOutput
 {
     /**
      * The name of the predicted class.
@@ -17,15 +17,15 @@ final class BinaryClassificationPredictOutput
     /**
      *  If computing feature contributions was enabled in the predict options, this value will explain the model's output, showing how much each feature contributed to the output.
      */
-    public FeatureContributions|null $feature_contributions;
+    public ?FeatureContributions $feature_contributions;
     /**
      * Create a new PredictOptions instance
      * @param string $class_name
      * @param float $probability
-     * @param FeatureContributions|null $feature_contributions
+     * @param ?FeatureContributions $feature_contributions
      * @return void
      */
-    public function __construct(string $class_name, float $probability, FeatureContributions|null $feature_contributions = null)
+    public function __construct(string $class_name, float $probability, ?FeatureContributions $feature_contributions = null)
     {
         $this->class_name = $class_name;
         $this->probability = $probability;

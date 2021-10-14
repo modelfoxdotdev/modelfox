@@ -145,7 +145,7 @@ final class Model
      * Make a prediction!
      * @param array $input A predict input is either a single predict input which is a map from symbols or strings to strings or floats or an array of such maps. The keys should match the columns in the CSV file you trained your model with.
      * @param PredictOptions $options Optional predict options
-     * @return RegressionPredictOutput|BinaryClassificationPredictOutput|MulticlassClassificationPredictOutput|array Return a single output if `input` was a single input, or an array if `input` was an array of `input`s.
+     * @return PredictOutput Return a single output if `input` was a single input, or an array if `input` was an array of `input`s.
      */
     public function predict(array $input, PredictOptions $options = null)
     {
@@ -176,13 +176,13 @@ final class Model
     }
     /**
      * Send a prediction even to the app.  If you want to batch events, you can use `enqueue_log_prediction` instead.
-     * @param string|int|float $identifier This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
+     * @param string $identifier This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
      * @param array $input A single PredictInput.
-     * @param RegressionPredictOutput|BinaryClassificationPredictOutput|MulticlassClassificationPredictOutput $output A single PredictOutput.
+     * @param PredictOutput $output A single PredictOutput.
      * @param PredictOptions $options This is the same $options value that you passed to `Model::predict`.
      * @return void
      */
-    public function log_prediction(string|int|float $identifier, array $input, RegressionPredictOutput|BinaryClassificationPredictOutput|MulticlassClassificationPredictOutput $output, PredictOptions $options)
+    public function log_prediction(string $identifier, array $input, PredictOutput $output, PredictOptions $options)
     {
         $event = $this->prediction_event($identifier, $input, $output, $options);
         $this->log_event($event);
@@ -190,13 +190,13 @@ final class Model
 
     /**
      * Add a prediction event to the queue.  Remember to call `flush_log_queue` at a later point to send the event to the app.
-     * @param string|float|int $identifier This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
+     * @param string $identifier This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
      * @param $input array A single prediction input.
-     * @param RegressionPredictOutput|BinaryClassificationPredictOutput|MulticlassClassificationPredictOutput $output A single prediction output
+     * @param PredictOutput $output A single prediction output
      * @param PredictOptions $options This is the same `predictOptions` value that you passed to `predict`
      * @return void
      */
-    public function enqueue_log_prediction(string|float|int $identifier, array $input, RegressionPredictOutput|BinaryClassificationPredictOutput|MulticlassClassificationPredictOutput $output, PredictOptions $options = null)
+    public function enqueue_log_prediction(string $identifier, array $input, PredictOutput $output, PredictOptions $options = null)
     {
         $event = $this->prediction_event($identifier, $input, $output, $options);
         array_push($this->log_queue, $event);
@@ -204,11 +204,11 @@ final class Model
 
     /**
      * Send a true value event to the app.  If you want to batch events, you can use `enqueue_log_true_value` instead.
-     * @param string|int|float $identifier This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
-     * @param string|int|float This is the true value for the prediction.
+     * @param string $identifier This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
+     * @param string This is the true value for the prediction.
      * @return void
      */
-    public function log_true_value(string|int|float $identifier, string|int|float $true_value)
+    public function log_true_value(string $identifier, string $true_value)
     {
         $event = $this->true_value_event($identifier, $true_value);
         $this->log_event($event);
@@ -216,11 +216,11 @@ final class Model
 
     /**
      * Add a true value event to the queue.  Remember to call `flush_log_queue` at a later point to send the event to the app.
-     * @param string|int|float $identifier This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
-     * @param string|int|float $true_value This is the true value for the prediction.
+     * @param string $identifier This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
+     * @param string $true_value This is the true value for the prediction.
      * @return void
      */
-    public function enqueue_log_true_value(string|int|float $identifier, string|int|float $true_value)
+    public function enqueue_log_true_value(string $identifier, string $true_value)
     {
         $event = $this->true_value_event($identifier, $true_value);
         array_push($this->log_queue, $event);
@@ -681,7 +681,7 @@ final class Model
         }
     }
 
-    private function prediction_event(string|float|int $identifier, array $input, RegressionPredictOutput|BinaryClassificationPredictOutput|MulticlassClassificationPredictOutput $output, PredictOptions $options = null)
+    private function prediction_event(string $identifier, array $input, PredictOutput $output, PredictOptions $options = null)
     {
         return [
             'date' => date(DATE_RFC3339),
@@ -694,7 +694,7 @@ final class Model
         ];
     }
 
-    private function true_value_event(string|float|int $identifier, string $true_value)
+    private function true_value_event(string $identifier, string $true_value)
     {
         return [
             'date' => date(DATE_RFC3339),
