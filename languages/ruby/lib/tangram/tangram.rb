@@ -701,7 +701,7 @@ module Tangram
       c_feature_value = FFI::MemoryPointer.new(:float)
       LibTangram.tangram_bag_of_words_cosine_similarity_feature_contribution_get_feature_value(c_bag_of_words_cosine_similarity_feature_contribution, c_feature_value)
       feature_value = c_feature_value.read(:float)
-      BagOfWordsFeatureContribution.new(
+      BagOfWordsCosineSimilarityFeatureContribution.new(
         column_name_a: column_name_a,
         column_name_b: column_name_b,
         feature_contribution_value: feature_contribution_value,
@@ -733,7 +733,7 @@ module Tangram
 
     def get_ngram(ngram)
       c_ngram_type = FFI::MemoryPointer.new(:int)
-      LibTangram.tangram_ngram_get_type(ngram, ngram_type)
+      LibTangram.tangram_ngram_get_type(ngram, c_ngram_type)
       case c_ngram_type.read(:int)
       when LibTangram::TangramNGramType[:unigram]
         get_unigram_ngram(ngram)
