@@ -1,5 +1,5 @@
 use anyhow::Result;
-use clap::Clap;
+use clap::Parser;
 use digest::Digest;
 use duct::cmd;
 use indoc::formatdoc;
@@ -9,7 +9,7 @@ use sha2::Sha256;
 use std::path::{Path, PathBuf};
 use tangram_build::{Arch, Target, TargetFileNames};
 
-#[derive(Clap)]
+#[derive(Parser)]
 pub struct Args {
 	#[clap(long, env)]
 	version: String,

@@ -1,5 +1,6 @@
 [package]
-edition = "2018"
+edition = "2021"
+rust-version = "1.56"
 license = "MIT"
 name = "tangram_build"
 publish = false
@@ -17,7 +18,7 @@ path = "main.rs"
 anyhow = { version = "1", features = ["backtrace"] }
 cbindgen = "0.20"
 chrono = { version = "0.4", features = ["serde"] }
-clap = { version = "3.0.0-beta.2", features = ["color"] }
+clap = { version = "3.0.0-beta.5", features = ["color"] }
 digest = "0.9"
 dirs = "4"
 duct = "0.13"

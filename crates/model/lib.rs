@@ -9,7 +9,7 @@ pub use self::{
 use anyhow::{bail, Result};
 use fnv::FnvHashMap;
 use num::ToPrimitive;
-use std::{convert::TryInto, io::prelude::*, path::Path};
+use std::{io::prelude::*, path::Path};
 
 mod binary_classifier;
 mod features;

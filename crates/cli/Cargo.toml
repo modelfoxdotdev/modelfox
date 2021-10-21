@@ -1,6 +1,7 @@
 [package]
 default-run = "tangram"
-edition = "2018"
+edition = "2021"
+rust-version = "1.56"
 license = "MIT"
 name = "tangram_cli"
 publish = false
@@ -18,7 +19,7 @@ app = ["tangram_app", "tangram_app/default"]
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
 backtrace = "0.3"
-clap = { version = "3.0.0-beta.2", features = ["color"] }
+clap = { version = "3.0.0-beta.5", features = ["color"] }
 colored = "2"
 csv = "1"
 dirs = "4"

@@ -406,6 +406,7 @@ where
 	.enumerate()
 	.map(
 		|(feature_index, (binning_instructions, offset, is_feature_splittable))| {
+			let _ = &bin_stats;
 			let bin_stats = unsafe { &mut *bin_stats.0 };
 			let offset = offset.to_usize().unwrap();
 			let bin_stats_range = offset..offset + binning_instructions.n_bins();
@@ -956,6 +957,7 @@ where
 	.enumerate()
 	.map(
 		|(feature_index, (binning_instructions, offset, is_feature_splittable))| {
+			let _ = (&smaller_child_bin_stats, &larger_child_bin_stats);
 			if !is_feature_splittable {
 				return (None, None);
 			}

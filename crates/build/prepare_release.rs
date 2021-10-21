@@ -1,10 +1,10 @@
-use clap::Clap;
+use clap::Parser;
 use duct::cmd;
 use indoc::formatdoc;
 use std::path::{Path, PathBuf};
 use tangram_build::{Target, TargetFileNames};
 
-#[derive(Clap)]
+#[derive(Parser)]
 pub struct Args {
 	#[clap(long, env)]
 	version: String,

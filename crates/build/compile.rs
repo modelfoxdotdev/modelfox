@@ -1,12 +1,12 @@
 use anyhow::anyhow;
-use clap::Clap;
+use clap::Parser;
 use duct::cmd;
 use indoc::formatdoc;
 use std::{fs::File, path::Path};
 use tangram_build::{Arch, Target, TargetFileNames};
 use which::which;
 
-#[derive(Clap)]
+#[derive(Parser)]
 pub struct Args {
 	#[clap(long)]
 	target: Target,

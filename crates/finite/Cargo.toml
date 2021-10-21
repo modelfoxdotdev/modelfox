@@ -2,7 +2,8 @@
 authors = ["Tangram <root@tangram.dev"]
 description = "Tangram makes it easy for programmers to train, deploy, and monitor machine learning models."
 documentation = "https://docs.rs/tangram"
-edition = "2018"
+edition = "2021"
+rust-version = "1.56"
 homepage = "https://github.com/tangramdotdev/tangram"
 license = "MIT"
 name = "tangram_finite"

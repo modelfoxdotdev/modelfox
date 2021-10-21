@@ -1,5 +1,5 @@
 use anyhow::Result;
-use clap::Clap;
+use clap::Parser;
 use std::{path::PathBuf, sync::Arc, time::Duration};
 use sunfish::Sunfish;
 use tower::{make::Shared, ServiceBuilder};
@@ -7,7 +7,7 @@ use tower_http::{add_extension::AddExtensionLayer, trace::TraceLayer};
 use tracing::{error, info, Span};
 use tracing_subscriber::prelude::*;
 
-#[derive(Clap)]
+#[derive(Parser)]
 enum Args {
 	#[clap(name = "serve")]
 	Serve,
@@ -15,7 +15,7 @@ enum Args {
 	Export(ExportArgs),
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 struct ExportArgs {
 	path: PathBuf,
 }

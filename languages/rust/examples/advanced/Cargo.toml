@@ -1,5 +1,6 @@
 [package]
-edition = "2018"
+edition = "2021"
+rust-version = "1.56"
 license = "MIT"
 name = "tangram_example_advanced"
 publish = false

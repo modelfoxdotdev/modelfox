@@ -1,6 +1,6 @@
 use anyhow::Result;
 use chrono::{Datelike, TimeZone, Timelike, Utc};
-use clap::{ArgEnum, Clap};
+use clap::{ArgEnum, Parser};
 use num::ToPrimitive;
 use rand::Rng;
 use std::{collections::HashMap, path::Path};
@@ -13,7 +13,7 @@ use tangram_id::Id;
 use tangram_table::TableView;
 use url::Url;
 
-#[derive(Clap)]
+#[derive(Parser)]
 pub struct Args {
 	#[clap(long)]
 	pub tangram_url: Url,
@@ -25,7 +25,7 @@ pub struct Args {
 	pub examples_count: usize,
 }
 
-#[derive(ArgEnum)]
+#[derive(Clone, ArgEnum)]
 pub enum Dataset {
 	#[clap(name = "boston")]
 	Boston,

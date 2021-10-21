@@ -1,7 +1,7 @@
-use clap::Clap;
+use clap::Parser;
 use duct::cmd;
 
-#[derive(Clap)]
+#[derive(Parser)]
 pub struct Args {
 	#[clap(multiple_values = true)]
 	machines: Vec<String>,

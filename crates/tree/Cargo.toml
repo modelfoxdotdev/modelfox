@@ -3,6 +3,7 @@ authors = ["Tangram <root@tangram.dev"]
 description = "Tangram makes it easy for programmers to train, deploy, and monitor machine learning models."
 documentation = "https://docs.rs/tangram"
 edition = "2018"
+rust-version = "1.56"
 homepage = "https://github.com/tangramdotdev/tangram"
 license = "MIT"
 name = "tangram_tree"
@@ -53,7 +54,7 @@ path = "benchmarks/iris.rs"
 [dependencies]
 bitvec = "0.19"
 buffalo = { version = "0.1", features = ["ndarray_0_15", "bitvec_0_19"] }
-clap = { version = "3.0.0-beta.2", features = ["color"] }
+clap = { version = "3.0.0-beta.5", features = ["color"] }
 itertools = "0.10"
 maplit = "1"
 ndarray = { version = "0.15", features = ["rayon"] }

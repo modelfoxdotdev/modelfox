@@ -1,5 +1,6 @@
 [package]
-edition = "2018"
+edition = "2021"
+rust-version = "1.56"
 name = "tangram_app_playground_server"
 publish = false
 version = "0.0.0"

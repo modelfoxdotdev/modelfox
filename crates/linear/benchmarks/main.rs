@@ -1,6 +1,6 @@
-use clap::{self, ArgEnum, Clap};
+use clap::{self, ArgEnum, Parser};
 
-#[derive(Clap)]
+#[derive(Parser)]
 struct Args {
 	#[clap(long, arg_enum, multiple_values = true)]
 	datasets: Vec<Dataset>,

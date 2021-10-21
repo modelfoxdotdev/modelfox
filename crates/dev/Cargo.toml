@@ -1,5 +1,6 @@
 [package]
-edition = "2018"
+edition = "2021"
+rust-version = "1.56"
 name = "tangram_dev"
 publish = false
 version = "0.0.0"
@@ -9,6 +10,6 @@ name = "tangram_dev"
 path = "main.rs"
 
 [dependencies]
-clap = { version = "3.0.0-beta.2", features = ["color"] }
+clap = { version = "3.0.0-beta.5", features = ["color"] }
 sunfish = "0.2"
 tokio = { version = "1", features = ["full"] }

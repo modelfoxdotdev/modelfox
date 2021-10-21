@@ -1,11 +1,11 @@
-use clap::Clap;
+use clap::Parser;
 
 mod build_pkgs;
 mod collect;
 mod compile;
 mod prepare_release;
 
-#[derive(Clap)]
+#[derive(Parser)]
 enum Args {
 	#[clap(name = "compile")]
 	Compile(self::compile::Args),

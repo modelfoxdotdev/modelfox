@@ -1,6 +1,6 @@
 //! This module contains the main entrypoint to the tangram cli.
 
-use clap::Clap;
+use clap::Parser;
 use colored::Colorize;
 use std::path::PathBuf;
 use tracing_subscriber::prelude::*;
@@ -14,7 +14,7 @@ mod predict;
 #[cfg(feature = "train")]
 mod train;
 
-#[derive(Clap)]
+#[derive(Parser)]
 #[clap(
 	version = concat!(env!("CARGO_PKG_VERSION")),
 	about = "Train and deploy a machine learning model in minutes.",
@@ -36,7 +36,7 @@ enum Args {
 }
 
 #[cfg(feature = "train")]
-#[derive(Clap)]
+#[derive(Parser)]
 #[clap(
 	about = "Train a model.",
 	long_about = "Train a model from a csv file."
@@ -76,7 +76,7 @@ pub struct TrainArgs {
 }
 
 #[cfg(feature = "train")]
-#[derive(Clap)]
+#[derive(Parser)]
 #[clap(
 	about = "Make predictions with a model.",
 	long_about = "Make predictions with a model on the command line from a csv file."
@@ -105,7 +105,7 @@ pub struct PredictArgs {
 }
 
 #[cfg(feature = "tangram_app")]
-#[derive(Clap)]
+#[derive(Parser)]
 #[clap(about = "Run the app.", long_about = "Run the app.")]
 pub struct AppArgs {
 	#[clap(short, long = "config")]
@@ -113,7 +113,7 @@ pub struct AppArgs {
 }
 
 #[cfg(feature = "tangram_app")]
-#[derive(Clap)]
+#[derive(Parser)]
 #[clap(
 	about = "Migrate your app database.",
 	long_about = "Migrate your app database to the latest version."

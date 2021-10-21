@@ -1,15 +1,15 @@
 use anyhow::Result;
-use clap::Clap;
+use clap::Parser;
 use duct::cmd;
 use std::path::PathBuf;
 
-#[derive(Clap)]
+#[derive(Parser)]
 pub enum Args {
 	#[clap(name = "generate")]
 	Generate(GenerateArgs),
 }
 
-#[derive(Clap)]
+#[derive(Parser)]
 pub struct GenerateArgs {
 	#[clap(short, long, about = "the path to write the license file")]
 	pub output: PathBuf,

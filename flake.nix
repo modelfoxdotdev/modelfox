@@ -16,13 +16,13 @@
         inherit system;
       };
       rust = (with fenix.packages.${system}; combine [
-        stable.rustc
-        stable.cargo
-        stable.clippy-preview
-        stable.rustfmt-preview
-        stable.rust-std
-        targets.wasm32-unknown-unknown.stable.rust-std
-        stable.rust-src
+        latest.rustc
+        latest.cargo
+        latest.clippy-preview
+        latest.rustfmt-preview
+        latest.rust-std
+        targets.wasm32-unknown-unknown.latest.rust-std
+        latest.rust-src
         rust-analyzer
       ]);
     in rec {
@@ -78,7 +78,7 @@
             pandas
             pytorch
             scikitlearn
-            xgboost
+            #xgboost
           ]))
           rpm
           ruby

@@ -1,7 +1,7 @@
-use clap::Clap;
+use clap::Parser;
 use std::path::PathBuf;
 
-#[derive(Clap)]
+#[derive(Parser)]
 pub struct Args {
 	#[clap(long, default_value = "0.0.0.0")]
 	host: std::net::IpAddr,
