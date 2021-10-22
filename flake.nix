@@ -84,7 +84,6 @@
           ruby
           rust
           rust-cbindgen
-          rust-analyzer
           sequoia
           sqlite
           time
