@@ -93,6 +93,7 @@ impl Regressor {
 				predictions_buffer.axis_chunks_iter_mut(Axis(0), n_examples_per_batch),
 			)
 			.for_each(|(features, labels, predictions)| {
+				let model_ptr = &model_ptr;
 				let model = unsafe { &mut *model_ptr.0 };
 				Regressor::train_batch(
 					model,

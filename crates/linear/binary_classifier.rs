@@ -92,6 +92,7 @@ impl BinaryClassifier {
 				probabilities_buffer.axis_chunks_iter_mut(Axis(0), n_examples_per_batch),
 			)
 			.for_each(|(features, labels, probabilities)| {
+				let model_ptr = &model_ptr;
 				let model = unsafe { &mut *model_ptr.0 };
 				BinaryClassifier::train_batch(
 					model,
