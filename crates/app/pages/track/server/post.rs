@@ -90,7 +90,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 }
 
 async fn handle_prediction_monitor_event(
-	mut db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	db: &mut sqlx::Transaction<'_, sqlx::Any>,
 	data_storage: &Storage,
 	model_cache: &mut BTreeMap<Id, Mmap>,
 	monitor_event: PredictionMonitorEvent,
@@ -105,14 +105,14 @@ async fn handle_prediction_monitor_event(
 		}
 	};
 	let model = tangram_model::from_bytes(bytes)?;
-	write_prediction_monitor_event(&mut db, model_id, &monitor_event).await?;
-	insert_or_update_production_stats_for_monitor_event(&mut db, model_id, model, monitor_event)
+	write_prediction_monitor_event(db, model_id, &monitor_event).await?;
+	insert_or_update_production_stats_for_monitor_event(db, model_id, model, monitor_event)
 		.await?;
 	Ok(())
 }
 
 async fn handle_true_value_monitor_event(
-	mut db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	db: &mut sqlx::Transaction<'_, sqlx::Any>,
 	data_storage: &Storage,
 	model_cache: &mut BTreeMap<Id, Mmap>,
 	monitor_event: TrueValueMonitorEvent,
@@ -127,8 +127,8 @@ async fn handle_true_value_monitor_event(
 		}
 	};
 	let model = tangram_model::from_bytes(bytes)?;
-	write_true_value_monitor_event(&mut db, model_id, &monitor_event).await?;
-	insert_or_update_production_metrics_for_monitor_event(&mut db, model_id, model, monitor_event)
+	write_true_value_monitor_event(db, model_id, &monitor_event).await?;
+	insert_or_update_production_metrics_for_monitor_event(db, model_id, model, monitor_event)
 		.await?;
 	Ok(())
 }

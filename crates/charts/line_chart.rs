@@ -86,7 +86,6 @@ pub struct LineChartOverlayInfo {
 
 #[derive(Clone)]
 pub struct LineChartHoverRegionInfo {
-	chart_rect: Rect,
 	color: String,
 	point: Point,
 	point_label: Option<String>,
@@ -94,10 +93,6 @@ pub struct LineChartHoverRegionInfo {
 	series_index: usize,
 	series_title: Option<String>,
 	tooltip_origin_pixels: Point,
-	x_max: f64,
-	x_min: f64,
-	y_max: f64,
-	y_min: f64,
 }
 
 impl ChartImpl for LineChart {
@@ -394,7 +389,6 @@ fn draw_line_chart(
 						&& y < point_pixels.y + tooltip_target_radius
 				}),
 				info: LineChartHoverRegionInfo {
-					chart_rect,
 					color: series.color.clone(),
 					point,
 					point_label,
@@ -406,10 +400,6 @@ fn draw_line_chart(
 						None
 					},
 					tooltip_origin_pixels: point_pixels,
-					x_max,
-					x_min,
-					y_max,
-					y_min,
 				},
 			};
 			hover_regions.push(hover_region);

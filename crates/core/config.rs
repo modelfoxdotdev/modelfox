@@ -73,7 +73,7 @@ pub struct TextColumn {
 	pub name: String,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, Default, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Features {
 	/// Use this field to control automatic feature engineering.
@@ -148,7 +148,7 @@ pub struct BagOfWordsCosineSimilarityFeatureGroup {
 	pub source_column_name_b: String,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, Default, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Train {
 	/// The `grid` specifies which models should be trained and with which hyperparameters. If you do not specify this option, a reasonable default grid will be used.
@@ -275,29 +275,11 @@ impl Default for Shuffle {
 	}
 }
 
-impl Default for Features {
-	fn default() -> Self {
-		Features {
-			auto: Default::default(),
-			include: Default::default(),
-		}
-	}
-}
-
 impl Default for AutoFeatures {
 	fn default() -> Self {
 		AutoFeatures {
 			enable: true,
 			exclude_columns: Default::default(),
-		}
-	}
-}
-
-impl Default for Train {
-	fn default() -> Self {
-		Train {
-			grid: Default::default(),
-			comparison_metric: Default::default(),
 		}
 	}
 }

@@ -661,7 +661,7 @@ fn draw_line(options: DrawLineOptions) {
 	} = options;
 	let line_width = line_width.unwrap_or(1.0);
 	let dashed = dashed.unwrap_or(false);
-	let line_cap = line_cap.as_deref().unwrap_or("butt");
+	let line_cap = line_cap.unwrap_or("butt");
 	ctx.save();
 	if dashed {
 		ctx.set_line_dash(&JsValue::from_serde(&[4.0, 4.0]).unwrap())

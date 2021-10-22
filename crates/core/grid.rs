@@ -40,7 +40,7 @@ pub enum GridItem {
 	},
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct LinearModelTrainOptions {
 	pub l2_regularization: Option<f32>,
 	pub learning_rate: Option<f32>,
@@ -49,19 +49,7 @@ pub struct LinearModelTrainOptions {
 	pub early_stopping_options: Option<EarlyStoppingOptions>,
 }
 
-impl Default for LinearModelTrainOptions {
-	fn default() -> LinearModelTrainOptions {
-		LinearModelTrainOptions {
-			l2_regularization: None,
-			learning_rate: None,
-			max_epochs: None,
-			n_examples_per_batch: None,
-			early_stopping_options: None,
-		}
-	}
-}
-
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct TreeModelTrainOptions {
 	pub binned_features_layout: Option<BinnedFeaturesLayout>,
 	pub early_stopping_options: Option<EarlyStoppingOptions>,
@@ -77,27 +65,6 @@ pub struct TreeModelTrainOptions {
 	pub min_gain_to_split: Option<f32>,
 	pub min_sum_hessians_per_node: Option<f32>,
 	pub smoothing_factor_for_discrete_bin_sorting: Option<f32>,
-}
-
-impl Default for TreeModelTrainOptions {
-	fn default() -> TreeModelTrainOptions {
-		TreeModelTrainOptions {
-			binned_features_layout: None,
-			early_stopping_options: None,
-			l2_regularization_for_continuous_splits: None,
-			l2_regularization_for_discrete_splits: None,
-			learning_rate: None,
-			max_depth: None,
-			max_examples_for_computing_bin_thresholds: None,
-			max_leaf_nodes: None,
-			max_rounds: None,
-			max_valid_bins_for_number_features: None,
-			min_examples_per_node: None,
-			min_gain_to_split: None,
-			min_sum_hessians_per_node: None,
-			smoothing_factor_for_discrete_bin_sorting: None,
-		}
-	}
 }
 
 #[derive(Clone, Debug)]

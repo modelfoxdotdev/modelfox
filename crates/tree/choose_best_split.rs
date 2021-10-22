@@ -692,7 +692,7 @@ fn compute_bin_stats_and_choose_best_splits_not_root_column_major(
 				binning_instructions,
 				binned_features_column,
 				smaller_child_bin_stats_for_feature,
-				mut larger_child_bin_stats_for_feature,
+				larger_child_bin_stats_for_feature,
 				is_feature_splittable,
 			),
 		)| {
@@ -711,7 +711,7 @@ fn compute_bin_stats_and_choose_best_splits_not_root_column_major(
 			// Compute the larger child bin stats by subtraction.
 			compute_bin_stats_subtraction(
 				smaller_child_bin_stats_for_feature,
-				&mut larger_child_bin_stats_for_feature,
+				larger_child_bin_stats_for_feature,
 			);
 			let (left_child_bin_stats_for_feature, right_child_bin_stats_for_feature) =
 				match smaller_child_direction {

@@ -44,7 +44,7 @@ impl ModelLayout {
 }
 
 pub async fn model_layout_info(
-	mut db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	db: &mut sqlx::Transaction<'_, sqlx::Any>,
 	context: &Context,
 	model_id: Id,
 	selected_item: ModelNavItem,
@@ -80,7 +80,7 @@ pub async fn model_layout_info(
 	let owner_user_email: Option<String> = row.get(4);
 	let owner_organization_id: Option<String> = row.get(5);
 	let owner_organization_name: Option<String> = row.get(6);
-	let model_version_ids = get_model_version_ids(&mut db, repo_id).await?;
+	let model_version_ids = get_model_version_ids(db, repo_id).await?;
 	#[allow(clippy::manual_map)]
 	let owner = if let Some(owner_user_id) = owner_user_id {
 		Some(Owner::User {
