@@ -56,7 +56,6 @@ bitvec = "0.19"
 buffalo = { version = "0.1", features = ["ndarray_0_15", "bitvec_0_19"] }
 clap = { version = "3.0.0-beta.5", features = ["color"] }
 itertools = "0.10"
-maplit = "1"
 ndarray = { version = "0.15", features = ["rayon"] }
 num = "0.4"
 rayon = "1.5"

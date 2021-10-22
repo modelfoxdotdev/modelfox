@@ -1,8 +1,7 @@
-use maplit::btreemap;
 use ndarray::prelude::*;
 use rayon::prelude::*;
 use serde_json::json;
-use std::path::Path;
+use std::{collections::BTreeMap, path::Path};
 use tangram_table::prelude::*;
 use tangram_tree::Progress;
 use tangram_zip::{pzip, zip};
@@ -95,17 +94,52 @@ fn main() {
 	.collect();
 	let target_variants = ["N", "Y"].iter().map(ToString::to_string).collect();
 	let options = tangram_table::FromCsvOptions {
-		column_types: Some(btreemap!(
-			"month".to_owned() => TableColumnType::Enum { variants: month_variants },
-			"day_of_week".to_owned() => TableColumnType::Enum { variants: day_of_week_variants },
-			"day_of_month".to_owned() => TableColumnType::Enum { variants: day_of_month_variants },
-			"dep_time".to_owned() => TableColumnType::Number,
-			"unique_carrier".to_owned() => TableColumnType::Enum { variants: carrier_variants },
-			"origin".to_owned() => TableColumnType::Enum { variants: origin_variants },
-			"dest".to_owned() => TableColumnType::Enum { variants: dest_variants },
-			"distance".to_owned() => TableColumnType::Number,
-			"dep_delayed_15min".to_owned() => TableColumnType::Enum { variants: target_variants }
-		)),
+		column_types: Some(BTreeMap::from([
+			(
+				"month".to_owned(),
+				TableColumnType::Enum {
+					variants: month_variants,
+				},
+			),
+			(
+				"day_of_week".to_owned(),
+				TableColumnType::Enum {
+					variants: day_of_week_variants,
+				},
+			),
+			(
+				"day_of_month".to_owned(),
+				TableColumnType::Enum {
+					variants: day_of_month_variants,
+				},
+			),
+			("dep_time".to_owned(), TableColumnType::Number),
+			(
+				"unique_carrier".to_owned(),
+				TableColumnType::Enum {
+					variants: carrier_variants,
+				},
+			),
+			(
+				"origin".to_owned(),
+				TableColumnType::Enum {
+					variants: origin_variants,
+				},
+			),
+			(
+				"dest".to_owned(),
+				TableColumnType::Enum {
+					variants: dest_variants,
+				},
+			),
+			("distance".to_owned(), TableColumnType::Number),
+			(
+				"dep_delayed_15min".to_owned(),
+				TableColumnType::Enum {
+					variants: target_variants,
+				},
+			),
+		])),
 		..Default::default()
 	};
 	let mut features_train =

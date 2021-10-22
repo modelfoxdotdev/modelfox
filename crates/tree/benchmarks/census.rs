@@ -1,7 +1,6 @@
-use maplit::btreemap;
 use ndarray::prelude::*;
 use serde_json::json;
-use std::path::Path;
+use std::{collections::BTreeMap, path::Path};
 use tangram_table::prelude::*;
 use tangram_tree::Progress;
 use tangram_zip::zip;
@@ -151,23 +150,68 @@ fn main() {
 	.collect();
 	let income_variants = ["<=50K", ">50K"].iter().map(ToString::to_string).collect();
 	let options = tangram_table::FromCsvOptions {
-		column_types: Some(btreemap!(
-		  "age".to_owned() => TableColumnType::Number ,
-			"workclass".to_owned() => TableColumnType::Enum { variants: workclass_variants },
-			"fnlwgt".to_owned() => TableColumnType::Number,
-			"education".to_owned() => TableColumnType::Enum { variants: education_variants },
-			"education_num".to_owned() => TableColumnType::Number,
-			"marital_status".to_owned() => TableColumnType::Enum { variants: marital_status_variants },
-			"occupation".to_owned() => TableColumnType::Enum { variants: occupation_variants },
-			"relationship".to_owned() => TableColumnType::Enum { variants: relationship_variants },
-			"race".to_owned() => TableColumnType::Enum { variants: race_variants },
-			"sex".to_owned() => TableColumnType::Enum { variants: sex_variants },
-			"capital_gain".to_owned() => TableColumnType::Number,
-			"capital_loss".to_owned() => TableColumnType::Number,
-			"hours_per_week".to_owned() => TableColumnType::Number,
-			"native_country".to_owned() => TableColumnType::Enum { variants: native_country_variants },
-			"income".to_owned() => TableColumnType::Enum { variants: income_variants },
-		)),
+		column_types: Some(BTreeMap::from([
+			("age".to_owned(), TableColumnType::Number),
+			(
+				"workclass".to_owned(),
+				TableColumnType::Enum {
+					variants: workclass_variants,
+				},
+			),
+			("fnlwgt".to_owned(), TableColumnType::Number),
+			(
+				"education".to_owned(),
+				TableColumnType::Enum {
+					variants: education_variants,
+				},
+			),
+			("education_num".to_owned(), TableColumnType::Number),
+			(
+				"marital_status".to_owned(),
+				TableColumnType::Enum {
+					variants: marital_status_variants,
+				},
+			),
+			(
+				"occupation".to_owned(),
+				TableColumnType::Enum {
+					variants: occupation_variants,
+				},
+			),
+			(
+				"relationship".to_owned(),
+				TableColumnType::Enum {
+					variants: relationship_variants,
+				},
+			),
+			(
+				"race".to_owned(),
+				TableColumnType::Enum {
+					variants: race_variants,
+				},
+			),
+			(
+				"sex".to_owned(),
+				TableColumnType::Enum {
+					variants: sex_variants,
+				},
+			),
+			("capital_gain".to_owned(), TableColumnType::Number),
+			("capital_loss".to_owned(), TableColumnType::Number),
+			("hours_per_week".to_owned(), TableColumnType::Number),
+			(
+				"native_country".to_owned(),
+				TableColumnType::Enum {
+					variants: native_country_variants,
+				},
+			),
+			(
+				"income".to_owned(),
+				TableColumnType::Enum {
+					variants: income_variants,
+				},
+			),
+		])),
 		..Default::default()
 	};
 	let mut features_train =

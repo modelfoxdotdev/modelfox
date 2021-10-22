@@ -1068,9 +1068,9 @@ dependencies = [
 
 [[package]]
 name = "http-body"
-version = "0.4.3"
+version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "399c583b2979440c60be0821a6199eca73bc3c8dcd9d070d75ac726e2c6186e5"
+checksum = "1ff4f84919677303da5f147645dbea6b1881f368d03ac84e1dc09031ebd7b2c6"
 dependencies = [
  "bytes",
  "http",
@@ -1400,12 +1400,6 @@ checksum = "51b9bbe6c47d51fc3e1a9b945965946b4c44142ab8792c50835a980d362c2710"
 dependencies = [
  "cfg-if",
 ]
-
-[[package]]
-name = "maplit"
-version = "1.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e2e65a1a2e43cfcb47a895c4c8b10d1f4a61097f9f254f183aee60cad9c651d"
 
 [[package]]
 name = "match_cfg"
@@ -4260,7 +4254,6 @@ version = "0.7.0"
 dependencies = [
  "buffalo",
  "clap 3.0.0-beta.5",
- "maplit",
  "ndarray",
  "num",
  "rayon",
@@ -4382,7 +4375,6 @@ dependencies = [
  "buffalo",
  "clap 3.0.0-beta.5",
  "itertools",
- "maplit",
  "ndarray",
  "num",
  "rayon",

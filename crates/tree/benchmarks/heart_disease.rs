@@ -1,7 +1,6 @@
-use maplit::btreemap;
 use ndarray::prelude::*;
 use serde_json::json;
-use std::path::Path;
+use std::{collections::BTreeMap, path::Path};
 use tangram_table::prelude::*;
 use tangram_tree::Progress;
 use tangram_zip::zip;
@@ -51,22 +50,70 @@ fn main() {
 		.map(ToString::to_string)
 		.collect();
 	let options = tangram_table::FromCsvOptions {
-		column_types: Some(btreemap!(
-			"age".to_owned() => TableColumnType::Number,
-			"gender".to_owned() => TableColumnType::Enum { variants: gender_variants },
-			"chest_pain".to_owned() => TableColumnType::Enum { variants: chest_pain_variants },
-			"resting_blood_pressure".to_owned() => TableColumnType::Number ,
-			"cholesterol".to_owned() => TableColumnType::Number,
-			"fasting_blood_sugar_greater_than_120".to_owned() => TableColumnType::Enum { variants: fasting_blood_sugar_greater_than_120_variants },
-			"resting_ecg_result".to_owned() => TableColumnType::Enum { variants: resting_ecg_result_variants },
-			"exercise_max_heart_rate".to_owned() => TableColumnType::Number,
-			"exercise_induced_angina".to_owned() => TableColumnType::Enum { variants: exercise_induced_angina_variants },
-			"exercise_st_depression".to_owned() => TableColumnType::Number,
-			"exercise_st_slope".to_owned() => TableColumnType::Enum { variants: exercise_st_slope_variants },
-			"fluoroscopy_vessels_colored".to_owned() => TableColumnType::Enum { variants: fluoroscopy_vessels_colored_variants },
-			"thallium_stress_test".to_owned() => TableColumnType::Enum { variants: thallium_stress_test_variants },
-			"diagnosis".to_owned() => TableColumnType::Enum { variants: diagnosis_variants },
-		)),
+		column_types: Some(BTreeMap::from([
+			("age".to_owned(), TableColumnType::Number),
+			(
+				"gender".to_owned(),
+				TableColumnType::Enum {
+					variants: gender_variants,
+				},
+			),
+			(
+				"chest_pain".to_owned(),
+				TableColumnType::Enum {
+					variants: chest_pain_variants,
+				},
+			),
+			("resting_blood_pressure".to_owned(), TableColumnType::Number),
+			("cholesterol".to_owned(), TableColumnType::Number),
+			(
+				"fasting_blood_sugar_greater_than_120".to_owned(),
+				TableColumnType::Enum {
+					variants: fasting_blood_sugar_greater_than_120_variants,
+				},
+			),
+			(
+				"resting_ecg_result".to_owned(),
+				TableColumnType::Enum {
+					variants: resting_ecg_result_variants,
+				},
+			),
+			(
+				"exercise_max_heart_rate".to_owned(),
+				TableColumnType::Number,
+			),
+			(
+				"exercise_induced_angina".to_owned(),
+				TableColumnType::Enum {
+					variants: exercise_induced_angina_variants,
+				},
+			),
+			("exercise_st_depression".to_owned(), TableColumnType::Number),
+			(
+				"exercise_st_slope".to_owned(),
+				TableColumnType::Enum {
+					variants: exercise_st_slope_variants,
+				},
+			),
+			(
+				"fluoroscopy_vessels_colored".to_owned(),
+				TableColumnType::Enum {
+					variants: fluoroscopy_vessels_colored_variants,
+				},
+			),
+			(
+				"thallium_stress_test".to_owned(),
+				TableColumnType::Enum {
+					variants: thallium_stress_test_variants,
+				},
+			),
+			(
+				"diagnosis".to_owned(),
+				TableColumnType::Enum {
+					variants: diagnosis_variants,
+				},
+			),
+		])),
 		..Default::default()
 	};
 	let mut features_train =

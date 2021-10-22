@@ -1,8 +1,7 @@
-use maplit::btreemap;
 use ndarray::prelude::*;
 use rayon::prelude::*;
 use serde_json::json;
-use std::path::Path;
+use std::{collections::BTreeMap, path::Path};
 use tangram_table::prelude::*;
 use tangram_tree::Progress;
 use tangram_zip::pzip;
@@ -548,42 +547,127 @@ fn main() {
 	.map(ToString::to_string)
 	.collect();
 	let options = tangram_table::FromCsvOptions {
-		column_types: Some(btreemap!(
-			"row_id".to_owned() => TableColumnType::Number,
-			"household_id".to_owned() => TableColumnType::Number,
-			"vehicle".to_owned() => TableColumnType::Number,
-			"calendar_year".to_owned() => TableColumnType::Number,
-			"model_year".to_owned() => TableColumnType::Number,
-			"blind_make".to_owned() => TableColumnType::Enum { variants: blind_make_variants },
-			"blind_model".to_owned() => TableColumnType::Enum { variants: blind_model_variants },
-			"blind_submodel".to_owned() => TableColumnType::Enum { variants: blind_submodel_variants },
-			"cat1".to_owned() => TableColumnType::Enum { variants: cat1_variants },
-			"cat2".to_owned() =>  TableColumnType::Enum { variants: cat2_variants },
-			"cat3".to_owned() =>  TableColumnType::Enum { variants: cat3_variants },
-			"cat4".to_owned() =>  TableColumnType::Enum { variants: cat4_variants },
-			"cat5".to_owned() =>  TableColumnType::Enum { variants: cat5_variants },
-			"cat6".to_owned() =>  TableColumnType::Enum { variants: cat6_variants },
-			"cat7".to_owned() =>  TableColumnType::Enum { variants: cat7_variants },
-			"cat8".to_owned() =>  TableColumnType::Enum { variants: cat8_variants },
-			"cat9".to_owned() =>  TableColumnType::Enum { variants: cat9_variants },
-			"cat10".to_owned() =>  TableColumnType::Enum { variants: cat10_variants },
-			"cat11".to_owned() =>  TableColumnType::Enum { variants: cat11_variants },
-			"cat12".to_owned() =>  TableColumnType::Enum { variants: cat12_variants },
-			"ordcat".to_owned() => TableColumnType::Enum { variants: ordcat_variants },
-			"var1".to_owned() => TableColumnType::Number,
-			"var2".to_owned() => TableColumnType::Number,
-			"var3".to_owned() => TableColumnType::Number,
-			"var4".to_owned() => TableColumnType::Number,
-			"var5".to_owned() => TableColumnType::Number,
-			"var6".to_owned() => TableColumnType::Number,
-			"var7".to_owned() => TableColumnType::Number,
-			"var8".to_owned() => TableColumnType::Number,
-			"nvcat".to_owned() => TableColumnType::Enum { variants: nvcat_variants },
-			"nvvar2".to_owned() => TableColumnType::Number,
-			"nvvar3".to_owned() => TableColumnType::Number,
-			"nvvar4".to_owned() => TableColumnType::Number ,
-			"claim_amount".to_owned() => TableColumnType::Number,
-		)),
+		column_types: Some(BTreeMap::from([
+			("row_id".to_owned(), TableColumnType::Number),
+			("household_id".to_owned(), TableColumnType::Number),
+			("vehicle".to_owned(), TableColumnType::Number),
+			("calendar_year".to_owned(), TableColumnType::Number),
+			("model_year".to_owned(), TableColumnType::Number),
+			(
+				"blind_make".to_owned(),
+				TableColumnType::Enum {
+					variants: blind_make_variants,
+				},
+			),
+			(
+				"blind_model".to_owned(),
+				TableColumnType::Enum {
+					variants: blind_model_variants,
+				},
+			),
+			(
+				"blind_submodel".to_owned(),
+				TableColumnType::Enum {
+					variants: blind_submodel_variants,
+				},
+			),
+			(
+				"cat1".to_owned(),
+				TableColumnType::Enum {
+					variants: cat1_variants,
+				},
+			),
+			(
+				"cat2".to_owned(),
+				TableColumnType::Enum {
+					variants: cat2_variants,
+				},
+			),
+			(
+				"cat3".to_owned(),
+				TableColumnType::Enum {
+					variants: cat3_variants,
+				},
+			),
+			(
+				"cat4".to_owned(),
+				TableColumnType::Enum {
+					variants: cat4_variants,
+				},
+			),
+			(
+				"cat5".to_owned(),
+				TableColumnType::Enum {
+					variants: cat5_variants,
+				},
+			),
+			(
+				"cat6".to_owned(),
+				TableColumnType::Enum {
+					variants: cat6_variants,
+				},
+			),
+			(
+				"cat7".to_owned(),
+				TableColumnType::Enum {
+					variants: cat7_variants,
+				},
+			),
+			(
+				"cat8".to_owned(),
+				TableColumnType::Enum {
+					variants: cat8_variants,
+				},
+			),
+			(
+				"cat9".to_owned(),
+				TableColumnType::Enum {
+					variants: cat9_variants,
+				},
+			),
+			(
+				"cat10".to_owned(),
+				TableColumnType::Enum {
+					variants: cat10_variants,
+				},
+			),
+			(
+				"cat11".to_owned(),
+				TableColumnType::Enum {
+					variants: cat11_variants,
+				},
+			),
+			(
+				"cat12".to_owned(),
+				TableColumnType::Enum {
+					variants: cat12_variants,
+				},
+			),
+			(
+				"ordcat".to_owned(),
+				TableColumnType::Enum {
+					variants: ordcat_variants,
+				},
+			),
+			("var1".to_owned(), TableColumnType::Number),
+			("var2".to_owned(), TableColumnType::Number),
+			("var3".to_owned(), TableColumnType::Number),
+			("var4".to_owned(), TableColumnType::Number),
+			("var5".to_owned(), TableColumnType::Number),
+			("var6".to_owned(), TableColumnType::Number),
+			("var7".to_owned(), TableColumnType::Number),
+			("var8".to_owned(), TableColumnType::Number),
+			(
+				"nvcat".to_owned(),
+				TableColumnType::Enum {
+					variants: nvcat_variants,
+				},
+			),
+			("nvvar2".to_owned(), TableColumnType::Number),
+			("nvvar3".to_owned(), TableColumnType::Number),
+			("nvvar4".to_owned(), TableColumnType::Number),
+			("claim_amount".to_owned(), TableColumnType::Number),
+		])),
 		..Default::default()
 	};
 	let mut features_train =

@@ -1,8 +1,7 @@
-use maplit::btreemap;
 use ndarray::prelude::*;
 use rayon::prelude::*;
 use serde_json::json;
-use std::path::Path;
+use std::{collections::BTreeMap, path::Path};
 use tangram_linear::Progress;
 use tangram_table::prelude::*;
 use tangram_zip::{pzip, zip};
@@ -13,37 +12,45 @@ fn main() {
 	let csv_file_path_test = Path::new("data/higgs_test.csv");
 	let target_column_index = 0;
 	let options = tangram_table::FromCsvOptions {
-		column_types: Some(btreemap! {
-			"signal".to_owned() => TableColumnType::Enum { variants: vec!["false".to_owned(), "true".to_owned()] },
-			"lepton_pt".to_owned() => TableColumnType::Number,
-			"lepton_eta".to_owned() => TableColumnType::Number,
-			"lepton_phi".to_owned() => TableColumnType::Number,
-			"missing_energy_magnitude".to_owned() => TableColumnType::Number,
-			"missing_energy_phi".to_owned() => TableColumnType::Number,
-			"jet_1_pt".to_owned() => TableColumnType::Number,
-			"jet_1_eta".to_owned() => TableColumnType::Number,
-			"jet_1_phi".to_owned() => TableColumnType::Number,
-			"jet_1_b_tag".to_owned() => TableColumnType::Number,
-			"jet_2_pt".to_owned() => TableColumnType::Number,
-			"jet_2_eta".to_owned() => TableColumnType::Number,
-			"jet_2_phi".to_owned() => TableColumnType::Number,
-			"jet_2_b_tag".to_owned() => TableColumnType::Number,
-			"jet_3_pt".to_owned() => TableColumnType::Number,
-			"jet_3_eta".to_owned() => TableColumnType::Number,
-			"jet_3_phi".to_owned() => TableColumnType::Number,
-			"jet_3_b_tag".to_owned() => TableColumnType::Number,
-			"jet_4_pt".to_owned() => TableColumnType::Number,
-			"jet_4_eta".to_owned() => TableColumnType::Number,
-			"jet_4_phi".to_owned() => TableColumnType::Number,
-			"jet_4_b_tag".to_owned() => TableColumnType::Number,
-			"m_jj".to_owned() => TableColumnType::Number,
-			"m_jjj".to_owned() => TableColumnType::Number,
-			"m_lv".to_owned() => TableColumnType::Number,
-			"m_jlv".to_owned() => TableColumnType::Number,
-			"m_bb".to_owned() => TableColumnType::Number,
-			"m_wbb".to_owned() => TableColumnType::Number,
-			"m_wwbb".to_owned() => TableColumnType::Number,
-		}),
+		column_types: Some(BTreeMap::from([
+			(
+				"signal".to_owned(),
+				TableColumnType::Enum {
+					variants: vec!["false".to_owned(), "true".to_owned()],
+				},
+			),
+			("lepton_pt".to_owned(), TableColumnType::Number),
+			("lepton_eta".to_owned(), TableColumnType::Number),
+			("lepton_phi".to_owned(), TableColumnType::Number),
+			(
+				"missing_energy_magnitude".to_owned(),
+				TableColumnType::Number,
+			),
+			("missing_energy_phi".to_owned(), TableColumnType::Number),
+			("jet_1_pt".to_owned(), TableColumnType::Number),
+			("jet_1_eta".to_owned(), TableColumnType::Number),
+			("jet_1_phi".to_owned(), TableColumnType::Number),
+			("jet_1_b_tag".to_owned(), TableColumnType::Number),
+			("jet_2_pt".to_owned(), TableColumnType::Number),
+			("jet_2_eta".to_owned(), TableColumnType::Number),
+			("jet_2_phi".to_owned(), TableColumnType::Number),
+			("jet_2_b_tag".to_owned(), TableColumnType::Number),
+			("jet_3_pt".to_owned(), TableColumnType::Number),
+			("jet_3_eta".to_owned(), TableColumnType::Number),
+			("jet_3_phi".to_owned(), TableColumnType::Number),
+			("jet_3_b_tag".to_owned(), TableColumnType::Number),
+			("jet_4_pt".to_owned(), TableColumnType::Number),
+			("jet_4_eta".to_owned(), TableColumnType::Number),
+			("jet_4_phi".to_owned(), TableColumnType::Number),
+			("jet_4_b_tag".to_owned(), TableColumnType::Number),
+			("m_jj".to_owned(), TableColumnType::Number),
+			("m_jjj".to_owned(), TableColumnType::Number),
+			("m_lv".to_owned(), TableColumnType::Number),
+			("m_jlv".to_owned(), TableColumnType::Number),
+			("m_bb".to_owned(), TableColumnType::Number),
+			("m_wbb".to_owned(), TableColumnType::Number),
+			("m_wwbb".to_owned(), TableColumnType::Number),
+		])),
 		..Default::default()
 	};
 	let mut features_train =
