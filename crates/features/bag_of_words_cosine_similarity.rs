@@ -154,7 +154,7 @@ impl BagOfWordsCosineSimilarityFeatureGroup {
 			.into_iter()
 			.flatten()
 			.chain(value_bigram_iter.into_iter().flatten());
-		for ngram in ngram_iter.into_iter() {
+		for ngram in ngram_iter {
 			if let Some((ngram_index, _, ngram_entry)) = self.ngrams.get_full(&ngram) {
 				match self.strategy {
 					BagOfWordsFeatureGroupStrategy::Present => {

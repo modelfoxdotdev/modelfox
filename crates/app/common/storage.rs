@@ -138,7 +138,7 @@ impl S3Storage {
 }
 
 fn key_for_item(entity: StorageEntity, id: Id) -> String {
-	format!("{}/{}", entity.dir_name(), id.to_string())
+	format!("{}/{}", entity.dir_name(), id)
 }
 
 #[derive(Clone, Copy)]

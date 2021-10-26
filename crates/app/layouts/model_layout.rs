@@ -273,11 +273,7 @@ impl Component for ModelLayoutTop {
 		let model_segment = a()
 			.class("model-layout-top-title-segment")
 			.attribute("title", "repo")
-			.href(format!(
-				"/repos/{}/models/{}/",
-				repo_id,
-				self.model_id.to_string()
-			))
+			.href(format!("/repos/{}/models/{}/", repo_id, self.model_id,))
 			.child(model_heading);
 		let title = div()
 			.class("model-layout-top-title-wrapper")

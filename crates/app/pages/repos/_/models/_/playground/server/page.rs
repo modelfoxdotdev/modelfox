@@ -55,7 +55,7 @@ impl From<PredictInputValue> for FieldValue {
 impl std::fmt::Display for FieldValue {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		match self {
-			FieldValue::Number(n) => write!(f, "{}", n.to_string()),
+			FieldValue::Number(n) => write!(f, "{}", n),
 			FieldValue::String(s) => write!(f, "{}", s),
 		}
 	}
