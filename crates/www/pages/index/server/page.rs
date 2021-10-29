@@ -40,27 +40,20 @@ impl Component for Hero {
 	fn into_node(self) -> Node {
 		let title = h1()
 			.class("index-hero-title")
-			.child("Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.");
+			.child("All-in-one Machine Learning Toolkit for Programmers");
 		let subtitle= "Train a model from a CSV file on the command line. Make predictions from Elixir, Go, JavaScript, PHP, Python, Ruby, or Rust. Learn about your models and monitor them in production from your browser.";
 		let subtitle = div().class("index-hero-subtitle").child(subtitle);
 		let buttons = div()
 			.class("index-hero-buttons")
 			.child(
 				ui::Button::new()
-					.color(ui::colors::RED.to_owned())
+					.color(ui::colors::GREEN.to_owned())
 					.href("https://github.com/tangramdotdev/tangram".to_owned())
 					.child("View on GitHub"),
 			)
 			.child(
 				ui::Button::new()
-					.color(ui::colors::GREEN.to_owned())
-					.href("https://calendly.com/tangramdotdev/demo".to_owned())
-					.open_new_window(true)
-					.child("Schedule a Demo"),
-			)
-			.child(
-				ui::Button::new()
-					.color(ui::colors::BLUE.to_owned())
+					.color(ui::colors::PURPLE.to_owned())
 					.href("/docs/install".to_owned())
 					.child("Install the CLI"),
 			);

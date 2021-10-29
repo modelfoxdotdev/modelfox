@@ -76,14 +76,13 @@ impl Component for Topbar {
 			ui::TopbarItem {
 				element: Some({
 					ui::Button::new()
-						.color(ui::colors::GREEN.to_owned())
-						.href("https://calendly.com/tangramdotdev/demo".to_owned())
-						.open_new_window(true)
-						.child("Schedule a Demo")
+						.color(ui::colors::BLUE.to_owned())
+						.href("/docs/getting_started/".to_owned())
+						.child("Learn")
 						.into()
 				}),
-				href: "/docs/install".to_owned(),
-				title: "Install the CLI".to_owned(),
+				href: "/docs/getting_started/".to_owned(),
+				title: "Learn".to_owned(),
 			},
 		];
 		ui::Topbar::new()

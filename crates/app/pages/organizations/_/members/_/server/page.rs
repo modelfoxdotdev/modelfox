@@ -21,19 +21,34 @@ impl Component for Page {
 					ui::S1::new()
 						.child(ui::H1::new().child("Edit Member"))
 						.child(
-							ui::S2::new()
+							ui::Form::new()
+								.post(true)
 								.child(
-									ui::TextField::new()
-										.label("Email".to_owned())
-										.disabled(true)
-										.value(self.member_email),
+									input()
+										.attribute("name", "action")
+										.attribute("type", "hidden")
+										.attribute("value", "update_member"),
 								)
 								.child(
-									ui::CheckboxField::new()
-										.label("Admin".to_owned())
-										.disabled(true)
-										.name("is_admin".to_owned())
-										.checked(self.is_admin),
+									ui::S2::new()
+										.child(
+											ui::TextField::new()
+												.label("Email".to_owned())
+												.disabled(true)
+												.value(self.member_email),
+										)
+										.child(
+											ui::CheckboxField::new()
+												.label("Admin".to_owned())
+												.name("is_admin".to_owned())
+												.value("true".to_owned())
+												.checked(self.is_admin),
+										)
+										.child(
+											ui::Button::new()
+												.button_type(ui::ButtonType::Submit)
+												.child("Update"),
+										),
 								),
 						)
 						.child(if self.can_delete {

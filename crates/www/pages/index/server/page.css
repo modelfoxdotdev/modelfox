@@ -15,8 +15,8 @@
 
 @media (min-width: 1200px) {
 	.index-grid {
-		row-gap: 2rem;
-		padding: 1rem;
+		row-gap: 4rem;
+		padding: 4rem;
 	}
 }
 
@@ -44,7 +44,7 @@
 
 @media (min-width: 1200px) {
 	.index-hero-title {
-		font-size: 2.5rem;
+		font-size: 3rem;
 	}
 }
 

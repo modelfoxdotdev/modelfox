@@ -134,8 +134,8 @@ impl Component for Predict {
 			.child(
 				ui::Link::new()
 					.href("https://pkg.go.dev/github.com/tangramdotdev/tangram-go".to_owned())
-					.title("Go".to_owned())
-					.child("Go"),
+					.title("Golang".to_owned())
+					.child("Golang"),
 			)
 			.child(", ")
 			.child(

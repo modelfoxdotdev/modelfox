@@ -53,6 +53,10 @@ impl Component for Document {
 			))
 		});
 		let body = body().child(self.children).child(client_script);
-		html::html().child(head).child(body).into_node()
+		html::html()
+			.attribute("lang", "en")
+			.child(head)
+			.child(body)
+			.into_node()
 	}
 }

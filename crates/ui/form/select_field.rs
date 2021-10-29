@@ -11,6 +11,8 @@ pub struct SelectField {
 	#[builder]
 	pub id: Option<String>,
 	#[builder]
+	pub class: Option<String>,
+	#[builder]
 	pub label: Option<String>,
 	#[builder]
 	pub name: Option<String>,
@@ -51,12 +53,17 @@ impl Component for SelectField {
 				}
 			}
 		};
+		let class = if let Some(class) = self.class {
+			format!("form-select-field {}", class)
+		} else {
+			"form-select-field".to_owned()
+		};
 		FieldLabel::new()
 			.child(self.label)
 			.child(
 				select()
 					.attribute("autocomplete", autocomplete)
-					.class("form-select-field")
+					.class(class)
 					.attribute("disabled", self.disabled)
 					.attribute("id", self.id)
 					.attribute("name", self.name)

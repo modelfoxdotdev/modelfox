@@ -122,7 +122,7 @@ impl Component for CodeSelect {
 			.class("code-select-grid")
 			.child(
 				ui::SelectField::new()
-					.id("code_select".to_owned())
+					.class("code-select".to_owned())
 					.options(options)
 					.value(language_str),
 			)
@@ -388,7 +388,7 @@ pub fn boot_code_select() {
 			.unwrap();
 		let select_element = select_node.dyn_ref::<dom::HtmlSelectElement>().unwrap();
 		let select_element_language = select_element.value();
-		let code_select_elements = document.query_selector_all("#code_select").unwrap();
+		let code_select_elements = document.query_selector_all(".code-select").unwrap();
 		for index in 0..code_select_elements.length() {
 			let code_select_element = code_select_elements
 				.get(index)
@@ -433,7 +433,7 @@ pub fn boot_code_select() {
 		}
 	}));
 	let document = dom::window().unwrap().document().unwrap();
-	let code_select_elements = document.query_selector_all("#code_select").unwrap();
+	let code_select_elements = document.query_selector_all(".code-select").unwrap();
 	for index in 0..code_select_elements.length() {
 		let code_select_element = code_select_elements
 			.get(index)

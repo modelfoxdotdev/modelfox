@@ -1,4 +1,5 @@
 use anyhow::{bail, Result};
+use serde::Deserialize;
 use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
@@ -13,6 +14,28 @@ use tangram_id::Id;
 enum Action {
 	#[serde(rename = "delete")]
 	Delete,
+	#[serde(rename = "update_member")]
+	Update(MemberFields),
+}
+
+#[derive(Debug, serde::Deserialize)]
+struct MemberFields {
+	#[serde(default, deserialize_with = "bool_from_string")]
+	is_admin: bool,
+}
+
+fn bool_from_string<'de, D>(deserializer: D) -> Result<bool, D::Error>
+where
+	D: serde::de::Deserializer<'de>,
+{
+	match String::deserialize(deserializer)?.as_ref() {
+		"true" => Ok(true),
+		"on" => Ok(true),
+		other => Err(serde::de::Error::invalid_value(
+			serde::de::Unexpected::Str(other),
+			&"on or true",
+		)),
+	}
 }
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
@@ -68,6 +91,17 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				.body(hyper::Body::empty())
 				.unwrap()
 		}
+		Action::Update(member_fields) => {
+			update_member(&mut db, organization_id, member_id, member_fields).await?;
+			http::Response::builder()
+				.status(http::StatusCode::SEE_OTHER)
+				.header(
+					http::header::LOCATION,
+					format!("/organizations/{}/", organization_id),
+				)
+				.body(hyper::Body::empty())
+				.unwrap()
+		}
 	};
 	db.commit().await?;
 	Ok(response)
@@ -89,6 +123,31 @@ async fn delete_member(
 	)
 	.bind(&organization_id.to_string())
 	.bind(&member_id.to_string())
+	.execute(&mut *db)
+	.await?;
+	Ok(())
+}
+
+async fn update_member(
+	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	organization_id: Id,
+	member_id: Id,
+	member_fields: MemberFields,
+) -> Result<()> {
+	dbg!(&member_fields);
+	sqlx::query(
+		"
+			update
+				organizations_users
+			set is_admin = $3
+			where
+				organization_id = $1
+				and user_id = $2
+		",
+	)
+	.bind(&organization_id.to_string())
+	.bind(&member_id.to_string())
+	.bind(&member_fields.is_admin)
 	.execute(&mut *db)
 	.await?;
 	Ok(())
