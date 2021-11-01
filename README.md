@@ -4,7 +4,7 @@
 
 # Tangram
 
-[Website](https://www.tangram.dev) | [Discord](https://discord.gg/RzkUvvg2)
+[Website](https://www.tangram.dev) | [Discord](https://discord.gg/jT9ZGp3TK2)
 
 Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.
 
