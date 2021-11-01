@@ -100,15 +100,17 @@ where
 					),
 			)
 			.child(
-				input()
-					.class("slider-input")
-					.attribute("type", "range")
-					.min(self.min.to_string())
-					.max(self.max.to_string())
-					.value_signal(value.signal().map(|value| value.to_string()))
-					.step("1")
-					.autocomplete("off")
-					.oninput(oninput),
+				label().child(
+					input()
+						.class("slider-input")
+						.attribute("type", "range")
+						.min(self.min.to_string())
+						.max(self.max.to_string())
+						.value_signal(value.signal().map(|value| value.to_string()))
+						.step("1")
+						.autocomplete("off")
+						.oninput(oninput),
+				),
 			)
 			.into_node()
 	}
