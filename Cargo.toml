@@ -11,6 +11,11 @@ members = [
 	"languages/rust/examples/*",
 ]
 
+[patch.crates-io]
+num-bigint-dig = { git = "https://github.com/tangramdotdev/num-bigint", branch = "remove-i128-feature" }
+sqlx = { git = "https://github.com/tangramdotdev/sqlx", branch = "libsqlite3-sys-0.23.1" }
+sunfish = { git = "https://github.com/tangramdotdev/sunfish" }
+
 [profile.dev.build-override]
 debug-assertions = false
 opt-level = 3

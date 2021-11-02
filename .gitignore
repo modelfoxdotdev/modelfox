@@ -3,4 +3,5 @@
 /.vscode
 /data
 /dist*
-/target*
+/target/
+/target_check/

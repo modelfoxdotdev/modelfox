@@ -14,11 +14,19 @@ fn main() {
 	let signal_variants = ["false", "true"].iter().map(ToString::to_string).collect();
 	let options = tangram_table::FromCsvOptions {
 		column_types: Some(BTreeMap::from([
-			("signal".to_owned(), TableColumnType::Enum { variants: signal_variants }),
+			(
+				"signal".to_owned(),
+				TableColumnType::Enum {
+					variants: signal_variants,
+				},
+			),
 			("lepton_pt".to_owned(), TableColumnType::Number),
 			("lepton_eta".to_owned(), TableColumnType::Number),
 			("lepton_phi".to_owned(), TableColumnType::Number),
-			("missing_energy_magnitude".to_owned(), TableColumnType::Number),
+			(
+				"missing_energy_magnitude".to_owned(),
+				TableColumnType::Number,
+			),
 			("missing_energy_phi".to_owned(), TableColumnType::Number),
 			("jet_1_pt".to_owned(), TableColumnType::Number),
 			("jet_1_eta".to_owned(), TableColumnType::Number),

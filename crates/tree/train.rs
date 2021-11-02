@@ -440,11 +440,14 @@ fn update_predictions_with_tree(
 	tree.leaf_values.par_iter().for_each(|(range, value)| {
 		examples_index[range.clone()]
 			.iter()
-			.for_each(|example_index| { let _ = &predictions_ptr; unsafe {
-				let predictions = &mut *predictions_ptr.0;
-				let example_index = example_index.to_usize().unwrap();
-				*predictions.get_unchecked_mut(example_index) += *value as f32;
-			} });
+			.for_each(|example_index| {
+				let _ = &predictions_ptr;
+				unsafe {
+					let predictions = &mut *predictions_ptr.0;
+					let example_index = example_index.to_usize().unwrap();
+					*predictions.get_unchecked_mut(example_index) += *value as f32;
+				}
+			});
 	});
 	#[cfg(feature = "timing")]
 	timing.update_predictions.inc(start.elapsed());

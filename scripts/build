@@ -1,1 +1,1 @@
-cargo run --release -p tangram_build -- $@
+cargo run -Ztarget-applies-to-host -Zhost-config --bin tangram_build -- $@

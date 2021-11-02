@@ -1,0 +1,3 @@
+#!/bin/sh
+lld-link /libpath:$WINDOWS_SDK/crt/lib/x64 /libpath:$WINDOWS_SDK/sdk/lib/x64 /libpath:$WINDOWS_SDK/sdk/lib/um/x64 /libpath:$WINDOWS_SDK/sdk/lib/ucrt/x64 $@
+#zig cc -target x86_64-windows-msvc /libpath:$WINDOWS_SDK/crt/lib/x64 /libpath:$WINDOWS_SDK/sdk/lib/x64 /libpath:$WINDOWS_SDK/sdk/lib/um/x64 /libpath:$WINDOWS_SDK/sdk/lib/ucrt/x64 $@

@@ -1,6 +1,154 @@
 use anyhow::{anyhow, Error, Result};
 
 pub enum Arch {
+	AArch64,
+	Wasm32,
+	X8664,
+}
+
+impl std::str::FromStr for Arch {
+	type Err = Error;
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		match s {
+			"aarch64" => Ok(Arch::AArch64),
+			"wasm32" => Ok(Arch::Wasm32),
+			"x86_64" => Ok(Arch::X8664),
+			_ => Err(anyhow!("invalid arch")),
+		}
+	}
+}
+
+impl Arch {
+	pub fn as_str(&self) -> &str {
+		match self {
+			Arch::AArch64 => "aarch64",
+			Arch::Wasm32 => "wasm32",
+			Arch::X8664 => "x86_64",
+		}
+	}
+}
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Target {
+	AArch64LinuxGnu228,
+	AArch64LinuxMusl,
+	AArch64MacOS,
+	Wasm32,
+	X8664LinuxGnu228,
+	X8664LinuxMusl,
+	X8664MacOS,
+	X8664WindowsGnu,
+	X8664WindowsMsvc,
+}
+
+impl Target {
+	pub fn target_name(&self) -> &str {
+		match self {
+			Target::AArch64LinuxGnu228 => "aarch64-linux-gnu_2_28",
+			Target::AArch64LinuxMusl => "aarch64-linux-musl",
+			Target::AArch64MacOS => "aarch64-macos",
+			Target::Wasm32 => "wasm32",
+			Target::X8664LinuxGnu228 => "x86_64-linux-gnu_2_28",
+			Target::X8664LinuxMusl => "x86_64-linux-musl",
+			Target::X8664MacOS => "x86_64-macos",
+			Target::X8664WindowsGnu => "x86_64-windows-gnu",
+			Target::X8664WindowsMsvc => "x86_64-windows-msvc",
+		}
+	}
+
+	pub fn rust_target_name(&self) -> &str {
+		match self {
+			Target::AArch64LinuxGnu228 => "aarch64-unknown-linux-gnu",
+			Target::AArch64LinuxMusl => "aarch64-unknown-linux-musl",
+			Target::AArch64MacOS => "aarch64-apple-darwin",
+			Target::Wasm32 => "wasm32-unknown-unknown",
+			Target::X8664LinuxGnu228 => "x86_64-unknown-linux-gnu",
+			Target::X8664LinuxMusl => "x86_64-unknown-linux-musl",
+			Target::X8664MacOS => "x86_64-apple-darwin",
+			Target::X8664WindowsGnu => "x86_64-pc-windows-gnu",
+			Target::X8664WindowsMsvc => "x86_64-pc-windows-msvc",
+		}
+	}
+
+	pub fn arch(&self) -> Arch {
+		match self {
+			Target::AArch64LinuxGnu228 | Target::AArch64LinuxMusl | Target::AArch64MacOS => {
+				Arch::AArch64
+			}
+			Target::Wasm32 => Arch::Wasm32,
+			Target::X8664LinuxGnu228
+			| Target::X8664LinuxMusl
+			| Target::X8664MacOS
+			| Target::X8664WindowsGnu
+			| Target::X8664WindowsMsvc => Arch::X8664,
+		}
+	}
+}
+
+pub struct TargetFileNames {
+	pub tangram_cli_file_name: &'static str,
+	pub tangram_h_file_name: &'static str,
+	pub libtangram_dynamic_file_name: &'static str,
+	pub libtangram_static_file_name: &'static str,
+	pub tangram_elixir_src_file_name: &'static str,
+	pub tangram_elixir_dst_file_name: &'static str,
+	pub tangram_node_src_file_name: &'static str,
+	pub tangram_node_dst_file_name: &'static str,
+}
+
+impl TargetFileNames {
+	pub fn for_target(target: Target) -> TargetFileNames {
+		match target {
+			Target::X8664LinuxGnu228
+			| Target::AArch64LinuxGnu228
+			| Target::X8664LinuxMusl
+			| Target::AArch64LinuxMusl => TargetFileNames {
+				tangram_cli_file_name: "tangram",
+				tangram_h_file_name: "tangram.h",
+				libtangram_dynamic_file_name: "libtangram.so",
+				libtangram_static_file_name: "libtangram.a",
+				tangram_elixir_src_file_name: "libtangram_elixir.so",
+				tangram_elixir_dst_file_name: "libtangram_elixir.so",
+				tangram_node_src_file_name: "libtangram_node.so",
+				tangram_node_dst_file_name: "tangram.node",
+			},
+			Target::X8664MacOS | Target::AArch64MacOS => TargetFileNames {
+				tangram_cli_file_name: "tangram",
+				tangram_h_file_name: "tangram.h",
+				libtangram_dynamic_file_name: "libtangram.dylib",
+				libtangram_static_file_name: "libtangram.a",
+				tangram_elixir_src_file_name: "libtangram_elixir.dylib",
+				tangram_elixir_dst_file_name: "libtangram_elixir.so",
+				tangram_node_src_file_name: "libtangram_node.dylib",
+				tangram_node_dst_file_name: "tangram.node",
+			},
+			Target::X8664WindowsMsvc => TargetFileNames {
+				tangram_cli_file_name: "tangram.exe",
+				tangram_h_file_name: "tangram.h",
+				libtangram_dynamic_file_name: "tangram.dll",
+				libtangram_static_file_name: "tangram.lib",
+				tangram_elixir_src_file_name: "tangram_elixir.dll",
+				tangram_elixir_dst_file_name: "tangram_elixir.dll",
+				tangram_node_src_file_name: "tangram_node.dll",
+				tangram_node_dst_file_name: "tangram.node",
+			},
+			Target::X8664WindowsGnu => TargetFileNames {
+				tangram_cli_file_name: "tangram.exe",
+				tangram_h_file_name: "tangram.h",
+				libtangram_dynamic_file_name: "tangram.dll",
+				libtangram_static_file_name: "libtangram.a",
+				tangram_elixir_src_file_name: "tangram_elixir.dll",
+				tangram_elixir_dst_file_name: "tangram_elixir.dll",
+				tangram_node_src_file_name: "tangram_node.dll",
+				tangram_node_dst_file_name: "tangram.node",
+			},
+			Target::Wasm32 => unreachable!(),
+		}
+	}
+}
+
+/*
+pub enum Arch {
 	X8664,
 	AArch64,
 	Wasm32,
@@ -156,3 +304,5 @@ impl TargetFileNames {
 		}
 	}
 }
+
+*/

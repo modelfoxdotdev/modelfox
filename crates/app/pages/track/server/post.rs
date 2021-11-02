@@ -106,8 +106,7 @@ async fn handle_prediction_monitor_event(
 	};
 	let model = tangram_model::from_bytes(bytes)?;
 	write_prediction_monitor_event(db, model_id, &monitor_event).await?;
-	insert_or_update_production_stats_for_monitor_event(db, model_id, model, monitor_event)
-		.await?;
+	insert_or_update_production_stats_for_monitor_event(db, model_id, model, monitor_event).await?;
 	Ok(())
 }
 
