@@ -1727,6 +1727,7 @@ dependencies = [
  "num-iter",
  "num-traits",
  "rand",
+ "serde",
  "smallvec",
  "zeroize",
 ]
@@ -4278,6 +4279,7 @@ dependencies = [
  "clap 3.0.0-beta.5",
  "duct",
  "indoc 1.0.3",
+ "num-bigint-dig",
  "pem",
  "rand",
  "rsa",
