@@ -1,5 +1,6 @@
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-maturin build
+python setup.py develop --user
+rm -rf tangram.egg-info
 deactivate
