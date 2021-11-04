@@ -272,6 +272,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "build_wheel"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "const_format",
+ "maturin",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4713,9 +4722,9 @@ name = "tangram_python"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "build_wheel",
  "chrono",
  "const_format",
- "maturin",
  "memmap",
  "pyo3",
  "reqwest",

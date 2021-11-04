@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
+use build_wheel::build_wheel;
 use const_format::concatcp;
-use maturin::{CargoToml, Metadata21, WheelWriter};
 use std::{io, path::Path, str::FromStr};
 
 const HELP: &str = "usage: build_wheel [help|release|testing]";
@@ -34,43 +34,6 @@ impl FromStr for Mode {
 			)),
 		}
 	}
-}
-
-fn build_wheel<T, U, V>(so_path: T, cargo_toml_path: U, output_path: V) -> Result<()>
-where
-	T: AsRef<Path>,
-	U: AsRef<Path>,
-	V: AsRef<Path>,
-{
-	let cargo_toml_path = cargo_toml_path.as_ref();
-	let so_path = so_path.as_ref();
-	let output_path = output_path.as_ref();
-
-	// Estabish clean output dir
-	if std::fs::metadata(&output_path)
-		.map(|m| m.is_dir())
-		.unwrap_or(false)
-	{
-		std::fs::remove_dir_all(&output_path).unwrap();
-	}
-	std::fs::create_dir_all(&output_path).unwrap();
-
-	let cargo_toml = CargoToml::from_path(cargo_toml_path).with_context(|| {
-		format!(
-			"Could not read Cargo.toml from {}",
-			cargo_toml_path.display()
-		)
-	})?;
-	let metadata = Metadata21::from_cargo_toml(&cargo_toml, output_path)
-		.with_context(|| "Could not build Python metadata")?;
-	let wheel_writer = WheelWriter::new(TAG, output_path, &metadata, &[])?;
-
-	let result_path = wheel_writer
-		.finish()
-		.with_context(|| "Could not create wheel")?;
-	println!("Wrote wheel to {}", result_path.display());
-
-	Ok(())
 }
 
 fn main() -> Result<()> {
