@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use build_wheel::build_wheel;
+use build_wheel::{build_wheel, Paths};
 use const_format::concatcp;
 use std::{io, path::Path, str::FromStr};
 
@@ -63,13 +63,14 @@ fn main() -> Result<()> {
 	}
 	.join(lib_name);
 	let output_path = root.join("build");
-	let cargo_toml_path = root.join("Cargo.toml");
+	let metadata_toml_path = root.join("metadata.toml");
+
+	let paths = Paths::new(so_path, metadata_toml_path, output_path);
 
 	println!("mode: {:?}", mode);
-	println!("so_path: {}", so_path.display());
-	println!("output_path: {}", output_path.display());
+	println!("{:?}", paths);
 
-	build_wheel(so_path, cargo_toml_path, output_path)?;
+	build_wheel(paths)?;
 
 	Ok(())
 }

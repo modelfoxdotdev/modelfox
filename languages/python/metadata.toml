@@ -1,0 +1,16 @@
+author = "Tangram"
+author_email = "root@tangram.dev"
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+]
+description = "README.md"
+description_content_type = "text/markdown"
+license = "MIT"
+name = "tangram"
+summary = "Tangram for Python"
+version = "0.7.0"
+
+[project_url]
+homepage = "https://tangram.dev"
