@@ -265,11 +265,10 @@ dependencies = [
 [[package]]
 name = "build_wheel"
 version = "0.1.0"
-source = "git+https://github.com/tangramdotdev/build_wheel?rev=fa4228f502a08f1e2f82254e0151fb1259d09485#fa4228f502a08f1e2f82254e0151fb1259d09485"
 dependencies = [
  "anyhow",
  "base64 0.13.0",
- "const_format",
+ "indoc 1.0.3",
  "regex",
  "serde",
  "serde_derive",
@@ -472,26 +471,6 @@ name = "const-oid"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fdab415d6744056100f40250a66bc430c1a46f7a02e20bc11c94c79a0f0464df"
-
-[[package]]
-name = "const_format"
-version = "0.2.22"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22bc6cd49b0ec407b680c3e380182b6ac63b73991cb7602de350352fc309b614"
-dependencies = [
- "const_format_proc_macros",
-]
-
-[[package]]
-name = "const_format_proc_macros"
-version = "0.2.22"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef196d5d972878a48da7decb7686eded338b4858fbabeed513d63a7c98b2b82d"
-dependencies = [
- "proc-macro2",
- "quote",
- "unicode-xid",
-]
 
 [[package]]
 name = "cpufeatures"

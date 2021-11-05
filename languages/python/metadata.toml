@@ -7,7 +7,7 @@ classifiers = [
 ]
 description = "README.md"
 description_content_type = "text/markdown"
-license = "MIT"
+license = "LICENSE"
 name = "tangram"
 summary = "Tangram for Python"
 version = "0.7.0"
