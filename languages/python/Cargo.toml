@@ -20,7 +20,6 @@ anyhow = { version = "1", features = ["backtrace"] }
 build_wheel = { path = "../../../build_wheel" }
 clap = { version = "3.0.0-beta.5", features = ["color"] }
 chrono = { version = "0.4", features = ["serde"] }
-const_format = "0.2"
 memmap = "0.7"
 pyo3 = { version = "0.14", features = ["abi3-py36", "extension-module"] }
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
