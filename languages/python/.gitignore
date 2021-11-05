@@ -7,4 +7,5 @@
 /tangram/*.dll
 /tangram/*.dylib
 /tangram/*.so
+/wheel
 __pycache__

@@ -265,6 +265,7 @@ dependencies = [
 [[package]]
 name = "build_wheel"
 version = "0.1.0"
+source = "git+https://github.com/tangramdotdev/build_wheel?rev=fa4228f502a08f1e2f82254e0151fb1259d09485#fa4228f502a08f1e2f82254e0151fb1259d09485"
 dependencies = [
  "anyhow",
  "base64 0.13.0",
@@ -4396,7 +4397,6 @@ name = "tangram_python"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "build_wheel",
  "chrono",
  "clap 3.0.0-beta.5",
  "memmap",
@@ -4407,6 +4407,14 @@ dependencies = [
  "tangram_core",
  "tangram_model",
  "url",
+]
+
+[[package]]
+name = "tangram_python_build"
+version = "0.0.0"
+dependencies = [
+ "build_wheel",
+ "clap 3.0.0-beta.5",
 ]
 
 [[package]]
