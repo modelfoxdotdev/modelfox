@@ -6,6 +6,7 @@ members = [
 	"languages/javascript/node",
 	"languages/javascript/wasm",
 	"languages/python",
+	"languages/python/build",
 	"languages/rust",
 	"languages/rust/examples/*",
 ]
