@@ -1,5 +1,2 @@
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-maturin build
-deactivate
+cargo build --release --package tangram_python
+cargo run --release -- -b build -l ../../target/release/libtangram_python.so -m metadata.toml
