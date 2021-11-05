@@ -7,7 +7,7 @@ use url::Url;
 /**
 */
 #[pymodule]
-fn tangram_python(py: Python, m: &PyModule) -> PyResult<()> {
+fn tangram(py: Python, m: &PyModule) -> PyResult<()> {
 	m.add_class::<LoadModelOptions>()?;
 	m.add_class::<Model>()?;
 	m.add_class::<PredictOptions>()?;

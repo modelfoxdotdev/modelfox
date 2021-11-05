@@ -1,7 +1,0 @@
-black
-cffi
-maturin
-mypy
-pdoc
-pip
-twine
