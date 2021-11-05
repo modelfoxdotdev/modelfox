@@ -1,7 +1,0 @@
-black
-mypy
-pdoc
-pip
-setuptools
-setuptools-rust
-twine
