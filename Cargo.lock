@@ -265,6 +265,7 @@ dependencies = [
 [[package]]
 name = "build_wheel"
 version = "0.1.0"
+source = "git+https://github.com/tangramdotdev/build_wheel?rev=82353f31aaec49f53ff6b9f159f619af7b932df3#82353f31aaec49f53ff6b9f159f619af7b932df3"
 dependencies = [
  "anyhow",
  "base64 0.13.0",
