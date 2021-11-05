@@ -1,0 +1,15 @@
+[package]
+authors = ["Tangram"]
+edition = "2021"
+rust-version = "1.56"
+name = "tangram_python_build"
+publish = false
+version = "0.0.0"
+
+[[bin]]
+name = "python_build"
+path = "main.rs"
+
+[dependencies]
+build_wheel = { git = "https://github.com/tangramdotdev/build_wheel", rev = "fa4228f502a08f1e2f82254e0151fb1259d09485" }
+clap = { version = "3.0.0-beta.5", features = ["color"] }
