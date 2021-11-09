@@ -11,6 +11,8 @@ mod app;
 mod migrate;
 #[cfg(feature = "train")]
 mod predict;
+#[cfg(feature = "serve")]
+mod serve;
 #[cfg(feature = "train")]
 mod train;
 
@@ -33,6 +35,9 @@ enum Args {
 	#[cfg(feature = "tangram_app")]
 	#[clap(name = "migrate")]
 	Migrate(Box<MigrateArgs>),
+	#[cfg(feature = "serve")]
+	#[clap(name = "serve")]
+	Serve(Box<ServeArgs>),
 }
 
 #[cfg(feature = "train")]
@@ -123,6 +128,21 @@ pub struct MigrateArgs {
 	database_url: Option<String>,
 }
 
+#[cfg(feature = "serve")]
+#[derive(Parser)]
+#[clap(
+	about = "Serve predictions via HTTP",
+	long_about = "Create an HTTP server to access predictions via JSON endpoints"
+)]
+pub struct ServeArgs {
+	#[clap(long, default_value = "127.0.0.1")]
+	host: String,
+	#[clap(long)]
+	model: PathBuf,
+	#[clap(long, default_value = "8080")]
+	port: u16,
+}
+
 fn main() {
 	setup_tracing();
 	let args = Args::parse();
@@ -135,6 +155,8 @@ fn main() {
 		Args::App(args) => self::app::app(*args),
 		#[cfg(feature = "tangram_app")]
 		Args::Migrate(args) => self::migrate::migrate(*args),
+		#[cfg(feature = "serve")]
+		Args::Serve(args) => self::serve::serve(*args),
 	};
 	if let Err(error) = result {
 		eprintln!("{}: {}", "error".red().bold(), error);

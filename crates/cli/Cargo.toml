@@ -12,12 +12,14 @@ name = "tangram"
 path = "main.rs"
 
 [features]
-default = ["train", "app"]
+default = ["train", "serve", "app"]
 train = []
+serve = ["axum", "tokio"]
 app = ["tangram_app", "tangram_app/default"]
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
+axum = { version = "0.3", optional = true }
 backtrace = "0.3"
 clap = { version = "3.0.0-beta.5", features = ["color"] }
 colored = "2"
@@ -40,6 +42,7 @@ tangram_model = { path = "../model" }
 tangram_progress_counter = { path = "../progress_counter" }
 tangram_table = { path = "../table" }
 tangram_zip = { path = "../zip" }
+tokio = { version = "1", optional = true }
 tortoise = "0.1"
 tracing = "0.1"
 tracing-subscriber = "0.2"
@@ -56,3 +59,8 @@ winapi = { version = "0.3", features = [
   "winbase",
   "wincon",
 ] }
+
+[dev-dependencies]
+hyper = "0.14"
+pretty_assertions = "0.7"
+tower= "0.4"
