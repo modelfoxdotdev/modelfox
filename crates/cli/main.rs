@@ -132,14 +132,23 @@ pub struct MigrateArgs {
 #[derive(Parser)]
 #[clap(
 	about = "Serve predictions via HTTP",
-	long_about = "Create an HTTP server to access predictions via JSON endpoints"
+	long_about = "Create HTTP server exposing an endpoint for running predictions against a Tangram model"
 )]
 pub struct ServeArgs {
-	#[clap(long, default_value = "127.0.0.1")]
-	host: String,
-	#[clap(long)]
+	#[clap(
+		short,
+		long,
+		default_value = "127.0.0.1",
+		about = "Host IP at which to bind the server"
+	)]
+	address: String,
+	#[clap(
+		short,
+		long,
+		about = "Path to the `.tangram` file containing the model to serve"
+	)]
 	model: PathBuf,
-	#[clap(long, default_value = "8080")]
+	#[clap(short, long, default_value = "8080", about = "Port to listen on")]
 	port: u16,
 }
 
