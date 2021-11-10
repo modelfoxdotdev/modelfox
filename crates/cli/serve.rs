@@ -4,7 +4,7 @@ use axum::{
 	async_trait,
 	extract::Extension,
 	handler::Handler,
-	http::{HeaderMap, Request, Response, StatusCode},
+	http::{Request, Response, StatusCode},
 	response::IntoResponse,
 	routing::{get, post},
 	AddExtensionLayer, Json, Router,
@@ -16,9 +16,6 @@ use std::{sync::Arc, time::Duration};
 use tangram_core::predict::{Model, PredictInput, PredictOptions, PredictOutput};
 use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
 use tracing::Span;
-
-// TODO you can probably get rid of unwraps() by defininng an Error type and implementing
-// IntoResponse.  Maybe even using anyhow::Error.
 
 #[tokio::main]
 pub async fn serve(args: ServeArgs) -> Result<()> {
@@ -55,11 +52,6 @@ fn app(model: Model) -> Router {
 				.on_body_chunk(|chunk: &Bytes, _latency: Duration, _span: &Span| {
 					tracing::debug!("sending {} bytes", chunk.len())
 				})
-				.on_eos(
-					|_trailers: Option<&HeaderMap>, stream_duration: Duration, _span: &Span| {
-						tracing::debug!("stream closed after {:?}", stream_duration)
-					},
-				)
 				.on_failure(
 					|error: ServerErrorsFailureClass, _latency: Duration, _span: &Span| {
 						tracing::warn!("something went wrong: {}", error)
@@ -126,15 +118,16 @@ mod test {
 	use pretty_assertions::assert_eq;
 	use tower::ServiceExt;
 
-	#[tokio::test]
-	async fn test_four_oh_four() {
+	fn test_app() -> Router {
 		let bytes = std::fs::read("heart_disease.tangram").unwrap();
 		let model = tangram_model::from_bytes(&bytes).unwrap();
 		let model = Model::from(model);
+		app(model)
+	}
 
-		let app = app(model);
-
-		let response = app
+	#[tokio::test]
+	async fn test_four_oh_four() {
+		let response = test_app()
 			.oneshot(
 				Request::builder()
 					.method(http::Method::GET)
@@ -153,13 +146,7 @@ mod test {
 
 	#[tokio::test]
 	async fn test_model_id() {
-		let bytes = std::fs::read("heart_disease.tangram").unwrap();
-		let model = tangram_model::from_bytes(&bytes).unwrap();
-		let model = Model::from(model);
-
-		let app = app(model);
-
-		let response = app
+		let response = test_app()
 			.oneshot(
 				Request::builder()
 					.method(http::Method::GET)
@@ -182,12 +169,6 @@ mod test {
 
 	#[tokio::test]
 	async fn test_predict() {
-		let bytes = std::fs::read("heart_disease.tangram").unwrap();
-		let model = tangram_model::from_bytes(&bytes).unwrap();
-		let model = Model::from(model);
-
-		let app = app(model);
-
 		let payload = r#"
             [
                 {
@@ -211,7 +192,7 @@ mod test {
 		// Verify the test payload is well-formed
 		let _: PredictInputs = serde_json::from_str(&payload).unwrap();
 
-		let response = app
+		let response = test_app()
 			.oneshot(
 				Request::builder()
 					.method(http::Method::POST)
@@ -238,5 +219,26 @@ mod test {
 			}
 		]);
 		assert_eq!(body, expected);
+	}
+
+	#[tokio::test]
+	async fn test_predict_bad_payload() {
+		let bad_payload = r#"{ "nonsense": "present" }"#;
+
+		let response = test_app()
+			.oneshot(
+				Request::builder()
+					.method(http::Method::POST)
+					.uri("/predict")
+					.header(http::header::CONTENT_TYPE, "application/json")
+					.body(Body::from(bad_payload))
+					.unwrap(),
+			)
+			.await
+			.unwrap();
+
+		assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+		let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
+		assert_eq!(body, Bytes::from("Failed to parse the request body as JSON: invalid type: map, expected a sequence at line 1 column 1"));
 	}
 }
