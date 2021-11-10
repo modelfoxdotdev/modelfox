@@ -75,5 +75,5 @@
 }
 
 .variable {
-	color: inherit;
+	color: var(--teal);
 }

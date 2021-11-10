@@ -10,6 +10,13 @@ pub struct BlogPost;
 pub struct BlogPostFrontMatter {
 	pub title: String,
 	pub date: String,
+	pub author: Option<BlogPostAuthor>,
+}
+
+#[derive(serde::Deserialize)]
+pub struct BlogPostAuthor {
+	pub name: String,
+	pub gravatar: String,
 }
 
 impl Content for BlogPost {

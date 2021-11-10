@@ -23,7 +23,7 @@ The tangram app is configured with a JSON file. You can pass a path to a configu
 | macOS    | `$HOME/Library/Application Support`  | /Users/Alice/Library/Application Support |
 | Windows  | `{FOLDERID_RoamingAppData}`          | C:\Users\Alice\AppData\Roaming           |
 
-### `auth`
+### auth
 
 By default, the app has authentication disabled and anyone who can access the app can view and edit all data. If you enable authentication, users will have to enter a login code they receive via email. You must set the `smtp` field documented below for authentication emails to be sent correctly.
 
@@ -37,7 +37,7 @@ Example:
 }
 ```
 
-### `database`
+### database
 
 Use the `database` key to specify the database the app should store its data in. The `url` should be a valid SQLite or PostgreSQL database url.
 
@@ -50,15 +50,15 @@ Use the `database` key to specify the database the app should store its data in.
 }
 ```
 
-### `host`
+### host
 
 Use the `host` key to specify the host the server will bind to. The app will prefer the `HOST` environment variable if it is set. The default value is `0.0.0.0`.
 
-### `port`
+### port
 
 Use the `port` key to specify the port the server will bind to. The app will prefer the `PORT` environment variable if it is set. The default value is `8080`.
 
-### `smtp`
+### smtp
 
 Use the `smtp` key to configure the SMTP server used to send authentication and alert emails.
 
@@ -72,7 +72,7 @@ Use the `smtp` key to configure the SMTP server used to send authentication and 
 }
 ```
 
-### `storage`
+### storage
 
 Use the `storage` key to configure storage for `.tangram` model files.
 
@@ -107,7 +107,7 @@ The `s3` storage type stores data in an S3-compatible cloud storage bucket.
 }
 ```
 
-#### `url`
+#### url
 
 Use the `url` key to specify the URL at which the app is accessible to users. This is used for links in invitation emails.
 

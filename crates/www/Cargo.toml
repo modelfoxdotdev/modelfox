@@ -14,8 +14,6 @@ path = "main.rs"
 default = [
   "tangram_www_benchmarks_client",
   "tangram_www_benchmarks_server",
-  "tangram_www_blog_index_server",
-  "tangram_www_blog_post_server",
   "tangram_www_docs_getting_started_index_server",
   "tangram_www_docs_getting_started_inspect_client",
   "tangram_www_docs_getting_started_inspect_server",
@@ -64,8 +62,6 @@ tracing = "0.1"
 tracing-subscriber = "0.2"
 
 tangram_www_benchmarks_server = { path = "pages/benchmarks/server", optional = true }
-tangram_www_blog_index_server = { path = "pages/blog/index/server", optional = true }
-tangram_www_blog_post_server = { path = "pages/blog/_/server", optional = true }
 tangram_www_docs_getting_started_index_server = { path = "pages/docs/getting_started/index/server", optional = true }
 tangram_www_docs_getting_started_inspect_server = { path = "pages/docs/getting_started/inspect/server", optional = true}
 tangram_www_docs_getting_started_monitor_server = { path = "pages/docs/getting_started/monitor/server", optional = true}

@@ -43,6 +43,12 @@ impl Component for Document {
 					.attribute("async", true)
 					.attribute("defer", true)
 					.attribute("src", "https://buttons.github.io/buttons.js"),
+			)
+			.child(
+				script()
+					.attribute("defer", true)
+					.attribute("data-domain","tangram.dev")
+					.attribute("src","https://plausible.io/js/plausible.js")
 			);
 		let client_script = self.client.map(|client| {
 			let paths = sunfish::client_paths(client);

@@ -1,9 +1,10 @@
 use crate as ui;
+use convert_case::Casing;
 use pinwheel::prelude::*;
 use pulldown_cmark::{escape::escape_html, Alignment, CodeBlockKind, Event, Options, Parser, Tag};
 use std::{borrow::Cow, fmt::Write};
 
-#[derive(builder, new)]
+#[derive(new)]
 pub struct Markdown {
 	string: Cow<'static, str>,
 }
@@ -18,6 +19,10 @@ enum State {
 		part: TablePart,
 		alignments: Vec<Alignment>,
 		column_index: usize,
+	},
+	Heading {
+		heading: Option<String>,
+		level: u32,
 	},
 }
 
@@ -39,10 +44,13 @@ impl Component for Markdown {
 						html.push_str("<p>");
 					}
 					Tag::Heading(level) => {
-						write!(&mut html, "<h{}>", level).unwrap();
+						state = State::Heading {
+							heading: None,
+							level,
+						};
 					}
 					Tag::BlockQuote => {
-						unimplemented!();
+						write!(&mut html, "<blockquote>").unwrap();
 					}
 					Tag::CodeBlock(kind) => {
 						let language = match kind {
@@ -151,11 +159,25 @@ impl Component for Markdown {
 					Tag::Paragraph => {
 						html.push_str("</p>");
 					}
-					Tag::Heading(level) => {
-						write!(&mut html, "</h{}>", level).unwrap();
-					}
+					Tag::Heading(level) => match &state {
+						State::Heading {
+							heading,
+							level: blevel,
+						} => {
+							assert!(level == *blevel);
+							let heading = heading.clone().unwrap();
+							let heading_snake_case =
+								heading.to_lowercase().to_case(convert_case::Case::Snake);
+							write!(&mut html, "<h{} id=\"{}\">", level, heading_snake_case)
+								.unwrap();
+							write!(&mut html, "{}", heading).unwrap();
+							write!(&mut html, "</h{}>", level).unwrap();
+							state = State::Ground;
+						}
+						_ => unreachable!(),
+					},
 					Tag::BlockQuote => {
-						unimplemented!();
+						write!(&mut html, "</blockquote>").unwrap();
 					}
 					Tag::CodeBlock(_) => match &state {
 						State::Code { language, code } => {
@@ -228,6 +250,7 @@ impl Component for Markdown {
 				Event::Text(text) => {
 					match &mut state {
 						State::Code { code, .. } => *code = Some(text.into_string()),
+						State::Heading { heading, .. } => *heading = Some(text.into_string()),
 						_ => escape_html(&mut html, &text).unwrap(),
 					};
 				}
