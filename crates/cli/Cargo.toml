@@ -14,13 +14,14 @@ path = "main.rs"
 [features]
 default = ["train", "serve", "app"]
 train = []
-serve = ["axum", "tokio"]
+serve = ["axum", "bytes", "tokio", "tower-http"]
 app = ["tangram_app", "tangram_app/default"]
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
 axum = { version = "0.3", optional = true }
 backtrace = "0.3"
+bytes = { version = "1.1", optional = true}
 clap = { version = "3.0.0-beta.5", features = ["color"] }
 colored = "2"
 csv = "1"
@@ -44,6 +45,7 @@ tangram_table = { path = "../table" }
 tangram_zip = { path = "../zip" }
 tokio = { version = "1", optional = true }
 tortoise = "0.1"
+tower-http = { version = "0.1", features = ["trace"], optional = true }
 tracing = "0.1"
 tracing-subscriber = "0.2"
 url = { version = "2", features = ["serde"] }
@@ -63,4 +65,4 @@ winapi = { version = "0.3", features = [
 [dev-dependencies]
 hyper = "0.14"
 pretty_assertions = "0.7"
-tower= "0.4"
+tower = "0.4"

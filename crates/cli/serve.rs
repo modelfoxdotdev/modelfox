@@ -4,14 +4,17 @@ use axum::{
 	async_trait,
 	extract::Extension,
 	handler::Handler,
-	http::StatusCode,
+	http::{HeaderMap, Request, Response, StatusCode},
 	response::IntoResponse,
 	routing::{get, post},
 	AddExtensionLayer, Json, Router,
 };
+use bytes::Bytes;
 use serde_json::{json, Value};
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 use tangram_core::predict::{Model, PredictInput};
+use tower_http::{classify::ServerErrorsFailureClass, trace::TraceLayer};
+use tracing::Span;
 
 #[tokio::main]
 pub async fn serve(args: ServeArgs) -> Result<()> {
@@ -34,7 +37,31 @@ fn app(model: Model) -> Router {
 	Router::new()
 		.route("/", get(root))
 		.route("/id", get(id))
+		.route("/predict", post(predict))
 		.layer(AddExtensionLayer::new(model_provider))
+		.layer(
+			TraceLayer::new_for_http()
+				.make_span_with(|request: &Request<_>| tracing::debug_span!("http-request"))
+				.on_request(|request: &Request<_>, _span: &Span| {
+					tracing::debug!("started {} {}", request.method(), request.uri().path())
+				})
+				.on_response(|response: &Response<_>, latency: Duration, _span: &Span| {
+					tracing::debug!("response generated in {:?}", latency)
+				})
+				.on_body_chunk(|chunk: &Bytes, latency: Duration, _span: &Span| {
+					tracing::debug!("sending {} bytes", chunk.len())
+				})
+				.on_eos(
+					|trailers: Option<&HeaderMap>, stream_duration: Duration, _span: &Span| {
+						tracing::debug!("stream closed after {:?}", stream_duration)
+					},
+				)
+				.on_failure(
+					|error: ServerErrorsFailureClass, latency: Duration, _span: &Span| {
+						tracing::warn!("something went wrong")
+					},
+				),
+		)
 		.fallback(handler_404.into_service())
 }
 
@@ -45,6 +72,16 @@ async fn root() -> &'static str {
 async fn id(Extension(model_provider): Extension<DynModelProvider>) -> Json<Value> {
 	let id = model_provider.id().await;
 	Json(json!({ "model_id": id }))
+}
+
+async fn predict(
+	Json(payload): Json<PredictInput>,
+	Extension(model_provider): Extension<DynModelProvider>,
+) -> Json<Value> {
+	// Convert payload to PredictInput
+	// Run prediction
+	// Return the Vec<PredictOutput> - probably serde_json::to_vec()
+	unimplemented!()
 }
 
 async fn handler_404() -> impl IntoResponse {
