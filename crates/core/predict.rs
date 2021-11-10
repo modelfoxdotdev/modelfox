@@ -122,9 +122,13 @@ impl Default for PredictOptions {
 }
 
 #[derive(Debug, serde::Serialize)]
+#[serde(tag = "type")]
 pub enum PredictOutput {
-	Regression(RegressionPredictOutput),
+	#[serde(rename = "regression")]
+    Regression(RegressionPredictOutput),
+    #[serde(rename = "binary_classification")]
 	BinaryClassification(BinaryClassificationPredictOutput),
+    #[serde(rename = "multiclass_classification")]
 	MulticlassClassification(MulticlassClassificationPredictOutput),
 }
 
@@ -160,12 +164,19 @@ pub struct FeatureContributions {
 }
 
 #[derive(Debug, serde::Serialize)]
+#[serde(tag = "type")]
 pub enum FeatureContributionEntry {
+    #[serde(rename = "identity")]
 	Identity(IdentityFeatureContribution),
+    #[serde(rename = "normalized")]
 	Normalized(NormalizedFeatureContribution),
+    #[serde(rename = "one_hot_encoded")]
 	OneHotEncoded(OneHotEncodedFeatureContribution),
+    #[serde(rename = "bag_of_words")]
 	BagOfWords(BagOfWordsFeatureContribution),
+    #[serde(rename = "bag_of_words_cosine_similarity")]
 	BagOfWordsCosineSimilarity(BagOfWordsCosineSimilarityFeatureContribution),
+    #[serde(rename = "word_embedding")]
 	WordEmbedding(WordEmbeddingFeatureContribution),
 }
 
@@ -216,7 +227,9 @@ pub struct WordEmbeddingFeatureContribution {
 
 #[derive(Debug, serde::Serialize)]
 pub enum NGram {
+    #[serde(rename = "unigram")]
 	Unigram(String),
+    #[serde(rename = "bigram")]
 	Bigram(String, String),
 }
 
