@@ -1,3 +1,16 @@
+//! This module exposes an HTTP endpoint for predicting against a pregenerated model
+//!
+//! Start the server, pointing to a valid `.tangram` file:
+//! ```not-rust
+//! $ tangram serve --model heart_disease.tangram
+//! ```
+//!
+//! Make a request:
+//! ```not-rust
+//! $ curl -X POST 127.0.0.1:8080/predict -H 'Content-Type: application/json' -d '[{"age": 63.0,"gender": "male","chest_pain": "typical angina","resting_blood_pressure": 145.0,"cholesterol": 233.0,"fasting_blood_sugar_greater_than_120": "true","resting_ecg_result": "probable or definite left ventricular hypertrophy","exercise_max_heart_rate": 150.0,"exercise_induced_angina": "no","exercise_st_depression": 2.3,"exercise_st_slope": "downsloping","fluoroscopy_vessels_colored": "0","thallium_stress_test": "fixed defect"}]'
+//! [{"BinaryClassification":{"class_name":"Positive","probability":0.560434,"feature_contributions":null}}]
+//! ```
+
 use crate::ServeArgs;
 use anyhow::Result;
 use axum::{
