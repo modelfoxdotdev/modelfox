@@ -40,7 +40,7 @@ impl Component for Hero {
 	fn into_node(self) -> Node {
 		let title = h1()
 			.class("index-hero-title")
-			.child("All-in-one Machine Learning Toolkit for Programmers");
+			.child("Tangram is the all-in-one machine learning toolkit for programmers.");
 		let subtitle= "Train a model from a CSV file on the command line. Make predictions from Elixir, Go, JavaScript, PHP, Python, Ruby, or Rust. Learn about your models and monitor them in production from your browser.";
 		let subtitle = div().class("index-hero-subtitle").child(subtitle);
 		let buttons = div()

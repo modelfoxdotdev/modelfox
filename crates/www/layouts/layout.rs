@@ -71,7 +71,7 @@ impl Component for Topbar {
 			ui::TopbarItem {
 				element: None,
 				href: "https://app.tangram.dev".to_owned(),
-				title: "Sign In".to_owned(),
+				title: "Login".to_owned(),
 			},
 			ui::TopbarItem {
 				element: Some({
@@ -86,8 +86,8 @@ impl Component for Topbar {
 			},
 		];
 		ui::Topbar::new()
-			.background_color(ui::colors::BACKGROUND.to_owned())
-			.dropdown_background_color(ui::colors::BACKGROUND.to_owned())
+			.background_color(ui::colors::HEADER.to_owned())
+			.dropdown_background_color(ui::colors::SURFACE.to_owned())
 			.items(topbar_items)
 			.logo(Logo::new().color_scheme(LogoColorScheme::Multi).into_node())
 			.title("tangram".to_owned())
