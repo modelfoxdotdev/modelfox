@@ -24,20 +24,9 @@
 }
 
 .docs-layout-left {
+	background-color: var(--header-color);
 	grid-area: left;
 	padding: 1rem;
-}
-
-@media (max-width: 1199px) {
-	.docs-layout-left {
-		background-color: var(--header-color);
-	}
-}
-
-@media (min-width: 1200px) {
-	.docs-layout-left {
-		background-color: transparent;
-	}
 }
 
 .docs-layout-center {

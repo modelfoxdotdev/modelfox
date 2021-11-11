@@ -149,7 +149,7 @@
 	grid-area: center;
 	margin: 0 auto;
 	max-width: var(--max-width);
-	padding: 2rem 2rem;
+	padding: 1rem;
 	width: 100%;
 }
 
