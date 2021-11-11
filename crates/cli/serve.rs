@@ -13,9 +13,10 @@
 
 use crate::ServeArgs;
 use bytes::Buf;
+use futures::future::FutureExt;
 use hyper::http;
 use serde::{Deserialize, Serialize};
-use std::{convert::Infallible, sync::Arc};
+use std::{convert::Infallible, panic::AssertUnwindSafe, sync::Arc};
 use tangram_core::predict::{PredictInput, PredictOptions, PredictOutput};
 
 #[tokio::main]
@@ -47,7 +48,12 @@ pub async fn serve(args: ServeArgs) -> anyhow::Result<()> {
 								request.uri()
 							);
 							let start = std::time::SystemTime::now();
-							let response = handle(request).await;
+							let response =
+								match AssertUnwindSafe(handle(request)).catch_unwind().await {
+									Ok(response) => response,
+									Err(_) => internal_server_error(),
+								};
+
 							tracing::debug!(
 								"Produced response in {}μs",
 								start.elapsed().unwrap().as_micros()
@@ -70,6 +76,13 @@ fn bad_request(msg: &str) -> http::Response<hyper::Body> {
 	http::Response::builder()
 		.status(http::StatusCode::BAD_REQUEST)
 		.body(hyper::Body::from(format!("bad request: {}", msg)))
+		.unwrap()
+}
+
+fn internal_server_error() -> http::Response<hyper::Body> {
+	http::Response::builder()
+		.status(http::StatusCode::INTERNAL_SERVER_ERROR)
+		.body(hyper::Body::from("internal server error"))
 		.unwrap()
 }
 

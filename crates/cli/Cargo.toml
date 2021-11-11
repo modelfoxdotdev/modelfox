@@ -14,7 +14,7 @@ path = "main.rs"
 [features]
 default = ["train", "serve", "app"]
 train = []
-serve = ["bytes", "hyper", "tokio"]
+serve = ["bytes", "futures", "hyper", "tokio"]
 app = ["tangram_app", "tangram_app/default"]
 
 [dependencies]
@@ -26,6 +26,7 @@ colored = "2"
 csv = "1"
 dirs = "4"
 either = "1"
+futures = { version = "0.3", optional = true }
 hyper = { version = "0.14", optional = true }
 itertools = "0.10"
 num = "0.4"
