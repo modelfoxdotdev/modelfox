@@ -66,6 +66,45 @@ pub async fn serve(args: ServeArgs) -> anyhow::Result<()> {
 	Ok(())
 }
 
+fn bad_request(msg: &str) -> http::Response<hyper::Body> {
+	http::Response::builder()
+		.status(http::StatusCode::BAD_REQUEST)
+		.body(hyper::Body::from(format!("bad request: {}", msg)))
+		.unwrap()
+}
+
+fn not_found() -> http::Response<hyper::Body> {
+	http::Response::builder()
+		.status(http::StatusCode::NOT_FOUND)
+		.body(hyper::Body::from("not found"))
+		.unwrap()
+}
+
+async fn predict(request: http::Request<hyper::Body>) -> http::Response<hyper::Body> {
+	let context: Arc<tangram_core::predict::Model> =
+		Arc::clone(request.extensions().get().unwrap());
+	let body = request.into_body();
+	let body_bytes = hyper::body::aggregate(body).await.unwrap();
+	let inputs: PredictInputs = match serde_json::from_reader(body_bytes.reader()) {
+		Ok(inputs) => inputs,
+		Err(e) => {
+			let msg = e.to_string();
+			tracing::debug!("sending {} bytes", msg.len());
+			return bad_request(&msg);
+		}
+	};
+	let outputs = PredictOutputs(tangram_core::predict::predict(
+		&*context,
+		&inputs.0,
+		&PredictOptions::default(),
+	));
+	let json = serde_json::to_string(&outputs).unwrap();
+	tracing::debug!("sending {} bytes", json.len());
+	http::Response::builder()
+		.body(hyper::Body::from(json))
+		.unwrap()
+}
+
 #[derive(Deserialize)]
 struct PredictInputs(Vec<PredictInput>);
 
@@ -73,41 +112,9 @@ struct PredictInputs(Vec<PredictInput>);
 struct PredictOutputs(Vec<PredictOutput>);
 
 async fn handle(request: http::Request<hyper::Body>) -> http::Response<hyper::Body> {
-	let context: Arc<tangram_core::predict::Model> =
-		Arc::clone(request.extensions().get().unwrap());
 	match (request.method(), request.uri().path()) {
-		(&hyper::Method::POST, "/predict") => {
-			let body = request.into_body();
-			let body_bytes = hyper::body::aggregate(body).await.unwrap();
-			let inputs: Result<PredictInputs, serde_json::Error> =
-				serde_json::from_reader(body_bytes.reader());
-			match inputs {
-				Ok(inputs) => {
-					let outputs = PredictOutputs(tangram_core::predict::predict(
-						&*context,
-						&inputs.0,
-						&PredictOptions::default(),
-					));
-					let json = serde_json::to_string(&outputs).unwrap();
-					tracing::debug!("sending {} bytes", json.len());
-					http::Response::builder()
-						.body(hyper::Body::from(json))
-						.unwrap()
-				}
-				Err(e) => {
-					let msg = e.to_string();
-					tracing::debug!("sending {} bytes", msg.len());
-					http::Response::builder()
-						.status(http::status::StatusCode::BAD_REQUEST)
-						.body(hyper::Body::from(msg))
-						.unwrap()
-				}
-			}
-		}
-		_ => http::Response::builder()
-			.status(http::status::StatusCode::NOT_FOUND)
-			.body(hyper::Body::empty())
-			.unwrap(),
+		(&hyper::Method::POST, "/predict") => predict(request).await,
+		_ => not_found(),
 	}
 }
 
@@ -137,7 +144,7 @@ mod test {
 		assert_eq!(response.status(), http::status::StatusCode::NOT_FOUND);
 
 		let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
-		assert_eq!(body, bytes::Bytes::new());
+		assert_eq!(body, "not found");
 	}
 
 	#[tokio::test]
@@ -203,7 +210,9 @@ mod test {
 		let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
 		assert_eq!(
 			body,
-			hyper::body::Bytes::from("invalid type: map, expected a sequence at line 1 column 1")
+			hyper::body::Bytes::from(
+				"bad request: invalid type: map, expected a sequence at line 1 column 1"
+			)
 		);
 	}
 }
