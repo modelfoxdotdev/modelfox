@@ -16,6 +16,9 @@ mod serve;
 #[cfg(feature = "train")]
 mod train;
 
+// TODO how to title/feature-gate?
+mod backtrace_server;
+
 #[derive(Parser)]
 #[clap(
 	version = concat!(env!("CARGO_PKG_VERSION")),

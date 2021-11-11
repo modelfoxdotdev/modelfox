@@ -11,22 +11,15 @@
 //! [{"type":"binary_classification","class_name":"Positive","probability":0.560434,"feature_contributions":null}]
 //! ```
 
-use crate::ServeArgs;
-use backtrace::Backtrace;
+use crate::{backtrace_server, ServeArgs};
 use bytes::Buf;
-use futures::future::FutureExt;
 use hyper::http;
 use serde::{Deserialize, Serialize};
-use std::{cell::RefCell, convert::Infallible, panic::AssertUnwindSafe, sync::Arc};
+use std::sync::Arc;
 use tangram_core::predict::{PredictInput, PredictOptions, PredictOutput};
 
 #[tokio::main]
 pub async fn serve(args: ServeArgs) -> anyhow::Result<()> {
-	// Storage for any potential panic in this Tokio task
-	tokio::task_local! {
-		static PANIC_MESSAGE_AND_BACKTRACE: RefCell<Option<(String, Backtrace)>>;
-	}
-
 	// Read model and create context
 	let bytes = std::fs::read(&args.model)?;
 	let model = tangram_model::from_bytes(&bytes)?;
@@ -36,69 +29,8 @@ pub async fn serve(args: ServeArgs) -> anyhow::Result<()> {
 	// Parse address
 	let addr = std::net::SocketAddr::new(args.address.parse()?, args.port);
 
-	// Define service
-	let make_svc =
-		hyper::service::make_service_fn(move |_socket: &hyper::server::conn::AddrStream| {
-			// handle connection
-			let context = Arc::clone(&context);
-			async {
-				Ok::<_, Infallible>(hyper::service::service_fn(
-					move |mut request: http::Request<hyper::Body>| {
-						// handle request
-						let context = Arc::clone(&context);
-						PANIC_MESSAGE_AND_BACKTRACE.scope(RefCell::new(None), async move {
-							request.extensions_mut().insert(context);
-							tracing::debug!(
-								"Processing request: {} {}",
-								request.method(),
-								request.uri()
-							);
-							let start = std::time::SystemTime::now();
-							let response =
-								match AssertUnwindSafe(handle(request)).catch_unwind().await {
-									Ok(response) => response,
-									Err(_) => {
-										let message = PANIC_MESSAGE_AND_BACKTRACE.with(
-											|panic_message_and_backtrace| {
-												let panic_message_and_backtrace =
-													panic_message_and_backtrace.borrow();
-												let (message, backtrace) =
-													panic_message_and_backtrace.as_ref().unwrap();
-												format!(
-													"panic: {}, backtrace: {:?}",
-													message, backtrace
-												)
-											},
-										);
-										tracing::error!(%message, "panic!");
-										internal_server_error(&message)
-									}
-								};
-
-							tracing::debug!(
-								"Produced response in {}μs",
-								start.elapsed().unwrap().as_micros()
-							);
-							Ok::<_, Infallible>(response)
-						})
-					},
-				))
-			}
-		});
-
-	// Record the panic message and backtrace if a panic occurs.
-	let hook = std::panic::take_hook();
-	std::panic::set_hook(Box::new(|panic_info| {
-		let value = (panic_info.to_string(), Backtrace::new());
-		PANIC_MESSAGE_AND_BACKTRACE.with(|panic_message_and_backtrace| {
-			panic_message_and_backtrace.borrow_mut().replace(value);
-		})
-	}));
-
 	tracing::info!("Serving model from {} at {}", args.model.display(), addr);
-
-	hyper::Server::bind(&addr).serve(make_svc).await?;
-	std::panic::set_hook(hook);
+	backtrace_server::serve.await(addr, &[context], handle).await?;
 	Ok(())
 }
 
@@ -106,13 +38,6 @@ fn bad_request(msg: &str) -> http::Response<hyper::Body> {
 	http::Response::builder()
 		.status(http::StatusCode::BAD_REQUEST)
 		.body(hyper::Body::from(format!("bad request: {}", msg)))
-		.unwrap()
-}
-
-fn internal_server_error(msg: &str) -> http::Response<hyper::Body> {
-	http::Response::builder()
-		.status(http::StatusCode::INTERNAL_SERVER_ERROR)
-		.body(hyper::Body::from(format!("internal server error: {}", msg)))
 		.unwrap()
 }
 
