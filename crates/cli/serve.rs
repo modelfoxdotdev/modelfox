@@ -34,7 +34,7 @@ pub async fn serve(args: ServeArgs) -> anyhow::Result<()> {
 	let context = Arc::new(model);
 
 	// Parse address
-	let addr = format!("{}:{}", args.address, args.port).parse()?;
+	let addr = std::net::SocketAddr::new(args.address.parse()?, args.port);
 
 	// Define service
 	let make_svc =

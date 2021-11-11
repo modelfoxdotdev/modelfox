@@ -68,6 +68,7 @@ default = [
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
+backtrace = "0.3"
 base64 = "0.13"
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.6", features = ["serde"] }
@@ -101,8 +102,6 @@ tangram_ui = { path = "../ui" }
 tangram_zip = { path = "../zip" }
 tokio = { version = "1", features = ["full"] }
 toml = "0.5"
-tower = { version = "0.4", features = ["make", "util"] }
-tower-http = { version = "0.1", features = ["add-extension", "trace"] }
 tracing = "0.1"
 url = { version = "2", features = ["serde"] }
 
