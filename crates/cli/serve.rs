@@ -201,7 +201,7 @@ mod test {
 
 		let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
 		let body: Value = serde_json::from_slice(&body).unwrap();
-	    insta::assert_json_snapshot!(body, @r###"
+		insta::assert_json_snapshot!(body, @r###"
      [
        {
          "class_name": "Positive",
@@ -433,7 +433,7 @@ mod test {
          "type": "binary_classification"
        }
      ]
-     "###);	
+     "###);
 	}
 
 	#[tokio::test]
