@@ -153,6 +153,7 @@ pub enum Arch {
 	AArch64,
 	Wasm32,
 }
+
 impl std::str::FromStr for Arch {
 	type Err = Error;
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -164,6 +165,7 @@ impl std::str::FromStr for Arch {
 		}
 	}
 }
+
 impl Arch {
 	pub fn as_str(&self) -> &str {
 		match self {
@@ -173,6 +175,7 @@ impl Arch {
 		}
 	}
 }
+
 #[derive(Clone, Copy, Debug)]
 pub enum Target {
 	X8664UnknownLinuxGnu,
@@ -185,6 +188,7 @@ pub enum Target {
 	X8664PcWindowsGnu,
 	Wasm32UnknownUnknown,
 }
+
 impl std::str::FromStr for Target {
 	type Err = Error;
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -202,6 +206,7 @@ impl std::str::FromStr for Target {
 		}
 	}
 }
+
 impl Target {
 	pub fn as_str(&self) -> &str {
 		match self {
@@ -230,11 +235,13 @@ impl Target {
 		}
 	}
 }
+
 impl std::fmt::Display for Target {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		write!(f, "{}", self.as_str())
 	}
 }
+
 pub struct TargetFileNames {
 	pub tangram_cli_file_name: &'static str,
 	pub tangram_h_file_name: &'static str,
@@ -245,6 +252,7 @@ pub struct TargetFileNames {
 	pub tangram_node_src_file_name: &'static str,
 	pub tangram_node_dst_file_name: &'static str,
 }
+
 impl TargetFileNames {
 	pub fn for_target(target: Target) -> TargetFileNames {
 		match target {
