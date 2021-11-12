@@ -146,7 +146,6 @@ impl TargetFileNames {
 		}
 	}
 }
-
 /*
 pub enum Arch {
 	X8664,
@@ -222,7 +221,7 @@ impl Target {
 		}
 	}
 
-    pub fn arch(&self) -> Arch {
+	pub fn arch(&self) -> Arch {
 		match self {
 			Target::X8664UnknownLinuxGnu
 			| Target::X8664UnknownLinuxMusl
