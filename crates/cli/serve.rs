@@ -122,19 +122,19 @@ mod test {
 	#[tokio::test]
 	async fn test_predict_default_options() {
 		let payload = json!({ "inputs": [{
-					"age": 63.0,
-					"gender": "male",
-					"chest_pain": "typical angina",
-					"resting_blood_pressure": 145.0,
-					"cholesterol": 233.0,
-					"fasting_blood_sugar_greater_than_120": "true",
-					"resting_ecg_result": "probable or definite left ventricular hypertrophy",
-					"exercise_max_heart_rate": 150.0,
-					"exercise_induced_angina": "no",
-					"exercise_st_depression": 2.3,
-					"exercise_st_slope": "downsloping",
-					"fluoroscopy_vessels_colored": "0",
-					"thallium_stress_test": "fixed defect"
+			"age": 63.0,
+			"gender": "male",
+			"chest_pain": "typical angina",
+			"resting_blood_pressure": 145.0,
+			"cholesterol": 233.0,
+			"fasting_blood_sugar_greater_than_120": "true",
+			"resting_ecg_result": "probable or definite left ventricular hypertrophy",
+			"exercise_max_heart_rate": 150.0,
+			"exercise_induced_angina": "no",
+			"exercise_st_depression": 2.3,
+			"exercise_st_slope": "downsloping",
+			"fluoroscopy_vessels_colored": "0",
+			"thallium_stress_test": "fixed defect"
 		}]});
 
 		let mut request = hyper::Request::builder()
@@ -167,19 +167,19 @@ mod test {
 	#[tokio::test]
 	async fn test_predict_with_options() {
 		let payload = json!({ "inputs": [{
-					"age": 63.0,
-					"gender": "male",
-					"chest_pain": "typical angina",
-					"resting_blood_pressure": 145.0,
-					"cholesterol": 233.0,
-					"fasting_blood_sugar_greater_than_120": "true",
-					"resting_ecg_result": "probable or definite left ventricular hypertrophy",
-					"exercise_max_heart_rate": 150.0,
-					"exercise_induced_angina": "no",
-					"exercise_st_depression": 2.3,
-					"exercise_st_slope": "downsloping",
-					"fluoroscopy_vessels_colored": "0",
-					"thallium_stress_test": "fixed defect"
+			"age": 63.0,
+			"gender": "male",
+			"chest_pain": "typical angina",
+			"resting_blood_pressure": 145.0,
+			"cholesterol": 233.0,
+			"fasting_blood_sugar_greater_than_120": "true",
+			"resting_ecg_result": "probable or definite left ventricular hypertrophy",
+			"exercise_max_heart_rate": 150.0,
+			"exercise_induced_angina": "no",
+			"exercise_st_depression": 2.3,
+			"exercise_st_slope": "downsloping",
+			"fluoroscopy_vessels_colored": "0",
+			"thallium_stress_test": "fixed defect"
 		}],
 		"options": {
 			"threshold": 0.4,
