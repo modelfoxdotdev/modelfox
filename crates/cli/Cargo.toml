@@ -63,4 +63,5 @@ winapi = { version = "0.3", features = [
 ] }
 
 [dev-dependencies]
+insta = "1"
 pretty_assertions = "0.7"
