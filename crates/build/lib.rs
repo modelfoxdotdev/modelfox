@@ -221,7 +221,7 @@ impl Target {
 			Target::Wasm32UnknownUnknown => "wasm32-unknown-unknown",
 		}
 	}
-	
+
     pub fn arch(&self) -> Arch {
 		match self {
 			Target::X8664UnknownLinuxGnu
