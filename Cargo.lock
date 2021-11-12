@@ -2912,7 +2912,8 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 [[package]]
 name = "sunfish"
 version = "0.2.5"
-source = "git+https://github.com/tangramdotdev/sunfish?rev=4bb007d95d9722efe95b961893a7dc64eb58fe30#4bb007d95d9722efe95b961893a7dc64eb58fe30"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0114cfa9eeccbdfc81d9eb2b70c4d71f103a127efdee9ae8ccfd1b8b3a9a7ccd"
 dependencies = [
  "anyhow",
  "clap 3.0.0-beta.5",
@@ -2937,7 +2938,8 @@ dependencies = [
 [[package]]
 name = "sunfish_macro"
 version = "0.2.5"
-source = "git+https://github.com/tangramdotdev/sunfish?rev=4bb007d95d9722efe95b961893a7dc64eb58fe30#4bb007d95d9722efe95b961893a7dc64eb58fe30"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e03d7d127bd6997967b4a13cbacac0bb54f84a79a0c52f024b694929f23e2c9"
 dependencies = [
  "glob",
  "proc-macro2",
@@ -2992,7 +2994,6 @@ name = "tangram_app"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "backtrace",
  "base64 0.13.0",
  "chrono",
  "chrono-tz",
@@ -3067,6 +3068,7 @@ dependencies = [
  "tangram_id",
  "tangram_metrics",
  "tangram_model",
+ "tangram_serve",
  "tangram_table",
  "tangram_ui",
  "tangram_zip",
@@ -4190,7 +4192,6 @@ dependencies = [
  "csv",
  "dirs 4.0.0",
  "either",
- "futures",
  "hyper",
  "itertools",
  "libc",
@@ -4208,6 +4209,7 @@ dependencies = [
  "tangram_license",
  "tangram_model",
  "tangram_progress_counter",
+ "tangram_serve",
  "tangram_table",
  "tangram_zip",
  "tokio",
@@ -4447,6 +4449,19 @@ version = "0.0.0"
 dependencies = [
  "build_wheel",
  "clap 3.0.0-beta.5",
+]
+
+[[package]]
+name = "tangram_serve"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "backtrace",
+ "futures",
+ "hyper",
+ "tangram_id",
+ "tokio",
+ "tracing",
 ]
 
 [[package]]

@@ -11,7 +11,8 @@
 //! [{"type":"binary_classification","class_name":"Positive","probability":0.560434,"feature_contributions":null}]
 //! ```
 
-use crate::{backtrace_server, ServeArgs};
+use crate::ServeArgs;
+use anyhow::Result;
 use bytes::Buf;
 use hyper::http;
 use serde::{Deserialize, Serialize};
@@ -19,7 +20,7 @@ use std::sync::Arc;
 use tangram_core::predict::{PredictInput, PredictOptions, PredictOutput};
 
 #[tokio::main]
-pub async fn serve(args: ServeArgs) -> anyhow::Result<()> {
+pub async fn serve(args: ServeArgs) -> Result<()> {
 	// Read model and create context
 	let bytes = std::fs::read(&args.model)?;
 	let model = tangram_model::from_bytes(&bytes)?;
@@ -29,8 +30,8 @@ pub async fn serve(args: ServeArgs) -> anyhow::Result<()> {
 	// Parse address
 	let addr = std::net::SocketAddr::new(args.address.parse()?, args.port);
 
-	tracing::info!("Serving model from {} at {}", args.model.display(), addr);
-	backtrace_server::serve(addr, context, handle).await?;
+	tracing::info!("Serving model from {}", args.model.display());
+	tangram_serve::serve(addr, context, handle).await?;
 	Ok(())
 }
 

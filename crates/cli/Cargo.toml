@@ -14,7 +14,7 @@ path = "main.rs"
 [features]
 default = ["train", "serve", "app"]
 train = []
-serve = ["bytes", "futures", "hyper", "tokio"]
+serve = ["bytes", "hyper", "tokio", "tangram_serve"]
 app = ["tangram_app", "tangram_app/default"]
 
 [dependencies]
@@ -26,7 +26,6 @@ colored = "2"
 csv = "1"
 dirs = "4"
 either = "1"
-futures = { version = "0.3", optional = true }
 hyper = { version = "0.14", optional = true }
 itertools = "0.10"
 num = "0.4"
@@ -42,6 +41,7 @@ tangram_kill_chip = { path = "../kill_chip" }
 tangram_license = { path = "../license" }
 tangram_model = { path = "../model" }
 tangram_progress_counter = { path = "../progress_counter" }
+tangram_serve = { path = "../serve", optional = true }
 tangram_table = { path = "../table" }
 tangram_zip = { path = "../zip" }
 tokio = { version = "1", optional = true }

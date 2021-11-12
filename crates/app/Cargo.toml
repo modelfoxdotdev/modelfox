@@ -68,7 +68,6 @@ default = [
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-backtrace = "0.3"
 base64 = "0.13"
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.6", features = ["serde"] }
@@ -97,6 +96,7 @@ tangram_core = { path = "../core" }
 tangram_id = { path = "../id" }
 tangram_metrics = { path = "../metrics" }
 tangram_model = { path = "../model" }
+tangram_serve = { path = "../serve" }
 tangram_table = { path = "../table" }
 tangram_ui = { path = "../ui" }
 tangram_zip = { path = "../zip" }

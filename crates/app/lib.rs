@@ -1,18 +1,12 @@
 use anyhow::{bail, Result};
-use backtrace::Backtrace;
-use futures::future::FutureExt;
-use std::{
-	cell::RefCell, convert::Infallible, net::SocketAddr, panic::AssertUnwindSafe, sync::Arc,
-	time::Duration,
-};
+use std::{net::SocketAddr, sync::Arc};
 pub use tangram_app_common::options;
 use tangram_app_common::{
 	options::{Options, StorageOptions},
 	storage::{LocalStorage, S3Storage, Storage},
 	Context,
 };
-use tangram_id::Id;
-use tracing::{error, info, trace_span, Span};
+use tracing::error;
 use url::Url;
 
 pub fn run(options: Options) -> Result<()> {
@@ -70,41 +64,7 @@ async fn run_inner(options: Options) -> Result<()> {
 		sunfish: sunfish::init!(),
 	};
 	let context = Arc::new(context);
-	let make_svc =
-		hyper::service::make_service_fn(move |_socket: &hyper::server::conn::AddrStream| {
-			// handle connection
-			let context = Arc::clone(&context);
-			async {
-				Ok::<_, Infallible>(hyper::service::service_fn(
-					move |mut request: http::Request<hyper::Body>| {
-						// handle request
-						let context = Arc::clone(&context);
-						async move {
-							request.extensions_mut().insert(context);
-							request.extensions_mut().insert(Id::generate());
-							tracing::debug!(
-								method = %request.method(),
-								request = %request.uri().path(),
-								query = ?request.uri().query(),
-								"request",
-							);
-							let start = std::time::SystemTime::now();
-							let response = AssertUnwindSafe(handle(request))
-								.catch_unwind()
-								.await
-								.unwrap();
-							tracing::debug!(
-								"Produced response in {}μs",
-								start.elapsed().unwrap().as_micros()
-							);
-							Ok::<_, Infallible>(response)
-						}
-					},
-				))
-			}
-		});
-	eprintln!("🚀 Server running at {}", addr);
-	hyper::Server::bind(&addr).serve(make_svc).await?;
+	tangram_serve::serve(addr, context, handle).await?;
 	Ok(())
 }
 
