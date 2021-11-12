@@ -82,7 +82,8 @@ fn main() {
 		std::fs::copy(libtangram_dynamic_src, libtangram_dynamic_dst).unwrap();
 		let libtangram_static_src =
 			cargo_artifact_path.join(target_file_names.libtangram_static_file_name);
-		let libtangram_static_dst = dist_target_path.join(target_file_names.libtangram_static_file_name);
+		let libtangram_static_dst =
+			dist_target_path.join(target_file_names.libtangram_static_file_name);
 		std::fs::copy(libtangram_static_src, libtangram_static_dst).unwrap();
 	}
 }

@@ -121,27 +121,31 @@ impl Default for PredictOptions {
 	}
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
+#[serde(tag = "type")]
 pub enum PredictOutput {
+	#[serde(rename = "regression")]
 	Regression(RegressionPredictOutput),
+	#[serde(rename = "binary_classification")]
 	BinaryClassification(BinaryClassificationPredictOutput),
+	#[serde(rename = "multiclass_classification")]
 	MulticlassClassification(MulticlassClassificationPredictOutput),
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub struct RegressionPredictOutput {
 	pub value: f32,
 	pub feature_contributions: Option<FeatureContributions>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub struct BinaryClassificationPredictOutput {
 	pub class_name: String,
 	pub probability: f32,
 	pub feature_contributions: Option<FeatureContributions>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub struct MulticlassClassificationPredictOutput {
 	pub class_name: String,
 	pub probability: f32,
@@ -149,7 +153,7 @@ pub struct MulticlassClassificationPredictOutput {
 	pub feature_contributions: Option<BTreeMap<String, FeatureContributions>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub struct FeatureContributions {
 	/// The baseline value is the value output by the model for this class before taking into account the feature values.
 	pub baseline_value: f32,
@@ -159,31 +163,38 @@ pub struct FeatureContributions {
 	pub entries: Vec<FeatureContributionEntry>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
+#[serde(tag = "type")]
 pub enum FeatureContributionEntry {
+	#[serde(rename = "identity")]
 	Identity(IdentityFeatureContribution),
+	#[serde(rename = "normalized")]
 	Normalized(NormalizedFeatureContribution),
+	#[serde(rename = "one_hot_encoded")]
 	OneHotEncoded(OneHotEncodedFeatureContribution),
+	#[serde(rename = "bag_of_words")]
 	BagOfWords(BagOfWordsFeatureContribution),
+	#[serde(rename = "bag_of_words_cosine_similarity")]
 	BagOfWordsCosineSimilarity(BagOfWordsCosineSimilarityFeatureContribution),
+	#[serde(rename = "word_embedding")]
 	WordEmbedding(WordEmbeddingFeatureContribution),
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub struct IdentityFeatureContribution {
 	pub column_name: String,
 	pub feature_value: f32,
 	pub feature_contribution_value: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub struct NormalizedFeatureContribution {
 	pub column_name: String,
 	pub feature_value: f32,
 	pub feature_contribution_value: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub struct OneHotEncodedFeatureContribution {
 	pub column_name: String,
 	pub variant: Option<String>,
@@ -191,7 +202,7 @@ pub struct OneHotEncodedFeatureContribution {
 	pub feature_contribution_value: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub struct BagOfWordsFeatureContribution {
 	pub column_name: String,
 	pub ngram: NGram,
@@ -199,7 +210,7 @@ pub struct BagOfWordsFeatureContribution {
 	pub feature_contribution_value: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub struct BagOfWordsCosineSimilarityFeatureContribution {
 	pub column_name_a: String,
 	pub column_name_b: String,
@@ -207,16 +218,18 @@ pub struct BagOfWordsCosineSimilarityFeatureContribution {
 	pub feature_contribution_value: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub struct WordEmbeddingFeatureContribution {
 	pub column_name: String,
 	pub value_index: usize,
 	pub feature_contribution_value: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize)]
 pub enum NGram {
+	#[serde(rename = "unigram")]
 	Unigram(String),
+	#[serde(rename = "bigram")]
 	Bigram(String, String),
 }
 

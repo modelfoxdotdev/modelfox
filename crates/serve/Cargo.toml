@@ -1,0 +1,19 @@
+[package]
+edition = "2021"
+rust-version = "1.56"
+license = "MIT"
+name = "tangram_serve"
+publish = false
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+anyhow = "1"
+backtrace = "0.3"
+futures = "0.3"
+hyper = { version = "0.14", features = ["http1", "server", "tcp"] }
+tangram_id = { path = "../id" }
+tokio = { version = "1", features = ["rt"] }
+tracing = "0.1"

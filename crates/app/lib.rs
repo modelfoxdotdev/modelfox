@@ -1,19 +1,13 @@
 use anyhow::{bail, Result};
-use request_id::RequestIdLayer;
-use std::{sync::Arc, time::Duration};
+use std::{net::SocketAddr, sync::Arc};
 pub use tangram_app_common::options;
 use tangram_app_common::{
 	options::{Options, StorageOptions},
 	storage::{LocalStorage, S3Storage, Storage},
 	Context,
 };
-use tangram_id::Id;
-use tower::{make::Shared, ServiceBuilder};
-use tower_http::{add_extension::AddExtensionLayer, trace::TraceLayer};
-use tracing::{error, info, trace_span, Span};
+use tracing::error;
 use url::Url;
-
-mod request_id;
 
 pub fn run(options: Options) -> Result<()> {
 	tokio::runtime::Builder::new_multi_thread()
@@ -61,6 +55,7 @@ async fn run_inner(options: Options) -> Result<()> {
 	// Start the server.
 	let host = options.host;
 	let port = options.port;
+	let addr = SocketAddr::new(host, port);
 	let context = Context {
 		database_pool,
 		options,
@@ -68,41 +63,12 @@ async fn run_inner(options: Options) -> Result<()> {
 		storage,
 		sunfish: sunfish::init!(),
 	};
-	let context_layer = AddExtensionLayer::<Arc<Context>>::new(Arc::new(context));
-	let request_id_layer = RequestIdLayer::new();
-	let trace_layer = TraceLayer::new_for_http()
-		.make_span_with(|request: &http::Request<hyper::Body>| {
-			let id = request.extensions().get::<Id>().unwrap();
-			trace_span!("request", %id)
-		})
-		.on_request(|request: &http::Request<hyper::Body>, _span: &Span| {
-			info!(
-				method = %request.method(),
-				path = %request.uri().path(),
-				query = ?request.uri().query(),
-				"request",
-			);
-		})
-		.on_response(
-			|response: &http::Response<hyper::Body>, _latency: Duration, _span: &Span| {
-				info!(status = %response.status(), "response");
-			},
-		);
-	let service = ServiceBuilder::new()
-		.layer(context_layer)
-		.layer(request_id_layer)
-		.layer(trace_layer)
-		.service_fn(handle);
-	let addr = std::net::SocketAddr::new(host, port);
-	let server = hyper::server::Server::try_bind(&addr)?;
-	eprintln!("🚀 Server running at {}", addr);
-	server.serve(Shared::new(service)).await?;
+	let context = Arc::new(context);
+	tangram_serve::serve(addr, context, handle).await?;
 	Ok(())
 }
 
-async fn handle(
-	mut request: http::Request<hyper::Body>,
-) -> Result<http::Response<hyper::Body>, http::Error> {
+async fn handle(mut request: http::Request<hyper::Body>) -> http::Response<hyper::Body> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	let context = context.clone();
 	let response = context
@@ -118,13 +84,12 @@ async fn handle(
 					.unwrap(),
 			)
 		});
-	let response = response.unwrap_or_else(|| {
+	response.unwrap_or_else(|| {
 		http::Response::builder()
 			.status(http::StatusCode::NOT_FOUND)
 			.body(hyper::Body::from("not found"))
 			.unwrap()
-	});
-	Ok(response)
+	})
 }
 
 pub fn migrate(database_url: Url) -> Result<()> {
