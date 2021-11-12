@@ -47,7 +47,7 @@ tangram_zip = { path = "../zip" }
 tokio = { version = "1", optional = true }
 tortoise = "0.1"
 tracing = "0.1"
-tracing-subscriber = "0.2"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 url = { version = "2", features = ["serde"] }
 
 [target.'cfg(unix)'.dependencies]
