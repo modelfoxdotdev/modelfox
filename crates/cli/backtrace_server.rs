@@ -1,8 +1,8 @@
 //! This module encapsulates the backtrace capturing functionality
 
-use futures::{Future, future::FutureExt};
+use futures::{future::FutureExt, Future};
 use hyper::http;
-use std::{cell::RefCell, convert::Infallible, panic::AssertUnwindSafe, sync::Arc};
+use std::{cell::RefCell, convert::Infallible, panic::AssertUnwindSafe, pin::Pin, sync::Arc};
 
 fn internal_server_error(msg: &str) -> http::Response<hyper::Body> {
 	http::Response::builder()
@@ -13,11 +13,11 @@ fn internal_server_error(msg: &str) -> http::Response<hyper::Body> {
 
 pub async fn serve<F, T>(
 	addr: std::net::SocketAddr,
-	contexts: &[std::sync::Arc<T>],
+	context: std::sync::Arc<T>,
 	handle: F,
 ) -> anyhow::Result<()>
 where
-	F: Future<Output=dyn FnMut(http::Request<hyper::Body>) -> http::Response<hyper::Body>>,
+	F: FnMut(http::Request<hyper::Body>) -> Pin<Box<dyn Future<Output=http::Response<hyper::Body>> + Send>>,
 	T: Send + Sync,
 {
 	// Storage for any potential panic in this Tokio task
@@ -28,12 +28,12 @@ where
 	let make_svc =
 		hyper::service::make_service_fn(move |_socket: &hyper::server::conn::AddrStream| {
 			// handle connection
-			let context = Arc::clone(&contexts[0]);
+			let context = Arc::clone(&context);
 			async {
 				Ok::<_, Infallible>(hyper::service::service_fn(
 					move |mut request: http::Request<hyper::Body>| {
 						// handle request
-						let context = Arc::clone(&contexts[0]);
+						let context = Arc::clone(&context);
 						PANIC_MESSAGE_AND_BACKTRACE.scope(RefCell::new(None), async move {
 							request.extensions_mut().insert(context);
 							tracing::debug!(

@@ -30,7 +30,7 @@ pub async fn serve(args: ServeArgs) -> anyhow::Result<()> {
 	let addr = std::net::SocketAddr::new(args.address.parse()?, args.port);
 
 	tracing::info!("Serving model from {} at {}", args.model.display(), addr);
-	backtrace_server::serve.await(addr, &[context], handle).await?;
+	backtrace_server::serve(addr, context, handle).await?;
 	Ok(())
 }
 
