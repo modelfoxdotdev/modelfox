@@ -130,7 +130,6 @@
         CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
 
         # x86_64-linux-gnu_2_28
-        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_APPLIES_TO_HOST = "false";
         CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = "${pkgs.writeShellScriptBin "linker" ''
           zig cc -target x86_64-linux-gnu.2.28 $@
         ''}/bin/linker";
