@@ -1,2 +1,0 @@
-#!/bin/sh
-clang-cl /I $WINDOWS_SDK/crt/include /I $WINDOWS_SDK/crt/include/clang/include /I $WINDOWS_SDK/sdk/include /I $WINDOWS_SDK/sdk/include/ucrt /I $WINDOWS_SDK/sdk/include/um /I $WINDOWS_SDK/sdk/include/ucrt /I $WINDOWS_SDK/sdk/include/shared $@
