@@ -19,6 +19,27 @@ Train a model from a CSV file on the command line. Make predictions from Elixir,
   </a>
 </p>
 <p align="center">
+	<a href="https://hex.pm/packages/tangram">
+		<img src="https://img.shields.io/hexpm/v/tangram?color=blueviolet&style=flat-square" alt="Tangram Hex package"/>
+	</a>
+	<a href="https://pypi.org/project/tangram/">
+		<img src="https://img.shields.io/pypi/v/tangram?color=blue&style=flat-square" alt="Tangram Pip package"/>
+	</a>	
+	<a href="https://www.npmjs.com/package/@tangramdotdev/tangram">
+		<img src="https://img.shields.io/npm/v/@tangramdotdev/tangram?color=yellow&style=flat-square" alt="Tangram Javascript package"/>
+	</a>	
+	<a href="https://github.com/tangramdotdev/tangram-go">
+		<img src="https://img.shields.io/github/go-mod/go-version/tangramdotdev/tangram-go?filename=go.mod&style=flat-square" alt="Tangram Go package"/>
+	</a>
+	<a href="https://rubygems.org/gems/tangram">
+		<img src="https://img.shields.io/gem/v/tangram?color=red&style=flat-square" alt="Tangram Ruby gem"/>
+	</a>
+	<a href="https://crates.io/crates/tangram">
+		<img src="https://img.shields.io/crates/v/tangram?style=flat-square" alt="Tangram crate"/>
+  </a>
+</p>
+
+<p align="center">
   <a href="https://twitter.com/intent/follow?screen_name=tangramdotdev">
     <img src="https://img.shields.io/twitter/follow/tangramdotdev?label=Follow%20tangramdotdev&style=social&color=blue" alt="Follow @tangramdotdev on Twitter" />
   </a>
@@ -26,7 +47,7 @@ Train a model from a CSV file on the command line. Make predictions from Elixir,
 
 # Tangram
 
-[Website](https://www.tangram.dev) | [Discord](https://discord.gg/jT9ZGp3TK2)
+[Website](https://www.tangram.dev) | [Docs](https://www.tangram.dev/docs/) | [Discord](https://discord.gg/jT9ZGp3TK2)
 
 Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.
 
