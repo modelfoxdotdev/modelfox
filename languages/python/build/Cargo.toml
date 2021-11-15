@@ -11,5 +11,5 @@ name = "python_build"
 path = "main.rs"
 
 [dependencies]
-build_wheel = { git = "https://github.com/tangramdotdev/build_wheel", rev = "d2b5179eca81088effb8438e455480594f5a375f" }
+build_wheel = { git = "https://github.com/tangramdotdev/build_wheel", rev = "3eeff356816c60af7223722f3fa9fe9907eb71ea" }
 clap = { version = "3.0.0-beta.5", features = ["color"] }

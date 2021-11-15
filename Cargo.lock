@@ -259,7 +259,7 @@ dependencies = [
 [[package]]
 name = "build_wheel"
 version = "0.1.0"
-source = "git+https://github.com/tangramdotdev/build_wheel?rev=d2b5179eca81088effb8438e455480594f5a375f#d2b5179eca81088effb8438e455480594f5a375f"
+source = "git+https://github.com/tangramdotdev/build_wheel?rev=3eeff356816c60af7223722f3fa9fe9907eb71ea#3eeff356816c60af7223722f3fa9fe9907eb71ea"
 dependencies = [
  "anyhow",
  "base64 0.13.0",
@@ -268,6 +268,7 @@ dependencies = [
  "serde",
  "serde_derive",
  "sha2",
+ "target-lexicon",
  "textwrap 0.14.2",
  "time 0.3.5",
  "toml",
@@ -4985,6 +4986,12 @@ dependencies = [
  "libc",
  "xattr",
 ]
+
+[[package]]
+name = "target-lexicon"
+version = "0.12.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d9bffcddbc2458fa3e6058414599e3c838a022abae82e5c67b4f7f80298d5bff"
 
 [[package]]
 name = "tempfile"

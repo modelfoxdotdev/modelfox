@@ -1,13 +1,16 @@
-//! This example demonstrates how to use `build_wheel` via a small command-line tool.
-use build_wheel::WheelBuilder;
+//! Build the python wheel from a prebuilt artifact.
+use build_wheel::{Arch, WheelBuilder};
 use clap::Parser;
 use std::path::PathBuf;
 
 #[derive(Parser)]
 struct Args {
-	/// The directory to run the build and output the wheel.  MUST BE EMPTY/NONEXISTENT
+	/// The architecture the library is compiled for
 	#[clap(short, long)]
-	build_path: Option<PathBuf>,
+	architecture: Arch,
+	/// The directory to run the build and output the wheel.
+	#[clap(short, long)]
+	build_dir: Option<PathBuf>,
 	/// The .pyi interface file
 	#[clap(short, long)]
 	interface_path: Option<PathBuf>,
@@ -17,21 +20,16 @@ struct Args {
 	/// The location of the TOML file defining the metadata.
 	#[clap(short, long)]
 	metadata_path: PathBuf,
-	/// The tag to build for.  Default is "cp36-abi3-manylinux_2_24_x86_64".
-	tag: Option<String>,
 }
 
 fn main() {
 	let args = Args::parse();
-	let mut builder = WheelBuilder::new(args.lib_path, args.metadata_path);
+	let mut builder = WheelBuilder::new(args.architecture, args.lib_path, args.metadata_path);
 	if let Some(p) = args.interface_path {
 		builder = builder.type_interface(p);
 	}
-	if let Some(p) = args.build_path {
-		builder = builder.output_dir(p);
-	}
-	if let Some(t) = args.tag {
-		builder = builder.tag(&t).expect("Could not parse tag");
+	if let Some(d) = args.build_dir {
+		builder = builder.output_dir(d);
 	}
 	if let Err(e) = builder.build() {
 		eprintln!("{}", e);

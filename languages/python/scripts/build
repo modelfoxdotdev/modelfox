@@ -1,2 +1,2 @@
 cargo build --release --package tangram_python
-cargo run --package tangram_python_build -- -b wheel -i tangram/__init__.pyi -l ../../target/release/libtangram_python.so -m metadata.toml
+cargo run --package tangram_python_build -- -a x86_64 -b wheel -i tangram/__init__.pyi -l ../../target/release/libtangram_python.so -m metadata.toml
