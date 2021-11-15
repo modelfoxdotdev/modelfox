@@ -241,7 +241,7 @@ impl Component for Page {
 			"#
 		).into());
 		let prev_next_buttons = PrevNextButtons::new()
-			.prev("predict", "Make a prediction.")
+			.prev("predict/", "Make a prediction.")
 			.next("monitor", "Monitor your model in production.");
 		let content = ui::S1::new()
 			.child(ui::H1::new().child("Inspect"))

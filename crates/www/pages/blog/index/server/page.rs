@@ -8,7 +8,7 @@ pub struct Page;
 impl Component for Page {
 	fn into_node(self) -> Node {
 		let blog_posts = BlogPost::list().unwrap().into_iter().map(|blog_post| {
-			let href = format!("/blog/{}", blog_post.slug);
+			let href = format!("/blog/{}/", blog_post.slug);
 			div()
 				.child(
 					ui::Link::new()
