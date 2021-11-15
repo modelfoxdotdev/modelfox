@@ -3,6 +3,7 @@ use std::{
 	io::Read,
 	path::{Path, PathBuf},
 };
+use tangram_ui as ui;
 
 pub struct BlogPost;
 
@@ -52,7 +53,7 @@ pub struct ContentItem<T> {
 	pub path: PathBuf,
 	pub slug: String,
 	pub front_matter: T,
-	pub markdown: String,
+	pub markdown: ui::Markdown,
 }
 
 pub trait Content: Sized {
@@ -85,16 +86,18 @@ pub trait Content: Sized {
 	}
 
 	fn from_slug(slug: String) -> Result<ContentItem<Self::FrontMatter>> {
-		let path = Path::new(Self::PATH).join(&slug).join("post.md");
-		let mut reader = std::io::BufReader::new(std::fs::File::open(&path)?);
+		let dir_path = Path::new(Self::PATH).join(&slug);
+		let post_path = dir_path.join("post.md");
+		let mut reader = std::io::BufReader::new(std::fs::File::open(&post_path)?);
 		let front_matter: Self::FrontMatter = serde_json::Deserializer::from_reader(&mut reader)
 			.into_iter()
 			.next()
 			.unwrap()?;
 		let mut markdown = String::new();
 		reader.read_to_string(&mut markdown)?;
+		let markdown = ui::Markdown::new(markdown.into()).relative_path_base(Some(Self::PATH.to_owned()));
 		Ok(ContentItem {
-			path,
+			path: post_path,
 			slug,
 			front_matter,
 			markdown,

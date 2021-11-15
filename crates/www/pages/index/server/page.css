@@ -16,7 +16,7 @@
 @media (min-width: 1200px) {
 	.index-grid {
 		row-gap: 4rem;
-		padding: 4rem;
+		padding: 4rem 2rem;
 	}
 }
 

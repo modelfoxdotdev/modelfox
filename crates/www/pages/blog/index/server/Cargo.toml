@@ -1,0 +1,16 @@
+[package]
+edition = "2021"
+rust-version = "1.56"
+name = "tangram_www_blog_index_server"
+publish = false
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+pinwheel = "0.2"
+tangram_ui = { path = "../../../../../ui" }
+sunfish = "0.2"
+tangram_www_content = { path = "../../../../content" }
+tangram_www_layouts = { path = "../../../../layouts" }

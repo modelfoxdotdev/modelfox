@@ -4566,6 +4566,8 @@ dependencies = [
  "tangram_www_about_server",
  "tangram_www_benchmarks_client",
  "tangram_www_benchmarks_server",
+ "tangram_www_blog_index_server",
+ "tangram_www_blog_server",
  "tangram_www_content",
  "tangram_www_docs_getting_started_index_server",
  "tangram_www_docs_getting_started_inspect_client",
@@ -4647,6 +4649,28 @@ dependencies = [
  "tangram_www_benchmarks_common",
  "tangram_www_layouts",
  "tracing",
+]
+
+[[package]]
+name = "tangram_www_blog_index_server"
+version = "0.0.0"
+dependencies = [
+ "pinwheel",
+ "sunfish",
+ "tangram_ui",
+ "tangram_www_content",
+ "tangram_www_layouts",
+]
+
+[[package]]
+name = "tangram_www_blog_server"
+version = "0.0.0"
+dependencies = [
+ "pinwheel",
+ "sunfish",
+ "tangram_ui",
+ "tangram_www_content",
+ "tangram_www_layouts",
 ]
 
 [[package]]

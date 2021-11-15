@@ -38,6 +38,7 @@
 	margin-top: 2rem;
 	color: var(--heading-text-color);
 	font-weight: normal;
+	line-height: 1.5;
 }
 
 .markdown h1 {
@@ -61,4 +62,8 @@
 	list-style-position: inside;
 	margin: 0;
 	padding: 0;
+}
+
+.markdown blockquote {
+	color: var(--muted-text-color);
 }
