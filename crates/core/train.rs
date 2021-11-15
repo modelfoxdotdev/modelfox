@@ -82,7 +82,7 @@ impl Trainer {
 					handle_progress_event,
 				)?)
 			}
-			_ => unreachable!(),
+			_ => bail!("no training data provided."),
 		};
 		let (table_train, table_comparison, table_test) = dataset.split();
 
