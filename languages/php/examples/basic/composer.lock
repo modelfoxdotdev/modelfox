@@ -4,20 +4,27 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5878f2255beda1fdffbb7d6f4bd33de3",
+    "content-hash": "2603326f2fe57f49ad0eb2bebc7b191b",
     "packages": [
         {
             "name": "tangram/tangram",
             "version": "0.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tangramdotdev/tangram-php.git",
+                "reference": "062fc944d4c0e725f5a5c835ba0b68f66b7d3573"
+            },
             "dist": {
-                "type": "path",
-                "url": "../..",
-                "reference": "611ca5ba92e6e010ca35dc6c348e9408d16d7526"
+                "type": "zip",
+                "url": "https://api.github.com/repos/tangramdotdev/tangram-php/zipball/062fc944d4c0e725f5a5c835ba0b68f66b7d3573",
+                "reference": "062fc944d4c0e725f5a5c835ba0b68f66b7d3573",
+                "shasum": ""
             },
             "require": {
                 "php": ">=7.4"
             },
             "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.2",
                 "phpunit/phpunit": ">=8.0",
                 "squizlabs/php_codesniffer": "^3.0"
             },
@@ -32,22 +39,7 @@
                     "tangram\\tangram\\": "src"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "tangram\\tangram\\": "tests"
-                }
-            },
-            "scripts": {
-                "test": [
-                    "phpunit"
-                ],
-                "check-style": [
-                    "phpcs src tests"
-                ],
-                "fix-style": [
-                    "phpcbf src tests"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -64,9 +56,11 @@
             "keywords": [
                 "tangram"
             ],
-            "transport-options": {
-                "relative": true
-            }
+            "support": {
+                "issues": "https://github.com/tangramdotdev/tangram-php/issues",
+                "source": "https://github.com/tangramdotdev/tangram-php/tree/v0.7.0"
+            },
+            "time": "2021-11-15T16:55:25+00:00"
         }
     ],
     "packages-dev": [],
