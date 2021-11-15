@@ -34,7 +34,7 @@
 	grid-area: center;
 	margin: 0 auto;
 	max-width: var(--max-width);
-	padding: 1rem;
+	padding: 2rem;
 	width: 100%;
 }
 

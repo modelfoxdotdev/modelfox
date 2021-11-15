@@ -142,16 +142,16 @@ impl Component for Log {
 				r#"
 					# Log the prediction.
 					model.log_prediction(
-							identifier=id,
-							input=input,
-							output=output,
-							options=predict_options,
+						identifier=id,
+						input=input,
+						output=output,
+						options=predict_options,
 					)
 
 					# Later on, if we get an official diagnosis for the patient, log the true value. Make sure to match the `identifier`.
 					model.log_true_value(
-							identifier=id,
-							true_value="Positive",
+						identifier=id,
+						true_value="Positive",
 					)
 				"#
 			).into(),
