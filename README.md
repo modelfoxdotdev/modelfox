@@ -28,6 +28,9 @@ Train a model from a CSV file on the command line. Make predictions from Elixir,
 	<a href="https://www.npmjs.com/package/@tangramdotdev/tangram">
 		<img src="https://img.shields.io/npm/v/@tangramdotdev/tangram?color=yellow&style=flat-square" alt="Tangram Javascript package"/>
 	</a>
+	<a href = "https://packagist.org/packages/tangram/tangram">
+	  <img src="https://img.shields.io/packagist/v/tangram/tangram?style=flat-square" alt = "Tangram PHP package"/>
+	</a>
 	<a href="https://pypi.org/project/tangram/">
 		<img src="https://img.shields.io/pypi/v/tangram?color=blue&style=flat-square" alt="Tangram Pip package"/>
 	</a>
