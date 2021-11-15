@@ -74,7 +74,12 @@
               rev = "002fbb0af043d90b0ab7d2f2804effc6fa2d690c";
               hash = "sha256-a4IXh4gfv34exfLPqxcS+7e3bOqL1AJNWzBMXm2tTvU=";
             };
-            patches = [ ./zig_x86_64-windows-gnu_static_library_search.patch ];
+            patches = [
+              (pkgs.fetchpatch {
+                url = "https://github.com/ziglang/zig/pull/9771.patch";
+                sha256 = "sha256-AaMNNBET/x0f3a9oxpgBZXnUdKH4bydKMLJfXLBmvZo=";
+              })
+            ];
             nativeBuildInputs = [
               cmake
               llvmPackages_13.llvm.dev
