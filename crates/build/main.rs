@@ -24,7 +24,6 @@ fn main() {
 		"-Zbuild-std-features=system-llvm-libunwind",
 		"-Zmultitarget",
 		"--release",
-		"--release",
 		"--target",
 		Target::AArch64LinuxGnu228.rust_target_name(),
 		// "--target",
