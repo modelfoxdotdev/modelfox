@@ -9,7 +9,7 @@ impl Component for Monitoring {
 			r#"
 				# Log the prediction.
 				Tangram.log_prediction(model, %Tangram.LogPredictionArgs{
-					identifier: "John Doe",
+					identifier: id,
 					options: predict_options,
 					input: input,
 					output: output,
@@ -17,7 +17,7 @@ impl Component for Monitoring {
 
 				# Later on, if we get an official diagnosis for the patient, log the true value.
 				Tangram.log_true_value(model, %Tangram.LogTrueValueArgs{
-					identifier: "John Doe",
+					identifier: id,
 					true_value: "Positive",
 				})
 			"#
@@ -27,7 +27,7 @@ impl Component for Monitoring {
 			r#"
 				// Log the prediction.
 				err = model.LogPrediction(tangram.LogPredictionArgs{
-					Identifier: "John Doe",
+					Identifier: id,
 					Input:      input,
 					Options:    predictOptions,
 					Output:     output,
@@ -38,7 +38,7 @@ impl Component for Monitoring {
 
 				// Later on, if we get an official diagnosis for the patient, log the true value.
 				err = model.LogTrueValue(tangram.LogTrueValueArgs{
-					Identifier: "John Doe",
+					Identifier: id,
 					TrueValue:  "Positive",
 				})
 				if err != nil {
@@ -51,7 +51,7 @@ impl Component for Monitoring {
 			r#"
 				// Log the prediction.
 				model.logPrediction({
-					identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
+					identifier: id,
 					input,
 					options,
 					output,
@@ -59,7 +59,7 @@ impl Component for Monitoring {
 
 				// Later on, if we get an official diagnosis for the patient, log the true value.
 				model.logTrueValue({
-					identifier: "6c955d4f-be61-4ca7-bba9-8fe32d03f801",
+					identifier: id,
 					trueValue: "Positive",
 				})
 			"#
@@ -68,17 +68,25 @@ impl Component for Monitoring {
 		let php = ui::doc!(
 			r#"
 				// Log the predicton
-				$model->log_prediction('71762b29-2296-4bf9-a1d4-59144d74c9d9', $input, $output, $options);
+				$model->log_prediction(
+					id,
+					$input,
+					$output,
+					$options,
+				);
 
 				// Later on, if we get an official diagnosis for the patient, log the true value. Make sure to match the `identifier`.
-				$model->log_true_value('71762b29-2296-4bf9-a1d4-59144d74c9d9', 'Positive');
+				$model->log_true_value(
+					id,
+					'Positive',
+				);
 			"#
 		).into();
 		let python = ui::doc!(
 			r#"
 				# Log the prediction.
 				model.log_prediction(
-						identifier="John Doe",
+						identifier=id,
 						input=input,
 						output=output,
 						options=predict_options,
@@ -86,7 +94,7 @@ impl Component for Monitoring {
 
 				# Later on, if we get an official diagnosis for the patient, log the true value.
 				model.log_true_value(
-						identifier="John Doe",
+						identifier=id,
 						true_value="Positive",
 				)
 			"#
@@ -96,7 +104,7 @@ impl Component for Monitoring {
 			r#"
 				# Log the prediction.
 				model.log_prediction(
-					identifier: 'John Doe',
+					identifier: id,
 					input: input,
 					output: output,
 					options: options
@@ -104,7 +112,7 @@ impl Component for Monitoring {
 
 				# Later on, if we get an official diagnosis for the patient, log the true value.
 				model.log_true_value(
-					identifier: 'John Doe',
+					identifier: id,
 					true_value: 'Positive'
 				)
 			"#
@@ -114,7 +122,7 @@ impl Component for Monitoring {
 			r#"
 				// Log the prediction.
 				model.log_prediction(tangram::LogPredictionArgs {
-					identifier: "John Doe".into(),
+					identifier: id,
 					input,
 					options: Some(options),
 					output,
@@ -122,7 +130,7 @@ impl Component for Monitoring {
 
 				// Later on, if we get an official diagnosis for the patient, log the true value.
 				model.log_true_value(tangram::LogTrueValueArgs {
-					identifier: "John Doe".into(),
+					identifier: id,
 					true_value: "Positive".into(),
 				})?;
 			"#
