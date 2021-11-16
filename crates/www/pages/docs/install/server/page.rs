@@ -15,7 +15,25 @@ impl Component for Page {
 				DocsLayout::new().selected_page(DocsPage::Install).child(
 					ui::S1::new()
 						.child(ui::H1::new().child("Install"))
+						.child(
+							ui::P::new()
+								.child("Tangram supports ")
+								.child(ui::Link::new().href("#MacOS".to_owned()).child("MacOS"))
+								.child(", ")
+								.child(ui::Link::new().href("#Linux".to_owned()).child("Linux"))
+								.child(", and ")
+								.child(ui::Link::new().href("#Windows".to_owned()).child("Windows"))
+								.child(" on x86_64 and ARM64 architectures.  ")
+								.child(
+									ui::Link::new()
+										.href("#other-options".to_owned())
+										.child("Other options"),
+								)
+								.child(" include Docker or building manually from source."),
+						)
+						.child(div().id("MacOS").child(ui::H2::new().child("MacOS")))
 						.child(Homebrew)
+						.child(div().id("Linux").child(ui::H2::new().child("Linux")))
 						.child(Deb {
 							distribution: "ubuntu".to_owned(),
 							version: "hirsute".to_owned(),
@@ -59,7 +77,13 @@ impl Component for Page {
 						.child(Fedora)
 						.child(Nix)
 						.child(Rhel)
+						.child(div().id("Windows").child(ui::H2::new().child("Windows")))
 						.child(Scoop)
+						.child(
+							div()
+								.id("other-options")
+								.child(ui::H2::new().child("Other")),
+						)
 						.child(Docker)
 						.child(Manual),
 				),
