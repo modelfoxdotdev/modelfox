@@ -1,1 +1,0 @@
-cargo clippy --target-dir target_check --message-format json --all-targets

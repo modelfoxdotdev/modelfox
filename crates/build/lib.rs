@@ -42,6 +42,20 @@ pub enum Target {
 }
 
 impl Target {
+	pub fn arch(&self) -> Arch {
+		match self {
+			Target::AArch64LinuxGnu228 | Target::AArch64LinuxMusl | Target::AArch64MacOS => {
+				Arch::AArch64
+			}
+			Target::Wasm32 => Arch::Wasm32,
+			Target::X8664LinuxGnu228
+			| Target::X8664LinuxMusl
+			| Target::X8664MacOS
+			| Target::X8664WindowsGnu
+			| Target::X8664WindowsMsvc => Arch::X8664,
+		}
+	}
+
 	pub fn target_name(&self) -> &str {
 		match self {
 			Target::AArch64LinuxGnu228 => "aarch64-linux-gnu_2_28",
@@ -58,11 +72,11 @@ impl Target {
 
 	pub fn rust_target_name(&self) -> &str {
 		match self {
-			Target::AArch64LinuxGnu228 => "aarch64-unknown-linux-gnu",
+			Target::AArch64LinuxGnu228 => "aarch64-linux-gnu_2_28",
 			Target::AArch64LinuxMusl => "aarch64-unknown-linux-musl",
 			Target::AArch64MacOS => "aarch64-apple-darwin",
 			Target::Wasm32 => "wasm32-unknown-unknown",
-			Target::X8664LinuxGnu228 => "x86_64-unknown-linux-gnu",
+			Target::X8664LinuxGnu228 => "x86_64-linux-gnu_2_28",
 			Target::X8664LinuxMusl => "x86_64-unknown-linux-musl",
 			Target::X8664MacOS => "x86_64-apple-darwin",
 			Target::X8664WindowsGnu => "x86_64-pc-windows-gnu",
@@ -70,17 +84,17 @@ impl Target {
 		}
 	}
 
-	pub fn arch(&self) -> Arch {
+	pub fn rust_target(&self) -> &str {
 		match self {
-			Target::AArch64LinuxGnu228 | Target::AArch64LinuxMusl | Target::AArch64MacOS => {
-				Arch::AArch64
-			}
-			Target::Wasm32 => Arch::Wasm32,
-			Target::X8664LinuxGnu228
-			| Target::X8664LinuxMusl
-			| Target::X8664MacOS
-			| Target::X8664WindowsGnu
-			| Target::X8664WindowsMsvc => Arch::X8664,
+			Target::AArch64LinuxGnu228 => "scripts/aarch64-linux-gnu_2_28.json",
+			Target::AArch64LinuxMusl => "aarch64-unknown-linux-musl",
+			Target::AArch64MacOS => "aarch64-apple-darwin",
+			Target::Wasm32 => "wasm32-unknown-unknown",
+			Target::X8664LinuxGnu228 => "scripts/x86_64-linux-gnu_2_28.json",
+			Target::X8664LinuxMusl => "x86_64-unknown-linux-musl",
+			Target::X8664MacOS => "x86_64-apple-darwin",
+			Target::X8664WindowsGnu => "x86_64-pc-windows-gnu",
+			Target::X8664WindowsMsvc => "x86_64-pc-windows-msvc",
 		}
 	}
 }

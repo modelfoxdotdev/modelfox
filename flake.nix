@@ -18,7 +18,8 @@
       pkgs = import nixpkgs {
         inherit system;
       };
-      rust = let
+      rust = 
+        let
           toolchain = { 
             channel = "nightly";
             date = "2021-11-11";
@@ -67,7 +68,7 @@
           llvm
         ]);
       }));
-    in rec {
+    in {
       devShell = pkgs.mkShell {
         packages = with pkgs; [
           cachix
@@ -103,17 +104,6 @@
             scikitlearn
             xgboost
           ]))
-          (pkgs.buildFHSUserEnv {
-             name = "pysh";
-             targetPkgs = pkgs: (with pkgs; [
-               (python3.withPackages(ps: with ps; [
-                 pip
-               ]))
-               zlib
-               zsh
-             ]);
-             runScript = "zsh";
-          })
           rpm
           ruby
           rust
@@ -124,23 +114,15 @@
           wasm-bindgen-cli
           windows_sdk
           zig 
+          zlib
         ];
 
-        CARGO_UNSTABLE_HOST_CONFIG = "true";
-        CARGO_UNSTABLE_TARGET_APPLIES_TO_HOST = "true";
-        CARGO_TARGET_APPLIES_TO_HOST = "false";
-
-        # x86_64-unknown-linux-gnu
-        CARGO_HOST_X86_64_UNKNOWN_LINUX_GNU_LINKER = "${pkgs.writeShellScriptBin "linker" ''
-          clang -fuse-ld=$(which mold) $@
-        ''}/bin/linker";
-
         # aarch64-linux-gnu_2_28
-        CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER = "${pkgs.writeShellScriptBin "linker" ''
+        CARGO_TARGET_AARCH64_LINUX_GNU_2_28_LINKER = "${pkgs.writeShellScriptBin "linker" ''
           zig cc -target aarch64-linux-gnu.2.28 $@
         ''}/bin/linker";
-        CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUSTFLAGS = "-C target-feature=-outline-atomics";
-        CC_aarch64_unknown_linux_gnu = "${pkgs.writeShellScriptBin "cc" ''
+        CARGO_TARGET_AARCH64_LINUX_GNU_2_28_RUSTFLAGS = "-C target-feature=-outline-atomics";
+        CC_aarch64_linux_gnu_2_28 = "${pkgs.writeShellScriptBin "cc" ''
           zig cc -target aarch64-linux-gnu.2.28 $@
         ''}/bin/cc";
 
@@ -165,10 +147,10 @@
         CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
 
         # x86_64-linux-gnu_2_28
-        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = "${pkgs.writeShellScriptBin "linker" ''
-          zig cc -target x86_64-linux-gnu.2.28 $@
+        CARGO_TARGET_X86_64_LINUX_GNU_2_28_LINKER = "${pkgs.writeShellScriptBin "linker" ''
+          zig cc -target x86_64-linux-gnu.2.28 -fuse-ld=$(which mold) $@
         ''}/bin/linker";
-        CC_x86_64_unknown_linux_gnu = "${pkgs.writeShellScriptBin "cc" ''
+        CC_x86_64_linux_gnu_2_28 = "${pkgs.writeShellScriptBin "cc" ''
           zig cc -target x86_64-linux-gnu.2.28 $@
         ''}/bin/cc";
 

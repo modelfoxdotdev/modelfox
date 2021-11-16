@@ -1,4 +1,4 @@
-mold -run cargo run --bin tangram_dev -- \
+cargo run --bin tangram_dev -- \
   --watch . \
   --ignore languages \
   --ignore target \

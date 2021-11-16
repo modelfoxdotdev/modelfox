@@ -1,2 +1,0 @@
-rm -rf target*
-rm -rf dist
