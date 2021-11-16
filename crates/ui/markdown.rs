@@ -7,9 +7,6 @@ use std::{borrow::Cow, fmt::Write};
 #[derive(builder, new)]
 pub struct Markdown {
 	string: Cow<'static, str>,
-	#[builder]
-	#[new(default)]
-	pub relative_path_base: Option<String>,
 }
 
 enum State {
