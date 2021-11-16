@@ -18,27 +18,29 @@
       pkgs = import nixpkgs {
         inherit system;
       };
-      rust = with fenix.packages.${system}; combine (with toolchainOf { 
-        channel = "nightly";
-        date = "2021-11-11";
-        sha256 = "sha256-J+uisSFON0GwVfyFemT7Oe28ziaZMelA+PgqJB2A4aw=";
-      }; [
-        cargo
-        clippy-preview
-        rust-src
-        rust-std
-        rustc
-        rustfmt-preview
-        targets.aarch64-unknown-linux-gnu.latest.rust-std
-        targets.aarch64-unknown-linux-musl.latest.rust-std
-        targets.aarch64-apple-darwin.latest.rust-std
-        targets.wasm32-unknown-unknown.latest.rust-std
-        targets.x86_64-unknown-linux-gnu.latest.rust-std
-        targets.x86_64-unknown-linux-musl.latest.rust-std
-        targets.x86_64-apple-darwin.latest.rust-std
-        targets.x86_64-pc-windows-gnu.latest.rust-std
-        targets.x86_64-pc-windows-msvc.latest.rust-std
-      ]);
+      rust = let
+          toolchain = { 
+            channel = "nightly";
+            date = "2021-11-11";
+            sha256 = "sha256-J+uisSFON0GwVfyFemT7Oe28ziaZMelA+PgqJB2A4aw=";
+          };
+        in with fenix.packages.${system}; combine (with toolchainOf toolchain; [
+          cargo
+          clippy-preview
+          rust-src
+          rust-std
+          rustc
+          rustfmt-preview
+          (targets.aarch64-unknown-linux-gnu.toolchainOf toolchain).rust-std
+          (targets.aarch64-unknown-linux-musl.toolchainOf toolchain).rust-std
+          (targets.aarch64-apple-darwin.toolchainOf toolchain).rust-std
+          (targets.wasm32-unknown-unknown.toolchainOf toolchain).rust-std
+          (targets.x86_64-unknown-linux-gnu.toolchainOf toolchain).rust-std
+          (targets.x86_64-unknown-linux-musl.toolchainOf toolchain).rust-std
+          (targets.x86_64-apple-darwin.toolchainOf toolchain).rust-std
+          (targets.x86_64-pc-windows-gnu.toolchainOf toolchain).rust-std
+          (targets.x86_64-pc-windows-msvc.toolchainOf toolchain).rust-std
+        ]);
       zig = (pkgs.zig.overrideAttrs (old: {
         src = pkgs.fetchFromGitHub {
           owner = "ziglang";
