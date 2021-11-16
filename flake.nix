@@ -97,7 +97,6 @@
 
         CARGO_UNSTABLE_HOST_CONFIG = "true";
         CARGO_UNSTABLE_TARGET_APPLIES_TO_HOST = "true";
-
         CARGO_TARGET_APPLIES_TO_HOST = "false";
 
         # x86_64-unknown-linux-gnu
