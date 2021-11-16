@@ -24,6 +24,7 @@ use rand::{seq::SliceRandom, SeedableRng};
 use rand_xoshiro::Xoshiro256Plus;
 use std::{
 	collections::BTreeMap,
+	io::Read,
 	path::Path,
 	sync::Arc,
 	time::{Duration, Instant},
@@ -33,6 +34,15 @@ use tangram_id::Id;
 use tangram_kill_chip::KillChip;
 use tangram_progress_counter::ProgressCounter;
 use tangram_table::prelude::*;
+
+pub enum TrainingDataSource {
+	Stdin,
+	File(std::path::PathBuf),
+	TrainAndTest {
+		train: std::path::PathBuf,
+		test: std::path::PathBuf,
+	},
+}
 
 pub struct Trainer {
 	id: Id,
@@ -57,9 +67,7 @@ pub struct Trainer {
 impl Trainer {
 	pub fn prepare(
 		id: Id,
-		file_path: Option<&Path>,
-		file_path_train: Option<&Path>,
-		file_path_test: Option<&Path>,
+		input: TrainingDataSource,
 		target_column_name: &str,
 		config_path: Option<&Path>,
 		handle_progress_event: &mut dyn FnMut(ProgressEvent),
@@ -68,22 +76,24 @@ impl Trainer {
 		let config = load_config(config_path)?;
 
 		// Load the train and test tables from the csv file(s).
-		let dataset = match (file_path, file_path_train, file_path_test) {
-			(Some(file_path), None, None) => Dataset::Train(load_and_shuffle_dataset_train(
-				file_path,
-				&config,
-				handle_progress_event,
-			)?),
-			(None, Some(file_path_train), Some(file_path_test)) => {
-				Dataset::TrainAndTest(load_and_shuffle_dataset_train_and_test(
-					file_path_train,
-					file_path_test,
+		let dataset =
+			match input {
+				TrainingDataSource::Stdin => Dataset::Train(load_and_shuffle_dataset_stdin(
 					&config,
 					handle_progress_event,
-				)?)
-			}
-			_ => bail!("no training data provided."),
-		};
+				)?),
+				TrainingDataSource::File(file_path) => Dataset::Train(
+					load_and_shuffle_dataset_train(&file_path, &config, handle_progress_event)?,
+				),
+				TrainingDataSource::TrainAndTest { train, test } => {
+					Dataset::TrainAndTest(load_and_shuffle_dataset_train_and_test(
+						&train,
+						&test,
+						&config,
+						handle_progress_event,
+					)?)
+				}
+			};
 		let (table_train, table_comparison, table_test) = dataset.split();
 
 		// Do not allow training if any dataset has no rows, or emit warnings if any dataset is too small.
@@ -604,6 +614,37 @@ impl Dataset {
 			}
 		}
 	}
+}
+
+fn load_and_shuffle_dataset_stdin(
+	config: &Config,
+	handle_progress_event: &mut dyn FnMut(ProgressEvent),
+) -> Result<DatasetTrain> {
+	let mut stdin = std::io::stdin();
+	let mut buf = Vec::new();
+	stdin.read_to_end(&mut buf)?;
+	// Get the column types from the config, if set.
+	let mut table = Table::from_bytes(
+		&buf,
+		tangram_table::FromCsvOptions {
+			column_types: column_types_from_config(config),
+			infer_options: Default::default(),
+			..Default::default()
+		},
+		&mut |progress_event| {
+			handle_progress_event(ProgressEvent::Load(LoadProgressEvent::Train(
+				progress_event,
+			)))
+		},
+	)?;
+	// Shuffle the table if enabled.
+	shuffle_table(&mut table, config, handle_progress_event);
+	// Split the table into train and test tables.
+	Ok(DatasetTrain {
+		table,
+		comparison_fraction: config.dataset.comparison_fraction,
+		test_fraction: config.dataset.test_fraction,
+	})
 }
 
 fn load_and_shuffle_dataset_train(

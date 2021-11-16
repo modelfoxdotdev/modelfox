@@ -66,6 +66,8 @@ pub struct TrainArgs {
 		requires = "file-train"
 	)]
 	file_test: Option<PathBuf>,
+	#[clap(long, about = "Pass the training data via stdin.")]
+	stdin: bool,
 	#[clap(short, long, about = "the name of the column to predict")]
 	target: String,
 	#[clap(short, long, about = "the path to a config file")]

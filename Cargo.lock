@@ -4230,6 +4230,7 @@ dependencies = [
  "bitvec",
  "buffalo",
  "chrono",
+ "csv",
  "fast-float",
  "fnv",
  "getrandom",

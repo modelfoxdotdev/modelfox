@@ -51,6 +51,20 @@ pub enum LoadProgressEvent {
 }
 
 impl Table {
+	pub fn from_bytes(
+		bytes: &[u8],
+		options: FromCsvOptions,
+		handle_progress_event: &mut impl FnMut(LoadProgressEvent),
+	) -> Result<Table> {
+		let len = bytes.len();
+		Table::from_csv(
+			&mut csv::Reader::from_reader(std::io::Cursor::new(bytes)),
+			len as u64,
+			options,
+			handle_progress_event,
+		)
+	}
+
 	pub fn from_path(
 		path: &Path,
 		options: FromCsvOptions,

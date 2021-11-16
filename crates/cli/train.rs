@@ -1,5 +1,5 @@
 use crate::TrainArgs;
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, bail, Result};
 use backtrace::Backtrace;
 use num::ToPrimitive;
 use once_cell::sync::Lazy;
@@ -47,12 +47,38 @@ pub fn train(args: TrainArgs) -> Result<()> {
 				progress_thread.send_progress_event(progress_event)
 			}
 		};
+		let input = match (&args.file, &args.file_train, &args.file_test, args.stdin) {
+			(None, None, None, true) => tangram_core::train::TrainingDataSource::Stdin,
+			(Some(file_path), None, None, false) => {
+				tangram_core::train::TrainingDataSource::File(file_path.to_owned())
+			}
+			(None, Some(file_path_train), Some(file_path_test), false) => {
+				tangram_core::train::TrainingDataSource::TrainAndTest {
+					train: file_path_train.to_owned(),
+					test: file_path_test.to_owned(),
+				}
+			}
+			_ => bail!("Must use the stdin flag or provide training data files."),
+		};
+		// Retrieve the output path from the command line arguments or generate a default.
+		let output_path = match (args.file, args.file_train, args.output, args.stdin) {
+			(_, _, Some(output), _) => output,
+			(Some(file), _, None, false) => {
+				let dir = std::env::current_dir()?;
+				let csv_file_name = file.file_stem().unwrap().to_str().unwrap();
+				available_path(&dir, csv_file_name, "tangram")?
+			}
+			(None, Some(file_train_path), None, false) => {
+				let dir = std::env::current_dir()?;
+				let csv_file_name = file_train_path.file_stem().unwrap().to_str().unwrap();
+				available_path(&dir, csv_file_name, "tangram")?
+			}
+			_ => bail!("Must provide an output path when using stdin for input!"),
+		};
 		// Load the dataset, compute stats, and prepare for training.
 		let mut trainer = tangram_core::train::Trainer::prepare(
 			tangram_id::Id::generate(),
-			args.file.as_deref(),
-			args.file_train.as_deref(),
-			args.file_test.as_deref(),
+			input,
 			&args.target,
 			args.config.as_deref(),
 			&mut handle_progress_event,
@@ -84,10 +110,10 @@ pub fn train(args: TrainArgs) -> Result<()> {
 		};
 		let model =
 			trainer.test_and_assemble_model(train_grid_item_outputs, &mut handle_progress_event)?;
-		Ok(model)
+		Ok((model, output_path))
 	});
 	std::panic::set_hook(hook);
-	let model = match result {
+	let (model, output_path) = match result {
 		Ok(result) => result,
 		Err(_) => {
 			let panic_info = PANIC_MESSAGE_AND_BACKTRACE.lock().unwrap();
@@ -95,23 +121,6 @@ pub fn train(args: TrainArgs) -> Result<()> {
 			Err(anyhow!("{}\n{:?}", message, backtrace))
 		}
 	}?;
-
-	// Retrieve the output path from the command line arguments or generate a default.
-	let output_path = match args.output {
-		Some(output) => output,
-		None => {
-			let dir = std::env::current_dir()?;
-			let csv_file_name = args
-				.file
-				.as_ref()
-				.unwrap_or_else(|| args.file_train.as_ref().unwrap())
-				.file_stem()
-				.unwrap()
-				.to_str()
-				.unwrap();
-			available_path(&dir, csv_file_name, "tangram")?
-		}
-	};
 
 	// Write the model to the output path.
 	model.to_path(&output_path)?;
