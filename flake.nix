@@ -18,13 +18,56 @@
       pkgs = import nixpkgs {
         inherit system;
       };
-      rust = fenix.packages.${system}.fromToolchainFile { 
-        file = ./rust-toolchain.toml;
+      rust = with fenix.packages.${system}; combine (with toolchainOf { 
+        channel = "nightly";
+        date = "2021-11-11";
         sha256 = "sha256-J+uisSFON0GwVfyFemT7Oe28ziaZMelA+PgqJB2A4aw=";
-      };
+      }; [
+        cargo
+        clippy-preview
+        rust-src
+        rust-std
+        rustc
+        rustfmt-preview
+        targets.aarch64-unknown-linux-gnu.latest.rust-std
+        targets.aarch64-unknown-linux-musl.latest.rust-std
+        targets.aarch64-apple-darwin.latest.rust-std
+        targets.wasm32-unknown-unknown.latest.rust-std
+        targets.x86_64-unknown-linux-gnu.latest.rust-std
+        targets.x86_64-unknown-linux-musl.latest.rust-std
+        targets.x86_64-apple-darwin.latest.rust-std
+        targets.x86_64-pc-windows-gnu.latest.rust-std
+        targets.x86_64-pc-windows-msvc.latest.rust-std
+      ]);
+      zig = (pkgs.zig.overrideAttrs (old: {
+        src = pkgs.fetchFromGitHub {
+          owner = "ziglang";
+          repo = "zig";
+          rev = "002fbb0af043d90b0ab7d2f2804effc6fa2d690c";
+          hash = "sha256-a4IXh4gfv34exfLPqxcS+7e3bOqL1AJNWzBMXm2tTvU=";
+        };
+        patches = [
+          (pkgs.fetchpatch {
+            url = "https://github.com/ziglang/zig/pull/9771.patch";
+            sha256 = "sha256-AaMNNBET/x0f3a9oxpgBZXnUdKH4bydKMLJfXLBmvZo=";
+          })
+        ];
+        nativeBuildInputs = with pkgs; [
+          cmake
+          llvmPackages_13.llvm.dev
+        ];
+        buildInputs = with pkgs; [
+          libxml2
+          zlib
+        ] ++ (with llvmPackages_13; [
+          libclang
+          lld
+          llvm
+        ]);
+      }));
     in rec {
       devShell = pkgs.mkShell {
-        buildInputs = with pkgs; [
+        packages = with pkgs; [
           cachix
           cargo-insta
           clang_13
@@ -49,7 +92,7 @@
             tokenizer
           ]))
           php.packages.composer
-          (python39.withPackages(ps: with ps; [
+          (python3.withPackages(ps: with ps; [
             catboost
             lightgbm
             numpy
@@ -58,6 +101,17 @@
             scikitlearn
             xgboost
           ]))
+          (pkgs.buildFHSUserEnv {
+             name = "pysh";
+             targetPkgs = pkgs: (with pkgs; [
+               (python3.withPackages(ps: with ps; [
+                 pip
+               ]))
+               zlib
+               zsh
+             ]);
+             runScript = "zsh";
+          })
           rpm
           ruby
           rust
@@ -67,32 +121,7 @@
           time
           wasm-bindgen-cli
           windows_sdk
-          (zig.overrideAttrs (old: {
-            src = pkgs.fetchFromGitHub {
-              owner = "ziglang";
-              repo = "zig";
-              rev = "002fbb0af043d90b0ab7d2f2804effc6fa2d690c";
-              hash = "sha256-a4IXh4gfv34exfLPqxcS+7e3bOqL1AJNWzBMXm2tTvU=";
-            };
-            patches = [
-              (pkgs.fetchpatch {
-                url = "https://github.com/ziglang/zig/pull/9771.patch";
-                sha256 = "sha256-AaMNNBET/x0f3a9oxpgBZXnUdKH4bydKMLJfXLBmvZo=";
-              })
-            ];
-            nativeBuildInputs = [
-              cmake
-              llvmPackages_13.llvm.dev
-            ];
-            buildInputs = [
-              libxml2
-              zlib
-            ] ++ (with llvmPackages_13; [
-              libclang
-              lld
-              llvm
-            ]);
-          }))
+          zig 
         ];
 
         CARGO_UNSTABLE_HOST_CONFIG = "true";
