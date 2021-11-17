@@ -6,21 +6,18 @@ pub struct Page;
 
 impl Component for Page {
 	fn into_node(self) -> Node {
-		let p1 = ui::P::new()
-			.child("Hi, we are David and Isabella, the founders of Tangram. We met as freshman at MIT over a decade ago and Isabella was most recently a machine learning engineer at Slack and David was an engineer at Facebook. We started working on Tangram to give developers best in class tools to train, deploy, and monitor machine learning models.");
-		let p2 = ui::P::new().child("At Tangram, we want to make it really easy for developers to train machine learning models and deploy them directly in their Javascript, Ruby, Elixir, Golang, PHP, Python, and Rust apps. We also want to give developers all the tools they need to understand how their model works and monitor it once it is deployed. We feel that developers shouldn't have to sacrifice convenience for high customizability so that is why we designed Tangram's CLI to train machine learning models with good defaults but allow developers to pass a custom configuration file to control every aspect of training, from manually specifying the column types and features generated all the way down to the hyperparameters of the gradient boosted decision tree algorithm.");
+		let p1 = ui::P::new().child("At Tangram, we want to make it really easy for developers to train machine learning models and deploy them directly in their Javascript, Ruby, Elixir, Golang, PHP, Python, and Rust apps. We also want to give developers all the tools they need to understand how their model works and monitor it once it is deployed.");
 		let link = ui::Link::new()
 			.href("mailto:hello@tangram.dev".to_string())
 			.title("hello@tangram.dev".to_string())
 			.child("hello@tangram.dev");
-		let p3 = ui::P::new()
+		let p2 = ui::P::new()
 			.child("We would love to hear from you, please don't hesistate to reach out! ")
 			.child(link);
 		let tangram = ui::S2::new()
 			.child(ui::H1::new().child("About"))
 			.child(p1)
-			.child(p2)
-			.child(p3);
+			.child(p2);
 		let david = Person::new()
 			.name("David Yamnitsky")
 			.linkedin("https://www.linkedin.com/in/david-yamnitsky".to_string())
