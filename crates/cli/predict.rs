@@ -22,10 +22,13 @@ pub fn predict(args: PredictArgs) -> Result<()> {
 		}
 	};
 	let model = tangram_core::predict::Model::from(model);
-	let options = PredictOptions {
+	let mut options = PredictOptions {
 		compute_feature_contributions: false,
 		..Default::default()
 	};
+	if let Some(threshold) = args.threshold {
+		options.threshold = threshold;
+	}
 	let reader = match args.file {
 		Some(path) => Either::Left(std::fs::File::open(path)?),
 		None => Either::Right(std::io::stdin()),

@@ -109,6 +109,8 @@ pub struct PredictArgs {
 		about = "output probabilities instead of class labels, only relevant for classifier models"
 	)]
 	probabilities: Option<bool>,
+	#[clap(short, long, about = "The threshold value to use for predictions.")]
+	threshold: Option<f32>
 }
 
 #[cfg(feature = "tangram_app")]
