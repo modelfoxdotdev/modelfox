@@ -311,6 +311,8 @@ impl Trainer {
 			| TrainModelOutput::TreeMulticlassClassifier(_) => "Tree",
 		};
 		let grid_len = train_grid_item_outputs.len();
+		let comparison_metric_value =
+			train_grid_item_outputs[best_grid_item_index].comparison_metric_value;
 
 		// Test the best model.
 		let test_metrics = test_model(&train_model_output, &table_test, &mut |progress_event| {
@@ -551,12 +553,13 @@ impl Trainer {
 		};
 		handle_progress_event(ProgressEvent::FinalizeDone);
 		handle_progress_event(ProgressEvent::Info(format!(
-			"Selected {} Model ({} of {}), {} based on {}",
+			"Selected {} Model {} of {} for {} result ({}: {})",
 			model_type,
 			best_grid_item_index + 1,
 			grid_len,
 			task,
-			comparison_metric
+			comparison_metric,
+			comparison_metric_value
 		)));
 		Ok(model)
 	}
