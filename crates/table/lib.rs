@@ -181,6 +181,26 @@ impl Table {
 		&mut self.columns
 	}
 
+	pub fn drop_row(&mut self, idx: usize) {
+		for column in self.columns_mut() {
+			match column {
+				TableColumn::Enum(etc) => {
+					let _ = etc.data_mut().remove(idx);
+				}
+				TableColumn::Number(ntc) => {
+					let _ = ntc.data_mut().remove(idx);
+				}
+				TableColumn::Text(ttc) => {
+					let _ = ttc.data_mut().remove(idx);
+				}
+				TableColumn::Unknown(utc) => {
+					let len = utc.len_mut();
+					*len -= 1;
+				}
+			}
+		}
+	}
+
 	pub fn ncols(&self) -> usize {
 		self.columns.len()
 	}
