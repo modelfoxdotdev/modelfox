@@ -48,6 +48,8 @@ fn main() {
 		"tangram_elixir",
 		"--package",
 		"tangram_node",
+		"--package",
+		"tangram_python",
 	)
 	.run()
 	.unwrap();

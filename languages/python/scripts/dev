@@ -1,5 +1,6 @@
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+cargo build -p tangram_python
+cp ../../target/debug/libtangram_python.so tangram/__init__.so
 pip install -e .
 deactivate

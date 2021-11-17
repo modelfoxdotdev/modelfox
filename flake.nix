@@ -83,7 +83,7 @@
           llvm_13
           mold
           nodejs-16_x
-          (php.withExtensions ({ all, ...}: with all; [
+          (php.withExtensions ({ all, ... }: with all; [
             curl
             dom
             ffi
@@ -95,11 +95,12 @@
             tokenizer
           ]))
           php.packages.composer
-          (python3.withPackages(ps: with ps; [
+          (python3.withPackages(p: with p; [
             catboost
             lightgbm
             numpy
             pandas
+            pip
             pytorch
             scikitlearn
             xgboost
@@ -116,6 +117,16 @@
           zig 
           zlib
         ];
+
+        LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}:${pkgs.zlib}";
+
+        # x86_64-unknown-linux-gnu
+        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = "${pkgs.writeShellScriptBin "linker" ''
+          clang --ld-path=$(which mold) $@
+        ''}/bin/linker";
+        CC_x86_64_unknown_linux_gnu = "${pkgs.writeShellScriptBin "cc" ''
+          clang $@
+        ''}/bin/cc";
 
         # aarch64-linux-gnu_2_28
         CARGO_TARGET_AARCH64_LINUX_GNU_2_28_LINKER = "${pkgs.writeShellScriptBin "linker" ''
@@ -148,7 +159,7 @@
 
         # x86_64-linux-gnu_2_28
         CARGO_TARGET_X86_64_LINUX_GNU_2_28_LINKER = "${pkgs.writeShellScriptBin "linker" ''
-          zig cc -target x86_64-linux-gnu.2.28 -fuse-ld=$(which mold) $@
+          zig cc -target x86_64-linux-gnu.2.28 $@
         ''}/bin/linker";
         CC_x86_64_linux_gnu_2_28 = "${pkgs.writeShellScriptBin "cc" ''
           zig cc -target x86_64-linux-gnu.2.28 $@
