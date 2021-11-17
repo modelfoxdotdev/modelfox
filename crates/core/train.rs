@@ -552,13 +552,32 @@ impl Trainer {
 			inner,
 		};
 		handle_progress_event(ProgressEvent::FinalizeDone);
+		let task_str = match task {
+			Task::BinaryClassification => "binary classification",
+			Task::MulticlassClassification => "multiclass classification",
+			Task::Regression => "regression",
+		};
+		let comparison_metric_str = match comparison_metric {
+			ComparisonMetric::BinaryClassification(bcm) => match bcm {
+				BinaryClassificationComparisonMetric::AucRoc => "AUC ROC",
+			},
+			ComparisonMetric::MulticlassClassification(mccm) => match mccm {
+				MulticlassClassificationComparisonMetric::Accuracy => "Accuracy",
+			},
+			ComparisonMetric::Regression(rcm) => match rcm {
+				RegressionComparisonMetric::MeanAbsoluteError => "mean absolute error",
+				RegressionComparisonMetric::MeanSquaredError => "mean squared error",
+				RegressionComparisonMetric::RootMeanSquaredError => "root mean squared error",
+				RegressionComparisonMetric::R2 => "r2",
+			},
+		};
 		handle_progress_event(ProgressEvent::Info(format!(
 			"Selected {} Model {} of {} for {} result ({}: {})",
 			model_type,
 			best_grid_item_index + 1,
 			grid_len,
-			task,
-			comparison_metric,
+			task_str,
+			comparison_metric_str,
 			comparison_metric_value
 		)));
 		Ok(model)
@@ -977,10 +996,24 @@ fn train_grid_item(
 		});
 	let comparison_metric_value =
 		get_comparison_metric_value(&comparison_metrics, comparison_metric);
+		let comparison_metric_str = match comparison_metric {
+			ComparisonMetric::BinaryClassification(bcm) => match bcm {
+				BinaryClassificationComparisonMetric::AucRoc => "AUC ROC",
+			},
+			ComparisonMetric::MulticlassClassification(mccm) => match mccm {
+				MulticlassClassificationComparisonMetric::Accuracy => "Accuracy",
+			},
+			ComparisonMetric::Regression(rcm) => match rcm {
+				RegressionComparisonMetric::MeanAbsoluteError => "mean absolute error",
+				RegressionComparisonMetric::MeanSquaredError => "mean squared error",
+				RegressionComparisonMetric::RootMeanSquaredError => "root mean squared error",
+				RegressionComparisonMetric::R2 => "r2",
+			},
+		};
 	handle_progress_event(ProgressEvent::Info(format!(
 		"🎯 Model {} {}: {}",
 		grid_item_index + 1,
-		comparison_metric,
+		comparison_metric_str,
 		comparison_metric_value
 	)));
 	TrainGridItemOutput {

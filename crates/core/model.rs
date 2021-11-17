@@ -7,7 +7,7 @@ use crate::{
 };
 use anyhow::Result;
 use num::ToPrimitive;
-use std::{fmt, path::Path};
+use std::path::Path;
 use tangram_id::Id;
 use tangram_zip::zip;
 
@@ -87,46 +87,21 @@ pub struct MulticlassClassifier {
 	pub test_metrics: tangram_metrics::MulticlassClassificationMetricsOutput,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub enum Task {
-	Regression,
 	BinaryClassification,
 	MulticlassClassification,
+	Regression,
 }
 
-impl fmt::Display for Task {
- fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
- 	    let s = match self {
-				Task::Regression => "Regression",
-				Task::BinaryClassification => "Binary Classification",
-				Task::MulticlassClassification => "Multiclass Classification",
-			};
-			write!(f, "{}", s)
- 	}	
-}
-
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub enum BinaryClassificationComparisonMetric {
 	AucRoc,
 }
 
-impl fmt::Display for BinaryClassificationComparisonMetric {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		match self {
-			BinaryClassificationComparisonMetric::AucRoc => write!(f, "AUC ROC"),
-		}
-	}
-}
-
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub enum MulticlassClassificationComparisonMetric {
 	Accuracy,
-}
-
-impl fmt::Display for MulticlassClassificationComparisonMetric {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		write!(f, "{:?}", self)
-	}
 }
 
 pub enum RegressionModel {
@@ -150,25 +125,12 @@ pub struct TreeRegressionModel {
 	pub feature_importances: Vec<f32>,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub enum RegressionComparisonMetric {
 	MeanAbsoluteError,
 	MeanSquaredError,
 	RootMeanSquaredError,
 	R2,
-}
-
-impl fmt::Display for RegressionComparisonMetric {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		use RegressionComparisonMetric::*;	
-		let s = match self {
-			MeanAbsoluteError => "Mean Absolute Error",
-			MeanSquaredError => "Mean Squared Error",
-			RootMeanSquaredError => "Root Mean Squared Error",
-			R2 => "R2",
-		};
-		write!(f, "{}", s)
-	}
 }
 
 pub enum BinaryClassificationModel {
@@ -213,22 +175,11 @@ pub struct TreeMulticlassClassificationModel {
 	pub feature_importances: Vec<f32>,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub enum ComparisonMetric {
 	Regression(RegressionComparisonMetric),
 	BinaryClassification(BinaryClassificationComparisonMetric),
 	MulticlassClassification(MulticlassClassificationComparisonMetric),
-}
-
-impl fmt::Display for ComparisonMetric {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		use ComparisonMetric::*;
-		match self {
-			Regression(rcm) => write!(f, "{}", rcm),
-			BinaryClassification(bccm) => write!(f, "{}", bccm),
-			MulticlassClassification(mccm) => write!(f, "{}", mccm),
-		}
-	}
 }
 
 pub enum Metrics {
