@@ -365,7 +365,7 @@ fn progress_thread_handle_progress_event(
 									progress_counter,
 								) => {
 									let title = format!(
-										"Training model {} of {}.",
+										"Training model {} of {}: Linear.",
 										grid_item_index + 1,
 										grid_item_count
 									)
@@ -389,7 +389,7 @@ fn progress_thread_handle_progress_event(
 									progress_counter,
 								) => {
 									let title = format!(
-										"Preparing model {} of {}.",
+										"Preparing model {} of {}: Tree.",
 										grid_item_index + 1,
 										grid_item_count
 									)

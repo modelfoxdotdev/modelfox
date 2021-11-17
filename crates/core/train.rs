@@ -302,6 +302,18 @@ impl Trainer {
 		let (train_model_output, best_grid_item_index) =
 			choose_best_model(&train_grid_item_outputs, &comparison_metric)?;
 
+		let model_type = match train_model_output {
+			TrainModelOutput::LinearRegressor(_)
+			| TrainModelOutput::LinearBinaryClassifier(_)
+			| TrainModelOutput::LinearMulticlassClassifier(_) => "Linear",
+			TrainModelOutput::TreeRegressor(_)
+			| TrainModelOutput::TreeBinaryClassifier(_)
+			| TrainModelOutput::TreeMulticlassClassifier(_) => "Tree",
+		};
+		let grid_len = train_grid_item_outputs.len();
+		let comparison_metric_value =
+			train_grid_item_outputs[best_grid_item_index].comparison_metric_value;
+
 		// Test the best model.
 		let test_metrics = test_model(&train_model_output, &table_test, &mut |progress_event| {
 			handle_progress_event(ProgressEvent::Test(progress_event))
@@ -540,6 +552,34 @@ impl Trainer {
 			inner,
 		};
 		handle_progress_event(ProgressEvent::FinalizeDone);
+		let task_str = match task {
+			Task::BinaryClassification => "binary classification",
+			Task::MulticlassClassification => "multiclass classification",
+			Task::Regression => "regression",
+		};
+		let comparison_metric_str = match comparison_metric {
+			ComparisonMetric::BinaryClassification(bcm) => match bcm {
+				BinaryClassificationComparisonMetric::AucRoc => "AUC ROC",
+			},
+			ComparisonMetric::MulticlassClassification(mccm) => match mccm {
+				MulticlassClassificationComparisonMetric::Accuracy => "Accuracy",
+			},
+			ComparisonMetric::Regression(rcm) => match rcm {
+				RegressionComparisonMetric::MeanAbsoluteError => "mean absolute error",
+				RegressionComparisonMetric::MeanSquaredError => "mean squared error",
+				RegressionComparisonMetric::RootMeanSquaredError => "root mean squared error",
+				RegressionComparisonMetric::R2 => "r2",
+			},
+		};
+		handle_progress_event(ProgressEvent::Info(format!(
+			"Selected {} Model {} of {} for {} result ({}: {})",
+			model_type,
+			best_grid_item_index + 1,
+			grid_len,
+			task_str,
+			comparison_metric_str,
+			comparison_metric_value
+		)));
 		Ok(model)
 	}
 }
@@ -956,6 +996,26 @@ fn train_grid_item(
 		});
 	let comparison_metric_value =
 		get_comparison_metric_value(&comparison_metrics, comparison_metric);
+		let comparison_metric_str = match comparison_metric {
+			ComparisonMetric::BinaryClassification(bcm) => match bcm {
+				BinaryClassificationComparisonMetric::AucRoc => "AUC ROC",
+			},
+			ComparisonMetric::MulticlassClassification(mccm) => match mccm {
+				MulticlassClassificationComparisonMetric::Accuracy => "Accuracy",
+			},
+			ComparisonMetric::Regression(rcm) => match rcm {
+				RegressionComparisonMetric::MeanAbsoluteError => "mean absolute error",
+				RegressionComparisonMetric::MeanSquaredError => "mean squared error",
+				RegressionComparisonMetric::RootMeanSquaredError => "root mean squared error",
+				RegressionComparisonMetric::R2 => "r2",
+			},
+		};
+	handle_progress_event(ProgressEvent::Info(format!(
+		"🎯 Model {} {}: {}",
+		grid_item_index + 1,
+		comparison_metric_str,
+		comparison_metric_value
+	)));
 	TrainGridItemOutput {
 		train_model_output,
 		comparison_metrics,

@@ -89,9 +89,9 @@ pub struct MulticlassClassifier {
 
 #[derive(Clone, Copy)]
 pub enum Task {
-	Regression,
 	BinaryClassification,
 	MulticlassClassification,
+	Regression,
 }
 
 #[derive(Clone, Copy)]
