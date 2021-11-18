@@ -181,9 +181,9 @@ impl Table {
 		&mut self.columns
 	}
 
-	pub fn drop_row(&mut self, idx: usize) {
+	pub fn drop_row(&mut self, index: usize) {
 		for column in self.columns_mut() {
-			column.drop_row(idx);
+			column.drop_row(index);
 		}
 	}
 

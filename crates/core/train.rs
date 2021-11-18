@@ -30,7 +30,6 @@ use std::{
 	time::{Duration, Instant},
 	unreachable,
 };
-use tangram_finite::Finite;
 use tangram_id::Id;
 use tangram_kill_chip::KillChip;
 use tangram_progress_counter::ProgressCounter;
@@ -655,50 +654,39 @@ fn drop_invalid_target_rows(
 	target_column_name: &str,
 	handle_progress_event: &mut dyn FnMut(ProgressEvent),
 ) {
-	let mut indices_to_drop = Vec::new();
-	for column in table.columns_mut() {
-		// find the target column
-		if column.name().unwrap_or_default() == target_column_name {
-			match column {
-				TableColumn::Number(_) => {
-					// unwrap is safe, we already know it's a number column
-					for (idx, value) in column.view().as_number().unwrap().data().iter().enumerate()
-					{
-						if !<Finite<f32>>::new(*value).is_ok() {
-							handle_progress_event(ProgressEvent::Warning(format!(
-								"Invalid numeric target data in row {}",
-								idx + 1
-							)));
-							indices_to_drop.push(idx);
-						}
-					}
+	let mut indexes_to_drop = Vec::new();
+	let target_column = table
+		.columns_mut()
+		.iter_mut()
+		.find(|c| c.name() == Some(target_column_name))
+		.expect("failed to find target column.");
+	match target_column.view() {
+		TableColumnView::Number(target_column) => {
+			for (index, value) in target_column.data().iter().enumerate() {
+				if !value.is_finite() {
+					indexes_to_drop.push(index);
 				}
-				TableColumn::Enum(_) => {
-					for (idx, value) in column.view().as_enum().unwrap().data().iter().enumerate() {
-						let index = value.map(|v| v.get()).unwrap_or(0);
-						if index == 0 {
-							handle_progress_event(ProgressEvent::Warning(format!(
-								"Invalid enum variant in row {}",
-								idx + 1
-							)));
-							indices_to_drop.push(idx);
-						}
-					}
-				}
-				_ => unreachable!(), // all targets are either numeric or enum
 			}
 		}
+		TableColumnView::Enum(target_column) => {
+			for (index, value) in target_column.data().iter().enumerate() {
+				if value.is_none() {
+					indexes_to_drop.push(index);
+				}
+			}
+		}
+		_ => {}
 	}
 
 	handle_progress_event(ProgressEvent::Warning(format!(
-		"Dropping {} rows with invalid target data",
-		indices_to_drop.len()
+		"Dropping {} row(s) with invalid values for the target column.",
+		indexes_to_drop.len()
 	)));
 
-	// For each index in indices to drop, remove the row from table
-	indices_to_drop.sort_by(|a, b| b.cmp(a));
-	for idx in &indices_to_drop {
-		table.drop_row(*idx);
+	// For each index in indexes to drop, remove the row from table.
+	indexes_to_drop.sort_by(|a, b| b.cmp(a));
+	for index in indexes_to_drop {
+		table.drop_row(index);
 	}
 }
 
