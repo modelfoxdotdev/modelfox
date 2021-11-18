@@ -76,24 +76,28 @@ impl Trainer {
 		let config = load_config(config_path)?;
 
 		// Load the train and test tables from the csv file(s).
-		let dataset =
-			match input {
-				TrainingDataSource::Stdin => Dataset::Train(load_and_shuffle_dataset_stdin(
+		let dataset = match input {
+			TrainingDataSource::Stdin => Dataset::Train(load_and_shuffle_dataset_stdin(
+				&config,
+				target_column_name,
+				handle_progress_event,
+			)?),
+			TrainingDataSource::File(file_path) => Dataset::Train(load_and_shuffle_dataset_train(
+				&file_path,
+				&config,
+				target_column_name,
+				handle_progress_event,
+			)?),
+			TrainingDataSource::TrainAndTest { train, test } => {
+				Dataset::TrainAndTest(load_and_shuffle_dataset_train_and_test(
+					&train,
+					&test,
 					&config,
+					target_column_name,
 					handle_progress_event,
-				)?),
-				TrainingDataSource::File(file_path) => Dataset::Train(
-					load_and_shuffle_dataset_train(&file_path, &config, handle_progress_event)?,
-				),
-				TrainingDataSource::TrainAndTest { train, test } => {
-					Dataset::TrainAndTest(load_and_shuffle_dataset_train_and_test(
-						&train,
-						&test,
-						&config,
-						handle_progress_event,
-					)?)
-				}
-			};
+				)?)
+			}
+		};
 		let (table_train, table_comparison, table_test) = dataset.split();
 
 		// Do not allow training if any dataset has no rows, or emit warnings if any dataset is too small.
@@ -184,17 +188,6 @@ impl Trainer {
 				_ => Task::MulticlassClassification,
 			},
 			_ => bail!("invalid target column type"),
-		};
-
-		// Determine whether the target column contains invalid values.
-		match overall_target_column_stats {
-			ColumnStatsOutput::Number(stats) if stats.invalid_count != 0 => {
-				bail!("The target column contains invalid values.");
-			}
-			ColumnStatsOutput::Enum(stats) if stats.invalid_count != 0 => {
-				bail!("The target column contains invalid values.");
-			}
-			_ => {}
 		};
 
 		// Compute the baseline metrics.
@@ -656,8 +649,50 @@ impl Dataset {
 	}
 }
 
+fn drop_invalid_target_rows(
+	table: &mut Table,
+	target_column_name: &str,
+	handle_progress_event: &mut dyn FnMut(ProgressEvent),
+) {
+	let mut indexes_to_drop = Vec::new();
+	let target_column = table
+		.columns_mut()
+		.iter_mut()
+		.find(|c| c.name() == Some(target_column_name))
+		.expect("failed to find target column.");
+	match target_column.view() {
+		TableColumnView::Number(target_column) => {
+			for (index, value) in target_column.data().iter().enumerate() {
+				if !value.is_finite() {
+					indexes_to_drop.push(index);
+				}
+			}
+		}
+		TableColumnView::Enum(target_column) => {
+			for (index, value) in target_column.data().iter().enumerate() {
+				if value.is_none() {
+					indexes_to_drop.push(index);
+				}
+			}
+		}
+		_ => {}
+	}
+
+	handle_progress_event(ProgressEvent::Warning(format!(
+		"Dropping {} row(s) with invalid values for the target column.",
+		indexes_to_drop.len()
+	)));
+
+	// For each index in indexes to drop, remove the row from table.
+	indexes_to_drop.sort_by(|a, b| b.cmp(a));
+	for index in indexes_to_drop {
+		table.drop_row(index);
+	}
+}
+
 fn load_and_shuffle_dataset_stdin(
 	config: &Config,
+	target_column_name: &str,
 	handle_progress_event: &mut dyn FnMut(ProgressEvent),
 ) -> Result<DatasetTrain> {
 	let mut stdin = std::io::stdin();
@@ -677,6 +712,8 @@ fn load_and_shuffle_dataset_stdin(
 			)))
 		},
 	)?;
+	// Drop any rows with invalid data in the target column
+	drop_invalid_target_rows(&mut table, target_column_name, handle_progress_event);
 	// Shuffle the table if enabled.
 	shuffle_table(&mut table, config, handle_progress_event);
 	// Split the table into train and test tables.
@@ -690,6 +727,7 @@ fn load_and_shuffle_dataset_stdin(
 fn load_and_shuffle_dataset_train(
 	file_path: &Path,
 	config: &Config,
+	target_column_name: &str,
 	handle_progress_event: &mut dyn FnMut(ProgressEvent),
 ) -> Result<DatasetTrain> {
 	// Get the column types from the config, if set.
@@ -706,6 +744,8 @@ fn load_and_shuffle_dataset_train(
 			)))
 		},
 	)?;
+	// Drop any rows with invalid data in the target column
+	drop_invalid_target_rows(&mut table, target_column_name, handle_progress_event);
 	// Shuffle the table if enabled.
 	shuffle_table(&mut table, config, handle_progress_event);
 	// Split the table into train and test tables.
@@ -720,6 +760,7 @@ fn load_and_shuffle_dataset_train_and_test(
 	file_path_train: &Path,
 	file_path_test: &Path,
 	config: &Config,
+	target_column_name: &str,
 	handle_progress_event: &mut dyn FnMut(ProgressEvent),
 ) -> Result<DatasetTrainAndTest> {
 	// Get the column types from the config, if set.
@@ -757,7 +798,7 @@ fn load_and_shuffle_dataset_train_and_test(
 			TableColumn::Text(column) => (column.name().to_owned().unwrap(), TableColumnType::Text),
 		})
 		.collect();
-	let table_test = Table::from_path(
+	let mut table_test = Table::from_path(
 		file_path_test,
 		tangram_table::FromCsvOptions {
 			column_types: Some(column_types),
@@ -768,6 +809,9 @@ fn load_and_shuffle_dataset_train_and_test(
 			handle_progress_event(ProgressEvent::Load(LoadProgressEvent::Test(progress_event)))
 		},
 	)?;
+	// Drop any rows with invalid data in the target column
+	drop_invalid_target_rows(&mut table_train, target_column_name, handle_progress_event);
+	drop_invalid_target_rows(&mut table_test, target_column_name, handle_progress_event);
 	shuffle_table(&mut table_train, config, handle_progress_event);
 	Ok(DatasetTrainAndTest {
 		table_train,
@@ -996,20 +1040,20 @@ fn train_grid_item(
 		});
 	let comparison_metric_value =
 		get_comparison_metric_value(&comparison_metrics, comparison_metric);
-		let comparison_metric_str = match comparison_metric {
-			ComparisonMetric::BinaryClassification(bcm) => match bcm {
-				BinaryClassificationComparisonMetric::AucRoc => "AUC ROC",
-			},
-			ComparisonMetric::MulticlassClassification(mccm) => match mccm {
-				MulticlassClassificationComparisonMetric::Accuracy => "Accuracy",
-			},
-			ComparisonMetric::Regression(rcm) => match rcm {
-				RegressionComparisonMetric::MeanAbsoluteError => "mean absolute error",
-				RegressionComparisonMetric::MeanSquaredError => "mean squared error",
-				RegressionComparisonMetric::RootMeanSquaredError => "root mean squared error",
-				RegressionComparisonMetric::R2 => "r2",
-			},
-		};
+	let comparison_metric_str = match comparison_metric {
+		ComparisonMetric::BinaryClassification(bcm) => match bcm {
+			BinaryClassificationComparisonMetric::AucRoc => "AUC ROC",
+		},
+		ComparisonMetric::MulticlassClassification(mccm) => match mccm {
+			MulticlassClassificationComparisonMetric::Accuracy => "Accuracy",
+		},
+		ComparisonMetric::Regression(rcm) => match rcm {
+			RegressionComparisonMetric::MeanAbsoluteError => "mean absolute error",
+			RegressionComparisonMetric::MeanSquaredError => "mean squared error",
+			RegressionComparisonMetric::RootMeanSquaredError => "root mean squared error",
+			RegressionComparisonMetric::R2 => "r2",
+		},
+	};
 	handle_progress_event(ProgressEvent::Info(format!(
 		"🎯 Model {} {}: {}",
 		grid_item_index + 1,
