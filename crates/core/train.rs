@@ -817,7 +817,7 @@ fn load_and_shuffle_dataset_train_and_test(
 	}
 	// Drop any rows with invalid data in the target column
 	drop_invalid_target_rows(&mut table_train, target_column_name, handle_progress_event);
-	//drop_invalid_target_rows(&mut table_test, target_column_name, handle_progress_event);
+	drop_invalid_target_rows(&mut table_test, target_column_name, handle_progress_event);
 	shuffle_table(&mut table_train, config, handle_progress_event);
 	Ok(DatasetTrainAndTest {
 		table_train,
