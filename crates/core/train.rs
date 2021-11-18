@@ -191,27 +191,6 @@ impl Trainer {
 			_ => bail!("invalid target column type"),
 		};
 
-		// Determine whether the target column contains invalid values.
-		match overall_target_column_stats {
-			ColumnStatsOutput::Number(ref stats) if stats.invalid_count != 0 => {
-				//bail!("The target column contains invalid values.");
-				let plural = if stats.invalid_count > 1 { "s" } else { "" };
-				handle_progress_event(ProgressEvent::Warning(format!(
-					"Dropped {} row{} containing invalid values.",
-					stats.invalid_count, plural
-				)));
-			}
-			ColumnStatsOutput::Enum(ref stats) if stats.invalid_count != 0 => {
-				//bail!("The target column contains invalid values.");
-				let plural = if stats.invalid_count > 1 { "s" } else { "" };
-				handle_progress_event(ProgressEvent::Warning(format!(
-					"Dropped {} row{} containing invalid values.",
-					stats.invalid_count, plural
-				)));
-			}
-			_ => {}
-		};
-
 		// Compute the baseline metrics.
 		let progress_counter = ProgressCounter::new(train_row_count as u64);
 		handle_progress_event(ProgressEvent::ComputeBaselineMetrics(
@@ -682,15 +661,13 @@ fn drop_invalid_target_rows(
 		if column.name().unwrap_or_default() == target_column_name {
 			match column {
 				TableColumn::Number(_) => {
-					// Check each value.  If valid, do nothing.
-					// If invalid, warn user, add index to indices_to_drop
 					// unwrap is safe, we already know it's a number column
 					for (idx, value) in column.view().as_number().unwrap().data().iter().enumerate()
 					{
 						if !<Finite<f32>>::new(*value).is_ok() {
 							handle_progress_event(ProgressEvent::Warning(format!(
 								"Invalid numeric target data in row {}",
-								idx
+								idx + 1
 							)));
 							indices_to_drop.push(idx);
 						}
@@ -702,7 +679,7 @@ fn drop_invalid_target_rows(
 						if index == 0 {
 							handle_progress_event(ProgressEvent::Warning(format!(
 								"Invalid enum variant in row {}",
-								idx
+								idx + 1
 							)));
 							indices_to_drop.push(idx);
 						}
@@ -719,9 +696,8 @@ fn drop_invalid_target_rows(
 	)));
 
 	// For each index in indices to drop, remove the row from table
-	// TODO can we do this inline above?
+	indices_to_drop.sort_by(|a, b| b.cmp(a));
 	for idx in &indices_to_drop {
-		//table.columns_mut().remove(*idx);
 		table.drop_row(*idx);
 	}
 }
