@@ -678,10 +678,13 @@ fn drop_invalid_target_rows(
 		_ => {}
 	}
 
-	handle_progress_event(ProgressEvent::Warning(format!(
-		"Dropping {} row(s) with invalid values for the target column.",
-		indexes_to_drop.len()
-	)));
+	let num_to_drop = indexes_to_drop.len();
+	if num_to_drop > 0 {
+		handle_progress_event(ProgressEvent::Warning(format!(
+			"Dropping {} row(s) with invalid values for the target column.",
+			num_to_drop
+		)));
+	}
 
 	// For each index in indexes to drop, remove the row from table.
 	indexes_to_drop.sort_by(|a, b| b.cmp(a));
@@ -809,9 +812,12 @@ fn load_and_shuffle_dataset_train_and_test(
 			handle_progress_event(ProgressEvent::Load(LoadProgressEvent::Test(progress_event)))
 		},
 	)?;
+	if table_train.columns().len() != table_test.columns().len() {
+		bail!("Training data and test data must contain the same number of columns.")
+	}
 	// Drop any rows with invalid data in the target column
 	drop_invalid_target_rows(&mut table_train, target_column_name, handle_progress_event);
-	drop_invalid_target_rows(&mut table_test, target_column_name, handle_progress_event);
+	//drop_invalid_target_rows(&mut table_test, target_column_name, handle_progress_event);
 	shuffle_table(&mut table_train, config, handle_progress_event);
 	Ok(DatasetTrainAndTest {
 		table_train,
