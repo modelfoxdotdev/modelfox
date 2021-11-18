@@ -680,9 +680,10 @@ fn drop_invalid_target_rows(
 
 	let num_to_drop = indexes_to_drop.len();
 	if num_to_drop > 0 {
+		let row_nums: Vec<usize> = indexes_to_drop.iter().map(|x| x + 1).collect();
 		handle_progress_event(ProgressEvent::Warning(format!(
-			"Dropping {} row(s) with invalid values for the target column.",
-			num_to_drop
+			"Dropping {} row(s) with invalid values for the target column: {:?}.",
+			num_to_drop, row_nums
 		)));
 	}
 
