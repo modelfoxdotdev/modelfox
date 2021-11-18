@@ -110,7 +110,7 @@ pub struct PredictArgs {
 	)]
 	probabilities: Option<bool>,
 	#[clap(short, long, about = "The threshold value to use for predictions.")]
-	threshold: Option<f32>
+	threshold: Option<f32>,
 }
 
 #[cfg(feature = "tangram_app")]

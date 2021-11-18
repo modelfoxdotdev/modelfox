@@ -318,7 +318,7 @@ const DEFAULT_TREE_MAX_ROUNDS_VALUES: [u64; 1] = [1000];
 const DEFAULT_TREE_MAX_DEPTH: [u64; 1] = [50];
 
 /// Compute the default hyperparameter grid for regression.
-pub fn default_regression_hyperparameter_grid(
+pub fn auto_regression_hyperparameter_grid(
 	target_column_index: usize,
 	column_stats: &[ColumnStatsOutput],
 	config: &config::Config,
@@ -375,64 +375,79 @@ pub fn default_regression_hyperparameter_grid(
 }
 
 /// Compute the default hyperparameter grid for binary classification.
-pub fn default_binary_classification_hyperparameter_grid(
+pub fn auto_binary_classification_hyperparameter_grid(
 	target_column_index: usize,
 	column_stats: &[ColumnStatsOutput],
 	config: &config::Config,
 ) -> Vec<GridItem> {
+	let autogrid = &config.train.autogrid;
+	let (train_linear, train_tree) = match autogrid {
+		Some(ag) => match &ag.model_types {
+			Some(vec) => (
+				vec.contains(&config::ModelType::Linear),
+				vec.contains(&config::ModelType::Tree),
+			),
+			None => (false, false),
+		},
+		None => (false, false),
+	};
 	let mut grid = Vec::new();
-	for (&l2_regularization, &learning_rate, &max_epochs, &n_examples_per_batch) in iproduct!(
-		DEFAULT_LINEAR_L2_REGULARIZATION_VALUES.iter(),
-		DEFAULT_LINEAR_MODEL_LEARNING_RATE_VALUES.iter(),
-		DEFAULT_LINEAR_MAX_EPOCHS_VALUES.iter(),
-		DEFAULT_LINEAR_N_EXAMPLES_PER_BATCH_VALUES.iter()
-	) {
-		grid.push(GridItem::LinearBinaryClassifier {
-			target_column_index,
-			feature_groups: choose_feature_groups_linear(column_stats, config),
-			options: LinearModelTrainOptions {
-				l2_regularization: Some(l2_regularization),
-				learning_rate: Some(learning_rate),
-				max_epochs: Some(max_epochs),
-				n_examples_per_batch: Some(n_examples_per_batch),
-				early_stopping_options: Some(Default::default()),
-			},
-		});
+	if train_linear {
+		for (&l2_regularization, &learning_rate, &max_epochs, &n_examples_per_batch) in iproduct!(
+			DEFAULT_LINEAR_L2_REGULARIZATION_VALUES.iter(),
+			DEFAULT_LINEAR_MODEL_LEARNING_RATE_VALUES.iter(),
+			DEFAULT_LINEAR_MAX_EPOCHS_VALUES.iter(),
+			DEFAULT_LINEAR_N_EXAMPLES_PER_BATCH_VALUES.iter()
+		) {
+			grid.push(GridItem::LinearBinaryClassifier {
+				target_column_index,
+				feature_groups: choose_feature_groups_linear(column_stats, config),
+				options: LinearModelTrainOptions {
+					l2_regularization: Some(l2_regularization),
+					learning_rate: Some(learning_rate),
+					max_epochs: Some(max_epochs),
+					n_examples_per_batch: Some(n_examples_per_batch),
+					early_stopping_options: Some(Default::default()),
+				},
+			});
+		}
 	}
-	for (
-		&max_leaf_nodes,
-		&learning_rate,
-		&l2_regularization_for_continous_splits,
-		&max_rounds,
-		&max_depth,
-	) in iproduct!(
-		DEFAULT_TREE_MAX_LEAF_NODES.iter(),
-		DEFAULT_TREE_LEARNING_RATE_VALUES.iter(),
-		DEFAULT_TREE_L2_REGULARIZATION_VALUES_FOR_CONTINUOUS_SPLITS.iter(),
-		DEFAULT_TREE_MAX_ROUNDS_VALUES.iter(),
-		DEFAULT_TREE_MAX_DEPTH.iter()
-	) {
-		grid.push(GridItem::TreeBinaryClassifier {
-			target_column_index,
-			feature_groups: choose_feature_groups_tree(column_stats, config),
-			options: TreeModelTrainOptions {
-				max_leaf_nodes: Some(max_leaf_nodes),
-				learning_rate: Some(learning_rate),
-				max_rounds: Some(max_rounds),
-				max_depth: Some(max_depth),
-				l2_regularization_for_continuous_splits: Some(
-					l2_regularization_for_continous_splits,
-				),
-				early_stopping_options: Some(Default::default()),
-				..Default::default()
-			},
-		});
+	if train_tree {
+		for (
+			&max_leaf_nodes,
+			&learning_rate,
+			&l2_regularization_for_continous_splits,
+			&max_rounds,
+			&max_depth,
+		) in iproduct!(
+			DEFAULT_TREE_MAX_LEAF_NODES.iter(),
+			DEFAULT_TREE_LEARNING_RATE_VALUES.iter(),
+			DEFAULT_TREE_L2_REGULARIZATION_VALUES_FOR_CONTINUOUS_SPLITS.iter(),
+			DEFAULT_TREE_MAX_ROUNDS_VALUES.iter(),
+			DEFAULT_TREE_MAX_DEPTH.iter()
+		) {
+			grid.push(GridItem::TreeBinaryClassifier {
+				target_column_index,
+				feature_groups: choose_feature_groups_tree(column_stats, config),
+				options: TreeModelTrainOptions {
+					max_leaf_nodes: Some(max_leaf_nodes),
+					learning_rate: Some(learning_rate),
+					max_rounds: Some(max_rounds),
+					max_depth: Some(max_depth),
+					l2_regularization_for_continuous_splits: Some(
+						l2_regularization_for_continous_splits,
+					),
+					early_stopping_options: Some(Default::default()),
+					..Default::default()
+				},
+			});
+		}
 	}
 	grid
 }
 
 /// Compute the default hyperparameter grid for multiclass classification.
-pub fn default_multiclass_classification_hyperparameter_grid(
+pub fn auto_multiclass_classification_hyperparameter_grid(
 	target_column_index: usize,
 	column_stats: &[ColumnStatsOutput],
 	config: &config::Config,

@@ -902,18 +902,18 @@ fn compute_hyperparameter_grid(
 			}
 		})
 		.unwrap_or_else(|| match &task {
-			Task::Regression => grid::default_regression_hyperparameter_grid(
+			Task::Regression => grid::auto_regression_hyperparameter_grid(
 				target_column_index,
 				train_column_stats,
 				config,
 			),
-			Task::BinaryClassification => grid::default_binary_classification_hyperparameter_grid(
+			Task::BinaryClassification => grid::auto_binary_classification_hyperparameter_grid(
 				target_column_index,
 				train_column_stats,
 				config,
 			),
 			Task::MulticlassClassification { .. } => {
-				grid::default_multiclass_classification_hyperparameter_grid(
+				grid::auto_multiclass_classification_hyperparameter_grid(
 					target_column_index,
 					train_column_stats,
 					config,

@@ -151,10 +151,26 @@ pub struct BagOfWordsCosineSimilarityFeatureGroup {
 #[derive(Debug, Default, serde::Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Train {
+	/// Use `autogrid` to control how the default hyperparameter grid is computed.
+	pub autogrid: Option<AutoGridOptions>,
 	/// The `grid` specifies which models should be trained and with which hyperparameters. If you do not specify this option, a reasonable default grid will be used.
 	pub grid: Option<Vec<GridItem>>,
 	/// This is the metric that will be computed on the comparison dataset to choose the best model.
 	pub comparison_metric: Option<ComparisonMetric>,
+}
+
+#[derive(Debug, Default, serde::Deserialize)]
+pub struct AutoGridOptions {
+	/// Which types of model to train
+	pub model_types: Option<Vec<ModelType>>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Deserialize)]
+pub enum ModelType {
+	#[serde(rename = "linear")]
+	Linear,
+	#[serde(rename = "tree")]
+	Tree,
 }
 
 #[derive(Debug, serde::Deserialize)]
