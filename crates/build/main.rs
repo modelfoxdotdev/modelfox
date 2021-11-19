@@ -61,7 +61,7 @@ fn compile() {
 		"--package",
 		"tangram_python",
 	]);
-	// cmd(which("cargo").unwrap(), args).run().unwrap();
+	cmd(which("cargo").unwrap(), args).run().unwrap();
 
 	// Copy the artifacts to the compile directory.
 	for target in TARGETS {
