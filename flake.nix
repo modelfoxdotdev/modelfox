@@ -9,8 +9,8 @@
     fenix = {
       url = "github:nix-community/fenix";
     };
-    wheel_builder = {
-			url = "github:tangramdotdev/wheel_builder";
+    wheel_writer = {
+			url = "github:tangramdotdev/wheel_writer";
     };
     windows_sdk = {
       url = "github:tangramdotdev/windows_sdk";
@@ -20,7 +20,7 @@
     fenix, 
     flake-utils, 
     nixpkgs, 
-    wheel_builder, 
+    wheel_writer, 
     windows_sdk, 
     ... 
   }: flake-utils.lib.eachDefaultSystem (system:
@@ -124,7 +124,7 @@
           sqlite
           time
           wasm-bindgen-cli
-          (wheel_builder.defaultPackage.${system})
+          (wheel_writer.defaultPackage.${system})
           windows_sdk
           zig 
           zlib

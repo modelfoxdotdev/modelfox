@@ -120,11 +120,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1636976544,
-        "narHash": "sha256-9ZmdyoRz4Qu8bP5BKR1T10YbzcB9nvCeQjOEw2cRKR0=",
+        "lastModified": 1637155076,
+        "narHash": "sha256-26ZPNiuzlsnXpt55Q44+yzXvp385aNAfevzVEKbrU5Q=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "931ab058daa7e4cd539533963f95e2bb0dbd41e6",
+        "rev": "715f63411952c86c8f57ab9e3e3cb866a015b5f2",
         "type": "github"
       },
       "original": {
@@ -203,7 +203,7 @@
         "fenix": "fenix",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs_2",
-        "wheel_builder": "wheel_builder",
+        "wheel_writer": "wheel_writer",
         "windows_sdk": "windows_sdk"
       }
     },
@@ -258,23 +258,23 @@
         "type": "github"
       }
     },
-    "wheel_builder": {
+    "wheel_writer": {
       "inputs": {
         "fenix": "fenix_2",
         "flake-utils": "flake-utils_2",
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1637336619,
-        "narHash": "sha256-jlKmGjViYbbUGcy9VvWhkzBO/8ewXpDQVoKcmJv1+/U=",
+        "lastModified": 1637344168,
+        "narHash": "sha256-tjkjVwOXFfTT7nFL61XgtU568gMbmhyA/PS6f/mbZ34=",
         "owner": "tangramdotdev",
-        "repo": "wheel_builder",
-        "rev": "691be238720d7c42467d765640a1c3d2f190ed96",
+        "repo": "wheel_writer",
+        "rev": "9f664fad5147ce0e109747c8754c802f8af4bc93",
         "type": "github"
       },
       "original": {
         "owner": "tangramdotdev",
-        "repo": "wheel_builder",
+        "repo": "wheel_writer",
         "type": "github"
       }
     },
