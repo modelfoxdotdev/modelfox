@@ -1,5 +1,6 @@
 bundle
+rm -rf lib/tangram/libtangram/
 cargo build -p libtangram
-install -D ../../target/debug/libtangram.so lib/tangram/libtangram/x86_64-unknown-linux-gnu/libtangram.so
+install -D ../../target/debug/libtangram.so lib/tangram/libtangram/x86_64-linux-gnu/libtangram.so
 gem build -o tangram.gem tangram.gemspec
 gem install tangram.gem

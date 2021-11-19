@@ -52,8 +52,8 @@ name = "tangram_tree_benchmark_iris"
 path = "benchmarks/iris.rs"
 
 [dependencies]
-bitvec = "0.19"
-buffalo = { version = "0.1", features = ["ndarray_0_15", "bitvec_0_19"] }
+bitvec = "0.22"
+buffalo = { version = "0.2", features = ["ndarray_0_15", "bitvec_0_22"] }
 clap = { version = "3.0.0-beta.5", features = ["color"] }
 itertools = "0.10"
 ndarray = { version = "0.15", features = ["rayon"] }

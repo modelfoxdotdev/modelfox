@@ -455,25 +455,25 @@ defmodule Tangram do
     nif_path =
       cond do
         String.match?(sys_arch, ~r/x86_64-(pc|unknown)-linux-gnu/) ->
-          "x86_64-unknown-linux-gnu/libtangram_elixir"
+          "x86_64-linux-gnu/libtangram_elixir"
 
         String.match?(sys_arch, ~r/(aarch64|arm)-(pc|unknown)-linux-gnu/) ->
-          "aarch64-unknown-linux-gnu/libtangram_elixir"
+          "aarch64-linux-gnu/libtangram_elixir"
 
         String.match?(sys_arch, ~r/x86_64-(alpine|pc)-linux-musl/) ->
-          "x86_64-unknown-linux-musl/libtangram_elixir"
+          "x86_64-linux-musl/libtangram_elixir"
 
         String.match?(sys_arch, ~r/(aarch64|arm)-(alpine|pc)-linux-musl/) ->
-          "aarch64-unknown-linux-musl/libtangram_elixir"
+          "aarch64-linux-musl/libtangram_elixir"
 
         String.match?(sys_arch, ~r/x86_64-apple-darwin[0-9]+\.[0-9]+\.[0-9]+/) ->
-          "x86_64-apple-darwin/libtangram_elixir"
+          "x86_64-macos/libtangram_elixir"
 
         String.match?(sys_arch, ~r/(aarch64|arm)-apple-darwin[0-9]+\.[0-9]+\.[0-9]+/) ->
-          "aarch64-apple-darwin/libtangram_elixir"
+          "aarch64-macos/libtangram_elixir"
 
         String.match?(sys_arch, ~r/win32/) ->
-          "x86_64-pc-windows-msvc/tangram_elixir"
+          "x86_64-windows-msvc/tangram_elixir"
 
         true ->
           raise "Tangram for Elixir does not yet support your combination of CPU architecture and operating system. Open an issue at https://github.com/tangramdotdev/tangram/issues/new or email us at help@tangram.dev to complain."

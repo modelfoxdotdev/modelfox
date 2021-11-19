@@ -1,15 +1,15 @@
 set -e
 rm -rf libtangram/
-install -D ../../dist/x86_64-unknown-linux-musl/libtangram.a libtangram/x86_64-unknown-linux-musl/libtangram.a
-install -D ../../dist/x86_64-unknown-linux-musl/tangram.h libtangram/x86_64-unknown-linux-musl/tangram.h
-install -D ../../dist/aarch64-unknown-linux-musl/libtangram.a libtangram/aarch64-unknown-linux-musl/libtangram.a
-install -D ../../dist/aarch64-unknown-linux-musl/tangram.h libtangram/aarch64-unknown-linux-musl/tangram.h
-install -D ../../dist/x86_64-apple-darwin/libtangram.a libtangram/x86_64-apple-darwin/libtangram.a
-install -D ../../dist/x86_64-apple-darwin/tangram.h libtangram/x86_64-apple-darwin/tangram.h
-install -D ../../dist/aarch64-apple-darwin/libtangram.a libtangram/aarch64-apple-darwin/libtangram.a
-install -D ../../dist/aarch64-apple-darwin/tangram.h libtangram/aarch64-apple-darwin/tangram.h
-install -D ../../dist/x86_64-pc-windows-gnu/libtangram.a libtangram/x86_64-pc-windows-gnu/libtangram.a
-install -D ../../dist/x86_64-pc-windows-gnu/tangram.h libtangram/x86_64-pc-windows-gnu/tangram.h
+install -D ../../dist/compile/x86_64-linux-musl/libtangram.a libtangram/x86_64-linux-musl/libtangram.a
+install -D ../../dist/compile/x86_64-linux-musl/tangram.h libtangram/x86_64-linux-musl/tangram.h
+install -D ../../dist/compile/aarch64-linux-musl/libtangram.a libtangram/aarch64-linux-musl/libtangram.a
+install -D ../../dist/compile/aarch64-linux-musl/tangram.h libtangram/aarch64-linux-musl/tangram.h
+install -D ../../dist/compile/x86_64-macos/libtangram.a libtangram/x86_64-macos/libtangram.a
+install -D ../../dist/compile/x86_64-macos/tangram.h libtangram/x86_64-macos/tangram.h
+install -D ../../dist/compile/aarch64-macos/libtangram.a libtangram/aarch64-macos/libtangram.a
+install -D ../../dist/compile/aarch64-macos/tangram.h libtangram/aarch64-macos/tangram.h
+install -D ../../dist/compile/x86_64-windows-gnu/libtangram.a libtangram/x86_64-windows-gnu/libtangram.a
+install -D ../../dist/compile/x86_64-windows-gnu/tangram.h libtangram/x86_64-windows-gnu/tangram.h
 if [ ! -e dist ]; then
 	git clone git@github.com:tangramdotdev/tangram-go dist
 fi

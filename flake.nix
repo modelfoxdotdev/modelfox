@@ -9,11 +9,21 @@
     fenix = {
       url = "github:nix-community/fenix";
     };
+    # wheel_builder = {
+    #   url = "github:tangramdotdev/wheel_builder";
+    # };
     windows_sdk = {
       url = "github:tangramdotdev/windows_sdk";
     };
   };
-  outputs = { fenix, flake-utils, nixpkgs, windows_sdk, ... }: flake-utils.lib.eachDefaultSystem (system:
+  outputs = { 
+    fenix, 
+    flake-utils, 
+    nixpkgs, 
+    # wheel_builder, 
+    windows_sdk, 
+    ... 
+  }: flake-utils.lib.eachDefaultSystem (system:
     let
       pkgs = import nixpkgs {
         inherit system;
@@ -103,6 +113,7 @@
             pip
             pytorch
             scikitlearn
+            twine
             xgboost
           ]))
           rpm
@@ -113,6 +124,7 @@
           sqlite
           time
           wasm-bindgen-cli
+          # wheel_builder
           windows_sdk
           zig 
           zlib
@@ -128,12 +140,12 @@
           clang $@
         ''}/bin/cc";
 
-        # aarch64-linux-gnu_2_28
-        CARGO_TARGET_AARCH64_LINUX_GNU_2_28_LINKER = "${pkgs.writeShellScriptBin "linker" ''
+        # aarch64-linux-gnu
+        CARGO_TARGET_AARCH64_LINUX_GNU_LINKER = "${pkgs.writeShellScriptBin "linker" ''
           zig cc -target aarch64-linux-gnu.2.28 $@
         ''}/bin/linker";
-        CARGO_TARGET_AARCH64_LINUX_GNU_2_28_RUSTFLAGS = "-C target-feature=-outline-atomics";
-        CC_aarch64_linux_gnu_2_28 = "${pkgs.writeShellScriptBin "cc" ''
+        CARGO_TARGET_AARCH64_LINUX_GNU_RUSTFLAGS = "-C target-feature=-outline-atomics";
+        CC_aarch64_linux_gnu = "${pkgs.writeShellScriptBin "cc" ''
           zig cc -target aarch64-linux-gnu.2.28 $@
         ''}/bin/cc";
 
@@ -157,11 +169,11 @@
         # wasm32
         CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
 
-        # x86_64-linux-gnu_2_28
-        CARGO_TARGET_X86_64_LINUX_GNU_2_28_LINKER = "${pkgs.writeShellScriptBin "linker" ''
+        # x86_64-linux-gnu
+        CARGO_TARGET_X86_64_LINUX_GNU_LINKER = "${pkgs.writeShellScriptBin "linker" ''
           zig cc -target x86_64-linux-gnu.2.28 $@
         ''}/bin/linker";
-        CC_x86_64_linux_gnu_2_28 = "${pkgs.writeShellScriptBin "cc" ''
+        CC_x86_64_linux_gnu = "${pkgs.writeShellScriptBin "cc" ''
           zig cc -target x86_64-linux-gnu.2.28 $@
         ''}/bin/cc";
 

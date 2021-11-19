@@ -13,15 +13,15 @@ let target = null
 let arch = os.arch()
 let platform = os.platform()
 if (arch === "x64" && platform === "linux") {
-	target = "x86_64-unknown-linux-gnu"
+	target = "x86_64-linux-gnu"
 } else if (arch === "arm64" && platform === "linux") {
-	target = "aarch64-unknown-linux-gnu"
+	target = "aarch64-linux-gnu"
 } else if (arch === "x64" && platform === "darwin") {
-	target = "x86_64-apple-darwin"
+	target = "x86_64-macos"
 } else if (arch === "arm64" && platform === "darwin") {
-	target = "aarch64-apple-darwin"
+	target = "aarch64-macos"
 } else if (arch === "x64" && platform === "win32") {
-	target = "x86_64-pc-windows-msvc"
+	target = "x86_64-windows-msvc"
 }
 
 if (target !== null) {

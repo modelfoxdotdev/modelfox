@@ -16,7 +16,7 @@ path = "lib.rs"
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-buffalo = "0.1"
+buffalo = "0.2"
 fnv = "1"
 num = "0.4"
 tangram_linear = { version = "0.7.0", path = "../linear" }

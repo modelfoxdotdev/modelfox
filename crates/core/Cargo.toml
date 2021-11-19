@@ -16,8 +16,8 @@ path = "lib.rs"
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-bitvec = "0.19"
-buffalo = "0.1"
+bitvec = "0.22"
+buffalo = "0.2"
 chrono = { version = "0.4", features = ["serde"] }
 csv = "1"
 fast-float = "0.2"

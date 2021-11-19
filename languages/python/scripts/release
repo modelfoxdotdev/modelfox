@@ -1,4 +1,31 @@
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-twine upload ../../dist/**/*.whl
+rm tangram/__init__.so tangram/__init__.pyd
+
+cp ../../dist/compile/aarch64-linux-gnu/libtangram_python.so tangram/__init__.so
+wheel_builder --distribution tangram --version $VERSION --python cp36 --abi abi3 --platform manylinux_2_28_aarch64 --metadata metadata.toml --package tangram --output dist
+rm tangram/__init__.so
+
+cp ../../dist/compile/aarch64-linux-musl/libtangram_python.so tangram/__init__.so
+wheel_builder --distribution tangram --version $VERSION --python cp36 --abi abi3 --platform musllinux_1_2_aarch64 --metadata metadata.toml --package tangram --output dist
+rm tangram/__init__.so
+
+cp ../../dist/compile/aarch64-macos/libtangram_python.dylib tangram/__init__.so
+wheel_builder --distribution tangram --version $VERSION --python cp36 --abi abi3 --platform macos_11_0_arm64 --metadata metadata.toml --package tangram --output dist
+rm tangram/__init__.so
+
+cp ../../dist/compile/x86_64-linux-gnu/libtangram_python.so tangram/__init__.so
+wheel_builder --distribution tangram --version $VERSION --python cp36 --abi abi3 --platform manylinux_2_28_x86_64 --metadata metadata.toml --package tangram --output dist
+rm tangram/__init__.so
+
+cp ../../dist/compile/x86_64-linux-musl/libtangram_python.so tangram/__init__.so
+wheel_builder --distribution tangram --version $VERSION --python cp36 --abi abi3 --platform musllinux_1_2_x86_64 --metadata metadata.toml --package tangram --output dist
+rm tangram/__init__.so
+
+cp ../../dist/compile/x86_64-macos/libtangram_python.dylib tangram/__init__.so
+wheel_builder --distribution tangram --version $VERSION --python cp36 --abi abi3 --platform macos_11_0_x86_64 --metadata metadata.toml --package tangram --output dist
+rm tangram/__init__.so
+
+cp ../../dist/compile/x86_64-windows-msvc/tangram_python.dll tangram/__init__.pyd
+wheel_builder --distribution tangram --version $VERSION --python cp36 --abi abi3 --platform win_amd64 --metadata metadata.toml --package tangram --output dist
+rm tangram/__init__.pyd
+
+twine upload dist/*.whl

@@ -6,10 +6,6 @@ name = "tangram_build"
 publish = false
 version = "0.0.0"
 
-[lib]
-name = "tangram_build"
-path = "lib.rs"
-
 [[bin]]
 name = "tangram_build"
 path = "main.rs"
