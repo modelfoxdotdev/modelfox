@@ -1,13 +1,1 @@
-rm -rf lib/tangram/libtangram/
-install -D ../../dist/compile/x86_64-linux-gnu/libtangram.so lib/tangram/libtangram/x86_64-linux-gnu/libtangram.so
-install -D ../../dist/compile/aarch64-linux-gnu/libtangram.so lib/tangram/libtangram/aarch64-linux-gnu/libtangram.so
-install -D ../../dist/compile/x86_64-linux-musl/libtangram.so lib/tangram/libtangram/x86_64-linux-musl/libtangram.so
-install -D ../../dist/compile/aarch64-linux-musl/libtangram.so lib/tangram/libtangram/aarch64-linux-musl/libtangram.so
-install -D ../../dist/compile/x86_64-macos/libtangram.dylib lib/tangram/libtangram/x86_64-macos/libtangram.dylib
-install -D ../../dist/compile/aarch64-macos/libtangram.dylib lib/tangram/libtangram/aarch64-macos/libtangram.dylib
-install -D ../../dist/compile/x86_64-windows-msvc/tangram.dll lib/tangram/libtangram/x86_64-windows-msvc/tangram.dll
-gem build tangram.gemspec
-rm -rf dist
-mkdir -p dist
-mv *.gem dist
-gem push dist/*
+gem push dist/tangram.gem

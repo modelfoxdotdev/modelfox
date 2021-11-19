@@ -1,19 +1,3 @@
-set -e
-rm -rf src/libtangram/
-install -D ../../dist/compile/x86_64-linux-musl/libtangram.so src/libtangram/x86_64-linux-musl/libtangram.so
-install -D ../../dist/compile/x86_64-linux-musl/tangram.h src/libtangram/x86_64-linux-musl/tangram.h
-install -D ../../dist/compile/aarch64-linux-musl/libtangram.so src/libtangram/aarch64-linux-musl/libtangram.so
-install -D ../../dist/compile/aarch64-linux-musl/tangram.h src/libtangram/aarch64-linux-musl/tangram.h
-install -D ../../dist/compile/x86_64-linux-gnu_2_24/libtangram.so src/libtangram/x86_64-linux-musl/libtangram.so
-install -D ../../dist/compile/x86_64-linux-gnu_2_24/tangram.h src/libtangram/x86_64-linux-musl/tangram.h
-install -D ../../dist/compile/aarch64-linux-gnu_2_24/libtangram.so src/libtangram/aarch64-linux-musl/libtangram.so
-install -D ../../dist/compile/aarch64-linux-gnu_2_24/tangram.h src/libtangram/aarch64-linux-musl/tangram.h
-install -D ../../dist/compile/x86_64-macos/libtangram.dylib src/libtangram/x86_64-macos/libtangram.dylib
-install -D ../../dist/compile/x86_64-macos/tangram.h src/libtangram/x86_64-macos/tangram.h
-install -D ../../dist/compile/aarch64-macos/libtangram.dylib src/libtangram/aarch64-macos/libtangram.dylib
-install -D ../../dist/compile/aarch64-macos/tangram.h src/libtangram/aarch64-macos/tangram.h
-install -D ../../dist/compile/x86_64-windows-msvc/tangram.dll src/libtangram/x86_64-windows-gnu/tangram.dll
-install -D ../../dist/compile/x86_64-windows-msvc/tangram.h src/libtangram/x86_64-windows-gnu/tangram.h
 if [ ! -e dist ]; then
 	git clone git@github.com:tangramdotdev/tangram-php dist
 fi
@@ -21,3 +5,5 @@ rsync --archive --delete --exclude .git --exclude .gitignore --exclude dist --ex
 git -C dist add --all
 git -C dist commit
 git -C dist push
+git -C dist tag v$VERSION
+git -C dist push --tag v$VERSION
