@@ -1,6 +1,12 @@
+# push to crates.io
 set -e
 for path in id zip progress_counter kill_chip finite table metrics text features model linear tree core
 do
   cargo publish --manifest-path crates/$path/Cargo.toml
   sleep 15
 done
+
+# deploy pkgs.tangram.dev
+ssh root@router-us-east-1.tangram.dev mkdir -p /srv/pkgs
+rsync --archive --compress --delete --progress dist/pkgs/ root@router-us-east-1.tangram.dev:/srv/pkgs/
+ssh root@router-us-east-1.tangram.dev "chown -R root:root /srv/pkgs && chmod -R u=rwX,go=rX /srv/pkgs"
