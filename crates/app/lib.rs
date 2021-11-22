@@ -248,6 +248,8 @@ async fn alert_manager(context: Arc<Context>) {
 
 	let alert_methods = vec![AlertMethod::Email("ben@tangram.dev".to_owned())];
 
+	let now = tokio::time::Instant::now();
+
 	loop {
 		// Are we at a deadline?
 		if let Some(cadence) = check_deadline(&enabled.get_cadences()) {
@@ -273,7 +275,6 @@ async fn alert_manager(context: Arc<Context>) {
 			)
 			.await;
 		}
-		// sleep 1 second
 	}
 }
 
