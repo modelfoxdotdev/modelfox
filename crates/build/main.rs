@@ -146,7 +146,7 @@ fn build_debs(version: &str) {
 		// Create the deb directory.
 		let deb_tempdir = tempdir().unwrap();
 		let deb_path = deb_tempdir.path();
-		clean_and_create(&deb_path);
+		clean_and_create(deb_path);
 		// Create /usr/bin in the deb directory.
 		let bin_path = deb_path.join("usr").join("bin");
 		std::fs::create_dir_all(&bin_path).unwrap();
@@ -196,7 +196,7 @@ fn build_rpms(version: &str) {
 		// Create the rpm directory.
 		let rpm_tempdir = tempdir().unwrap();
 		let rpm_path = rpm_tempdir.path();
-		clean_and_create(&rpm_path);
+		clean_and_create(rpm_path);
 		for subdir in ["BUILD", "BUILDROOT", "RPMS", "SOURCES", "SPECS", "SRPMS"] {
 			std::fs::create_dir(rpm_path.join(subdir)).unwrap();
 		}
@@ -338,22 +338,22 @@ pub fn build_pkgs(version: &str, pkgs_url: &str) {
 	std::fs::write(&rpm_private_key_path, rpm_private_key).unwrap();
 
 	alpine(
-		&pkgs_url,
-		&version,
+		pkgs_url,
+		version,
 		&alpine_public_key_path,
 		&alpine_private_key_path,
 	)
 	.unwrap();
 	deb(
-		&pkgs_url,
-		&version,
+		pkgs_url,
+		version,
 		&deb_public_key_path,
 		&deb_private_key_path,
 	)
 	.unwrap();
 	rpm(
-		&pkgs_url,
-		&version,
+		pkgs_url,
+		version,
 		&rpm_public_key_path,
 		&rpm_private_key_path,
 	)
