@@ -105,6 +105,7 @@ tangram_serve = { path = "../serve" }
 tangram_table = { path = "../table" }
 tangram_ui = { path = "../ui" }
 tangram_zip = { path = "../zip" }
+time = "0.3"
 tokio = { version = "1", features = ["full"] }
 toml = "0.5"
 tracing = "0.1"

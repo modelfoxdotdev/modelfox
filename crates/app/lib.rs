@@ -64,6 +64,12 @@ async fn run_inner(options: Options) -> Result<()> {
 		sunfish: sunfish::init!(),
 	};
 	let context = Arc::new(context);
+	tokio::spawn({
+		let context = Arc::clone(&context);
+		async move {
+			alert_manager(context).await;
+		}
+	});
 	tangram_serve::serve(addr, context, handle).await?;
 	Ok(())
 }
@@ -141,4 +147,174 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 		.connect_with(pool_options)
 		.await?;
 	Ok(pool)
+}
+
+/// Alert cadence
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum AlertCadence {
+	Daily,
+	Hourly,
+	Monthly,
+	Weekly,
+}
+
+impl AlertCadence {
+	/// Check whether this cadence's deadline is currently being triggered
+	fn check_deadline(&self) -> bool {
+		let now = time::OffsetDateTime::now_utc();
+		// NOTE - do we need microsecond too?  nanosecond?
+		let top_of_hour = now.minute() == 0 && now.second() == 0 && now.millisecond() == 0;
+		let top_of_day = now.hour() == 0 && top_of_hour;
+		let top_of_week = now.weekday() == time::Weekday::Sunday && top_of_day;
+		let top_of_month = now.day() == 0 && top_of_day;
+		match self {
+			&AlertCadence::Daily => top_of_day,
+			&AlertCadence::Hourly => top_of_hour,
+			&AlertCadence::Monthly => top_of_month,
+			AlertCadence::Weekly => top_of_week,
+		}
+	}
+}
+
+/// The various ways to receive alerts
+#[derive(Debug, Clone, PartialEq, Eq)]
+enum AlertMethod {
+	Email(String),
+}
+
+/// Statistics that can generate alerts
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum AlertMetric {
+	Auc,
+	Accuracy,
+	MeanSquaredError,
+}
+
+/// Single alert threshold
+#[derive(Debug, Clone, Copy)]
+struct AlertThreshold {
+	metric: AlertMetric,
+	variance: f32,
+}
+
+/// A result from checking a metric
+#[derive(Debug, Clone, Copy)]
+struct AlertResult {
+	metric: AlertMetric,
+	observed_variance: f32,
+}
+
+/// Thresholds for generating an Alert
+#[derive(Debug, Clone)]
+struct AlertHeuristics {
+	cadence: AlertCadence,
+	thresholds: Vec<AlertThreshold>,
+}
+
+/// Manager for all enabled alerts
+#[derive(Debug, Default)]
+struct Alerts(Vec<AlertHeuristics>);
+
+impl Alerts {
+	// Retrieve all currently enabled cadences
+	fn get_cadences(&self) -> Vec<AlertCadence> {
+		self.0
+			.iter()
+			.map(|ah| ah.cadence)
+			.collect::<Vec<AlertCadence>>()
+	}
+
+	/// Retrieve the heuristics for the given cadence, if present
+	fn cadence(&self, cadence: AlertCadence) -> Option<&AlertHeuristics> {
+		for heuristics in &self.0 {
+			if heuristics.cadence == cadence {
+				return Some(heuristics);
+			}
+		}
+		None
+	}
+}
+
+/// Manage periodic alerting
+async fn alert_manager(context: Arc<Context>) {
+	// Currently enabled alerts - should probably move up to the context
+	let enabled = Alerts(vec![AlertHeuristics {
+		cadence: AlertCadence::Hourly,
+		thresholds: vec![AlertThreshold {
+			metric: AlertMetric::Auc,
+			variance: 0.1,
+		}],
+	}]);
+
+	let alert_methods = vec![AlertMethod::Email("ben@tangram.dev".to_owned())];
+
+	loop {
+		// Are we at a deadline?
+		if let Some(cadence) = check_deadline(&enabled.get_cadences()) {
+			let already_handled = check_ongoing(cadence).await;
+
+			if already_handled {
+				continue;
+			}
+
+			write_alert_start(cadence, &context.database_pool).await;
+
+			let heuristics = enabled.cadence(cadence).unwrap();
+			let exceeded_thresholds = check_metrics(heuristics);
+			if !exceeded_thresholds.is_empty() {
+				push_alerts(&exceeded_thresholds, &alert_methods).await;
+			}
+
+			write_alert_end(
+				heuristics,
+				&exceeded_thresholds,
+				&alert_methods,
+				&context.database_pool,
+			)
+			.await;
+		}
+		// sleep 1 second
+	}
+}
+
+/// Check if it's time to run an alert process
+// TODO - should this be a method on Alerts?
+fn check_deadline(enabled: &[AlertCadence]) -> Option<AlertCadence> {
+	for cadence in enabled {
+		if cadence.check_deadline() {
+			return Some(*cadence);
+		};
+	}
+	None
+}
+
+/// Check the current values for any variences which exceed the thresholds in the heuristics, return any that do
+fn check_metrics(heuristics: &AlertHeuristics) -> Vec<AlertResult> {
+	todo!()
+}
+
+/// Read the DB to see if the given cadence is already in process
+async fn check_ongoing(cadence: AlertCadence) -> bool {
+	todo!()
+}
+
+/// Send alerts containing all exceeded thresholds to each enabled alert method
+async fn push_alerts(exceeded_thresholds: &[AlertResult], methods: &[AlertMethod]) {
+	todo!()
+}
+
+/// Log the beginning of an alert handling process
+async fn write_alert_start(cadence: AlertCadence, database_pool: &sqlx::AnyPool) {
+	// Write the current time and cadence being handled
+	todo!()
+}
+
+/// Log the completion of an alert handling process
+async fn write_alert_end(
+	heuristics: &AlertHeuristics,
+	exceeded_thresholds: &[AlertResult],
+	methods: &[AlertMethod],
+	database_pool: &sqlx::AnyPool,
+) {
+	todo!()
 }
