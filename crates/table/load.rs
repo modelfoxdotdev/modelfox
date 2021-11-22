@@ -39,7 +39,8 @@ impl Default for InferOptions {
 
 /// These values are the default values that are considered invalid.
 const DEFAULT_INVALID_VALUES: &[&str] = &[
-	"", "?", "null", "NULL", "n/a", "N/A", "NA", "nan", "-nan", "NaN", "-NaN",
+	"", "+Inf", "+inf", "-Inf", "-NaN", "-inf", "-nan", "?", "N/A", "NA", "NULL", "NaN", "n/a",
+	"nan", "null",
 ];
 
 #[derive(Clone, Debug)]
