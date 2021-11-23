@@ -1,5 +1,6 @@
-use anyhow::{bail, Result};
-use std::{net::SocketAddr, sync::Arc};
+#![feature(async_closure)]
+use anyhow::{anyhow, bail, Result};
+use std::{fmt, net::SocketAddr, sync::Arc};
 pub use tangram_app_common::options;
 use tangram_app_common::{
 	options::{Options, StorageOptions},
@@ -67,7 +68,7 @@ async fn run_inner(options: Options) -> Result<()> {
 	tokio::spawn({
 		let context = Arc::clone(&context);
 		async move {
-			alert_manager(context).await;
+			alert_manager(context).await.unwrap();
 		}
 	});
 	tangram_serve::serve(addr, context, handle).await?;
@@ -158,21 +159,15 @@ enum AlertCadence {
 	Weekly,
 }
 
-impl AlertCadence {
-	/// Check whether this cadence's deadline is currently being triggered
-	fn check_deadline(&self) -> bool {
-		let now = time::OffsetDateTime::now_utc();
-		// NOTE - do we need microsecond too?  nanosecond?
-		let top_of_hour = now.minute() == 0 && now.second() == 0 && now.millisecond() == 0;
-		let top_of_day = now.hour() == 0 && top_of_hour;
-		let top_of_week = now.weekday() == time::Weekday::Sunday && top_of_day;
-		let top_of_month = now.day() == 0 && top_of_day;
-		match self {
-			&AlertCadence::Daily => top_of_day,
-			&AlertCadence::Hourly => top_of_hour,
-			&AlertCadence::Monthly => top_of_month,
-			AlertCadence::Weekly => top_of_week,
-		}
+impl fmt::Display for AlertCadence {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		let s = match self {
+			AlertCadence::Daily => "daily",
+			AlertCadence::Hourly => "hourly",
+			AlertCadence::Monthly => "monthly",
+			AlertCadence::Weekly => "weekly",
+		};
+		write!(f, "{}", s)
 	}
 }
 
@@ -236,7 +231,7 @@ impl Alerts {
 }
 
 /// Manage periodic alerting
-async fn alert_manager(context: Arc<Context>) {
+async fn alert_manager(context: Arc<Context>) -> Result<()> {
 	// Currently enabled alerts - should probably move up to the context
 	let enabled = Alerts(vec![AlertHeuristics {
 		cadence: AlertCadence::Hourly,
@@ -245,77 +240,169 @@ async fn alert_manager(context: Arc<Context>) {
 			variance: 0.1,
 		}],
 	}]);
+	let enabled = Arc::new(enabled);
 
 	let alert_methods = vec![AlertMethod::Email("ben@tangram.dev".to_owned())];
+	let alert_methods = Arc::new(alert_methods);
 
 	let now = tokio::time::Instant::now();
-
+	//let intended_start = ???
+	let mut test_interval = tokio::time::interval_at(now, tokio::time::Duration::from_secs(10));
 	loop {
-		// Are we at a deadline?
-		if let Some(cadence) = check_deadline(&enabled.get_cadences()) {
-			let already_handled = check_ongoing(cadence).await;
-
-			if already_handled {
-				continue;
-			}
-
-			write_alert_start(cadence, &context.database_pool).await;
-
-			let heuristics = enabled.cadence(cadence).unwrap();
-			let exceeded_thresholds = check_metrics(heuristics);
-			if !exceeded_thresholds.is_empty() {
-				push_alerts(&exceeded_thresholds, &alert_methods).await;
-			}
-
-			write_alert_end(
-				heuristics,
-				&exceeded_thresholds,
-				&alert_methods,
-				&context.database_pool,
-			)
-			.await;
-		}
+		test_interval.tick().await;
+		println!("tick");
+		handle_alert_cadence(
+			&enabled,
+			&alert_methods,
+			AlertCadence::Hourly,
+			&context.database_pool,
+		)
+		.await?;
 	}
-}
-
-/// Check if it's time to run an alert process
-// TODO - should this be a method on Alerts?
-fn check_deadline(enabled: &[AlertCadence]) -> Option<AlertCadence> {
-	for cadence in enabled {
-		if cadence.check_deadline() {
-			return Some(*cadence);
-		};
-	}
-	None
 }
 
 /// Check the current values for any variences which exceed the thresholds in the heuristics, return any that do
 fn check_metrics(heuristics: &AlertHeuristics) -> Vec<AlertResult> {
-	todo!()
+	println!("Checking metrics!");
+	vec![AlertResult {
+		metric: AlertMetric::Auc,
+		observed_variance: 0.2,
+	}]
 }
 
 /// Read the DB to see if the given cadence is already in process
-async fn check_ongoing(cadence: AlertCadence) -> bool {
-	todo!()
+async fn check_ongoing(cadence: AlertCadence, database_pool: &sqlx::AnyPool) -> Result<bool> {
+	let mut db = match database_pool.begin().await {
+		Ok(db) => db,
+		Err(_) => {
+			eprintln!("Oh no! Failed to read database!");
+			return Err(anyhow!("Database unavailable"));
+		}
+	};
+	let ten_minutes_in_seconds: i32 = 10 * 60;
+	let now = time::OffsetDateTime::now_utc().unix_timestamp();
+	let existing = sqlx::query(
+		"
+			select
+				alerts.id as alerts_id
+			from alerts
+			where
+			alerts.cadence = $1 and
+			$2 - alerts.date < $3
+		",
+	)
+	.bind(cadence.to_string())
+	.bind(&now)
+	.bind(&ten_minutes_in_seconds)
+	.fetch_optional(&mut db)
+	.await?;
+	db.commit().await?;
+	Ok(existing.is_some())
+}
+
+/// Handle a specific alert cadence
+async fn handle_alert_cadence(
+	alerts: &Alerts,
+	alert_methods: &[AlertMethod],
+	cadence: AlertCadence,
+	database_pool: &sqlx::AnyPool,
+) -> Result<()> {
+	let already_handled = check_ongoing(cadence, database_pool).await?;
+
+	if already_handled {
+		return Ok(());
+	}
+
+	let alert_id = write_alert_start(cadence, database_pool).await?;
+
+	let heuristics = alerts.cadence(cadence).unwrap();
+	let exceeded_thresholds = check_metrics(heuristics);
+	if !exceeded_thresholds.is_empty() {
+		push_alerts(&exceeded_thresholds, &alert_methods).await;
+	}
+
+	write_alert_end(
+		alert_id,
+		heuristics,
+		&exceeded_thresholds,
+		&alert_methods,
+		database_pool,
+	)
+	.await?;
+	Ok(())
 }
 
 /// Send alerts containing all exceeded thresholds to each enabled alert method
 async fn push_alerts(exceeded_thresholds: &[AlertResult], methods: &[AlertMethod]) {
-	todo!()
+	println!("alerts: {:?}", exceeded_thresholds);
 }
 
 /// Log the beginning of an alert handling process
-async fn write_alert_start(cadence: AlertCadence, database_pool: &sqlx::AnyPool) {
+async fn write_alert_start(
+	cadence: AlertCadence,
+	database_pool: &sqlx::AnyPool,
+) -> Result<tangram_id::Id> {
 	// Write the current time and cadence being handled
-	todo!()
+	let mut db = match database_pool.begin().await {
+		Ok(db) => db,
+		Err(_) => {
+			eprintln!("Oh no! Failed to write alert progress to DB");
+			return Err(anyhow!("Database unavailable"));
+		}
+	};
+	let id = tangram_id::Id::generate();
+	sqlx::query(
+		"
+			insert into alerts
+			   (id, progress, cadence, date)
+		  values
+			  ($1, $2, $3, $4)
+		",
+	)
+	.bind(id.to_string())
+	.bind("IN PROGRESS".to_string())
+	.bind(cadence.to_string())
+	.bind(time::OffsetDateTime::now_utc().unix_timestamp())
+	.execute(&mut db)
+	.await?;
+	db.commit().await?;
+	println!("{}", id);
+	Ok(id)
 }
 
 /// Log the completion of an alert handling process
 async fn write_alert_end(
+	id: tangram_id::Id,
 	heuristics: &AlertHeuristics,
 	exceeded_thresholds: &[AlertResult],
 	methods: &[AlertMethod],
 	database_pool: &sqlx::AnyPool,
-) {
-	todo!()
+) -> Result<()> {
+	let mut db = match database_pool.begin().await {
+		Ok(db) => db,
+		Err(_) => {
+			eprintln!("Oh no! Failed to write alert progress to DB");
+			return Err(anyhow!("Database unavailable"));
+		}
+	};
+
+	let data = format!("Did some alerting!");
+
+	sqlx::query(
+		"
+		 update alerts
+		 set
+		 	progress = $1,
+			data = $2
+		 where
+		 	id = $3
+		",
+	)
+	.bind("COMPLETED".to_string())
+	.bind(data)
+	.bind(id.to_string())
+	.execute(&mut db)
+	.await?;
+	db.commit().await?;
+	Ok(())
 }

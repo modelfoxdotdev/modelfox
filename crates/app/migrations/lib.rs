@@ -7,6 +7,7 @@ use tangram_zip::zip;
 
 mod migration_2020_01_01_000000;
 mod migration_2020_04_19_000000;
+mod migration_2021_11_23_000000;
 
 #[rustfmt::skip]
 type Migration = &'static (dyn Sync + for<'a> Fn(&'a mut sqlx::Transaction<sqlx::Any>) -> BoxFuture<'a, Result<()>>);
@@ -20,6 +21,9 @@ static MIGRATIONS: Lazy<MigrationMap> = Lazy::new(|| {
 	});
 	migrations.insert("2020_04_19_000000", &|db| {
 		migration_2020_04_19_000000::migrate(db).boxed()
+	});
+	migrations.insert("2021_11_23_000000", &|db| {
+		migration_2021_11_23_000000::migrate(db).boxed()
 	});
 	migrations
 });
