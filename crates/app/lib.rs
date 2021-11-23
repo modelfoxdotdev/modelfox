@@ -1,5 +1,6 @@
-#![feature(async_closure)]
 use anyhow::{anyhow, bail, Result};
+use serde::{Deserialize, Serialize};
+use sqlx::prelude::*;
 use std::{fmt, net::SocketAddr, sync::Arc};
 pub use tangram_app_common::options;
 use tangram_app_common::{
@@ -151,12 +152,18 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 }
 
 /// Alert cadence
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 enum AlertCadence {
 	Daily,
 	Hourly,
 	Monthly,
 	Weekly,
+}
+
+impl Default for AlertCadence {
+	fn default() -> Self {
+		AlertCadence::Hourly
+	}
 }
 
 impl fmt::Display for AlertCadence {
@@ -172,13 +179,13 @@ impl fmt::Display for AlertCadence {
 }
 
 /// The various ways to receive alerts
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 enum AlertMethod {
 	Email(String),
 }
 
 /// Statistics that can generate alerts
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 enum AlertMetric {
 	Auc,
 	Accuracy,
@@ -186,21 +193,21 @@ enum AlertMetric {
 }
 
 /// Single alert threshold
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Deserialize, Serialize)]
 struct AlertThreshold {
 	metric: AlertMetric,
 	variance: f32,
 }
 
 /// A result from checking a metric
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Deserialize, Serialize)]
 struct AlertResult {
 	metric: AlertMetric,
 	observed_variance: f32,
 }
 
 /// Thresholds for generating an Alert
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default, Deserialize, Serialize)]
 struct AlertHeuristics {
 	cadence: AlertCadence,
 	thresholds: Vec<AlertThreshold>,
@@ -230,6 +237,14 @@ impl Alerts {
 	}
 }
 
+/// Collection for the alert results from a single run
+#[derive(Debug, Default, Deserialize, Serialize)]
+struct AlertData {
+	alert_methods: Vec<AlertMethod>,
+	exceeded_thresholds: Vec<AlertResult>,
+	heuristics: AlertHeuristics,
+}
+
 /// Manage periodic alerting
 async fn alert_manager(context: Arc<Context>) -> Result<()> {
 	// Currently enabled alerts - should probably move up to the context
@@ -250,7 +265,6 @@ async fn alert_manager(context: Arc<Context>) -> Result<()> {
 	let mut test_interval = tokio::time::interval_at(now, tokio::time::Duration::from_secs(10));
 	loop {
 		test_interval.tick().await;
-		println!("tick");
 		handle_alert_cadence(
 			&enabled,
 			&alert_methods,
@@ -262,12 +276,28 @@ async fn alert_manager(context: Arc<Context>) -> Result<()> {
 }
 
 /// Check the current values for any variences which exceed the thresholds in the heuristics, return any that do
-fn check_metrics(heuristics: &AlertHeuristics) -> Vec<AlertResult> {
+async fn check_metrics(
+	heuristics: &AlertHeuristics,
+	database_pool: &sqlx::AnyPool,
+) -> Result<Vec<AlertResult>> {
 	println!("Checking metrics!");
-	vec![AlertResult {
-		metric: AlertMetric::Auc,
-		observed_variance: 0.2,
-	}]
+
+	let mut exceeded_thresholds = Vec::new();
+	for threshold in &heuristics.thresholds {
+		match threshold.metric {
+			AlertMetric::Auc => {
+				// Look at the previous alert
+				let data = find_previous_data(heuristics.cadence, database_pool).await?;
+				println!("{:?}", data);
+				// Look at the current value.
+				// Compare, store the difference
+				// If the difference exceeds the threshold_value, create a Result
+			}
+			_ => todo!(),
+		}
+	}
+
+	Ok(exceeded_thresholds)
 }
 
 /// Read the DB to see if the given cadence is already in process
@@ -293,11 +323,51 @@ async fn check_ongoing(cadence: AlertCadence, database_pool: &sqlx::AnyPool) -> 
 	)
 	.bind(cadence.to_string())
 	.bind(&now)
-	.bind(&ten_minutes_in_seconds)
+	//.bind(&ten_minutes_in_seconds)
+	.bind(&5) // TODO remove - just for testing!
 	.fetch_optional(&mut db)
 	.await?;
 	db.commit().await?;
 	Ok(existing.is_some())
+}
+
+/// Find the previous instance of the given alert cadence
+async fn find_previous_data(
+	cadence: AlertCadence,
+	database_pool: &sqlx::AnyPool,
+) -> Result<AlertData> {
+	let mut db = match database_pool.begin().await {
+		Ok(db) => db,
+		Err(_) => {
+			eprintln!("Oh no! Failed to read database!");
+			return Err(anyhow!("Database unavailable"));
+		}
+	};
+	let row = sqlx::query(
+		"
+			select
+				data
+			from
+				alerts
+			where
+				cadence = $1 and
+				progress = $2 and
+				date = (select max(date) from alerts)
+		",
+	)
+	.bind(cadence.to_string())
+	.bind("COMPLETED".to_string())
+	.fetch_optional(&mut db)
+	.await?;
+
+	match row {
+		Some(r) => {
+			let data: String = r.get("data");
+			let result: AlertData = serde_json::from_str(&data)?;
+			Ok(result)
+		}
+		None => Ok(AlertData::default()),
+	}
 }
 
 /// Handle a specific alert cadence
@@ -316,25 +386,25 @@ async fn handle_alert_cadence(
 	let alert_id = write_alert_start(cadence, database_pool).await?;
 
 	let heuristics = alerts.cadence(cadence).unwrap();
-	let exceeded_thresholds = check_metrics(heuristics);
+	let exceeded_thresholds = check_metrics(heuristics, database_pool).await?;
 	if !exceeded_thresholds.is_empty() {
-		push_alerts(&exceeded_thresholds, &alert_methods).await;
+		push_alerts(&exceeded_thresholds, alert_methods).await;
 	}
 
-	write_alert_end(
-		alert_id,
-		heuristics,
-		&exceeded_thresholds,
-		&alert_methods,
-		database_pool,
-	)
-	.await?;
+	let alert_data = AlertData {
+		alert_methods: alert_methods.to_owned(),
+		exceeded_thresholds: exceeded_thresholds.to_owned(),
+		heuristics: heuristics.to_owned(),
+	};
+	write_alert_end(alert_id, alert_data, database_pool).await?;
 	Ok(())
 }
 
 /// Send alerts containing all exceeded thresholds to each enabled alert method
 async fn push_alerts(exceeded_thresholds: &[AlertResult], methods: &[AlertMethod]) {
-	println!("alerts: {:?}", exceeded_thresholds);
+	for method in methods {
+		println!("pushing alert to {:?}: {:?}", method, exceeded_thresholds);
+	}
 }
 
 /// Log the beginning of an alert handling process
@@ -373,9 +443,7 @@ async fn write_alert_start(
 /// Log the completion of an alert handling process
 async fn write_alert_end(
 	id: tangram_id::Id,
-	heuristics: &AlertHeuristics,
-	exceeded_thresholds: &[AlertResult],
-	methods: &[AlertMethod],
+	alert_data: AlertData,
 	database_pool: &sqlx::AnyPool,
 ) -> Result<()> {
 	let mut db = match database_pool.begin().await {
@@ -386,7 +454,7 @@ async fn write_alert_end(
 		}
 	};
 
-	let data = format!("Did some alerting!");
+	let data = serde_json::to_string(&alert_data)?;
 
 	sqlx::query(
 		"
