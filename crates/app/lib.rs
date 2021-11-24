@@ -153,10 +153,15 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 
 /// Alert cadence
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(tag = "type")]
 enum AlertCadence {
+	#[serde(rename = "daily")]
 	Daily,
+	#[serde(rename = "hourly")]
 	Hourly,
+	#[serde(rename = "monthly")]
 	Monthly,
+	#[serde(rename = "weekly")]
 	Weekly,
 }
 
@@ -179,6 +184,7 @@ impl fmt::Display for AlertCadence {
 }
 
 /// The various ways to receive alerts
+// FIXME - using tag = type and renaming here causes sqlx to panic!!
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 enum AlertMethod {
 	Email(String),
@@ -186,9 +192,13 @@ enum AlertMethod {
 
 /// Statistics that can generate alerts
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(tag = "type")]
 enum AlertMetric {
+	#[serde(rename = "auc")]
 	Auc,
+	#[serde(rename = "accuracy")]
 	Accuracy,
+	#[serde(rename = "mean_squared_error")]
 	MeanSquaredError,
 }
 
@@ -203,6 +213,7 @@ struct AlertThreshold {
 #[derive(Debug, Clone, Copy, Deserialize, Serialize)]
 struct AlertResult {
 	metric: AlertMetric,
+	observed_value: f32,
 	observed_variance: f32,
 }
 
@@ -287,9 +298,10 @@ async fn check_metrics(
 		match threshold.metric {
 			AlertMetric::Auc => {
 				// Look at the previous alert
-				let data = find_previous_data(heuristics.cadence, database_pool).await?;
-				println!("{:?}", data);
+				let previous_data = find_previous_data(heuristics.cadence, database_pool).await?;
+				println!("{:?}", previous_data);
 				// Look at the current value.
+				//let current_data = find_current_data(heuristics.metric, database_pool).await?;
 				// Compare, store the difference
 				// If the difference exceeds the threshold_value, create a Result
 			}
@@ -314,7 +326,7 @@ async fn check_ongoing(cadence: AlertCadence, database_pool: &sqlx::AnyPool) -> 
 	let existing = sqlx::query(
 		"
 			select
-				alerts.id as alerts_id
+				alerts.id
 			from alerts
 			where
 			alerts.cadence = $1 and
@@ -351,15 +363,14 @@ async fn find_previous_data(
 				alerts
 			where
 				cadence = $1 and
-				progress = $2 and
-				date = (select max(date) from alerts)
+				date = (select max(date) from alerts where progress = $2)
 		",
 	)
 	.bind(cadence.to_string())
 	.bind("COMPLETED".to_string())
 	.fetch_optional(&mut db)
 	.await?;
-
+	db.commit().await?;
 	match row {
 		Some(r) => {
 			let data: String = r.get("data");
