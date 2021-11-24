@@ -26,7 +26,7 @@ input = {
 }
 
 # Make the prediction!
-output = model.predict(input)
+output = model.predict(5)
 
 # Print the output.
 print("Output:", output)

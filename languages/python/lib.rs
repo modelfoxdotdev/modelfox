@@ -7,6 +7,7 @@ use url::Url;
 /**
 */
 #[pymodule]
+#[pyo3(name = "tangram_python")]
 fn tangram(py: Python, m: &PyModule) -> PyResult<()> {
 	m.add_class::<LoadModelOptions>()?;
 	m.add_class::<Model>()?;

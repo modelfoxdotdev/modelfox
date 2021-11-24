@@ -83,6 +83,7 @@
         packages = with pkgs; [
           cachix
           cargo-insta
+          cargo-outdated
           clang_13
           createrepo_c
           doxygen

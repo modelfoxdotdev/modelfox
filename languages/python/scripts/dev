@@ -1,6 +1,6 @@
 python -m venv .venv
 source .venv/bin/activate
 cargo build -p tangram_python
-cp ../../target/debug/libtangram_python.so tangram/__init__.so
+cp ../../target/debug/libtangram_python.so tangram/tangram_python.so
 pip install -e .
 deactivate
