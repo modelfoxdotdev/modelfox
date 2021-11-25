@@ -8,18 +8,7 @@ use serde_json::json;
 use sha2::Digest;
 use tangram_id::Id;
 
-pub const TANGRAM_LICENSE_PUBLIC_KEY: &str = indoc!(
-	r#"
-		-----BEGIN RSA PUBLIC KEY-----
-		MIIBCgKCAQEAq+JphywG8wCe6cX+bx4xKH8xphMhaI5BgYefQHUXwp8xavoor6Fy
-		B54yZba/pkfTnao+P9BvPT0PlSJ1L9aGzq45lcQCcaT+ZdPC5qUogTrKu4eB2qSj
-		yTt5pGnPsna+/7yh2sDhC/SHMvTPKt4oHgobWYkH3/039Rj7z5X2WGq69gJzSknX
-		/lraNlVUqCWi3yCnMP9QOV5Tou5gQi4nxlfEJO3razrif5jHw1NufQ+xpx1GCpN9
-		WhFBU2R4GFZsxlEXV9g1Os1ZpyVuoOe9BnenuS57TixU9SC8kFUHAyAWRSiuLjoP
-		xAmGGm4wQ4FlMAt+Bj/K6rvdG3FJUu5ttQIDAQAB
-		-----END RSA PUBLIC KEY-----
-	"#
-);
+pub const TANGRAM_LICENSE_PUBLIC_KEY: &str = include_str!("./license.public.rsa");
 
 pub fn generate(private_key: &str) -> Result<String> {
 	let private_key = RsaPrivateKey::from_pkcs1_pem(private_key)?;
