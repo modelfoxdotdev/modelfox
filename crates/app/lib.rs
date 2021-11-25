@@ -8,6 +8,7 @@ use tangram_app_common::{
 	storage::{LocalStorage, S3Storage, Storage},
 	Context,
 };
+use tangram_app_production_metrics::BinaryClassificationProductionPredictionMetrics;
 use tracing::error;
 use url::Url;
 
@@ -194,12 +195,10 @@ enum AlertMethod {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(tag = "type")]
 enum AlertMetric {
-	#[serde(rename = "auc")]
-	Auc,
 	#[serde(rename = "accuracy")]
 	Accuracy,
-	#[serde(rename = "mean_squared_error")]
-	MeanSquaredError,
+	#[serde(rename = "root_mean_squared_error")]
+	RootMeanSquaredError,
 }
 
 /// Single alert threshold
@@ -217,11 +216,30 @@ struct AlertResult {
 	observed_variance: f32,
 }
 
+impl AlertResult {
+	/// Should this result send an alert?
+	pub fn exceeds_threshold(&self, tolerance: f32) -> bool {
+		self.observed_variance.abs() > tolerance
+	}
+}
+
 /// Thresholds for generating an Alert
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 struct AlertHeuristics {
 	cadence: AlertCadence,
 	thresholds: Vec<AlertThreshold>,
+}
+
+impl AlertHeuristics {
+	/// Retrieve the variance tolerance for a given metric, if present
+	fn get_threshold(&self, metric: AlertMetric) -> Option<f32> {
+		for threshold in &self.thresholds {
+			if threshold.metric == metric {
+				return Some(threshold.variance);
+			}
+		}
+		None
+	}
 }
 
 /// Manager for all enabled alerts
@@ -252,8 +270,8 @@ impl Alerts {
 #[derive(Debug, Default, Deserialize, Serialize)]
 struct AlertData {
 	alert_methods: Vec<AlertMethod>,
-	exceeded_thresholds: Vec<AlertResult>,
 	heuristics: AlertHeuristics,
+	results: Vec<AlertResult>,
 }
 
 /// Manage periodic alerting
@@ -262,7 +280,7 @@ async fn alert_manager(context: Arc<Context>) -> Result<()> {
 	let enabled = Alerts(vec![AlertHeuristics {
 		cadence: AlertCadence::Hourly,
 		thresholds: vec![AlertThreshold {
-			metric: AlertMetric::Auc,
+			metric: AlertMetric::Accuracy,
 			variance: 0.1,
 		}],
 	}]);
@@ -274,6 +292,7 @@ async fn alert_manager(context: Arc<Context>) -> Result<()> {
 	let now = tokio::time::Instant::now();
 	//let intended_start = ???
 	let mut test_interval = tokio::time::interval_at(now, tokio::time::Duration::from_secs(10));
+	let _enabled_cadences = enabled.get_cadences();
 	loop {
 		test_interval.tick().await;
 		handle_alert_cadence(
@@ -286,30 +305,38 @@ async fn alert_manager(context: Arc<Context>) -> Result<()> {
 	}
 }
 
-/// Check the current values for any variences which exceed the thresholds in the heuristics, return any that do
+/// Return the current observed values for each heuristic
 async fn check_metrics(
 	heuristics: &AlertHeuristics,
 	database_pool: &sqlx::AnyPool,
 ) -> Result<Vec<AlertResult>> {
 	println!("Checking metrics!");
 
-	let mut exceeded_thresholds = Vec::new();
-	for threshold in &heuristics.thresholds {
-		match threshold.metric {
-			AlertMetric::Auc => {
-				// Look at the previous alert
-				let previous_data = find_previous_data(heuristics.cadence, database_pool).await?;
-				println!("{:?}", previous_data);
-				// Look at the current value.
-				//let current_data = find_current_data(heuristics.metric, database_pool).await?;
-				// Compare, store the difference
-				// If the difference exceeds the threshold_value, create a Result
-			}
-			_ => todo!(),
-		}
-	}
+	// cases:
+	// 1. This is at least the second alert.  Check against the previous answer.
+	// 2. This is the first alert.  There is no possible alert to submit.
 
-	Ok(exceeded_thresholds)
+	let mut results = Vec::new();
+	let previous_alert_data = find_previous_alert_data(heuristics.cadence, database_pool).await?;
+	if previous_alert_data.is_none() {
+		return Ok(vec![]);
+	}
+	for threshold in &heuristics.thresholds {
+		// Look at the current value.
+		// FIXME - is this option necessary? Should always return a value I think.
+		let current_value = find_current_data(threshold.metric, database_pool).await?;
+		if current_value.is_none() {
+			// No predictions have ever been logged - abort!
+			return Ok(vec![]);
+		}
+		let current_value = current_value.unwrap();
+		results.push(AlertResult {
+			metric: threshold.metric,
+			observed_value: current_value,
+			observed_variance: (current_value - threshold.variance).abs(),
+		});
+	}
+	Ok(results)
 }
 
 /// Read the DB to see if the given cadence is already in process
@@ -343,11 +370,58 @@ async fn check_ongoing(cadence: AlertCadence, database_pool: &sqlx::AnyPool) -> 
 	Ok(existing.is_some())
 }
 
+/// Find the most recent value for the given metric
+async fn find_current_data(
+	metric: AlertMetric,
+	database_pool: &sqlx::AnyPool,
+) -> Result<Option<f32>> {
+	let mut db = match database_pool.begin().await {
+		Ok(db) => db,
+		Err(_) => {
+			eprintln!("Oh no! Failed to read database!");
+			return Err(anyhow!("Database unavailable"));
+		}
+	};
+	// TODO - I think this table only ever has one value, that is constantly updated.
+	// This query can probably be simplified.
+	let result = sqlx::query(
+		"
+			select
+				data
+			from
+				production_metrics
+			where
+				hour = (select max(hour) from production_metrics)
+		",
+	)
+	.fetch_optional(&mut db)
+	.await?;
+
+	match result {
+		Some(r) => {
+			let data: String = r.get(0);
+			match metric {
+				AlertMetric::Accuracy => {
+					// TODO multiclass also - use higher-level ProductionPredictionMetrics
+					// You still need to match, but some of this is handled in production_metrics/lib.rs
+					let res: BinaryClassificationProductionPredictionMetrics =
+						serde_json::from_str(&data)?;
+					let output = res.finalize().unwrap();
+					let accuracy = output.accuracy;
+					Ok(Some(accuracy))
+				}
+				_ => todo!(),
+			}
+		}
+		None => Ok(None),
+	}
+}
+
 /// Find the previous instance of the given alert cadence
-async fn find_previous_data(
+async fn find_previous_alert_data(
 	cadence: AlertCadence,
 	database_pool: &sqlx::AnyPool,
-) -> Result<AlertData> {
+) -> Result<Option<AlertData>> {
 	let mut db = match database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => {
@@ -375,9 +449,9 @@ async fn find_previous_data(
 		Some(r) => {
 			let data: String = r.get("data");
 			let result: AlertData = serde_json::from_str(&data)?;
-			Ok(result)
+			Ok(Some(result))
 		}
-		None => Ok(AlertData::default()),
+		None => Ok(None),
 	}
 }
 
@@ -397,22 +471,29 @@ async fn handle_alert_cadence(
 	let alert_id = write_alert_start(cadence, database_pool).await?;
 
 	let heuristics = alerts.cadence(cadence).unwrap();
-	let exceeded_thresholds = check_metrics(heuristics, database_pool).await?;
-	if !exceeded_thresholds.is_empty() {
-		push_alerts(&exceeded_thresholds, alert_methods).await;
-	}
+	let results = check_metrics(heuristics, database_pool).await?;
+	let exceeded_thresholds: Vec<&AlertResult> = results
+		.iter()
+		.filter(|r| {
+			heuristics
+				.get_threshold(r.metric)
+				.map(|t| r.exceeds_threshold(t))
+				.unwrap_or(false)
+		})
+		.collect();
+	push_alerts(&exceeded_thresholds, alert_methods).await;
 
 	let alert_data = AlertData {
 		alert_methods: alert_methods.to_owned(),
-		exceeded_thresholds: exceeded_thresholds.to_owned(),
 		heuristics: heuristics.to_owned(),
+		results: results.to_owned(),
 	};
 	write_alert_end(alert_id, alert_data, database_pool).await?;
 	Ok(())
 }
 
 /// Send alerts containing all exceeded thresholds to each enabled alert method
-async fn push_alerts(exceeded_thresholds: &[AlertResult], methods: &[AlertMethod]) {
+async fn push_alerts(exceeded_thresholds: &[&AlertResult], methods: &[AlertMethod]) {
 	for method in methods {
 		println!("pushing alert to {:?}: {:?}", method, exceeded_thresholds);
 	}

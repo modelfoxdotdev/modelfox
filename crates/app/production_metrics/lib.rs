@@ -1,4 +1,4 @@
-use self::{
+pub use self::{
 	binary_classification_production_metrics::{
 		BinaryClassificationProductionPredictionMetrics,
 		BinaryClassificationProductionPredictionMetricsOutput,

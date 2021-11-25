@@ -96,6 +96,7 @@ sunfish = "0.3"
 tangram_app_common = { path = "common" }
 tangram_app_layouts = { path = "layouts" }
 tangram_app_migrations = { path = "migrations" }
+tangram_app_production_metrics = { path = "production_metrics" }
 tangram_charts = { path = "../charts" }
 tangram_core = { path = "../core" }
 tangram_id = { path = "../id" }
