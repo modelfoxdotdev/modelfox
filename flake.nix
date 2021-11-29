@@ -32,7 +32,7 @@
         let
           toolchain = { 
             channel = "nightly";
-            date = "2021-11-22";
+            date = "2021-11-29";
             sha256 = "sha256-4G0IuwM6gbnQWllKJYj5eabm7b9ob+xnk/9UbG9lkcU=";
           };
         in with fenix.packages.${system}; combine (with toolchainOf toolchain; [
