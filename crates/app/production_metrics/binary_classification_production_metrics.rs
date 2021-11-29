@@ -30,7 +30,7 @@ impl BinaryConfusionMatrix {
 	}
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize)]
 pub struct BinaryClassificationProductionPredictionMetricsOutput {
 	pub accuracy: f32,
 	pub f1_score: f32,

@@ -4,11 +4,12 @@ use sqlx::prelude::*;
 use std::{fmt, net::SocketAddr, sync::Arc};
 pub use tangram_app_common::options;
 use tangram_app_common::{
+	heuristics::ALERT_METRICS_MINIMUM_TRUE_VALUES_THRESHOLD,
 	options::{Options, StorageOptions},
 	storage::{LocalStorage, S3Storage, Storage},
 	Context,
 };
-use tangram_app_production_metrics::BinaryClassificationProductionPredictionMetrics;
+use tangram_app_production_metrics::{ProductionMetrics, ProductionPredictionMetrics};
 use tracing::error;
 use url::Url;
 
@@ -166,6 +167,17 @@ enum AlertCadence {
 	Weekly,
 }
 
+impl AlertCadence {
+	pub fn duration(&self) -> tokio::time::Duration {
+		match self {
+			AlertCadence::Daily => tokio::time::Duration::from_secs(60 * 60 * 24),
+			AlertCadence::Hourly => tokio::time::Duration::from_secs(60 * 60),
+			AlertCadence::Monthly => tokio::time::Duration::from_secs(60 * 60 * 24 * 31), //FIXME that's not correct
+			AlertCadence::Weekly => tokio::time::Duration::from_secs(60 * 60 * 24 * 7),
+		}
+	}
+}
+
 impl Default for AlertCadence {
 	fn default() -> Self {
 		AlertCadence::Hourly
@@ -199,6 +211,23 @@ enum AlertMetric {
 	Accuracy,
 	#[serde(rename = "root_mean_squared_error")]
 	RootMeanSquaredError,
+}
+
+/// An alert record can be in one of these states
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum AlertProgress {
+	Completed,
+	InProgress,
+}
+
+impl fmt::Display for AlertProgress {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		let s = match self {
+			AlertProgress::Completed => "COMPLETED",
+			AlertProgress::InProgress => "IN PROGRESS",
+		};
+		write!(f, "{}", s)
+	}
 }
 
 /// Single alert threshold
@@ -277,13 +306,22 @@ struct AlertData {
 /// Manage periodic alerting
 async fn alert_manager(context: Arc<Context>) -> Result<()> {
 	// Currently enabled alerts - should probably move up to the context
-	let enabled = Alerts(vec![AlertHeuristics {
-		cadence: AlertCadence::Hourly,
-		thresholds: vec![AlertThreshold {
-			metric: AlertMetric::Accuracy,
-			variance: 0.1,
-		}],
-	}]);
+	let enabled = Alerts(vec![
+		AlertHeuristics {
+			cadence: AlertCadence::Hourly,
+			thresholds: vec![AlertThreshold {
+				metric: AlertMetric::Accuracy,
+				variance: 0.2,
+			}],
+		},
+		AlertHeuristics {
+			cadence: AlertCadence::Daily,
+			thresholds: vec![AlertThreshold {
+				metric: AlertMetric::Accuracy,
+				variance: 0.1,
+			}],
+		},
+	]);
 	let enabled = Arc::new(enabled);
 
 	let alert_methods = vec![AlertMethod::Email("ben@tangram.dev".to_owned())];
@@ -291,18 +329,25 @@ async fn alert_manager(context: Arc<Context>) -> Result<()> {
 
 	let now = tokio::time::Instant::now();
 	//let intended_start = ???
-	let mut test_interval = tokio::time::interval_at(now, tokio::time::Duration::from_secs(10));
-	let _enabled_cadences = enabled.get_cadences();
-	loop {
-		test_interval.tick().await;
-		handle_alert_cadence(
-			&enabled,
-			&alert_methods,
-			AlertCadence::Hourly,
-			&context.database_pool,
-		)
-		.await?;
+	let enabled_cadences = enabled.get_cadences();
+	// Spawn a subtask for each cadence
+	for cadence in enabled_cadences {
+		tokio::spawn({
+			let alert_methods = Arc::clone(&alert_methods);
+			let context = Arc::clone(&context);
+			let enabled = Arc::clone(&enabled);
+			let mut interval = tokio::time::interval_at(now, cadence.duration());
+			async move {
+				loop {
+					interval.tick().await;
+					handle_alert_cadence(&enabled, &alert_methods, cadence, &context.database_pool)
+						.await
+						.unwrap();
+				}
+			}
+		});
 	}
+	Ok(())
 }
 
 /// Return the current observed values for each heuristic
@@ -323,10 +368,9 @@ async fn check_metrics(
 	}
 	for threshold in &heuristics.thresholds {
 		// Look at the current value.
-		// FIXME - is this option necessary? Should always return a value I think.
 		let current_value = find_current_data(threshold.metric, database_pool).await?;
 		if current_value.is_none() {
-			// No predictions have ever been logged - abort!
+			// Not enough predictions have been logged - abort!
 			return Ok(vec![]);
 		}
 		let current_value = current_value.unwrap();
@@ -362,8 +406,8 @@ async fn check_ongoing(cadence: AlertCadence, database_pool: &sqlx::AnyPool) -> 
 	)
 	.bind(cadence.to_string())
 	.bind(&now)
-	//.bind(&ten_minutes_in_seconds)
-	.bind(&5) // TODO remove - just for testing!
+	.bind(&ten_minutes_in_seconds)
+	//.bind(&5) // TODO remove - just for testing!
 	.fetch_optional(&mut db)
 	.await?;
 	db.commit().await?;
@@ -382,35 +426,54 @@ async fn find_current_data(
 			return Err(anyhow!("Database unavailable"));
 		}
 	};
-	// TODO - I think this table only ever has one value, that is constantly updated.
-	// This query can probably be simplified.
+
+	// First, check how many true values have been logged.  If under the configured threshold, don't do anything.
+	let num_true_values_result = sqlx::query("select count(*) from true_values")
+		.fetch_one(&mut db)
+		.await?;
+	let num_true_values: i64 = num_true_values_result.get(0);
+	if num_true_values < ALERT_METRICS_MINIMUM_TRUE_VALUES_THRESHOLD {
+		return Ok(None);
+	}
+
 	let result = sqlx::query(
 		"
 			select
 				data
 			from
 				production_metrics
-			where
-				hour = (select max(hour) from production_metrics)
 		",
 	)
 	.fetch_optional(&mut db)
 	.await?;
+	db.commit().await?;
 
 	match result {
 		Some(r) => {
 			let data: String = r.get(0);
+			let res: ProductionMetrics = serde_json::from_str(&data)?;
 			match metric {
 				AlertMetric::Accuracy => {
-					// TODO multiclass also - use higher-level ProductionPredictionMetrics
-					// You still need to match, but some of this is handled in production_metrics/lib.rs
-					let res: BinaryClassificationProductionPredictionMetrics =
-						serde_json::from_str(&data)?;
-					let output = res.finalize().unwrap();
-					let accuracy = output.accuracy;
+					let accuracy = match res.prediction_metrics {
+						ProductionPredictionMetrics::BinaryClassification(bcppm) => {
+							bcppm.finalize().unwrap().accuracy
+						}
+						ProductionPredictionMetrics::MulticlassClassification(mccppm) => {
+							mccppm.finalize().unwrap().accuracy
+						}
+						_ => unreachable!(), // we will never have regression for the Accuracy metric
+					};
 					Ok(Some(accuracy))
 				}
-				_ => todo!(),
+				AlertMetric::RootMeanSquaredError => {
+					let rmse = match res.prediction_metrics {
+						ProductionPredictionMetrics::Regression(rppm) => {
+							rppm.finalize().unwrap().rmse
+						}
+						_ => unreachable!(), // RMSE is only for regression
+					};
+					Ok(Some(rmse))
+				}
 			}
 		}
 		None => Ok(None),
@@ -441,7 +504,7 @@ async fn find_previous_alert_data(
 		",
 	)
 	.bind(cadence.to_string())
-	.bind("COMPLETED".to_string())
+	.bind(AlertProgress::Completed.to_string())
 	.fetch_optional(&mut db)
 	.await?;
 	db.commit().await?;
@@ -472,6 +535,7 @@ async fn handle_alert_cadence(
 
 	let heuristics = alerts.cadence(cadence).unwrap();
 	let results = check_metrics(heuristics, database_pool).await?;
+	println!("here");
 	let exceeded_thresholds: Vec<&AlertResult> = results
 		.iter()
 		.filter(|r| {
@@ -522,7 +586,7 @@ async fn write_alert_start(
 		",
 	)
 	.bind(id.to_string())
-	.bind("IN PROGRESS".to_string())
+	.bind(AlertProgress::InProgress.to_string())
 	.bind(cadence.to_string())
 	.bind(time::OffsetDateTime::now_utc().unix_timestamp())
 	.execute(&mut db)
@@ -558,7 +622,7 @@ async fn write_alert_end(
 		 	id = $3
 		",
 	)
-	.bind("COMPLETED".to_string())
+	.bind(AlertProgress::Completed.to_string())
 	.bind(data)
 	.bind(id.to_string())
 	.execute(&mut db)

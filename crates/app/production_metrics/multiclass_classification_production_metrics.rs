@@ -96,7 +96,7 @@ impl<'de> serde::de::Deserialize<'de> for MulticlassClassificationProductionPred
 	}
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize)]
 pub struct MulticlassClassificationProductionPredictionMetricsOutput {
 	pub class_metrics: Vec<MulticlassClassificationProductionPredictionClassMetricsOutput>,
 	pub accuracy: f32,
@@ -107,7 +107,7 @@ pub struct MulticlassClassificationProductionPredictionMetricsOutput {
 	pub recall_weighted: f32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde::Deserialize)]
 pub struct MulticlassClassificationProductionPredictionClassMetricsOutput {
 	pub class_name: String,
 	pub true_positives: u64,
