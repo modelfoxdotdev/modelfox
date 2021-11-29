@@ -10,7 +10,7 @@
       url = "github:nix-community/fenix";
     };
     wheel_writer = {
-			url = "github:tangramdotdev/wheel_writer";
+      url = "github:tangramdotdev/wheel_writer";
     };
     windows_sdk = {
       url = "github:tangramdotdev/windows_sdk";
