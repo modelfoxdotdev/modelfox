@@ -53,11 +53,12 @@
           (targets.x86_64-pc-windows-msvc.toolchainOf toolchain).rust-std
         ]);
       zig = (pkgs.zig.overrideAttrs (old: {
+        version = "0.0.0";
         src = pkgs.fetchFromGitHub {
           owner = "ziglang";
           repo = "zig";
-          rev = "002fbb0af043d90b0ab7d2f2804effc6fa2d690c";
-          hash = "sha256-a4IXh4gfv34exfLPqxcS+7e3bOqL1AJNWzBMXm2tTvU=";
+          rev = "adf059f272dfd3c1652bce774c0b6c204d5d6b8b";
+          hash = "sha256-pnNfvdLBN8GrVHz+Cf5QX3VHC+s3jjNO/vtzgGD132Y=";
         };
         patches = [
           (pkgs.fetchpatch {
