@@ -179,7 +179,7 @@ fn build_tangram_benchmark(dataset: &Dataset) {
 	let output = std::process::Command::new("cargo")
 		.arg("build")
 		.arg("--release")
-		.arg("--bin")
+		.arg("-p")
 		.arg(format!("tangram_tree_benchmark_{}", dataset))
 		.output()
 		.unwrap();

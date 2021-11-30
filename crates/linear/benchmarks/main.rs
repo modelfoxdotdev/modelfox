@@ -173,7 +173,7 @@ fn build_tangram_benchmark(dataset: &Dataset) {
 	let status = std::process::Command::new("cargo")
 		.arg("build")
 		.arg("--release")
-		.arg("--bin")
+		.arg("-p")
 		.arg(format!("tangram_linear_benchmark_{}", dataset))
 		.spawn()
 		.unwrap()

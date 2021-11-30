@@ -1,7 +1,5 @@
-/.direnv
+/.direnv/
 /.envrc
-/.vscode
-/data
-/dist*
+/data/
+/dist/
 /target/
-/target_check/

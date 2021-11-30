@@ -23,7 +23,7 @@ curl -sSL https://datasets.tangram.dev/higgs_test.csv > data/higgs_test.csv
 5. Run the benchmarks:
 
 ```
-cargo run --release --bin tangram_tree_benchmarks -- \
+cargo run --release -p tangram_tree_benchmarks -- \
   --libraries tangram lightgbm xgboost \
   --datasets allstate flights higgs
 ```

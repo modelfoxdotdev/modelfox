@@ -41,9 +41,6 @@ fn compile() {
 
 	let mut args = vec![
 		"build",
-		"-Zbuild-std",
-		"-Zbuild-std-features=system-llvm-libunwind",
-		"-Zmultitarget",
 		"--release",
 	];
 	for target in TARGETS {
@@ -776,12 +773,12 @@ fn build_release(version: &str) {
 	}
 }
 
-const TARGETS: [Target; 4] = [
+const TARGETS: [Target; 6] = [
 	Target::AArch64LinuxGnu,
-	// Target::AArch64LinuxMusl,
+	Target::AArch64LinuxMusl,
 	// Target::AArch64MacOS,
 	Target::X8664LinuxGnu,
-	// Target::X8664LinuxMusl,
+	Target::X8664LinuxMusl,
 	// Target::X8664MacOS,
 	Target::X8664WindowsGnu,
 	Target::X8664WindowsMsvc,
@@ -833,10 +830,10 @@ impl Target {
 
 	pub fn rust_target_name(&self) -> &'static str {
 		match self {
-			Target::AArch64LinuxGnu => "aarch64-linux-gnu",
+			Target::AArch64LinuxGnu => "aarch64-unknown-linux-gnu",
 			Target::AArch64LinuxMusl => "aarch64-unknown-linux-musl",
 			Target::AArch64MacOs => "aarch64-apple-darwin",
-			Target::X8664LinuxGnu => "x86_64-linux-gnu",
+			Target::X8664LinuxGnu => "x86_64-unknown-linux-gnu",
 			Target::X8664LinuxMusl => "x86_64-unknown-linux-musl",
 			Target::X8664MacOs => "x86_64-apple-darwin",
 			Target::X8664WindowsGnu => "x86_64-pc-windows-gnu",
@@ -846,10 +843,10 @@ impl Target {
 
 	pub fn rust_target(&self) -> &'static str {
 		match self {
-			Target::AArch64LinuxGnu => "scripts/aarch64-linux-gnu.json",
+			Target::AArch64LinuxGnu => "aarch64-unknown-linux-gnu",
 			Target::AArch64LinuxMusl => "aarch64-unknown-linux-musl",
 			Target::AArch64MacOs => "aarch64-apple-darwin",
-			Target::X8664LinuxGnu => "scripts/x86_64-linux-gnu.json",
+			Target::X8664LinuxGnu => "x86_64-unknown-linux-gnu",
 			Target::X8664LinuxMusl => "x86_64-unknown-linux-musl",
 			Target::X8664MacOs => "x86_64-apple-darwin",
 			Target::X8664WindowsGnu => "x86_64-pc-windows-gnu",

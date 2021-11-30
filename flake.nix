@@ -93,7 +93,6 @@
           go
           lld_13
           llvm_13
-          mold
           nodejs-16_x
           (php.withExtensions ({ all, ... }: with all; [
             curl
@@ -128,98 +127,108 @@
           wasm-bindgen-cli
           (wheel_writer.defaultPackage.${system})
           windows_sdk
-          zig 
-          zlib
+          zig
         ];
 
-        LD_LIBRARY_PATH="${pkgs.stdenv.cc.cc.lib}:${pkgs.zlib}";
-
-        # x86_64-unknown-linux-gnu
-        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = "${pkgs.writeShellScriptBin "linker" ''
-          clang --ld-path=$(which mold) $@
-        ''}/bin/linker";
-        CC_x86_64_unknown_linux_gnu = "${pkgs.writeShellScriptBin "cc" ''
-          clang $@
-        ''}/bin/cc";
+        CARGO_UNSTABLE_MULTITARGET = "true";
 
         # aarch64-linux-gnu
-        CARGO_TARGET_AARCH64_LINUX_GNU_LINKER = "${pkgs.writeShellScriptBin "linker" ''
-          zig cc -target aarch64-linux-gnu.2.28 $@
-        ''}/bin/linker";
-        CARGO_TARGET_AARCH64_LINUX_GNU_RUSTFLAGS = "-C target-feature=-outline-atomics";
-        CC_aarch64_linux_gnu = "${pkgs.writeShellScriptBin "cc" ''
-          zig cc -target aarch64-linux-gnu.2.28 $@
-        ''}/bin/cc";
+        CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER = pkgs.writeShellScriptBin "linker" ''
+          for arg do
+            shift
+            [ "$arg" = "-lgcc_s" ] && set -- "$@" "-lunwind" && continue
+            set -- "$@" "$arg"
+          done
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target aarch64-linux-gnu.2.28 $@
+        '' + /bin/linker;
+        CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUSTFLAGS = "-C target-feature=-outline-atomics";
+        CC_aarch64_unknown_linux_gnu = pkgs.writeShellScriptBin "cc" ''
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target aarch64-linux-gnu.2.28 $@
+        '' + /bin/cc;
 
         # aarch64-linux-musl
-        CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER = "${pkgs.writeShellScriptBin "linker" ''
-          zig cc -target aarch64-linux-musl -lc -dynamic $@
-        ''}/bin/linker";
-        CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS = "-C target-feature=-outline-atomics";
-        CC_aarch64_unknown_linux_musl = "${pkgs.writeShellScriptBin "cc" ''
-          zig cc -target aarch64-linux-musl $@
-        ''}/bin/cc";
+        CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER = pkgs.writeShellScriptBin "linker" ''
+          for arg do
+            shift
+            [ "$arg" = "-lgcc_s" ] && set -- "$@" "-lunwind" && continue
+            set -- "$@" "$arg"
+          done
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target aarch64-linux-musl -dynamic $@
+        '' + /bin/linker;
+        CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS = "-C target-feature=-crt-static";
+        CC_aarch64_unknown_linux_musl = pkgs.writeShellScriptBin "cc" ''
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target aarch64-linux-musl $@
+        '' + /bin/cc;
 
         # aarch64-macos
-        CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER = "${pkgs.writeShellScriptBin "linker" ''
-          zig cc -target aarch64-macos $@
-        ''}/bin/linker";
-        CC_aarch64_apple_darwin = "${pkgs.writeShellScriptBin "cc" ''
-          zig cc -target aarch64-macos $@
-        ''}/bin/cc";
+        CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER = pkgs.writeShellScriptBin "linker" ''
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target aarch64-macos $@
+        '' + /bin/linker;
+        CC_aarch64_apple_darwin = pkgs.writeShellScriptBin "cc" ''
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target aarch64-macos $@
+        '' + /bin/cc;
 
         # wasm32
         CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = "lld";
 
         # x86_64-linux-gnu
-        CARGO_TARGET_X86_64_LINUX_GNU_LINKER = "${pkgs.writeShellScriptBin "linker" ''
-          zig cc -target x86_64-linux-gnu.2.28 $@
-        ''}/bin/linker";
-        CC_x86_64_linux_gnu = "${pkgs.writeShellScriptBin "cc" ''
-          zig cc -target x86_64-linux-gnu.2.28 $@
-        ''}/bin/cc";
+        CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = pkgs.writeShellScriptBin "linker" ''
+          for arg do
+            shift
+            [ "$arg" = "-lgcc_s" ] && set -- "$@" "-lunwind" && continue
+            set -- "$@" "$arg"
+          done
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-linux-gnu.2.28 $@
+        '' + /bin/linker;
+        CC_x86_64_unknown_linux_gnu = pkgs.writeShellScriptBin "cc" ''
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-linux-gnu.2.28 $@
+        '' + /bin/cc;
 
         # x86_64-linux-musl
-        CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER = "${pkgs.writeShellScriptBin "linker" ''
-          zig cc -target x86_64-linux-musl -lc -dynamic $@
-        ''}/bin/linker";
-        CC_x86_64_unknown_linux_musl = "${pkgs.writeShellScriptBin "cc" ''
-          zig cc -target x86_64-linux-musl $@
-        ''}/bin/cc";
+        CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER = pkgs.writeShellScriptBin "linker" ''
+          for arg do
+            shift
+            [ "$arg" = "-lgcc_s" ] && set -- "$@" "-lunwind" && continue
+            set -- "$@" "$arg"
+          done
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-linux-musl -dynamic $@
+        '' + /bin/linker;
+        CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS = "-C target-feature=-crt-static";
+        CC_x86_64_unknown_linux_musl = pkgs.writeShellScriptBin "cc" ''
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-linux-musl $@
+        '' + /bin/cc;
 
         # x86_64-macos
-        CARGO_TARGET_X86_64_APPLE_DARWIN_LINKER = "${pkgs.writeShellScriptBin "linker" ''
-          zig cc -target x86_64-macos $@
-        ''}/bin/linker";
-        CC_x86_64_apple_darwin = "${pkgs.writeShellScriptBin "cc" ''
-          zig cc -target x86_64-macos $@
-        ''}/bin/cc";
+        CARGO_TARGET_X86_64_APPLE_DARWIN_LINKER = pkgs.writeShellScriptBin "linker" ''
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-macos $@
+        '' + /bin/linker;
+        CC_x86_64_apple_darwin = pkgs.writeShellScriptBin "cc" ''
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-macos $@
+        '' + /bin/cc;
 
         # x86_64-windows-gnu
-        CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER = "${pkgs.writeShellScriptBin "linker" ''
+        CARGO_TARGET_X86_64_PC_WINDOWS_GNU_LINKER = pkgs.writeShellScriptBin "linker" ''
           for arg do
             shift
             [ "$arg" = "-lgcc" ] && continue
-            [ "$arg" = "-lgcc_s" ] && continue
             [ "$arg" = "-lgcc_eh" ] && continue
             [ "$arg" = "-l:libpthread.a" ] && continue
             set -- "$@" "$arg"
           done
-          zig cc -target x86_64-windows-gnu -lstdc++ $@
-        ''}/bin/linker";
-        CC_x86_64_pc_windows_gnu = "${pkgs.writeShellScriptBin "cc" ''
-          zig cc -target x86_64-windows-gnu $@
-        ''}/bin/cc";
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-windows-gnu -lstdc++ $@
+        '' + /bin/linker;
+        CC_x86_64_pc_windows_gnu = pkgs.writeShellScriptBin "cc" ''
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-windows-gnu $@
+        '' + /bin/cc;
 
         # x86_64-windows-msvc
         AR_x86_64_pc_windows_msvc = "llvm-lib";
-        CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER = "${pkgs.writeShellScriptBin "linker" ''
-          lld-link /libpath:$WINDOWS_SDK/clang/lib/x64 /libpath:$WINDOWS_SDK/crt/lib/x64 /libpath:$WINDOWS_SDK/sdk/lib/x64 /libpath:$WINDOWS_SDK/sdk/lib/x64/ucrt /libpath:$WINDOWS_SDK/sdk/lib/x64/um $@
-        ''}/bin/linker";
-        CC_x86_64_pc_windows_msvc = "${pkgs.writeShellScriptBin "cc" ''
-          clang-cl /I $WINDOWS_SDK/clang/include /I $WINDOWS_SDK/crt/include /I $WINDOWS_SDK/sdk/include /I $WINDOWS_SDK/sdk/include/shared /I $WINDOWS_SDK/sdk/include/ucrt /I $WINDOWS_SDK/sdk/include/um $@
-        ''}/bin/cc";
-        WINDOWS_SDK = windows_sdk.defaultPackage.${system};
+        CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER = pkgs.writeShellScriptBin "linker" ''
+          lld-link /libpath:${windows_sdk.defaultPackage.${system}}/clang/lib/x64 /libpath:${windows_sdk.defaultPackage.${system}}/crt/lib/x64 /libpath:${windows_sdk.defaultPackage.${system}}/sdk/lib/x64 /libpath:${windows_sdk.defaultPackage.${system}}/sdk/lib/x64/ucrt /libpath:${windows_sdk.defaultPackage.${system}}/sdk/lib/x64/um $@
+        '' + /bin/linker;
+        CC_x86_64_pc_windows_msvc = pkgs.writeShellScriptBin "cc" ''
+          clang-cl /I ${windows_sdk.defaultPackage.${system}}/clang/include /I ${windows_sdk.defaultPackage.${system}}/crt/include /I ${windows_sdk.defaultPackage.${system}}/sdk/include /I ${windows_sdk.defaultPackage.${system}}/sdk/include/shared /I ${windows_sdk.defaultPackage.${system}}/sdk/include/ucrt /I ${windows_sdk.defaultPackage.${system}}/sdk/include/um $@
+        '' + /bin/cc;
       };
     }
   );
