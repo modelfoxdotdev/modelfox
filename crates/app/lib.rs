@@ -1,4 +1,5 @@
 use anyhow::{anyhow, bail, Result};
+use lettre::AsyncTransport;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::*;
 use std::{fmt, net::SocketAddr, sync::Arc};
@@ -163,6 +164,8 @@ enum AlertCadence {
 	Hourly,
 	#[serde(rename = "monthly")]
 	Monthly,
+	#[serde(rename = "testing")]
+	Testing,
 	#[serde(rename = "weekly")]
 	Weekly,
 }
@@ -173,6 +176,7 @@ impl AlertCadence {
 			AlertCadence::Daily => tokio::time::Duration::from_secs(60 * 60 * 24),
 			AlertCadence::Hourly => tokio::time::Duration::from_secs(60 * 60),
 			AlertCadence::Monthly => tokio::time::Duration::from_secs(60 * 60 * 24 * 31), //FIXME that's not correct
+			AlertCadence::Testing => tokio::time::Duration::from_secs(10),
 			AlertCadence::Weekly => tokio::time::Duration::from_secs(60 * 60 * 24 * 7),
 		}
 	}
@@ -190,6 +194,7 @@ impl fmt::Display for AlertCadence {
 			AlertCadence::Daily => "daily",
 			AlertCadence::Hourly => "hourly",
 			AlertCadence::Monthly => "monthly",
+			AlertCadence::Testing => "testing",
 			AlertCadence::Weekly => "weekly",
 		};
 		write!(f, "{}", s)
@@ -200,7 +205,38 @@ impl fmt::Display for AlertCadence {
 // FIXME - using tag = type and renaming here causes sqlx to panic!!
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 enum AlertMethod {
+	/// Send an email to the stored address
 	Email(String),
+	/// Dump the alert to STDOUT - mostly useful for testing
+	Stdout,
+}
+
+impl AlertMethod {
+	pub async fn send_alert(
+		&self,
+		exceeded_thresholds: &[&AlertResult],
+		context: &Context,
+	) -> Result<()> {
+		match self {
+			AlertMethod::Email(address) => {
+				let email = lettre::Message::builder()
+					.from("Tangram <noreply@tangram.dev>".parse()?)
+					.to(address.parse()?)
+					.subject("Tangram Metrics Alert")
+					.body(format!(
+						"Exceeded alert thresholds: {:?}",
+						exceeded_thresholds
+					))?; // TODO - include heuristics too
+				if let Some(smtp_transport) = &context.smtp_transport {
+					smtp_transport.send(email).await?;
+				} else {
+					return Err(anyhow!("No SMTP Transport in context"));
+				}
+			}
+			AlertMethod::Stdout => println!("exceeded thresholds: {:?}", exceeded_thresholds),
+		}
+		Ok(())
+	}
 }
 
 /// Statistics that can generate alerts
@@ -305,7 +341,16 @@ struct AlertData {
 
 /// Manage periodic alerting
 async fn alert_manager(context: Arc<Context>) -> Result<()> {
+	// TODO - this will all be grabbed from the DB, configured by the user
 	// Currently enabled alerts - should probably move up to the context
+	let enabled = Alerts(vec![AlertHeuristics {
+		cadence: AlertCadence::Testing,
+		thresholds: vec![AlertThreshold {
+			metric: AlertMetric::Accuracy,
+			variance: 0.1,
+		}],
+	}]);
+	/*
 	let enabled = Alerts(vec![
 		AlertHeuristics {
 			cadence: AlertCadence::Hourly,
@@ -322,9 +367,13 @@ async fn alert_manager(context: Arc<Context>) -> Result<()> {
 			}],
 		},
 	]);
+	*/
 	let enabled = Arc::new(enabled);
 
-	let alert_methods = vec![AlertMethod::Email("ben@tangram.dev".to_owned())];
+	let alert_methods = vec![
+		//AlertMethod::Email("ben@tangram.dev".to_owned()),
+		AlertMethod::Stdout,
+	];
 	let alert_methods = Arc::new(alert_methods);
 
 	let now = tokio::time::Instant::now();
@@ -340,7 +389,7 @@ async fn alert_manager(context: Arc<Context>) -> Result<()> {
 			async move {
 				loop {
 					interval.tick().await;
-					handle_alert_cadence(&enabled, &alert_methods, cadence, &context.database_pool)
+					handle_alert_cadence(&enabled, &alert_methods, cadence, &context)
 						.await
 						.unwrap();
 				}
@@ -355,12 +404,6 @@ async fn check_metrics(
 	heuristics: &AlertHeuristics,
 	database_pool: &sqlx::AnyPool,
 ) -> Result<Vec<AlertResult>> {
-	println!("Checking metrics!");
-
-	// cases:
-	// 1. This is at least the second alert.  Check against the previous answer.
-	// 2. This is the first alert.  There is no possible alert to submit.
-
 	let mut results = Vec::new();
 	let previous_alert_data = find_previous_alert_data(heuristics.cadence, database_pool).await?;
 	if previous_alert_data.is_none() {
@@ -406,8 +449,8 @@ async fn check_ongoing(cadence: AlertCadence, database_pool: &sqlx::AnyPool) -> 
 	)
 	.bind(cadence.to_string())
 	.bind(&now)
-	.bind(&ten_minutes_in_seconds)
-	//.bind(&5) // TODO remove - just for testing!
+	//.bind(&ten_minutes_in_seconds)
+	.bind(&5) // TODO remove - just for testing!
 	.fetch_optional(&mut db)
 	.await?;
 	db.commit().await?;
@@ -523,19 +566,18 @@ async fn handle_alert_cadence(
 	alerts: &Alerts,
 	alert_methods: &[AlertMethod],
 	cadence: AlertCadence,
-	database_pool: &sqlx::AnyPool,
+	context: &Context,
 ) -> Result<()> {
-	let already_handled = check_ongoing(cadence, database_pool).await?;
+	let already_handled = check_ongoing(cadence, &context.database_pool).await?;
 
 	if already_handled {
 		return Ok(());
 	}
 
-	let alert_id = write_alert_start(cadence, database_pool).await?;
+	let alert_id = write_alert_start(cadence, &context.database_pool).await?;
 
 	let heuristics = alerts.cadence(cadence).unwrap();
-	let results = check_metrics(heuristics, database_pool).await?;
-	println!("here");
+	let results = check_metrics(heuristics, &context.database_pool).await?;
 	let exceeded_thresholds: Vec<&AlertResult> = results
 		.iter()
 		.filter(|r| {
@@ -545,22 +587,27 @@ async fn handle_alert_cadence(
 				.unwrap_or(false)
 		})
 		.collect();
-	push_alerts(&exceeded_thresholds, alert_methods).await;
+	push_alerts(&exceeded_thresholds, alert_methods, context).await?;
 
 	let alert_data = AlertData {
 		alert_methods: alert_methods.to_owned(),
 		heuristics: heuristics.to_owned(),
 		results: results.to_owned(),
 	};
-	write_alert_end(alert_id, alert_data, database_pool).await?;
+	write_alert_end(alert_id, alert_data, &context.database_pool).await?;
 	Ok(())
 }
 
 /// Send alerts containing all exceeded thresholds to each enabled alert method
-async fn push_alerts(exceeded_thresholds: &[&AlertResult], methods: &[AlertMethod]) {
+async fn push_alerts(
+	exceeded_thresholds: &[&AlertResult],
+	methods: &[AlertMethod],
+	context: &Context,
+) -> Result<()> {
 	for method in methods {
-		println!("pushing alert to {:?}: {:?}", method, exceeded_thresholds);
+		method.send_alert(exceeded_thresholds, context).await?;
 	}
+	Ok(())
 }
 
 /// Log the beginning of an alert handling process
@@ -592,7 +639,6 @@ async fn write_alert_start(
 	.execute(&mut db)
 	.await?;
 	db.commit().await?;
-	println!("{}", id);
 	Ok(id)
 }
 
