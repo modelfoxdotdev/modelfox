@@ -39,10 +39,7 @@ fn compile() {
 	let compile_path = root_path.join("dist").join("compile");
 	clean_and_create(&compile_path);
 
-	let mut args = vec![
-		"build",
-		"--release",
-	];
+	let mut args = vec!["build", "--release"];
 	for target in TARGETS {
 		args.extend(["--target", target.rust_target()]);
 	}

@@ -1,10 +1,8 @@
 use anyhow::Result;
 use clap::Parser;
-use std::{path::PathBuf, sync::Arc, time::Duration};
+use std::{net::SocketAddr, path::PathBuf, sync::Arc};
 use sunfish::Sunfish;
-use tower::{make::Shared, ServiceBuilder};
-use tower_http::{add_extension::AddExtensionLayer, trace::TraceLayer};
-use tracing::{error, info, Span};
+use tracing::error;
 use tracing_subscriber::prelude::*;
 
 #[derive(Parser)]
@@ -18,6 +16,10 @@ enum Args {
 #[derive(Parser)]
 struct ExportArgs {
 	path: PathBuf,
+}
+
+struct Context {
+	sunfish: Sunfish,
 }
 
 #[tokio::main]
@@ -49,51 +51,35 @@ async fn serve(sunfish: Sunfish) -> Result<()> {
 		None
 	};
 	let port = port_from_env.unwrap_or(8080);
-	let context_layer = AddExtensionLayer::new(Arc::new(sunfish));
-	let trace_layer = TraceLayer::new_for_http()
-		.on_request(|request: &http::Request<hyper::Body>, _span: &Span| {
-			info!(
-				method = %request.method(),
-				path = %request.uri().path(),
-				query = ?request.uri().query(),
-				"request",
-			);
-		})
-		.on_response(
-			|response: &http::Response<hyper::Body>, _latency: Duration, _span: &Span| {
-				info!(status = %response.status(), "response");
-			},
-		);
-	let service = ServiceBuilder::new()
-		.layer(context_layer)
-		.layer(trace_layer)
-		.service_fn(handle);
-	let addr = std::net::SocketAddr::new(host, port);
-	let server = hyper::server::Server::try_bind(&addr)?;
-	server.serve(Shared::new(service)).await?;
+	let addr = SocketAddr::new(host, port);
+	let context = Context { sunfish };
+	let context = Arc::new(context);
+	tangram_serve::serve(addr, context, handle).await?;
 	Ok(())
 }
 
-async fn handle(
-	mut request: http::Request<hyper::Body>,
-) -> Result<http::Response<hyper::Body>, http::Error> {
-	let sunfish = request.extensions().get::<Arc<Sunfish>>().unwrap().clone();
-	let response = sunfish.handle(&mut request).await.unwrap_or_else(|error| {
-		error!(%error);
-		Some(
-			http::Response::builder()
-				.status(http::StatusCode::INTERNAL_SERVER_ERROR)
-				.body(hyper::Body::from("internal server error"))
-				.unwrap(),
-		)
-	});
-	let response = response.unwrap_or_else(|| {
+async fn handle(mut request: http::Request<hyper::Body>) -> http::Response<hyper::Body> {
+	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let context = context.clone();
+	let response = context
+		.sunfish
+		.handle(&mut request)
+		.await
+		.unwrap_or_else(|error| {
+			error!(%error, backtrace = %error.backtrace());
+			Some(
+				http::Response::builder()
+					.status(http::StatusCode::INTERNAL_SERVER_ERROR)
+					.body(hyper::Body::from("internal server error"))
+					.unwrap(),
+			)
+		});
+	response.unwrap_or_else(|| {
 		http::Response::builder()
 			.status(http::StatusCode::NOT_FOUND)
 			.body(hyper::Body::from("not found"))
 			.unwrap()
-	});
-	Ok(response)
+	})
 }
 
 async fn export(sunfish: Sunfish, path: PathBuf) -> Result<()> {
