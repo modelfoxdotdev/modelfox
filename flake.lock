@@ -265,11 +265,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1637550528,
-        "narHash": "sha256-/Qur51K0BQtq5HD+jY/gtpVNB2qqASeymXOh2nrkweE=",
+        "lastModified": 1638468576,
+        "narHash": "sha256-jtIJPWNqkJW2mU2Q7KLZjm6+OO0Hfl+q7OSsQtOli0w=",
         "owner": "tangramdotdev",
         "repo": "wheel_writer",
-        "rev": "5ba312050e14b2e6dfce51bc6f15198f15e0c1af",
+        "rev": "cc253c6b9aad8c17c90537b31c537c06a169876b",
         "type": "github"
       },
       "original": {
@@ -285,11 +285,11 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1637026166,
-        "narHash": "sha256-Ub1tGQ5Dc5kLlxkhUVkFRml4vDWqbKBk3uwiyKPHr+8=",
+        "lastModified": 1638469136,
+        "narHash": "sha256-I60JeNLSPRCTKBuYKtL18uIsErsi1tRd+fQ5Wi/OYwM=",
         "owner": "tangramdotdev",
         "repo": "windows_sdk",
-        "rev": "9431e6ed6793afae9d1d2f69b48e3d97f33f40b8",
+        "rev": "5a31225ad6fd77113980cdd56b2c4a1bddbb9dc8",
         "type": "github"
       },
       "original": {

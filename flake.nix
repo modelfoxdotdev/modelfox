@@ -16,21 +16,21 @@
       url = "github:tangramdotdev/windows_sdk";
     };
   };
-  outputs = { 
-    fenix, 
-    flake-utils, 
-    nixpkgs, 
-    wheel_writer, 
-    windows_sdk, 
-    ... 
+  outputs = {
+    fenix,
+    flake-utils,
+    nixpkgs,
+    wheel_writer,
+    windows_sdk,
+    ...
   }: flake-utils.lib.eachDefaultSystem (system:
     let
       pkgs = import nixpkgs {
         inherit system;
       };
-      rust = 
+      rust =
         let
-          toolchain = { 
+          toolchain = {
             channel = "nightly";
             date = "2021-11-30";
             sha256 = "sha256-pPoHJ/5yG7o3wRqsHsy0a/QhxH6Us7Wzzb/hz1k7f7E=";
