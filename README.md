@@ -11,12 +11,12 @@ Train a model from a CSV file on the command line. Make predictions from Elixir,
 </p>
 
 <p align="center">
-  <a href="https://tangram.dev/docs/">
-      <img src="https://img.shields.io/badge/docs-tangram.dev-purple?style=flat-square" alt="Documentation" />
-  </a>
-  <a href="">
-    <img src="https://img.shields.io/github/last-commit/tangramdotdev/tangram?style=flat-square" alt="Last commit" />
-  </a>
+	<a href="https://tangram.dev/docs/">
+		<img src="https://img.shields.io/badge/docs-tangram.dev-purple?style=flat-square" alt="Documentation" />
+	</a>
+	<a href="">
+		<img src="https://img.shields.io/github/last-commit/tangramdotdev/tangram?style=flat-square" alt="Last commit" />
+	</a>
 </p>
 <p align="center">
 	<a href="https://hex.pm/packages/tangram">
@@ -43,9 +43,9 @@ Train a model from a CSV file on the command line. Make predictions from Elixir,
 </p>
 
 <p align="center">
-  <a href="https://twitter.com/intent/follow?screen_name=tangramdotdev">
-    <img src="https://img.shields.io/twitter/follow/tangramdotdev?label=Follow%20tangramdotdev&style=social&color=blue" alt="Follow @tangramdotdev on Twitter" />
-  </a>
+	<a href="https://twitter.com/intent/follow?screen_name=tangramdotdev">
+		<img src="https://img.shields.io/twitter/follow/tangramdotdev?label=Follow%20tangramdotdev&style=social&color=blue" alt="Follow @tangramdotdev on Twitter" />
+	</a>
 </p>
 
 # Tangram
