@@ -1,10 +1,12 @@
 use anyhow::{anyhow, bail, Result};
-use lettre::AsyncTransport;
-use serde::{Deserialize, Serialize};
 use sqlx::prelude::*;
-use std::{fmt, net::SocketAddr, sync::Arc};
+use std::{net::SocketAddr, sync::Arc};
 pub use tangram_app_common::options;
 use tangram_app_common::{
+	alerts::{
+		AlertCadence, AlertData, AlertHeuristics, AlertProgress, AlertMethod, AlertMetric, AlertResult,
+		AlertThreshold, Alerts,
+	},
 	heuristics::ALERT_METRICS_MINIMUM_TRUE_VALUES_THRESHOLD,
 	options::{Options, StorageOptions},
 	storage::{LocalStorage, S3Storage, Storage},
@@ -154,196 +156,11 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 	Ok(pool)
 }
 
-/// Alert cadence
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(tag = "type")]
-enum AlertCadence {
-	#[serde(rename = "daily")]
-	Daily,
-	#[serde(rename = "hourly")]
-	Hourly,
-	#[serde(rename = "monthly")]
-	Monthly,
-	#[serde(rename = "testing")]
-	Testing,
-	#[serde(rename = "weekly")]
-	Weekly,
-}
-
-impl AlertCadence {
-	pub fn duration(&self) -> tokio::time::Duration {
-		match self {
-			AlertCadence::Daily => tokio::time::Duration::from_secs(60 * 60 * 24),
-			AlertCadence::Hourly => tokio::time::Duration::from_secs(60 * 60),
-			AlertCadence::Monthly => tokio::time::Duration::from_secs(60 * 60 * 24 * 31), //FIXME that's not correct
-			AlertCadence::Testing => tokio::time::Duration::from_secs(10),
-			AlertCadence::Weekly => tokio::time::Duration::from_secs(60 * 60 * 24 * 7),
-		}
-	}
-}
-
-impl Default for AlertCadence {
-	fn default() -> Self {
-		AlertCadence::Hourly
-	}
-}
-
-impl fmt::Display for AlertCadence {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let s = match self {
-			AlertCadence::Daily => "daily",
-			AlertCadence::Hourly => "hourly",
-			AlertCadence::Monthly => "monthly",
-			AlertCadence::Testing => "testing",
-			AlertCadence::Weekly => "weekly",
-		};
-		write!(f, "{}", s)
-	}
-}
-
-/// The various ways to receive alerts
-// FIXME - using tag = type and renaming here causes sqlx to panic!!
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
-enum AlertMethod {
-	/// Send an email to the stored address
-	Email(String),
-	/// Dump the alert to STDOUT - mostly useful for testing
-	Stdout,
-}
-
-impl AlertMethod {
-	pub async fn send_alert(
-		&self,
-		exceeded_thresholds: &[&AlertResult],
-		context: &Context,
-	) -> Result<()> {
-		match self {
-			AlertMethod::Email(address) => {
-				let email = lettre::Message::builder()
-					.from("Tangram <noreply@tangram.dev>".parse()?)
-					.to(address.parse()?)
-					.subject("Tangram Metrics Alert")
-					.body(format!(
-						"Exceeded alert thresholds: {:?}",
-						exceeded_thresholds
-					))?; // TODO - include heuristics too
-				if let Some(smtp_transport) = &context.smtp_transport {
-					smtp_transport.send(email).await?;
-				} else {
-					return Err(anyhow!("No SMTP Transport in context"));
-				}
-			}
-			AlertMethod::Stdout => println!("exceeded thresholds: {:?}", exceeded_thresholds),
-		}
-		Ok(())
-	}
-}
-
-/// Statistics that can generate alerts
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
-#[serde(tag = "type")]
-enum AlertMetric {
-	#[serde(rename = "accuracy")]
-	Accuracy,
-	#[serde(rename = "root_mean_squared_error")]
-	RootMeanSquaredError,
-}
-
-/// An alert record can be in one of these states
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum AlertProgress {
-	Completed,
-	InProgress,
-}
-
-impl fmt::Display for AlertProgress {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let s = match self {
-			AlertProgress::Completed => "COMPLETED",
-			AlertProgress::InProgress => "IN PROGRESS",
-		};
-		write!(f, "{}", s)
-	}
-}
-
-/// Single alert threshold
-#[derive(Debug, Clone, Copy, Deserialize, Serialize)]
-struct AlertThreshold {
-	metric: AlertMetric,
-	variance: f32,
-}
-
-/// A result from checking a metric
-#[derive(Debug, Clone, Copy, Deserialize, Serialize)]
-struct AlertResult {
-	metric: AlertMetric,
-	observed_value: f32,
-	observed_variance: f32,
-}
-
-impl AlertResult {
-	/// Should this result send an alert?
-	pub fn exceeds_threshold(&self, tolerance: f32) -> bool {
-		self.observed_variance.abs() > tolerance
-	}
-}
-
-/// Thresholds for generating an Alert
-#[derive(Debug, Clone, Default, Deserialize, Serialize)]
-struct AlertHeuristics {
-	cadence: AlertCadence,
-	thresholds: Vec<AlertThreshold>,
-}
-
-impl AlertHeuristics {
-	/// Retrieve the variance tolerance for a given metric, if present
-	fn get_threshold(&self, metric: AlertMetric) -> Option<f32> {
-		for threshold in &self.thresholds {
-			if threshold.metric == metric {
-				return Some(threshold.variance);
-			}
-		}
-		None
-	}
-}
-
-/// Manager for all enabled alerts
-#[derive(Debug, Default)]
-struct Alerts(Vec<AlertHeuristics>);
-
-impl Alerts {
-	// Retrieve all currently enabled cadences
-	fn get_cadences(&self) -> Vec<AlertCadence> {
-		self.0
-			.iter()
-			.map(|ah| ah.cadence)
-			.collect::<Vec<AlertCadence>>()
-	}
-
-	/// Retrieve the heuristics for the given cadence, if present
-	fn cadence(&self, cadence: AlertCadence) -> Option<&AlertHeuristics> {
-		for heuristics in &self.0 {
-			if heuristics.cadence == cadence {
-				return Some(heuristics);
-			}
-		}
-		None
-	}
-}
-
-/// Collection for the alert results from a single run
-#[derive(Debug, Default, Deserialize, Serialize)]
-struct AlertData {
-	alert_methods: Vec<AlertMethod>,
-	heuristics: AlertHeuristics,
-	results: Vec<AlertResult>,
-}
-
 /// Manage periodic alerting
 async fn alert_manager(context: Arc<Context>) -> Result<()> {
 	// TODO - this will all be grabbed from the DB, configured by the user
 	// Currently enabled alerts - should probably move up to the context
-	let enabled = Alerts(vec![AlertHeuristics {
+	let enabled = Alerts::from(vec![AlertHeuristics {
 		cadence: AlertCadence::Testing,
 		thresholds: vec![AlertThreshold {
 			metric: AlertMetric::Accuracy,
