@@ -17,3 +17,40 @@ impl Component for Page {
 			.into_node()
 	}
 }
+
+pub struct AlertsTable {
+	pub rows: Vec<AlertsTableRow>,
+}
+
+pub struct AlertsTableRow {
+	pub id: String,
+	pub created_at: String,
+}
+
+impl Component for AlertsTable {
+	fn into_node(self) -> Node {
+		ui::Table::new()
+			.width("100%".to_owned())
+			.child(
+				ui::TableHeader::new().child(
+					ui::TableRow::new()
+						.child(ui::TableHeaderCell::new().child("Id"))
+						.child(ui::TableHeaderCell::new().child("Uploaded")),
+				),
+			)
+			.child(
+				ui::TableBody::new().children(self.rows.into_iter().map(|row| {
+					ui::TableRow::new()
+						.child(
+							ui::TableCell::new().child(
+								ui::Link::new()
+									.href(format!("./alerts/{}/", row.id))
+									.child(row.id.clone()),
+							),
+						)
+						.child(ui::TableCell::new().child(row.created_at))
+				})),
+			)
+			.into_node()
+	}
+}
