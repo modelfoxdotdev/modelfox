@@ -224,10 +224,23 @@
         # x86_64-windows-msvc
         AR_x86_64_pc_windows_msvc = "llvm-lib";
         CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER = pkgs.writeShellScriptBin "linker" ''
-          lld-link /libpath:${windows_sdk.defaultPackage.${system}}/clang/lib/x64 /libpath:${windows_sdk.defaultPackage.${system}}/crt/lib/x64 /libpath:${windows_sdk.defaultPackage.${system}}/sdk/lib/x64 /libpath:${windows_sdk.defaultPackage.${system}}/sdk/lib/x64/ucrt /libpath:${windows_sdk.defaultPackage.${system}}/sdk/lib/x64/um $@
+          lld-link /
+            \libpath:${windows_sdk.defaultPackage.${system}}/clang/lib/x64 \
+            /libpath:${windows_sdk.defaultPackage.${system}}/crt/lib/x64 \
+            /libpath:${windows_sdk.defaultPackage.${system}}/sdk/lib/x64 \
+            /libpath:${windows_sdk.defaultPackage.${system}}/sdk/lib/x64/ucrt \
+            /libpath:${windows_sdk.defaultPackage.${system}}/sdk/lib/x64/um \
+            $@
         '' + /bin/linker;
         CC_x86_64_pc_windows_msvc = pkgs.writeShellScriptBin "cc" ''
-          clang-cl /I ${windows_sdk.defaultPackage.${system}}/clang/include /I ${windows_sdk.defaultPackage.${system}}/crt/include /I ${windows_sdk.defaultPackage.${system}}/sdk/include /I ${windows_sdk.defaultPackage.${system}}/sdk/include/shared /I ${windows_sdk.defaultPackage.${system}}/sdk/include/ucrt /I ${windows_sdk.defaultPackage.${system}}/sdk/include/um $@
+          clang-cl \
+            /I ${windows_sdk.defaultPackage.${system}}/clang/include \
+            /I ${windows_sdk.defaultPackage.${system}}/crt/include \
+            /I ${windows_sdk.defaultPackage.${system}}/sdk/include \
+            /I ${windows_sdk.defaultPackage.${system}}/sdk/include/shared \
+            /I ${windows_sdk.defaultPackage.${system}}/sdk/include/ucrt \
+            /I ${windows_sdk.defaultPackage.${system}}/sdk/include/um \
+            $@
         '' + /bin/cc;
       };
     }
