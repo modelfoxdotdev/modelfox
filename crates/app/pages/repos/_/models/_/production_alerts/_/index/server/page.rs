@@ -1,4 +1,3 @@
-pub use crate::{enum_column::*, number_column::*, text_column::*};
 use pinwheel::prelude::*;
 use tangram_app_layouts::{
 	document::Document,
@@ -20,9 +19,6 @@ impl Component for Page {
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
 						.child(ui::H1::new().child(self.alert_name))
-						.child(DateWindowSelectForm {
-							date_window: self.date_window,
-						})
 				),
 			)
 			.into_node()

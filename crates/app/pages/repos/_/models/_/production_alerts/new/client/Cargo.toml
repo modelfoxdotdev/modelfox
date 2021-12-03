@@ -1,0 +1,14 @@
+[package]
+edition = "2021"
+rust-version = "1.56"
+name = "tangram_app_new_production_alert_client"
+publish = false
+version = "0.0.0"
+
+[[bin]]
+name = "tangram_app_new_production_alert_client"
+path = "main.rs"
+
+[dependencies]
+tangram_ui = { path = "../../../../../../../../../ui" }
+web-sys = "0.3"

@@ -15,9 +15,6 @@ use tangram_app_common::{
 	Context,
 };
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_app_production_stats::{
-	get_production_stats, GetProductionStatsOutput, ProductionColumnStatsOutput,
-};
 use tangram_app_ui::{
 	date_window::{get_date_window_and_interval, DateWindow, DateWindowInterval},
 	time::format_date_window_interval,
@@ -25,9 +22,13 @@ use tangram_app_ui::{
 use tangram_id::Id;
 use tangram_ui as ui;
 
+
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
+	todo!()
+}
+/*
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
-	let (model_id, column_name) = if let ["repos", _, "models", model_id, "production_stats", "columns", column_name] =
+	let (model_id, column_name) = if let ["repos", _, "models", model_id, "production_alerts", "alerts", column_name] =
 		path_components(request).as_slice()
 	{
 		(model_id.to_owned(), column_name.to_owned())
@@ -409,3 +410,4 @@ fn text_column(
 		},
 	}
 }
+*/

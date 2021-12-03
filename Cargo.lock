@@ -2991,11 +2991,14 @@ dependencies = [
  "tangram_app_new_model_client",
  "tangram_app_new_model_server",
  "tangram_app_new_organization_server",
+ "tangram_app_new_production_alert_client",
+ "tangram_app_new_production_alert_server",
  "tangram_app_new_repo_server",
  "tangram_app_organization_index_server",
  "tangram_app_organization_member_server",
  "tangram_app_playground_client",
  "tangram_app_playground_server",
+ "tangram_app_production_alerts_alerts_server",
  "tangram_app_production_alerts_index_server",
  "tangram_app_production_class_metrics_client",
  "tangram_app_production_class_metrics_server",
@@ -3363,6 +3366,37 @@ dependencies = [
 ]
 
 [[package]]
+name = "tangram_app_new_production_alert_client"
+version = "0.0.0"
+dependencies = [
+ "tangram_ui",
+ "web-sys",
+]
+
+[[package]]
+name = "tangram_app_new_production_alert_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "multer",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "sunfish",
+ "tangram_app_common",
+ "tangram_app_layouts",
+ "tangram_app_ui",
+ "tangram_core",
+ "tangram_id",
+ "tangram_model",
+ "tangram_ui",
+]
+
+[[package]]
 name = "tangram_app_new_repo_server"
 version = "0.0.0"
 dependencies = [
@@ -3472,6 +3506,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "tangram_app_production_alerts_alerts_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+ "tangram_app_common",
+ "tangram_app_layouts",
+ "tangram_app_ui",
+ "tangram_core",
+ "tangram_id",
+ "tangram_model",
+ "tangram_ui",
+ "tangram_zip",
+]
+
+[[package]]
 name = "tangram_app_production_alerts_index_server"
 version = "0.0.0"
 dependencies = [
@@ -3489,7 +3550,6 @@ dependencies = [
  "sunfish",
  "tangram_app_common",
  "tangram_app_layouts",
- "tangram_app_production_stats",
  "tangram_app_ui",
  "tangram_charts",
  "tangram_core",
