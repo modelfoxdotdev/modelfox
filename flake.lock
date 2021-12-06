@@ -6,11 +6,11 @@
         "rust-analyzer-src": "rust-analyzer-src"
       },
       "locked": {
-        "lastModified": 1638167085,
-        "narHash": "sha256-8rqAhzLjaXjYrK5GettWIVP3plI7iJThc//TPfcF8zs=",
+        "lastModified": 1638771914,
+        "narHash": "sha256-0Y9k9FUd4t/X0l2wxSymgTHOCJIA0AflmQVWI0S8Oa8=",
         "owner": "nix-community",
         "repo": "fenix",
-        "rev": "7b1a6cad1eb2574e682fda5f865aaff08f56df37",
+        "rev": "f034a142dc4277e7f840aed449c85c2fe93e5b41",
         "type": "github"
       },
       "original": {
@@ -104,11 +104,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1638110343,
-        "narHash": "sha256-hQaow8sGPyUrXgrqgDRsfA+73uR0vms2goTQNxIAaRQ=",
+        "lastModified": 1638535497,
+        "narHash": "sha256-tk5LNbdkUhALp00+r5ZmQ3t7n2d5M7YUQB+MznWvVOg=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "942eb9a335b4cd22fa6a7be31c494e53e76f5637",
+        "rev": "c71f061c68ba8ce53471b767d5049cbd0f3d8490",
         "type": "github"
       },
       "original": {
@@ -120,11 +120,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1638110343,
-        "narHash": "sha256-hQaow8sGPyUrXgrqgDRsfA+73uR0vms2goTQNxIAaRQ=",
+        "lastModified": 1638535497,
+        "narHash": "sha256-tk5LNbdkUhALp00+r5ZmQ3t7n2d5M7YUQB+MznWvVOg=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "942eb9a335b4cd22fa6a7be31c494e53e76f5637",
+        "rev": "c71f061c68ba8ce53471b767d5049cbd0f3d8490",
         "type": "github"
       },
       "original": {
@@ -210,11 +210,11 @@
     "rust-analyzer-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1638036899,
-        "narHash": "sha256-vh7z8jupVxXPOko3sWUsOB7eji/7lKfwJ/CE3iw97Sw=",
+        "lastModified": 1638718108,
+        "narHash": "sha256-k6ur90DkrFe9N/didkNCTbt7QYjNsGbXv9NcRIL8l7k=",
         "owner": "rust-analyzer",
         "repo": "rust-analyzer",
-        "rev": "d9b2291f546abc77d24499339a72a89127464b95",
+        "rev": "7d6fcbc0be2151bfa85ec146545b42d8be2fb28c",
         "type": "github"
       },
       "original": {
@@ -285,11 +285,11 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1638469136,
-        "narHash": "sha256-I60JeNLSPRCTKBuYKtL18uIsErsi1tRd+fQ5Wi/OYwM=",
+        "lastModified": 1638476515,
+        "narHash": "sha256-nyuK1FHnnaHGyluY7i+vsePwjxIaDhB15tr72ZJ0UZA=",
         "owner": "tangramdotdev",
         "repo": "windows_sdk",
-        "rev": "5a31225ad6fd77113980cdd56b2c4a1bddbb9dc8",
+        "rev": "7b033a8b4ec01f0b8de5178f8ee00b02936f2f40",
         "type": "github"
       },
       "original": {
