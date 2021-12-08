@@ -306,9 +306,9 @@ dependencies = [
 
 [[package]]
 name = "chrono-tz"
-version = "0.6.0"
+version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64c01c1c607d25c71bbaa67c113d6c6b36c434744b4fd66691d711b5b1bc0c8b"
+checksum = "58549f1842da3080ce63002102d5bc954c7bc843d4f47818e642abdc36253552"
 dependencies = [
  "chrono",
  "chrono-tz-build",
@@ -662,9 +662,9 @@ checksum = "a357d28ed41a50f9c765dbfe56cbc04a64e53e5fc58ba79fbc34c10ef3df831f"
 
 [[package]]
 name = "encoding_rs"
-version = "0.8.29"
+version = "0.8.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a74ea89a0a1b98f6332de42c95baff457ada66d1cb4030f9ff151b2041a1c746"
+checksum = "7896dc8abb250ffdda33912550faa54c88ec8b998dec0b2c55ab224921ce11df"
 dependencies = [
  "cfg-if",
 ]
@@ -1252,9 +1252,9 @@ checksum = "68f2d64f2edebec4ce84ad108148e67e1064789bee435edc5b60ad398714a3a9"
 
 [[package]]
 name = "itertools"
-version = "0.10.1"
+version = "0.10.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69ddb889f9d0d08a67338271fa9b62996bc788c7796a5c18cf057420aaed5eaf"
+checksum = "a9a9d19fa1e79b6215ff29b9d6880b706147f16e9b1dbb1e4e5947b5b02bc5e3"
 dependencies = [
  "either",
 ]
@@ -1337,9 +1337,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.108"
+version = "0.2.109"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8521a1b57e76b1ec69af7599e75e38e7b7fad6610f037db8c79b127201b5d119"
+checksum = "f98a04dce437184842841303488f70d0188c5f51437d2a834dc097eafa909a01"
 
 [[package]]
 name = "libm"
@@ -1349,9 +1349,9 @@ checksum = "c7d73b3f436185384286bd8098d17ec07c9a7d2388a6599f824d8502b529702a"
 
 [[package]]
 name = "libsqlite3-sys"
-version = "0.23.1"
+version = "0.23.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "abd5850c449b40bacb498b2bbdfaff648b1b055630073ba8db499caf2d0ea9f2"
+checksum = "d2cafc7c74096c336d9d27145f7ebd4f4b6f95ba16aa5a282387267e6925cb58"
 dependencies = [
  "cc",
  "pkg-config",
@@ -1471,9 +1471,9 @@ dependencies = [
 
 [[package]]
 name = "memoffset"
-version = "0.6.4"
+version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59accc507f1338036a0477ef61afdae33cde60840f4dfe481319ce3ad116ddf9"
+checksum = "5aa361d4faea93603064a027415f07bd8e1d5c88c9fbf68bf56a285428fd79ce"
 dependencies = [
  "autocfg",
 ]
@@ -2005,9 +2005,9 @@ dependencies = [
 
 [[package]]
 name = "pkg-config"
-version = "0.3.22"
+version = "0.3.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12295df4f294471248581bc09bef3c38a5e46f1e36d6a37353621a0c6c357e1f"
+checksum = "d1a3ea4f0dd7f1f3e512cf97bf100819aa547f36a6eccac8dbaae839eb92363e"
 
 [[package]]
 name = "ppv-lite86"
@@ -2059,9 +2059,9 @@ checksum = "dbf0c48bc1d91375ae5c3cd81e3722dff1abcf81a30960240640d223f59fe0e5"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.32"
+version = "1.0.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba508cc11742c0dc5c1659771673afbab7a0efab23aa17e854cbab0837ed0b43"
+checksum = "fb37d2df5df740e582f28f8560cf425f52bb267d872fe58358eadb554909f07a"
 dependencies = [
  "unicode-xid",
 ]
@@ -5199,9 +5199,9 @@ dependencies = [
 
 [[package]]
 name = "tree-sitter"
-version = "0.20.1"
+version = "0.19.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9394e9dbfe967b5f3d6ab79e302e78b5fb7b530c368d634ff3b8d67ede138bf1"
+checksum = "1f41201fed3db3b520405a9c01c61773a250d4c3f43e9861c14b2bb232c981ab"
 dependencies = [
  "cc",
  "regex",
@@ -5209,20 +5209,19 @@ dependencies = [
 
 [[package]]
 name = "tree-sitter-highlight"
-version = "0.20.1"
+version = "0.19.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "042342584c5a7a0b833d9fc4e2bdab3f9868ddc6c4b339a1e01451c6720868bc"
+checksum = "fb37284ab259e42af1e49fa0f302e3fa93400f2f3921dcfd342b1c833db45970"
 dependencies = [
  "regex",
- "thiserror",
  "tree-sitter",
 ]
 
 [[package]]
 name = "tree-sitter-javascript"
-version = "0.20.0"
+version = "0.19.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2490fab08630b2c8943c320f7b63473cbf65511c8d83aec551beb9b4375906ed"
+checksum = "fded47e6354ce3c016e433314f87309d86eb020172e1ca4ab8d4a8f345c6a2f9"
 dependencies = [
  "cc",
  "tree-sitter",

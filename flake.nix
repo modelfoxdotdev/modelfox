@@ -93,6 +93,7 @@
           go
           lld_13
           llvm_13
+          mold
           nodejs-16_x
           (php.withExtensions ({ all, ... }: with all; [
             curl
@@ -178,7 +179,7 @@
             [ "$arg" = "-lgcc_s" ] && set -- "$@" "-lunwind" && continue
             set -- "$@" "$arg"
           done
-          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-linux-gnu.2.28 $@
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-linux-gnu.2.28 --ld-path=$(which mold) $@
         '' + /bin/linker;
         CC_x86_64_unknown_linux_gnu = pkgs.writeShellScriptBin "cc" ''
           ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-linux-gnu.2.28 $@
@@ -225,23 +226,24 @@
         AR_x86_64_pc_windows_msvc = "llvm-lib";
         CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER = pkgs.writeShellScriptBin "linker" ''
           lld-link /
-            \libpath:${windows_sdk.defaultPackage.${system}}/clang/lib/x64 \
-            /libpath:${windows_sdk.defaultPackage.${system}}/crt/lib/x64 \
-            /libpath:${windows_sdk.defaultPackage.${system}}/sdk/lib/x64 \
-            /libpath:${windows_sdk.defaultPackage.${system}}/sdk/lib/x64/ucrt \
-            /libpath:${windows_sdk.defaultPackage.${system}}/sdk/lib/x64/um \
+            /libpath:$WINDOWS_SDK/clang/lib/x64 \
+            /libpath:$WINDOWS_SDK/crt/lib/x64 \
+            /libpath:$WINDOWS_SDK/sdk/lib/x64 \
+            /libpath:$WINDOWS_SDK/sdk/lib/x64/ucrt \
+            /libpath:$WINDOWS_SDK/sdk/lib/x64/um \
             $@
         '' + /bin/linker;
         CC_x86_64_pc_windows_msvc = pkgs.writeShellScriptBin "cc" ''
           clang-cl \
-            /I ${windows_sdk.defaultPackage.${system}}/clang/include \
-            /I ${windows_sdk.defaultPackage.${system}}/crt/include \
-            /I ${windows_sdk.defaultPackage.${system}}/sdk/include \
-            /I ${windows_sdk.defaultPackage.${system}}/sdk/include/shared \
-            /I ${windows_sdk.defaultPackage.${system}}/sdk/include/ucrt \
-            /I ${windows_sdk.defaultPackage.${system}}/sdk/include/um \
+            /I $WINDOWS_SDK/clang/include \
+            /I $WINDOWS_SDK/crt/include \
+            /I $WINDOWS_SDK/sdk/include \
+            /I $WINDOWS_SDK/sdk/include/shared \
+            /I $WINDOWS_SDK/sdk/include/ucrt \
+            /I $WINDOWS_SDK/sdk/include/um \
             $@
         '' + /bin/cc;
+        WINDOWS_SDK = windows_sdk.defaultPackage.${system};
       };
     }
   );
