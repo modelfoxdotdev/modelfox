@@ -4,8 +4,8 @@ use std::{net::SocketAddr, sync::Arc};
 pub use tangram_app_common::options;
 use tangram_app_common::{
 	alerts::{
-		AlertCadence, AlertData, AlertHeuristics, AlertProgress, AlertMethod, AlertMetric, AlertResult,
-		AlertThreshold, Alerts,
+		AlertCadence, AlertData, AlertHeuristics, AlertMethod, AlertMetric, AlertProgress,
+		AlertResult, AlertThreshold, Alerts,
 	},
 	heuristics::ALERT_METRICS_MINIMUM_TRUE_VALUES_THRESHOLD,
 	options::{Options, StorageOptions},
@@ -162,10 +162,10 @@ async fn alert_manager(context: Arc<Context>) -> Result<()> {
 	// Currently enabled alerts - should probably move up to the context
 	let enabled = Alerts::from(vec![AlertHeuristics {
 		cadence: AlertCadence::Testing,
-		thresholds: vec![AlertThreshold {
+		threshold: AlertThreshold {
 			metric: AlertMetric::Accuracy,
 			variance: 0.1,
-		}],
+		},
 	}]);
 	/*
 	let enabled = Alerts(vec![
@@ -226,20 +226,18 @@ async fn check_metrics(
 	if previous_alert_data.is_none() {
 		return Ok(vec![]);
 	}
-	for threshold in &heuristics.thresholds {
-		// Look at the current value.
-		let current_value = find_current_data(threshold.metric, database_pool).await?;
-		if current_value.is_none() {
-			// Not enough predictions have been logged - abort!
-			return Ok(vec![]);
-		}
-		let current_value = current_value.unwrap();
-		results.push(AlertResult {
-			metric: threshold.metric,
-			observed_value: current_value,
-			observed_variance: (current_value - threshold.variance).abs(),
-		});
+	// Look at the current value.
+	let current_value = find_current_data(heuristics.threshold.metric, database_pool).await?;
+	if current_value.is_none() {
+		// Not enough predictions have been logged - abort!
+		return Ok(vec![]);
 	}
+	let current_value = current_value.unwrap();
+	results.push(AlertResult {
+		metric: heuristics.threshold.metric,
+		observed_value: current_value,
+		observed_variance: (current_value - heuristics.threshold.variance).abs(),
+	});
 	Ok(results)
 }
 

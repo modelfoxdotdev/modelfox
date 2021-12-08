@@ -51,7 +51,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		"
 			select
 				id,
-				alerts,
+				alert,
 				last_updated
 			from alert_preferences
 			where model_id = $1

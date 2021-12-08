@@ -2,7 +2,7 @@ use crate::Context;
 use anyhow::{anyhow, Result};
 use lettre::AsyncTransport;
 use serde::{Deserialize, Serialize};
-use std::fmt;
+use std::{fmt, io, str::FromStr};
 
 /// Alert cadence
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
@@ -48,6 +48,23 @@ impl fmt::Display for AlertCadence {
 			AlertCadence::Weekly => "weekly",
 		};
 		write!(f, "{}", s)
+	}
+}
+
+impl FromStr for AlertCadence {
+	type Err = io::Error;
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		match s.to_lowercase().as_str() {
+			"daily" => Ok(AlertCadence::Daily),
+			"hourly" => Ok(AlertCadence::Hourly),
+			"monthly" => Ok(AlertCadence::Monthly),
+			"testing" => Ok(AlertCadence::Testing),
+			"weekly" => Ok(AlertCadence::Weekly),
+			_ => Err(io::Error::new(
+				io::ErrorKind::InvalidInput,
+				format!("Unsupported cadence {}", s),
+			)),
+		}
 	}
 }
 
@@ -99,6 +116,20 @@ pub enum AlertMetric {
 	RootMeanSquaredError,
 }
 
+impl FromStr for AlertMetric {
+	type Err = io::Error;
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		match s.to_lowercase().as_str() {
+			"accuracy" => Ok(AlertMetric::Accuracy),
+			"rmse" | "root_mean_squared_error" => Ok(AlertMetric::RootMeanSquaredError),
+			_ => Err(io::Error::new(
+				io::ErrorKind::InvalidInput,
+				"Unsupported alert metric",
+			)),
+		}
+	}
+}
+
 /// An alert record can be in one of these states
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AlertProgress {
@@ -123,6 +154,15 @@ pub struct AlertThreshold {
 	pub variance: f32,
 }
 
+impl Default for AlertThreshold {
+	fn default() -> Self {
+		AlertThreshold {
+			metric: AlertMetric::Accuracy,
+			variance: 0.1,
+		}
+	}
+}
+
 /// A result from checking a metric
 #[derive(Debug, Clone, Copy, Deserialize, Serialize)]
 pub struct AlertResult {
@@ -142,16 +182,14 @@ impl AlertResult {
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct AlertHeuristics {
 	pub cadence: AlertCadence,
-	pub thresholds: Vec<AlertThreshold>,
+	pub threshold: AlertThreshold,
 }
 
 impl AlertHeuristics {
 	/// Retrieve the variance tolerance for a given metric, if present
 	pub fn get_threshold(&self, metric: AlertMetric) -> Option<f32> {
-		for threshold in &self.thresholds {
-			if threshold.metric == metric {
-				return Some(threshold.variance);
-			}
+		if self.threshold.metric == metric {
+			return Some(self.threshold.variance);
 		}
 		None
 	}

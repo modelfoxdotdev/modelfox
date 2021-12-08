@@ -3386,6 +3386,7 @@ dependencies = [
  "pinwheel",
  "serde",
  "serde_json",
+ "serde_urlencoded",
  "sqlx",
  "sunfish",
  "tangram_app_common",
@@ -3395,6 +3396,7 @@ dependencies = [
  "tangram_id",
  "tangram_model",
  "tangram_ui",
+ "time 0.3.5",
 ]
 
 [[package]]

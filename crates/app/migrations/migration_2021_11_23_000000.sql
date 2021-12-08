@@ -9,7 +9,7 @@ create table alerts (
 
 create table alert_preferences (
 	id char(32) primary key,
-	alerts text,
+	alert text,
 	model_id char(32) references models (id) not null,
 	last_updated bigint not null
 );

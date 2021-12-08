@@ -24,7 +24,6 @@ impl Component for Page {
 						)
 						.child(
 							ui::Form::new()
-								.enc_type("multipart/form-data".to_owned())
 								.post(true)
 								.child(
 									self.error.map(|error| {
@@ -63,7 +62,7 @@ impl Component for Page {
 										.options(vec![
 											ui::SelectFieldOption {
 												text: "Accuracy".to_owned(),
-												value: "accurace".to_owned(),
+												value: "accuracy".to_owned(),
 											},
 											ui::SelectFieldOption {
 												text: "Root Mean Squared Error".to_owned(),

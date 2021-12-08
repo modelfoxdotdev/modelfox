@@ -1,10 +1,9 @@
 use crate::page::Page;
 use anyhow::{bail, Result};
-use multer::Multipart;
 use pinwheel::prelude::*;
-use std::sync::Arc;
+use std::{str, str::FromStr, sync::Arc};
 use tangram_app_common::{
-	alerts::{AlertHeuristics, AlertThreshold},
+	alerts::{AlertCadence, AlertHeuristics, AlertMetric, AlertThreshold},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	path_components,
 	user::{authorize_user, authorize_user_for_model, authorize_user_for_repo},
@@ -12,6 +11,13 @@ use tangram_app_common::{
 };
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_id::Id;
+
+#[derive(serde::Deserialize)]
+struct Action {
+	cadence: String,
+	metric: String,
+	threshold: String,
+}
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
@@ -51,92 +57,43 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
+	let data = match hyper::body::to_bytes(request.body_mut()).await {
+		Ok(data) => data,
+		Err(_) => return Ok(bad_request()),
+	};
+	let action: Action = match serde_urlencoded::from_bytes(&data) {
+		Ok(action) => action,
+		Err(_) => return Ok(bad_request()),
+	};
 	let model_layout_info =
 		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionAlerts).await?;
-	let boundary = match request
-		.headers()
-		.get(http::header::CONTENT_TYPE)
-		.and_then(|ct| ct.to_str().ok())
-		.and_then(|ct| multer::parse_boundary(ct).ok())
-	{
-		Some(boundary) => boundary,
-		None => {
-			let page = Page {
-				model_layout_info,
-				error: Some(format!(
-					"Failed to parse request body.\n{}:{}",
-					file!(),
-					line!()
-				)),
-			};
-			let html = html(page);
-			let response = http::Response::builder()
-				.status(http::StatusCode::BAD_REQUEST)
-				.body(hyper::Body::from(html))
-				.unwrap();
-			return Ok(response);
-		}
-	};
-	let mut cadence: Option<Vec<u8>> = None;
-	let mut metric: Option<Vec<u8>> = None;
-	let mut threshold: Option<Vec<u8>> = None;
-	let mut multipart = Multipart::new(request.body_mut(), boundary);
-	while let Some(field) = multipart.next_field().await? {
-		let name = match field.name() {
-			Some(name) => name.to_owned(),
-			None => {
-				let page = Page {
-					model_layout_info,
-					error: Some(format!(
-						"Failed to parse request body.\n{}:{}",
-						file!(),
-						line!()
-					)),
-				};
-				let html = html(page);
-				let response = http::Response::builder()
-					.status(http::StatusCode::BAD_REQUEST)
-					.body(hyper::Body::from(html))
-					.unwrap();
-				return Ok(response);
-			}
-		};
-		let field_data = field.bytes().await?.to_vec();
-		match name.as_str() {
-			"cadence" => cadence = Some(field_data),
-			"metric" => metric = Some(field_data),
-			"threshold" => threshold = Some(field_data),
-			_ => {
-				let page = Page {
-					model_layout_info,
-					error: Some(format!(
-						"Failed to parse request body.\n{}:{}",
-						file!(),
-						line!()
-					)),
-				};
-				let html = html(page);
-				let response = http::Response::builder()
-					.status(http::StatusCode::BAD_REQUEST)
-					.body(hyper::Body::from(html))
-					.unwrap();
-				return Ok(response);
-			}
-		}
-	}
-	// TODO - unwrap options, deal with error, convert Vec<u8> data to proper types
-	let cadence = todo!();
-	let metric = todo!();
-	let variance = todo!();
-	let alert = AlertHeuristics {
+	let Action {
 		cadence,
-		thresholds: vec![AlertThreshold { metric, variance }],
+		metric,
+		threshold,
+	} = action;
+	// TODO - maybe impl From<Action> for AlertHeuristics ?
+	println!("Recevied {}|{}|{}", cadence, metric, threshold);
+	let alert = AlertHeuristics {
+		cadence: AlertCadence::from_str(&cadence)?,
+		threshold: AlertThreshold {
+			metric: AlertMetric::from_str(&metric)?,
+			variance: threshold.parse()?,
+		},
 	};
+	let alert_json = serde_json::to_string(&alert)?;
 	let result = sqlx::query(
 		"
-			insert into 
+			insert into alert_preferences
+				(id, alert, model_id, last_updated)
+			values
+				($1, $2, $3, $4)
 		",
 	)
+	.bind(Id::generate().to_string())
+	.bind(alert_json)
+	.bind(model_id.to_string())
+	.bind(time::OffsetDateTime::now_utc().unix_timestamp().to_string())
 	.execute(&mut db)
 	.await;
 	if result.is_err() {
