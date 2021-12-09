@@ -29,13 +29,13 @@
 	margin: 0;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.h1 {
 		font-size: 1.25rem;
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.h1 {
 		font-size: 2rem;
 	}
@@ -47,13 +47,13 @@
 	margin: 0;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.h2 {
 		font-size: 1rem;
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.h2 {
 		font-size: 1.5rem;
 	}

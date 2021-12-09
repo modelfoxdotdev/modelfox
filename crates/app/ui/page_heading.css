@@ -3,14 +3,14 @@
 	display: grid;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.page-heading {
 		grid-auto-flow: row;
 		row-gap: 1rem;
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.page-heading {
 		justify-content: space-between;
 		min-height: 2.5rem;
@@ -22,14 +22,14 @@
 	display: grid;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.page-heading-buttons {
 		grid-auto-flow: row;
 		row-gap: 1rem;
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.page-heading-buttons {
 		grid-auto-flow: column;
 		column-gap: 1rem;

@@ -13,6 +13,10 @@ path = "lib.rs"
 name = "tangram_app_seed"
 path = "seed.rs"
 
+[[bin]]
+name = "tangram_app_track"
+path = "track.rs"
+
 [build-dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
 sunfish = "0.3"

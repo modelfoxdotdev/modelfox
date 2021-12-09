@@ -10,7 +10,7 @@
 	overflow: auto;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.number-comparison-card-wrapper {
 		column-gap: 1rem;
 		row-gap: 0.5rem;
@@ -18,7 +18,7 @@
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.number-comparison-card-wrapper {
 		column-gap: 2rem;
 		row-gap: 0.5rem;
@@ -31,13 +31,13 @@
 	justify-self: center;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.number-comparison-card-title {
 		font-size: 1rem;
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.number-comparison-card-title {
 		font-size: 1.25rem;
 	}
@@ -72,13 +72,13 @@
 	grid-area: value-b;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.number-comparison-card-value {
 		font-size: 1.5rem;
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.number-comparison-card-value {
 		font-size: 2rem;
 	}

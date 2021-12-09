@@ -8,7 +8,7 @@
 	gap: 1rem;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.tuning-number-chart-grid {
 		grid:
 			"accuracy accuracy" auto "precision recall" auto /
@@ -16,7 +16,7 @@
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.tuning-number-chart-grid {
 		grid:
 			"accuracy precision recall" auto /

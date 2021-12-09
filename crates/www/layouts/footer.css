@@ -16,13 +16,13 @@
 	gap: 2rem;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.footer-sections {
 		grid-auto-flow: row;
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.footer-sections {
 		grid-auto-flow: column;
 	}

@@ -2,7 +2,7 @@
 	display: grid;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.docs-layout {
 		grid-template-rows: auto auto;
 		grid-template-columns: minmax(0, 1fr);
@@ -15,7 +15,7 @@
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.docs-layout {
 		grid-template-rows: auto;
 		grid-template-columns: 250px minmax(0, 1fr) 250px;
@@ -47,7 +47,7 @@
 	display: grid;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.docs-prev-next-buttons {
 		grid: auto auto / auto;
 		row-gap: 1rem;
@@ -55,7 +55,7 @@
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.docs-prev-next-buttons {
 		grid: auto / auto auto;
 		justify-content: space-between;

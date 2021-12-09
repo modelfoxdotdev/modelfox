@@ -10,7 +10,7 @@
 	margin-bottom: 1rem;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.nav-details {
 		display: block;
 	}
@@ -19,7 +19,7 @@
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.nav-details {
 		display: none;
 	}

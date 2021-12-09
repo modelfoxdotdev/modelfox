@@ -50,7 +50,7 @@
 	font-size: 2rem;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.confusion-matrix-comparison-item-value {
 		font-size: 1.5rem;
 	}

@@ -12,13 +12,13 @@
 	gap: 1rem;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.predict-form-grid {
 		grid: auto / minmax(0, 1fr);
 	}
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.predict-column-chart-wrapper {
 		display: none;
 	}

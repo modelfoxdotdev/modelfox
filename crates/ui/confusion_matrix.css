@@ -32,37 +32,37 @@
 	color: var(--text-color);
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.confusion-matrix-item-title {
 		font-size: 1.25rem;
 	}
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.confusion-matrix-item-title {
 		font-size: 1rem;
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.confusion-matrix-item-value {
 		font-size: 2rem;
 	}
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.confusion-matrix-item-value {
 		font-size: 1.5rem;
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.confusion-matrix-item-percent {
 		font-size: 1.25rem;
 	}
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.confusion-matrix-item-percent {
 		font-size: 1rem;
 	}

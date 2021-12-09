@@ -43,13 +43,13 @@
 	z-index: 1;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.topbar-details {
 		display: block;
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.topbar-details {
 		display: none;
 	}
@@ -110,7 +110,7 @@
 	user-select: none;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.topbar-items-wrapper {
 		display: none;
 	}

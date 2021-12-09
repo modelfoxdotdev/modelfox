@@ -3,7 +3,7 @@
 	gap: 1rem;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.production-metrics-wrapper {
 		grid: auto auto auto / auto;
 		grid-template-areas:
@@ -12,7 +12,7 @@
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.production-metrics-wrapper {
 		grid: auto auto / minmax(0, 1fr) minmax(0, 1fr);
 		grid-template-areas: "accuracy precision";

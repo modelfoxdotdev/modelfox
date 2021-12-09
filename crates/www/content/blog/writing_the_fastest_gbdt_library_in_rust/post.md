@@ -1,6 +1,6 @@
 {
 "title": "Writing the fastest GBDT Library in Rust",
-"date": "January 1, 2022",
+"date": "December 8, 2021",
 "author": {
 "name": "Isabella Tromba",
 "gravatar": "https://gravatar.com/avatar/b5c16153bae7a6fa6663d7f555906dd0?s=100"
@@ -32,7 +32,7 @@ The content of this post is organized into sections, feel free to skip to the on
 
 ## What are GBDTs?
 
-GBDT stands for Gradient Boosted Decision Tree. GBDTs are a type of machine learning model that perform incredibly well on tabular data. Tabular data is data that you would normally find in a spreadsheet or csv file. You can think of tabular data as ints, floats, booleans, enums, short text.
+GBDT stands for Gradient Boosted Decision Tree. GBDTs are a type of machine learning model that perform incredibly well on tabular data. Tabular data is data that you would normally find in a spreadsheet/csv. You can think of tabular data as ints, floats, booleans, enums, and short text.
 
 In order to get a feeling for how GBDT's work, let's go through an example of making a prediction with a single decision tree. Let’s say you want to predict the price of a house based on features like the number of bedrooms, bathrooms, and square footage. Here is a table with 3 features `num_bedrooms`, `num_bathrooms` and `sqft`. The final column called `price` is what we are trying to predict.
 
@@ -79,7 +79,7 @@ To learn more about GBDT's check out the [wikipedia article on gradient boosting
 
 ## Use Rayon to Parallelize
 
-So now that we know a little about GBDT's let's talk about how we made our code fast. The first thing we did was parallelize our code! [Rayon](https://github.com/rayon-rs/rayon) makes this really easy. Rayon is a data parallelism library for Rust that makes converting sequential operations into parallel ones extremely easy.
+So now that we know a little about GBDT's let's talk about how we made our code fast. The first thing we did was parallelize our code. [Rayon](https://github.com/rayon-rs/rayon) makes this really easy. Rayon is a data parallelism library for Rust that makes converting sequential operations into parallel ones extremely easy.
 
 <img
   src="features_matrix.png"
@@ -95,7 +95,7 @@ The process of training trees takes in a matrix of training data which is n_rows
   width="50%"
 />
 
-To decide which feature to use at each node, we need to compute a score for each feature. We can compute the score for each feature in parallel.
+To decide which feature to use at each node, we need to compute a score for each feature. We do this by iterating over each column in the matrix. The following is a sequential iteration over the columns.
 
 ```rust
 dataset.columns().iter().map(|column| {
@@ -103,7 +103,7 @@ dataset.columns().iter().map(|column| {
 })
 ```
 
-With rayon, it’s as easy as changing the call to `iter` to `par_iter`. Rayon will keep a thread pool around and schedule items from your iterator to be processed in parallel. Parallelizing over the features works well when the number of features is larger than the number of cores on your computer.
+We can parallelize this code with Rayon. All we have to do is change the call to `iter` to `par_iter`. 
 
 ```rust
 dataset.columns().par_iter().map(|column| {
@@ -111,7 +111,7 @@ dataset.columns().par_iter().map(|column| {
 })
 ```
 
-When the number of features is smaller than the number of logical cores in your computer, parallelizing over the features is not as efficient. This is because some of our cores will be sitting idle so we will not be using all of the compute power available to us.
+Rayon will keep a thread pool around and schedule items from your iterator to be processed in parallel. Parallelizing over the features works well when the number of features is larger than the number of cores on your computer. When the number of features is smaller than the number of logical cores in your computer, parallelizing over the features is not as efficient. This is because some of our cores will be sitting idle so we will not be using all of the compute power available to us. You can see this clearly in the image below. Cores 1 through 4 have work to do because they have features 1 through 4 assigned to them. Cores 5 through 8 though are sitting idle. 
 
 <img
   src="cores_column_wise.png"
@@ -119,7 +119,7 @@ When the number of features is smaller than the number of logical cores in your 
   width="100%"
 />
 
-Instead, we can parallelize over chunks of rows and make sure we have enough chunks so that each core has some work to do.
+In this situation, we can parallelize over chunks of rows instead and make sure we have enough chunks so that each core has some work to do.
 
 <img
   src="features_matrix_row_wise.png"
@@ -135,13 +135,14 @@ Each core now has some rows assigned to it, and no core is sitting idle.
   width="50%"
 />
 
-Distributing the work across rows is super easy with Rayon as well. We just use the combinator `par_chunks`! Rayon has a lot of other high-level combinators that make it easy to express complex parallel computations.
+Distributing the work across rows is super easy with Rayon as well. We just use the combinator `par_chunks`! 
 
 ```rust
 dataset.rows().par_chunks(N).map(|chunk| {
   // process the chunk
 });
 ```
+These are just a couple of the combinators available in Rayon. There are a lot of other high-level combinators that make it easy to express complex parallel computations. Check out [Rayon](https://github.com/rayon-rs/rayon) on GitHub to learn more.
 
 ## Use cargo-flamegraph to find bottlenecks
 
@@ -153,13 +154,7 @@ cargo install flamegraph
 cargo flamegraph
 ```
 
-`Cargo-flamegraph` makes it easy generate flamegraphs and integrates elegantly with cargo. You can install it with `cargo install`, then run `cargo flamegraph` to run your program and generate a flamegraph!
-
-<img
-  src="flamegraph.png"
-  alt="flame graph"
-  width="100%"
-/>
+`Cargo-flamegraph` makes it easy generate flamegraphs and integrates elegantly with cargo. You can install it with `cargo install`, then run `cargo flamegraph` to run your program and generate a flamegraph.
 
 ```rust
 fn main() {
@@ -168,7 +163,15 @@ fn main() {
 }
 ```
 
-Here is a simple example with a program that calls two subroutines, foo and bar. When we run `cargo flamegraph` we get an output that looks like this. It contains a lot of extra functions that you have to sort through, but it boils down to something like this.
+Here is a simple example with a program that calls two subroutines, `foo` and `bar`. When we run `cargo flamegraph` we get an output that looks like this. 
+
+<img
+  src="flamegraph.png"
+  alt="flame graph"
+  width="100%"
+/>
+
+It contains a lot of extra functions that you have to sort through, but it boils down to something like this.
 
 <img
   src="flame.png"
@@ -178,9 +181,9 @@ Here is a simple example with a program that calls two subroutines, foo and bar.
 
 The y-axis of the graph is the call stack, and the x axis is duration. The bottom of the graph shows that the entire duration of the program was spent in the main function. Above that, you see that the main function’s time is broken up between calls to `foo` and `bar`, and that about two thirds of the time was spent in `foo` and its subroutines, vs about one third of the time spent in bar and its subroutines.
 
-In our code for training decision trees, the flamegraph showed one function where the majority of the time was spent. It boiled down to something like this.
+In our code for training decision trees, the flamegraph showed one function where the majority of the time was spent. It boiled down to something like this: 
 
-We maintain an array of the numbers 0 to n that we call `indexes`, and at each iteration of training we rearrange it. Then, we access an array of the same length, called `values`, but in the order of the indexes in the `indexes` array.
+We maintain an array of the numbers `0` to `n` that we call `indexes`, and at each iteration of training we rearrange it. Then, we access an array of the same length, called `values`, but in the order of the indexes in the `indexes` array.
 
 ```rust
 let indexes = (0..n).collect();
@@ -204,7 +207,7 @@ cargo install cargo-asm
 cargo asm --rust path::to::a::function
 ```
 
-Like cargo-flamegraph, cargo-asm is really easy to install and integrates nicely with cargo. You can install it with `cargo install`, and run it as a cargo subcommand.
+Like `cargo-flamegraph`, `cargo-asm` is really easy to install and integrates nicely with cargo. You can install it with `cargo install`, and run it as a cargo subcommand.
 
 Here is a simple example with a function that adds two numbers and multiplies the result by two.
 
@@ -290,7 +293,7 @@ Remember how we noticed that this code results in accessing the `values` array o
   width="100%"
 />
 
-However, we know which values we are going to be accessing a few iterations of the loop in the future. We can hint to x86_64 CPU’s to prefetch those values into cache using the [mm_prefetch](https://doc.rust-lang.org/beta/core/arch/x86_64/fn._mm_prefetch.html) intrinsic. We experimented with different values of the `OFFSET` until we got the best performance.
+However, we know which values we are going to be accessing a few iterations of the loop in the future. We can hint to x86_64 CPU’s to prefetch those values into cache using the [mm_prefetch](https://doc.rust-lang.org/beta/core/arch/x86_64/fn._mm_prefetch.html) intrinsic. We experimented with different values of the `OFFSET` until we got the best performance. If the `OFFSET` is too small, the CPU will still have to wait for the data, if the `OFFSET` is too large, data that the CPU needs might be evicted and by the time the CPU gets to the iteration that needs the data, it will no longer be there. The best offset will vary depending on your computer's hardware so it can be more of an art than a science. 
 
 ```rust
 for index in indexes {
@@ -299,6 +302,8 @@ for index in indexes {
   // do something with value
 }
 ```
+
+If you are interested in cache performance and writing performant code, check out [Mike Acton's talk on Data-Oriented Design](https://www.youtube.com/watch?v=rX0ItVEVjHc) Andrew Kelly, the creator of Zig, [recent talk at Handmade Seattle](https://media.handmade-seattle.com/practical-data-oriented-design/). 
 
 ## Use unsafe code to eliminate unnecessary bounds checks
 
@@ -320,7 +325,7 @@ Most of the time, the compiler can eliminate bounds checks when looping over val
 // }
 ```
 
-But we said at the beginning that the indexes array is a permutation of the values 0 to n. This means the bounds check is unnecessary! We can fix this by replacing `get_mut` with `get_unchecked_mut`. We have to use unsafe code here, because Rust provides no way to communicate to the compiler that the values in the `indexes` array are always in bounds of the `values` array.
+But we said at the beginning that the indexes array is a permutation of the values 0 to n. This means the bounds check is unnecessary. We can fix this by replacing `get_mut` with `get_unchecked_mut`. We have to use unsafe code here, because Rust provides no way to communicate to the compiler that the values in the `indexes` array are always in bounds of the `values` array.
 
 ## Use unsafe code to parallelize non-overlapping memory access
 
@@ -369,7 +374,7 @@ Combining the four optimizations together:
 - making sure that the `values` array is a contiguous slice.
 - prefetching values so they are in cache.
 - Removing bounds checks because we know the indexes are always in bounds.
-- And parallelizing over the indexes because we know they never overlap
+- Parallelizing over the indexes because we know they never overlap
 
 This is the code we get:
 
@@ -395,4 +400,5 @@ Here are our benchmarks on training time comparing Tangram's Gradient Boosted De
 
 To see all the benchmarks, head over to [https://tangram.dev/benchmarks](https://tangram.dev/benchmarks).
 
-If you are interested in reading the code, it is available on [GitHub](https://github.com/tangramdotdev/tangram). Head over and give us a star if you like our project!
+If you are interested in reading the code or giving us a star, the project is available on [GitHub](https://github.com/tangramdotdev/tangram).
+

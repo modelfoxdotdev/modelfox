@@ -2,14 +2,14 @@
 	display: grid;
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.pricing-grid {
 		row-gap: 2rem;
 		grid-auto-flow: row;
 	}
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.pricing-grid {
 		row-gap: 8rem;
 		grid-auto-flow: column;
@@ -29,13 +29,13 @@
 	gap: 0.5rem;
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1024px) {
 	.pricing-cards-grid {
 		grid: auto / repeat(3, minmax(0, 1fr));
 	}
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1023px) {
 	.pricing-cards-grid {
 		grid: repeat(3, auto) / minmax(0, 1fr);
 	}
