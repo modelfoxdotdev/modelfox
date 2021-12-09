@@ -2998,7 +2998,7 @@ dependencies = [
  "tangram_app_organization_member_server",
  "tangram_app_playground_client",
  "tangram_app_playground_server",
- "tangram_app_production_alerts_alerts_server",
+ "tangram_app_production_alerts_edit_server",
  "tangram_app_production_alerts_index_server",
  "tangram_app_production_class_metrics_client",
  "tangram_app_production_class_metrics_server",
@@ -3509,7 +3509,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tangram_app_production_alerts_alerts_server"
+name = "tangram_app_production_alerts_edit_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",

@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 rust-version = "1.56"
-name = "tangram_app_production_alerts_alerts_server"
+name = "tangram_app_production_alerts_edit_server"
 publish = false
 version = "0.0.0"
 

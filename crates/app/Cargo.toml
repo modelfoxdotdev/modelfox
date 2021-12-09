@@ -24,7 +24,7 @@ sunfish = "0.3"
 [features]
 default = [
 	"tangram_app_production_alerts_index_server",
-	"tangram_app_production_alerts_alerts_server",
+	"tangram_app_production_alerts_edit_server",
 	"tangram_app_new_production_alert_client",
 	"tangram_app_new_production_alert_server",
 	"tangram_app_training_metrics_precision_recall_client",
@@ -135,7 +135,7 @@ tangram_app_organization_index_server = { path = "pages/organizations/_/index/se
 tangram_app_organization_member_server = { path = "pages/organizations/_/members/_/server", optional = true }
 tangram_app_playground_client = { path = "pages/repos/_/models/_/playground/client", optional = true }
 tangram_app_playground_server = { path = "pages/repos/_/models/_/playground/server", optional = true }
-tangram_app_production_alerts_alerts_server = { path = "pages/repos/_/models/_/production_alerts/_/index/server", optional = true }
+tangram_app_production_alerts_edit_server = { path = "pages/repos/_/models/_/production_alerts/_/edit/server", optional = true }
 tangram_app_production_alerts_index_server = { path = "pages/repos/_/models/_/production_alerts/index/server", optional = true }
 tangram_app_production_class_metrics_client = { path = "pages/repos/_/models/_/production_metrics/class_metrics/client", optional = true }
 tangram_app_production_class_metrics_server = { path = "pages/repos/_/models/_/production_metrics/class_metrics/server", optional = true }

@@ -8,13 +8,11 @@ use std::sync::Arc;
 use tangram_app_common::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	path_components,
-	repos::get_repo,
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
 use tangram_app_layouts::{
-	app_layout::app_layout_info,
 	model_layout::{model_layout_info, ModelNavItem},
 };
 use tangram_id::Id;

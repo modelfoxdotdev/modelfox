@@ -68,7 +68,7 @@ impl Component for AlertsTable {
 						.child(
 							ui::TableCell::new().child(
 								ui::Link::new()
-									.href(format!("./alerts/{}/", row.id))
+									.href(format!("./{}/edit", row.id))
 									.child(row.id.clone()),
 							),
 						)

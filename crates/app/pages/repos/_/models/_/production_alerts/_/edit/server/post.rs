@@ -12,8 +12,13 @@ use tangram_app_common::{
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_id::Id;
 
+enum Action {
+	UpdateAlert(UpdateAlertAction),
+	Delete,
+}
+
 #[derive(serde::Deserialize)]
-struct Action {
+struct UpdateAlertAction {
 	cadence: String,
 	metric: String,
 	threshold: String,
@@ -21,10 +26,10 @@ struct Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
-	let (repo_id, model_id) = if let ["repos", repo_id, "models", model_id, "production_alerts", "new"] =
+	let (repo_id, model_id, alert_id) = if let ["repos", repo_id, "models", model_id, "production_alerts", alert_id, "edit"] =
 		*path_components(request).as_slice()
 	{
-		(repo_id.to_owned(), model_id.to_owned())
+		(repo_id.to_owned(), model_id.to_owned(), alert_id.to_owned())
 	} else {
 		bail!("unexpected path");
 	};
@@ -60,12 +65,19 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	};
 	let model_layout_info =
 		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionAlerts).await?;
-	let Action {
+	match action {
+		Action::Delete => {
+			todo!()
+		},
+		Action::UpdateAlertAction(uaa) => {
+			
+	let UpdateAlertAction {
 		cadence,
 		metric,
 		threshold,
-	} = action;
+	} = uaa;
 	// TODO - maybe impl From<Action> for AlertHeuristics ?
+	println!("Recevied {}|{}|{}", cadence, metric, threshold);
 	let alert = AlertHeuristics {
 		cadence: AlertCadence::from_str(&cadence)?,
 		threshold: AlertThreshold {
@@ -76,22 +88,21 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	let alert_json = serde_json::to_string(&alert)?;
 	let result = sqlx::query(
 		"
-			insert into alert_preferences
-				(id, alert, model_id, last_updated)
-			values
-				($1, $2, $3, $4)
+			update
+				alert_preferences
+			set alert = $1, last_updated = $2
+			where id = $3
 		",
 	)
-	.bind(Id::generate().to_string())
 	.bind(alert_json)
-	.bind(model_id.to_string())
 	.bind(time::OffsetDateTime::now_utc().unix_timestamp().to_string())
+	.bind(alert_id.to_string())
 	.execute(&mut db)
 	.await;
 	if result.is_err() {
 		let page = Page {
 			model_layout_info,
-			error: Some("There was an error creating your alert.".to_owned()),
+			error: Some("There was an error editing your alert.".to_owned()),
 		};
 		let html = html(page);
 		let response = http::Response::builder()
@@ -110,4 +121,6 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		.body(hyper::Body::empty())
 		.unwrap();
 	Ok(response)
+		}
+	}
 }
