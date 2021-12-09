@@ -19,6 +19,7 @@ sunfish = "0.3"
 
 [features]
 default = [
+	"tangram_app_training_metrics_precision_recall_client",
   "tangram_app_edit_organization_server",
   "tangram_app_health_server",
   "tangram_app_index_server",
@@ -55,7 +56,7 @@ default = [
   "tangram_app_training_grid_index_server",
   "tangram_app_training_grid_item_server",
   "tangram_app_training_metrics_index_server",
-  "tangram_app_training_metrics_precision_recall_server", "tangram_app_training_metrics_precision_recall_client",
+  "tangram_app_training_metrics_precision_recall_server",
   "tangram_app_training_metrics_roc_client",
   "tangram_app_training_metrics_roc_server",
   "tangram_app_training_stats_column_client",
@@ -71,7 +72,7 @@ anyhow = { version = "1", features = ["backtrace"] }
 base64 = "0.13"
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.6", features = ["serde"] }
-clap = { version = "3.0.0-beta.5", features = ["color"] }
+clap = { version = "=3.0.0-beta.5", features = ["color"] }
 futures = "0.3"
 glob = "0.3"
 http = "0.2"
@@ -105,50 +106,50 @@ toml = "0.5"
 tracing = "0.1"
 url = { version = "2", features = ["serde"] }
 
-tangram_app_edit_organization_server = { path = "pages/organizations/_/edit/server", optional = true }
-tangram_app_health_server = { path = "pages/health/server", optional = true }
-tangram_app_index_server = { path = "pages/index/server", optional = true }
-tangram_app_login_server = { path = "pages/login/server", optional = true }
-tangram_app_model_download_server = { path = "pages/repos/_/models/_/download/server", optional = true }
-tangram_app_model_edit_server = { path = "pages/repos/_/models/_/edit/server", optional = true }
-tangram_app_model_index_server = { path = "pages/repos/_/models/_/index/server", optional = true }
-tangram_app_new_member_server = { path = "pages/organizations/_/members/new/server", optional = true }
-tangram_app_new_model_server = { path = "pages/repos/_/models/new/server", optional = true }
-tangram_app_new_organization_server = { path = "pages/organizations/new/server", optional = true }
-tangram_app_new_repo_server = { path = "pages/repos/new/server", optional = true }
-tangram_app_organization_index_server = { path = "pages/organizations/_/index/server", optional = true }
-tangram_app_organization_member_server = { path = "pages/organizations/_/members/_/server", optional = true }
-tangram_app_playground_server = { path = "pages/repos/_/models/_/playground/server", optional = true }
-tangram_app_production_class_metrics_server = { path = "pages/repos/_/models/_/production_metrics/class_metrics/server", optional = true }
-tangram_app_production_metrics_index_server = { path = "pages/repos/_/models/_/production_metrics/index/server", optional = true }
-tangram_app_production_prediction_server = { path = "pages/repos/_/models/_/production_predictions/predictions/_/server", optional = true }
-tangram_app_production_predictions_index_server = { path = "pages/repos/_/models/_/production_predictions/index/server", optional = true }
-tangram_app_production_stats_column_server = { path = "pages/repos/_/models/_/production_stats/columns/_/server", optional = true }
-tangram_app_production_stats_index_server = { path = "pages/repos/_/models/_/production_stats/index/server", optional = true }
-tangram_app_repo_edit_server = { path = "pages/repos/_/edit/server", optional = true }
-tangram_app_repo_index_server = { path = "pages/repos/_/index/server", optional = true }
-tangram_app_track_server = { path = "pages/track/server", optional = true }
-tangram_app_training_class_metrics_server = { path = "pages/repos/_/models/_/training_metrics/class_metrics/server", optional = true }
-tangram_app_training_grid_index_server = { path = "pages/repos/_/models/_/training_grid/index/server", optional = true }
-tangram_app_training_grid_item_server = { path = "pages/repos/_/models/_/training_grid/grid_item/_/server", optional = true }
-tangram_app_training_metrics_index_server = { path = "pages/repos/_/models/_/training_metrics/index/server", optional = true }
-tangram_app_training_metrics_precision_recall_server = { path = "pages/repos/_/models/_/training_metrics/precision_recall/server", optional = true }
-tangram_app_training_metrics_roc_server = { path = "pages/repos/_/models/_/training_metrics/roc/server", optional = true }
-tangram_app_training_stats_column_server = { path = "pages/repos/_/models/_/training_stats/columns/_/server", optional = true }
-tangram_app_training_stats_index_server = { path = "pages/repos/_/models/_/training_stats/index/server", optional = true }
-tangram_app_tuning_server = { path = "pages/repos/_/models/_/tuning/server", optional = true }
-tangram_app_user_server = { path = "pages/user/server", optional = true }
 
-tangram_app_model_index_client = { path = "pages/repos/_/models/_/index/client", optional = true }
-tangram_app_new_model_client = { path = "pages/repos/_/models/new/client", optional = true }
-tangram_app_playground_client = { path = "pages/repos/_/models/_/playground/client", optional = true }
-tangram_app_production_class_metrics_client = { path = "pages/repos/_/models/_/production_metrics/class_metrics/client", optional = true }
-tangram_app_production_metrics_index_client = { path = "pages/repos/_/models/_/production_metrics/index/client", optional = true }
-tangram_app_production_prediction_client = { path = "pages/repos/_/models/_/production_predictions/predictions/_/client", optional = true }
-tangram_app_production_stats_column_client = { path = "pages/repos/_/models/_/production_stats/columns/_/client", optional = true }
-tangram_app_production_stats_index_client = { path = "pages/repos/_/models/_/production_stats/index/client", optional = true }
-tangram_app_training_class_metrics_client = { path = "pages/repos/_/models/_/training_metrics/class_metrics/client", optional = true }
-tangram_app_training_metrics_precision_recall_client = { path = "pages/repos/_/models/_/training_metrics/precision_recall/client", optional = true }
-tangram_app_training_metrics_roc_client = { path = "pages/repos/_/models/_/training_metrics/roc/client", optional = true }
-tangram_app_training_stats_column_client = { path = "pages/repos/_/models/_/training_stats/columns/_/client", optional = true }
-tangram_app_tuning_client = { path = "pages/repos/_/models/_/tuning/client", optional = true }
+tangram_app_edit_organization_server = { path = "routes/organizations/_/edit/server", optional = true }
+tangram_app_health_server = { path = "routes/health/server", optional = true }
+tangram_app_index_server = { path = "routes/index/server", optional = true }
+tangram_app_login_server = { path = "routes/login/server", optional = true }
+tangram_app_model_download_server = { path = "routes/repos/_/models/_/download/server", optional = true }
+tangram_app_model_edit_server = { path = "routes/repos/_/models/_/edit/server", optional = true }
+tangram_app_model_index_client = { path = "routes/repos/_/models/_/index/client", optional = true }
+tangram_app_model_index_server = { path = "routes/repos/_/models/_/index/server", optional = true }
+tangram_app_new_member_server = { path = "routes/organizations/_/members/new/server", optional = true }
+tangram_app_new_model_client = { path = "routes/repos/_/models/new/client", optional = true }
+tangram_app_new_model_server = { path = "routes/repos/_/models/new/server", optional = true }
+tangram_app_new_organization_server = { path = "routes/organizations/new/server", optional = true }
+tangram_app_new_repo_server = { path = "routes/repos/new/server", optional = true }
+tangram_app_organization_index_server = { path = "routes/organizations/_/index/server", optional = true }
+tangram_app_organization_member_server = { path = "routes/organizations/_/members/_/server", optional = true }
+tangram_app_playground_client = { path = "routes/repos/_/models/_/playground/client", optional = true }
+tangram_app_playground_server = { path = "routes/repos/_/models/_/playground/server", optional = true }
+tangram_app_production_class_metrics_client = { path = "routes/repos/_/models/_/production_metrics/class_metrics/client", optional = true }
+tangram_app_production_class_metrics_server = { path = "routes/repos/_/models/_/production_metrics/class_metrics/server", optional = true }
+tangram_app_production_metrics_index_client = { path = "routes/repos/_/models/_/production_metrics/index/client", optional = true }
+tangram_app_production_metrics_index_server = { path = "routes/repos/_/models/_/production_metrics/index/server", optional = true }
+tangram_app_production_prediction_client = { path = "routes/repos/_/models/_/production_predictions/predictions/_/client", optional = true }
+tangram_app_production_prediction_server = { path = "routes/repos/_/models/_/production_predictions/predictions/_/server", optional = true }
+tangram_app_production_predictions_index_server = { path = "routes/repos/_/models/_/production_predictions/index/server", optional = true }
+tangram_app_production_stats_column_client = { path = "routes/repos/_/models/_/production_stats/columns/_/client", optional = true }
+tangram_app_production_stats_column_server = { path = "routes/repos/_/models/_/production_stats/columns/_/server", optional = true }
+tangram_app_production_stats_index_client = { path = "routes/repos/_/models/_/production_stats/index/client", optional = true }
+tangram_app_production_stats_index_server = { path = "routes/repos/_/models/_/production_stats/index/server", optional = true }
+tangram_app_repo_edit_server = { path = "routes/repos/_/edit/server", optional = true }
+tangram_app_repo_index_server = { path = "routes/repos/_/index/server", optional = true }
+tangram_app_track_server = { path = "routes/track/server", optional = true }
+tangram_app_training_class_metrics_client = { path = "routes/repos/_/models/_/training_metrics/class_metrics/client", optional = true }
+tangram_app_training_class_metrics_server = { path = "routes/repos/_/models/_/training_metrics/class_metrics/server", optional = true }
+tangram_app_training_grid_index_server = { path = "routes/repos/_/models/_/training_grid/index/server", optional = true }
+tangram_app_training_grid_item_server = { path = "routes/repos/_/models/_/training_grid/grid_item/_/server", optional = true }
+tangram_app_training_metrics_index_server = { path = "routes/repos/_/models/_/training_metrics/index/server", optional = true }
+tangram_app_training_metrics_precision_recall_client = { path = "routes/repos/_/models/_/training_metrics/precision_recall/client", optional = true }
+tangram_app_training_metrics_precision_recall_server = { path = "routes/repos/_/models/_/training_metrics/precision_recall/server", optional = true }
+tangram_app_training_metrics_roc_client = { path = "routes/repos/_/models/_/training_metrics/roc/client", optional = true }
+tangram_app_training_metrics_roc_server = { path = "routes/repos/_/models/_/training_metrics/roc/server", optional = true }
+tangram_app_training_stats_column_client = { path = "routes/repos/_/models/_/training_stats/columns/_/client", optional = true }
+tangram_app_training_stats_column_server = { path = "routes/repos/_/models/_/training_stats/columns/_/server", optional = true }
+tangram_app_training_stats_index_server = { path = "routes/repos/_/models/_/training_stats/index/server", optional = true }
+tangram_app_tuning_client = { path = "routes/repos/_/models/_/tuning/client", optional = true }
+tangram_app_tuning_server = { path = "routes/repos/_/models/_/tuning/server", optional = true }
+tangram_app_user_server = { path = "routes/user/server", optional = true }

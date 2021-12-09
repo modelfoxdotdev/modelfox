@@ -13,7 +13,7 @@ path = "lib.rs"
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-clap = { version = "3.0.0-beta.5", features = ["color"] }
+clap = { version = "=3.0.0-beta.5", features = ["color"] }
 chrono = { version = "0.4", features = ["serde"] }
 memmap = "0.7"
 pyo3 = { version = "0.15", features = ["abi3-py37", "extension-module"] }

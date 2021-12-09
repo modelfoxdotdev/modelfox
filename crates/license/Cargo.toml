@@ -17,7 +17,7 @@ path = "main.rs"
 anyhow = { version = "1", features = ["backtrace"] }
 base64 = "0.13"
 chrono = { version = "0.4", features = ["serde"] }
-clap = { version = "3.0.0-beta.5", features = ["color"] }
+clap = { version = "=3.0.0-beta.5", features = ["color"] }
 duct = "0.13"
 indoc = "1"
 pem = "1"

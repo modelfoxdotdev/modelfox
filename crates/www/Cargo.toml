@@ -12,10 +12,11 @@ path = "main.rs"
 
 [features]
 default = [
+  "tangram_www_about_server",
   "tangram_www_benchmarks_client",
   "tangram_www_benchmarks_server",
-  "tangram_www_blog_server",
   "tangram_www_blog_index_server",
+  "tangram_www_blog_server",
   "tangram_www_docs_getting_started_index_server",
   "tangram_www_docs_getting_started_inspect_client",
   "tangram_www_docs_getting_started_inspect_server",
@@ -31,15 +32,14 @@ default = [
   "tangram_www_docs_getting_started_predict_ruby_server",
   "tangram_www_docs_getting_started_predict_rust_server",
   "tangram_www_docs_getting_started_train_server",
-  "tangram_www_docs_index_server",
   "tangram_www_docs_guide_server",
+  "tangram_www_docs_index_server",
   "tangram_www_docs_install_server",
   "tangram_www_docs_internals_server",
   "tangram_www_index_client",
   "tangram_www_index_server",
-  "tangram_www_pricing_server",
-  "tangram_www_about_server",
   "tangram_www_jobs_server",
+  "tangram_www_pricing_server",
 ]
 
 [build-dependencies]
@@ -48,7 +48,7 @@ sunfish = "0.3"
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-clap = { version = "3.0.0-beta.5", features = ["color"] }
+clap = { version = "=3.0.0-beta.5", features = ["color"] }
 futures = "0.3"
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
@@ -62,32 +62,31 @@ tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
-tangram_www_benchmarks_server = { path = "pages/benchmarks/server", optional = true }
-tangram_www_docs_getting_started_index_server = { path = "pages/docs/getting_started/index/server", optional = true }
-tangram_www_blog_server = { path = "pages/blog/_/index/server", optional = true }
-tangram_www_blog_index_server = { path = "pages/blog/index/server", optional = true }
-tangram_www_docs_getting_started_inspect_server = { path = "pages/docs/getting_started/inspect/server", optional = true}
-tangram_www_docs_getting_started_monitor_server = { path = "pages/docs/getting_started/monitor/server", optional = true}
-tangram_www_docs_getting_started_predict_cli_server = { path = "pages/docs/getting_started/predict/cli/server", optional = true}
-tangram_www_docs_getting_started_predict_elixir_server = { path = "pages/docs/getting_started/predict/elixir/server", optional = true}
-tangram_www_docs_getting_started_predict_go_server = { path = "pages/docs/getting_started/predict/go/server", optional = true}
-tangram_www_docs_getting_started_predict_index_server = { path = "pages/docs/getting_started/predict/index/server", optional = true}
-tangram_www_docs_getting_started_predict_javascript_server = { path = "pages/docs/getting_started/predict/javascript/server", optional = true}
-tangram_www_docs_getting_started_predict_php_server = { path = "pages/docs/getting_started/predict/php/server", optional = true}
-tangram_www_docs_getting_started_predict_python_server = { path = "pages/docs/getting_started/predict/python/server", optional = true}
-tangram_www_docs_getting_started_predict_ruby_server = { path = "pages/docs/getting_started/predict/ruby/server", optional = true}
-tangram_www_docs_getting_started_predict_rust_server = { path = "pages/docs/getting_started/predict/rust/server", optional = true}
-tangram_www_docs_getting_started_train_server = { path = "pages/docs/getting_started/train/server", optional = true }
-tangram_www_docs_guide_server = { path = "pages/docs/guides/_/server", optional = true }
-tangram_www_docs_index_server = { path = "pages/docs/index/server", optional = true}
-tangram_www_docs_internals_server = { path = "pages/docs/internals/_/server", optional = true }
-tangram_www_docs_install_server = { path = "pages/docs/install/server", optional = true}
-tangram_www_index_server = { path = "pages/index/server", optional = true}
-tangram_www_pricing_server = { path = "pages/pricing/server", optional = true}
-tangram_www_about_server = { path = "pages/about/server", optional = true}
-tangram_www_jobs_server = { path = "pages/jobs/server", optional = true}
-
-tangram_www_benchmarks_client = { path = "pages/benchmarks/client", optional = true }
-tangram_www_docs_getting_started_inspect_client = {path = "pages/docs/getting_started/inspect/client", optional = true}
-tangram_www_docs_getting_started_monitor_client = {path = "pages/docs/getting_started/monitor/client", optional = true}
-tangram_www_index_client = { path = "pages/index/client", optional = true}
+tangram_www_about_server = { path = "routes/about/server", optional = true}
+tangram_www_benchmarks_client = { path = "routes/benchmarks/client", optional = true }
+tangram_www_benchmarks_server = { path = "routes/benchmarks/server", optional = true }
+tangram_www_blog_index_server = { path = "routes/blog/index/server", optional = true }
+tangram_www_blog_server = { path = "routes/blog/_/index/server", optional = true }
+tangram_www_docs_getting_started_index_server = { path = "routes/docs/getting_started/index/server", optional = true }
+tangram_www_docs_getting_started_inspect_client = {path = "routes/docs/getting_started/inspect/client", optional = true}
+tangram_www_docs_getting_started_inspect_server = { path = "routes/docs/getting_started/inspect/server", optional = true}
+tangram_www_docs_getting_started_monitor_client = {path = "routes/docs/getting_started/monitor/client", optional = true}
+tangram_www_docs_getting_started_monitor_server = { path = "routes/docs/getting_started/monitor/server", optional = true}
+tangram_www_docs_getting_started_predict_cli_server = { path = "routes/docs/getting_started/predict/cli/server", optional = true}
+tangram_www_docs_getting_started_predict_elixir_server = { path = "routes/docs/getting_started/predict/elixir/server", optional = true}
+tangram_www_docs_getting_started_predict_go_server = { path = "routes/docs/getting_started/predict/go/server", optional = true}
+tangram_www_docs_getting_started_predict_index_server = { path = "routes/docs/getting_started/predict/index/server", optional = true}
+tangram_www_docs_getting_started_predict_javascript_server = { path = "routes/docs/getting_started/predict/javascript/server", optional = true}
+tangram_www_docs_getting_started_predict_php_server = { path = "routes/docs/getting_started/predict/php/server", optional = true}
+tangram_www_docs_getting_started_predict_python_server = { path = "routes/docs/getting_started/predict/python/server", optional = true}
+tangram_www_docs_getting_started_predict_ruby_server = { path = "routes/docs/getting_started/predict/ruby/server", optional = true}
+tangram_www_docs_getting_started_predict_rust_server = { path = "routes/docs/getting_started/predict/rust/server", optional = true}
+tangram_www_docs_getting_started_train_server = { path = "routes/docs/getting_started/train/server", optional = true }
+tangram_www_docs_guide_server = { path = "routes/docs/guides/_/server", optional = true }
+tangram_www_docs_index_server = { path = "routes/docs/index/server", optional = true}
+tangram_www_docs_install_server = { path = "routes/docs/install/server", optional = true}
+tangram_www_docs_internals_server = { path = "routes/docs/internals/_/server", optional = true }
+tangram_www_index_client = { path = "routes/index/client", optional = true}
+tangram_www_index_server = { path = "routes/index/server", optional = true}
+tangram_www_jobs_server = { path = "routes/jobs/server", optional = true}
+tangram_www_pricing_server = { path = "routes/pricing/server", optional = true}
