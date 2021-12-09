@@ -15,7 +15,7 @@ path = "seed.rs"
 
 [build-dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-sunfish = "0.2"
+sunfish = "0.3"
 
 [features]
 default = [
@@ -87,7 +87,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.9"
 sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }
-sunfish = "0.2"
+sunfish = "0.3"
 tangram_app_common = { path = "common" }
 tangram_app_layouts = { path = "layouts" }
 tangram_app_migrations = { path = "migrations" }

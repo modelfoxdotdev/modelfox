@@ -3,8 +3,8 @@ use tangram_www_content::Content;
 
 mod page;
 
-pub fn init() -> sunfish::Page {
-	sunfish::Page::new_static_with_paths(
+pub fn init() -> sunfish::Route {
+	sunfish::Route::new_static_with_paths(
 		|| {
 			tangram_www_content::DocsGuide::slugs()
 				.unwrap()

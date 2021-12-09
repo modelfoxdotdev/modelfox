@@ -14,7 +14,7 @@ futures = "0.3"
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
 pinwheel = "0.2"
-sunfish = "0.2"
+sunfish = "0.3"
 tangram_app_common = { path = "../../../../../../../../../common" }
 tangram_app_layouts = { path = "../../../../../../../../../layouts" }
 tangram_app_training_grid_common = { path = "../../../common" }
