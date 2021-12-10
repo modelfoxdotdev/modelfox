@@ -12,6 +12,8 @@ use tangram_app_common::{
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_id::Id;
 
+#[derive(serde::Deserialize)]
+#[serde(rename = "action")]
 enum Action {
 	UpdateAlert(UpdateAlertAction),
 	Delete,
@@ -68,59 +70,60 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	match action {
 		Action::Delete => {
 			todo!()
-		},
-		Action::UpdateAlertAction(uaa) => {
-			
-	let UpdateAlertAction {
-		cadence,
-		metric,
-		threshold,
-	} = uaa;
-	// TODO - maybe impl From<Action> for AlertHeuristics ?
-	println!("Recevied {}|{}|{}", cadence, metric, threshold);
-	let alert = AlertHeuristics {
-		cadence: AlertCadence::from_str(&cadence)?,
-		threshold: AlertThreshold {
-			metric: AlertMetric::from_str(&metric)?,
-			variance: threshold.parse()?,
-		},
-	};
-	let alert_json = serde_json::to_string(&alert)?;
-	let result = sqlx::query(
-		"
+		}
+		Action::UpdateAlert(ua) => {
+			let UpdateAlertAction {
+				cadence,
+				metric,
+				threshold,
+			} = ua;
+			// TODO - maybe impl From<Action> for AlertHeuristics ?
+			println!("Recevied {}|{}|{}", cadence, metric, threshold);
+			let alert = AlertHeuristics {
+				cadence: AlertCadence::from_str(&cadence)?,
+				threshold: AlertThreshold {
+					metric: AlertMetric::from_str(&metric)?,
+					variance: threshold.parse()?,
+				},
+			};
+			let alert_json = serde_json::to_string(&alert)?;
+			let result = sqlx::query(
+				"
 			update
 				alert_preferences
 			set alert = $1, last_updated = $2
 			where id = $3
 		",
-	)
-	.bind(alert_json)
-	.bind(time::OffsetDateTime::now_utc().unix_timestamp().to_string())
-	.bind(alert_id.to_string())
-	.execute(&mut db)
-	.await;
-	if result.is_err() {
-		let page = Page {
-			model_layout_info,
-			error: Some("There was an error editing your alert.".to_owned()),
-		};
-		let html = html(page);
-		let response = http::Response::builder()
-			.status(http::StatusCode::BAD_REQUEST)
-			.body(hyper::Body::from(html))
-			.unwrap();
-		return Ok(response);
-	};
-	db.commit().await?;
-	let response = http::Response::builder()
-		.status(http::StatusCode::SEE_OTHER)
-		.header(
-			http::header::LOCATION,
-			format!("/repos/{}/models/{}/production_alerts/", repo_id, model_id),
-		)
-		.body(hyper::Body::empty())
-		.unwrap();
-	Ok(response)
+			)
+			.bind(alert_json)
+			.bind(time::OffsetDateTime::now_utc().unix_timestamp().to_string())
+			.bind(alert_id.to_string())
+			.execute(&mut db)
+			.await;
+			if result.is_err() {
+				let page = Page {
+					alert,
+					alert_id,
+					model_layout_info,
+					error: Some("There was an error editing your alert.".to_owned()),
+				};
+				let html = html(page);
+				let response = http::Response::builder()
+					.status(http::StatusCode::BAD_REQUEST)
+					.body(hyper::Body::from(html))
+					.unwrap();
+				return Ok(response);
+			};
+			db.commit().await?;
+			let response = http::Response::builder()
+				.status(http::StatusCode::SEE_OTHER)
+				.header(
+					http::header::LOCATION,
+					format!("/repos/{}/models/{}/production_alerts/", repo_id, model_id),
+				)
+				.body(hyper::Body::empty())
+				.unwrap();
+			Ok(response)
 		}
 	}
 }

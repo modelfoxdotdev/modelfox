@@ -9,7 +9,6 @@ use tangram_ui as ui;
 pub struct Page {
 	pub alert: AlertHeuristics,
 	pub alert_id: String,
-	pub model_id: String,
 	pub model_layout_info: ModelLayoutInfo,
 	pub error: Option<String>,
 }

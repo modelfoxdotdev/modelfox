@@ -57,7 +57,6 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let page = Page {
 		alert,
 		alert_id: alert_id.to_string(),
-		model_id: model_id.to_string(),
 		model_layout_info,
 		error: None,
 	};
