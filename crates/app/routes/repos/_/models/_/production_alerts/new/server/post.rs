@@ -3,7 +3,7 @@ use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use std::{str, str::FromStr, sync::Arc};
 use tangram_app_common::{
-	alerts::{AlertCadence, AlertHeuristics, AlertMetric, AlertThreshold},
+	alerts::{create_alert, AlertCadence, AlertHeuristics, AlertMetric, AlertThreshold},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	path_components,
 	user::{authorize_user, authorize_user_for_model, authorize_user_for_repo},
@@ -65,7 +65,6 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		metric,
 		threshold,
 	} = action;
-	// TODO - maybe impl From<Action> for AlertHeuristics ?
 	let alert = AlertHeuristics {
 		cadence: AlertCadence::from_str(&cadence)?,
 		threshold: AlertThreshold {
@@ -73,21 +72,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			variance: threshold.parse()?,
 		},
 	};
-	let alert_json = serde_json::to_string(&alert)?;
-	let result = sqlx::query(
-		"
-			insert into alert_preferences
-				(id, alert, model_id, last_updated)
-			values
-				($1, $2, $3, $4)
-		",
-	)
-	.bind(Id::generate().to_string())
-	.bind(alert_json)
-	.bind(model_id.to_string())
-	.bind(time::OffsetDateTime::now_utc().unix_timestamp().to_string())
-	.execute(&mut db)
-	.await;
+	let result = create_alert(&mut db, alert, model_id).await;
 	if result.is_err() {
 		let page = Page {
 			model_layout_info,

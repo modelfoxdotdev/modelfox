@@ -40,6 +40,7 @@ tangram_model = { path = "../../model" }
 tangram_text = { path = "../../text" }
 tangram_ui = { path = "../../ui" }
 tangram_zip = { path = "../../zip" }
+time = "0.3"
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 url = { version = "2", features = ["serde"] }

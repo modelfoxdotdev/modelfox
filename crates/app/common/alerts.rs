@@ -2,7 +2,9 @@ use crate::Context;
 use anyhow::{anyhow, Result};
 use lettre::AsyncTransport;
 use serde::{Deserialize, Serialize};
+use sqlx::Row;
 use std::{fmt, io, str::FromStr};
+use tangram_id::Id;
 
 /// Alert cadence
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
@@ -245,4 +247,86 @@ pub struct AlertData {
 	pub alert_methods: Vec<AlertMethod>,
 	pub heuristics: AlertHeuristics,
 	pub results: Vec<AlertResult>,
+}
+
+// Database interaction
+
+pub async fn get_alert(
+	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	alert_id: &str,
+) -> Result<AlertHeuristics> {
+	let result = sqlx::query(
+		"
+			select
+				alert
+			from
+				alert_preferences
+			where
+				id = $1
+		",
+	)
+	.bind(alert_id.to_owned())
+	.fetch_one(db)
+	.await?;
+	let alert: String = result.get(0);
+	let alert: AlertHeuristics = serde_json::from_str(&alert)?;
+	Ok(alert)
+}
+
+pub async fn create_alert(
+	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	alert: AlertHeuristics,
+	model_id: Id,
+) -> Result<()> {
+	let alert_json = serde_json::to_string(&alert)?;
+	sqlx::query(
+		"
+			insert into alert_preferences
+				(id, alert, model_id, last_updated)
+			values
+				($1, $2, $3, $4)
+		",
+	)
+	.bind(Id::generate().to_string())
+	.bind(alert_json)
+	.bind(model_id.to_string())
+	.bind(time::OffsetDateTime::now_utc().unix_timestamp().to_string())
+	.execute(db)
+	.await?;
+	Ok(())
+}
+
+pub async fn delete_alert(db: &mut sqlx::Transaction<'_, sqlx::Any>, alert_id: &str) -> Result<()> {
+	sqlx::query(
+		"
+			delete from alert_preferences
+			where id = $1
+		",
+	)
+	.bind(alert_id.to_string())
+	.execute(db)
+	.await?;
+	Ok(())
+}
+
+pub async fn update_alert(
+	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	new_alert: &AlertHeuristics,
+	alert_id: &str,
+) -> Result<()> {
+	let alert_json = serde_json::to_string(new_alert)?;
+	sqlx::query(
+		"
+			update
+				alert_preferences
+			set alert = $1, last_updated = $2
+			where id = $3
+		",
+	)
+	.bind(alert_json)
+	.bind(time::OffsetDateTime::now_utc().unix_timestamp().to_string())
+	.bind(alert_id.to_string())
+	.execute(db)
+	.await?;
+	Ok(())
 }

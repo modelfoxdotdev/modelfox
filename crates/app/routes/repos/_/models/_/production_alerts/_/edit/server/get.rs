@@ -1,10 +1,9 @@
 use crate::page::Page;
 use anyhow::{bail, Result};
 use pinwheel::prelude::*;
-use sqlx::Row;
 use std::sync::Arc;
 use tangram_app_common::{
-	alerts::AlertHeuristics,
+	alerts::get_alert,
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	path_components,
 	user::{authorize_user, authorize_user_for_model},
@@ -39,21 +38,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	}
 	let model_layout_info =
 		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionAlerts).await?;
-	let result = sqlx::query(
-		"
-			select
-				alert
-			from
-				alert_preferences
-			where
-				id = $1
-		",
-	)
-	.bind(alert_id)
-	.fetch_one(&mut db)
-	.await?;
-	let alert: String = result.get(0);
-	let alert: AlertHeuristics = serde_json::from_str(&alert)?;
+	let alert = get_alert(&mut db, alert_id).await?;
 	let page = Page {
 		alert,
 		alert_id: alert_id.to_string(),

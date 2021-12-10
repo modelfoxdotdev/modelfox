@@ -3,7 +3,9 @@ use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use std::{str, str::FromStr, sync::Arc};
 use tangram_app_common::{
-	alerts::{AlertCadence, AlertHeuristics, AlertMetric, AlertThreshold},
+	alerts::{
+		delete_alert, update_alert, AlertCadence, AlertHeuristics, AlertMetric, AlertThreshold,
+	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	path_components,
 	user::{authorize_user, authorize_user_for_model, authorize_user_for_repo},
@@ -74,7 +76,17 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionAlerts).await?;
 	match action {
 		Action::Delete => {
-			todo!()
+			delete_alert(&mut db, &alert_id).await?;
+			db.commit().await?;
+			let response = http::Response::builder()
+				.status(http::StatusCode::SEE_OTHER)
+				.header(
+					http::header::LOCATION,
+					format!("/repos/{}/models/{}/production_alerts/", repo_id, model_id),
+				)
+				.body(hyper::Body::empty())
+				.unwrap();
+			Ok(response)
 		}
 		Action::UpdateAlert(ua) => {
 			let UpdateAlertAction {
@@ -82,8 +94,6 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				metric,
 				threshold,
 			} = ua;
-			// TODO - maybe impl From<Action> for AlertHeuristics ?
-			println!("Recevied {}|{}|{}", cadence, metric, threshold);
 			let alert = AlertHeuristics {
 				cadence: AlertCadence::from_str(&cadence)?,
 				threshold: AlertThreshold {
@@ -91,20 +101,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 					variance: threshold.parse()?,
 				},
 			};
-			let alert_json = serde_json::to_string(&alert)?;
-			let result = sqlx::query(
-				"
-			update
-				alert_preferences
-			set alert = $1, last_updated = $2
-			where id = $3
-		",
-			)
-			.bind(alert_json)
-			.bind(time::OffsetDateTime::now_utc().unix_timestamp().to_string())
-			.bind(alert_id.to_string())
-			.execute(&mut db)
-			.await;
+			let result = update_alert(&mut db, &alert, &alert_id).await;
 			if result.is_err() {
 				let page = Page {
 					alert,

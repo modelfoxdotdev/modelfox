@@ -18,7 +18,6 @@ use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
-	// TODO - should some of this get abstracted?
 	let timezone = get_timezone(request);
 	let model_id = if let ["repos", _, "models", model_id, "production_alerts", ""] =
 		path_components(request).as_slice()
