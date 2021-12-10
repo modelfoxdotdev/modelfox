@@ -92,23 +92,3 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	Ok(response)
 }
 
-/*
-
-
-fn alert_message(count: u64, absent_count: u64, invalid_count: u64) -> Option<String> {
-	let invalid_ratio = invalid_count.to_f32().unwrap() / count.to_f32().unwrap();
-	let absent_ratio = absent_count.to_f32().unwrap() / count.to_f32().unwrap();
-	if invalid_ratio > PRODUCTION_STATS_LARGE_INVALID_RATIO_THRESHOLD_TO_TRIGGER_ALERT {
-		if absent_ratio > PRODUCTION_STATS_LARGE_ABSENT_RATIO_THRESHOLD_TO_TRIGGER_ALERT {
-			Some("High Invalid and Absent Count".to_owned())
-		} else {
-			Some("High Invalid Count".to_owned())
-		}
-	} else if absent_ratio > PRODUCTION_STATS_LARGE_ABSENT_RATIO_THRESHOLD_TO_TRIGGER_ALERT {
-		Some("High Absent Count".to_owned())
-	} else {
-		None
-	}
-}
-
-*/
