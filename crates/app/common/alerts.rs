@@ -118,6 +118,15 @@ pub enum AlertMetric {
 	RootMeanSquaredError,
 }
 
+impl AlertMetric {
+	pub fn short_name(&self) -> String {
+		match self {
+			AlertMetric::Accuracy => "accuracy".to_owned(),
+			AlertMetric::RootMeanSquaredError => "rmse".to_owned(),
+		}
+	}
+}
+
 impl fmt::Display for AlertMetric {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let s = match self {

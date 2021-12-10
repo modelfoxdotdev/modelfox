@@ -57,7 +57,7 @@ impl Component for Page {
 												value: "monthly".to_owned(),
 											},
 										])
-										.value(self.alert.cadence.to_string()),
+										.value(self.alert.cadence.to_string().to_lowercase()),
 								)
 								.child(
 									ui::SelectField::new()
@@ -68,15 +68,13 @@ impl Component for Page {
 											ui::SelectFieldOption {
 												text: "Accuracy".to_owned(),
 												value: "accuracy".to_owned(),
-												// FIXME - may need to add this to SelectFieldOption
-												//selected: self.alert.threshold.metric
-												//	== AlertMetric::Accuracy,
 											},
 											ui::SelectFieldOption {
 												text: "Root Mean Squared Error".to_owned(),
 												value: "rmse".to_owned(),
 											},
-										]), //.value(self.alert.threshold.metric.to_string()),
+										])
+										.value(self.alert.threshold.metric.short_name()),
 								)
 								.child(
 									ui::TextField::new()
