@@ -6,15 +6,14 @@ use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
+	alerts::AlertHeuristics,
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	path_components,
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 	Context,
 };
-use tangram_app_layouts::{
-	model_layout::{model_layout_info, ModelNavItem},
-};
+use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
@@ -64,11 +63,15 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 			.map(|row| {
 				let id: String = row.get(0);
 				let id: Id = id.parse().unwrap();
+				let alert: String = row.get(1);
+				let alert: AlertHeuristics = serde_json::from_str(&alert).unwrap();
+				let name = alert.title();
 				let last_updated: i64 = row.get(2);
 				let last_updated: DateTime<Tz> =
 					Utc.timestamp(last_updated, 0).with_timezone(&timezone);
 				AlertsTableRow {
 					id: id.to_string(),
+					name,
 					last_updated: last_updated.to_string(),
 				}
 			})

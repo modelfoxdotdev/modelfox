@@ -19,16 +19,16 @@ impl Component for Page {
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
-						.child(ui::H1::new().child(format!("Edit Alert {}", self.alert_id)))
+						.child(ui::H1::new().child(format!("Edit {} Alert", self.alert.title())))
 						.child(
 							ui::Form::new()
 								.post(true)
-													.child(
-						input()
-							.attribute("name", "action")
-							.attribute("type", "hidden")
-							.attribute("value", "update_alert"),
-					)
+								.child(
+									input()
+										.attribute("name", "action")
+										.attribute("type", "hidden")
+										.attribute("value", "update_alert"),
+								)
 								.child(
 									self.error.map(|error| {
 										ui::Alert::new(ui::Level::Danger).child(error)
@@ -56,7 +56,8 @@ impl Component for Page {
 												text: "Monthly".to_owned(),
 												value: "monthly".to_owned(),
 											},
-										]),
+										])
+										.value(self.alert.cadence.to_string()),
 								)
 								.child(
 									ui::SelectField::new()
@@ -67,18 +68,22 @@ impl Component for Page {
 											ui::SelectFieldOption {
 												text: "Accuracy".to_owned(),
 												value: "accuracy".to_owned(),
+												// FIXME - may need to add this to SelectFieldOption
+												//selected: self.alert.threshold.metric
+												//	== AlertMetric::Accuracy,
 											},
 											ui::SelectFieldOption {
 												text: "Root Mean Squared Error".to_owned(),
 												value: "rmse".to_owned(),
 											},
-										]),
+										]), //.value(self.alert.threshold.metric.to_string()),
 								)
 								.child(
 									ui::TextField::new()
 										.label("Threshold Value".to_string())
 										.name("threshold".to_string())
-										.required(true),
+										.required(true)
+										.value(self.alert.threshold.variance.to_string()),
 								)
 								.child(
 									ui::Button::new()

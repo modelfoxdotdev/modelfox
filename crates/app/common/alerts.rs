@@ -41,11 +41,11 @@ impl Default for AlertCadence {
 impl fmt::Display for AlertCadence {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let s = match self {
-			AlertCadence::Daily => "daily",
-			AlertCadence::Hourly => "hourly",
-			AlertCadence::Monthly => "monthly",
-			AlertCadence::Testing => "testing",
-			AlertCadence::Weekly => "weekly",
+			AlertCadence::Daily => "Daily",
+			AlertCadence::Hourly => "Hourly",
+			AlertCadence::Monthly => "Monthly",
+			AlertCadence::Testing => "Testing",
+			AlertCadence::Weekly => "Weekly",
 		};
 		write!(f, "{}", s)
 	}
@@ -114,6 +114,16 @@ pub enum AlertMetric {
 	Accuracy,
 	#[serde(rename = "root_mean_squared_error")]
 	RootMeanSquaredError,
+}
+
+impl fmt::Display for AlertMetric {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		let s = match self {
+			AlertMetric::Accuracy => "Accuracy",
+			AlertMetric::RootMeanSquaredError => "Root Mean Squared Error",
+		};
+		write!(f, "{}", s)
+	}
 }
 
 impl FromStr for AlertMetric {
@@ -192,6 +202,10 @@ impl AlertHeuristics {
 			return Some(self.threshold.variance);
 		}
 		None
+	}
+
+	pub fn title(&self) -> String {
+		format!("{} {}", self.cadence, self.threshold.metric)
 	}
 }
 

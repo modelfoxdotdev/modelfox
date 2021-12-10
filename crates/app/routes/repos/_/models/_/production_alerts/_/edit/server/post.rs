@@ -13,9 +13,11 @@ use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_id::Id;
 
 #[derive(serde::Deserialize)]
-#[serde(rename = "action")]
+#[serde(tag = "action")]
 enum Action {
+	#[serde(rename = "update_alert")]
 	UpdateAlert(UpdateAlertAction),
+	#[serde(rename = "delete")]
 	Delete,
 }
 
@@ -63,7 +65,10 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	};
 	let action: Action = match serde_urlencoded::from_bytes(&data) {
 		Ok(action) => action,
-		Err(_) => return Ok(bad_request()),
+		Err(_) => {
+			dbg!(data);
+			return Ok(bad_request());
+		}
 	};
 	let model_layout_info =
 		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionAlerts).await?;

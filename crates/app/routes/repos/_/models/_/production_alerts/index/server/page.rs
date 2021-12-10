@@ -48,6 +48,7 @@ pub struct AlertsTable {
 
 pub struct AlertsTableRow {
 	pub id: String,
+	pub name: String,
 	pub last_updated: String,
 }
 
@@ -58,7 +59,7 @@ impl Component for AlertsTable {
 			.child(
 				ui::TableHeader::new().child(
 					ui::TableRow::new()
-						.child(ui::TableHeaderCell::new().child("Id"))
+						.child(ui::TableHeaderCell::new().child("Name"))
 						.child(ui::TableHeaderCell::new().child("Uploaded")),
 				),
 			)
@@ -69,7 +70,7 @@ impl Component for AlertsTable {
 							ui::TableCell::new().child(
 								ui::Link::new()
 									.href(format!("./{}/edit", row.id))
-									.child(row.id.clone()),
+									.child(row.name),
 							),
 						)
 						.child(ui::TableCell::new().child(row.last_updated))
