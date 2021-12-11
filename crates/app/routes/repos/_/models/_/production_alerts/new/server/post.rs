@@ -3,7 +3,9 @@ use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use std::{str, str::FromStr, sync::Arc};
 use tangram_app_common::{
-	alerts::{create_alert, AlertCadence, AlertHeuristics, AlertMethod, AlertMetric, AlertThreshold},
+	alerts::{
+		create_alert, AlertCadence, AlertHeuristics, AlertMethod, AlertMetric, AlertThreshold,
+	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	path_components,
 	user::{authorize_user, authorize_user_for_model, authorize_user_for_repo},
@@ -15,6 +17,7 @@ use tangram_id::Id;
 #[derive(serde::Deserialize)]
 struct Action {
 	cadence: String,
+	email: Option<String>,
 	metric: String,
 	threshold: String,
 }
@@ -62,12 +65,17 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionAlerts).await?;
 	let Action {
 		cadence,
+		email,
 		metric,
 		threshold,
 	} = action;
+	let mut methods = vec![AlertMethod::Stdout];
+	if let Some(e) = email {
+		methods.push(AlertMethod::Email(e));
+	}
 	let alert = AlertHeuristics {
 		cadence: AlertCadence::from_str(&cadence)?,
-		methods: vec![AlertMethod::Stdout],
+		methods,
 		threshold: AlertThreshold {
 			metric: AlertMetric::from_str(&metric)?,
 			variance: threshold.parse()?,

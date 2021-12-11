@@ -1,9 +1,6 @@
 use pinwheel::prelude::*;
-use tangram_app_common::alerts::AlertHeuristics;
-use tangram_app_layouts::{
-	document::Document,
-	model_layout::{ModelLayout, ModelLayoutInfo},
-};
+use tangram_app_common::alerts::{AlertHeuristics, AlertMethod};
+use tangram_app_layouts::{document::Document, model_layout::{ModelLayout, ModelLayoutInfo}};
 use tangram_ui as ui;
 
 pub struct Page {
@@ -15,6 +12,14 @@ pub struct Page {
 
 impl Component for Page {
 	fn into_node(self) -> Node {
+		let email = self
+			.alert
+			.methods
+			.iter()
+			.fold(String::new(), |acc, el| match el {
+				AlertMethod::Email(e) => e.to_string(),
+				_ => acc,
+			});
 		Document::new()
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
@@ -82,6 +87,13 @@ impl Component for Page {
 										.name("threshold".to_string())
 										.required(true)
 										.value(self.alert.threshold.variance.to_string()),
+								)
+								.child(
+									ui::TextField::new()
+										.label("Email Address".to_string())
+										.name("email".to_string())
+										.required(false)
+										.value(email),
 								)
 								.child(
 									ui::Button::new()

@@ -77,6 +77,12 @@ impl Component for Page {
 										.required(true),
 								)
 								.child(
+									ui::TextField::new()
+									.label("Email Address".to_string())
+									.name("email".to_string())
+									.required(false)
+								)
+								.child(
 									ui::Button::new()
 										.button_type(ui::ButtonType::Submit)
 										.child("Create"),

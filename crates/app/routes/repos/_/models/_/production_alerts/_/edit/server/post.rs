@@ -4,7 +4,8 @@ use pinwheel::prelude::*;
 use std::{str, str::FromStr, sync::Arc};
 use tangram_app_common::{
 	alerts::{
-		delete_alert, update_alert, AlertCadence, AlertMethod, AlertHeuristics, AlertMetric, AlertThreshold,
+		delete_alert, update_alert, AlertCadence, AlertHeuristics, AlertMethod, AlertMetric,
+		AlertThreshold,
 	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	path_components,
@@ -26,6 +27,7 @@ enum Action {
 #[derive(serde::Deserialize)]
 struct UpdateAlertAction {
 	cadence: String,
+	email: Option<String>,
 	metric: String,
 	threshold: String,
 }
@@ -91,12 +93,17 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Action::UpdateAlert(ua) => {
 			let UpdateAlertAction {
 				cadence,
+				email,
 				metric,
 				threshold,
 			} = ua;
+			let mut methods = vec![AlertMethod::Stdout];
+			if let Some(e) = email {
+				methods.push(AlertMethod::Email(e));
+			}
 			let alert = AlertHeuristics {
 				cadence: AlertCadence::from_str(&cadence)?,
-				methods: vec![AlertMethod::Stdout], // TODO add to form!
+				methods,
 				threshold: AlertThreshold {
 					metric: AlertMetric::from_str(&metric)?,
 					variance: threshold.parse()?,
