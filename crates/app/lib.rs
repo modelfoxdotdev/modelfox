@@ -207,7 +207,6 @@ async fn handle_heuristics(context: &Context, heuristics: &AlertHeuristics) -> R
 	push_alerts(&exceeded_thresholds, &heuristics.methods, context).await?;
 
 	let alert_data = AlertData {
-		alert_methods: heuristics.methods.to_owned(),
 		heuristics: heuristics.to_owned(),
 		results: results.to_owned(),
 	};

@@ -268,7 +268,6 @@ impl Alerts {
 /// Collection for the alert results from a single run
 #[derive(Debug, Default, Deserialize, Serialize)]
 pub struct AlertData {
-	pub alert_methods: Vec<AlertMethod>,
 	pub heuristics: AlertHeuristics,
 	pub results: Vec<AlertResult>,
 }
