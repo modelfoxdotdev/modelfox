@@ -4,7 +4,7 @@ use pinwheel::prelude::*;
 use std::{str, str::FromStr, sync::Arc};
 use tangram_app_common::{
 	alerts::{
-		delete_alert, update_alert, AlertCadence, AlertHeuristics, AlertMetric, AlertThreshold,
+		delete_alert, update_alert, AlertCadence, AlertMethod, AlertHeuristics, AlertMetric, AlertThreshold,
 	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	path_components,
@@ -96,6 +96,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			} = ua;
 			let alert = AlertHeuristics {
 				cadence: AlertCadence::from_str(&cadence)?,
+				methods: vec![AlertMethod::Stdout], // TODO add to form!
 				threshold: AlertThreshold {
 					metric: AlertMetric::from_str(&metric)?,
 					variance: threshold.parse()?,

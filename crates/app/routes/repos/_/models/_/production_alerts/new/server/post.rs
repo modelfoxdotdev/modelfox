@@ -3,7 +3,7 @@ use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use std::{str, str::FromStr, sync::Arc};
 use tangram_app_common::{
-	alerts::{create_alert, AlertCadence, AlertHeuristics, AlertMetric, AlertThreshold},
+	alerts::{create_alert, AlertCadence, AlertHeuristics, AlertMethod, AlertMetric, AlertThreshold},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	path_components,
 	user::{authorize_user, authorize_user_for_model, authorize_user_for_repo},
@@ -67,6 +67,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	} = action;
 	let alert = AlertHeuristics {
 		cadence: AlertCadence::from_str(&cadence)?,
+		methods: vec![AlertMethod::Stdout],
 		threshold: AlertThreshold {
 			metric: AlertMetric::from_str(&metric)?,
 			variance: threshold.parse()?,

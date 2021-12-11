@@ -6,6 +6,10 @@ use sqlx::Row;
 use std::{fmt, io, str::FromStr};
 use tangram_id::Id;
 
+// Task
+
+// Types
+
 /// Alert cadence
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(tag = "type")]
@@ -203,6 +207,7 @@ impl AlertResult {
 #[derive(Debug, Clone, Default, Deserialize, Serialize)]
 pub struct AlertHeuristics {
 	pub cadence: AlertCadence,
+	pub methods: Vec<AlertMethod>,
 	pub threshold: AlertThreshold,
 }
 
@@ -213,6 +218,13 @@ impl AlertHeuristics {
 			return Some(self.threshold.variance);
 		}
 		None
+	}
+
+	/// Check if the given timestamp is more than one cadence interval behind the current time
+	pub fn is_expired(&self, timestamp: u64) -> bool {
+		let now = time::OffsetDateTime::now_utc().unix_timestamp() as u64;
+		let offset = now - timestamp;
+		offset > self.cadence.duration().as_secs()
 	}
 
 	pub fn title(&self) -> String {
@@ -238,6 +250,9 @@ impl Alerts {
 			.map(|ah| ah.cadence)
 			.collect::<Vec<AlertCadence>>()
 	}
+	pub fn alerts(&self) -> &[AlertHeuristics] {
+		&self.0
+	}
 
 	/// Retrieve the heuristics for the given cadence, if present
 	pub fn cadence(&self, cadence: AlertCadence) -> Option<&AlertHeuristics> {
@@ -257,6 +272,8 @@ pub struct AlertData {
 	pub heuristics: AlertHeuristics,
 	pub results: Vec<AlertResult>,
 }
+
+// Helpers
 
 // Database interaction
 
@@ -280,6 +297,62 @@ pub async fn get_alert(
 	let alert: String = result.get(0);
 	let alert: AlertHeuristics = serde_json::from_str(&alert)?;
 	Ok(alert)
+}
+
+pub async fn get_all_alerts(context: &Context) -> Result<Alerts> {
+	let mut db = context.database_pool.begin().await?;
+	let rows = sqlx::query(
+		"
+			select
+				alert
+			from
+				alert_preferences
+		",
+	)
+	.fetch_all(&mut db)
+	.await?;
+	db.commit().await?;
+	let alerts: Vec<AlertHeuristics> = rows
+		.iter()
+		.map(|row| {
+			let alert: String = row.get(0);
+			serde_json::from_str(&alert).unwrap()
+		})
+		.collect();
+	Ok(Alerts::from(alerts))
+}
+
+/// Get the unix timestamp of the last run with the given cadence/metric combination
+pub async fn get_last_alert_time(
+	context: &Context,
+	cadence: AlertCadence,
+	metric: AlertMetric,
+) -> Result<u64> {
+	let mut db = context.database_pool.begin().await?;
+	let result = sqlx::query(
+		"
+			select
+				MAX(date)
+			from
+				alerts
+			where
+				cadence = $1 and
+				metric = $2
+		",
+	)
+	.bind(cadence.to_string())
+	.bind(metric.to_string())
+	.fetch_optional(&mut db)
+	.await?;
+	db.commit().await?;
+	match result {
+		Some(r) => {
+			let data: String = r.get(0);
+			let data: u64 = data.parse()?;
+			Ok(data)
+		}
+		None => Err(anyhow!("No registered alerts in table")),
+	}
 }
 
 pub async fn create_alert(
@@ -339,3 +412,42 @@ pub async fn update_alert(
 	.await?;
 	Ok(())
 }
+
+/*
+/// Handle a specific alert cadence
+async fn handle_alert_cadence(
+	alerts: &Alerts,
+	alert_methods: &[AlertMethod],
+	cadence: AlertCadence,
+	context: &Context,
+) -> Result<()> {
+	let already_handled = check_ongoing(cadence, &context.database_pool).await?;
+
+	if already_handled {
+		return Ok(());
+	}
+
+	let alert_id = write_alert_start(cadence, &context.database_pool).await?;
+
+	let heuristics = alerts.cadence(cadence).unwrap();
+	let results = check_metrics(heuristics, &context.database_pool).await?;
+	let exceeded_thresholds: Vec<&AlertResult> = results
+		.iter()
+		.filter(|r| {
+			heuristics
+				.get_threshold(r.metric)
+				.map(|t| r.exceeds_threshold(t))
+				.unwrap_or(false)
+		})
+		.collect();
+	push_alerts(&exceeded_thresholds, alert_methods, context).await?;
+
+	let alert_data = AlertData {
+		alert_methods: alert_methods.to_owned(),
+		heuristics: heuristics.to_owned(),
+		results: results.to_owned(),
+	};
+	write_alert_end(alert_id, alert_data, &context.database_pool).await?;
+	Ok(())
+}
+*/
