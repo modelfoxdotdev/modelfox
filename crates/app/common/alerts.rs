@@ -92,6 +92,8 @@ impl AlertMethod {
 	) -> Result<()> {
 		match self {
 			AlertMethod::Email(address) => {
+				// TODO re-enable this code!
+				/*
 				let email = lettre::Message::builder()
 					.from("Tangram <noreply@tangram.dev>".parse()?)
 					.to(address.parse()?)
@@ -105,6 +107,7 @@ impl AlertMethod {
 				} else {
 					return Err(anyhow!("No SMTP Transport in context"));
 				}
+				*/
 			}
 			AlertMethod::Stdout => println!("exceeded thresholds: {:?}", exceeded_thresholds),
 		}
@@ -326,7 +329,7 @@ pub async fn get_last_alert_time(
 	context: &Context,
 	cadence: AlertCadence,
 	metric: AlertMetric,
-) -> Result<u64> {
+) -> Result<Option<u64>> {
 	let mut db = context.database_pool.begin().await?;
 	let result = sqlx::query(
 		"
@@ -347,10 +350,13 @@ pub async fn get_last_alert_time(
 	match result {
 		Some(r) => {
 			let data: String = r.get(0);
+			if data.is_empty() {
+				return Ok(None);
+			}
 			let data: u64 = data.parse()?;
-			Ok(data)
+			Ok(Some(data))
 		}
-		None => Err(anyhow!("No registered alerts in table")),
+		None => Ok(None),
 	}
 }
 

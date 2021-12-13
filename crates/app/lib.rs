@@ -161,7 +161,7 @@ async fn alert_manager(context: Arc<Context>) -> Result<()> {
 	// calculate time until next heartbeat
 	let now = tokio::time::Instant::now();
 	// TODO wait for next heartbeat start
-	let duration = tokio::time::Duration::from_secs(30);
+	let duration = tokio::time::Duration::from_secs(10);
 
 	// start interval.
 	let mut interval = tokio::time::interval_at(now, duration);
@@ -174,8 +174,9 @@ async fn alert_manager(context: Arc<Context>) -> Result<()> {
 		// For each alert:
 		for alert in enabled.alerts() {
 			let last_run =
-				get_last_alert_time(&context, alert.cadence, alert.threshold.metric).await;
-			if last_run.is_err() || alert.is_expired(last_run.unwrap()) {
+				get_last_alert_time(&context, alert.cadence, alert.threshold.metric).await?;
+			dbg!(last_run);
+			if last_run.is_none() || alert.is_expired(last_run.unwrap()) {
 				// Run the alert hueristics if the time has expired for this cadence, or if no heuristics have ever been run
 				handle_heuristics(&context, alert).await?;
 			}
@@ -254,6 +255,7 @@ async fn push_alerts(
 	for method in methods {
 		method.send_alert(exceeded_thresholds, context).await?;
 	}
+	println!("after alerts");
 	Ok(())
 }
 
@@ -461,8 +463,8 @@ async fn write_alert_start(
 	)
 	.bind(id.to_string())
 	.bind(AlertProgress::InProgress.to_string())
-	.bind(cadence.to_string())
-	.bind(metric.to_string())
+	.bind(cadence.to_string().to_lowercase())
+	.bind(metric.short_name())
 	.bind(time::OffsetDateTime::now_utc().unix_timestamp())
 	.execute(&mut db)
 	.await?;
