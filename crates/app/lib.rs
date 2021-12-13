@@ -159,12 +159,18 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 /// Manage periodic alerting
 async fn alert_manager(context: Arc<Context>) -> Result<()> {
 	// calculate time until next heartbeat
-	let now = tokio::time::Instant::now();
-	// TODO wait for next heartbeat start
-	let duration = tokio::time::Duration::from_secs(10);
+	let now = time::OffsetDateTime::now_utc();
+	let now_timestamp = now.unix_timestamp();
+	let date = now.date();
+	let hour = now.hour();
+	let next_start = now.replace_time(time::Time::from_hms(hour + 1, 0, 0)?);
+	let next_start_timestamp = next_start.unix_timestamp();
+	let now_instant = tokio::time::Instant::now();
+	let delay = tokio::time::Duration::from_secs((next_start_timestamp - now_timestamp).try_into().unwrap());
+	let period = tokio::time::Duration::from_secs(60 * 60);
 
 	// start interval.
-	let mut interval = tokio::time::interval_at(now, duration);
+	let mut interval = tokio::time::interval_at(now_instant + delay, period);
 
 	// Each interval:
 	loop {
@@ -363,8 +369,7 @@ async fn check_ongoing(
 	.bind(cadence.to_string())
 	.bind(metric.to_string())
 	.bind(&now)
-	//.bind(&ten_minutes_in_seconds)
-	.bind(&5) // TODO remove - just for testing!
+	.bind(&ten_minutes_in_seconds)
 	.fetch_optional(&mut db)
 	.await?;
 	db.commit().await?;
