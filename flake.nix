@@ -32,8 +32,8 @@
         let
           toolchain = {
             channel = "nightly";
-            date = "2021-12-06";
-            sha256 = "sha256-TdL+JpgFzO6OmI2VmGpvukE3O4XzDtjcUBpxNhWEqZs=";
+            date = "2021-12-13";
+            sha256 = "sha256-eBhVG38AcnLx4QEfL+JM9IJxCBEWax4C+ubYua2Km4s=";
           };
         in with fenix.packages.${system}; combine (with toolchainOf toolchain; [
           cargo
