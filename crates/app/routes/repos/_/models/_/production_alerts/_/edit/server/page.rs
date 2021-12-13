@@ -1,6 +1,9 @@
 use pinwheel::prelude::*;
 use tangram_app_common::alerts::{AlertHeuristics, AlertMethod};
-use tangram_app_layouts::{document::Document, model_layout::{ModelLayout, ModelLayoutInfo}};
+use tangram_app_layouts::{
+	document::Document,
+	model_layout::{ModelLayout, ModelLayoutInfo},
+};
 use tangram_ui as ui;
 
 pub struct Page {
@@ -73,6 +76,10 @@ impl Component for Page {
 											ui::SelectFieldOption {
 												text: "Accuracy".to_owned(),
 												value: "accuracy".to_owned(),
+											},
+											ui::SelectFieldOption {
+												text: "Mean Squared Error".to_owned(),
+												value: "mse".to_owned(),
 											},
 											ui::SelectFieldOption {
 												text: "Root Mean Squared Error".to_owned(),

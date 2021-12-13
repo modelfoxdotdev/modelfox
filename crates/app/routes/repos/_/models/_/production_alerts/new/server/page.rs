@@ -65,6 +65,10 @@ impl Component for Page {
 												value: "accuracy".to_owned(),
 											},
 											ui::SelectFieldOption {
+												text: "Mean Squared Error".to_owned(),
+												value: "mse".to_owned(),
+											},
+											ui::SelectFieldOption {
 												text: "Root Mean Squared Error".to_owned(),
 												value: "rmse".to_owned(),
 											},

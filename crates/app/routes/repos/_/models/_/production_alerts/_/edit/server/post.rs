@@ -8,6 +8,7 @@ use tangram_app_common::{
 		AlertThreshold,
 	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
+	model::get_model_bytes,
 	path_components,
 	user::{authorize_user, authorize_user_for_model, authorize_user_for_repo},
 	Context,
@@ -74,6 +75,9 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			return Ok(bad_request());
 		}
 	};
+	let bytes = get_model_bytes(&context.storage, model_id).await?;
+	let model = tangram_model::from_bytes(&bytes)?;
+	let model_inner = model.inner();
 	let model_layout_info =
 		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionAlerts).await?;
 	match action {
@@ -97,6 +101,8 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				metric,
 				threshold,
 			} = ua;
+			let metric = AlertMetric::from_str(&metric)?;
+			// Validate metric type
 			let mut methods = vec![AlertMethod::Stdout];
 			if let Some(e) = email {
 				methods.push(AlertMethod::Email(e));
@@ -105,9 +111,47 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				cadence: AlertCadence::from_str(&cadence)?,
 				methods,
 				threshold: AlertThreshold {
-					metric: AlertMetric::from_str(&metric)?,
+					metric,
 					variance: threshold.parse()?,
 				},
+			};
+			match metric {
+				AlertMetric::Accuracy => {
+					if !matches!(
+						model_inner,
+						tangram_model::ModelInnerReader::BinaryClassifier(_)
+							| tangram_model::ModelInnerReader::MulticlassClassifier(_)
+					) {
+						let page = Page {
+							alert,
+							alert_id,
+							model_layout_info,
+							error: Some("Invalid metric for model type.".to_owned()),
+						};
+						let html = html(page);
+						let response = http::Response::builder()
+							.status(http::StatusCode::BAD_REQUEST)
+							.body(hyper::Body::from(html))
+							.unwrap();
+						return Ok(response);
+					}
+				}
+				AlertMetric::MeanSquaredError | AlertMetric::RootMeanSquaredError => {
+					if !matches!(model_inner, tangram_model::ModelInnerReader::Regressor(_)) {
+						let page = Page {
+							alert,
+							alert_id,
+							model_layout_info,
+							error: Some("Invalid metric for model type.".to_owned()),
+						};
+						let html = html(page);
+						let response = http::Response::builder()
+							.status(http::StatusCode::BAD_REQUEST)
+							.body(hyper::Body::from(html))
+							.unwrap();
+						return Ok(response);
+					}
+				}
 			};
 			let result = update_alert(&mut db, &alert, &alert_id).await;
 			if result.is_err() {

@@ -310,6 +310,15 @@ async fn find_current_data(
 					};
 					Ok(Some(accuracy))
 				}
+				AlertMetric::MeanSquaredError => {
+					let mse = match res.prediction_metrics {
+						ProductionPredictionMetrics::Regression(rppm) => {
+							rppm.finalize().unwrap().mse
+						}
+						_ => unreachable!(), // MSE is only for regression
+					};
+					Ok(Some(mse))
+				}
 				AlertMetric::RootMeanSquaredError => {
 					let rmse = match res.prediction_metrics {
 						ProductionPredictionMetrics::Regression(rppm) => {

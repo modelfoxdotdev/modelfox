@@ -101,7 +101,7 @@ impl AlertMethod {
 					.body(format!(
 						"Exceeded alert thresholds: {:?}",
 						exceeded_thresholds
-					))?; // TODO - include heuristics too
+					))?;
 				if let Some(smtp_transport) = &context.smtp_transport {
 					smtp_transport.send(email).await?;
 				} else {
@@ -121,6 +121,8 @@ impl AlertMethod {
 pub enum AlertMetric {
 	#[serde(rename = "accuracy")]
 	Accuracy,
+	#[serde(rename = "mean_squared_error")]
+	MeanSquaredError,
 	#[serde(rename = "root_mean_squared_error")]
 	RootMeanSquaredError,
 }
@@ -129,6 +131,7 @@ impl AlertMetric {
 	pub fn short_name(&self) -> String {
 		match self {
 			AlertMetric::Accuracy => "accuracy".to_owned(),
+			AlertMetric::MeanSquaredError => "mse".to_owned(),
 			AlertMetric::RootMeanSquaredError => "rmse".to_owned(),
 		}
 	}
@@ -138,6 +141,7 @@ impl fmt::Display for AlertMetric {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let s = match self {
 			AlertMetric::Accuracy => "Accuracy",
+			AlertMetric::MeanSquaredError => "Mean Squared Error",
 			AlertMetric::RootMeanSquaredError => "Root Mean Squared Error",
 		};
 		write!(f, "{}", s)
@@ -149,6 +153,7 @@ impl FromStr for AlertMetric {
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		match s.to_lowercase().as_str() {
 			"accuracy" => Ok(AlertMetric::Accuracy),
+			"mse" | "mean_squared_error" => Ok(AlertMetric::MeanSquaredError),
 			"rmse" | "root_mean_squared_error" => Ok(AlertMetric::RootMeanSquaredError),
 			_ => Err(io::Error::new(
 				io::ErrorKind::InvalidInput,
