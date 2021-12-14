@@ -379,9 +379,10 @@ pub async fn get_last_alert_time(
 	match result {
 		Some(r) => {
 			let data: String = r.get(0);
-			if data.is_empty() {
-				return Ok(None);
-			}
+			//if data.is_empty() {
+			
+			//	return Ok(None);
+			//}
 			let data: u64 = data.parse()?;
 			Ok(Some(data))
 		}

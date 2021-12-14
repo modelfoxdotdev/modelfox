@@ -164,7 +164,7 @@ async fn alert_manager(context: Arc<Context>) -> Result<()> {
 	// TODO - webhook check.
 	// Scrape the DB for any incomplete webhook attempts, and spawn an exponential decay thread for any found
 
-	let (begin, period) = if cfg!(release) {
+	let (begin, period) = if cfg!(not(debug_assertions)) {
 		// In release mode, calculate time until next heartbeat
 		// Start heartbeat at the top of the hour, run once per hour
 		// FIXME - see https://github.com/tangramdotdev/tangram/blob/879c3805e81238e4c30c26725e1bdca5cd0d095e/crates/app/routes/track/server/post.rs#L231
