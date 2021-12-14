@@ -64,7 +64,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				let id: Id = id.parse().unwrap();
 				let alert: String = row.get(1);
 				let alert: AlertHeuristics = serde_json::from_str(&alert).unwrap();
-				let name = alert.title();
+				let name = alert.title;
 				let last_updated: i64 = row.get(2);
 				let last_updated: DateTime<Tz> =
 					Utc.timestamp(last_updated, 0).with_timezone(&timezone);

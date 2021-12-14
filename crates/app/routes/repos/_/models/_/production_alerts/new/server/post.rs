@@ -22,6 +22,7 @@ struct Action {
 	email: Option<String>,
 	metric: String,
 	threshold: String,
+	title: Option<String>,
 }
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
@@ -73,6 +74,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		email,
 		metric,
 		threshold,
+		title,
 	} = action;
 	let metric = AlertMetric::from_str(&metric)?;
 	// Validate metric type
@@ -80,14 +82,18 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	if let Some(e) = email {
 		methods.push(AlertMethod::Email(e));
 	}
-	let alert = AlertHeuristics {
+	let mut alert = AlertHeuristics {
 		cadence: AlertCadence::from_str(&cadence)?,
 		methods,
 		threshold: AlertThreshold {
 			metric,
 			variance: threshold.parse()?,
 		},
+		title: title.unwrap_or_default(),
 	};
+			if alert.title.is_empty() {
+				alert.title = alert.default_title();
+			}
 	let result = create_alert(&mut db, alert, model_id).await;
 	if result.is_err() {
 		let page = Page {

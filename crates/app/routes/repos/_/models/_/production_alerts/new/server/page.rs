@@ -87,6 +87,12 @@ impl Component for Page {
 								)
 								.child(
 									ui::TextField::new()
+										.label("Title (Optional)".to_string())
+										.name("title".to_string())
+										.required(false)
+								)
+								.child(
+									ui::TextField::new()
 										.label("Email Address".to_string())
 										.name("email".to_string())
 										.required(false),

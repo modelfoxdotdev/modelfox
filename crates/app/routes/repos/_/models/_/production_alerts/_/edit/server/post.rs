@@ -4,8 +4,8 @@ use pinwheel::prelude::*;
 use std::{str, str::FromStr, sync::Arc};
 use tangram_app_common::{
 	alerts::{
-		delete_alert, update_alert, AlertHeuristics, AlertCadence, AlertMethod, AlertMetric, AlertModelType,
-		AlertThreshold,
+		delete_alert, update_alert, AlertCadence, AlertHeuristics, AlertMethod, AlertMetric,
+		AlertModelType, AlertThreshold,
 	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
@@ -31,6 +31,7 @@ struct UpdateAlertAction {
 	email: Option<String>,
 	metric: String,
 	threshold: String,
+	title: Option<String>,
 }
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
@@ -100,6 +101,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				email,
 				metric,
 				threshold,
+				title,
 			} = ua;
 			let metric = AlertMetric::from_str(&metric)?;
 			// Validate metric type
@@ -107,14 +109,18 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			if let Some(e) = email {
 				methods.push(AlertMethod::Email(e));
 			}
-			let alert = AlertHeuristics {
+			let mut alert = AlertHeuristics {
 				cadence: AlertCadence::from_str(&cadence)?,
 				methods,
 				threshold: AlertThreshold {
 					metric,
 					variance: threshold.parse()?,
 				},
+				title: title.unwrap_or_default(),
 			};
+			if alert.title.is_empty() {
+				alert.title = alert.default_title();
+			}
 			let result = update_alert(&mut db, &alert, &alert_id).await;
 			if result.is_err() {
 				let page = Page {

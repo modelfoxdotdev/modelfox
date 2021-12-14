@@ -1,5 +1,5 @@
 use pinwheel::prelude::*;
-use tangram_app_common::alerts::{AlertModelType, AlertHeuristics, AlertMethod};
+use tangram_app_common::alerts::{AlertHeuristics, AlertMethod, AlertModelType};
 use tangram_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
@@ -44,7 +44,7 @@ impl Component for Page {
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
-						.child(ui::H1::new().child(format!("Edit {} Alert", self.alert.title())))
+						.child(ui::H1::new().child(format!("Edit {} Alert", self.alert.title)))
 						.child(
 							ui::Form::new()
 								.post(true)
@@ -98,6 +98,13 @@ impl Component for Page {
 										.name("threshold".to_string())
 										.required(true)
 										.value(self.alert.threshold.variance.to_string()),
+								)
+								.child(
+									ui::TextField::new()
+										.label("Title (Optional)".to_string())
+										.name("title".to_string())
+										.required(false)
+										.value(self.alert.title),
 								)
 								.child(
 									ui::TextField::new()

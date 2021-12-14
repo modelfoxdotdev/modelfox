@@ -142,19 +142,6 @@ impl AlertMetric {
 			AlertMetric::RootMeanSquaredError => "rmse".to_owned(),
 		}
 	}
-
-	/// Check if this metric type applies to the given model type
-	fn valid_metric(&self, model_type: tangram_model::ModelInnerReader) -> bool {
-		use tangram_model::ModelInnerReader::*;
-		match self {
-			AlertMetric::Accuracy => {
-				matches!(model_type, BinaryClassifier(_) | MulticlassClassifier(_))
-			}
-			AlertMetric::MeanSquaredError | AlertMetric::RootMeanSquaredError => {
-				matches!(model_type, Regressor(_))
-			}
-		}
-	}
 }
 
 impl fmt::Display for AlertMetric {
@@ -253,6 +240,7 @@ pub struct AlertHeuristics {
 	pub cadence: AlertCadence,
 	pub methods: Vec<AlertMethod>,
 	pub threshold: AlertThreshold,
+	pub title: String,
 }
 
 impl AlertHeuristics {
@@ -271,7 +259,7 @@ impl AlertHeuristics {
 		offset > self.cadence.duration().as_secs()
 	}
 
-	pub fn title(&self) -> String {
+	pub fn default_title(&self) -> String {
 		format!("{} {}", self.cadence, self.threshold.metric)
 	}
 }
