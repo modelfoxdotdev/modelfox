@@ -7,7 +7,10 @@ use tangram_app_common::{
 		get_all_alerts, get_last_alert_time, AlertCadence, AlertData, AlertHeuristics, AlertMethod,
 		AlertMetric, AlertProgress, AlertResult,
 	},
-	heuristics::ALERT_METRICS_MINIMUM_TRUE_VALUES_THRESHOLD,
+	heuristics::{
+		ALERT_METRICS_HEARTBEAT_DURATION_PRODUCTION, ALERT_METRICS_HEARTBEAT_DURATION_TESTING,
+		ALERT_METRICS_MINIMUM_TRUE_VALUES_THRESHOLD,
+	},
 	options::{Options, StorageOptions},
 	storage::{LocalStorage, S3Storage, Storage},
 	Context,
@@ -159,18 +162,32 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 /// Manage periodic alerting
 async fn alert_manager(context: Arc<Context>) -> Result<()> {
 	// calculate time until next heartbeat
-	let now = time::OffsetDateTime::now_utc();
-	let now_timestamp = now.unix_timestamp();
-	let date = now.date();
-	let hour = now.hour();
-	let next_start = now.replace_time(time::Time::from_hms(hour + 1, 0, 0)?);
-	let next_start_timestamp = next_start.unix_timestamp();
-	let now_instant = tokio::time::Instant::now();
-	let delay = tokio::time::Duration::from_secs((next_start_timestamp - now_timestamp).try_into().unwrap());
-	let period = tokio::time::Duration::from_secs(60 * 60);
+	// TODO env var
+	let testing = true;
 
+	let (begin, period) = if testing {
+		(
+			tokio::time::Instant::now(),
+			ALERT_METRICS_HEARTBEAT_DURATION_TESTING,
+		)
+	} else {
+		let now = time::OffsetDateTime::now_utc();
+		let now_timestamp = now.unix_timestamp();
+		let hour = now.hour();
+		let next_start = now.replace_time(time::Time::from_hms(hour + 1, 0, 0)?);
+		let next_start_timestamp = next_start.unix_timestamp();
+		let now_instant = tokio::time::Instant::now();
+		let delay = tokio::time::Duration::from_secs(
+			(next_start_timestamp - now_timestamp).try_into().unwrap(),
+		);
+
+		(
+			now_instant + delay,
+			ALERT_METRICS_HEARTBEAT_DURATION_PRODUCTION,
+		)
+	};
 	// start interval.
-	let mut interval = tokio::time::interval_at(now_instant + delay, period);
+	let mut interval = tokio::time::interval_at(begin, period);
 
 	// Each interval:
 	loop {
@@ -261,7 +278,6 @@ async fn push_alerts(
 	for method in methods {
 		method.send_alert(exceeded_thresholds, context).await?;
 	}
-	println!("after alerts");
 	Ok(())
 }
 
