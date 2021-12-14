@@ -3,7 +3,9 @@ use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
+	alerts::AlertModelType,
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
+	model::get_model_bytes,
 	path_components,
 	user::{authorize_user, authorize_user_for_model, authorize_user_for_repo},
 	Context,
@@ -49,10 +51,14 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
+	let bytes = get_model_bytes(&context.storage, model_id).await?;
+	let model = tangram_model::from_bytes(&bytes)?;
+	let model_type = AlertModelType::from(model.inner());
 	let model_layout_info =
 		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionAlerts).await?;
 	let page = Page {
 		model_layout_info,
+		model_type,
 		error: None,
 	};
 	let html = html(page);

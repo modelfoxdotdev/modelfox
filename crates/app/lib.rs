@@ -161,16 +161,14 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 
 /// Manage periodic alerting
 async fn alert_manager(context: Arc<Context>) -> Result<()> {
-	// calculate time until next heartbeat
-	// TODO env var
-	let testing = true;
+	// TODO - webhook check.
+	// Scrape the DB for any incomplete webhook attempts, and spawn an exponential decay thread for any found
 
-	let (begin, period) = if testing {
-		(
-			tokio::time::Instant::now(),
-			ALERT_METRICS_HEARTBEAT_DURATION_TESTING,
-		)
-	} else {
+	let (begin, period) = if cfg!(release) {
+		// In release mode, calculate time until next heartbeat
+		// Start heartbeat at the top of the hour, run once per hour
+		// FIXME - see https://github.com/tangramdotdev/tangram/blob/879c3805e81238e4c30c26725e1bdca5cd0d095e/crates/app/routes/track/server/post.rs#L231
+		// that uses chrono, do the same thing with time
 		let now = time::OffsetDateTime::now_utc();
 		let now_timestamp = now.unix_timestamp();
 		let hour = now.hour();
@@ -180,10 +178,15 @@ async fn alert_manager(context: Arc<Context>) -> Result<()> {
 		let delay = tokio::time::Duration::from_secs(
 			(next_start_timestamp - now_timestamp).try_into().unwrap(),
 		);
-
 		(
 			now_instant + delay,
 			ALERT_METRICS_HEARTBEAT_DURATION_PRODUCTION,
+		)
+	} else {
+		// In every mode other than release, don't introduce a delay.  The period is currently 5 seconds.
+		(
+			tokio::time::Instant::now(),
+			ALERT_METRICS_HEARTBEAT_DURATION_TESTING,
 		)
 	};
 	// start interval.

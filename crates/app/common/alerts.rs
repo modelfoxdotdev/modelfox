@@ -82,6 +82,8 @@ pub enum AlertMethod {
 	Email(String),
 	/// Dump the alert to STDOUT - mostly useful for testing
 	Stdout,
+	/// POST the alert to the given URL as a webhook
+	Webhook(String),
 }
 
 impl AlertMethod {
@@ -91,7 +93,7 @@ impl AlertMethod {
 		context: &Context,
 	) -> Result<()> {
 		match self {
-			AlertMethod::Email(address) => {
+			AlertMethod::Email(_address) => {
 				// TODO re-enable this code!
 				/*
 				let email = lettre::Message::builder()
@@ -110,6 +112,11 @@ impl AlertMethod {
 				*/
 			}
 			AlertMethod::Stdout => println!("exceeded thresholds: {:?}", exceeded_thresholds),
+			AlertMethod::Webhook(_url) => {
+				// Spawn a thread
+				// Attempt the POST, record status in DB.
+				// If status has failed, attempt again until it succeeds.
+			}
 		}
 		Ok(())
 	}
@@ -133,6 +140,19 @@ impl AlertMetric {
 			AlertMetric::Accuracy => "accuracy".to_owned(),
 			AlertMetric::MeanSquaredError => "mse".to_owned(),
 			AlertMetric::RootMeanSquaredError => "rmse".to_owned(),
+		}
+	}
+
+	/// Check if this metric type applies to the given model type
+	fn valid_metric(&self, model_type: tangram_model::ModelInnerReader) -> bool {
+		use tangram_model::ModelInnerReader::*;
+		match self {
+			AlertMetric::Accuracy => {
+				matches!(model_type, BinaryClassifier(_) | MulticlassClassifier(_))
+			}
+			AlertMetric::MeanSquaredError | AlertMetric::RootMeanSquaredError => {
+				matches!(model_type, Regressor(_))
+			}
 		}
 	}
 }
@@ -159,6 +179,22 @@ impl FromStr for AlertMetric {
 				io::ErrorKind::InvalidInput,
 				"Unsupported alert metric",
 			)),
+		}
+	}
+}
+
+/// For filtering valid metric options
+pub enum AlertModelType {
+	Classifier,
+	Regressor,
+}
+
+impl From<tangram_model::ModelInnerReader<'_>> for AlertModelType {
+	fn from(mir: tangram_model::ModelInnerReader) -> Self {
+		use tangram_model::ModelInnerReader::*;
+		match mir {
+			BinaryClassifier(_) | MulticlassClassifier(_) => AlertModelType::Classifier,
+			Regressor(_) => AlertModelType::Regressor,
 		}
 	}
 }

@@ -4,7 +4,8 @@ use pinwheel::prelude::*;
 use std::{str, str::FromStr, sync::Arc};
 use tangram_app_common::{
 	alerts::{
-		create_alert, AlertCadence, AlertHeuristics, AlertMethod, AlertMetric, AlertThreshold,
+		create_alert, AlertCadence, AlertHeuristics, AlertMethod, AlertMetric, AlertModelType,
+		AlertThreshold,
 	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
@@ -64,7 +65,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	};
 	let bytes = get_model_bytes(&context.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
-	let model_inner = model.inner();
+	let model_type = AlertModelType::from(model.inner());
 	let model_layout_info =
 		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionAlerts).await?;
 	let Action {
@@ -75,40 +76,6 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	} = action;
 	let metric = AlertMetric::from_str(&metric)?;
 	// Validate metric type
-	match metric {
-		AlertMetric::Accuracy => {
-			if !matches!(
-				model_inner,
-				tangram_model::ModelInnerReader::BinaryClassifier(_)
-					| tangram_model::ModelInnerReader::MulticlassClassifier(_)
-			) {
-				let page = Page {
-					model_layout_info,
-					error: Some("Invalid metric for model type.".to_owned()),
-				};
-				let html = html(page);
-				let response = http::Response::builder()
-					.status(http::StatusCode::BAD_REQUEST)
-					.body(hyper::Body::from(html))
-					.unwrap();
-				return Ok(response);
-			}
-		}
-		AlertMetric::MeanSquaredError | AlertMetric::RootMeanSquaredError => {
-			if !matches!(model_inner, tangram_model::ModelInnerReader::Regressor(_)) {
-				let page = Page {
-					model_layout_info,
-					error: Some("Invalid metric for model type.".to_owned()),
-				};
-				let html = html(page);
-				let response = http::Response::builder()
-					.status(http::StatusCode::BAD_REQUEST)
-					.body(hyper::Body::from(html))
-					.unwrap();
-				return Ok(response);
-			}
-		}
-	};
 	let mut methods = vec![AlertMethod::Stdout];
 	if let Some(e) = email {
 		methods.push(AlertMethod::Email(e));
@@ -125,6 +92,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	if result.is_err() {
 		let page = Page {
 			model_layout_info,
+			model_type,
 			error: Some("There was an error creating your alert.".to_owned()),
 		};
 		let html = html(page);

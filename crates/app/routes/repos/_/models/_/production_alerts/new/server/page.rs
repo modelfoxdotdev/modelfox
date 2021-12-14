@@ -1,4 +1,5 @@
 use pinwheel::prelude::*;
+use tangram_app_common::alerts::AlertModelType;
 use tangram_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
@@ -8,11 +9,28 @@ use tangram_ui as ui;
 
 pub struct Page {
 	pub model_layout_info: ModelLayoutInfo,
+	pub model_type: AlertModelType,
 	pub error: Option<String>,
 }
 
 impl Component for Page {
 	fn into_node(self) -> Node {
+		let metric_options = match self.model_type {
+			AlertModelType::Classifier => vec![ui::SelectFieldOption {
+				text: "Accuracy".to_owned(),
+				value: "accuracy".to_owned(),
+			}],
+			AlertModelType::Regressor => vec![
+				ui::SelectFieldOption {
+					text: "Mean Squared Error".to_owned(),
+					value: "mse".to_owned(),
+				},
+				ui::SelectFieldOption {
+					text: "Root Mean Squared Error".to_owned(),
+					value: "rmse".to_owned(),
+				},
+			],
+		};
 		Document::new()
 			.client("tangram_app_new_model_production_client")
 			.child(
@@ -59,20 +77,7 @@ impl Component for Page {
 										.label("Alert Metric".to_owned())
 										.name("metric".to_owned())
 										.required(true)
-										.options(vec![
-											ui::SelectFieldOption {
-												text: "Accuracy".to_owned(),
-												value: "accuracy".to_owned(),
-											},
-											ui::SelectFieldOption {
-												text: "Mean Squared Error".to_owned(),
-												value: "mse".to_owned(),
-											},
-											ui::SelectFieldOption {
-												text: "Root Mean Squared Error".to_owned(),
-												value: "rmse".to_owned(),
-											},
-										]),
+										.options(metric_options),
 								)
 								.child(
 									ui::TextField::new()
@@ -82,9 +87,9 @@ impl Component for Page {
 								)
 								.child(
 									ui::TextField::new()
-									.label("Email Address".to_string())
-									.name("email".to_string())
-									.required(false)
+										.label("Email Address".to_string())
+										.name("email".to_string())
+										.required(false),
 								)
 								.child(
 									ui::Button::new()
