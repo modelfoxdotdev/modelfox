@@ -2886,9 +2886,9 @@ dependencies = [
 
 [[package]]
 name = "sunfish_macro"
-version = "0.3.1"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0418ac11cba73f5b86b06bd34106f6e3fffffc2afb9e29c0b8f993f2f340bf25"
+checksum = "305ab130dc812585ea14f895ebe1235fe66acbe8308d4561123b052c9f60b7df"
 dependencies = [
  "glob",
  "proc-macro2",
