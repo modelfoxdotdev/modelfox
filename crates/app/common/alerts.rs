@@ -203,19 +203,84 @@ impl fmt::Display for AlertProgress {
 	}
 }
 
+/// Alerts can either be set as absolute values or percentage deviations
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "mode")]
+pub enum AlertThresholdMode {
+	#[serde(rename = "absolute")]
+	Absolute,
+	#[serde(rename = "percentage")]
+	Percentage,
+}
+
+impl fmt::Display for AlertThresholdMode {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+	    let s = match self {
+				AlertThresholdMode::Absolute => "absolute",
+				AlertThresholdMode::Percentage => "percentage",
+			};
+			write!(f, "{}", s)
+	}
+}
+
+impl FromStr for AlertThresholdMode {
+	type Err = io::Error;
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		match s.to_lowercase().as_str() {
+			"absolute" => Ok(AlertThresholdMode::Absolute),
+			"percentage" => Ok(AlertThresholdMode::Percentage),
+			_ => Err(io::Error::new(
+				io::ErrorKind::InvalidInput,
+				"unsupported threshold mode",
+			)),
+		}
+	}
+}
+
 /// Single alert threshold
-#[derive(Debug, Clone, Copy, Deserialize, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
 pub struct AlertThreshold {
 	pub metric: AlertMetric,
-	pub variance: f32,
+	pub mode: AlertThresholdMode,
+	pub variance_lower: Option<f32>,
+	pub variance_upper: Option<f32>,
 }
 
 impl Default for AlertThreshold {
 	fn default() -> Self {
 		AlertThreshold {
 			metric: AlertMetric::Accuracy,
-			variance: 0.1,
+			mode: AlertThresholdMode::Absolute,
+			variance_lower: Some(0.1),
+			variance_upper: Some(0.1),
 		}
+	}
+}
+
+pub fn extract_threshold_bounds(
+	threshold_bounds: (String, String),
+) -> Result<(Option<f32>, Option<f32>)> {
+	let lower = if !threshold_bounds.0.is_empty() {
+		Some(threshold_bounds.0.parse()?)
+	} else {
+		None
+	};
+	let upper = if !threshold_bounds.1.is_empty() {
+		Some(threshold_bounds.1.parse()?)
+	} else {
+		None
+	};
+	Ok((lower, upper))
+}
+
+pub fn validate_threshold_bounds(lower: String, upper: String) -> Option<(String, String)> {
+	let at_least_one = (!lower.is_empty() && !upper.is_empty())
+		|| (lower.is_empty() && !upper.is_empty())
+		|| (!lower.is_empty() && upper.is_empty());
+	if at_least_one {
+		Some((lower, upper))
+	} else {
+		None
 	}
 }
 
@@ -244,14 +309,9 @@ pub struct AlertHeuristics {
 }
 
 impl AlertHeuristics {
-	/// Retrieve the variance tolerance for a given metric, if present
 	pub fn get_threshold(&self, metric: AlertMetric) -> Option<f32> {
-		if self.threshold.metric == metric {
-			return Some(self.threshold.variance);
-		}
-		None
+		todo!()
 	}
-
 	/// Check if the given timestamp is more than one cadence interval behind the current time
 	pub fn is_expired(&self, timestamp: u64) -> bool {
 		let now = time::OffsetDateTime::now_utc().unix_timestamp() as u64;
@@ -387,6 +447,41 @@ pub async fn get_last_alert_time(
 		}
 		None => Ok(None),
 	}
+}
+
+pub async fn check_for_duplicate_alert(
+	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	alert: &AlertHeuristics,
+	model_id: Id,
+) -> Result<bool> {
+	// Pull all rows with matching metric and cadence
+	// Verify none of them have identical thresholds
+	let rows = sqlx::query(
+		"
+			select
+				alert
+			from
+				alert_preferences
+			where
+				model_id = $1
+		",
+	)
+	.bind(model_id.to_string())
+	.fetch_all(db)
+	.await?;
+	let result = rows
+		.iter()
+		.map(|row| {
+			let alert_json: String = row.get(0);
+			let alert: AlertHeuristics =
+				serde_json::from_str(&alert_json).expect("Could not parse stored alert");
+			alert
+		})
+		.fold(false, |acc, el| {
+			acc || (el.cadence == alert.cadence && el.threshold == alert.threshold)
+		});
+
+	Ok(result)
 }
 
 pub async fn create_alert(

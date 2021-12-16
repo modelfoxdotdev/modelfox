@@ -4,8 +4,9 @@ use pinwheel::prelude::*;
 use std::{str, str::FromStr, sync::Arc};
 use tangram_app_common::{
 	alerts::{
-		create_alert, AlertCadence, AlertHeuristics, AlertMethod, AlertMetric, AlertModelType,
-		AlertThreshold,
+		check_for_duplicate_alert, create_alert, extract_threshold_bounds,
+		validate_threshold_bounds, AlertCadence, AlertHeuristics, AlertMethod, AlertMetric,
+		AlertModelType, AlertThreshold, AlertThresholdMode,
 	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
@@ -19,10 +20,13 @@ use tangram_id::Id;
 #[derive(serde::Deserialize)]
 struct Action {
 	cadence: String,
-	email: Option<String>,
+	email: String,
 	metric: String,
-	threshold: String,
-	title: Option<String>,
+	mode: String,
+	threshold_lower: String,
+	threshold_upper: String,
+	title: String,
+	webhook: String,
 }
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
@@ -73,27 +77,64 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		cadence,
 		email,
 		metric,
-		threshold,
+		mode,
+		threshold_lower,
+		threshold_upper,
 		title,
+		webhook,
 	} = action;
 	let metric = AlertMetric::from_str(&metric)?;
 	// Validate metric type
 	let mut methods = vec![AlertMethod::Stdout];
-	if let Some(e) = email {
-		methods.push(AlertMethod::Email(e));
+	if !email.is_empty() {
+		methods.push(AlertMethod::Email(email));
 	}
+	if !webhook.is_empty() {
+		methods.push(AlertMethod::Webhook(webhook));
+	}
+	let threshold_bounds = validate_threshold_bounds(threshold_lower, threshold_upper);
+	dbg!(&threshold_bounds);
+	if threshold_bounds.is_none() {
+		let page = Page {
+			model_layout_info,
+			model_type,
+			error: Some("Must provide at least one threshold bound.".to_owned()),
+		};
+		let html = html(page);
+		let response = http::Response::builder()
+			.status(http::StatusCode::BAD_REQUEST)
+			.body(hyper::Body::from(html))
+			.unwrap();
+		return Ok(response);
+	}
+	let (variance_lower, variance_upper) = extract_threshold_bounds(threshold_bounds.unwrap())?;
 	let mut alert = AlertHeuristics {
 		cadence: AlertCadence::from_str(&cadence)?,
 		methods,
 		threshold: AlertThreshold {
 			metric,
-			variance: threshold.parse()?,
+			mode: AlertThresholdMode::from_str(&mode)?,
+			variance_lower,
+			variance_upper,
 		},
-		title: title.unwrap_or_default(),
+		title,
 	};
-			if alert.title.is_empty() {
-				alert.title = alert.default_title();
-			}
+	if alert.title.is_empty() {
+		alert.title = alert.default_title();
+	}
+	if check_for_duplicate_alert(&mut db, &alert, model_id).await? {
+		let page = Page {
+			model_layout_info,
+			model_type,
+			error: Some("Identical alert already exists.".to_owned()),
+		};
+		let html = html(page);
+		let response = http::Response::builder()
+			.status(http::StatusCode::BAD_REQUEST)
+			.body(hyper::Body::from(html))
+			.unwrap();
+		return Ok(response);
+	}
 	let result = create_alert(&mut db, alert, model_id).await;
 	if result.is_err() {
 		let page = Page {

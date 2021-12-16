@@ -40,6 +40,16 @@ impl Component for Page {
 				AlertMethod::Email(e) => e.to_string(),
 				_ => acc,
 			});
+		let lower = if let Some(l) = self.alert.threshold.variance_lower {
+			l.to_string()
+		} else {
+			String::new()
+		};
+		let upper = if let Some(u) = self.alert.threshold.variance_upper {
+			u.to_string()
+		} else {
+			String::new()
+		};
 		Document::new()
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
@@ -94,10 +104,34 @@ impl Component for Page {
 								)
 								.child(
 									ui::TextField::new()
-										.label("Threshold Value".to_string())
-										.name("threshold".to_string())
+										.label("Lower Threshold Value".to_string())
+										.name("threshold_lower".to_string())
+										.required(false)
+										.value(lower),
+								)
+								.child(
+									ui::TextField::new()
+										.label("Upper Threshold Value".to_string())
+										.name("threshold_upper".to_string())
+										.required(false)
+										.value(upper),
+								)
+								.child(
+									ui::SelectField::new()
+										.label("Threshold Mode".to_string())
+										.name("mode".to_string())
 										.required(true)
-										.value(self.alert.threshold.variance.to_string()),
+										.options(vec![
+											ui::SelectFieldOption {
+												text: "Absolute".to_owned(),
+												value: "absolute".to_owned(),
+											},
+											ui::SelectFieldOption {
+												text: "Percentage".to_owned(),
+												value: "percentage".to_owned(),
+											},
+										])
+										.value(self.alert.threshold.mode.to_string()),
 								)
 								.child(
 									ui::TextField::new()
@@ -112,6 +146,12 @@ impl Component for Page {
 										.name("email".to_string())
 										.required(false)
 										.value(email),
+								)
+								.child(
+									ui::TextField::new()
+										.label("Webhook URL".to_string())
+										.name("webhook".to_string())
+										.required(false),
 								)
 								.child(
 									ui::Button::new()

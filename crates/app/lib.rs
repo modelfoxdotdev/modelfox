@@ -267,7 +267,7 @@ async fn check_metrics(
 	results.push(AlertResult {
 		metric: heuristics.threshold.metric,
 		observed_value: current_value,
-		observed_variance: (current_value - heuristics.threshold.variance).abs(),
+		observed_variance: (current_value - heuristics.threshold.variance_lower.unwrap()).abs(), //FIXME upper and lower
 	});
 	Ok(results)
 }
