@@ -170,10 +170,16 @@ fn build_debs(version: &str) {
 				Homepage: https://www.tangram.dev
 				Description: Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.
 			"#,
+			architecture = architecture,
+			version = version,
 		);
 		std::fs::write(&control_path, &control).unwrap();
 		// Run dpkg-deb
-		let deb_file_name = format!("tangram_{version}_{architecture}.deb");
+		let deb_file_name = format!(
+			"tangram_{version}_{architecture}.deb",
+			version = version,
+			architecture = architecture,
+		);
 		let deb_output_path = debs_path.join(&deb_file_name);
 		cmd!("dpkg-deb", "--build", &deb_path, &deb_output_path)
 			.run()
@@ -199,7 +205,8 @@ fn build_rpms(version: &str) {
 		let tangram_cli_path = compile_path
 			.join(target.target_name())
 			.join(tangram_cli_file_name);
-		let tangram_path_in_tar = PathBuf::from(format!("tangram-{version}/tangram"));
+		let tangram_path_in_tar =
+			PathBuf::from(format!("tangram-{version}/tangram", version = version));
 		let sources_path = rpm_path.join("SOURCES");
 		let tar_path = sources_path.join("tangram.tar.gz");
 		tar(vec![(tangram_cli_path, tangram_path_in_tar)], &tar_path);
@@ -228,6 +235,7 @@ fn build_rpms(version: &str) {
 				%files
 				%attr(0755, root, root) /usr/bin/tangram
 			"#,
+			version = version,
 		);
 		let spec_path = rpm_path.join("SPECS/tangram.spec");
 		std::fs::write(&spec_path, spec).unwrap();
@@ -241,7 +249,7 @@ fn build_rpms(version: &str) {
 		cmd!(
 			"rpmbuild",
 			"-D",
-			format!("_topdir {topdir}"),
+			format!("_topdir {topdir}", topdir = topdir),
 			"--target",
 			target,
 			"-bb",
@@ -250,8 +258,16 @@ fn build_rpms(version: &str) {
 		.run()
 		.unwrap();
 		// Move the rpm to the release directory.
-		let src_rpm_file_name = format!("tangram-{version}-1.{target}.rpm");
-		let dst_rpm_file_name = format!("tangram_{version}_{target}.rpm");
+		let src_rpm_file_name = format!(
+			"tangram-{version}-1.{target}.rpm",
+			version = version,
+			target = target,
+		);
+		let dst_rpm_file_name = format!(
+			"tangram_{version}_{target}.rpm",
+			version = version,
+			target = target,
+		);
 		std::fs::copy(
 			rpm_path.join("RPMS").join(target).join(&src_rpm_file_name),
 			rpms_path.join(&dst_rpm_file_name),
@@ -279,13 +295,17 @@ fn build_containers(version: &str) {
 				COPY {tangram_cli_path} .
 				ENTRYPOINT ["/tangram"]
 			"#,
+			tangram_cli_path = tangram_cli_path,
 		);
 		std::fs::write(&dockerfile_path, &dockerfile).unwrap();
 		let platform = match target.arch() {
 			Arch::AArch64 => "linux/arm64",
 			Arch::X8664 => "linux/amd64",
 		};
-		let tag = format!("docker.io/tangramdotdev/tangram:{version}");
+		let tag = format!(
+			"docker.io/tangramdotdev/tangram:{version}",
+			version = version,
+		);
 		cmd!(
 			"docker",
 			"build",
@@ -393,6 +413,8 @@ fn alpine(
 					install -D -m 755 "$srcdir"/tangram "$pkgdir"/usr/bin/tangram
 				}}
 			"#,
+			version = version,
+			arch = arch,
 		);
 		std::fs::write(&apkbuild_path, &apkbuild).unwrap();
 		let tangram_cli_dst_path = repo_path.join("tangram");
@@ -477,7 +499,11 @@ fn deb(
 		.iter()
 		.cloned()
 		.map(|arch| {
-			let path = debs_path.join(format!("tangram_{version}_{arch}.deb"));
+			let path = debs_path.join(format!(
+				"tangram_{version}_{arch}.deb",
+				version = version,
+				arch = arch,
+			));
 			Deb {
 				arch,
 				version,
@@ -499,16 +525,25 @@ fn deb(
 		};
 		for distribution_version in distribution_versions {
 			// Write the .list file.
-			let list_path = repo_path.join(format!("{distribution_version}.list"));
+			let list_path = repo_path.join(format!(
+				"{distribution_version}.list",
+				distribution_version = distribution_version,
+			));
 			let list_file = formatdoc!(
 				r#"
 					# tangram packages for {distribution} {distribution_version}
 					deb {pkgs_url}/stable/{distribution} {distribution_version} main
 				"#,
+				distribution = distribution,
+				distribution_version = distribution_version,
+				pkgs_url = pkgs_url,
 			);
 			std::fs::write(list_path, list_file).unwrap();
 			// Copy the public key.
-			let public_key_path = repo_path.join(format!("{distribution_version}.gpg"));
+			let public_key_path = repo_path.join(format!(
+				"{distribution_version}.gpg",
+				distribution_version = distribution_version,
+			));
 			std::fs::copy(deb_public_key_path, public_key_path).unwrap();
 		}
 		let pool_path = repo_path.join("pool");
@@ -528,7 +563,7 @@ fn deb(
 			for arch in archs {
 				let component_path = distribution_path.join("main");
 				std::fs::create_dir_all(&component_path).unwrap();
-				let binary_arch_path = component_path.join(format!("binary-{arch}"));
+				let binary_arch_path = component_path.join(format!("binary-{arch}", arch = arch));
 				std::fs::create_dir_all(&binary_arch_path).unwrap();
 				let packages_path = binary_arch_path.join("Packages");
 				let mut packages_file = String::new();
@@ -553,6 +588,13 @@ fn deb(
 							Homepage: https://www.tangram.dev
 							Description: Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.
 						"#,
+						deb_version = deb_version,
+						arch = arch,
+						version = version,
+						size = size,
+						md5 = md5,
+						sha1 = sha1,
+						sha256 = sha256,
 					);
 					packages_file.push_str(&packages_entry);
 					packages_file.push('\n');
@@ -564,14 +606,28 @@ fn deb(
 					.unwrap()
 					.display();
 				let md5 = hex::encode(Md5::digest(packages_file.as_bytes()));
-				let md5_line = format!(" {md5} {packages_file_len} {packages_relative_path}");
+				let md5_line = format!(
+					" {md5} {packages_file_len} {packages_relative_path}",
+					md5 = md5,
+					packages_file_len = packages_file_len,
+					packages_relative_path = packages_relative_path,
+				);
 				md5_lines.push(md5_line);
 				let sha1 = hex::encode(Sha1::digest(packages_file.as_bytes()));
-				let sha1_line = format!(" {sha1} {packages_file_len} {packages_relative_path}");
+				let sha1_line = format!(
+					" {sha1} {packages_file_len} {packages_relative_path}",
+					sha1 = sha1,
+					packages_file_len = packages_file_len,
+					packages_relative_path = packages_relative_path,
+				);
 				sha1_lines.push(sha1_line);
 				let sha256 = hex::encode(Sha256::digest(packages_file.as_bytes()));
-				let sha256_line =
-					format!(" {sha256} {packages_file_len} {packages_relative_path}",);
+				let sha256_line = format!(
+					" {sha256} {packages_file_len} {packages_relative_path}",
+					sha256 = sha256,
+					packages_file_len = packages_file_len,
+					packages_relative_path = packages_relative_path,
+				);
 				sha256_lines.push(sha256_line);
 			}
 			// Write the Release file.
@@ -594,6 +650,11 @@ fn deb(
 					SHA256:
 					{sha256}
 				"#,
+				distribution_version = distribution_version,
+				date = date,
+				md5 = md5,
+				sha1 = sha1,
+				sha256 = sha256,
 			);
 			std::fs::write(&release_file_path, &release_file).unwrap();
 			// Write the Release.gpg file.
@@ -657,7 +718,11 @@ fn rpm(
 		.iter()
 		.cloned()
 		.map(|target| {
-			let path = rpms_path.join(format!("tangram_{version}_{target}.rpm"));
+			let path = rpms_path.join(format!(
+				"tangram_{version}_{target}.rpm",
+				version = version,
+				target = target,
+			));
 			Rpm { target, path }
 		})
 		.collect();
@@ -676,7 +741,7 @@ fn rpm(
 		// Create the .repo file.
 		let repo_file_path = repo_path.join("tangram.repo");
 		let distribution_version_with_leading_slash = distribution_version
-			.map(|v| format!("/{v}"))
+			.map(|v| format!("/{v}", v = v))
 			.unwrap_or_else(|| "".to_owned());
 		let repo_file = formatdoc!(
 			r#"
@@ -689,6 +754,9 @@ fn rpm(
 				gpgcheck=0
 				gpgkey={pkgs_url}/stable/{distribution}{distribution_version_with_leading_slash}/repo.gpg
 			"#,
+			pkgs_url = pkgs_url,
+			distribution = distribution,
+			distribution_version_with_leading_slash = distribution_version_with_leading_slash,
 		);
 		std::fs::write(repo_file_path, repo_file).unwrap();
 		// Copy the rpm public key.
@@ -739,7 +807,11 @@ fn build_release(version: &str) {
 			.join(target.target_name())
 			.join(tangram_cli_file_name);
 		let target_name = target.target_name();
-		let output_path = release_path.join(format!("tangram_cli_{version}_{target_name}.tar.gz",));
+		let output_path = release_path.join(format!(
+			"tangram_cli_{version}_{target_name}.tar.gz",
+			version = version,
+			target_name = target_name,
+		));
 		let inputs = vec![(
 			tangram_cli_path.clone(),
 			PathBuf::from(tangram_cli_file_name),
@@ -751,7 +823,11 @@ fn build_release(version: &str) {
 		let target_file_names = TargetFileNames::for_target(target);
 		let target_path = compile_path.join(target.target_name());
 		let target_name = target.target_name();
-		let output_path = release_path.join(format!("libtangram_{version}_{target_name}.tar.gz",));
+		let output_path = release_path.join(format!(
+			"libtangram_{version}_{target_name}.tar.gz",
+			version = version,
+			target_name = target_name,
+		));
 		let inputs = vec![
 			(
 				target_path.join(target_file_names.tangram_h_file_name),
