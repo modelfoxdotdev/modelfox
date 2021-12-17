@@ -90,6 +90,7 @@
           doxygen
           dpkg
           elixir
+          gnupg
           go
           lld_13
           llvm_13
@@ -122,7 +123,6 @@
           ruby
           rust
           rust-cbindgen
-          sequoia
           sqlite
           time
           wasm-bindgen-cli

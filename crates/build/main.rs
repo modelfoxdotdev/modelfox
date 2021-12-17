@@ -658,29 +658,19 @@ fn deb(
 			);
 			std::fs::write(&release_file_path, &release_file).unwrap();
 			// Write the Release.gpg file.
-			cmd!(
-				"sq",
-				"sign",
-				"--detached",
-				"--signer-key",
-				deb_private_key_path
-			)
-			.stdin_path(&release_file_path)
-			.stdout_path(distribution_path.join("Release.gpg"))
-			.read()
-			.unwrap();
+			sign(
+				SignatureType::Detached,
+				deb_private_key_path,
+				&release_file_path,
+				&distribution_path.join("Release.gpg"),
+			);
 			// Write the InRelease file.
-			cmd!(
-				"sq",
-				"sign",
-				"--cleartext-signature",
-				"--signer-key",
-				deb_private_key_path
-			)
-			.stdin_path(&release_file_path)
-			.stdout_path(distribution_path.join("InRelease"))
-			.read()
-			.unwrap();
+			sign(
+				SignatureType::Cleartext,
+				deb_private_key_path,
+				&release_file_path,
+				&distribution_path.join("InRelease"),
+			);
 		}
 	}
 	Ok(())
@@ -779,17 +769,12 @@ fn rpm(
 			// Run createrepo.
 			cmd!("createrepo_c", &repo_target_path).run().unwrap();
 			// Write the signature.
-			cmd!(
-				"sq",
-				"sign",
-				"--detached",
-				"--signer-key",
-				rpm_private_key_path
-			)
-			.stdin_path(repo_target_path.join("repodata/repomd.xml"))
-			.stdout_path(repo_target_path.join("repodata/repomd.xml.asc"))
-			.read()
-			.unwrap();
+			sign(
+				SignatureType::Detached,
+				rpm_private_key_path,
+				&repo_target_path.join("repodata/repomd.xml"),
+				&repo_target_path.join("repodata/repomd.xml.asc"),
+			);
 		}
 	}
 	Ok(())
@@ -999,4 +984,31 @@ fn tar(input_paths: Vec<(PathBuf, PathBuf)>, output_path: &Path) {
 		tar.append_path_with_name(path, name).unwrap();
 	}
 	tar.finish().unwrap();
+}
+
+enum SignatureType {
+	Cleartext,
+	Detached,
+}
+
+fn sign(signature_type: SignatureType, key: &Path, input: &Path, output: &Path) {
+	let action = match signature_type {
+		SignatureType::Cleartext => "--clear-sign",
+		SignatureType::Detached => "--detach-sign",
+	};
+	let key = key.display();
+	let input = input.display();
+	let output = output.display();
+	let script = formatdoc!(
+		r#"
+			export GNUPGHOME=$(mktemp -d)
+			gpg --import {key}
+			cat {input} | gpg --armor {action} > {output}
+		"#,
+		key = key,
+		input = input,
+		action = action,
+		output = output,
+	);
+	cmd!("sh", "-c", script).read().unwrap();
 }
