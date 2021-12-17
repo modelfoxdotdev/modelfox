@@ -1,4 +1,4 @@
-use crate::Context;
+use crate::{model::get_model_bytes, Context};
 use anyhow::{anyhow, Result};
 use lettre::AsyncTransport;
 use serde::{Deserialize, Serialize};
@@ -27,6 +27,7 @@ pub enum AlertCadence {
 }
 
 impl AlertCadence {
+	// TODO - not necessary, we're doing heartbeats now?
 	pub fn duration(&self) -> tokio::time::Duration {
 		match self {
 			AlertCadence::Daily => tokio::time::Duration::from_secs(60 * 60 * 24),
@@ -142,6 +143,16 @@ impl AlertMetric {
 			AlertMetric::RootMeanSquaredError => "rmse".to_owned(),
 		}
 	}
+
+	/// Check if the given AlertModelType is applicable to this AlertMetric
+	pub fn validate(&self, model_type: AlertModelType) -> bool {
+		match self {
+			AlertMetric::Accuracy => matches!(model_type, AlertModelType::Classifier),
+			AlertMetric::MeanSquaredError | &AlertMetric::RootMeanSquaredError => {
+				matches!(model_type, AlertModelType::Regressor)
+			}
+		}
+	}
 }
 
 impl fmt::Display for AlertMetric {
@@ -171,6 +182,7 @@ impl FromStr for AlertMetric {
 }
 
 /// For filtering valid metric options
+#[derive(Debug, Clone, Copy)]
 pub enum AlertModelType {
 	Classifier,
 	Regressor,
@@ -215,11 +227,11 @@ pub enum AlertThresholdMode {
 
 impl fmt::Display for AlertThresholdMode {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-	    let s = match self {
-				AlertThresholdMode::Absolute => "absolute",
-				AlertThresholdMode::Percentage => "percentage",
-			};
-			write!(f, "{}", s)
+		let s = match self {
+			AlertThresholdMode::Absolute => "absolute",
+			AlertThresholdMode::Percentage => "percentage",
+		};
+		write!(f, "{}", s)
 	}
 }
 
@@ -300,10 +312,11 @@ impl AlertResult {
 }
 
 /// Thresholds for generating an Alert
-#[derive(Debug, Clone, Default, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AlertHeuristics {
 	pub cadence: AlertCadence,
 	pub methods: Vec<AlertMethod>,
+	pub model_id: Id,
 	pub threshold: AlertThreshold,
 	pub title: String,
 }
@@ -358,7 +371,7 @@ impl Alerts {
 }
 
 /// Collection for the alert results from a single run
-#[derive(Debug, Default, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct AlertData {
 	pub heuristics: AlertHeuristics,
 	pub results: Vec<AlertResult>,
@@ -542,41 +555,62 @@ pub async fn update_alert(
 	Ok(())
 }
 
-/*
-/// Handle a specific alert cadence
-async fn handle_alert_cadence(
-	alerts: &Alerts,
-	alert_methods: &[AlertMethod],
-	cadence: AlertCadence,
+/// Read the model, find the training metric value for the given AlertMetric
+pub async fn find_current_data(
+	metric: AlertMetric,
+	model_id: Id,
 	context: &Context,
-) -> Result<()> {
-	let already_handled = check_ongoing(cadence, &context.database_pool).await?;
-
-	if already_handled {
-		return Ok(());
+) -> Result<f32> {
+	// Grab the model from the DB
+	let bytes = get_model_bytes(&context.storage, model_id).await?;
+	let model = tangram_model::from_bytes(&bytes)?;
+	// Determine model type
+	let model_inner = model.inner();
+	let model_type = AlertModelType::from(model_inner);
+	if !metric.validate(model_type) {
+		return Err(anyhow!(
+			"Invalid metric {} for model type {:?}",
+			metric,
+			model_type
+		));
 	}
 
-	let alert_id = write_alert_start(cadence, &context.database_pool).await?;
-
-	let heuristics = alerts.cadence(cadence).unwrap();
-	let results = check_metrics(heuristics, &context.database_pool).await?;
-	let exceeded_thresholds: Vec<&AlertResult> = results
-		.iter()
-		.filter(|r| {
-			heuristics
-				.get_threshold(r.metric)
-				.map(|t| r.exceeds_threshold(t))
-				.unwrap_or(false)
-		})
-		.collect();
-	push_alerts(&exceeded_thresholds, alert_methods, context).await?;
-
-	let alert_data = AlertData {
-		alert_methods: alert_methods.to_owned(),
-		heuristics: heuristics.to_owned(),
-		results: results.to_owned(),
+	// match on model_inner
+	let result = match metric {
+		AlertMetric::Accuracy => {
+			// We know we have a classifier, need to get the accuracy from either type
+			match model_inner {
+				tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+					binary_classifier
+						.read()
+						.test_metrics()
+						.default_threshold() // TODO ask if this is correct?
+						.accuracy()
+				}
+				tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+					multiclass_classifier.read().test_metrics().accuracy()
+				}
+				_ => unreachable!(),
+			}
+		}
+		AlertMetric::MeanSquaredError => {
+			// we know we have a regressor, just read it
+			match model_inner {
+				tangram_model::ModelInnerReader::Regressor(regressor) => {
+					regressor.read().test_metrics().mse()
+				}
+				_ => unreachable!(),
+			}
+		}
+		AlertMetric::RootMeanSquaredError => {
+			// we know we have a regressor, just read it
+			match model_inner {
+				tangram_model::ModelInnerReader::Regressor(regressor) => {
+					regressor.read().test_metrics().rmse()
+				}
+				_ => unreachable!(),
+			}
+		}
 	};
-	write_alert_end(alert_id, alert_data, &context.database_pool).await?;
-	Ok(())
+	Ok(result)
 }
-*/

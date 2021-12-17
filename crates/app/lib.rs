@@ -4,8 +4,8 @@ use std::{net::SocketAddr, sync::Arc};
 pub use tangram_app_common::options;
 use tangram_app_common::{
 	alerts::{
-		get_all_alerts, get_last_alert_time, AlertCadence, AlertData, AlertHeuristics, AlertMethod,
-		AlertMetric, AlertProgress, AlertResult,
+		find_current_data, get_all_alerts, get_last_alert_time, AlertCadence, AlertData,
+		AlertHeuristics, AlertMethod, AlertMetric, AlertProgress, AlertResult,
 	},
 	heuristics::{
 		ALERT_METRICS_HEARTBEAT_DURATION_PRODUCTION, ALERT_METRICS_HEARTBEAT_DURATION_TESTING,
@@ -221,7 +221,7 @@ async fn handle_heuristics(context: &Context, heuristics: &AlertHeuristics) -> R
 
 	let alert_id = write_alert_start(cadence, metric, &context.database_pool).await?;
 
-	let results = check_metrics(heuristics, &context.database_pool).await?;
+	let results = check_metrics(heuristics, &context).await?;
 	let exceeded_thresholds: Vec<&AlertResult> = results
 		.iter()
 		.filter(|r| {
@@ -245,25 +245,15 @@ async fn handle_heuristics(context: &Context, heuristics: &AlertHeuristics) -> R
 /// Return the current observed values for each heuristic
 async fn check_metrics(
 	heuristics: &AlertHeuristics,
-	database_pool: &sqlx::AnyPool,
+	context: &Context,
 ) -> Result<Vec<AlertResult>> {
 	let mut results = Vec::new();
-	let previous_alert_data = find_previous_alert_data(
-		heuristics.cadence,
-		heuristics.threshold.metric,
-		database_pool,
-	)
-	.await?;
-	if previous_alert_data.is_none() {
-		return Ok(vec![]);
-	}
 	// Look at the current value.
-	let current_value = find_current_data(heuristics.threshold.metric, database_pool).await?;
-	if current_value.is_none() {
-		// Not enough predictions have been logged - abort!
-		return Ok(vec![]);
-	}
-	let current_value = current_value.unwrap();
+	let current_value = find_current_data(heuristics.threshold.metric, heuristics.model_id, context).await?;
+	// check lower if any
+	// check higher if any
+	// aggregate results
+
 	results.push(AlertResult {
 		metric: heuristics.threshold.metric,
 		observed_value: current_value,
@@ -282,81 +272,6 @@ async fn push_alerts(
 		method.send_alert(exceeded_thresholds, context).await?;
 	}
 	Ok(())
-}
-
-/// Find the most recent value for the given metric
-async fn find_current_data(
-	metric: AlertMetric,
-	database_pool: &sqlx::AnyPool,
-) -> Result<Option<f32>> {
-	let mut db = match database_pool.begin().await {
-		Ok(db) => db,
-		Err(_) => {
-			eprintln!("Oh no! Failed to read database!");
-			return Err(anyhow!("Database unavailable"));
-		}
-	};
-
-	// First, check how many true values have been logged.  If under the configured threshold, don't do anything.
-	let num_true_values_result = sqlx::query("select count(*) from true_values")
-		.fetch_one(&mut db)
-		.await?;
-	let num_true_values: i64 = num_true_values_result.get(0);
-	if num_true_values < ALERT_METRICS_MINIMUM_TRUE_VALUES_THRESHOLD {
-		return Ok(None);
-	}
-
-	let result = sqlx::query(
-		"
-			select
-				data
-			from
-				production_metrics
-		",
-	)
-	.fetch_optional(&mut db)
-	.await?;
-	db.commit().await?;
-
-	match result {
-		Some(r) => {
-			let data: String = r.get(0);
-			let res: ProductionMetrics = serde_json::from_str(&data)?;
-			match metric {
-				AlertMetric::Accuracy => {
-					let accuracy = match res.prediction_metrics {
-						ProductionPredictionMetrics::BinaryClassification(bcppm) => {
-							bcppm.finalize().unwrap().accuracy
-						}
-						ProductionPredictionMetrics::MulticlassClassification(mccppm) => {
-							mccppm.finalize().unwrap().accuracy
-						}
-						_ => unreachable!(), // we will never have regression for the Accuracy metric
-					};
-					Ok(Some(accuracy))
-				}
-				AlertMetric::MeanSquaredError => {
-					let mse = match res.prediction_metrics {
-						ProductionPredictionMetrics::Regression(rppm) => {
-							rppm.finalize().unwrap().mse
-						}
-						_ => unreachable!(), // MSE is only for regression
-					};
-					Ok(Some(mse))
-				}
-				AlertMetric::RootMeanSquaredError => {
-					let rmse = match res.prediction_metrics {
-						ProductionPredictionMetrics::Regression(rppm) => {
-							rppm.finalize().unwrap().rmse
-						}
-						_ => unreachable!(), // RMSE is only for regression
-					};
-					Ok(Some(rmse))
-				}
-			}
-		}
-		None => Ok(None),
-	}
 }
 
 /// Read the DB to see if the given cadence is already in process
@@ -393,47 +308,6 @@ async fn check_ongoing(
 	.await?;
 	db.commit().await?;
 	Ok(existing.is_some())
-}
-
-/// Find the previous instance of the given alert cadence
-async fn find_previous_alert_data(
-	cadence: AlertCadence,
-	metric: AlertMetric,
-	database_pool: &sqlx::AnyPool,
-) -> Result<Option<AlertData>> {
-	let mut db = match database_pool.begin().await {
-		Ok(db) => db,
-		Err(_) => {
-			eprintln!("Oh no! Failed to read database!");
-			return Err(anyhow!("Database unavailable"));
-		}
-	};
-	let row = sqlx::query(
-		"
-			select
-				data
-			from
-				alerts
-			where
-				cadence = $1 and
-				metric = $2 and
-				date = (select max(date) from alerts where progress = $3)
-		",
-	)
-	.bind(cadence.to_string())
-	.bind(metric.to_string())
-	.bind(AlertProgress::Completed.to_string())
-	.fetch_optional(&mut db)
-	.await?;
-	db.commit().await?;
-	match row {
-		Some(r) => {
-			let data: String = r.get("data");
-			let result: AlertData = serde_json::from_str(&data)?;
-			Ok(Some(result))
-		}
-		None => Ok(None),
-	}
 }
 
 /// Log the completion of an alert handling process

@@ -111,6 +111,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	let mut alert = AlertHeuristics {
 		cadence: AlertCadence::from_str(&cadence)?,
 		methods,
+		model_id,
 		threshold: AlertThreshold {
 			metric,
 			mode: AlertThresholdMode::from_str(&mode)?,
