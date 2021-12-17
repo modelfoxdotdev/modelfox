@@ -24,11 +24,8 @@ struct Topbar;
 
 impl Component for Topbar {
 	fn into_node(self) -> Node {
-		let gh_button = div()
-			.style("line-height", "0")
-			.child(
-				a()
-				.href("https://github.com/tangramdotdev/tangram")
+		let gh_button = div().style("line-height", "0").child(
+			a().href("https://github.com/tangramdotdev/tangram")
 				.class("github-button")
 				.class("link")
 				.style("color", "var(--text-color)")
@@ -39,8 +36,8 @@ impl Component for Topbar {
 				.attribute("data-size", "large")
 				.attribute("data-show-count", "true")
 				.attribute("aria-label", "Star tangramdotdev/tangram on GitHub")
-				.child("GitHub")
-			);
+				.child("GitHub"),
+		);
 		let topbar_items = vec![
 			ui::TopbarItem {
 				element: Some(gh_button.into_node()),
@@ -78,13 +75,13 @@ impl Component for Topbar {
 				title: "Login".to_owned(),
 			},
 			ui::TopbarItem {
-				element: Some({
+				element: Some(
 					ui::Button::new()
 						.color(ui::colors::BLUE.to_owned())
 						.href("/docs/getting_started/".to_owned())
 						.child("Learn")
-						.into()
-				}),
+						.into(),
+				),
 				href: "/docs/getting_started/".to_owned(),
 				title: "Learn".to_owned(),
 			},
@@ -98,4 +95,3 @@ impl Component for Topbar {
 			.into_node()
 	}
 }
-
