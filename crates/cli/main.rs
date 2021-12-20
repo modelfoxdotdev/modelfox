@@ -50,33 +50,33 @@ pub struct TrainArgs {
 	#[clap(
 		short,
 		long,
-		about = "the path to your .csv file",
+		help = "the path to your .csv file",
 		conflicts_with_all=&["file-train", "file-test"],
 	)]
 	file: Option<PathBuf>,
 	#[clap(
 		long,
-		about = "the path to your .csv file used for training",
+		help = "the path to your .csv file used for training",
 		requires = "file-test"
 	)]
 	file_train: Option<PathBuf>,
 	#[clap(
 		long,
-		about = "the path to your .csv file used for testing",
+		help = "the path to your .csv file used for testing",
 		requires = "file-train"
 	)]
 	file_test: Option<PathBuf>,
-	#[clap(long, about = "Pass the training data via stdin.")]
+	#[clap(long, help = "Pass the training data via stdin.")]
 	stdin: bool,
-	#[clap(short, long, about = "the name of the column to predict")]
+	#[clap(short, long, help = "the name of the column to predict")]
 	target: String,
-	#[clap(short, long, about = "the path to a config file")]
+	#[clap(short, long, help = "the path to a config file")]
 	config: Option<PathBuf>,
-	#[clap(short, long, about = "the path to write the .tangram file to")]
+	#[clap(short, long, help = "the path to write the .tangram file to")]
 	output: Option<PathBuf>,
 	#[clap(
 		long = "no-progress",
-		about = "disable the cli progress view",
+		help = "disable the cli progress view",
 		parse(from_flag = std::ops::Not::not),
 	)]
 	progress: bool,
@@ -92,24 +92,24 @@ pub struct PredictArgs {
 	#[clap(
 		short,
 		long,
-		about = "the path to read examples from, defaults to stdin"
+		help = "the path to read examples from, defaults to stdin"
 	)]
 	file: Option<PathBuf>,
-	#[clap(short, long, about = "the path to the model to make predictions with")]
+	#[clap(short, long, help = "the path to the model to make predictions with")]
 	model: PathBuf,
 	#[clap(
 		short,
 		long,
-		about = "the path to write the predictions to, defaults to stdout"
+		help = "the path to write the predictions to, defaults to stdout"
 	)]
 	output: Option<PathBuf>,
 	#[clap(
 		short,
 		long,
-		about = "output probabilities instead of class labels, only relevant for classifier models"
+		help = "output probabilities instead of class labels, only relevant for classifier models"
 	)]
 	probabilities: Option<bool>,
-	#[clap(short, long, about = "The threshold value to use for predictions.")]
+	#[clap(short, long, help = "The threshold value to use for predictions.")]
 	threshold: Option<f32>,
 }
 
@@ -143,16 +143,16 @@ pub struct ServeArgs {
 		short,
 		long,
 		default_value = "127.0.0.1",
-		about = "Host IP at which to bind the server"
+		help = "Host IP at which to bind the server"
 	)]
 	address: String,
 	#[clap(
 		short,
 		long,
-		about = "Path to the `.tangram` file containing the model to serve"
+		help = "Path to the `.tangram` file containing the model to serve"
 	)]
 	model: PathBuf,
-	#[clap(short, long, default_value = "8080", about = "Port to listen on")]
+	#[clap(short, long, default_value = "8080", help = "Port to listen on")]
 	port: u16,
 }
 

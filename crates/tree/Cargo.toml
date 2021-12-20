@@ -54,7 +54,7 @@ path = "benchmarks/iris.rs"
 [dependencies]
 bitvec = "0.22"
 buffalo = { version = "0.2", features = ["ndarray_0_15", "bitvec_0_22"] }
-clap = { version = "=3.0.0-beta.5", features = ["color"] }
+clap = { version = "3.0.0-rc.7", features = ["derive"] }
 itertools = "0.10"
 ndarray = { version = "0.15", features = ["rayon"] }
 num = "0.4"

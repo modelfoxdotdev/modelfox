@@ -11,7 +11,7 @@ pub enum Args {
 
 #[derive(Parser)]
 pub struct GenerateArgs {
-	#[clap(short, long, about = "the path to write the license file")]
+	#[clap(short, long, help = "the path to write the license file")]
 	pub output: PathBuf,
 }
 
