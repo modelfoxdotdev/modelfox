@@ -5,7 +5,7 @@ pub use tangram_app_common::options;
 use tangram_app_common::{
 	alerts::{
 		find_current_data, get_all_alerts, get_last_alert_time, AlertCadence, AlertData,
-		AlertHeuristics, AlertMethod, AlertMetric, AlertProgress, AlertResult,
+		AlertHeuristics, AlertMethod, AlertMetric, AlertProgress, AlertResult, AlertThresholdMode,
 	},
 	heuristics::{
 		ALERT_METRICS_HEARTBEAT_DURATION_PRODUCTION, ALERT_METRICS_HEARTBEAT_DURATION_TESTING,
@@ -222,6 +222,7 @@ async fn handle_heuristics(context: &Context, heuristics: &AlertHeuristics) -> R
 	let alert_id = write_alert_start(cadence, metric, &context.database_pool).await?;
 
 	let results = check_metrics(heuristics, &context).await?;
+	// FIXME - this needs to check against lower and upper
 	let exceeded_thresholds: Vec<&AlertResult> = results
 		.iter()
 		.filter(|r| {
@@ -249,15 +250,21 @@ async fn check_metrics(
 ) -> Result<Vec<AlertResult>> {
 	let mut results = Vec::new();
 	// Look at the current value.
-	let current_value = find_current_data(heuristics.threshold.metric, heuristics.model_id, context).await?;
-	// check lower if any
-	// check higher if any
+	let current_value =
+		find_current_data(heuristics.threshold.metric, heuristics.model_id, context).await?;
+	let observed_variance = match heuristics.threshold.mode {
+		AlertThresholdMode::Absolute => {
+			todo!()
+		}
+		AlertThresholdMode::Percentage => todo!(),
+	};
+	let higher = heuristics.threshold.variance_upper;
 	// aggregate results
 
 	results.push(AlertResult {
 		metric: heuristics.threshold.metric,
 		observed_value: current_value,
-		observed_variance: (current_value - heuristics.threshold.variance_lower.unwrap()).abs(), //FIXME upper and lower
+		observed_variance,
 	});
 	Ok(results)
 }
