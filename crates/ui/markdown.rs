@@ -1,9 +1,7 @@
 use crate as ui;
 use convert_case::Casing;
 use pinwheel::prelude::*;
-use pulldown_cmark::{
-	escape::escape_html, Alignment, CodeBlockKind, Event, HeadingLevel, Options, Parser, Tag,
-};
+use pulldown_cmark::{escape::escape_html, Alignment, CodeBlockKind, Event, Options, Parser, Tag};
 use std::{borrow::Cow, fmt::Write};
 
 #[derive(builder, new)]
@@ -24,8 +22,6 @@ enum State {
 	},
 	Heading {
 		heading: Option<String>,
-		level: HeadingLevel,
-		id: Option<String>,
 	},
 }
 
@@ -46,12 +42,8 @@ impl Component for Markdown {
 					Tag::Paragraph => {
 						html.push_str("<p>");
 					}
-					Tag::Heading(level, id, _) => {
-						state = State::Heading {
-							heading: None,
-							level,
-							id: id.map(|id| id.to_owned()),
-						};
+					Tag::Heading(_, _, _) => {
+						state = State::Heading { heading: None };
 					}
 					Tag::BlockQuote => {
 						write!(&mut html, "<blockquote>").unwrap();
@@ -163,7 +155,7 @@ impl Component for Markdown {
 					Tag::Paragraph => {
 						html.push_str("</p>");
 					}
-					Tag::Heading(level, id, classes) => match &state {
+					Tag::Heading(level, id, _) => match &state {
 						State::Heading { heading, .. } => {
 							write!(&mut html, "<h{}", level).unwrap();
 							let id =
