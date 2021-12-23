@@ -4,9 +4,9 @@ use pinwheel::prelude::*;
 use std::{str, str::FromStr, sync::Arc};
 use tangram_app_common::{
 	alerts::{
-		check_for_duplicate_alert, create_alert, extract_threshold_bounds,
-		validate_threshold_bounds, AlertCadence, AlertHeuristics, AlertMethod, AlertMetric,
-		AlertModelType, AlertThreshold, AlertThresholdMode,
+		check_for_duplicate_monitor, create_monitor, extract_threshold_bounds,
+		validate_threshold_bounds, AlertCadence, AlertMethod, AlertMetric, AlertModelType,
+		AlertThreshold, AlertThresholdMode, Monitor,
 	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
@@ -31,7 +31,7 @@ struct Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
-	let (repo_id, model_id) = if let ["repos", repo_id, "models", model_id, "production_alerts", "new"] =
+	let (repo_id, model_id) = if let ["repos", repo_id, "models", model_id, "monitors", "new"] =
 		*path_components(request).as_slice()
 	{
 		(repo_id.to_owned(), model_id.to_owned())
@@ -72,7 +72,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model_type = AlertModelType::from(model.inner());
 	let model_layout_info =
-		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionAlerts).await?;
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::Monitors).await?;
 	let Action {
 		cadence,
 		email,
@@ -108,7 +108,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		return Ok(response);
 	}
 	let (variance_lower, variance_upper) = extract_threshold_bounds(threshold_bounds.unwrap())?;
-	let mut alert = AlertHeuristics {
+	let mut monitor = Monitor {
 		cadence: AlertCadence::from_str(&cadence)?,
 		methods,
 		model_id,
@@ -120,10 +120,10 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		},
 		title,
 	};
-	if alert.title.is_empty() {
-		alert.title = alert.default_title();
+	if monitor.title.is_empty() {
+		monitor.title = monitor.default_title();
 	}
-	if check_for_duplicate_alert(&mut db, &alert, model_id).await? {
+	if check_for_duplicate_monitor(&mut db, &monitor, model_id).await? {
 		let page = Page {
 			model_layout_info,
 			model_type,
@@ -136,7 +136,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			.unwrap();
 		return Ok(response);
 	}
-	let result = create_alert(&mut db, alert, model_id).await;
+	let result = create_monitor(&mut db, monitor, model_id).await;
 	if result.is_err() {
 		let page = Page {
 			model_layout_info,
@@ -155,7 +155,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		.status(http::StatusCode::SEE_OTHER)
 		.header(
 			http::header::LOCATION,
-			format!("/repos/{}/models/{}/production_alerts/", repo_id, model_id),
+			format!("/repos/{}/models/{}/monitors/", repo_id, model_id),
 		)
 		.body(hyper::Body::empty())
 		.unwrap();

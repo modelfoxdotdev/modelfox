@@ -8,16 +8,16 @@ use tangram_ui as ui;
 
 pub struct Page {
 	pub model_layout_info: ModelLayoutInfo,
-	pub alerts_table: Option<AlertsTable>,
+	pub monitors_table: Option<MonitorsTable>,
 }
 
 impl Component for Page {
 	fn into_node(self) -> Node {
-		let alerts_table_or_empty_message = if let Some(alerts_table) = self.alerts_table {
-			alerts_table.into_node()
+		let monitors_table_or_empty_message = if let Some(monitors_table) = self.monitors_table {
+			monitors_table.into_node()
 		} else {
 			ui::Card::new()
-				.child(ui::P::new().child("No configured alerts for this model."))
+				.child(ui::P::new().child("No configured monitors for this model."))
 				.into_node()
 		};
 		Document::new()
@@ -26,33 +26,33 @@ impl Component for Page {
 					ui::S1::new()
 						.child(
 							PageHeading::new()
-								.child(ui::H1::new().child("Production Alerts".to_string()))
+								.child(ui::H1::new().child("Production Monitors".to_string()))
 								.child(
 									PageHeadingButtons::new().child(
 										ui::Button::new()
 											.href("new".to_owned())
-											.child("Create New Alert"),
+											.child("Create New Monitor"),
 									),
 								),
 						)
-						.child(alerts_table_or_empty_message),
+						.child(monitors_table_or_empty_message),
 				),
 			)
 			.into_node()
 	}
 }
 
-pub struct AlertsTable {
-	pub rows: Vec<AlertsTableRow>,
+pub struct MonitorsTable {
+	pub rows: Vec<MonitorsTableRow>,
 }
 
-pub struct AlertsTableRow {
+pub struct MonitorsTableRow {
 	pub id: String,
 	pub name: String,
 	pub last_updated: String,
 }
 
-impl Component for AlertsTable {
+impl Component for MonitorsTable {
 	fn into_node(self) -> Node {
 		ui::Table::new()
 			.width("100%".to_owned())

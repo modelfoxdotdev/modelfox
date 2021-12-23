@@ -1,4 +1,4 @@
-use crate::page::{AlertsTable, AlertsTableRow, Page};
+use crate::page::{MonitorsTable, MonitorsTableRow, Page};
 use anyhow::{bail, Result};
 use chrono::prelude::*;
 use chrono_tz::Tz;
@@ -6,7 +6,7 @@ use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
 use tangram_app_common::{
-	alerts::AlertHeuristics,
+	alerts::Monitor,
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	path_components,
 	timezone::get_timezone,
@@ -19,7 +19,7 @@ use tangram_id::Id;
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	let timezone = get_timezone(request);
-	let model_id = if let ["repos", _, "models", model_id, "production_alerts", ""] =
+	let model_id = if let ["repos", _, "models", model_id, "monitors", ""] =
 		path_components(request).as_slice()
 	{
 		model_id.to_owned()
@@ -42,46 +42,46 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		return Ok(not_found());
 	}
 	let model_layout_info =
-		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionAlerts).await?;
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::Monitors).await?;
 	let rows = sqlx::query(
 		"
 			select
 				id,
-				alert,
-				last_updated
-			from alert_preferences
+				data,
+				date
+			from monitors
 			where model_id = $1
 		",
 	)
 	.bind(model_id.to_string())
 	.fetch_all(&mut db)
 	.await?;
-	let alerts_table = if !rows.is_empty() {
+	let monitors_table = if !rows.is_empty() {
 		let rows = rows
 			.iter()
 			.map(|row| {
 				let id: String = row.get(0);
 				let id: Id = id.parse().unwrap();
-				let alert: String = row.get(1);
-				let alert: AlertHeuristics = serde_json::from_str(&alert).unwrap();
-				let name = alert.title;
+				let monitor: String = row.get(1);
+				let monitor: Monitor = serde_json::from_str(&monitor).unwrap();
+				let name = monitor.title;
 				let last_updated: i64 = row.get(2);
 				let last_updated: DateTime<Tz> =
 					Utc.timestamp(last_updated, 0).with_timezone(&timezone);
-				AlertsTableRow {
+				MonitorsTableRow {
 					id: id.to_string(),
 					name,
 					last_updated: last_updated.to_string(),
 				}
 			})
 			.collect();
-		let alerts_table = AlertsTable { rows };
-		Some(alerts_table)
+		let monitors_table = MonitorsTable { rows };
+		Some(monitors_table)
 	} else {
 		None
 	};
 	let page = Page {
-		alerts_table,
+		monitors_table,
 		model_layout_info,
 	};
 	let html = html(page);
@@ -91,4 +91,3 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		.unwrap();
 	Ok(response)
 }
-

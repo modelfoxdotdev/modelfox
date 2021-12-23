@@ -1,5 +1,5 @@
 use pinwheel::prelude::*;
-use tangram_app_common::alerts::{AlertHeuristics, AlertMethod, AlertModelType};
+use tangram_app_common::alerts::{AlertMethod, AlertModelType, Monitor};
 use tangram_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
@@ -7,8 +7,8 @@ use tangram_app_layouts::{
 use tangram_ui as ui;
 
 pub struct Page {
-	pub alert: AlertHeuristics,
-	pub alert_id: String,
+	pub monitor: Monitor,
+	pub monitor_id: String,
 	pub model_layout_info: ModelLayoutInfo,
 	pub model_type: AlertModelType,
 	pub error: Option<String>,
@@ -33,19 +33,19 @@ impl Component for Page {
 			],
 		};
 		let email = self
-			.alert
+			.monitor
 			.methods
 			.iter()
 			.fold(String::new(), |acc, el| match el {
 				AlertMethod::Email(e) => e.to_string(),
 				_ => acc,
 			});
-		let lower = if let Some(l) = self.alert.threshold.variance_lower {
+		let lower = if let Some(l) = self.monitor.threshold.variance_lower {
 			l.to_string()
 		} else {
 			String::new()
 		};
-		let upper = if let Some(u) = self.alert.threshold.variance_upper {
+		let upper = if let Some(u) = self.monitor.threshold.variance_upper {
 			u.to_string()
 		} else {
 			String::new()
@@ -54,7 +54,7 @@ impl Component for Page {
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
-						.child(ui::H1::new().child(format!("Edit {} Alert", self.alert.title)))
+						.child(ui::H1::new().child(format!("Edit {} Monitor", self.monitor.title)))
 						.child(
 							ui::Form::new()
 								.post(true)
@@ -62,7 +62,7 @@ impl Component for Page {
 									input()
 										.attribute("name", "action")
 										.attribute("type", "hidden")
-										.attribute("value", "update_alert"),
+										.attribute("value", "update_monitor"),
 								)
 								.child(
 									self.error.map(|error| {
@@ -92,7 +92,7 @@ impl Component for Page {
 												value: "monthly".to_owned(),
 											},
 										])
-										.value(self.alert.cadence.to_string().to_lowercase()),
+										.value(self.monitor.cadence.to_string().to_lowercase()),
 								)
 								.child(
 									ui::SelectField::new()
@@ -100,7 +100,7 @@ impl Component for Page {
 										.name("metric".to_owned())
 										.required(true)
 										.options(metric_options)
-										.value(self.alert.threshold.metric.short_name()),
+										.value(self.monitor.threshold.metric.short_name()),
 								)
 								.child(
 									ui::TextField::new()
@@ -131,14 +131,14 @@ impl Component for Page {
 												value: "percentage".to_owned(),
 											},
 										])
-										.value(self.alert.threshold.mode.to_string()),
+										.value(self.monitor.threshold.mode.to_string()),
 								)
 								.child(
 									ui::TextField::new()
 										.label("Title (Optional)".to_string())
 										.name("title".to_string())
 										.required(false)
-										.value(self.alert.title),
+										.value(self.monitor.title),
 								)
 								.child(
 									ui::TextField::new()

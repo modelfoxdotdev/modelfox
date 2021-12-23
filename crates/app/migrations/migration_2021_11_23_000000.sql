@@ -1,16 +1,14 @@
-create table alerts (
+create table monitors (
 	id char(32) primary key,
-	/* IN_PROGRESS, COMPLETED */
-	progress varchar(11) not null,
-	cadence varchar(7) not null,
-	metric varchar(7) not null,
-	data text,
+	model_id char(32) references models (id) not null,
+	data text not null,
+	cadence integer not null,
 	date bigint not null
 );
 
-create table alert_preferences (
+create table alerts (
 	id char(32) primary key,
-	alert text,
-	model_id char(32) references models (id) not null,
-	last_updated bigint not null
+	monitor_id char(32) references monitors (id) not null,
+	data text not null,
+	date bigint not null
 );

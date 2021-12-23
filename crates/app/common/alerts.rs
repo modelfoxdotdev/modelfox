@@ -14,28 +14,25 @@ use tangram_id::Id;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
 #[serde(tag = "type")]
 pub enum AlertCadence {
-	#[serde(rename = "daily")]
-	Daily,
-	#[serde(rename = "hourly")]
-	Hourly,
-	#[serde(rename = "monthly")]
-	Monthly,
 	#[serde(rename = "testing")]
 	Testing,
+	#[serde(rename = "hourly")]
+	Hourly,
+	#[serde(rename = "daily")]
+	Daily,
 	#[serde(rename = "weekly")]
 	Weekly,
+	#[serde(rename = "monthly")]
+	Monthly,
 }
 
+// store timestamp, truncate to significant portion.
+
 impl AlertCadence {
-	// TODO - not necessary, we're doing heartbeats now?
 	pub fn duration(&self) -> tokio::time::Duration {
-		match self {
-			AlertCadence::Daily => tokio::time::Duration::from_secs(60 * 60 * 24),
-			AlertCadence::Hourly => tokio::time::Duration::from_secs(60 * 60),
-			AlertCadence::Monthly => tokio::time::Duration::from_secs(60 * 60 * 24 * 31), //FIXME that's not correct
-			AlertCadence::Testing => tokio::time::Duration::from_secs(10),
-			AlertCadence::Weekly => tokio::time::Duration::from_secs(60 * 60 * 24 * 7),
-		}
+		// This is really not a duration, it's looking for the time until the next interval?
+		// think about this more
+		todo!()
 	}
 }
 
@@ -48,11 +45,11 @@ impl Default for AlertCadence {
 impl fmt::Display for AlertCadence {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let s = match self {
-			AlertCadence::Daily => "Daily",
-			AlertCadence::Hourly => "Hourly",
-			AlertCadence::Monthly => "Monthly",
 			AlertCadence::Testing => "Testing",
+			AlertCadence::Hourly => "Hourly",
+			AlertCadence::Daily => "Daily",
 			AlertCadence::Weekly => "Weekly",
+			AlertCadence::Monthly => "Monthly",
 		};
 		write!(f, "{}", s)
 	}
@@ -198,23 +195,6 @@ impl From<tangram_model::ModelInnerReader<'_>> for AlertModelType {
 	}
 }
 
-/// An alert record can be in one of these states
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum AlertProgress {
-	Completed,
-	InProgress,
-}
-
-impl fmt::Display for AlertProgress {
-	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-		let s = match self {
-			AlertProgress::Completed => "COMPLETED",
-			AlertProgress::InProgress => "IN PROGRESS",
-		};
-		write!(f, "{}", s)
-	}
-}
-
 /// Alerts can either be set as absolute values or percentage deviations
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "mode")]
@@ -311,9 +291,10 @@ impl AlertResult {
 	}
 }
 
+// FIXME - Monitor.  Monitor produces alerts
 /// Thresholds for generating an Alert
 #[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct AlertHeuristics {
+pub struct Monitor {
 	pub cadence: AlertCadence,
 	pub methods: Vec<AlertMethod>,
 	pub model_id: Id,
@@ -321,9 +302,9 @@ pub struct AlertHeuristics {
 	pub title: String,
 }
 
-impl AlertHeuristics {
-	pub fn get_threshold(&self, metric: AlertMetric) -> Option<f32> {
-		todo!()
+impl Monitor {
+	pub fn get_thresholds(&self) -> (Option<f32>, Option<f32>) {
+		(self.threshold.variance_upper, self.threshold.variance_lower)
 	}
 	/// Check if the given timestamp is more than one cadence interval behind the current time
 	pub fn is_expired(&self, timestamp: u64) -> bool {
@@ -339,10 +320,10 @@ impl AlertHeuristics {
 
 /// Manager for all enabled alerts
 #[derive(Debug, Default)]
-pub struct Alerts(Vec<AlertHeuristics>);
+pub struct Alerts(Vec<Monitor>);
 
-impl From<Vec<AlertHeuristics>> for Alerts {
-	fn from(v: Vec<AlertHeuristics>) -> Self {
+impl From<Vec<Monitor>> for Alerts {
+	fn from(v: Vec<Monitor>) -> Self {
 		Self(v)
 	}
 }
@@ -355,12 +336,12 @@ impl Alerts {
 			.map(|ah| ah.cadence)
 			.collect::<Vec<AlertCadence>>()
 	}
-	pub fn alerts(&self) -> &[AlertHeuristics] {
+	pub fn alerts(&self) -> &[Monitor] {
 		&self.0
 	}
 
 	/// Retrieve the heuristics for the given cadence, if present
-	pub fn cadence(&self, cadence: AlertCadence) -> Option<&AlertHeuristics> {
+	pub fn cadence(&self, cadence: AlertCadence) -> Option<&Monitor> {
 		for heuristics in &self.0 {
 			if heuristics.cadence == cadence {
 				return Some(heuristics);
@@ -373,7 +354,7 @@ impl Alerts {
 /// Collection for the alert results from a single run
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AlertData {
-	pub heuristics: AlertHeuristics,
+	pub preference: Monitor,
 	pub results: Vec<AlertResult>,
 }
 
@@ -381,52 +362,53 @@ pub struct AlertData {
 
 // Database interaction
 
-pub async fn get_alert(
+pub async fn get_monitor(
 	db: &mut sqlx::Transaction<'_, sqlx::Any>,
-	alert_id: &str,
-) -> Result<AlertHeuristics> {
+	monitor_id: &str,
+) -> Result<Monitor> {
 	let result = sqlx::query(
 		"
 			select
-				alert
+				data
 			from
-				alert_preferences
+				monitors
 			where
 				id = $1
 		",
 	)
-	.bind(alert_id.to_owned())
+	.bind(monitor_id.to_owned())
 	.fetch_one(db)
 	.await?;
-	let alert: String = result.get(0);
-	let alert: AlertHeuristics = serde_json::from_str(&alert)?;
-	Ok(alert)
+	let monitor: String = result.get(0);
+	let monitor: Monitor = serde_json::from_str(&monitor)?;
+	Ok(monitor)
 }
 
-pub async fn get_all_alerts(context: &Context) -> Result<Alerts> {
+pub async fn get_all_monitors(context: &Context) -> Result<Alerts> {
 	let mut db = context.database_pool.begin().await?;
 	let rows = sqlx::query(
 		"
 			select
-				alert
+				data
 			from
-				alert_preferences
+				monitors
 		",
 	)
 	.fetch_all(&mut db)
 	.await?;
 	db.commit().await?;
-	let alerts: Vec<AlertHeuristics> = rows
+	let monitors: Vec<Monitor> = rows
 		.iter()
 		.map(|row| {
-			let alert: String = row.get(0);
-			serde_json::from_str(&alert).unwrap()
+			let monitor: String = row.get(0);
+			serde_json::from_str(&monitor).unwrap()
 		})
 		.collect();
-	Ok(Alerts::from(alerts))
+	Ok(Alerts::from(monitors))
 }
 
 /// Get the unix timestamp of the last run with the given cadence/metric combination
+// FIXME no longer useful
 pub async fn get_last_alert_time(
 	context: &Context,
 	cadence: AlertCadence,
@@ -462,9 +444,9 @@ pub async fn get_last_alert_time(
 	}
 }
 
-pub async fn check_for_duplicate_alert(
+pub async fn check_for_duplicate_monitor(
 	db: &mut sqlx::Transaction<'_, sqlx::Any>,
-	alert: &AlertHeuristics,
+	monitor: &Monitor,
 	model_id: Id,
 ) -> Result<bool> {
 	// Pull all rows with matching metric and cadence
@@ -472,9 +454,9 @@ pub async fn check_for_duplicate_alert(
 	let rows = sqlx::query(
 		"
 			select
-				alert
+				data
 			from
-				alert_preferences
+				monitors
 			where
 				model_id = $1
 		",
@@ -485,71 +467,75 @@ pub async fn check_for_duplicate_alert(
 	let result = rows
 		.iter()
 		.map(|row| {
-			let alert_json: String = row.get(0);
-			let alert: AlertHeuristics =
-				serde_json::from_str(&alert_json).expect("Could not parse stored alert");
-			alert
+			let monitor_json: String = row.get(0);
+			let monitor: Monitor =
+				serde_json::from_str(&monitor_json).expect("Could not parse stored alert");
+			monitor
 		})
 		.fold(false, |acc, el| {
-			acc || (el.cadence == alert.cadence && el.threshold == alert.threshold)
+			acc || (el.cadence == monitor.cadence && el.threshold == monitor.threshold)
 		});
 
 	Ok(result)
 }
 
-pub async fn create_alert(
+pub async fn create_monitor(
 	db: &mut sqlx::Transaction<'_, sqlx::Any>,
-	alert: AlertHeuristics,
+	monitor: Monitor,
 	model_id: Id,
 ) -> Result<()> {
-	let alert_json = serde_json::to_string(&alert)?;
+	let monitor_json = serde_json::to_string(&monitor)?;
 	sqlx::query(
 		"
-			insert into alert_preferences
-				(id, alert, model_id, last_updated)
+			insert into monitors
+				(id, model_id, data, cadence, date)
 			values
-				($1, $2, $3, $4)
+				($1, $2, $3, $4, $5)
 		",
 	)
 	.bind(Id::generate().to_string())
-	.bind(alert_json)
 	.bind(model_id.to_string())
+	.bind(monitor_json)
+	.bind(monitor.cadence.to_string()) // FIXME cadence Encode
 	.bind(time::OffsetDateTime::now_utc().unix_timestamp().to_string())
 	.execute(db)
 	.await?;
 	Ok(())
 }
 
-pub async fn delete_alert(db: &mut sqlx::Transaction<'_, sqlx::Any>, alert_id: &str) -> Result<()> {
+pub async fn delete_monitor(
+	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	monitor_id: &str,
+) -> Result<()> {
 	sqlx::query(
 		"
-			delete from alert_preferences
+			delete from monitors
 			where id = $1
 		",
 	)
-	.bind(alert_id.to_string())
+	.bind(monitor_id.to_string())
 	.execute(db)
 	.await?;
 	Ok(())
 }
 
-pub async fn update_alert(
+pub async fn update_monitor(
 	db: &mut sqlx::Transaction<'_, sqlx::Any>,
-	new_alert: &AlertHeuristics,
-	alert_id: &str,
+	new_monitor: &Monitor,
+	monitor_id: &str,
 ) -> Result<()> {
-	let alert_json = serde_json::to_string(new_alert)?;
+	let monitor_json = serde_json::to_string(new_monitor)?;
 	sqlx::query(
 		"
 			update
-				alert_preferences
-			set alert = $1, last_updated = $2
+				monitors
+			set data = $1, date = $2
 			where id = $3
 		",
 	)
-	.bind(alert_json)
+	.bind(monitor_json)
 	.bind(time::OffsetDateTime::now_utc().unix_timestamp().to_string())
-	.bind(alert_id.to_string())
+	.bind(monitor_id.to_string())
 	.execute(db)
 	.await?;
 	Ok(())

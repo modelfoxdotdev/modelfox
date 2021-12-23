@@ -23,10 +23,10 @@ sunfish = "0.3"
 
 [features]
 default = [
-	"tangram_app_production_alerts_index_server",
-	"tangram_app_production_alerts_edit_server",
-	"tangram_app_new_production_alert_client",
-	"tangram_app_new_production_alert_server",
+	"tangram_app_new_monitor_client",
+	"tangram_app_new_monitor_server",
+	"tangram_app_monitors_edit_server",
+	"tangram_app_monitors_index_server",
 	"tangram_app_training_metrics_precision_recall_client",
   "tangram_app_edit_organization_server",
   "tangram_app_health_server",
@@ -124,19 +124,19 @@ tangram_app_model_download_server = { path = "routes/repos/_/models/_/download/s
 tangram_app_model_edit_server = { path = "routes/repos/_/models/_/edit/server", optional = true }
 tangram_app_model_index_client = { path = "routes/repos/_/models/_/index/client", optional = true }
 tangram_app_model_index_server = { path = "routes/repos/_/models/_/index/server", optional = true }
+tangram_app_monitors_edit_server = { path = "routes/repos/_/models/_/monitors/_/edit/server", optional = true }
+tangram_app_monitors_index_server = { path = "routes/repos/_/models/_/monitors/index/server", optional = true }
 tangram_app_new_member_server = { path = "routes/organizations/_/members/new/server", optional = true }
 tangram_app_new_model_client = { path = "routes/repos/_/models/new/client", optional = true }
 tangram_app_new_model_server = { path = "routes/repos/_/models/new/server", optional = true }
+tangram_app_new_monitor_client = { path = "routes/repos/_/models/_/monitors/new/client", optional = true }
+tangram_app_new_monitor_server = { path = "routes/repos/_/models/_/monitors/new/server", optional = true }
 tangram_app_new_organization_server = { path = "routes/organizations/new/server", optional = true }
-tangram_app_new_production_alert_client = { path = "routes/repos/_/models/_/production_alerts/new/client", optional = true }
-tangram_app_new_production_alert_server = { path = "routes/repos/_/models/_/production_alerts/new/server", optional = true }
 tangram_app_new_repo_server = { path = "routes/repos/new/server", optional = true }
 tangram_app_organization_index_server = { path = "routes/organizations/_/index/server", optional = true }
 tangram_app_organization_member_server = { path = "routes/organizations/_/members/_/server", optional = true }
 tangram_app_playground_client = { path = "routes/repos/_/models/_/playground/client", optional = true }
 tangram_app_playground_server = { path = "routes/repos/_/models/_/playground/server", optional = true }
-tangram_app_production_alerts_edit_server = { path = "routes/repos/_/models/_/production_alerts/_/edit/server", optional = true }
-tangram_app_production_alerts_index_server = { path = "routes/repos/_/models/_/production_alerts/index/server", optional = true }
 tangram_app_production_class_metrics_client = { path = "routes/repos/_/models/_/production_metrics/class_metrics/client", optional = true }
 tangram_app_production_class_metrics_server = { path = "routes/repos/_/models/_/production_metrics/class_metrics/server", optional = true }
 tangram_app_production_metrics_index_client = { path = "routes/repos/_/models/_/production_metrics/index/client", optional = true }

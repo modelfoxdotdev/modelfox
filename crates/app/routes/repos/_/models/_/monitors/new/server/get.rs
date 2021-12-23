@@ -15,17 +15,10 @@ use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
-	let repo_id = if let ["repos", repo_id, "models", _, "production_alerts", "new"] =
+	let (repo_id, model_id) = if let ["repos", repo_id, "models", model_id, "monitors", "new"] =
 		*path_components(request).as_slice()
 	{
-		repo_id.to_owned()
-	} else {
-		bail!("unexpected path");
-	};
-	let model_id = if let ["repos", _, "models", model_id, "production_alerts", "new"] =
-		path_components(request).as_slice()
-	{
-		model_id.to_owned()
+		(repo_id.to_owned(), model_id.to_owned())
 	} else {
 		bail!("unexpected path");
 	};
@@ -55,7 +48,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model_type = AlertModelType::from(model.inner());
 	let model_layout_info =
-		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionAlerts).await?;
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::Monitors).await?;
 	let page = Page {
 		model_layout_info,
 		model_type,

@@ -4,9 +4,9 @@ use pinwheel::prelude::*;
 use std::{str, str::FromStr, sync::Arc};
 use tangram_app_common::{
 	alerts::{
-		check_for_duplicate_alert, delete_alert, extract_threshold_bounds, get_alert, update_alert,
-		validate_threshold_bounds, AlertCadence, AlertHeuristics, AlertMethod, AlertMetric,
-		AlertModelType, AlertThreshold, AlertThresholdMode,
+		check_for_duplicate_monitor, delete_monitor, extract_threshold_bounds, get_monitor,
+		update_monitor, validate_threshold_bounds, AlertCadence, AlertMethod, AlertMetric,
+		AlertModelType, AlertThreshold, AlertThresholdMode, Monitor,
 	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
@@ -21,13 +21,13 @@ use tangram_id::Id;
 #[serde(tag = "action")]
 enum Action {
 	#[serde(rename = "update_alert")]
-	UpdateAlert(UpdateAlertAction),
+	UpdateMonitor(UpdateMonitorAction),
 	#[serde(rename = "delete")]
 	Delete,
 }
 
 #[derive(serde::Deserialize)]
-struct UpdateAlertAction {
+struct UpdateMonitorAction {
 	cadence: String,
 	email: String,
 	metric: String,
@@ -40,10 +40,14 @@ struct UpdateAlertAction {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
-	let (repo_id, model_id, alert_id) = if let ["repos", repo_id, "models", model_id, "production_alerts", alert_id, "edit"] =
+	let (repo_id, model_id, monitor_id) = if let ["repos", repo_id, "models", model_id, "monitors", monitor_id, "edit"] =
 		*path_components(request).as_slice()
 	{
-		(repo_id.to_owned(), model_id.to_owned(), alert_id.to_owned())
+		(
+			repo_id.to_owned(),
+			model_id.to_owned(),
+			monitor_id.to_owned(),
+		)
 	} else {
 		bail!("unexpected path");
 	};
@@ -84,23 +88,23 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model_type = AlertModelType::from(model.inner());
 	let model_layout_info =
-		model_layout_info(&mut db, &context, model_id, ModelNavItem::ProductionAlerts).await?;
+		model_layout_info(&mut db, &context, model_id, ModelNavItem::Monitors).await?;
 	match action {
 		Action::Delete => {
-			delete_alert(&mut db, &alert_id).await?;
+			delete_monitor(&mut db, &monitor_id).await?;
 			db.commit().await?;
 			let response = http::Response::builder()
 				.status(http::StatusCode::SEE_OTHER)
 				.header(
 					http::header::LOCATION,
-					format!("/repos/{}/models/{}/production_alerts/", repo_id, model_id),
+					format!("/repos/{}/models/{}/monitors/", repo_id, model_id),
 				)
 				.body(hyper::Body::empty())
 				.unwrap();
 			Ok(response)
 		}
-		Action::UpdateAlert(ua) => {
-			let UpdateAlertAction {
+		Action::UpdateMonitor(um) => {
+			let UpdateMonitorAction {
 				cadence,
 				email,
 				metric,
@@ -109,7 +113,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				threshold_upper,
 				title,
 				webhook,
-			} = ua;
+			} = um;
 			let metric = AlertMetric::from_str(&metric)?;
 			// Validate metric type
 			let mut methods = vec![AlertMethod::Stdout];
@@ -122,8 +126,8 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			let threshold_bounds = validate_threshold_bounds(threshold_lower, threshold_upper);
 			if threshold_bounds.is_none() {
 				let page = Page {
-					alert: get_alert(&mut db, &alert_id).await?,
-					alert_id,
+					monitor: get_monitor(&mut db, &monitor_id).await?,
+					monitor_id,
 					model_layout_info,
 					model_type,
 					error: Some("Must provide at least one threshold bound.".to_owned()),
@@ -137,7 +141,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			}
 			let (variance_lower, variance_upper) =
 				extract_threshold_bounds(threshold_bounds.unwrap())?;
-			let mut alert = AlertHeuristics {
+			let mut monitor = Monitor {
 				cadence: AlertCadence::from_str(&cadence)?,
 				methods,
 				model_id,
@@ -149,16 +153,16 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				},
 				title,
 			};
-			if alert.title.is_empty() {
-				alert.title = alert.default_title();
+			if monitor.title.is_empty() {
+				monitor.title = monitor.default_title();
 			}
-			if check_for_duplicate_alert(&mut db, &alert, model_id).await? {
+			if check_for_duplicate_monitor(&mut db, &monitor, model_id).await? {
 				let page = Page {
-					alert,
-					alert_id,
+					monitor,
+					monitor_id,
 					model_layout_info,
 					model_type,
-					error: Some("Identical alert already exists.".to_owned()),
+					error: Some("Identical monitor already exists.".to_owned()),
 				};
 				let html = html(page);
 				let response = http::Response::builder()
@@ -167,14 +171,14 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 					.unwrap();
 				return Ok(response);
 			}
-			let result = update_alert(&mut db, &alert, &alert_id).await;
+			let result = update_monitor(&mut db, &monitor, &monitor_id).await;
 			if result.is_err() {
 				let page = Page {
-					alert,
-					alert_id,
+					monitor,
+					monitor_id,
 					model_layout_info,
 					model_type,
-					error: Some("There was an error editing your alert.".to_owned()),
+					error: Some("There was an error editing your monitor.".to_owned()),
 				};
 				let html = html(page);
 				let response = http::Response::builder()
@@ -188,7 +192,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				.status(http::StatusCode::SEE_OTHER)
 				.header(
 					http::header::LOCATION,
-					format!("/repos/{}/models/{}/production_alerts/", repo_id, model_id),
+					format!("/repos/{}/models/{}/monitors/", repo_id, model_id),
 				)
 				.body(hyper::Body::empty())
 				.unwrap();

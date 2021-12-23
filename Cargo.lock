@@ -3019,19 +3019,19 @@ dependencies = [
  "tangram_app_model_edit_server",
  "tangram_app_model_index_client",
  "tangram_app_model_index_server",
+ "tangram_app_monitors_edit_server",
+ "tangram_app_monitors_index_server",
  "tangram_app_new_member_server",
  "tangram_app_new_model_client",
  "tangram_app_new_model_server",
+ "tangram_app_new_monitor_client",
+ "tangram_app_new_monitor_server",
  "tangram_app_new_organization_server",
- "tangram_app_new_production_alert_client",
- "tangram_app_new_production_alert_server",
  "tangram_app_new_repo_server",
  "tangram_app_organization_index_server",
  "tangram_app_organization_member_server",
  "tangram_app_playground_client",
  "tangram_app_playground_server",
- "tangram_app_production_alerts_edit_server",
- "tangram_app_production_alerts_index_server",
  "tangram_app_production_class_metrics_client",
  "tangram_app_production_class_metrics_server",
  "tangram_app_production_metrics",
@@ -3325,6 +3325,62 @@ dependencies = [
 ]
 
 [[package]]
+name = "tangram_app_monitors_edit_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish 0.2.5",
+ "tangram_app_common",
+ "tangram_app_layouts",
+ "tangram_app_ui",
+ "tangram_core",
+ "tangram_id",
+ "tangram_model",
+ "tangram_ui",
+ "tangram_zip",
+ "time 0.3.5",
+]
+
+[[package]]
+name = "tangram_app_monitors_index_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish 0.2.5",
+ "tangram_app_common",
+ "tangram_app_layouts",
+ "tangram_app_ui",
+ "tangram_charts",
+ "tangram_core",
+ "tangram_id",
+ "tangram_model",
+ "tangram_ui",
+ "tangram_zip",
+]
+
+[[package]]
 name = "tangram_app_new_member_server"
 version = "0.0.0"
 dependencies = [
@@ -3380,26 +3436,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tangram_app_new_organization_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "pinwheel",
- "serde",
- "serde_urlencoded",
- "sqlx",
- "sunfish 0.3.1",
- "tangram_app_common",
- "tangram_app_layouts",
- "tangram_id",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_new_production_alert_client"
+name = "tangram_app_new_monitor_client"
 version = "0.0.0"
 dependencies = [
  "tangram_ui",
@@ -3407,7 +3444,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tangram_app_new_production_alert_server"
+name = "tangram_app_new_monitor_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
@@ -3430,6 +3467,25 @@ dependencies = [
  "tangram_model",
  "tangram_ui",
  "time 0.3.5",
+]
+
+[[package]]
+name = "tangram_app_new_organization_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "pinwheel",
+ "serde",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish 0.3.1",
+ "tangram_app_common",
+ "tangram_app_layouts",
+ "tangram_id",
+ "tangram_ui",
 ]
 
 [[package]]
@@ -3539,62 +3595,6 @@ dependencies = [
  "tangram_model",
  "tangram_ui",
  "url",
-]
-
-[[package]]
-name = "tangram_app_production_alerts_edit_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sqlx",
- "sunfish 0.2.5",
- "tangram_app_common",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
- "tangram_zip",
- "time 0.3.5",
-]
-
-[[package]]
-name = "tangram_app_production_alerts_index_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sqlx",
- "sunfish 0.2.5",
- "tangram_app_common",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_charts",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
- "tangram_zip",
 ]
 
 [[package]]

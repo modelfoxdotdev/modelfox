@@ -32,13 +32,13 @@ impl Component for Page {
 			],
 		};
 		Document::new()
-			.client("tangram_app_new_model_production_client")
+			.client("tangram_app_new_monitor_client")
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
 						.child(
 							PageHeading::new()
-								.child(ui::H1::new().child("Specify Production Alert")),
+								.child(ui::H1::new().child("Specify Production Alert Monitor")),
 						)
 						.child(
 							ui::Form::new()

@@ -1,12 +1,12 @@
 [package]
 edition = "2021"
 rust-version = "1.56"
-name = "tangram_app_new_production_alert_client"
+name = "tangram_app_new_monitor_client"
 publish = false
 version = "0.0.0"
 
 [[bin]]
-name = "tangram_app_new_production_alert_client"
+name = "tangram_app_new_monitor_client"
 path = "main.rs"
 
 [dependencies]
