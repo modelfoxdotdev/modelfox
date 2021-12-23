@@ -1,7 +1,9 @@
 use crate as ui;
 use convert_case::Casing;
 use pinwheel::prelude::*;
-use pulldown_cmark::{escape::escape_html, Alignment, CodeBlockKind, Event, Options, Parser, Tag};
+use pulldown_cmark::{
+	escape::escape_html, Alignment, CodeBlockKind, Event, HeadingLevel, Options, Parser, Tag,
+};
 use std::{borrow::Cow, fmt::Write};
 
 #[derive(builder, new)]
@@ -22,7 +24,8 @@ enum State {
 	},
 	Heading {
 		heading: Option<String>,
-		level: u32,
+		level: HeadingLevel,
+		id: Option<String>,
 	},
 }
 
@@ -43,10 +46,11 @@ impl Component for Markdown {
 					Tag::Paragraph => {
 						html.push_str("<p>");
 					}
-					Tag::Heading(level) => {
+					Tag::Heading(level, id, _) => {
 						state = State::Heading {
 							heading: None,
 							level,
+							id: id.map(|id| id.to_owned()),
 						};
 					}
 					Tag::BlockQuote => {
@@ -159,18 +163,21 @@ impl Component for Markdown {
 					Tag::Paragraph => {
 						html.push_str("</p>");
 					}
-					Tag::Heading(level) => match &state {
-						State::Heading {
-							heading,
-							level: blevel,
-						} => {
-							assert!(level == *blevel);
-							let heading = heading.clone().unwrap();
-							let heading_snake_case =
-								heading.to_lowercase().to_case(convert_case::Case::Snake);
-							write!(&mut html, "<h{} id=\"{}\">", level, heading_snake_case)
-								.unwrap();
-							write!(&mut html, "{}", heading).unwrap();
+					Tag::Heading(level, id, classes) => match &state {
+						State::Heading { heading, .. } => {
+							write!(&mut html, "<h{}", level).unwrap();
+							let id =
+								id.map(|id| id.to_owned())
+									.or(heading.as_ref().map(|heading| {
+										heading.to_lowercase().to_case(convert_case::Case::Snake)
+									}));
+							if let Some(id) = id {
+								write!(&mut html, " id=\"{}\"", id).unwrap();
+							}
+							write!(&mut html, ">").unwrap();
+							if let Some(heading) = heading {
+								write!(&mut html, "{}", heading).unwrap();
+							}
 							write!(&mut html, "</h{}>", level).unwrap();
 							state = State::Ground;
 						}
