@@ -13,7 +13,7 @@ use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let model_id = if let ["repos", _, "models", model_id, "training_metrics", "precision_recall"] =
 		path_components(request).as_slice()
 	{

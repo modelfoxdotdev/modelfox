@@ -26,7 +26,7 @@ use tangram_id::Id;
 use tangram_zip::zip;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let model_id = if let ["repos", _, "models", model_id, "production_metrics", ""] =
 		path_components(request).as_slice()
 	{

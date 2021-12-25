@@ -23,7 +23,7 @@ use tangram_core::predict::{PredictInput, PredictOptions};
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let (model_id, id) = if let ["repos", _, "models", model_id, "production_predictions", "predictions", id] =
 		path_components(request).as_slice()
 	{

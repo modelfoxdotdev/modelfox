@@ -19,7 +19,7 @@ struct Action {
 }
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let organization_id = if let ["organizations", organization_id, "members", "new"] =
 		*path_components(request).as_slice()
 	{

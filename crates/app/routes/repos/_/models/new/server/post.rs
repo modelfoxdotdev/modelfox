@@ -14,7 +14,7 @@ use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_id::Id;
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let repo_id = if let ["repos", repo_id, "models", "new"] = *path_components(request).as_slice()
 	{
 		repo_id.to_owned()

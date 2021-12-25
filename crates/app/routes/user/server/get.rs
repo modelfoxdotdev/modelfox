@@ -16,7 +16,7 @@ use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	if !context.options.auth_enabled() {
 		return Ok(not_found());
 	}

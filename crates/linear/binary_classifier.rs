@@ -284,6 +284,7 @@ impl BinaryClassifier {
 		crate::serialize::serialize_binary_classifier(self, writer)
 	}
 
+	#[must_use]
 	pub fn from_bytes(&self, bytes: &[u8]) -> BinaryClassifier {
 		let reader = buffalo::read::<crate::serialize::BinaryClassifierReader>(bytes);
 		Self::from_reader(reader)

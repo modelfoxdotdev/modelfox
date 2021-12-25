@@ -158,11 +158,11 @@ impl Component for Markdown {
 					Tag::Heading(level, id, _) => match &state {
 						State::Heading { heading, .. } => {
 							write!(&mut html, "<h{}", level).unwrap();
-							let id =
-								id.map(|id| id.to_owned())
-									.or(heading.as_ref().map(|heading| {
-										heading.to_lowercase().to_case(convert_case::Case::Snake)
-									}));
+							let id = id.map(|id| id.to_owned()).or_else(|| {
+								heading.as_ref().map(|heading| {
+									heading.to_lowercase().to_case(convert_case::Case::Snake)
+								})
+							});
 							if let Some(id) = id {
 								write!(&mut html, " id=\"{}\"", id).unwrap();
 							}

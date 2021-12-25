@@ -125,7 +125,7 @@ pub async fn post(
 	request: &mut http::Request<hyper::Body>,
 	model_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap();
+	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),

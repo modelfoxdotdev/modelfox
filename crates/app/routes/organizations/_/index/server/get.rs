@@ -17,7 +17,7 @@ use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let organization_id =
 		if let ["organizations", organization_id, ""] = *path_components(request).as_slice() {
 			organization_id.to_owned()

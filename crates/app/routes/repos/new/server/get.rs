@@ -11,7 +11,7 @@ use tangram_app_common::{
 use tangram_app_layouts::app_layout::app_layout_info;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),

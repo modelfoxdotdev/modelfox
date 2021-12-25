@@ -19,7 +19,7 @@ use tangram_id::Id;
 use tangram_ui as ui;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),

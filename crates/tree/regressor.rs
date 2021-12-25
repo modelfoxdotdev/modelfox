@@ -90,6 +90,7 @@ impl Regressor {
 		crate::serialize::serialize_regressor(self, writer)
 	}
 
+	#[must_use]
 	pub fn from_bytes(&self, bytes: &[u8]) -> Regressor {
 		let reader = buffalo::read::<crate::serialize::RegressorReader>(bytes);
 		Self::from_reader(reader)

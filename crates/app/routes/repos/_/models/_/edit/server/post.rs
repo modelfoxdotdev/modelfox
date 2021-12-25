@@ -24,7 +24,7 @@ struct UpdateTagAction {
 }
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let (repo_id, model_id) = if let ["repos", repo_id, "models", model_id, "edit"] =
 		*path_components(request).as_slice()
 	{

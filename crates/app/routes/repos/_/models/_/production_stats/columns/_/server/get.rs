@@ -37,7 +37,7 @@ use tangram_id::Id;
 use tangram_ui as ui;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let (model_id, column_name) = if let ["repos", _, "models", model_id, "production_stats", "columns", column_name] =
 		path_components(request).as_slice()
 	{

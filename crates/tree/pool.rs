@@ -29,14 +29,14 @@ impl<T> Pool<T> {
 			state.n_items_outstanding += 1;
 			Some(PoolItem {
 				item: Some(item),
-				state: self.state.clone(),
+				state: Arc::clone(&self.state),
 			})
 		} else if state.n_items_outstanding < self.max_items {
 			state.n_items_outstanding += 1;
 			let item = (self.create_item)();
 			Some(PoolItem {
 				item: Some(item),
-				state: self.state.clone(),
+				state: Arc::clone(&self.state),
 			})
 		} else {
 			None

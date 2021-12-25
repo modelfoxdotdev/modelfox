@@ -283,18 +283,13 @@ mod test {
 			.collect(),
 		};
 		let mut bag_of_words_features = vec![0.0; feature_group.ngrams.len()];
-		feature_group.compute_bag_of_words_feature(
-			&"hello".to_owned(),
-			bag_of_words_features.as_mut_slice(),
-		);
+		feature_group.compute_bag_of_words_feature("hello", bag_of_words_features.as_mut_slice());
 		assert!((bag_of_words_features[0] - 0.0).abs() < f32::EPSILON);
 		assert!((bag_of_words_features[1] - 1.0).abs() < f32::EPSILON);
 
 		let mut bag_of_words_features = vec![0.0; feature_group.ngrams.len()];
-		feature_group.compute_bag_of_words_feature(
-			&"hello test".to_owned(),
-			bag_of_words_features.as_mut_slice(),
-		);
+		feature_group
+			.compute_bag_of_words_feature("hello test", bag_of_words_features.as_mut_slice());
 		assert!((bag_of_words_features[0] - 1.0 / 2.0f32.sqrt()).abs() < f32::EPSILON);
 		assert!((bag_of_words_features[1] - 1.0 / 2.0f32.sqrt()).abs() < f32::EPSILON);
 	}
@@ -327,8 +322,8 @@ mod test {
 		let mut bag_of_words_features_a = vec![0.0; feature_group.ngrams.len()];
 		let mut bag_of_words_features_b = vec![0.0; feature_group.ngrams.len()];
 		let feature = feature_group.compute_bag_of_words_comparison_feature(
-			&"Ben Bitdiddle".to_owned(),
-			&"Little Ben Bitdiddle".to_owned(),
+			"Ben Bitdiddle",
+			"Little Ben Bitdiddle",
 			bag_of_words_features_a.as_mut_slice(),
 			bag_of_words_features_b.as_mut_slice(),
 		);

@@ -28,7 +28,7 @@ enum MonitorEventSet {
 }
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let bytes = match hyper::body::to_bytes(request.body_mut()).await {
 		Ok(bytes) => bytes,
 		Err(e) => {

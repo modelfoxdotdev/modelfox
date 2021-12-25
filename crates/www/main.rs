@@ -59,7 +59,7 @@ async fn serve(sunfish: Sunfish) -> Result<()> {
 }
 
 async fn handle(mut request: http::Request<hyper::Body>) -> http::Response<hyper::Body> {
-	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let context = context.clone();
 	let response = context
 		.sunfish

@@ -330,6 +330,7 @@ pub struct PrevNextButton {
 }
 
 impl PrevNextButtons {
+	#[must_use]
 	pub fn prev(mut self, href: impl Into<String>, title: impl Into<String>) -> PrevNextButtons {
 		self.prev = Some(PrevNextButton {
 			href: href.into(),
@@ -338,6 +339,7 @@ impl PrevNextButtons {
 		self
 	}
 
+	#[must_use]
 	pub fn next(mut self, href: impl Into<String>, title: impl Into<String>) -> PrevNextButtons {
 		self.next = Some(PrevNextButton {
 			href: href.into(),

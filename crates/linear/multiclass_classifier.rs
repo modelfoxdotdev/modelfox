@@ -309,6 +309,7 @@ impl MulticlassClassifier {
 		crate::serialize::serialize_multiclass_classifier(self, writer)
 	}
 
+	#[must_use]
 	pub fn from_bytes(&self, bytes: &[u8]) -> MulticlassClassifier {
 		let reader = buffalo::read::<crate::serialize::MulticlassClassifierReader>(bytes);
 		Self::from_reader(reader)
