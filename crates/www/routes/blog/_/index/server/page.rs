@@ -70,6 +70,7 @@ impl Component for Author {
 	fn into_node(self) -> Node {
 		let facehole = img()
 			.attribute("src", self.gravatar)
+			.attribute("alt", self.name.clone())
 			.class("blog-post-author-facehole");
 		div()
 			.class("blog-post-author")
@@ -129,7 +130,11 @@ pub struct HN;
 impl Component for HN {
 	fn into_node(self) -> Node {
 		let hn = include_str!("./hn.svg");
-		div().style("width", "30px").inner_html(hn).into_node()
+		div()
+			.style("width", "30px")
+			.attribute("alt", "hackernews")
+			.inner_html(hn)
+			.into_node()
 	}
 }
 
@@ -137,7 +142,11 @@ pub struct Twitter;
 impl Component for Twitter {
 	fn into_node(self) -> Node {
 		let twitter = include_str!("./twitter.svg");
-		div().style("width", "30px").inner_html(twitter).into_node()
+		div()
+			.style("width", "30px")
+			.attribute("alt", "twitter")
+			.inner_html(twitter)
+			.into_node()
 	}
 }
 
@@ -145,6 +154,10 @@ pub struct Reddit;
 impl Component for Reddit {
 	fn into_node(self) -> Node {
 		let reddit = include_str!("./reddit.svg");
-		div().style("width", "30px").inner_html(reddit).into_node()
+		div()
+			.style("width", "30px")
+			.attribute("alt", "reddit")
+			.inner_html(reddit)
+			.into_node()
 	}
 }

@@ -21,7 +21,7 @@ I wrote my first end-to-end functioning web application using Ruby on Rails in [
 
 > \- DHH, The Rails Doctrine
 
-Fast forward a couple of years, I ended up becoming a machine learning engineer at Slack. Unfortunately, getting machine learning into production felt a lot more like "the framework as a thick textbook" and my application as "a blank piece of paper" that DHH talks about in the Rails Doctrine.
+A couple of years later, as a machine learning engineer at Slack, getting machine learning into production felt a lot more like "the framework as a thick textbook" and my application as "a blank piece of paper" that DHH talks about in the Rails Doctrine.
 
 To make things even worse, try googling “how to learn machine learning”. The steps involved start looking like the curriculum required to obtain a PhD in Statistics, Math, and Computer Science.
 
@@ -35,9 +35,9 @@ In the Rails Doctrine, there is a section on “Value Integrated Systems”. DHH
 >
 > \- DHH, The Rails Doctrine
 
-This line from the Rails Doctrine is so important, I'll requote it again "Its[Rails'] purpose is not to segregate specialists into small niches and then require whole teams of such in order to build anything of enduring value". This sounds a lot like what getting a machine learning model into production is like today where companies have to assemble a team of specialists including Data Scientists, Machine Learning Engineers, Backend Engineers and Ops teams.
+One sentence in that section really stuck out to me: "Its [Rails'] purpose is not to segregate specialists into small niches and then require whole teams of such in order to build anything of enduring value". Today, this is exactly what companies are doing to get machine learning into production. They are required to assemble a team of specialists including Data Scientists, Machine Learning Engineers, Backend Engineers and Ops teams.
 
-It would be great if we had something like Ruby on Rails for machine learning: a single system that provides the tools you need to go from data to a deployed machine learning model.  Just as DHH says "rails specifically seeks to equip generalist individuals to make these full system", we need tools to equip generalist programmers (frontend, backend, mobile, ...) to build full machine learning systems.
+It would be great if we had something like Ruby on Rails for machine learning: a single system that provides the tools you need to go from data to a deployed machine learning model.  Just as DHH says "rails specifically seeks to equip generalist individuals to make these full system", we need tools to equip generalist programmers, like front-end javascript programmers or back-end ruby programmers, to build full machine learning systems.
 
 ## Introducing Tangram
 
