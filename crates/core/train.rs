@@ -136,7 +136,7 @@ impl Trainer {
 		// Get the row counts.
 		let train_row_count = table_train.nrows();
 		let test_row_count = table_test.nrows();
-		let overall_row_count = train_row_count + test_row_count;
+		let overall_row_count = train_row_count + test_row_count + table_comparison.nrows();
 
 		// Compute stats.
 		let stats_settings = StatsSettings::default();
