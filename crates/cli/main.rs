@@ -181,7 +181,7 @@ fn setup_tracing() {
 	std::env::set_var("RUST_BACKTRACE", "1");
 	let env_layer = tracing_subscriber::EnvFilter::try_from_env("TANGRAM_TRACING");
 	let env_layer = if cfg!(debug_assertions) {
-		Some(env_layer.unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("[]=info")))
+		Some(env_layer.unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("[]=debug")))
 	} else {
 		env_layer.ok()
 	};

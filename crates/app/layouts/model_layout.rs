@@ -179,6 +179,8 @@ pub enum ModelNavItem {
 	ProductionPredictions,
 	ProductionStats,
 	ProductionMetrics,
+	Alerts,
+	Monitors,
 }
 
 impl Component for ModelLayout {
@@ -394,6 +396,24 @@ impl Component for ModelNav {
 						self.repo_id, self.model_id
 					))
 					.selected(self.selected_item == ModelNavItem::ProductionMetrics),
+			)
+			.child(
+				ui::NavItem::new()
+					.title("Alerts".to_owned())
+					.href(format!(
+						"/repos/{}/models/{}/alerts/",
+						self.repo_id, self.model_id
+					))
+					.selected(self.selected_item == ModelNavItem::Alerts),
+			)
+			.child(
+				ui::NavItem::new()
+					.title("Monitors".to_owned())
+					.href(format!(
+						"/repos/{}/models/{}/monitors/",
+						self.repo_id, self.model_id
+					))
+					.selected(self.selected_item == ModelNavItem::Monitors),
 			);
 		ui::Nav::new()
 			.title("Pages".to_owned())

@@ -1,6 +1,7 @@
 use anyhow::Result;
 use std::{future::Future, pin::Pin};
 
+pub mod alerts;
 pub mod cookies;
 pub mod error;
 pub mod heuristics;

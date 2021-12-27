@@ -1,11 +1,22 @@
-use anyhow::{bail, Result};
+use anyhow::{anyhow, bail, Result};
+use sqlx::prelude::*;
 use std::{net::SocketAddr, sync::Arc};
 pub use tangram_app_common::options;
 use tangram_app_common::{
+	alerts::{
+		find_current_data, get_overdue_monitors, AlertCadence, AlertData, AlertMethod, AlertMetric,
+		AlertResult, Monitor, MonitorThresholdMode,
+	},
+	heuristics::{
+		ALERT_METRICS_HEARTBEAT_DURATION_PRODUCTION, ALERT_METRICS_HEARTBEAT_DURATION_TESTING,
+		ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_THRESHOLD,
+	},
 	options::{Options, StorageOptions},
 	storage::{LocalStorage, S3Storage, Storage},
 	Context,
 };
+use tangram_app_production_metrics::{ProductionMetrics, ProductionPredictionMetricsOutput};
+use tangram_id::Id;
 use tracing::error;
 use url::Url;
 
@@ -64,6 +75,12 @@ async fn run_inner(options: Options) -> Result<()> {
 		sunfish: sunfish::init!(),
 	};
 	let context = Arc::new(context);
+	tokio::spawn({
+		let context = Arc::clone(&context);
+		async move {
+			alert_manager(context).await.unwrap();
+		}
+	});
 	tangram_serve::serve(addr, context, handle).await?;
 	Ok(())
 }
@@ -141,4 +158,273 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 		.connect_with(pool_options)
 		.await?;
 	Ok(pool)
+}
+
+/// Manage periodic alerting
+async fn alert_manager(context: Arc<Context>) -> Result<()> {
+	// TODO - webhook check.
+	// Scrape the DB for any incomplete webhook attempts, and spawn an exponential decay thread for any found
+
+	let (begin, period) = if cfg!(not(debug_assertions)) {
+		// In release mode, calculate time until next heartbeat
+		// Start heartbeat at the top of the hour, run once per hour
+		// FIXME - see https://github.com/tangramdotdev/tangram/blob/879c3805e81238e4c30c26725e1bdca5cd0d095e/crates/app/routes/track/server/post.rs#L231
+		// that uses chrono, do the same thing with time
+		let now = time::OffsetDateTime::now_utc();
+		let now_timestamp = now.unix_timestamp();
+		let hour = now.hour();
+		let next_start = now.replace_time(time::Time::from_hms(hour + 1, 0, 0)?);
+		let next_start_timestamp = next_start.unix_timestamp();
+		let now_instant = tokio::time::Instant::now();
+		let delay = tokio::time::Duration::from_secs(
+			(next_start_timestamp - now_timestamp).try_into().unwrap(),
+		);
+		(
+			now_instant + delay,
+			ALERT_METRICS_HEARTBEAT_DURATION_PRODUCTION,
+		)
+	} else {
+		// In every mode other than release, don't introduce a delay.  The period is currently 5 seconds.
+		(
+			tokio::time::Instant::now(),
+			ALERT_METRICS_HEARTBEAT_DURATION_TESTING,
+		)
+	};
+	// start interval.
+	let mut interval = tokio::time::interval_at(begin, period);
+
+	// Each interval:
+	loop {
+		interval.tick().await;
+		// Grab all currently enabled alerts
+		let enabled = get_overdue_monitors(&context).await?;
+		// TODO get_overdue_alerts: "which alerts are currently ready to be processed" - if last run is more than one cadence period ago
+		// For each alert:
+		for monitor in enabled.alerts() {
+			handle_monitor(&context, monitor).await?;
+		}
+	}
+}
+
+async fn handle_monitor(context: &Context, monitor: &Monitor) -> Result<()> {
+	let not_enough_existing_metrics = get_total_production_metrics(context).await?
+		< ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_THRESHOLD;
+	if not_enough_existing_metrics {
+		return Ok(());
+	}
+
+	let already_handled = check_ongoing(monitor.id, &context.database_pool).await?;
+	if already_handled {
+		return Ok(());
+	}
+
+	let results = check_metrics(monitor, &context).await?;
+	let exceeded_thresholds: Vec<&AlertResult> = results
+		.iter()
+		.filter(|r| {
+			let (upper, lower) = monitor.get_thresholds();
+			let upper_exceeded = if let Some(u) = upper {
+				r.observed_variance > u
+			} else {
+				false
+			};
+			let lower_exceeded = if let Some(l) = lower {
+				r.observed_variance < l
+			} else {
+				false
+			};
+			upper_exceeded || lower_exceeded
+		})
+		.collect();
+	push_alerts(&exceeded_thresholds, &monitor.methods, context).await?;
+
+	let alert_data = AlertData {
+		preference: monitor.to_owned(),
+		results: results.to_owned(),
+	};
+	write_alert(alert_data, monitor.id, &context.database_pool).await?;
+
+	Ok(())
+}
+
+/// Return the current observed values for each heuristic
+async fn check_metrics(preference: &Monitor, context: &Context) -> Result<Vec<AlertResult>> {
+	let mut results = Vec::new();
+	let current_training_value =
+		find_current_data(preference.threshold.metric, preference.model_id, context).await?;
+	let current_production_value =
+		get_production_metric(preference.threshold.metric, preference.model_id, context).await?;
+	if current_production_value.is_none() {
+		return Err(anyhow!("Unable to find production metric value"));
+	}
+	let current_production_value = current_production_value.unwrap();
+	let observed_variance = match preference.threshold.mode {
+		MonitorThresholdMode::Absolute => current_training_value - current_production_value,
+		MonitorThresholdMode::Percentage => todo!(),
+	};
+
+	results.push(AlertResult {
+		metric: preference.threshold.metric,
+		observed_value: current_training_value,
+		observed_variance,
+	});
+	Ok(results)
+}
+
+/// Retrieve the latest value for the given metric from the production_metrics table
+pub async fn get_production_metric(
+	metric: AlertMetric,
+	model_id: Id,
+	context: &Context,
+) -> Result<Option<f32>> {
+	let mut db = match context.database_pool.begin().await {
+		Ok(db) => db,
+		Err(_) => {
+			eprintln!("Oh no! Failed to read database!");
+			return Err(anyhow!("Database unavailable"));
+		}
+	};
+	let row = sqlx::query(
+		"
+			select
+				data
+			from
+				production_metrics
+			where
+				model_id = $1
+			order by
+				hour
+			desc
+			limit 1
+		",
+	)
+	.bind(model_id.to_string())
+	.fetch_optional(&mut db)
+	.await?;
+	if let Some(row) = row {
+		let data: String = row.get(0);
+		let production_metrics: ProductionMetrics = serde_json::from_str(&data)?;
+		let output = production_metrics.finalize();
+		let metrics = output.prediction_metrics;
+		if let Some(metrics) = metrics {
+			use ProductionPredictionMetricsOutput::*;
+			match metrics {
+				Regression(r) => match metric {
+					AlertMetric::MeanSquaredError => Ok(Some(r.mse)),
+					AlertMetric::RootMeanSquaredError => Ok(Some(r.rmse)),
+					_ => Ok(None),
+				},
+				BinaryClassification(bc) => match metric {
+					AlertMetric::Accuracy => Ok(Some(bc.accuracy)),
+					_ => Ok(None),
+				},
+				MulticlassClassification(mc) => match metric {
+					AlertMetric::Accuracy => Ok(Some(mc.accuracy)),
+					_ => Ok(None),
+				},
+			}
+		} else {
+			Ok(None)
+		}
+	} else {
+		Ok(None)
+	}
+}
+
+async fn get_total_production_metrics(context: &Context) -> Result<i64> {
+	let mut db = match context.database_pool.begin().await {
+		Ok(db) => db,
+		Err(_) => {
+			eprintln!("Oh no! Failed to read database!");
+			return Err(anyhow!("Database unavailable"));
+		}
+	};
+	let result = sqlx::query(
+		"
+			select
+				count(*)
+			from production_metrics
+		",
+	)
+	.fetch_one(&mut db)
+	.await?;
+	db.commit().await?;
+	let result: i64 = result.get(0);
+	Ok(result)
+}
+
+/// Send alerts containing all exceeded thresholds to each enabled alert method
+async fn push_alerts(
+	exceeded_thresholds: &[&AlertResult],
+	methods: &[AlertMethod],
+	context: &Context,
+) -> Result<()> {
+	for method in methods {
+		method.send_alert(exceeded_thresholds, context).await?;
+	}
+	Ok(())
+}
+
+/// Read the DB to see if the given cadence is already in process
+async fn check_ongoing(id: Id, database_pool: &sqlx::AnyPool) -> Result<bool> {
+	let mut db = match database_pool.begin().await {
+		Ok(db) => db,
+		Err(_) => {
+			eprintln!("Oh no! Failed to read database!");
+			return Err(anyhow!("Database unavailable"));
+		}
+	};
+	let ten_minutes_in_seconds: i32 = 10 * 60;
+	let now = time::OffsetDateTime::now_utc().unix_timestamp();
+	let existing = sqlx::query(
+		"
+			select
+				*
+			from
+				alerts
+			where
+				id = $1 and
+				$2 - alerts.date < $3
+		",
+	)
+	.bind(id.to_string())
+	.bind(&now)
+	.bind(&ten_minutes_in_seconds)
+	.fetch_optional(&mut db)
+	.await?;
+	db.commit().await?;
+	Ok(existing.is_some())
+}
+
+/// Log the completion of an alert handling process
+async fn write_alert(
+	alert_data: AlertData,
+	monitor_id: Id,
+	database_pool: &sqlx::AnyPool,
+) -> Result<()> {
+	let mut db = match database_pool.begin().await {
+		Ok(db) => db,
+		Err(_) => {
+			eprintln!("Oh no! Failed to write alert progress to DB");
+			return Err(anyhow!("Database unavailable"));
+		}
+	};
+
+	let data = serde_json::to_string(&alert_data)?;
+
+	sqlx::query(
+		"
+		 insert into alerts
+		 	(id, monitor_id, data, date)
+		 values
+		 	($1, $2, $3, $4)
+		",
+	)
+	.bind(Id::generate().to_string())
+	.bind(monitor_id.to_string())
+	.bind(data)
+	.execute(&mut db)
+	.await?;
+	db.commit().await?;
+	Ok(())
 }

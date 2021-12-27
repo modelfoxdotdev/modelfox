@@ -1,4 +1,4 @@
-use self::{
+pub use self::{
 	binary_classification_production_metrics::{
 		BinaryClassificationProductionPredictionMetrics,
 		BinaryClassificationProductionPredictionMetricsOutput,
@@ -42,6 +42,7 @@ pub enum ProductionPredictionMetrics {
 	MulticlassClassification(MulticlassClassificationProductionPredictionMetrics),
 }
 
+#[derive(serde::Deserialize)]
 pub struct ProductionMetricsOutput {
 	pub start_date: DateTime<Utc>,
 	pub end_date: DateTime<Utc>,
@@ -49,6 +50,7 @@ pub struct ProductionMetricsOutput {
 	pub prediction_metrics: Option<ProductionPredictionMetricsOutput>,
 }
 
+#[derive(serde::Deserialize)]
 pub enum ProductionPredictionMetricsOutput {
 	Regression(RegressionProductionPredictionMetricsOutput),
 	BinaryClassification(BinaryClassificationProductionPredictionMetricsOutput),

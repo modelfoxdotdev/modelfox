@@ -64,9 +64,12 @@ where
 	let hook = std::panic::take_hook();
 	std::panic::set_hook(Box::new(|panic_info| {
 		let value = (panic_info.to_string(), Backtrace::new());
-		PANIC_MESSAGE_AND_BACKTRACE.with(|panic_message_and_backtrace| {
-			panic_message_and_backtrace.borrow_mut().replace(value);
-		})
+		tracing::error!("{}\n{:?}", value.0, value.1);
+		PANIC_MESSAGE_AND_BACKTRACE
+			.try_with(|panic_message_and_backtrace| {
+				panic_message_and_backtrace.borrow_mut().replace(value);
+			})
+			.ok();
 	}));
 	// Wrap the request handler and context with Arc to allow sharing a reference to it with each task.
 	let handler = Arc::new(handler);

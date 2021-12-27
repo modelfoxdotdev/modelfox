@@ -9,6 +9,7 @@ pub struct RegressionProductionPredictionMetrics {
 	squared_error: f64,
 }
 
+#[derive(serde::Deserialize)]
 pub struct RegressionProductionPredictionMetricsOutput {
 	pub mse: f32,
 	pub rmse: f32,
