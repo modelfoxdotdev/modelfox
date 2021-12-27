@@ -4,12 +4,12 @@ use std::{net::SocketAddr, sync::Arc};
 pub use tangram_app_common::options;
 use tangram_app_common::{
 	alerts::{
-		find_current_data, get_all_monitors, get_last_alert_time, AlertCadence, AlertData,
-		AlertMethod, AlertMetric, AlertResult, AlertThresholdMode, Monitor,
+		find_current_data, get_overdue_monitors, AlertCadence, AlertData, AlertMethod, AlertMetric,
+		AlertResult, Monitor, MonitorThresholdMode,
 	},
 	heuristics::{
 		ALERT_METRICS_HEARTBEAT_DURATION_PRODUCTION, ALERT_METRICS_HEARTBEAT_DURATION_TESTING,
-		ALERT_METRICS_MINIMUM_TRUE_VALUES_THRESHOLD,
+		ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_THRESHOLD,
 	},
 	options::{Options, StorageOptions},
 	storage::{LocalStorage, S3Storage, Storage},
@@ -197,27 +197,23 @@ async fn alert_manager(context: Arc<Context>) -> Result<()> {
 	loop {
 		interval.tick().await;
 		// Grab all currently enabled alerts
-		// TODO - ask the database, which alerts need to be addressed now?
-		let enabled = get_all_monitors(&context).await?;
+		let enabled = get_overdue_monitors(&context).await?;
 		// TODO get_overdue_alerts: "which alerts are currently ready to be processed" - if last run is more than one cadence period ago
 		// For each alert:
 		for monitor in enabled.alerts() {
-			let last_run =
-				get_last_alert_time(&context, monitor.cadence, monitor.threshold.metric).await?;
-			dbg!(last_run);
-			if last_run.is_none() || monitor.is_expired(last_run.unwrap()) {
-				// Run the alert hueristics if the time has expired for this cadence, or if no heuristics have ever been run
-				handle_monitor(&context, monitor).await?;
-			}
+			handle_monitor(&context, monitor).await?;
 		}
 	}
 }
 
 async fn handle_monitor(context: &Context, monitor: &Monitor) -> Result<()> {
-	let cadence = monitor.cadence;
-	let metric = monitor.threshold.metric;
-	let already_handled = check_ongoing(cadence, metric, &context.database_pool).await?;
+	let not_enough_existing_metrics = get_total_production_metrics(context).await?
+		< ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_THRESHOLD;
+	if not_enough_existing_metrics {
+		return Ok(());
+	}
 
+	let already_handled = check_ongoing(monitor.id, &context.database_pool).await?;
 	if already_handled {
 		return Ok(());
 	}
@@ -246,7 +242,7 @@ async fn handle_monitor(context: &Context, monitor: &Monitor) -> Result<()> {
 		preference: monitor.to_owned(),
 		results: results.to_owned(),
 	};
-	write_alert(alert_data, &context.database_pool).await?;
+	write_alert(alert_data, monitor.id, &context.database_pool).await?;
 
 	Ok(())
 }
@@ -263,8 +259,8 @@ async fn check_metrics(preference: &Monitor, context: &Context) -> Result<Vec<Al
 	}
 	let current_production_value = current_production_value.unwrap();
 	let observed_variance = match preference.threshold.mode {
-		AlertThresholdMode::Absolute => current_training_value - current_production_value,
-		AlertThresholdMode::Percentage => todo!(),
+		MonitorThresholdMode::Absolute => current_training_value - current_production_value,
+		MonitorThresholdMode::Percentage => todo!(),
 	};
 
 	results.push(AlertResult {
@@ -335,6 +331,28 @@ pub async fn get_production_metric(
 	}
 }
 
+async fn get_total_production_metrics(context: &Context) -> Result<i64> {
+	let mut db = match context.database_pool.begin().await {
+		Ok(db) => db,
+		Err(_) => {
+			eprintln!("Oh no! Failed to read database!");
+			return Err(anyhow!("Database unavailable"));
+		}
+	};
+	let result = sqlx::query(
+		"
+			select
+				count(*)
+			from production_metrics
+		",
+	)
+	.fetch_one(&mut db)
+	.await?;
+	db.commit().await?;
+	let result: i64 = result.get(0);
+	Ok(result)
+}
+
 /// Send alerts containing all exceeded thresholds to each enabled alert method
 async fn push_alerts(
 	exceeded_thresholds: &[&AlertResult],
@@ -348,11 +366,7 @@ async fn push_alerts(
 }
 
 /// Read the DB to see if the given cadence is already in process
-async fn check_ongoing(
-	cadence: AlertCadence,
-	metric: AlertMetric,
-	database_pool: &sqlx::AnyPool,
-) -> Result<bool> {
+async fn check_ongoing(id: Id, database_pool: &sqlx::AnyPool) -> Result<bool> {
 	let mut db = match database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => {
@@ -365,16 +379,15 @@ async fn check_ongoing(
 	let existing = sqlx::query(
 		"
 			select
-				alerts.id
-			from alerts
+				*
+			from
+				alerts
 			where
-			alerts.cadence = $1 and
-			alerts.metric = $2 and
-			$3 - alerts.date < $4
+				id = $1 and
+				$2 - alerts.date < $3
 		",
 	)
-	.bind(cadence.to_string())
-	.bind(metric.to_string())
+	.bind(id.to_string())
 	.bind(&now)
 	.bind(&ten_minutes_in_seconds)
 	.fetch_optional(&mut db)
@@ -384,7 +397,11 @@ async fn check_ongoing(
 }
 
 /// Log the completion of an alert handling process
-async fn write_alert(alert_data: AlertData, monitor_id: Id, database_pool: &sqlx::AnyPool) -> Result<()> {
+async fn write_alert(
+	alert_data: AlertData,
+	monitor_id: Id,
+	database_pool: &sqlx::AnyPool,
+) -> Result<()> {
 	let mut db = match database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => {

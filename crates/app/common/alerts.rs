@@ -198,29 +198,29 @@ impl From<tangram_model::ModelInnerReader<'_>> for AlertModelType {
 /// Alerts can either be set as absolute values or percentage deviations
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "mode")]
-pub enum AlertThresholdMode {
+pub enum MonitorThresholdMode {
 	#[serde(rename = "absolute")]
 	Absolute,
 	#[serde(rename = "percentage")]
 	Percentage,
 }
 
-impl fmt::Display for AlertThresholdMode {
+impl fmt::Display for MonitorThresholdMode {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let s = match self {
-			AlertThresholdMode::Absolute => "absolute",
-			AlertThresholdMode::Percentage => "percentage",
+			MonitorThresholdMode::Absolute => "absolute",
+			MonitorThresholdMode::Percentage => "percentage",
 		};
 		write!(f, "{}", s)
 	}
 }
 
-impl FromStr for AlertThresholdMode {
+impl FromStr for MonitorThresholdMode {
 	type Err = io::Error;
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		match s.to_lowercase().as_str() {
-			"absolute" => Ok(AlertThresholdMode::Absolute),
-			"percentage" => Ok(AlertThresholdMode::Percentage),
+			"absolute" => Ok(MonitorThresholdMode::Absolute),
+			"percentage" => Ok(MonitorThresholdMode::Percentage),
 			_ => Err(io::Error::new(
 				io::ErrorKind::InvalidInput,
 				"unsupported threshold mode",
@@ -231,18 +231,18 @@ impl FromStr for AlertThresholdMode {
 
 /// Single alert threshold
 #[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize)]
-pub struct AlertThreshold {
+pub struct MonitorThreshold {
 	pub metric: AlertMetric,
-	pub mode: AlertThresholdMode,
+	pub mode: MonitorThresholdMode,
 	pub variance_lower: Option<f32>,
 	pub variance_upper: Option<f32>,
 }
 
-impl Default for AlertThreshold {
+impl Default for MonitorThreshold {
 	fn default() -> Self {
-		AlertThreshold {
+		MonitorThreshold {
 			metric: AlertMetric::Accuracy,
-			mode: AlertThresholdMode::Absolute,
+			mode: MonitorThresholdMode::Absolute,
 			variance_lower: Some(0.1),
 			variance_upper: Some(0.1),
 		}
@@ -296,9 +296,10 @@ impl AlertResult {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Monitor {
 	pub cadence: AlertCadence,
+	pub id: Id,
 	pub methods: Vec<AlertMethod>,
 	pub model_id: Id,
-	pub threshold: AlertThreshold,
+	pub threshold: MonitorThreshold,
 	pub title: String,
 }
 
@@ -307,10 +308,13 @@ impl Monitor {
 		(self.threshold.variance_upper, self.threshold.variance_lower)
 	}
 	/// Check if the given timestamp is more than one cadence interval behind the current time
-	pub fn is_expired(&self, timestamp: u64) -> bool {
-		let now = time::OffsetDateTime::now_utc().unix_timestamp() as u64;
-		let offset = now - timestamp;
-		offset > self.cadence.duration().as_secs()
+	// FIXME - this is not correct.  Check when the last one was, when the next one should be, etc.
+	// For now, just returns true all the time.
+	pub fn is_overdue(&self) -> bool {
+		//let now = time::OffsetDateTime::now_utc().unix_timestamp() as u64;
+		//let offset = now - timestamp;
+		//offset > self.cadence.duration().as_secs()
+		true
 	}
 
 	pub fn default_title(&self) -> String {
@@ -384,7 +388,7 @@ pub async fn get_monitor(
 	Ok(monitor)
 }
 
-pub async fn get_all_monitors(context: &Context) -> Result<Alerts> {
+pub async fn get_overdue_monitors(context: &Context) -> Result<Alerts> {
 	let mut db = context.database_pool.begin().await?;
 	let rows = sqlx::query(
 		"
@@ -403,45 +407,9 @@ pub async fn get_all_monitors(context: &Context) -> Result<Alerts> {
 			let monitor: String = row.get(0);
 			serde_json::from_str(&monitor).unwrap()
 		})
+		.filter(|monitor: &Monitor| monitor.is_overdue())
 		.collect();
 	Ok(Alerts::from(monitors))
-}
-
-/// Get the unix timestamp of the last run with the given cadence/metric combination
-// FIXME no longer useful
-pub async fn get_last_alert_time(
-	context: &Context,
-	cadence: AlertCadence,
-	metric: AlertMetric,
-) -> Result<Option<u64>> {
-	let mut db = context.database_pool.begin().await?;
-	let result = sqlx::query(
-		"
-			select
-				MAX(date)
-			from
-				alerts
-			where
-				cadence = $1 and
-				metric = $2
-		",
-	)
-	.bind(cadence.to_string())
-	.bind(metric.to_string())
-	.fetch_optional(&mut db)
-	.await?;
-	db.commit().await?;
-	match result {
-		Some(r) => {
-			let data: String = r.get(0);
-			if data.is_empty() {
-				return Ok(None);
-			}
-			let data: u64 = data.parse()?;
-			Ok(Some(data))
-		}
-		None => Ok(None),
-	}
 }
 
 pub async fn check_for_duplicate_monitor(

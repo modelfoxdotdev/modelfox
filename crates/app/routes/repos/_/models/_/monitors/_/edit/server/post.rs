@@ -6,7 +6,7 @@ use tangram_app_common::{
 	alerts::{
 		check_for_duplicate_monitor, delete_monitor, extract_threshold_bounds, get_monitor,
 		update_monitor, validate_threshold_bounds, AlertCadence, AlertMethod, AlertMetric,
-		AlertModelType, AlertThreshold, AlertThresholdMode, Monitor,
+		AlertModelType, Monitor, MonitorThreshold, MonitorThresholdMode,
 	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
@@ -143,11 +143,12 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				extract_threshold_bounds(threshold_bounds.unwrap())?;
 			let mut monitor = Monitor {
 				cadence: AlertCadence::from_str(&cadence)?,
+				id: Id::generate(),
 				methods,
 				model_id,
-				threshold: AlertThreshold {
+				threshold: MonitorThreshold {
 					metric,
-					mode: AlertThresholdMode::from_str(&mode)?,
+					mode: MonitorThresholdMode::from_str(&mode)?,
 					variance_lower,
 					variance_upper,
 				},

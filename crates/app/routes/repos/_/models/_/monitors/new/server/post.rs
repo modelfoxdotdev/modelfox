@@ -5,8 +5,8 @@ use std::{str, str::FromStr, sync::Arc};
 use tangram_app_common::{
 	alerts::{
 		check_for_duplicate_monitor, create_monitor, extract_threshold_bounds,
-		validate_threshold_bounds, AlertCadence, AlertMethod, AlertMetric, AlertModelType,
-		AlertThreshold, AlertThresholdMode, Monitor,
+		validate_threshold_bounds, AlertCadence, AlertMethod, AlertMetric, AlertModelType, Monitor,
+		MonitorThreshold, MonitorThresholdMode,
 	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
@@ -110,11 +110,12 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	let (variance_lower, variance_upper) = extract_threshold_bounds(threshold_bounds.unwrap())?;
 	let mut monitor = Monitor {
 		cadence: AlertCadence::from_str(&cadence)?,
+		id: Id::generate(),
 		methods,
 		model_id,
-		threshold: AlertThreshold {
+		threshold: MonitorThreshold {
 			metric,
-			mode: AlertThresholdMode::from_str(&mode)?,
+			mode: MonitorThresholdMode::from_str(&mode)?,
 			variance_lower,
 			variance_upper,
 		},
