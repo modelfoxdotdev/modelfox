@@ -27,6 +27,47 @@
     let
       pkgs = import nixpkgs {
         inherit system;
+        overlays = [
+          (self: super: {
+            rpm = super.rpm.overrideAttrs (_: {
+              patches = [
+                (pkgs.fetchpatch {
+                  url = "https://github.com/rpm-software-management/rpm/pull/1775.patch";
+                  sha256 = "0zzblwx9apxyjsri4cxd09y9b2hs57r2fck98939j1qgcwy732ar";
+                })
+              ];
+            });
+            rust-cbindgen = super.rust-cbindgen.overrideAttrs (_: {
+              doCheck = false;
+            });
+            zig = super.zig.overrideAttrs (_: {
+              src = self.fetchFromGitHub {
+                owner = "ziglang";
+                repo = "zig";
+                rev = "adf059f272dfd3c1652bce774c0b6c204d5d6b8b";
+                hash = "sha256-pnNfvdLBN8GrVHz+Cf5QX3VHC+s3jjNO/vtzgGD132Y=";
+              };
+              patches = [
+                (self.fetchpatch {
+                  url = "https://github.com/ziglang/zig/pull/9771.patch";
+                  sha256 = "sha256-AaMNNBET/x0f3a9oxpgBZXnUdKH4bydKMLJfXLBmvZo=";
+                })
+              ];
+              nativeBuildInputs = with self; [
+                cmake
+                llvmPackages_13.llvm.dev
+              ];
+              buildInputs = with self; [
+                libxml2
+                zlib
+              ] ++ (with llvmPackages_13; [
+                libclang
+                lld
+                llvm
+              ]);
+            });
+          })
+        ];
       };
       rust =
         let
@@ -52,33 +93,6 @@
           (targets.x86_64-pc-windows-gnu.toolchainOf toolchain).rust-std
           (targets.x86_64-pc-windows-msvc.toolchainOf toolchain).rust-std
         ]);
-      zig = (pkgs.zig.overrideAttrs (old: {
-        version = "0.0.0";
-        src = pkgs.fetchFromGitHub {
-          owner = "ziglang";
-          repo = "zig";
-          rev = "adf059f272dfd3c1652bce774c0b6c204d5d6b8b";
-          hash = "sha256-pnNfvdLBN8GrVHz+Cf5QX3VHC+s3jjNO/vtzgGD132Y=";
-        };
-        patches = [
-          (pkgs.fetchpatch {
-            url = "https://github.com/ziglang/zig/pull/9771.patch";
-            sha256 = "sha256-AaMNNBET/x0f3a9oxpgBZXnUdKH4bydKMLJfXLBmvZo=";
-          })
-        ];
-        nativeBuildInputs = with pkgs; [
-          cmake
-          llvmPackages_13.llvm.dev
-        ];
-        buildInputs = with pkgs; [
-          libxml2
-          zlib
-        ] ++ (with llvmPackages_13; [
-          libclang
-          lld
-          llvm
-        ]);
-      }));
     in {
       devShell = pkgs.mkShell {
         packages = with pkgs; [
@@ -92,6 +106,7 @@
           elixir
           gnupg
           go
+          libiconv
           lld_13
           llvm_13
           mold
@@ -108,17 +123,7 @@
             tokenizer
           ]))
           php.packages.composer
-          (python3.withPackages(p: with p; [
-            catboost
-            lightgbm
-            numpy
-            pandas
-            pip
-            pytorch
-            scikitlearn
-            twine
-            xgboost
-          ]))
+          python3
           rpm
           ruby
           rust
@@ -127,7 +132,7 @@
           time
           wasm-bindgen-cli
           (wheel_writer.defaultPackage.${system})
-          windows_sdk
+          (windows_sdk.defaultPackage.${system})
           zig
         ];
 
