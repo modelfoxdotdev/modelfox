@@ -194,6 +194,10 @@ fn compute_summary_section(model: tangram_model::ModelReader) -> TrainingSummary
 				),
 				train_row_count: regressor.train_row_count().to_usize().unwrap(),
 				test_row_count: regressor.test_row_count().to_usize().unwrap(),
+				comparison_row_count: regressor.overall_row_count().to_usize().unwrap()
+					- regressor.train_row_count().to_usize().unwrap()
+					- regressor.test_row_count().to_usize().unwrap(),
+				overall_row_count: regressor.overall_row_count().to_usize().unwrap(),
 			}
 		}
 		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
@@ -206,6 +210,10 @@ fn compute_summary_section(model: tangram_model::ModelReader) -> TrainingSummary
 				),
 				train_row_count: binary_classifier.train_row_count().to_usize().unwrap(),
 				test_row_count: binary_classifier.test_row_count().to_usize().unwrap(),
+				comparison_row_count: binary_classifier.overall_row_count().to_usize().unwrap()
+					- binary_classifier.train_row_count().to_usize().unwrap()
+					- binary_classifier.test_row_count().to_usize().unwrap(),
+				overall_row_count: binary_classifier.overall_row_count().to_usize().unwrap(),
 			}
 		}
 		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
@@ -218,6 +226,20 @@ fn compute_summary_section(model: tangram_model::ModelReader) -> TrainingSummary
 				),
 				train_row_count: multiclass_classifier.train_row_count().to_usize().unwrap(),
 				test_row_count: multiclass_classifier.test_row_count().to_usize().unwrap(),
+				comparison_row_count: multiclass_classifier
+					.overall_row_count()
+					.to_usize()
+					.unwrap() - multiclass_classifier
+					.train_row_count()
+					.to_usize()
+					.unwrap() - multiclass_classifier
+					.test_row_count()
+					.to_usize()
+					.unwrap(),
+				overall_row_count: multiclass_classifier
+					.overall_row_count()
+					.to_usize()
+					.unwrap(),
 			}
 		}
 	}
