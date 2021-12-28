@@ -1,6 +1,6 @@
 use crate::{model::get_model_bytes, Context};
 use anyhow::{anyhow, Result};
-use lettre::AsyncTransport;
+//use lettre::AsyncTransport;
 use serde::{Deserialize, Serialize};
 use sqlx::Row;
 use std::{fmt, io, str::FromStr};
@@ -88,7 +88,7 @@ impl AlertMethod {
 	pub async fn send_alert(
 		&self,
 		exceeded_thresholds: &[&AlertResult],
-		context: &Context,
+		_context: &Context,
 	) -> Result<()> {
 		match self {
 			AlertMethod::Email(_address) => {

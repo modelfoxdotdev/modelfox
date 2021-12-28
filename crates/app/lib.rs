@@ -4,7 +4,7 @@ use std::{net::SocketAddr, sync::Arc};
 pub use tangram_app_common::options;
 use tangram_app_common::{
 	alerts::{
-		find_current_data, get_overdue_monitors, AlertCadence, AlertData, AlertMethod, AlertMetric,
+		find_current_data, get_overdue_monitors, AlertData, AlertMethod, AlertMetric,
 		AlertResult, Monitor, MonitorThresholdMode,
 	},
 	heuristics::{
