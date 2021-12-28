@@ -1,7 +1,7 @@
 {
   inputs = {
     nixpkgs = {
-      url = "github:nixos/nixpkgs/nixos-unstable";
+      url = "github:nixos/nixpkgs";
     };
     flake-utils = {
       url = "github:numtide/flake-utils";
@@ -9,31 +9,38 @@
     fenix = {
       url = "github:nix-community/fenix";
     };
-    wheel_writer = {
-      url = "github:tangramdotdev/wheel_writer";
-    };
     windows_sdk = {
       url = "github:tangramdotdev/windows_sdk";
     };
   };
-  outputs = {
-    fenix,
-    flake-utils,
-    nixpkgs,
-    wheel_writer,
-    windows_sdk,
-    ...
-  }: flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    inputs: inputs.flake-utils.lib.eachDefaultSystem (system:
     let
-      pkgs = import nixpkgs {
+      pkgs = import inputs.nixpkgs {
         inherit system;
         overlays = [
           (self: super: {
+            abuild = super.abuild.overrideAttrs (old: {
+              patches = [
+                (pkgs.fetchpatch {
+                  url = "https://gitlab.alpinelinux.org/alpine/abuild/-/merge_requests/130.patch";
+                  sha256 = "sha256-9+MpH9HTNDzfRd7vwTD2yU7guIYScAuGMpsqSdvZ9p4=";
+                })
+              ];
+              patchPhase = null;
+              postPatch = old.patchPhase;
+              propagatedBuildInputs = with self; [
+                apk-tools
+                fakeroot
+                libressl
+                pax-utils
+              ];
+            });
             rpm = super.rpm.overrideAttrs (_: {
               patches = [
                 (pkgs.fetchpatch {
                   url = "https://github.com/rpm-software-management/rpm/pull/1775.patch";
-                  sha256 = "0zzblwx9apxyjsri4cxd09y9b2hs57r2fck98939j1qgcwy732ar";
+                  sha256 = "sha256-WYlxPGcPB5lGQmkyJ/IpGoqVfAKtMxKzlr5flTqn638=";
                 })
               ];
             });
@@ -76,7 +83,8 @@
             date = "2021-12-20";
             sha256 = "sha256-FTlFODbchSsFDRGVTd6HkY5QeeZ2YgFV9HCubYl6TJQ=";
           };
-        in with fenix.packages.${system}; combine (with toolchainOf toolchain; [
+        in
+        with inputs.fenix.packages.${system}; combine (with toolchainOf toolchain; [
           cargo
           clippy-preview
           rust-src
@@ -93,9 +101,11 @@
           (targets.x86_64-pc-windows-gnu.toolchainOf toolchain).rust-std
           (targets.x86_64-pc-windows-msvc.toolchainOf toolchain).rust-std
         ]);
-    in {
+    in
+    {
       devShell = pkgs.mkShell {
         packages = with pkgs; [
+          abuild
           cachix
           cargo-insta
           cargo-outdated
@@ -131,8 +141,6 @@
           sqlite
           time
           wasm-bindgen-cli
-          (wheel_writer.defaultPackage.${system})
-          (windows_sdk.defaultPackage.${system})
           zig
         ];
 
@@ -230,8 +238,7 @@
         # x86_64-windows-msvc
         AR_x86_64_pc_windows_msvc = "llvm-lib";
         CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER = pkgs.writeShellScriptBin "linker" ''
-          lld-link /
-            /libpath:$WINDOWS_SDK/clang/lib/x64 \
+          lld-link \
             /libpath:$WINDOWS_SDK/crt/lib/x64 \
             /libpath:$WINDOWS_SDK/sdk/lib/x64 \
             /libpath:$WINDOWS_SDK/sdk/lib/x64/ucrt \
@@ -248,8 +255,8 @@
             /I $WINDOWS_SDK/sdk/include/um \
             $@
         '' + /bin/cc;
-        WINDOWS_SDK = windows_sdk.defaultPackage.${system};
+        WINDOWS_SDK = inputs.windows_sdk.defaultPackage.${system};
       };
     }
-  );
+    );
 }

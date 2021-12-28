@@ -1,0 +1,29 @@
+[package]
+authors = ["Tangram <root@tangram.dev"]
+edition = "2021"
+name = "wheel_writer"
+rust-version = "1.56"
+version = "0.0.0"
+
+[lib]
+name = "wheel_writer"
+path = "lib.rs"
+
+[[bin]]
+name = "wheel_writer"
+path = "main.rs"
+
+[dependencies]
+anyhow = "1"
+base64 = "0.13"
+clap = { version = "3.0.0-rc.9", features = ["derive"] }
+indoc = "1"
+regex = "1.5"
+serde = "1"
+serde_derive = "1"
+sha2 = "0.10"
+textwrap = "0.14"
+time = "0.3"
+toml = "0.5"
+walkdir = "2"
+zip = "0.5"

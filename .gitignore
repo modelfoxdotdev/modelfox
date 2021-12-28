@@ -1,6 +1,7 @@
+.DS_Store
 /.direnv/
 /.envrc
 /data/
 /dist/
+/secrets/
 /target/
-.DS_Store

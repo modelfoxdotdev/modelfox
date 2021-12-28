@@ -27,9 +27,9 @@ fn main() {
 	clean_and_create(&dist_path);
 
 	compile();
+	build_containers(&version);
 	build_debs(&version);
 	build_rpms(&version);
-	build_containers(&version);
 	build_pkgs(&version, &pkgs_url);
 	build_release(&version);
 }
@@ -56,6 +56,17 @@ fn compile() {
 		"tangram_python",
 	]);
 	cmd(which("cargo").unwrap(), args).run().unwrap();
+	cmd!(
+		which("cargo").unwrap(),
+		"build",
+		"--release",
+		"--target",
+		"wasm32-unknown-unknown",
+		"--package",
+		"tangram_wasm",
+	)
+	.run()
+	.unwrap();
 
 	// Copy the artifacts to the compile directory.
 	for target in TARGETS {
@@ -106,7 +117,6 @@ fn compile() {
 		)
 		.unwrap();
 	}
-
 	// tangram_wasm
 	let cargo_artifact_path = root_path
 		.join("target")
@@ -114,17 +124,6 @@ fn compile() {
 		.join("release");
 	let dist_target_path = compile_path.join("wasm32");
 	std::fs::create_dir(&dist_target_path).unwrap();
-	cmd!(
-		which("cargo").unwrap(),
-		"build",
-		"--release",
-		"--target",
-		"wasm32-unknown-unknown",
-		"--package",
-		"tangram_wasm",
-	)
-	.run()
-	.unwrap();
 	std::fs::copy(
 		cargo_artifact_path.join("tangram_wasm.wasm"),
 		dist_target_path.join("tangram_wasm.wasm"),
@@ -248,6 +247,7 @@ fn build_rpms(version: &str) {
 		let topdir = rpm_path.display();
 		cmd!(
 			"rpmbuild",
+			"--quiet",
 			"-D",
 			format!("_topdir {topdir}", topdir = topdir),
 			"--target",
@@ -280,7 +280,7 @@ fn build_containers(version: &str) {
 	let root_path = std::env::current_dir().unwrap();
 	let compile_path = root_path.join("dist").join("compile");
 	for target in [Target::AArch64LinuxMusl, Target::X8664LinuxMusl] {
-		let dockerfile_path = root_path.join("Dockerfile");
+		let dockerfile_path = tempfile::NamedTempFile::new().unwrap().into_temp_path();
 		let tangram_cli_file_name = TargetFileNames::for_target(target).tangram_cli_file_name;
 		let tangram_cli_path = compile_path
 			.strip_prefix(&root_path)
@@ -307,7 +307,7 @@ fn build_containers(version: &str) {
 			version = version,
 		);
 		cmd!(
-			"docker",
+			"podman",
 			"build",
 			"--platform",
 			platform,
@@ -317,7 +317,6 @@ fn build_containers(version: &str) {
 		)
 		.run()
 		.unwrap();
-		std::fs::remove_file(&dockerfile_path).unwrap();
 	}
 }
 
@@ -327,16 +326,24 @@ pub fn build_pkgs(version: &str, pkgs_url: &str) {
 	clean_and_create(&pkgs_path);
 
 	// Retrieve the keys from the password store.
-	let alpine_public_key = cmd!("pass", "tangram/keys/alpine.public.rsa")
+	let alpine_public_key = cmd!("gpg", "--decrypt", "secrets/keys/alpine.public.rsa.gpg")
 		.read()
 		.unwrap();
-	let alpine_private_key = cmd!("pass", "tangram/keys/alpine.private.rsa")
+	let alpine_private_key = cmd!("gpg", "--decrypt", "secrets/keys/alpine.private.rsa.gpg")
 		.read()
 		.unwrap();
-	let deb_public_key = cmd!("pass", "tangram/keys/deb.public.gpg").read().unwrap();
-	let deb_private_key = cmd!("pass", "tangram/keys/deb.private.gpg").read().unwrap();
-	let rpm_public_key = cmd!("pass", "tangram/keys/rpm.public.gpg").read().unwrap();
-	let rpm_private_key = cmd!("pass", "tangram/keys/rpm.private.gpg").read().unwrap();
+	let deb_public_key = cmd!("gpg", "--decrypt", "secrets/keys/deb.public.gpg.gpg")
+		.read()
+		.unwrap();
+	let deb_private_key = cmd!("gpg", "--decrypt", "secrets/keys/deb.private.gpg.gpg")
+		.read()
+		.unwrap();
+	let rpm_public_key = cmd!("gpg", "--decrypt", "secrets/keys/rpm.public.gpg.gpg")
+		.read()
+		.unwrap();
+	let rpm_private_key = cmd!("gpg", "--decrypt", "secrets/keys/rpm.private.gpg.gpg")
+		.read()
+		.unwrap();
 
 	let alpine_public_key_path = tempfile::NamedTempFile::new().unwrap().into_temp_path();
 	std::fs::write(&alpine_public_key_path, alpine_public_key).unwrap();
@@ -381,12 +388,17 @@ fn alpine(
 	alpine_private_key_path: &Path,
 ) -> Result<()> {
 	let root_path = std::env::current_dir().unwrap();
+	let compile_path = root_path.join("dist").join("compile");
 	let pkgs_path = root_path.join("dist").join("pkgs");
-	for target in [Target::X8664LinuxMusl] {
-		let repo_path = pkgs_path.join("stable").join("alpine");
-		std::fs::create_dir_all(&repo_path).unwrap();
-		std::fs::copy(alpine_public_key_path, repo_path.join("tangram.rsa")).unwrap();
-		let apkbuild_path = repo_path.join("APKBUILD");
+	let repo_path = pkgs_path.join("stable").join("alpine");
+	clean_and_create(&repo_path);
+	for target in [Target::AArch64LinuxMusl, Target::X8664LinuxMusl] {
+		let src_tempdir = tempdir().unwrap();
+		let src_path = src_tempdir.path();
+		let dst_tempdir = tempdir().unwrap();
+		let dst_path = dst_tempdir.path();
+		std::fs::copy(alpine_public_key_path, src_path.join("tangram.rsa")).unwrap();
+		let apkbuild_path = src_path.join("APKBUILD");
 		let arch = match target.arch() {
 			Arch::AArch64 => "aarch64",
 			Arch::X8664 => "x86_64",
@@ -417,52 +429,22 @@ fn alpine(
 			arch = arch,
 		);
 		std::fs::write(&apkbuild_path, &apkbuild).unwrap();
-		let tangram_cli_dst_path = repo_path.join("tangram");
-		let tangram_cli_path = root_path
+		let tangram_cli_file_name = TargetFileNames::for_target(target).tangram_cli_file_name;
+		let tangram_cli_dst_path = src_path.join("tangram");
+		let tangram_cli_path = compile_path
 			.join(target.target_name())
-			.join(TargetFileNames::for_target(target).tangram_cli_file_name);
+			.join(tangram_cli_file_name);
 		std::fs::copy(tangram_cli_path, &tangram_cli_dst_path).unwrap();
-		let script = r#"
-			set -e
-			apk add build-base abuild
-			echo "PACKAGER_PUBKEY=/alpine.public.rsa" >> /etc/abuild.conf
-			echo "PACKAGER_PRIVKEY=/alpine.private.rsa" >> /etc/abuild.conf
-			abuild -F checksum
-			abuild -f -F -P $PWD
-			rm -rf src pkg
-		"#;
-		cmd!(
-			"docker",
-			"run",
-			"-i",
-			"--rm",
-			"-v",
-			format!(
-				"{}:{}",
-				repo_path.canonicalize().unwrap().display(),
-				"/tangram"
-			),
-			"-v",
-			format!(
-				"{}:{}",
-				alpine_public_key_path.canonicalize().unwrap().display(),
-				"/alpine.public.rsa"
-			),
-			"-v",
-			format!(
-				"{}:{}",
-				alpine_private_key_path.canonicalize().unwrap().display(),
-				"/alpine.private.rsa"
-			),
-			"-w",
-			"/tangram",
-			"alpine:3.13",
-		)
-		.stdin_bytes(script)
-		.run()
-		.unwrap();
-		std::fs::remove_file(&apkbuild_path).unwrap();
-		std::fs::remove_file(&tangram_cli_dst_path).unwrap();
+		cmd!("abuild", "-d", "-P", &dst_path, "checksum", "all")
+			.dir(&src_path)
+			.env("CBUILD", arch)
+			.env("PACKAGER_PUBKEY", alpine_public_key_path)
+			.env("PACKAGER_PRIVKEY", alpine_private_key_path)
+			.run()
+			.unwrap();
+		cmd!("mv", dst_path.join("tmp").join(arch), &repo_path)
+			.run()
+			.unwrap();
 	}
 	Ok(())
 }
@@ -834,10 +816,10 @@ fn build_release(version: &str) {
 const TARGETS: [Target; 6] = [
 	Target::AArch64LinuxGnu,
 	Target::AArch64LinuxMusl,
-	// Target::AArch64MacOS,
+	// Target::AArch64MacOs,
 	Target::X8664LinuxGnu,
 	Target::X8664LinuxMusl,
-	// Target::X8664MacOS,
+	// Target::X8664MacOs,
 	Target::X8664WindowsGnu,
 	Target::X8664WindowsMsvc,
 ];
@@ -996,15 +978,18 @@ fn sign(signature_type: SignatureType, key: &Path, input: &Path, output: &Path) 
 		SignatureType::Cleartext => "--clear-sign",
 		SignatureType::Detached => "--detach-sign",
 	};
+	let gnupghome_tempdir = tempdir().unwrap();
+	let gnupghome = gnupghome_tempdir.path().display();
 	let key = key.display();
 	let input = input.display();
 	let output = output.display();
 	let script = formatdoc!(
 		r#"
-			export GNUPGHOME=$(mktemp -d)
+			export GNUPGHOME={gnupghome}
 			gpg --import {key}
 			cat {input} | gpg --armor {action} > {output}
 		"#,
+		gnupghome = gnupghome,
 		key = key,
 		input = input,
 		action = action,

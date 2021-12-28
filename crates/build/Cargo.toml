@@ -14,7 +14,7 @@ path = "main.rs"
 anyhow = { version = "1", features = ["backtrace"] }
 cbindgen = "0.20"
 chrono = { version = "0.4", features = ["serde"] }
-clap = { version = "3.0.0-rc.7", features = ["derive", "env"] }
+clap = { version = "3.0.0-rc.9", features = ["derive", "env"] }
 digest = "0.10"
 dirs = "4"
 duct = "0.13"

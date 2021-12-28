@@ -48,7 +48,7 @@ path = "benchmarks/iris.rs"
 
 [dependencies]
 buffalo = { version = "0.2", features = ["ndarray_0_15"] }
-clap = { version = "3.0.0-rc.7", features = ["derive"] }
+clap = { version = "3.0.0-rc.9", features = ["derive"] }
 ndarray = { version = "0.15", features = ["rayon"] }
 num = "0.4"
 rayon = "1.5"
