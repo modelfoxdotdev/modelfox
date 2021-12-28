@@ -4,8 +4,8 @@ use std::{net::SocketAddr, sync::Arc};
 pub use tangram_app_common::options;
 use tangram_app_common::{
 	alerts::{
-		find_current_data, get_overdue_monitors, AlertData, AlertMethod, AlertMetric,
-		AlertResult, Monitor, MonitorThresholdMode,
+		find_current_data, get_overdue_monitors, AlertData, AlertMethod, AlertMetric, AlertResult,
+		Monitor, MonitorThresholdMode,
 	},
 	heuristics::{
 		ALERT_METRICS_HEARTBEAT_DURATION_PRODUCTION, ALERT_METRICS_HEARTBEAT_DURATION_TESTING,
@@ -218,7 +218,7 @@ async fn handle_monitor(context: &Context, monitor: &Monitor) -> Result<()> {
 		return Ok(());
 	}
 
-	let results = check_metrics(monitor, &context).await?;
+	let results = check_metrics(monitor, context).await?;
 	let exceeded_thresholds: Vec<&AlertResult> = results
 		.iter()
 		.filter(|r| {

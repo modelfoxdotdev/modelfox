@@ -440,9 +440,7 @@ pub async fn check_for_duplicate_monitor(
 				serde_json::from_str(&monitor_json).expect("Could not parse stored alert");
 			monitor
 		})
-		.fold(false, |acc, el| {
-			acc || (el.cadence == monitor.cadence && el.threshold == monitor.threshold)
-		});
+		.any(|el| el.cadence == monitor.cadence && el.threshold == monitor.threshold);
 
 	Ok(result)
 }
