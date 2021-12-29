@@ -24,7 +24,7 @@ pub fn main() -> Result<()> {
 }
 
 fn generate(generate_args: GenerateArgs) -> Result<()> {
-	let private_key = cmd!("pass", "tangram/keys/license.private.rsa")
+	let private_key = cmd!("gpg", "--decrypt", "secrets/keys/license.private.rsa")
 		.run()?
 		.stdout;
 	let private_key = String::from_utf8(private_key)?;
