@@ -1,6 +1,6 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_app_common::predict::PredictOutput;
+use tangram_app_core::predict::PredictOutput;
 use tangram_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},

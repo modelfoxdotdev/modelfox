@@ -4,7 +4,7 @@ use clap::{ArgEnum, Parser};
 use num::ToPrimitive;
 use rand::Rng;
 use std::{collections::HashMap, path::Path};
-use tangram_app_common::monitor_event::{
+use tangram_app_core::monitor_event::{
 	BinaryClassificationPredictOutput, MonitorEvent, MulticlassClassificationPredictOutput,
 	NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,
 	TrueValueMonitorEvent,

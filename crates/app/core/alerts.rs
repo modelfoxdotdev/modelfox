@@ -1,4 +1,4 @@
-use crate::{model::get_model_bytes, Context};
+use crate::{model::get_model_bytes, App};
 use anyhow::{anyhow, Result};
 //use lettre::AsyncTransport;
 use serde::{Deserialize, Serialize};
@@ -88,7 +88,7 @@ impl AlertMethod {
 	pub async fn send_alert(
 		&self,
 		exceeded_thresholds: &[&AlertResult],
-		_context: &Context,
+		_context: &App,
 	) -> Result<()> {
 		match self {
 			AlertMethod::Email(_address) => {
@@ -324,15 +324,15 @@ impl Monitor {
 
 /// Manager for all enabled alerts
 #[derive(Debug, Default)]
-pub struct Alerts(Vec<Monitor>);
+pub struct Monitors(Vec<Monitor>);
 
-impl From<Vec<Monitor>> for Alerts {
+impl From<Vec<Monitor>> for Monitors {
 	fn from(v: Vec<Monitor>) -> Self {
 		Self(v)
 	}
 }
 
-impl Alerts {
+impl Monitors {
 	// Retrieve all currently enabled cadences
 	pub fn get_cadences(&self) -> Vec<AlertCadence> {
 		self.0
@@ -388,8 +388,8 @@ pub async fn get_monitor(
 	Ok(monitor)
 }
 
-pub async fn get_overdue_monitors(context: &Context) -> Result<Alerts> {
-	let mut db = context.database_pool.begin().await?;
+pub async fn get_overdue_monitors(app: &App) -> Result<Monitors> {
+	let mut db = app.database_pool.begin().await?;
 	let rows = sqlx::query(
 		"
 			select
@@ -409,7 +409,7 @@ pub async fn get_overdue_monitors(context: &Context) -> Result<Alerts> {
 		})
 		.filter(|monitor: &Monitor| monitor.is_overdue())
 		.collect();
-	Ok(Alerts::from(monitors))
+	Ok(Monitors::from(monitors))
 }
 
 pub async fn check_for_duplicate_monitor(
@@ -508,11 +508,7 @@ pub async fn update_monitor(
 }
 
 /// Read the model, find the training metric value for the given AlertMetric
-pub async fn find_current_data(
-	metric: AlertMetric,
-	model_id: Id,
-	context: &Context,
-) -> Result<f32> {
+pub async fn find_current_data(metric: AlertMetric, model_id: Id, context: &App) -> Result<f32> {
 	// Grab the model from the DB
 	let bytes = get_model_bytes(&context.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;

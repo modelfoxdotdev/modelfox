@@ -1,7 +1,7 @@
 use ndarray::prelude::*;
 use num::ToPrimitive;
 use serde::ser::SerializeStruct;
-use tangram_app_common::monitor_event::NumberOrString;
+use crate::monitor_event::NumberOrString;
 use tangram_zip::zip;
 
 #[derive(Clone)]

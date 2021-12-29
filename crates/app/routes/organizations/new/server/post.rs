@@ -1,9 +1,9 @@
 use anyhow::Result;
 use std::sync::Arc;
-use tangram_app_common::{
+use tangram_app_context::Context;
+use tangram_app_core::{
 	error::{bad_request, service_unavailable, unauthorized},
 	user::{authorize_normal_user, NormalUser},
-	Context,
 };
 use tangram_id::Id;
 
@@ -14,7 +14,8 @@ struct Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	if !context.options.auth_enabled() {
+	let app = &context.app;
+	if !app.options.auth_enabled() {
 		return Ok(bad_request());
 	}
 	let data = match hyper::body::to_bytes(request.body_mut()).await {
@@ -25,7 +26,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(action) => action,
 		Err(_) => return Ok(bad_request()),
 	};
-	let mut db = match context.database_pool.begin().await {
+	let mut db = match app.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};

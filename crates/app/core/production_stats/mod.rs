@@ -4,7 +4,7 @@ use chrono::prelude::*;
 use chrono_tz::Tz;
 use num::ToPrimitive;
 use sqlx::prelude::*;
-use tangram_app_common::monitor_event::PredictionMonitorEvent;
+use crate::monitor_event::PredictionMonitorEvent;
 use tangram_app_ui::date_window::{DateWindow, DateWindowInterval};
 use tangram_zip::zip;
 

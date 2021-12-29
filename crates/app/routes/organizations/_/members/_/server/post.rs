@@ -1,11 +1,11 @@
 use anyhow::{bail, Result};
 use serde::Deserialize;
 use std::sync::Arc;
-use tangram_app_common::{
+use tangram_app_context::Context;
+use tangram_app_core::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
 	path_components,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
-	Context,
 };
 use tangram_id::Id;
 
@@ -40,6 +40,7 @@ where
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
+	let app = &context.app;
 	let (organization_id, member_id) = if let ["organizations", organization_id, "members", member_id] =
 		*path_components(request).as_slice()
 	{
@@ -47,10 +48,10 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	} else {
 		bail!("unexpected path");
 	};
-	if !context.options.auth_enabled() {
+	if !app.options.auth_enabled() {
 		return Ok(not_found());
 	}
-	let mut db = match context.database_pool.begin().await {
+	let mut db = match app.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};

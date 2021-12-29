@@ -16,7 +16,7 @@ use chrono::prelude::*;
 use chrono_tz::Tz;
 use num::ToPrimitive;
 use sqlx::prelude::*;
-use tangram_app_common::monitor_event::NumberOrString;
+use crate::monitor_event::NumberOrString;
 use tangram_app_ui::date_window::{DateWindow, DateWindowInterval};
 
 mod binary_classification_production_metrics;

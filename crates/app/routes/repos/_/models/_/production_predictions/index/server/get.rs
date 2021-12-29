@@ -6,20 +6,21 @@ use num::ToPrimitive;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
-use tangram_app_common::{
+use tangram_app_context::Context;
+use tangram_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	heuristics::PRODUCTION_PREDICTIONS_NUM_PREDICTIONS_PER_PAGE_TABLE,
 	monitor_event::PredictOutput,
 	path_components,
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
-	Context,
 };
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
+	let app = &context.app;
 	let model_id = if let ["repos", _, "models", model_id, "production_predictions", ""] =
 		path_components(request).as_slice()
 	{
@@ -38,11 +39,11 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		None
 	};
 	let timezone = get_timezone(request);
-	let mut db = match context.database_pool.begin().await {
+	let mut db = match app.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, context.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -55,7 +56,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	}
 	let model_layout_info = model_layout_info(
 		&mut db,
-		&context,
+		&app,
 		model_id,
 		ModelNavItem::ProductionPredictions,
 	)

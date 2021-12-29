@@ -4,22 +4,23 @@ use num::ToPrimitive;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
-use tangram_app_common::{
+use tangram_app_context::Context;
+use tangram_app_core::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
 	organizations::get_organization_user,
 	path_components,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
-	Context,
 };
 use tangram_app_layouts::app_layout::app_layout_info;
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	if !context.options.auth_enabled() {
+	let app = &context.app;
+	if !app.options.auth_enabled() {
 		return Ok(not_found());
 	}
-	let mut db = match context.database_pool.begin().await {
+	let mut db = match app.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
@@ -41,7 +42,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	if !authorize_normal_user_for_organization(&mut db, &user, organization_id).await? {
 		return Ok(not_found());
 	}
-	let app_layout_info = app_layout_info(&context).await?;
+	let app_layout_info = app_layout_info(&app).await?;
 	let row = sqlx::query(
 		"
 			select

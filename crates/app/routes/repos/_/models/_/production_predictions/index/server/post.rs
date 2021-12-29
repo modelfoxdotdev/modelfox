@@ -1,10 +1,10 @@
 use anyhow::{bail, Result};
 use std::sync::Arc;
-use tangram_app_common::{
+use tangram_app_context::Context;
+use tangram_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	path_components,
 	user::{authorize_user, authorize_user_for_model},
-	Context,
 };
 use tangram_id::Id;
 
@@ -15,6 +15,7 @@ struct Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
+	let app = &context.app;
 	let model_id = if let ["repos", _, "models", model_id, "production_predictions", ""] =
 		path_components(request).as_slice()
 	{
@@ -22,11 +23,11 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	} else {
 		bail!("unexpected path");
 	};
-	let mut db = match context.database_pool.begin().await {
+	let mut db = match app.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, context.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};

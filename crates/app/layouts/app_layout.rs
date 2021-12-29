@@ -1,6 +1,6 @@
 use anyhow::Result;
 use pinwheel::prelude::*;
-use tangram_app_common::Context;
+use tangram_app_core::App;
 use tangram_app_ui::topbar::{Topbar, TopbarAvatar};
 
 pub struct AppLayoutInfo {
@@ -27,8 +27,8 @@ impl Component for AppLayout {
 	}
 }
 
-pub async fn app_layout_info(context: &Context) -> Result<AppLayoutInfo> {
-	let topbar_avatar = if context.options.auth_enabled() {
+pub async fn app_layout_info(app: &App) -> Result<AppLayoutInfo> {
+	let topbar_avatar = if app.options.auth_enabled() {
 		Some(TopbarAvatar { avatar_url: None })
 	} else {
 		None

@@ -4,7 +4,8 @@ use memmap::Mmap;
 use num::ToPrimitive;
 use sqlx::prelude::*;
 use std::{collections::BTreeMap, sync::Arc};
-use tangram_app_common::{
+use tangram_app_context::Context;
+use tangram_app_core::{
 	error::{bad_request, service_unavailable},
 	model::get_model_bytes,
 	monitor_event::{
@@ -12,11 +13,10 @@ use tangram_app_common::{
 		NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,
 		TrueValueMonitorEvent,
 	},
+	production_metrics::ProductionMetrics,
+	production_stats::ProductionStats,
 	storage::Storage,
-	Context,
 };
-use tangram_app_production_metrics::ProductionMetrics;
-use tangram_app_production_stats::ProductionStats;
 use tangram_id::Id;
 use tracing::error;
 
@@ -29,6 +29,7 @@ enum MonitorEventSet {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
+	let app = &context.app;
 	let bytes = match hyper::body::to_bytes(request.body_mut()).await {
 		Ok(bytes) => bytes,
 		Err(e) => {
@@ -47,7 +48,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		MonitorEventSet::Single(monitor_event) => vec![monitor_event],
 		MonitorEventSet::Multiple(monitor_event) => monitor_event,
 	};
-	let mut db = match context.database_pool.begin().await {
+	let mut db = match app.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
@@ -57,7 +58,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			MonitorEvent::Prediction(monitor_event) => {
 				let handle_prediction_result = handle_prediction_monitor_event(
 					&mut db,
-					&context.storage,
+					&app.storage,
 					&mut model_cache,
 					monitor_event,
 				)
@@ -70,7 +71,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			MonitorEvent::TrueValue(monitor_event) => {
 				let handle_true_value_result = handle_true_value_monitor_event(
 					&mut db,
-					&context.storage,
+					&app.storage,
 					&mut model_cache,
 					monitor_event,
 				)

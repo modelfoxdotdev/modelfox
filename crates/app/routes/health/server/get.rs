@@ -1,10 +1,10 @@
 use anyhow::Result;
 use std::sync::Arc;
-use tangram_app_common::Context;
+use tangram_app_context::Context;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	match context.database_pool.acquire().await {
+	match context.app.database_pool.acquire().await {
 		Ok(_) => {
 			let response = http::Response::builder()
 				.status(http::StatusCode::OK)

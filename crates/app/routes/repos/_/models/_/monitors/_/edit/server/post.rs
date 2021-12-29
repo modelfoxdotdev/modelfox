@@ -2,7 +2,8 @@ use crate::page::Page;
 use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use std::{str, str::FromStr, sync::Arc};
-use tangram_app_common::{
+use tangram_app_context::Context;
+use tangram_app_core::{
 	alerts::{
 		check_for_duplicate_monitor, delete_monitor, extract_threshold_bounds, get_monitor,
 		update_monitor, validate_threshold_bounds, AlertCadence, AlertMethod, AlertMetric,
@@ -12,7 +13,6 @@ use tangram_app_common::{
 	model::get_model_bytes,
 	path_components,
 	user::{authorize_user, authorize_user_for_model, authorize_user_for_repo},
-	Context,
 };
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_id::Id;
@@ -40,6 +40,7 @@ struct UpdateMonitorAction {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let app = &context.app;
 	let (repo_id, model_id, monitor_id) = if let ["repos", repo_id, "models", model_id, "monitors", monitor_id, "edit"] =
 		*path_components(request).as_slice()
 	{
@@ -51,11 +52,11 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	} else {
 		bail!("unexpected path");
 	};
-	let mut db = match context.database_pool.begin().await {
+	let mut db = match app.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, context.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -84,11 +85,11 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			return Ok(bad_request());
 		}
 	};
-	let bytes = get_model_bytes(&context.storage, model_id).await?;
+	let bytes = get_model_bytes(&app.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model_type = AlertModelType::from(model.inner());
 	let model_layout_info =
-		model_layout_info(&mut db, &context, model_id, ModelNavItem::Monitors).await?;
+		model_layout_info(&mut db, &app, model_id, ModelNavItem::Monitors).await?;
 	match action {
 		Action::Delete => {
 			delete_monitor(&mut db, &monitor_id).await?;

@@ -2,12 +2,13 @@ use anyhow::{anyhow, bail, Result};
 use lettre::AsyncTransport;
 use sqlx::prelude::*;
 use std::sync::Arc;
-use tangram_app_common::{
+use tangram_app_context::Context;
+use tangram_app_core::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
 	path_components,
 	user::NormalUser,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
-	Context,
+	App,
 };
 use tangram_id::Id;
 use url::Url;
@@ -20,6 +21,7 @@ struct Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
+	let app = &context.app;
 	let organization_id = if let ["organizations", organization_id, "members", "new"] =
 		*path_components(request).as_slice()
 	{
@@ -27,10 +29,10 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	} else {
 		bail!("unexpected path");
 	};
-	if !context.options.auth_enabled() {
+	if !app.options.auth_enabled() {
 		return Ok(not_found());
 	}
-	let mut db = match context.database_pool.begin().await {
+	let mut db = match app.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
@@ -53,7 +55,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(action) => action,
 		Err(_) => return Ok(bad_request()),
 	};
-	let response = add_member(action, user, &mut db, &context, organization_id).await?;
+	let response = add_member(action, user, &mut db, &app, organization_id).await?;
 	db.commit().await?;
 	Ok(response)
 }
@@ -62,7 +64,7 @@ async fn add_member(
 	action: Action,
 	user: NormalUser,
 	db: &mut sqlx::Transaction<'_, sqlx::Any>,
-	context: &Context,
+	app: &App,
 	organization_id: Id,
 ) -> Result<http::Response<hyper::Body>> {
 	// Create the new user.
@@ -114,8 +116,8 @@ async fn add_member(
 	.execute(&mut *db)
 	.await?;
 	// Send the new user an invitation email.
-	if let Some(smtp_transport) = context.smtp_transport.clone() {
-		let url = context
+	if let Some(smtp_transport) = app.smtp_transport.clone() {
+		let url = app
 			.options
 			.url
 			.clone()

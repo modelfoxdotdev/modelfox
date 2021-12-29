@@ -6,10 +6,8 @@ use pinwheel::prelude::*;
 use rand::Rng;
 use sqlx::prelude::*;
 use std::sync::Arc;
-use tangram_app_common::{
-	error::{bad_request, service_unavailable},
-	Context,
-};
+use tangram_app_context::Context;
+use tangram_app_core::error::{bad_request, service_unavailable};
 use tangram_id::Id;
 
 #[derive(serde::Deserialize)]
@@ -20,6 +18,7 @@ struct Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
+	let app = &context.app;
 	// Read the post data.
 	let data = match hyper::body::to_bytes(request.body_mut()).await {
 		Ok(data) => data,
@@ -29,7 +28,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(data) => data,
 		Err(_) => return Ok(bad_request()),
 	};
-	let mut db = match context.database_pool.begin().await {
+	let mut db = match app.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
@@ -64,7 +63,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	.await?
 	.get(0);
 	let user_id: Id = user_id.parse()?;
-	if context.options.auth_enabled() {
+	if app.options.auth_enabled() {
 		if let Some(code) = code {
 			// Verify the code.
 			let ten_minutes_in_seconds: i32 = 10 * 60;
@@ -140,7 +139,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			.bind(&code)
 			.execute(&mut *db)
 			.await?;
-			if let Some(smtp_transport) = context.smtp_transport.clone() {
+			if let Some(smtp_transport) = app.smtp_transport.clone() {
 				send_code_email(smtp_transport, email.clone(), code).await?;
 			}
 			db.commit().await?;
@@ -156,7 +155,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	}
 	let token = create_token(&mut db, user_id).await?;
 	db.commit().await?;
-	let set_cookie = set_cookie_header_value(token, context.options.cookie_domain.as_deref());
+	let set_cookie = set_cookie_header_value(token, app.options.cookie_domain.as_deref());
 	let response = http::Response::builder()
 		.status(http::StatusCode::SEE_OTHER)
 		.header(http::header::LOCATION, "/")

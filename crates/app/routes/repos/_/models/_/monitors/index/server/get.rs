@@ -5,19 +5,20 @@ use chrono_tz::Tz;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
-use tangram_app_common::{
+use tangram_app_context::Context;
+use tangram_app_core::{
 	alerts::Monitor,
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	path_components,
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
-	Context,
 };
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
+	let app = &context.app;
 	let timezone = get_timezone(request);
 	let model_id = if let ["repos", _, "models", model_id, "monitors", ""] =
 		path_components(request).as_slice()
@@ -26,11 +27,11 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	} else {
 		bail!("unexpected path - model");
 	};
-	let mut db = match context.database_pool.begin().await {
+	let mut db = match app.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, context.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -42,7 +43,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		return Ok(not_found());
 	}
 	let model_layout_info =
-		model_layout_info(&mut db, &context, model_id, ModelNavItem::Monitors).await?;
+		model_layout_info(&mut db, &app, model_id, ModelNavItem::Monitors).await?;
 	let rows = sqlx::query(
 		"
 			select

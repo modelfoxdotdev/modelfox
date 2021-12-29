@@ -2,11 +2,13 @@ use crate::page::{Page, Stage};
 use anyhow::Result;
 use pinwheel::prelude::*;
 use std::sync::Arc;
-use tangram_app_common::{error::not_found, Context};
+use tangram_app_context::Context;
+use tangram_app_core::error::not_found;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	if !context.options.auth_enabled() {
+	let app = &context.app;
+	if !app.options.auth_enabled() {
 		return Ok(not_found());
 	}
 	#[derive(serde::Deserialize)]

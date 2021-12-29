@@ -2,18 +2,19 @@ use crate::page::{Page, RocCurveData};
 use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use std::sync::Arc;
-use tangram_app_common::{
+use tangram_app_context::Context;
+use tangram_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
 	path_components,
 	user::{authorize_user, authorize_user_for_model},
-	Context,
 };
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
+	let app = &context.app;
 	let model_id = if let ["repos", _, "models", model_id, "training_metrics", "roc"] =
 		path_components(request).as_slice()
 	{
@@ -21,11 +22,11 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	} else {
 		bail!("unexpected path");
 	};
-	let mut db = match context.database_pool.begin().await {
+	let mut db = match app.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, context.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -36,7 +37,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
-	let bytes = get_model_bytes(&context.storage, model_id).await?;
+	let bytes = get_model_bytes(&app.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
 	let page = match model.inner() {
 		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
@@ -52,7 +53,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				.collect();
 			let auc_roc = test_metrics.auc_roc();
 			let model_layout_info =
-				model_layout_info(&mut db, &context, model_id, ModelNavItem::TrainingMetrics)
+				model_layout_info(&mut db, &app, model_id, ModelNavItem::TrainingMetrics)
 					.await?;
 			Page {
 				id: model_id.to_string(),

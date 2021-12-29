@@ -16,7 +16,8 @@ hyper = { version = "0.14", features = ["full"] }
 num = "0.4"
 pinwheel = "0.2"
 sunfish = "0.3"
-tangram_app_common = { path = "../../../../../../../../common" }
+tangram_app_context = { path = "../../../../../../../../context" }
+tangram_app_core = { path = "../../../../../../../../core" }
 tangram_app_layouts = { path = "../../../../../../../../layouts" }
 tangram_app_training_grid_common = { path = "../../common" }
 tangram_charts = { path = "../../../../../../../../../charts" }
