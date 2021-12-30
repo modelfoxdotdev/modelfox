@@ -107,7 +107,7 @@
             (inputs.windows_sdk.defaultPackage.${system})
           ];
           outputHashMode = "recursive";
-          outputHash = "sha256-AU2gXKk2F1iNYjL+njZctf1Vq3R/nB/eCeO7qRo/3Kg=";
+          outputHash = "sha256-T3cV5GuluEF1GBWVvFu1JA4DtY9xQJECJC2lnDmAe54";
         }
         ''
           windows_sdk \
