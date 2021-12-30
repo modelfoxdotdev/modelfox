@@ -101,6 +101,25 @@
           (targets.x86_64-pc-windows-gnu.toolchainOf toolchain).rust-std
           (targets.x86_64-pc-windows-msvc.toolchainOf toolchain).rust-std
         ]);
+      windows_sdk = pkgs.runCommand "windows_sdk"
+        {
+          nativeBuildInputs = [
+            (inputs.windows_sdk.defaultPackage.${system})
+          ];
+          outputHashMode = "recursive";
+          outputHash = "sha256-AU2gXKk2F1iNYjL+njZctf1Vq3R/nB/eCeO7qRo/3Kg=";
+        }
+        ''
+          windows_sdk \
+            --manifest-url \
+              https://download.visualstudio.microsoft.com/download/pr/b763973d-da6e-4025-834d-d8bc48e7d37f/81eb5576c4f6514b8744516eac345f5bb062723cec3dbd36aba0594a50482ef3/VisualStudio.vsman \
+            --package-ids \
+              Microsoft.VisualStudio.VC.Llvm.Clang \
+              Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
+              Microsoft.VisualStudio.Component.Windows10SDK.19041 \
+            --cache $(mktemp -d) \
+            --output $out
+        '';
     in
     {
       devShell = pkgs.mkShell {
@@ -109,7 +128,7 @@
           cachix
           cargo-insta
           cargo-outdated
-          clang_13
+          clang_12
           createrepo_c
           doxygen
           dpkg
@@ -117,8 +136,8 @@
           gnupg
           go
           libiconv
-          lld_13
-          llvm_13
+          lld_12
+          llvm_12
           mold
           nodejs-16_x
           (php.withExtensions ({ all, ... }: with all; [
@@ -239,23 +258,21 @@
         AR_x86_64_pc_windows_msvc = "llvm-lib";
         CARGO_TARGET_X86_64_PC_WINDOWS_MSVC_LINKER = pkgs.writeShellScriptBin "linker" ''
           lld-link \
-            /libpath:$WINDOWS_SDK/crt/lib/x64 \
-            /libpath:$WINDOWS_SDK/sdk/lib/x64 \
-            /libpath:$WINDOWS_SDK/sdk/lib/x64/ucrt \
-            /libpath:$WINDOWS_SDK/sdk/lib/x64/um \
+            /libpath:"${windows_sdk}/VC/Tools/Llvm/lib" \
+            /libpath:"${windows_sdk}/VC/Tools/MSVC/14.29.30133/lib/x64" \
+            /libpath:"${windows_sdk}/Windows Kits/10/Lib/10.0.19041.0/ucrt/x64" \
+            /libpath:"${windows_sdk}/Windows Kits/10/Lib/10.0.19041.0/um/x64" \
             $@
         '' + /bin/linker;
         CC_x86_64_pc_windows_msvc = pkgs.writeShellScriptBin "cc" ''
           clang-cl \
-            /I $WINDOWS_SDK/clang/include \
-            /I $WINDOWS_SDK/crt/include \
-            /I $WINDOWS_SDK/sdk/include \
-            /I $WINDOWS_SDK/sdk/include/shared \
-            /I $WINDOWS_SDK/sdk/include/ucrt \
-            /I $WINDOWS_SDK/sdk/include/um \
+            /I "${windows_sdk}/VC/Tools/Llvm/lib/clang/12.0.0/include" \
+            /I "${windows_sdk}/VC/Tools/MSVC/14.29.30133/include" \
+            /I "${windows_sdk}/Windows Kits/10/Include/10.0.19041.0/ucrt" \
+            /I "${windows_sdk}/Windows Kits/10/Include/10.0.19041.0/um" \
+            /I "${windows_sdk}/Windows Kits/10/Include/10.0.19041.0/shared" \
             $@
         '' + /bin/cc;
-        WINDOWS_SDK = inputs.windows_sdk.defaultPackage.${system};
       };
     }
     );
