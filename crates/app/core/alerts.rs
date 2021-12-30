@@ -368,7 +368,7 @@ pub struct AlertData {
 
 pub async fn get_monitor(
 	db: &mut sqlx::Transaction<'_, sqlx::Any>,
-	monitor_id: &str,
+	monitor_id: Id,
 ) -> Result<Monitor> {
 	let result = sqlx::query(
 		"
@@ -380,7 +380,7 @@ pub async fn get_monitor(
 				id = $1
 		",
 	)
-	.bind(monitor_id.to_owned())
+	.bind(monitor_id.to_string())
 	.fetch_one(db)
 	.await?;
 	let monitor: String = result.get(0);
@@ -488,7 +488,7 @@ pub async fn delete_monitor(
 pub async fn update_monitor(
 	db: &mut sqlx::Transaction<'_, sqlx::Any>,
 	new_monitor: &Monitor,
-	monitor_id: &str,
+	monitor_id: Id,
 ) -> Result<()> {
 	let monitor_json = serde_json::to_string(new_monitor)?;
 	sqlx::query(

@@ -5,8 +5,8 @@ use std::{str, str::FromStr, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	alerts::{
-		check_for_duplicate_monitor, delete_monitor, extract_threshold_bounds, get_monitor,
-		update_monitor, validate_threshold_bounds, AlertCadence, AlertMethod, AlertMetric,
+		delete_monitor, extract_threshold_bounds, get_monitor,
+		validate_threshold_bounds, AlertCadence, AlertMethod, AlertMetric,
 		AlertModelType, Monitor, MonitorThreshold, MonitorThresholdMode,
 	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -127,7 +127,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			let threshold_bounds = validate_threshold_bounds(threshold_lower, threshold_upper);
 			if threshold_bounds.is_none() {
 				let page = Page {
-					monitor: get_monitor(&mut db, &monitor_id).await?,
+					monitor: get_monitor(&mut db, Id::from_str(&monitor_id)?).await?,
 					monitor_id,
 					model_layout_info,
 					model_type,
@@ -142,41 +142,34 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			}
 			let (variance_lower, variance_upper) =
 				extract_threshold_bounds(threshold_bounds.unwrap())?;
-			let mut monitor = Monitor {
-				cadence: AlertCadence::from_str(&cadence)?,
-				id: Id::generate(),
-				methods,
-				model_id,
-				threshold: MonitorThreshold {
-					metric,
-					mode: MonitorThresholdMode::from_str(&mode)?,
-					variance_lower,
-					variance_upper,
-				},
-				title,
+			let threshold = MonitorThreshold {
+				metric,
+				mode: MonitorThresholdMode::from_str(&mode)?,
+				variance_lower,
+				variance_upper,
 			};
-			if monitor.title.is_empty() {
-				monitor.title = monitor.default_title();
-			}
-			if check_for_duplicate_monitor(&mut db, &monitor, model_id).await? {
-				let page = Page {
-					monitor,
-					monitor_id,
-					model_layout_info,
-					model_type,
-					error: Some("Identical monitor already exists.".to_owned()),
-				};
-				let html = html(page);
-				let response = http::Response::builder()
-					.status(http::StatusCode::BAD_REQUEST)
-					.body(hyper::Body::from(html))
-					.unwrap();
-				return Ok(response);
-			}
-			let result = update_monitor(&mut db, &monitor, &monitor_id).await;
+			let cadence = AlertCadence::from_str(&cadence)?;
+			let result = app
+				.update_monitor(
+					&mut db,
+					Id::from_str(&monitor_id)?,
+					cadence,
+					&methods,
+					model_id,
+					threshold,
+					&title,
+				)
+				.await;
 			if result.is_err() {
 				let page = Page {
-					monitor,
+					monitor: Monitor {
+						cadence,
+						id: Id::from_str(&monitor_id)?,
+						methods,
+						model_id,
+						threshold,
+						title,
+					},
 					monitor_id,
 					model_layout_info,
 					model_type,

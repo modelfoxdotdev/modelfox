@@ -5,9 +5,8 @@ use std::{str, str::FromStr, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	alerts::{
-		check_for_duplicate_monitor, create_monitor, extract_threshold_bounds,
-		validate_threshold_bounds, AlertCadence, AlertMethod, AlertMetric, AlertModelType, Monitor,
-		MonitorThreshold, MonitorThresholdMode,
+		extract_threshold_bounds, validate_threshold_bounds, AlertCadence, AlertMethod,
+		AlertMetric, AlertModelType, MonitorThreshold, MonitorThresholdMode,
 	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
@@ -109,41 +108,27 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		return Ok(response);
 	}
 	let (variance_lower, variance_upper) = extract_threshold_bounds(threshold_bounds.unwrap())?;
-	let mut monitor = Monitor {
-		cadence: AlertCadence::from_str(&cadence)?,
-		id: Id::generate(),
-		methods,
-		model_id,
-		threshold: MonitorThreshold {
-			metric,
-			mode: MonitorThresholdMode::from_str(&mode)?,
-			variance_lower,
-			variance_upper,
-		},
-		title,
+	let threshold = MonitorThreshold {
+		metric,
+		mode: MonitorThresholdMode::from_str(&mode)?,
+		variance_lower,
+		variance_upper,
 	};
-	if monitor.title.is_empty() {
-		monitor.title = monitor.default_title();
-	}
-	if check_for_duplicate_monitor(&mut db, &monitor, model_id).await? {
-		let page = Page {
-			model_layout_info,
-			model_type,
-			error: Some("Identical alert already exists.".to_owned()),
-		};
-		let html = html(page);
-		let response = http::Response::builder()
-			.status(http::StatusCode::BAD_REQUEST)
-			.body(hyper::Body::from(html))
-			.unwrap();
-		return Ok(response);
-	}
-	let result = create_monitor(&mut db, monitor, model_id).await;
+	let result = app
+		.create_monitor(
+			&mut db,
+			AlertCadence::from_str(&cadence)?,
+			&methods,
+			model_id,
+			threshold,
+			&title,
+		)
+		.await;
 	if result.is_err() {
 		let page = Page {
 			model_layout_info,
 			model_type,
-			error: Some("There was an error creating your alert.".to_owned()),
+			error: Some(result.err().unwrap().to_string()),
 		};
 		let html = html(page);
 		let response = http::Response::builder()
