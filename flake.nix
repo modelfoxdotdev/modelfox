@@ -48,30 +48,12 @@
               doCheck = false;
             });
             zig = super.zig.overrideAttrs (_: {
-              src = self.fetchFromGitHub {
-                owner = "ziglang";
-                repo = "zig";
-                rev = "adf059f272dfd3c1652bce774c0b6c204d5d6b8b";
-                hash = "sha256-pnNfvdLBN8GrVHz+Cf5QX3VHC+s3jjNO/vtzgGD132Y=";
-              };
               patches = [
                 (self.fetchpatch {
                   url = "https://github.com/ziglang/zig/pull/9771.patch";
                   sha256 = "sha256-AaMNNBET/x0f3a9oxpgBZXnUdKH4bydKMLJfXLBmvZo=";
                 })
               ];
-              nativeBuildInputs = with self; [
-                cmake
-                llvmPackages_13.llvm.dev
-              ];
-              buildInputs = with self; [
-                libxml2
-                zlib
-              ] ++ (with llvmPackages_13; [
-                libclang
-                lld
-                llvm
-              ]);
             });
           })
         ];
