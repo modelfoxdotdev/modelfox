@@ -311,6 +311,8 @@ fn build_containers(version: &str) {
 			"build",
 			"--platform",
 			platform,
+			"-f",
+			&dockerfile_path,
 			"--tag",
 			tag,
 			&root_path,

@@ -380,9 +380,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "3.0.0-rc.9"
+version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c7843ae7a539bef687e018bf9edf7e87728024b29d02b0f8409726be8880ae1a"
+checksum = "d17bf219fcd37199b9a29e00ba65dfb8cd5b2688b7297ec14ff829c40ac50ca9"
 dependencies = [
  "atty",
  "bitflags",
@@ -397,9 +397,9 @@ dependencies = [
 
 [[package]]
 name = "clap_derive"
-version = "3.0.0-rc.9"
+version = "3.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cae3cc2f259ea636871f5da15b0ac033f1821d7a5506c3d1bfbdde201f14c803"
+checksum = "e1b9752c030a14235a0bd5ef3ad60a1dcac8468c30921327fc8af36b20c790b9"
 dependencies = [
  "heck",
  "proc-macro-error",
@@ -904,14 +904,15 @@ dependencies = [
 
 [[package]]
 name = "futures-signals"
-version = "0.3.23"
+version = "0.3.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "402d707a810e5fddfb1d5ff44174ffa96c6c1b136e7019cef5c9ef87c8977592"
+checksum = "439b5920b9dc57ddd4a959b4b1c0eb9a68ded001f1e331d422b0a68ef2928c5f"
 dependencies = [
  "discard",
  "futures-channel",
  "futures-core",
  "futures-util",
+ "log",
  "pin-project",
  "serde",
 ]
@@ -2986,7 +2987,7 @@ dependencies = [
  "base64 0.13.0",
  "chrono",
  "chrono-tz",
- "clap 3.0.0-rc.9",
+ "clap 3.0.0",
  "futures",
  "glob",
  "http",
@@ -4219,7 +4220,7 @@ dependencies = [
  "anyhow",
  "cbindgen",
  "chrono",
- "clap 3.0.0-rc.9",
+ "clap 3.0.0",
  "digest 0.10.1",
  "dirs 4.0.0",
  "duct",
@@ -4263,7 +4264,7 @@ dependencies = [
  "anyhow",
  "backtrace",
  "bytes",
- "clap 3.0.0-rc.9",
+ "clap 3.0.0",
  "colored",
  "csv",
  "dirs 4.0.0",
@@ -4336,7 +4337,7 @@ dependencies = [
 name = "tangram_dev"
 version = "0.0.0"
 dependencies = [
- "clap 3.0.0-rc.9",
+ "clap 3.0.0",
  "sunfish",
  "tokio",
 ]
@@ -4413,7 +4414,7 @@ dependencies = [
  "anyhow",
  "base64 0.13.0",
  "chrono",
- "clap 3.0.0-rc.9",
+ "clap 3.0.0",
  "duct",
  "indoc 1.0.3",
  "pem",
@@ -4430,7 +4431,7 @@ name = "tangram_linear"
 version = "0.7.0"
 dependencies = [
  "buffalo",
- "clap 3.0.0-rc.9",
+ "clap 3.0.0",
  "ndarray",
  "num",
  "rayon",
@@ -4563,7 +4564,7 @@ version = "0.7.0"
 dependencies = [
  "bitvec",
  "buffalo",
- "clap 3.0.0-rc.9",
+ "clap 3.0.0",
  "itertools",
  "ndarray",
  "num",
@@ -4621,7 +4622,7 @@ name = "tangram_www"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "clap 3.0.0-rc.9",
+ "clap 3.0.0",
  "futures",
  "http",
  "hyper",
@@ -5356,9 +5357,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-subscriber"
-version = "0.3.4"
+version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d5e6136799e1079699e0d9784c883e03af55cf6a1bee48fe1d79ca552c1bc36f"
+checksum = "5d81bfa81424cc98cb034b837c985b7a290f592e5b4322f353f94a0ab0f9f594"
 dependencies = [
  "ansi_term",
  "lazy_static",
@@ -5816,7 +5817,7 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "base64 0.13.0",
- "clap 3.0.0-rc.9",
+ "clap 3.0.0",
  "indoc 1.0.3",
  "regex",
  "serde",

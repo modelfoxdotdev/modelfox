@@ -16,7 +16,7 @@ path = "main.rs"
 [dependencies]
 anyhow = "1"
 base64 = "0.13"
-clap = { version = "3.0.0-rc.9", features = ["derive"] }
+clap = { version = "3", features = ["derive"] }
 indoc = "1"
 regex = "1.5"
 serde = "1"
