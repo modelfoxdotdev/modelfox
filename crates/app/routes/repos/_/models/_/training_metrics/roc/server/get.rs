@@ -53,8 +53,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				.collect();
 			let auc_roc = test_metrics.auc_roc();
 			let model_layout_info =
-				model_layout_info(&mut db, &app, model_id, ModelNavItem::TrainingMetrics)
-					.await?;
+				model_layout_info(&mut db, app, model_id, ModelNavItem::TrainingMetrics).await?;
 			Page {
 				id: model_id.to_string(),
 				class: binary_classifier.positive_class().to_owned(),

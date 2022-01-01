@@ -55,7 +55,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(action) => action,
 		Err(_) => return Ok(bad_request()),
 	};
-	let response = add_member(action, user, &mut db, &app, organization_id).await?;
+	let response = add_member(action, user, &mut db, app, organization_id).await?;
 	db.commit().await?;
 	Ok(response)
 }

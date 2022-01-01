@@ -17,16 +17,25 @@ pub struct App {
 	pub storage: self::storage::Storage,
 }
 
+pub struct CreateMonitorArgs<'a, 't> {
+	pub db: &'a mut sqlx::Transaction<'t, sqlx::Any>,
+	pub cadence: AlertCadence,
+	pub methods: &'a [AlertMethod],
+	pub model_id: Id,
+	pub threshold: MonitorThreshold,
+	pub title: &'a str,
+}
+
 impl App {
-	pub async fn create_monitor(
-		&self,
-		db: &mut sqlx::Transaction<'_, sqlx::Any>,
-		cadence: AlertCadence,
-		methods: &[AlertMethod],
-		model_id: Id,
-		threshold: MonitorThreshold,
-		title: &str,
-	) -> Result<()> {
+	pub async fn create_monitor(&self, args: CreateMonitorArgs<'_, '_>) -> Result<()> {
+		let CreateMonitorArgs {
+			db,
+			cadence,
+			methods,
+			model_id,
+			threshold,
+			title,
+		} = args;
 		let mut monitor = Monitor {
 			cadence,
 			id: Id::generate(),
@@ -38,32 +47,40 @@ impl App {
 		if monitor.title.is_empty() {
 			monitor.title = monitor.default_title();
 		}
-
 		if check_for_duplicate_monitor(db, &monitor, model_id).await? {
 			return Err(anyhow!("Identical alert already exists"));
 		}
-
 		create_monitor(db, monitor, model_id).await?;
-
 		Ok(())
 	}
+}
 
-	pub async fn update_monitor(
-		&self,
-		db: &mut sqlx::Transaction<'_, sqlx::Any>,
-		monitor_id: Id,
-		cadence: AlertCadence,
-		methods: &[AlertMethod],
-		model_id: Id,
-		threshold: MonitorThreshold,
-		title: &str,
-	) -> Result<()> {
+pub struct UpdateMonitorArgs<'a, 't> {
+	pub db: &'a mut sqlx::Transaction<'t, sqlx::Any>,
+	pub monitor_id: Id,
+	pub cadence: AlertCadence,
+	pub methods: &'a [AlertMethod],
+	pub model_id: Id,
+	pub threshold: MonitorThreshold,
+	pub title: &'a str,
+}
+
+impl App {
+	pub async fn update_monitor(&self, args: UpdateMonitorArgs<'_, '_>) -> Result<()> {
+		let UpdateMonitorArgs {
+			db,
+			monitor_id,
+			cadence,
+			methods,
+			model_id,
+			threshold,
+			title,
+		} = args;
 		let mut monitor = get_monitor(db, monitor_id).await?;
 		let mut title = title.to_owned();
 		if title.is_empty() {
 			title = monitor.default_title();
 		}
-
 		// Replace any components that are different.
 		if cadence != monitor.cadence {
 			monitor.cadence = cadence;
@@ -77,13 +94,10 @@ impl App {
 		if title != monitor.title {
 			monitor.title = title;
 		}
-
 		if check_for_duplicate_monitor(db, &monitor, model_id).await? {
 			return Err(anyhow!("Identical alert already exists"));
 		}
-
 		update_monitor(db, &monitor, monitor_id).await?;
-
 		Ok(())
 	}
 }

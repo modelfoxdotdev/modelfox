@@ -28,7 +28,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	if !app.options.auth_enabled() {
 		return Ok(not_found());
 	}
-	let app_layout_info = app_layout_info(&app).await?;
+	let app_layout_info = app_layout_info(app).await?;
 	let mut db = match app.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),

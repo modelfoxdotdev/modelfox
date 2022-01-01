@@ -67,7 +67,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	};
 	let model_hyperparameters = hyperparameters_for_grid_item(&grid_item);
 	let model_layout_info =
-		model_layout_info(&mut db, &app, model_id, ModelNavItem::TrainingGrid).await?;
+		model_layout_info(&mut db, app, model_id, ModelNavItem::TrainingGrid).await?;
 	let page = Page {
 		id: model_id.to_string(),
 		model_grid_item_identifier: grid_item_id.to_owned(),

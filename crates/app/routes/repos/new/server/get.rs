@@ -21,7 +21,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
-	let app_layout_info = app_layout_info(&app).await?;
+	let app_layout_info = app_layout_info(app).await?;
 	let owners = match user {
 		User::Root => None,
 		User::Normal(user) => {

@@ -113,7 +113,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		}
 	};
 	let model_layout_info =
-		model_layout_info(&mut db, &app, model_id, ModelNavItem::ProductionStats).await?;
+		model_layout_info(&mut db, app, model_id, ModelNavItem::ProductionStats).await?;
 	let page = Page {
 		model_id: model_id.to_string(),
 		model_layout_info,

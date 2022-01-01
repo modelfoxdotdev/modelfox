@@ -42,8 +42,8 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model_type = AlertModelType::from(model.inner());
 	let model_layout_info =
-		model_layout_info(&mut db, &app, model_id, ModelNavItem::Monitors).await?;
-	let monitor = get_monitor(&mut db, Id::from_str(&monitor_id)?).await?;
+		model_layout_info(&mut db, app, model_id, ModelNavItem::Monitors).await?;
+	let monitor = get_monitor(&mut db, Id::from_str(monitor_id)?).await?;
 	let page = Page {
 		monitor,
 		monitor_id: monitor_id.to_string(),

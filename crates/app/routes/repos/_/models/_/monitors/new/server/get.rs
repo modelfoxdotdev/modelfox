@@ -49,7 +49,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model_type = AlertModelType::from(model.inner());
 	let model_layout_info =
-		model_layout_info(&mut db, &app, model_id, ModelNavItem::Monitors).await?;
+		model_layout_info(&mut db, app, model_id, ModelNavItem::Monitors).await?;
 	let page = Page {
 		model_layout_info,
 		model_type,

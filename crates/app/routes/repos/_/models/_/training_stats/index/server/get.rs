@@ -42,7 +42,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let bytes = get_model_bytes(&app.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model_layout_info =
-		model_layout_info(&mut db, &app, model_id, ModelNavItem::TrainingStats).await?;
+		model_layout_info(&mut db, app, model_id, ModelNavItem::TrainingStats).await?;
 	let page = match model.inner() {
 		tangram_model::ModelInnerReader::Regressor(regressor) => {
 			let regressor = regressor.read();

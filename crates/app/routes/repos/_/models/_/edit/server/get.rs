@@ -40,7 +40,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
-	let app_layout_info = app_layout_info(&app).await?;
+	let app_layout_info = app_layout_info(app).await?;
 	let row = sqlx::query(
 		"
 			select

@@ -93,8 +93,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		}
 		tangram_model::ModelInnerReader::MulticlassClassifier(_) => None,
 	};
-	let model_layout_info =
-		model_layout_info(&mut db, &app, model_id, ModelNavItem::Tuning).await?;
+	let model_layout_info = model_layout_info(&mut db, app, model_id, ModelNavItem::Tuning).await?;
 	let page = Page {
 		model_layout_info,
 		tuning,

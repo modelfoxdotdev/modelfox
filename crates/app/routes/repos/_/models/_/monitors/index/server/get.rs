@@ -43,7 +43,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		return Ok(not_found());
 	}
 	let model_layout_info =
-		model_layout_info(&mut db, &app, model_id, ModelNavItem::Monitors).await?;
+		model_layout_info(&mut db, app, model_id, ModelNavItem::Monitors).await?;
 	let rows = sqlx::query(
 		"
 			select

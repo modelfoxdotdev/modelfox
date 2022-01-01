@@ -21,7 +21,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
-	let app_layout_info = app_layout_info(&app).await?;
+	let app_layout_info = app_layout_info(app).await?;
 	let repos = match user {
 		User::Root => repos_for_root(&mut db).await?,
 		User::Normal(user) => repos_for_user(&mut db, &user).await?,

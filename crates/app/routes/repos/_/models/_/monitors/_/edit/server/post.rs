@@ -5,9 +5,9 @@ use std::{str, str::FromStr, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	alerts::{
-		delete_monitor, extract_threshold_bounds, get_monitor,
-		validate_threshold_bounds, AlertCadence, AlertMethod, AlertMetric,
-		AlertModelType, Monitor, MonitorThreshold, MonitorThresholdMode,
+		delete_monitor, extract_threshold_bounds, get_monitor, validate_threshold_bounds,
+		AlertCadence, AlertMethod, AlertMetric, AlertModelType, Monitor, MonitorThreshold,
+		MonitorThresholdMode,
 	},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
@@ -89,7 +89,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model_type = AlertModelType::from(model.inner());
 	let model_layout_info =
-		model_layout_info(&mut db, &app, model_id, ModelNavItem::Monitors).await?;
+		model_layout_info(&mut db, app, model_id, ModelNavItem::Monitors).await?;
 	match action {
 		Action::Delete => {
 			delete_monitor(&mut db, &monitor_id).await?;
@@ -149,17 +149,16 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				variance_upper,
 			};
 			let cadence = AlertCadence::from_str(&cadence)?;
-			let result = app
-				.update_monitor(
-					&mut db,
-					Id::from_str(&monitor_id)?,
-					cadence,
-					&methods,
-					model_id,
-					threshold,
-					&title,
-				)
-				.await;
+			let args = tangram_app_core::app::UpdateMonitorArgs {
+				db: &mut db,
+				monitor_id: Id::from_str(&monitor_id)?,
+				cadence,
+				methods: &methods,
+				model_id,
+				threshold,
+				title: &title,
+			};
+			let result = app.update_monitor(args).await;
 			if result.is_err() {
 				let page = Page {
 					monitor: Monitor {

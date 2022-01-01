@@ -51,7 +51,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		return Ok(not_found());
 	}
 	let model_layout_info =
-		model_layout_info(&mut db, &app, model_id, ModelNavItem::ProductionPredictions).await?;
+		model_layout_info(&mut db, app, model_id, ModelNavItem::ProductionPredictions).await?;
 	let id: Id = match id.parse() {
 		Ok(id) => id,
 		Err(_) => return Ok(bad_request()),

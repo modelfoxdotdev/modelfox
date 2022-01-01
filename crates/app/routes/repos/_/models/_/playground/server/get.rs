@@ -58,7 +58,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let bytes = get_model_bytes(&app.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model_layout_info =
-		model_layout_info(&mut db, &app, model_id, ModelNavItem::Playground).await?;
+		model_layout_info(&mut db, app, model_id, ModelNavItem::Playground).await?;
 	let inner = compute_inner(model, search_params);
 	let page = Page {
 		model_layout_info,

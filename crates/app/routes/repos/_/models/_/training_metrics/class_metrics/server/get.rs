@@ -76,7 +76,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let false_negatives = class_metrics.false_negatives();
 	let false_positives = class_metrics.false_positives();
 	let model_layout_info =
-		model_layout_info(&mut db, &app, model_id, ModelNavItem::TrainingMetrics).await?;
+		model_layout_info(&mut db, app, model_id, ModelNavItem::TrainingMetrics).await?;
 	let precision_recall_section = PrecisionRecallSection {
 		f1_score,
 		precision,

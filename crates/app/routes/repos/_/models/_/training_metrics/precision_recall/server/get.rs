@@ -61,7 +61,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		)
 		.collect();
 	let model_layout_info =
-		model_layout_info(&mut db, &app, model_id, ModelNavItem::TrainingMetrics).await?;
+		model_layout_info(&mut db, app, model_id, ModelNavItem::TrainingMetrics).await?;
 	let page = Page {
 		class: model.positive_class().to_owned(),
 		precision_recall_curve_series,

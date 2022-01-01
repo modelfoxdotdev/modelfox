@@ -82,7 +82,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let bytes = get_model_bytes(&app.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model_layout_info =
-		model_layout_info(&mut db, &app, model_id, ModelNavItem::ProductionStats).await?;
+		model_layout_info(&mut db, app, model_id, ModelNavItem::ProductionStats).await?;
 	let get_production_stats_output =
 		get_production_stats(&mut db, model, date_window, date_window_interval, timezone).await?;
 	let overall_train_row_count = match model.inner() {

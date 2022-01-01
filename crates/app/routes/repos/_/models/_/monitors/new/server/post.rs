@@ -72,7 +72,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model_type = AlertModelType::from(model.inner());
 	let model_layout_info =
-		model_layout_info(&mut db, &app, model_id, ModelNavItem::Monitors).await?;
+		model_layout_info(&mut db, app, model_id, ModelNavItem::Monitors).await?;
 	let Action {
 		cadence,
 		email,
@@ -114,16 +114,15 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		variance_lower,
 		variance_upper,
 	};
-	let result = app
-		.create_monitor(
-			&mut db,
-			AlertCadence::from_str(&cadence)?,
-			&methods,
-			model_id,
-			threshold,
-			&title,
-		)
-		.await;
+	let args = tangram_app_core::app::CreateMonitorArgs {
+		db: &mut db,
+		cadence: AlertCadence::from_str(&cadence)?,
+		methods: &methods,
+		model_id,
+		threshold,
+		title: &title,
+	};
+	let result = app.create_monitor(args).await;
 	if result.is_err() {
 		let page = Page {
 			model_layout_info,

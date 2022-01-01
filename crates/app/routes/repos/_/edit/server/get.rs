@@ -35,7 +35,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	if !authorize_user_for_repo(&mut db, &user, repo_id).await? {
 		return Ok(not_found());
 	};
-	let app_layout_info = app_layout_info(&app).await?;
+	let app_layout_info = app_layout_info(app).await?;
 	let repo = get_repo(&mut db, repo_id).await?;
 	let page = Page {
 		app_layout_info,

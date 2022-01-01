@@ -54,13 +54,8 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
-	let model_layout_info = model_layout_info(
-		&mut db,
-		&app,
-		model_id,
-		ModelNavItem::ProductionPredictions,
-	)
-	.await?;
+	let model_layout_info =
+		model_layout_info(&mut db, app, model_id, ModelNavItem::ProductionPredictions).await?;
 	let after = search_params.as_ref().and_then(|s| s.after);
 	let before = search_params.as_ref().and_then(|s| s.before);
 	let rows = match (after, before) {

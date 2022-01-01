@@ -41,7 +41,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		return Ok(not_found());
 	};
 	let repo = get_repo(&mut db, repo_id).await?;
-	let app_layout_info = app_layout_info(&app).await?;
+	let app_layout_info = app_layout_info(app).await?;
 	let rows = sqlx::query(
 		"
 			select
