@@ -1,4 +1,4 @@
-use super::app::default_database_url;
+use tangram_app_core::app::default_database_url;
 use crate::MigrateArgs;
 use anyhow::Result;
 
@@ -7,5 +7,5 @@ pub fn migrate(args: MigrateArgs) -> Result<()> {
 		Some(database_url) => database_url.parse()?,
 		None => default_database_url(),
 	};
-	tangram_app::migrate(database_url)
+	tangram_app_core::app::migrate(database_url)
 }

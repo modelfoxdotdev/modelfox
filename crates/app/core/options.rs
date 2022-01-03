@@ -1,3 +1,4 @@
+use crate::app::{data_path, default_database_url};
 use std::net::IpAddr;
 use std::path::PathBuf;
 use url::Url;
@@ -54,5 +55,41 @@ pub struct S3StorageOptions {
 impl Options {
 	pub fn auth_enabled(&self) -> bool {
 		self.auth.is_some()
+	}
+}
+
+impl Default for Options {
+	fn default() -> Self {
+		let host: IpAddr = if let Ok(host) = std::env::var("HOST") {
+			host.parse()
+				.expect("Could not parse HOST environment variable")
+		} else {
+			"0.0.0.0".parse().unwrap()
+		};
+		let port = if let Ok(port) = std::env::var("PORT") {
+			port.parse()
+				.expect("Could not parse PORT environment variable")
+		} else {
+			8080u16
+		};
+		let database = DatabaseOptions {
+			max_connections: None,
+			url: default_database_url(),
+		};
+		let storage = StorageOptions::Local(LocalStorageOptions {
+			path: data_path()
+				.expect("Could not read or create tangram data directory")
+				.join("data"),
+		});
+		Options {
+			auth: None,
+			cookie_domain: None,
+			database,
+			host,
+			port,
+			smtp: None,
+			storage,
+			url: None,
+		}
 	}
 }

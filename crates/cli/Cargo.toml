@@ -15,7 +15,7 @@ path = "main.rs"
 default = ["train", "serve", "app"]
 train = []
 serve = ["bytes", "hyper", "tokio", "tangram_serve"]
-app = ["tangram_app", "tangram_app/default"]
+app = ["tangram_app_core", "tangram_app", "tangram_app/default"]
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
@@ -34,6 +34,7 @@ rayon = "1.5"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_yaml = "0.8"
+tangram_app_core = { path = "../app/core", optional = true }
 tangram_app = { path = "../app", default-features = false, optional = true }
 tangram_core = { path = "../core" }
 tangram_id = { path = "../id" }

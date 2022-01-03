@@ -1,7 +1,10 @@
 use crate::AppArgs;
-use anyhow::{anyhow, bail, Result};
+use anyhow::{bail, Result};
 use std::path::PathBuf;
 use url::Url;
+
+#[cfg(feature = "tangram_app")]
+use tangram_app_core::app::{cache_path, data_path, default_database_url};
 
 #[derive(Clone, serde::Deserialize)]
 struct AppConfig {
@@ -188,45 +191,4 @@ pub fn app(args: AppArgs) -> Result<()> {
 		url,
 	};
 	tangram_app::run(options)
-}
-
-/// Retrieve the user cache directory using the `dirs` crate.
-#[cfg(feature = "tangram_app")]
-fn cache_path() -> Result<PathBuf> {
-	let cache_dir =
-		dirs::cache_dir().ok_or_else(|| anyhow!("failed to find user cache directory"))?;
-	let tangram_cache_dir = cache_dir.join("tangram");
-	std::fs::create_dir_all(&tangram_cache_dir).map_err(|_| {
-		anyhow!(
-			"failed to create tangram cache directory in {}",
-			tangram_cache_dir.display()
-		)
-	})?;
-	Ok(tangram_cache_dir)
-}
-
-/// Retrieve the user data directory using the `dirs` crate.
-#[cfg(feature = "tangram_app")]
-fn data_path() -> Result<PathBuf> {
-	let data_dir = dirs::data_dir().ok_or_else(|| anyhow!("failed to find user data directory"))?;
-	let tangram_data_dir = data_dir.join("tangram");
-	std::fs::create_dir_all(&tangram_data_dir).map_err(|_| {
-		anyhow!(
-			"failed to create tangram data directory in {}",
-			tangram_data_dir.display()
-		)
-	})?;
-	Ok(tangram_data_dir)
-}
-
-/// Retrieve the default database url, which is a sqlite database in the user data directory.
-#[cfg(feature = "tangram_app")]
-pub fn default_database_url() -> Url {
-	let tangram_database_path = data_path().unwrap().join("db").join("tangram.db");
-	std::fs::create_dir_all(tangram_database_path.parent().unwrap()).unwrap();
-	let url = format!(
-		"sqlite:{}",
-		tangram_database_path.to_str().unwrap().to_owned()
-	);
-	Url::parse(&url).unwrap()
 }
