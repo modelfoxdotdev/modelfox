@@ -18,14 +18,14 @@ enum Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app = &context.app;
+	let app_state = &context.app.state;
 	let organization_id =
 		if let ["organizations", organization_id, ""] = *path_components(request).as_slice() {
 			organization_id.to_owned()
 		} else {
 			bail!("unexpected path");
 		};
-	if !app.options.auth_enabled() {
+	if !app_state.options.auth_enabled() {
 		return Ok(not_found());
 	}
 	let data = match hyper::body::to_bytes(request.body_mut()).await {
@@ -36,7 +36,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(action) => action,
 		Err(_) => return Ok(bad_request()),
 	};
-	let mut db = match app.database_pool.begin().await {
+	let mut db = match app_state.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};

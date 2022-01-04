@@ -24,7 +24,7 @@ mod train;
 )]
 struct Args {
 	#[clap(subcommand)]
-	subcommand: Subcommand
+	subcommand: Subcommand,
 }
 
 #[derive(Parser)]

@@ -18,18 +18,18 @@ use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app = &context.app;
+	let app_state = &context.app.state;
 	let organization_id =
 		if let ["organizations", organization_id, ""] = *path_components(request).as_slice() {
 			organization_id.to_owned()
 		} else {
 			bail!("unexpected path");
 		};
-	if !app.options.auth_enabled() {
+	if !app_state.options.auth_enabled() {
 		return Ok(not_found());
 	}
-	let app_layout_info = app_layout_info(app).await?;
-	let mut db = match app.database_pool.begin().await {
+	let app_layout_info = app_layout_info(app_state).await?;
+	let mut db = match app_state.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};

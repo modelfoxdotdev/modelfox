@@ -5,7 +5,7 @@ use crate::{
 	},
 	model::get_model_bytes,
 	production_metrics::{ProductionMetrics, ProductionPredictionMetricsOutput},
-	App,
+	AppState,
 };
 use anyhow::{anyhow, Result};
 //use lettre::AsyncTransport;
@@ -96,7 +96,7 @@ impl AlertMethod {
 	pub async fn send_alert(
 		&self,
 		exceeded_thresholds: &[&AlertResult],
-		_context: &App,
+		_context: &AppState,
 	) -> Result<()> {
 		match self {
 			AlertMethod::Email(_address) => {
@@ -396,7 +396,7 @@ pub async fn get_monitor(
 	Ok(monitor)
 }
 
-pub async fn get_overdue_monitors(app: &App) -> Result<Monitors> {
+pub async fn get_overdue_monitors(app: &AppState) -> Result<Monitors> {
 	let mut db = app.database_pool.begin().await?;
 	let rows = sqlx::query(
 		"
@@ -516,7 +516,11 @@ pub async fn update_monitor(
 }
 
 /// Read the model, find the training metric value for the given AlertMetric
-pub async fn find_current_data(metric: AlertMetric, model_id: Id, context: &App) -> Result<f32> {
+pub async fn find_current_data(
+	metric: AlertMetric,
+	model_id: Id,
+	context: &AppState,
+) -> Result<f32> {
 	// Grab the model from the DB
 	let bytes = get_model_bytes(&context.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
@@ -572,7 +576,7 @@ pub async fn find_current_data(metric: AlertMetric, model_id: Id, context: &App)
 }
 
 /// Manage periodic alerting
-pub async fn alert_manager(app: &App) -> Result<()> {
+pub async fn alert_manager(app: &AppState) -> Result<()> {
 	// TODO - webhook check.
 	// Scrape the DB for any incomplete webhook attempts, and spawn an exponential decay thread for any found
 
@@ -617,7 +621,7 @@ pub async fn alert_manager(app: &App) -> Result<()> {
 	}
 }
 
-async fn handle_monitor(app: &App, monitor: &Monitor) -> Result<()> {
+async fn handle_monitor(app: &AppState, monitor: &Monitor) -> Result<()> {
 	// TODO Do separate for dev and release mode
 	let not_enough_existing_metrics = get_total_production_metrics(app).await?
 		< ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_THRESHOLD;
@@ -660,7 +664,7 @@ async fn handle_monitor(app: &App, monitor: &Monitor) -> Result<()> {
 }
 
 /// Return the current observed values for each heuristic
-async fn check_metrics(preference: &Monitor, context: &App) -> Result<Vec<AlertResult>> {
+async fn check_metrics(preference: &Monitor, context: &AppState) -> Result<Vec<AlertResult>> {
 	let mut results = Vec::new();
 	let current_training_value =
 		find_current_data(preference.threshold.metric, preference.model_id, context).await?;
@@ -687,7 +691,7 @@ async fn check_metrics(preference: &Monitor, context: &App) -> Result<Vec<AlertR
 pub async fn get_production_metric(
 	metric: AlertMetric,
 	model_id: Id,
-	context: &App,
+	context: &AppState,
 ) -> Result<Option<f32>> {
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
@@ -743,7 +747,7 @@ pub async fn get_production_metric(
 	}
 }
 
-async fn get_total_production_metrics(context: &App) -> Result<i64> {
+async fn get_total_production_metrics(context: &AppState) -> Result<i64> {
 	let mut db = match context.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => {
@@ -769,7 +773,7 @@ async fn get_total_production_metrics(context: &App) -> Result<i64> {
 async fn push_alerts(
 	exceeded_thresholds: &[&AlertResult],
 	methods: &[AlertMethod],
-	context: &App,
+	context: &AppState,
 ) -> Result<()> {
 	for method in methods {
 		method.send_alert(exceeded_thresholds, context).await?;

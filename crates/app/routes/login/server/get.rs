@@ -8,7 +8,7 @@ use tangram_app_core::error::not_found;
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let app = &context.app;
-	if !app.options.auth_enabled() {
+	if !app.state.options.auth_enabled() {
 		return Ok(not_found());
 	}
 	#[derive(serde::Deserialize)]

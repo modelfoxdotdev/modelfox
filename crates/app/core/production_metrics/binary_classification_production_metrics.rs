@@ -1,5 +1,5 @@
-use num::ToPrimitive;
 use crate::monitor_event::NumberOrString;
+use num::ToPrimitive;
 
 #[derive(serde::Deserialize, serde::Serialize, Clone)]
 pub struct BinaryClassificationProductionPredictionMetrics {

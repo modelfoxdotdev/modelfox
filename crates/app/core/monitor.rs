@@ -1,7 +1,7 @@
 use super::App;
 use crate::alerts::{
-	check_for_duplicate_monitor, create_monitor, get_monitor, update_monitor,
-	AlertCadence, AlertMethod, Monitor, MonitorThreshold,
+	check_for_duplicate_monitor, create_monitor, get_monitor, update_monitor, AlertCadence,
+	AlertMethod, Monitor, MonitorThreshold,
 };
 use anyhow::{anyhow, Result};
 use tangram_id::Id;

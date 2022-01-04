@@ -15,18 +15,18 @@ use tangram_id::Id;
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app = &context.app;
+	let app_state = &context.app.state;
 	let repo_id = if let ["repos", repo_id, "models", "new"] = *path_components(request).as_slice()
 	{
 		repo_id.to_owned()
 	} else {
 		bail!("unexpected path");
 	};
-	let mut db = match app.database_pool.begin().await {
+	let mut db = match app_state.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, app.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app_state.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -37,7 +37,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	if !authorize_user_for_repo(&mut db, &user, repo_id).await? {
 		return Ok(not_found());
 	}
-	let app_layout_info = app_layout_info(app).await?;
+	let app_layout_info = app_layout_info(app_state).await?;
 	let boundary = match request
 		.headers()
 		.get(http::header::CONTENT_TYPE)
@@ -137,7 +137,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	};
 	let result = add_model_version(
 		&mut db,
-		&app.storage,
+		&app_state.storage,
 		repo_id,
 		model.id().parse().unwrap(),
 		&bytes,

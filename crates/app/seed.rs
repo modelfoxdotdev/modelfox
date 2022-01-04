@@ -5,21 +5,18 @@ use num::ToPrimitive;
 use rand::Rng;
 use std::{collections::HashMap, path::Path};
 use tangram_app_core::{
-	App,
 	monitor_event::{
 		BinaryClassificationPredictOutput, MonitorEvent, MulticlassClassificationPredictOutput,
 		NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,
 		TrueValueMonitorEvent,
 	},
+	App,
 };
 use tangram_id::Id;
 use tangram_table::TableView;
-use url::Url;
 
 #[derive(Parser)]
 pub struct Args {
-	#[clap(long)]
-	pub tangram_url: Url,
 	#[clap(long, arg_enum)]
 	pub dataset: Dataset,
 	#[clap(long)]

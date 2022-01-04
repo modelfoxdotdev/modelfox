@@ -7,7 +7,7 @@ use tangram_app_layouts::app_layout::app_layout_info;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app_layout_info = app_layout_info(&context.app).await?;
+	let app_layout_info = app_layout_info(&context.app.state).await?;
 	let page = Page {
 		app_layout_info,
 		error: None,

@@ -30,7 +30,7 @@ struct Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
-	let app = &context.app;
+	let app_state = &context.app.state;
 	let (repo_id, model_id) = if let ["repos", repo_id, "models", model_id, "monitors", "new"] =
 		*path_components(request).as_slice()
 	{
@@ -38,11 +38,11 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	} else {
 		bail!("unexpected path");
 	};
-	let mut db = match app.database_pool.begin().await {
+	let mut db = match app_state.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, app.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app_state.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -68,11 +68,11 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(action) => action,
 		Err(_) => return Ok(bad_request()),
 	};
-	let bytes = get_model_bytes(&app.storage, model_id).await?;
+	let bytes = get_model_bytes(&app_state.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
 	let model_type = AlertModelType::from(model.inner());
 	let model_layout_info =
-		model_layout_info(&mut db, app, model_id, ModelNavItem::Monitors).await?;
+		model_layout_info(&mut db, app_state, model_id, ModelNavItem::Monitors).await?;
 	let Action {
 		cadence,
 		email,
@@ -122,7 +122,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		threshold,
 		title: &title,
 	};
-	let result = app.create_monitor(args).await;
+	let result = context.app.create_monitor(args).await;
 	if result.is_err() {
 		let page = Page {
 			model_layout_info,

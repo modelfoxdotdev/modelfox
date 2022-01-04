@@ -16,11 +16,11 @@ use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app = &context.app;
-	if !app.options.auth_enabled() {
+	let app_state = &context.app.state;
+	if !app_state.options.auth_enabled() {
 		return Ok(not_found());
 	}
-	let mut db = match app.database_pool.begin().await {
+	let mut db = match app_state.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
@@ -42,7 +42,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	if !authorize_normal_user_for_organization(&mut db, &user, organization_id).await? {
 		return Ok(not_found());
 	}
-	let app_layout_info = app_layout_info(app).await?;
+	let app_layout_info = app_layout_info(app_state).await?;
 	let row = sqlx::query(
 		"
 			select

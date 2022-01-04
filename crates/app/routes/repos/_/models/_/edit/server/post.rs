@@ -25,7 +25,7 @@ struct UpdateTagAction {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app = &context.app;
+	let app_state = &context.app.state;
 	let (repo_id, model_id) = if let ["repos", repo_id, "models", model_id, "edit"] =
 		*path_components(request).as_slice()
 	{
@@ -41,11 +41,11 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(action) => action,
 		Err(_) => return Ok(bad_request()),
 	};
-	let mut db = match app.database_pool.begin().await {
+	let mut db = match app_state.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, app.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app_state.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -58,7 +58,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			if !authorize_user_for_model(&mut db, &user, model_id).await? {
 				return Ok(not_found());
 			};
-			delete_model_version(&mut db, &app.storage, model_id).await?;
+			delete_model_version(&mut db, &app_state.storage, model_id).await?;
 			db.commit().await?;
 			http::Response::builder()
 				.status(http::StatusCode::SEE_OTHER)

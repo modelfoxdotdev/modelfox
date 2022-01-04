@@ -1,10 +1,10 @@
 pub use self::{column_stats::*, number_stats::*, prediction_stats::*};
+use crate::monitor_event::PredictionMonitorEvent;
 use anyhow::Result;
 use chrono::prelude::*;
 use chrono_tz::Tz;
 use num::ToPrimitive;
 use sqlx::prelude::*;
-use crate::monitor_event::PredictionMonitorEvent;
 use tangram_app_ui::date_window::{DateWindow, DateWindowInterval};
 use tangram_zip::zip;
 

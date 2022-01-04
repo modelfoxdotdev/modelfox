@@ -22,7 +22,7 @@ use super::App;
 
 impl App {
 	pub async fn track_events(&self, events: Vec<MonitorEvent>) -> Result<()> {
-		let mut db = match self.database_pool.begin().await {
+		let mut db = match self.state.database_pool.begin().await {
 			Ok(db) => db,
 			Err(_) => return Err(anyhow!("unable to access database pool")),
 		};
@@ -32,7 +32,7 @@ impl App {
 				MonitorEvent::Prediction(monitor_event) => {
 					let handle_prediction_result = handle_prediction_monitor_event(
 						&mut db,
-						&self.storage,
+						&self.state.storage,
 						&mut model_cache,
 						monitor_event,
 					)
@@ -45,7 +45,7 @@ impl App {
 				MonitorEvent::TrueValue(monitor_event) => {
 					let handle_true_value_result = handle_true_value_monitor_event(
 						&mut db,
-						&self.storage,
+						&self.state.storage,
 						&mut model_cache,
 						monitor_event,
 					)

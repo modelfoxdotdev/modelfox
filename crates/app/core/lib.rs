@@ -5,6 +5,7 @@ use crate::{
 };
 use anyhow::{anyhow, bail, Result};
 use std::{path::PathBuf, sync::Arc};
+use tokio::task::JoinHandle;
 use url::Url;
 
 pub mod alerts;
@@ -25,11 +26,16 @@ pub mod timezone;
 pub mod track;
 pub mod user;
 
-pub struct App {
+pub struct AppState {
 	pub database_pool: sqlx::AnyPool,
 	pub options: Options,
 	pub smtp_transport: Option<lettre::AsyncSmtpTransport<lettre::Tokio1Executor>>,
 	pub storage: Storage,
+}
+
+pub struct App {
+	pub state: Arc<AppState>,
+	tasks: Vec<JoinHandle<()>>,
 }
 
 struct CreateDatabasePoolOptions {
@@ -121,7 +127,7 @@ pub fn default_database_url() -> Url {
 	Url::parse(&url).unwrap()
 }
 impl App {
-	pub async fn new(options: Options) -> Result<Arc<Self>> {
+	pub async fn new(options: Options) -> Result<Self> {
 		// Create the database pool.
 		let database_pool = create_database_pool(CreateDatabasePoolOptions {
 			database_max_connections: options.database.max_connections,
@@ -156,19 +162,23 @@ impl App {
 				options.cache_path,
 			)?),
 		};
-		let app = App {
+		let state = AppState {
 			database_pool,
 			options,
 			smtp_transport,
 			storage,
 		};
-		let app = Arc::new(app);
-		tokio::spawn({
-			let app = Arc::clone(&app);
+		let state = Arc::new(state);
+		let alert_manager_handle = tokio::spawn({
+			let state = Arc::clone(&state);
 			async move {
-				alert_manager(&app).await.unwrap();
+				alert_manager(&state).await.unwrap();
 			}
 		});
+		let app = App {
+			state,
+			tasks: vec![alert_manager_handle],
+		};
 		Ok(app)
 	}
 }

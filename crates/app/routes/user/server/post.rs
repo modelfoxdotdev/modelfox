@@ -15,11 +15,11 @@ enum Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app = &context.app;
-	if !app.options.auth_enabled() {
+	let app_state = &context.app.state;
+	if !app_state.options.auth_enabled() {
 		return Ok(not_found());
 	}
-	let mut db = match app.database_pool.begin().await {
+	let mut db = match app_state.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};

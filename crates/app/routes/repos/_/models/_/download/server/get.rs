@@ -24,11 +24,11 @@ pub async fn download_inner(
 		} else {
 			bail!("unexpected path");
 		};
-	let mut db = match app.database_pool.begin().await {
+	let mut db = match app.state.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, app.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app.state.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -39,7 +39,7 @@ pub async fn download_inner(
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
-	let bytes = get_model_bytes(&app.storage, model_id).await?;
+	let bytes = get_model_bytes(&app.state.storage, model_id).await?;
 	let bytes = bytes.to_owned();
 	db.commit().await?;
 	let response = http::Response::builder()

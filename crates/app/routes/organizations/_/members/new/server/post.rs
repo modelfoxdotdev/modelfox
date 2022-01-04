@@ -8,7 +8,7 @@ use tangram_app_core::{
 	path_components,
 	user::NormalUser,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
-	App,
+	AppState,
 };
 use tangram_id::Id;
 use url::Url;
@@ -21,7 +21,7 @@ struct Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app = &context.app;
+	let app_state = &context.app.state;
 	let organization_id = if let ["organizations", organization_id, "members", "new"] =
 		*path_components(request).as_slice()
 	{
@@ -29,10 +29,10 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	} else {
 		bail!("unexpected path");
 	};
-	if !app.options.auth_enabled() {
+	if !app_state.options.auth_enabled() {
 		return Ok(not_found());
 	}
-	let mut db = match app.database_pool.begin().await {
+	let mut db = match app_state.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
@@ -55,7 +55,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(action) => action,
 		Err(_) => return Ok(bad_request()),
 	};
-	let response = add_member(action, user, &mut db, app, organization_id).await?;
+	let response = add_member(action, user, &mut db, app_state, organization_id).await?;
 	db.commit().await?;
 	Ok(response)
 }
@@ -64,7 +64,7 @@ async fn add_member(
 	action: Action,
 	user: NormalUser,
 	db: &mut sqlx::Transaction<'_, sqlx::Any>,
-	app: &App,
+	app_state: &AppState,
 	organization_id: Id,
 ) -> Result<http::Response<hyper::Body>> {
 	// Create the new user.
@@ -116,8 +116,8 @@ async fn add_member(
 	.execute(&mut *db)
 	.await?;
 	// Send the new user an invitation email.
-	if let Some(smtp_transport) = app.smtp_transport.clone() {
-		let url = app
+	if let Some(smtp_transport) = app_state.smtp_transport.clone() {
+		let url = app_state
 			.options
 			.url
 			.clone()

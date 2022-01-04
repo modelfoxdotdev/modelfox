@@ -7,7 +7,7 @@ use tangram_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	repos::get_model_version_ids,
 	user::{authorize_user, authorize_user_for_model},
-	App,
+	AppState,
 };
 use tangram_app_ui::topbar::{Topbar, TopbarAvatar};
 use tangram_id::Id;
@@ -46,7 +46,7 @@ impl ModelLayout {
 
 pub async fn model_layout_info(
 	db: &mut sqlx::Transaction<'_, sqlx::Any>,
-	app: &App,
+	app_state: &AppState,
 	model_id: Id,
 	selected_item: ModelNavItem,
 ) -> Result<ModelLayoutInfo> {
@@ -96,7 +96,7 @@ pub async fn model_layout_info(
 	} else {
 		None
 	};
-	let topbar_avatar = if app.options.auth_enabled() {
+	let topbar_avatar = if app_state.options.auth_enabled() {
 		Some(TopbarAvatar { avatar_url: None })
 	} else {
 		None
@@ -128,11 +128,11 @@ pub async fn post(
 ) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let app = &context.app;
-	let mut db = match app.database_pool.begin().await {
+	let mut db = match app.state.database_pool.begin().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, app.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app.state.options.auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};

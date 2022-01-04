@@ -2,7 +2,7 @@ use anyhow::Result;
 use std::sync::Arc;
 use tangram_app_context::Context;
 pub use tangram_app_core::options;
-use tangram_app_core::{App, options::Options};
+use tangram_app_core::{options::Options, App};
 use tracing::error;
 
 pub fn run(options: Options) -> Result<()> {
@@ -47,4 +47,3 @@ async fn handle(mut request: http::Request<hyper::Body>) -> http::Response<hyper
 			.unwrap()
 	})
 }
-
