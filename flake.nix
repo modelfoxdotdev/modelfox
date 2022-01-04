@@ -108,7 +108,7 @@
         '';
       macos_sdk = builtins.fetchTarball {
         url = "https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX11.3.sdk.tar.xz";
-        sha256 = "1ahldqlw9v8wixj9hc3knx3f58178rdkihywvlikss472j2md086";
+        sha256 = "sha256-BoFWhRSHaD0j3dzDOFtGJ6DiRrdzMJhkjxztxCluFKo=";
       };
     in
     {
