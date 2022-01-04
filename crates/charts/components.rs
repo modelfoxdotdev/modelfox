@@ -52,7 +52,7 @@ impl Component for BarChart {
 			group_gap: self.group_gap,
 			hide_legend: self.hide_legend,
 			number_formatter: NumberFormatter::default(),
-			series: self.series.unwrap_or_else(Vec::new),
+			series: self.series.unwrap_or_default(),
 			should_draw_x_axis_labels: self.should_draw_x_axis_labels,
 			should_draw_y_axis_labels: self.should_draw_y_axis_labels,
 			x_axis_title: self.x_axis_title,
@@ -142,7 +142,7 @@ impl Component for BoxChart {
 		let options = BoxChartOptions {
 			hide_legend: self.hide_legend,
 			number_formatter: NumberFormatter::default(),
-			series: self.series.unwrap_or_else(Vec::new),
+			series: self.series.unwrap_or_default(),
 			should_draw_x_axis_labels: self.should_draw_x_axis_labels,
 			should_draw_y_axis_labels: self.should_draw_y_axis_labels,
 			title: self.title.clone(),
@@ -226,7 +226,7 @@ pub struct FeatureContributionsChart {
 impl Component for FeatureContributionsChart {
 	fn into_node(self) -> Node {
 		let chart_config = ChartConfig::default();
-		let mut series = self.series.unwrap_or_else(Vec::new);
+		let mut series = self.series.unwrap_or_default();
 		let n_series = series.len();
 		// Compress the feature contributions chart series on the server assuming a reasonable chart width to avoid sending too much data to the client.
 		compress_feature_contributions_chart_series(
@@ -332,7 +332,7 @@ impl Component for LineChart {
 			hide_legend: self.hide_legend,
 			labels: self.labels,
 			number_formatter: NumberFormatter::default(),
-			series: self.series.unwrap_or_else(Vec::new),
+			series: self.series.unwrap_or_default(),
 			should_draw_x_axis_labels: self.should_draw_x_axis_labels,
 			should_draw_y_axis_labels: self.should_draw_y_axis_labels,
 			title: self.title.clone(),

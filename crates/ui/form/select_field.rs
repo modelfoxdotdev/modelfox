@@ -36,7 +36,7 @@ pub struct SelectFieldOption {
 
 impl Component for SelectField {
 	fn into_node(self) -> Node {
-		let options = self.options.unwrap_or_else(Vec::new);
+		let options = self.options.unwrap_or_default();
 		let value = self.value;
 		let autocomplete = value.as_ref().map(|_| "off".to_owned());
 		let oninput = {

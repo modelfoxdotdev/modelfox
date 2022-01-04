@@ -129,7 +129,7 @@ checksum = "460a75eac8f3cb7683e0a9a588a83c3ff039331ea7bfbfbfcecf1dacab276e11"
 dependencies = [
  "anyhow",
  "attohttpc",
- "dirs 4.0.0",
+ "dirs",
  "rust-ini",
  "serde",
  "serde-xml-rs",
@@ -637,15 +637,6 @@ dependencies = [
 
 [[package]]
 name = "dirs"
-version = "3.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "30baa043103c9d0c2a57cf537cc2f35623889dc0d405e6c3cccfadbc81c71309"
-dependencies = [
- "dirs-sys",
-]
-
-[[package]]
-name = "dirs"
 version = "4.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ca3aa72a6f96ea37bbc5aa912f6788242832f75369bdfdadcb0e38423f100059"
@@ -788,6 +779,18 @@ dependencies = [
  "crc32fast",
  "libc",
  "miniz_oxide",
+]
+
+[[package]]
+name = "flume"
+version = "0.10.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "24c3fd473b3a903a62609e413ed7538f99e10b665ecb502b5e481a95283f8ab4"
+dependencies = [
+ "futures-core",
+ "futures-sink",
+ "pin-project",
+ "spin 0.9.2",
 ]
 
 [[package]]
@@ -2763,6 +2766,9 @@ name = "spin"
 version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "511254be0c5bcf062b019a6c89c01a664aa359ded62f78aa72c6fc137c0590e5"
+dependencies = [
+ "lock_api",
+]
 
 [[package]]
 name = "spki"
@@ -2786,8 +2792,9 @@ dependencies = [
 
 [[package]]
 name = "sqlx"
-version = "0.5.9"
-source = "git+https://github.com/launchbadge/sqlx#f0d0f2f2e9955c5c6db0eab66c72e846fd24b0c3"
+version = "0.5.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "692749de69603d81e016212199d73a2e14ee20e2def7d7914919e8db5d4d48b9"
 dependencies = [
  "sqlx-core",
  "sqlx-macros",
@@ -2795,8 +2802,9 @@ dependencies = [
 
 [[package]]
 name = "sqlx-core"
-version = "0.5.9"
-source = "git+https://github.com/launchbadge/sqlx#f0d0f2f2e9955c5c6db0eab66c72e846fd24b0c3"
+version = "0.5.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "518be6f6fff5ca76f985d434f9c37f3662af279642acf730388f271dff7b9016"
 dependencies = [
  "ahash 0.7.6",
  "atoi",
@@ -2808,17 +2816,19 @@ dependencies = [
  "crossbeam-channel",
  "crossbeam-queue",
  "crossbeam-utils",
- "dirs 3.0.2",
+ "dirs",
  "either",
+ "flume",
  "futures-channel",
  "futures-core",
+ "futures-executor",
  "futures-intrusive",
  "futures-util",
  "hashlink",
  "hex",
  "hmac",
  "indexmap",
- "itoa 0.4.8",
+ "itoa 1.0.1",
  "libc",
  "libsqlite3-sys",
  "log",
@@ -2847,8 +2857,9 @@ dependencies = [
 
 [[package]]
 name = "sqlx-macros"
-version = "0.5.9"
-source = "git+https://github.com/launchbadge/sqlx#f0d0f2f2e9955c5c6db0eab66c72e846fd24b0c3"
+version = "0.5.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "38e45140529cf1f90a5e1c2e561500ca345821a1c513652c8f486bbf07407cc8"
 dependencies = [
  "dotenv",
  "either",
@@ -2864,8 +2875,9 @@ dependencies = [
 
 [[package]]
 name = "sqlx-rt"
-version = "0.5.9"
-source = "git+https://github.com/launchbadge/sqlx#f0d0f2f2e9955c5c6db0eab66c72e846fd24b0c3"
+version = "0.5.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8061cbaa91ee75041514f67a09398c65a64efed72c90151ecd47593bad53da99"
 dependencies = [
  "once_cell",
  "tokio",
@@ -4224,7 +4236,7 @@ dependencies = [
  "chrono",
  "clap 3.0.0",
  "digest 0.10.1",
- "dirs 4.0.0",
+ "dirs",
  "duct",
  "flate2",
  "hex",
@@ -4239,7 +4251,6 @@ dependencies = [
  "tar",
  "tempfile",
  "url",
- "which",
 ]
 
 [[package]]
@@ -4269,7 +4280,7 @@ dependencies = [
  "clap 3.0.0",
  "colored",
  "csv",
- "dirs 4.0.0",
+ "dirs",
  "either",
  "hyper",
  "insta",

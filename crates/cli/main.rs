@@ -22,7 +22,13 @@ mod train;
 	about = "Train and deploy a machine learning model in minutes.",
 	setting = clap::AppSettings::DisableHelpSubcommand,
 )]
-enum Args {
+struct Args {
+	#[clap(subcommand)]
+	subcommand: Subcommand
+}
+
+#[derive(Parser)]
+enum Subcommand {
 	#[cfg(feature = "train")]
 	#[clap(name = "train")]
 	Train(Box<TrainArgs>),
@@ -128,7 +134,7 @@ pub struct AppArgs {
 	long_about = "Migrate your app database to the latest version."
 )]
 pub struct MigrateArgs {
-	#[clap(long, env = "DATABASE_URL")]
+	#[clap(long)]
 	database_url: Option<String>,
 }
 

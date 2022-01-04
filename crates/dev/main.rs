@@ -11,9 +11,9 @@ pub struct Args {
 	child_host: std::net::IpAddr,
 	#[clap(long, default_value = "8081")]
 	child_port: u16,
-	#[clap(long = "watch", multiple_occurrences = true)]
+	#[clap(long = "watch")]
 	watch_paths: Vec<PathBuf>,
-	#[clap(long = "ignore", multiple_occurrences = true)]
+	#[clap(long = "ignore")]
 	ignore_paths: Vec<PathBuf>,
 	#[clap(long)]
 	command: String,

@@ -10,9 +10,6 @@ members = [
 	"languages/rust/examples/*",
 ]
 
-[patch.crates-io]
-sqlx = { git = "https://github.com/launchbadge/sqlx" }
-
 [profile.dev.build-override]
 debug-assertions = false
 opt-level = 3

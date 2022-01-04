@@ -14,7 +14,7 @@ path = "main.rs"
 anyhow = { version = "1", features = ["backtrace"] }
 cbindgen = "0.20"
 chrono = { version = "0.4", features = ["serde"] }
-clap = { version = "3", features = ["derive", "env"] }
+clap = { version = "3", features = ["derive"] }
 digest = "0.10"
 dirs = "4"
 duct = "0.13"
@@ -31,4 +31,3 @@ sha2 = "0.10"
 tar = "0.4"
 tempfile = "3"
 url = { version = "2", features = ["serde"] }
-which = "4"

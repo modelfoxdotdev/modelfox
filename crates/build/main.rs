@@ -8,13 +8,12 @@ use sha1::Sha1;
 use sha2::Sha256;
 use std::path::{Path, PathBuf};
 use tempfile::tempdir;
-use which::which;
 
 #[derive(Parser)]
 pub struct Args {
-	#[clap(long, env)]
+	#[clap(long)]
 	version: String,
-	#[clap(long, env, default_value = "https://pkgs.tangram.dev")]
+	#[clap(long, default_value = "https://pkgs.tangram.dev")]
 	pkgs_url: String,
 }
 
@@ -55,9 +54,9 @@ fn compile() {
 		"--package",
 		"tangram_python",
 	]);
-	cmd(which("cargo").unwrap(), args).run().unwrap();
+	cmd("cargo", args).run().unwrap();
 	cmd!(
-		which("cargo").unwrap(),
+		"cargo",
 		"build",
 		"--release",
 		"--target",
