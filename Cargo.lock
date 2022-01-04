@@ -3102,7 +3102,7 @@ dependencies = [
  "anyhow",
  "chrono",
  "chrono-tz",
- "dirs 4.0.0",
+ "dirs",
  "fnv",
  "http",
  "hyper",

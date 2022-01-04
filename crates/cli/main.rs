@@ -165,17 +165,17 @@ pub struct ServeArgs {
 fn main() {
 	setup_tracing();
 	let args = Args::parse();
-	let result = match args {
+	let result = match args.subcommand {
 		#[cfg(feature = "train")]
-		Args::Train(args) => self::train::train(*args),
+		Subcommand::Train(args) => self::train::train(*args),
 		#[cfg(feature = "train")]
-		Args::Predict(args) => self::predict::predict(*args),
+		Subcommand::Predict(args) => self::predict::predict(*args),
 		#[cfg(feature = "tangram_app")]
-		Args::App(args) => self::app::app(*args),
+		Subcommand::App(args) => self::app::app(*args),
 		#[cfg(feature = "tangram_app")]
-		Args::Migrate(args) => self::migrate::migrate(*args),
+		Subcommand::Migrate(args) => self::migrate::migrate(*args),
 		#[cfg(feature = "serve")]
-		Args::Serve(args) => self::serve::serve(*args),
+		Subcommand::Serve(args) => self::serve::serve(*args),
 	};
 	if let Err(error) = result {
 		eprintln!("{}: {}", "error".red().bold(), error);
