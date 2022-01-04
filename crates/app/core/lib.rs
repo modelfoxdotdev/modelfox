@@ -35,7 +35,7 @@ pub struct AppState {
 
 pub struct App {
 	pub state: Arc<AppState>,
-	tasks: Vec<JoinHandle<()>>,
+	_tasks: Vec<JoinHandle<()>>,
 }
 
 struct CreateDatabasePoolOptions {
@@ -126,6 +126,7 @@ pub fn default_database_url() -> Url {
 	);
 	Url::parse(&url).unwrap()
 }
+
 impl App {
 	pub async fn new(options: Options) -> Result<Self> {
 		// Create the database pool.
@@ -177,7 +178,7 @@ impl App {
 		});
 		let app = App {
 			state,
-			tasks: vec![alert_manager_handle],
+			_tasks: vec![alert_manager_handle],
 		};
 		Ok(app)
 	}
