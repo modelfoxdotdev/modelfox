@@ -814,13 +814,13 @@ fn build_release(version: &str) {
 	}
 }
 
-const TARGETS: [Target; 6] = [
+const TARGETS: [Target; 8] = [
 	Target::AArch64LinuxGnu,
 	Target::AArch64LinuxMusl,
-	// Target::AArch64MacOs,
+	Target::AArch64MacOs,
 	Target::X8664LinuxGnu,
 	Target::X8664LinuxMusl,
-	// Target::X8664MacOs,
+	Target::X8664MacOs,
 	Target::X8664WindowsGnu,
 	Target::X8664WindowsMsvc,
 ];

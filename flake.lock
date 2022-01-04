@@ -180,11 +180,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1640983067,
-        "narHash": "sha256-+baSBTJ9OG7JdXHxIlSBQyjfmT0mdQothAd9irrKZtk=",
+        "lastModified": 1641154864,
+        "narHash": "sha256-3lvAsZanMAoajRFVLe1yZrr8LRv0QviEGOcGh0rTwck=",
         "owner": "tangramdotdev",
         "repo": "windows_sdk",
-        "rev": "0ce80b3c8f1b8e4ee2320979cc42b36d2da925f1",
+        "rev": "aceda6213da4ef87b886460156268f6f33377905",
         "type": "github"
       },
       "original": {
