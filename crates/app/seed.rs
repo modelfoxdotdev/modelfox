@@ -4,10 +4,13 @@ use clap::{ArgEnum, Parser};
 use num::ToPrimitive;
 use rand::Rng;
 use std::{collections::HashMap, path::Path};
-use tangram_app_core::monitor_event::{
-	BinaryClassificationPredictOutput, MonitorEvent, MulticlassClassificationPredictOutput,
-	NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,
-	TrueValueMonitorEvent,
+use tangram_app_core::{
+	app::App,
+	monitor_event::{
+		BinaryClassificationPredictOutput, MonitorEvent, MulticlassClassificationPredictOutput,
+		NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,
+		TrueValueMonitorEvent,
+	},
 };
 use tangram_id::Id;
 use tangram_table::TableView;
@@ -63,7 +66,8 @@ const IRIS: DatasetConfig = DatasetConfig {
 	class_names: Some(&["Iris Setosa", "Iris Versicolor", "Iris Virginica"]),
 };
 
-pub fn main() -> Result<()> {
+#[tokio::main]
+pub async fn main() -> Result<()> {
 	let args = Args::parse();
 	let dataset = match args.dataset {
 		Dataset::Boston => BOSTON,
@@ -109,9 +113,10 @@ pub fn main() -> Result<()> {
 			events
 		})
 		.collect();
-	for events in events.chunks(100) {
-		track_events(&args.tangram_url, events);
-	}
+
+	let app = App::new(tangram_app_core::options::Options::default()).await?;
+
+	app.track_events(events).await?;
 	Ok(())
 }
 
@@ -242,11 +247,4 @@ fn get_random_row(table: TableView) -> HashMap<String, serde_json::Value> {
 			_ => unimplemented!(),
 		})
 		.collect::<HashMap<String, serde_json::Value>>()
-}
-
-fn track_events(tangram_url: &Url, events: &[MonitorEvent]) {
-	let client = reqwest::blocking::Client::new();
-	let mut url = tangram_url.clone();
-	url.set_path("/track");
-	client.post(url).json(&events).send().unwrap();
 }
