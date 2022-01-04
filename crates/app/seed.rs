@@ -5,7 +5,7 @@ use num::ToPrimitive;
 use rand::Rng;
 use std::{collections::HashMap, path::Path};
 use tangram_app_core::{
-	app::App,
+	App,
 	monitor_event::{
 		BinaryClassificationPredictOutput, MonitorEvent, MulticlassClassificationPredictOutput,
 		NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,

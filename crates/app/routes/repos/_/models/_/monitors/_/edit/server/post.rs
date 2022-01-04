@@ -149,7 +149,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				variance_upper,
 			};
 			let cadence = AlertCadence::from_str(&cadence)?;
-			let args = tangram_app_core::app::monitor::UpdateMonitorArgs {
+			let args = tangram_app_core::monitor::UpdateMonitorArgs {
 				db: &mut db,
 				monitor_id: Id::from_str(&monitor_id)?,
 				cadence,

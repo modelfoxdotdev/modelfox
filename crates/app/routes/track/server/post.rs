@@ -2,7 +2,7 @@ use anyhow::Result;
 use std::{collections::BTreeMap, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
-	app::track::{handle_prediction_monitor_event, handle_true_value_monitor_event},
+	track::{handle_prediction_monitor_event, handle_true_value_monitor_event},
 	error::{bad_request, service_unavailable},
 	monitor_event::MonitorEvent,
 };

@@ -1,4 +1,4 @@
-use crate::app::{data_path, default_database_url};
+use crate::{data_path, default_database_url};
 use std::net::IpAddr;
 use std::path::PathBuf;
 use url::Url;

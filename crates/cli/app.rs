@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use url::Url;
 
 #[cfg(feature = "tangram_app")]
-use tangram_app_core::app::{cache_path, data_path, default_database_url};
+use tangram_app_core::{cache_path, data_path, default_database_url};
 
 #[derive(Clone, serde::Deserialize)]
 struct AppConfig {
