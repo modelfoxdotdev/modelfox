@@ -10,7 +10,7 @@ use tangram_app_core::{
 		NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,
 		TrueValueMonitorEvent,
 	},
-	App,
+	App, reset_data
 };
 use tangram_id::Id;
 use tangram_table::TableView;
@@ -52,8 +52,8 @@ pub async fn main() -> Result<()> {
 		tangram_table::Table::from_path(Path::new(dataset.path), Default::default(), &mut |_| {})?;
 	let mut rng = rand::thread_rng();
 
+	reset_data()?;
 	let app = App::new(tangram_app_core::options::Options::default()).await?;
-	app.reset()?;
 	let repo_id = app.create_root_repo("seed repo").await?;
 	let model_id = app.add_model_to_repo(repo_id, dataset.model_path).await?;
 
