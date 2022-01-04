@@ -182,6 +182,12 @@ impl App {
 		};
 		Ok(app)
 	}
+
+	/// Remove all contents of the data dir, including the database
+	pub fn reset(&self) -> Result<()> {
+		std::fs::remove_dir_all(data_path()?)?;
+		Ok(())
+	}
 }
 
 pub fn path_components(request: &http::Request<hyper::Body>) -> Vec<&str> {

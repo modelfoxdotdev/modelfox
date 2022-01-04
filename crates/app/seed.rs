@@ -17,63 +17,46 @@ use tangram_table::TableView;
 
 #[derive(Parser)]
 pub struct Args {
-	#[clap(long, arg_enum)]
-	pub dataset: Dataset,
-	#[clap(long)]
-	pub model_id: String,
 	#[clap(long)]
 	pub examples_count: usize,
 }
 
 #[derive(Clone, ArgEnum)]
 pub enum Dataset {
-	#[clap(name = "boston")]
-	Boston,
 	#[clap(name = "heart_disease")]
 	HeartDisease,
-	#[clap(name = "iris")]
-	Iris,
 }
 
 struct DatasetConfig {
 	path: &'static str,
+	model_path: &'static str,
 	name: &'static str,
 	target: &'static str,
 	class_names: Option<&'static [&'static str]>,
 }
 
-const BOSTON: DatasetConfig = DatasetConfig {
-	path: "data/boston.csv",
-	name: "boston",
-	target: "medv",
-	class_names: None,
-};
-
 const HEART_DISEASE: DatasetConfig = DatasetConfig {
 	path: "data/heart_disease.csv",
+	model_path: "heart_disease.tangram",
 	name: "heart_disease",
 	target: "diagnosis",
 	class_names: Some(&["Negative", "Positive"]),
 };
 
-const IRIS: DatasetConfig = DatasetConfig {
-	path: "data/iris.csv",
-	name: "iris",
-	target: "species",
-	class_names: Some(&["Iris Setosa", "Iris Versicolor", "Iris Virginica"]),
-};
-
 #[tokio::main]
 pub async fn main() -> Result<()> {
 	let args = Args::parse();
-	let dataset = match args.dataset {
-		Dataset::Boston => BOSTON,
-		Dataset::HeartDisease => HEART_DISEASE,
-		Dataset::Iris => IRIS,
-	};
+	// FIXME - const generic for dataset?
+	let dataset = HEART_DISEASE;
 	let table =
 		tangram_table::Table::from_path(Path::new(dataset.path), Default::default(), &mut |_| {})?;
 	let mut rng = rand::thread_rng();
+
+	let app = App::new(tangram_app_core::options::Options::default()).await?;
+	app.reset()?;
+	let repo_id = app.create_root_repo("seed repo").await?;
+	let model_id = app.add_model_to_repo(repo_id, dataset.model_path).await?;
+
 	let events: Vec<MonitorEvent> = (0..args.examples_count)
 		.flat_map(|_| {
 			let id = Id::generate();
@@ -89,7 +72,7 @@ pub async fn main() -> Result<()> {
 				}
 			}
 			let output = generate_fake_prediction(&target, &dataset);
-			let model_id: &str = args.model_id.as_str();
+			let model_id = model_id.to_string();
 			let date = get_random_date();
 			let mut events = vec![MonitorEvent::Prediction(PredictionMonitorEvent {
 				date,
@@ -110,8 +93,6 @@ pub async fn main() -> Result<()> {
 			events
 		})
 		.collect();
-
-	let app = App::new(tangram_app_core::options::Options::default()).await?;
 
 	app.track_events(events).await?;
 	Ok(())

@@ -1,8 +1,9 @@
 use crate::{
 	storage::{Storage, StorageEntity},
 	user::NormalUser,
+	App,
 };
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use chrono::prelude::*;
 use sqlx::prelude::*;
 use tangram_id::Id;
@@ -278,4 +279,17 @@ pub async fn get_model_version_ids(
 	.iter()
 	.map(|row| row.get::<String, _>(0).parse().unwrap())
 	.collect())
+}
+
+impl App {
+	pub async fn create_root_repo(&self, title: &str) -> Result<Id> {
+		let mut db = match self.state.database_pool.begin().await {
+			Ok(db) => db,
+			Err(_) => return Err(anyhow!("unable to access database pool!")),
+		};
+		let id = Id::generate();
+		create_root_repo(&mut db, id, title).await?;
+		db.commit().await?;
+		Ok(id)
+	}
 }
