@@ -47,22 +47,22 @@ impl Component for Predict {
 		.into();
 		let php = ui::doc!(
 			r#"
-			<?php
+				<?php
 
-			namespace tangram\tangram;
+				namespace tangram\tangram;
 
-			require_once(dirname(dirname(__FILE__)) . '/vendor/autoload.php');
+				require_once(dirname(dirname(__FILE__)) . '/vendor/autoload.php');
 
-			$model_path = dirname(dirname(__FILE__)) . '/heart_disease.tangram';
-			$model = Model::from_path($model_path);
+				$model_path = dirname(dirname(__FILE__)) . '/heart_disease.tangram';
+				$model = Model::from_path($model_path);
 
-			$input = [
-			    'age' => 63.0,
-			    'gender' => 'male',
-			    // ..
-			];
+				$input = [
+					'age' => 63.0,
+					'gender' => 'male',
+					// ..
+				];
 
-			$output = $model->predict($input);
+				$output = $model->predict($input);
 			"#
 		)
 		.into();
