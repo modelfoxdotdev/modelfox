@@ -20,7 +20,7 @@ pub enum Language {
 	Elixir,
 	Go,
 	Javascript,
-	PHP,
+	Php,
 	Python,
 	Ruby,
 	Rust,
@@ -113,7 +113,7 @@ impl Component for CodeSelect {
 			Language::Elixir => "elixir".to_owned(),
 			Language::Go => "go".to_owned(),
 			Language::Javascript => "javascript".to_owned(),
-			Language::PHP => "php".to_owned(),
+			Language::Php => "php".to_owned(),
 			Language::Python => "python".to_owned(),
 			Language::Ruby => "ruby".to_owned(),
 			Language::Rust => "rust".to_owned(),
@@ -183,7 +183,7 @@ impl Component for CodeSelect {
 						div()
 							.style(
 								style::DISPLAY,
-								if language == Language::PHP {
+								if language == Language::Php {
 									Some("block")
 								} else {
 									None
@@ -292,7 +292,7 @@ pub fn highlight_code_for_language(code_for_language: CodeForLanguage) -> CodeFo
 		elixir: highlight(&code_for_language.elixir, Language::Elixir).into(),
 		go: highlight(&code_for_language.go, Language::Go).into(),
 		javascript: highlight(&code_for_language.javascript, Language::Javascript).into(),
-		php: highlight(&code_for_language.php, Language::PHP).into(),
+		php: highlight(&code_for_language.php, Language::Php).into(),
 		python: highlight(&code_for_language.python, Language::Python).into(),
 		ruby: highlight(&code_for_language.ruby, Language::Ruby).into(),
 		rust: highlight(&code_for_language.rust, Language::Rust).into(),
@@ -349,7 +349,7 @@ pub fn highlight(code: &str, language: Language) -> String {
 		Language::Elixir => &ELIXIR,
 		Language::Go => &GO,
 		Language::Javascript => &JAVASCRIPT,
-		Language::PHP => &PHP,
+		Language::Php => &PHP,
 		Language::Python => &PYTHON,
 		Language::Ruby => &RUBY,
 		Language::Rust => &RUST,

@@ -55,7 +55,7 @@ impl Component for Markdown {
 								"elixir" => Some(ui::Language::Elixir),
 								"go" => Some(ui::Language::Go),
 								"javscript" => Some(ui::Language::Javascript),
-								"php" => Some(ui::Language::PHP),
+								"php" => Some(ui::Language::Php),
 								"python" => Some(ui::Language::Python),
 								"ruby" => Some(ui::Language::Ruby),
 								"rust" => Some(ui::Language::Rust),
