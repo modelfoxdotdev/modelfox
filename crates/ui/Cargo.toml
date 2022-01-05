@@ -58,5 +58,5 @@ web-sys = { version = "0.3", features = [
 ] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-tree-sitter-highlight = "=0.19"
-tree-sitter-javascript = "=0.19"
+tree-sitter-highlight = "0.20"
+tree-sitter-javascript = "0.20"
