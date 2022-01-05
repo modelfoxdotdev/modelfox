@@ -152,7 +152,6 @@
           zig
         ];
 
-        MACOS_SDK = macos_sdk;
         CARGO_UNSTABLE_MULTITARGET = "true";
 
         # aarch64-linux-gnu
