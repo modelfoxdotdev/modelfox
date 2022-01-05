@@ -5,12 +5,14 @@ use num::ToPrimitive;
 use rand::Rng;
 use std::{collections::HashMap, path::Path};
 use tangram_app_core::{
+	alerts::{AlertCadence, AlertMetric, MonitorThreshold, MonitorThresholdMode},
+	monitor::MonitorConfig,
 	monitor_event::{
 		BinaryClassificationPredictOutput, MonitorEvent, MulticlassClassificationPredictOutput,
 		NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,
 		TrueValueMonitorEvent,
 	},
-	App, reset_data
+	reset_data, App,
 };
 use tangram_id::Id;
 use tangram_table::TableView;
@@ -19,6 +21,8 @@ use tangram_table::TableView;
 pub struct Args {
 	#[clap(long)]
 	pub examples_count: usize,
+	#[clap(long)]
+	pub monitors_count: usize,
 }
 
 #[derive(Clone, ArgEnum)]
@@ -45,6 +49,8 @@ const HEART_DISEASE: DatasetConfig = DatasetConfig {
 
 #[tokio::main]
 pub async fn main() -> Result<()> {
+	// Broadcast channel for handling task shutdown
+	//let (tx, mut rx) = tokio::sync::broadcast::channel(1);
 	let args = Args::parse();
 	// FIXME - const generic for dataset?
 	let dataset = HEART_DISEASE;
@@ -94,8 +100,73 @@ pub async fn main() -> Result<()> {
 		})
 		.collect();
 
+	let monitors: Vec<MonitorConfig> = (0..args.monitors_count)
+		.flat_map(|_| vec![generate_fake_monitor()])
+		.collect();
+
+	for config in monitors {
+		app.create_monitor_from_config(model_id, &config).await?;
+	}
 	app.track_events(events).await?;
 	Ok(())
+}
+
+fn generate_fake_monitor() -> MonitorConfig {
+	let mut rng = rand::thread_rng();
+	// random cadence
+	let cadence = match rng.gen_range(0..4) {
+		0 => AlertCadence::Hourly,
+		1 => AlertCadence::Daily,
+		2 => AlertCadence::Weekly,
+		3 => AlertCadence::Monthly,
+		_ => unreachable!(),
+	};
+
+	let mode = if rng.gen::<bool>() {
+		MonitorThresholdMode::Absolute
+	} else {
+		MonitorThresholdMode::Percentage
+	};
+	// NOTE - what values are valid for aboslute and percentage?  Uses 0..=100 now
+	let mut pick_variance = |_mode: MonitorThresholdMode, force_some: bool| {
+		if force_some || rng.gen::<bool>() {
+			Some(rng.gen_range(0.0..=100.0))
+		} else {
+			None
+		}
+	};
+	// Pick variances, ensuring at least one has a value
+	let variance_lower = pick_variance(mode, false);
+	let variance_upper = pick_variance(mode, variance_lower.is_none());
+	// The only model is a classification, so it will always be one of these
+	let metric = if rng.gen::<bool>() {
+		AlertMetric::RootMeanSquaredError
+	} else {
+		AlertMetric::MeanSquaredError
+	};
+	let threshold = MonitorThreshold {
+		metric,
+		mode,
+		variance_lower,
+		variance_upper,
+	};
+
+	let title = if rng.gen::<bool>() {
+		Some(
+			rng.sample_iter(&rand::distributions::Alphanumeric)
+				.take(rand::thread_rng().gen_range(5..20))
+				.map(char::from)
+				.collect(),
+		)
+	} else {
+		None
+	};
+
+	MonitorConfig {
+		cadence,
+		threshold,
+		title,
+	}
 }
 
 fn generate_fake_prediction(target: &serde_json::Value, dataset: &DatasetConfig) -> PredictOutput {

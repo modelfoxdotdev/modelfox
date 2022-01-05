@@ -34,6 +34,35 @@ impl App {
 		Ok(())
 	}
 
+	pub async fn create_monitor_from_config(
+		&self,
+		model_id: Id,
+		config: &MonitorConfig,
+	) -> Result<()> {
+		let mut db = match self.state.database_pool.begin().await {
+			Ok(db) => db,
+			Err(_) => return Err(anyhow!("unable to access database pool!")),
+		};
+
+		let title = match &config.title {
+			Some(s) => s,
+			None => "",
+		};
+
+		self.create_monitor(CreateMonitorArgs {
+			db: &mut db,
+			cadence: config.cadence,
+			methods: vec![AlertMethod::Stdout].as_slice(),
+			model_id,
+			threshold: config.threshold,
+			title,
+		})
+		.await?;
+
+		db.commit().await?;
+		Ok(())
+	}
+
 	pub async fn update_monitor(&self, args: UpdateMonitorArgs<'_, '_>) -> Result<()> {
 		let UpdateMonitorArgs {
 			db,
@@ -87,4 +116,10 @@ pub struct UpdateMonitorArgs<'a, 't> {
 	pub model_id: Id,
 	pub threshold: MonitorThreshold,
 	pub title: &'a str,
+}
+
+pub struct MonitorConfig {
+	pub cadence: AlertCadence,
+	pub threshold: MonitorThreshold,
+	pub title: Option<String>,
 }

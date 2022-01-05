@@ -184,10 +184,19 @@ impl App {
 	}
 }
 
-	/// Remove all contents of the data dir, including the database
+/*
+impl Drop for App {
+	fn drop(&mut self) {
+		// Notify each task in self.tasks to end.
+		todo!()
+	}
+}
+*/
+
+/// Remove all contents of the data dir, including the database
 pub fn reset_data() -> Result<()> {
-		std::fs::remove_dir_all(data_path()?)?;
-		Ok(())
+	std::fs::remove_dir_all(data_path()?)?;
+	Ok(())
 }
 
 pub fn path_components(request: &http::Request<hyper::Body>) -> Vec<&str> {
