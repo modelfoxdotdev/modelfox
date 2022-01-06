@@ -1,7 +1,7 @@
 use anyhow::{anyhow, bail, Result};
 use lettre::AsyncTransport;
 use sqlx::prelude::*;
-use std::sync::Arc;
+use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
@@ -63,7 +63,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 async fn add_member(
 	action: Action,
 	user: NormalUser,
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	app_state: &AppState,
 	organization_id: Id,
 ) -> Result<http::Response<hyper::Body>> {
@@ -81,7 +81,7 @@ async fn add_member(
 	)
 	.bind(&user_id.to_string())
 	.bind(&action.email)
-	.execute(&mut *db)
+	.execute(txn.borrow_mut())
 	.await?;
 	let row = sqlx::query(
 		"
@@ -91,7 +91,7 @@ async fn add_member(
 		",
 	)
 	.bind(&action.email)
-	.fetch_one(&mut *db)
+	.fetch_one(txn.borrow_mut())
 	.await?;
 	let user_id: String = row.get(0);
 	let user_id: Id = user_id.parse().unwrap();
@@ -113,7 +113,7 @@ async fn add_member(
 	.bind(&organization_id.to_string())
 	.bind(&user_id.to_string())
 	.bind(&is_admin)
-	.execute(&mut *db)
+	.execute(txn.borrow_mut())
 	.await?;
 	// Send the new user an invitation email.
 	if let Some(smtp_transport) = app_state.smtp_transport.clone() {

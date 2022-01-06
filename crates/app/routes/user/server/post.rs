@@ -1,5 +1,5 @@
 use anyhow::Result;
-use std::sync::Arc;
+use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
@@ -44,7 +44,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 
 async fn logout(
 	user: &NormalUser,
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 ) -> Result<http::Response<hyper::Body>> {
 	sqlx::query(
 		"
@@ -52,7 +52,7 @@ async fn logout(
 		",
 	)
 	.bind(&user.token)
-	.execute(&mut *db)
+	.execute(txn.borrow_mut())
 	.await?;
 	let response = http::Response::builder()
 		.status(http::StatusCode::SEE_OTHER)

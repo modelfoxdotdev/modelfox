@@ -5,7 +5,7 @@ use chrono_tz::Tz;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
-use std::sync::Arc;
+use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -93,7 +93,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 			.bind(&model_id.to_string())
 			.bind(after)
 			.bind(PRODUCTION_PREDICTIONS_NUM_PREDICTIONS_PER_PAGE_TABLE)
-			.fetch_all(&mut *db)
+			.fetch_all(db.borrow_mut())
 			.await?;
 			rows
 		}
@@ -117,7 +117,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 			.bind(&model_id.to_string())
 			.bind(before)
 			.bind(PRODUCTION_PREDICTIONS_NUM_PREDICTIONS_PER_PAGE_TABLE)
-			.fetch_all(&mut *db)
+			.fetch_all(db.borrow_mut())
 			.await?
 		}
 		(None, None) => {
@@ -138,7 +138,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 			)
 			.bind(&model_id.to_string())
 			.bind(PRODUCTION_PREDICTIONS_NUM_PREDICTIONS_PER_PAGE_TABLE)
-			.fetch_all(&mut *db)
+			.fetch_all(db.borrow_mut())
 			.await?
 		}
 		_ => unreachable!(),
@@ -157,7 +157,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				)
 				.bind(&model_id.to_string())
 				.bind(first_row_timestamp)
-				.fetch_one(&mut *db)
+				.fetch_one(db.borrow_mut())
 				.await?
 				.get(0);
 				let older_predictions_exist: bool = sqlx::query(
@@ -169,7 +169,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				)
 				.bind(&model_id.to_string())
 				.bind(last_row_timestamp)
-				.fetch_one(&mut *db)
+				.fetch_one(db.borrow_mut())
 				.await?
 				.get(0);
 				(newer_predictions_exist, older_predictions_exist)

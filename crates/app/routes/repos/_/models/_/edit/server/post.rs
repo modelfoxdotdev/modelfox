@@ -1,5 +1,5 @@
 use anyhow::{bail, Result};
-use std::sync::Arc;
+use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -76,7 +76,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			)
 			.bind(&action.tag)
 			.bind(&model_id.to_string())
-			.execute(&mut *db)
+			.execute(db.borrow_mut())
 			.await?;
 			db.commit().await?;
 			http::Response::builder()

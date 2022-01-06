@@ -4,7 +4,7 @@ use chrono::prelude::*;
 use chrono_tz::Tz;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
-use std::sync::Arc;
+use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -77,7 +77,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		",
 	)
 	.bind(&id.to_string())
-	.fetch_optional(&mut *db)
+	.fetch_optional(db.borrow_mut())
 	.await?;
 	let row = match row {
 		Some(row) => row,

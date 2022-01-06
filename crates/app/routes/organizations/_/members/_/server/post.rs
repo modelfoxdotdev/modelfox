@@ -1,6 +1,6 @@
 use anyhow::{bail, Result};
 use serde::Deserialize;
-use std::sync::Arc;
+use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
@@ -109,7 +109,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 }
 
 async fn delete_member(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	organization_id: Id,
 	member_id: Id,
 ) -> Result<()> {
@@ -124,13 +124,13 @@ async fn delete_member(
 	)
 	.bind(&organization_id.to_string())
 	.bind(&member_id.to_string())
-	.execute(&mut *db)
+	.execute(txn.borrow_mut())
 	.await?;
 	Ok(())
 }
 
 async fn update_member(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	organization_id: Id,
 	member_id: Id,
 	member_fields: MemberFields,
@@ -149,7 +149,7 @@ async fn update_member(
 	.bind(&organization_id.to_string())
 	.bind(&member_id.to_string())
 	.bind(&member_fields.is_admin)
-	.execute(&mut *db)
+	.execute(txn.borrow_mut())
 	.await?;
 	Ok(())
 }

@@ -14,7 +14,7 @@ use chrono::prelude::*;
 use memmap::Mmap;
 use num::ToPrimitive;
 use sqlx::prelude::*;
-use std::collections::BTreeMap;
+use std::{borrow::BorrowMut, collections::BTreeMap};
 use tangram_id::Id;
 use tracing::error;
 
@@ -103,7 +103,7 @@ pub async fn write_prediction_monitor_event(
 	)
 	.bind(&model_id.to_string())
 	.bind(&identifier.to_string())
-	.fetch_one(&mut *txn)
+	.fetch_one(txn.borrow_mut())
 	.await?;
 	let prediction_count: i64 = row.get(0);
 	if prediction_count > 0 {
@@ -129,7 +129,7 @@ pub async fn write_prediction_monitor_event(
 	.bind(&input)
 	.bind(&options)
 	.bind(&output)
-	.execute(&mut *txn)
+	.execute(txn.borrow_mut())
 	.await?;
 	Ok(())
 }
@@ -172,7 +172,7 @@ pub async fn write_true_value_monitor_event(
 	)
 	.bind(&model_id.to_string())
 	.bind(&identifier.to_string())
-	.fetch_one(&mut *txn)
+	.fetch_one(txn.borrow_mut())
 	.await?;
 	let true_value_count: i64 = row.get(0);
 	if true_value_count > 0 {
@@ -194,7 +194,7 @@ pub async fn write_true_value_monitor_event(
 	.bind(&date.timestamp())
 	.bind(&identifier.to_string())
 	.bind(&true_value.to_string())
-	.execute(&mut *txn)
+	.execute(txn.borrow_mut())
 	.await?;
 	Ok(())
 }
@@ -221,7 +221,7 @@ pub async fn insert_or_update_production_stats_for_monitor_event(
 	)
 	.bind(&model_id.to_string())
 	.bind(&hour.timestamp())
-	.fetch_all(&mut *txn)
+	.fetch_all(txn.borrow_mut())
 	.await?;
 	if let Some(row) = rows.get(0) {
 		let data: String = row.get(0);
@@ -242,7 +242,7 @@ pub async fn insert_or_update_production_stats_for_monitor_event(
 		.bind(&data)
 		.bind(&model_id.to_string())
 		.bind(&hour.timestamp())
-		.execute(&mut *txn)
+		.execute(txn.borrow_mut())
 		.await?;
 	} else {
 		let start_date = hour;
@@ -261,7 +261,7 @@ pub async fn insert_or_update_production_stats_for_monitor_event(
 		.bind(&model_id.to_string())
 		.bind(&data)
 		.bind(&hour.timestamp())
-		.execute(&mut *txn)
+		.execute(txn.borrow_mut())
 		.await?;
 	}
 	Ok(())
@@ -288,7 +288,7 @@ pub async fn insert_or_update_production_metrics_for_monitor_event(
 	)
 	.bind(&model_id.to_string())
 	.bind(&identifier)
-	.fetch_all(&mut *txn)
+	.fetch_all(txn.borrow_mut())
 	.await?;
 	if rows.is_empty() {
 		bail!("Failed to find prediction with identifier {}", identifier);
@@ -339,7 +339,7 @@ pub async fn insert_or_update_production_metrics_for_monitor_event(
 	)
 	.bind(&model_id.to_string())
 	.bind(&hour.timestamp())
-	.fetch_optional(&mut *txn)
+	.fetch_optional(txn.borrow_mut())
 	.await?;
 	if let Some(row) = row {
 		let data: String = row.get(0);
@@ -360,7 +360,7 @@ pub async fn insert_or_update_production_metrics_for_monitor_event(
 		.bind(&data)
 		.bind(&model_id.to_string())
 		.bind(&hour.timestamp())
-		.execute(&mut *txn)
+		.execute(txn.borrow_mut())
 		.await?;
 	} else {
 		let start_date = hour;
@@ -379,7 +379,7 @@ pub async fn insert_or_update_production_metrics_for_monitor_event(
 		.bind(&model_id.to_string())
 		.bind(&data)
 		.bind(&hour.timestamp())
-		.execute(&mut *txn)
+		.execute(txn.borrow_mut())
 		.await?;
 	}
 	Ok(())

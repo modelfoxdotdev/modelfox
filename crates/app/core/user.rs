@@ -1,3 +1,5 @@
+use std::borrow::BorrowMut;
+
 use crate::cookies::parse_cookies;
 use anyhow::Result;
 use sqlx::prelude::*;
@@ -41,7 +43,7 @@ pub async fn authorize_user(
 
 pub async fn authorize_normal_user(
 	request: &http::Request<hyper::Body>,
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 ) -> Result<Result<NormalUser, AuthorizeUserError>> {
 	let token = if let Some(authorization) = request.headers().get(http::header::AUTHORIZATION) {
 		let authorization = match authorization.to_str() {
@@ -81,7 +83,7 @@ pub async fn authorize_normal_user(
 		",
 	)
 	.bind(&token)
-	.fetch_optional(db)
+	.fetch_optional(txn.borrow_mut())
 	.await?;
 	let row = if let Some(row) = row {
 		row
@@ -96,20 +98,20 @@ pub async fn authorize_normal_user(
 }
 
 pub async fn authorize_user_for_organization(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	user: &User,
 	organization_id: Id,
 ) -> Result<bool> {
 	match user {
 		User::Root => Ok(true),
 		User::Normal(user) => {
-			authorize_normal_user_for_organization(db, user, organization_id).await
+			authorize_normal_user_for_organization(txn, user, organization_id).await
 		}
 	}
 }
 
 pub async fn authorize_normal_user_for_organization(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	user: &NormalUser,
 	organization_id: Id,
 ) -> Result<bool> {
@@ -124,24 +126,24 @@ pub async fn authorize_normal_user_for_organization(
 	)
 	.bind(&user.id.to_string())
 	.bind(&organization_id.to_string())
-	.fetch_one(&mut *db)
+	.fetch_one(txn.borrow_mut())
 	.await?
 	.get(0))
 }
 
 pub async fn authorize_user_for_repo(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	user: &User,
 	repo_id: Id,
 ) -> Result<bool> {
 	match user {
 		User::Root => Ok(true),
-		User::Normal(user) => authorize_normal_user_for_repo(db, user, repo_id).await,
+		User::Normal(user) => authorize_normal_user_for_repo(txn, user, repo_id).await,
 	}
 }
 
 pub async fn authorize_normal_user_for_repo(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	user: &NormalUser,
 	repo_id: Id,
 ) -> Result<bool> {
@@ -162,24 +164,24 @@ pub async fn authorize_normal_user_for_repo(
 	)
 	.bind(&user.id.to_string())
 	.bind(&repo_id.to_string())
-	.fetch_one(&mut *db)
+	.fetch_one(txn.borrow_mut())
 	.await?
 	.get(0))
 }
 
 pub async fn authorize_user_for_model(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	user: &User,
 	model_id: Id,
 ) -> Result<bool> {
 	match user {
 		User::Root => Ok(true),
-		User::Normal(user) => authorize_normal_user_for_model(db, user, model_id).await,
+		User::Normal(user) => authorize_normal_user_for_model(txn, user, model_id).await,
 	}
 }
 
 pub async fn authorize_normal_user_for_model(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	user: &NormalUser,
 	model_id: Id,
 ) -> Result<bool> {
@@ -202,7 +204,7 @@ pub async fn authorize_normal_user_for_model(
 	)
 	.bind(&user.id.to_string())
 	.bind(&model_id.to_string())
-	.fetch_one(&mut *db)
+	.fetch_one(txn.borrow_mut())
 	.await?
 	.get(0))
 }

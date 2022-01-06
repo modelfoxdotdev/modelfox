@@ -5,7 +5,7 @@ use crate::page::{
 use anyhow::Result;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
-use std::sync::Arc;
+use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{not_found, redirect_to_login, service_unavailable},
@@ -109,7 +109,7 @@ struct Repo {
 }
 
 async fn get_normal_user_repositories(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	user_id: Id,
 ) -> Result<Vec<Repo>> {
 	let rows = sqlx::query(
@@ -122,7 +122,7 @@ async fn get_normal_user_repositories(
 		",
 	)
 	.bind(&user_id.to_string())
-	.fetch_all(&mut *db)
+	.fetch_all(txn.borrow_mut())
 	.await?;
 	Ok(rows
 		.iter()
@@ -135,7 +135,7 @@ async fn get_normal_user_repositories(
 }
 
 async fn get_root_user_repositories(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 ) -> Result<Vec<Repo>> {
 	let rows = sqlx::query(
 		"
@@ -145,7 +145,7 @@ async fn get_root_user_repositories(
 			from repos
 		",
 	)
-	.fetch_all(&mut *db)
+	.fetch_all(txn.borrow_mut())
 	.await?;
 	Ok(rows
 		.iter()

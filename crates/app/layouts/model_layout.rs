@@ -1,7 +1,7 @@
 use anyhow::Result;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
-use std::sync::Arc;
+use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -45,7 +45,7 @@ impl ModelLayout {
 }
 
 pub async fn model_layout_info(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	app_state: &AppState,
 	model_id: Id,
 	selected_item: ModelNavItem,
@@ -71,7 +71,7 @@ pub async fn model_layout_info(
 		",
 	)
 	.bind(&model_id.to_string())
-	.fetch_one(&mut *db)
+	.fetch_one(txn.borrow_mut())
 	.await?;
 	let repo_id: String = row.get(0);
 	let repo_id: Id = repo_id.parse()?;
@@ -81,7 +81,7 @@ pub async fn model_layout_info(
 	let owner_user_email: Option<String> = row.get(4);
 	let owner_organization_id: Option<String> = row.get(5);
 	let owner_organization_name: Option<String> = row.get(6);
-	let model_version_ids = get_model_version_ids(db, repo_id).await?;
+	let model_version_ids = get_model_version_ids(txn, repo_id).await?;
 	#[allow(clippy::manual_map)]
 	let owner = if let Some(owner_user_id) = owner_user_id {
 		Some(Owner::User {
@@ -149,7 +149,7 @@ pub async fn post(
 }
 
 async fn delete_model(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	model_id: Id,
 ) -> Result<http::Response<hyper::Body>> {
 	sqlx::query(
@@ -160,7 +160,7 @@ async fn delete_model(
 	",
 	)
 	.bind(&model_id.to_string())
-	.execute(&mut *db)
+	.execute(txn.borrow_mut())
 	.await?;
 	let response = http::Response::builder()
 		.status(http::StatusCode::SEE_OTHER)

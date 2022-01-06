@@ -3,7 +3,7 @@ use anyhow::{bail, Result};
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
-use std::sync::Arc;
+use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
@@ -58,7 +58,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	)
 	.bind(&organization_id.to_string())
 	.bind(&member_id.to_string())
-	.fetch_one(&mut *db)
+	.fetch_one(db.borrow_mut())
 	.await?;
 	let member_email = row.get(1);
 	let admin_member_count = get_admin_member_count(&mut db, organization_id).await?;
@@ -101,7 +101,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 }
 
 async fn get_admin_member_count(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	organization_id: Id,
 ) -> Result<usize> {
 	let row = sqlx::query(
@@ -115,7 +115,7 @@ async fn get_admin_member_count(
 		",
 	)
 	.bind(&organization_id.to_string())
-	.fetch_one(&mut *db)
+	.fetch_one(txn.borrow_mut())
 	.await?;
 	let member_count: i64 = row.get(0);
 	let member_count = member_count.to_usize().unwrap();

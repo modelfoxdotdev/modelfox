@@ -5,7 +5,7 @@ use crate::page::{
 use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
-use std::sync::Arc;
+use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
@@ -84,7 +84,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		",
 	)
 	.bind(&organization_id.to_string())
-	.fetch_all(&mut *db)
+	.fetch_all(db.borrow_mut())
 	.await?;
 	let rows: Vec<ReposTableRow> = rows
 		.iter()

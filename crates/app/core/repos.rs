@@ -6,6 +6,7 @@ use crate::{
 use anyhow::Result;
 use chrono::prelude::*;
 use sqlx::prelude::*;
+use std::borrow::BorrowMut;
 use tangram_id::Id;
 
 pub struct Repo {
@@ -25,7 +26,7 @@ pub async fn get_repo(txn: &mut sqlx::Transaction<'_, sqlx::Any>, id: Id) -> Res
 		",
 	)
 	.bind(&id.to_string())
-	.fetch_one(&mut *txn)
+	.fetch_one(txn.borrow_mut())
 	.await?;
 	let id: String = row.get(0);
 	let id: Id = id.parse().unwrap();
@@ -43,6 +44,7 @@ pub async fn delete_repo(
 	storage: &Storage,
 	repo_id: Id,
 ) -> Result<()> {
+	let model_version_ids = get_model_version_ids(txn, repo_id).await?;
 	sqlx::query(
 		"
 			delete from repos
@@ -50,9 +52,8 @@ pub async fn delete_repo(
 		",
 	)
 	.bind(&repo_id.to_string())
-	.execute(&mut *txn)
+	.execute(txn.borrow_mut())
 	.await?;
-	let model_version_ids = get_model_version_ids(txn, repo_id).await?;
 	for model_id in model_version_ids.into_iter() {
 		storage.remove(StorageEntity::Model, model_id).await?;
 	}
@@ -68,7 +69,7 @@ pub async fn repos_for_root(txn: &mut sqlx::Transaction<'_, sqlx::Any>) -> Resul
 			from repos
 		",
 	)
-	.fetch_all(&mut *txn)
+	.fetch_all(txn.borrow_mut())
 	.await?;
 	let repos = rows
 		.iter()
@@ -101,7 +102,7 @@ pub async fn repos_for_user(
 		",
 	)
 	.bind(&user.id.to_string())
-	.fetch_all(&mut *txn)
+	.fetch_all(txn.borrow_mut())
 	.await?;
 	for row in rows {
 		let id = row.get(0);
@@ -128,7 +129,7 @@ pub async fn repos_for_user(
 		",
 	)
 	.bind(&user.id.to_string())
-	.fetch_all(&mut *txn)
+	.fetch_all(txn.borrow_mut())
 	.await?;
 	for row in rows {
 		let id = row.get(0);
@@ -160,7 +161,7 @@ pub async fn create_root_repo(
 	.bind(&repo_id.to_string())
 	.bind(&Utc::now().timestamp())
 	.bind(&title)
-	.execute(&mut *txn)
+	.execute(txn.borrow_mut())
 	.await?;
 	Ok(())
 }
@@ -184,7 +185,7 @@ pub async fn create_user_repo(
 	.bind(&Utc::now().timestamp())
 	.bind(&title)
 	.bind(&user_id.to_string())
-	.execute(&mut *txn)
+	.execute(txn.borrow_mut())
 	.await?;
 	Ok(())
 }
@@ -208,7 +209,7 @@ pub async fn create_org_repo(
 	.bind(&Utc::now().timestamp())
 	.bind(&title)
 	.bind(&org_id.to_string())
-	.execute(&mut *txn)
+	.execute(txn.borrow_mut())
 	.await?;
 	Ok(())
 }
@@ -232,7 +233,7 @@ pub async fn add_model_version(
 	.bind(&model_id.to_string())
 	.bind(&Utc::now().timestamp())
 	.bind(&repo_id.to_string())
-	.execute(&mut *txn)
+	.execute(txn.borrow_mut())
 	.await?;
 	data_storage
 		.set(StorageEntity::Model, model_id, bytes)
@@ -252,7 +253,7 @@ pub async fn delete_model_version(
 		",
 	)
 	.bind(&model_id.to_string())
-	.execute(&mut *txn)
+	.execute(txn.borrow_mut())
 	.await?;
 	data_storage.remove(StorageEntity::Model, model_id).await?;
 	Ok(())
@@ -274,7 +275,7 @@ pub async fn get_model_version_ids(
 		",
 	)
 	.bind(&repo_id.to_string())
-	.fetch_all(&mut *txn)
+	.fetch_all(txn.borrow_mut())
 	.await?
 	.iter()
 	.map(|row| row.get::<String, _>(0).parse().unwrap())

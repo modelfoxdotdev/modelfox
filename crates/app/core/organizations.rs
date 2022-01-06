@@ -1,3 +1,5 @@
+use std::borrow::BorrowMut;
+
 use anyhow::Result;
 use sqlx::prelude::*;
 use tangram_id::Id;
@@ -16,7 +18,7 @@ pub struct Member {
 
 pub async fn get_organization(
 	organization_id: Id,
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 ) -> Result<Option<GetOrganizationOutput>> {
 	let row = sqlx::query(
 		"
@@ -27,7 +29,7 @@ pub async fn get_organization(
 		",
 	)
 	.bind(&organization_id.to_string())
-	.fetch_one(&mut *db)
+	.fetch_one(txn.borrow_mut())
 	.await?;
 	let organization_name: String = row.get(0);
 	let user_rows = sqlx::query(
@@ -43,7 +45,7 @@ pub async fn get_organization(
 		",
 	)
 	.bind(&organization_id.to_string())
-	.fetch_all(&mut *db)
+	.fetch_all(txn.borrow_mut())
 	.await?;
 	let members = user_rows
 		.iter()
@@ -64,7 +66,7 @@ pub async fn get_organization(
 }
 
 pub async fn get_organization_user(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	organization_id: Id,
 	user_id: Id,
 ) -> Result<Option<Member>> {
@@ -83,7 +85,7 @@ pub async fn get_organization_user(
 	)
 	.bind(&organization_id.to_string())
 	.bind(&user_id.to_string())
-	.fetch_optional(&mut *db)
+	.fetch_optional(txn.borrow_mut())
 	.await?;
 	Ok(member_row.map(|member_row| Member {
 		id: user_id,
@@ -98,7 +100,7 @@ pub struct GetOrganizationsOutputItem {
 }
 
 pub async fn get_organizations(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	user_id: Id,
 ) -> Result<Vec<GetOrganizationsOutputItem>> {
 	let rows = sqlx::query(
@@ -113,7 +115,7 @@ pub async fn get_organizations(
 		",
 	)
 	.bind(&user_id.to_string())
-	.fetch_all(&mut *db)
+	.fetch_all(txn.borrow_mut())
 	.await?;
 	Ok(rows
 		.iter()
@@ -126,7 +128,7 @@ pub async fn get_organizations(
 }
 
 pub async fn delete_organization(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	organization_id: Id,
 ) -> Result<()> {
 	sqlx::query(
@@ -137,7 +139,7 @@ pub async fn delete_organization(
 	",
 	)
 	.bind(&organization_id.to_string())
-	.execute(&mut *db)
+	.execute(txn.borrow_mut())
 	.await?;
 	Ok(())
 }

@@ -5,7 +5,7 @@ use lettre::AsyncTransport;
 use pinwheel::prelude::*;
 use rand::Rng;
 use sqlx::prelude::*;
-use std::sync::Arc;
+use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::error::{bad_request, service_unavailable};
 use tangram_id::Id;
@@ -46,7 +46,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	)
 	.bind(&user_id.to_string())
 	.bind(&email)
-	.execute(&mut *db)
+	.execute(db.borrow_mut())
 	.await?;
 	// Retrieve the user's id.
 	let user_id: String = sqlx::query(
@@ -59,7 +59,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		",
 	)
 	.bind(&email)
-	.fetch_one(&mut *db)
+	.fetch_one(db.borrow_mut())
 	.await?
 	.get(0);
 	let user_id: Id = user_id.parse()?;
@@ -86,7 +86,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			.bind(&ten_minutes_in_seconds)
 			.bind(&email)
 			.bind(&code)
-			.fetch_optional(&mut db)
+			.fetch_optional(db.borrow_mut())
 			.await?;
 			let row = if let Some(row) = row {
 				row
@@ -137,7 +137,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			.bind(false)
 			.bind(&user_id.to_string())
 			.bind(&code)
-			.execute(&mut *db)
+			.execute(db.borrow_mut())
 			.await?;
 			if let Some(smtp_transport) = app_state.smtp_transport.clone() {
 				send_code_email(smtp_transport, email.clone(), code).await?;

@@ -1,3 +1,5 @@
+use std::borrow::BorrowMut;
+
 pub use self::{column_stats::*, number_stats::*, prediction_stats::*};
 use crate::monitor_event::PredictionMonitorEvent;
 use anyhow::Result;
@@ -104,7 +106,7 @@ pub struct GetProductionStatsOutput {
 }
 
 pub async fn get_production_stats(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	model: tangram_model::ModelReader<'_>,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
@@ -147,7 +149,7 @@ pub async fn get_production_stats(
 	.bind(&model.id().to_string())
 	.bind(&start_date.timestamp())
 	.bind(&end_date.timestamp())
-	.fetch_all(&mut *db)
+	.fetch_all(txn.borrow_mut())
 	.await?;
 	// Compute the number of intervals.
 	// * For today, use 24.

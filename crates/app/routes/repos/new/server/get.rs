@@ -2,7 +2,7 @@ use crate::page::{Owner, Page};
 use anyhow::Result;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
-use std::sync::Arc;
+use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{redirect_to_login, service_unavailable},
@@ -41,7 +41,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 			",
 			)
 			.bind(&user.id.to_string())
-			.fetch_all(&mut *db)
+			.fetch_all(db.borrow_mut())
 			.await?;
 			for row in rows {
 				let id: String = row.get(0);

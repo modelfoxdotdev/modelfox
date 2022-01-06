@@ -1,5 +1,5 @@
 use anyhow::Result;
-use std::sync::Arc;
+use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{bad_request, service_unavailable, unauthorized},
@@ -42,7 +42,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 async fn create_organization(
 	action: Action,
 	user: &NormalUser,
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 ) -> Result<http::Response<hyper::Body>> {
 	let Action { name } = action;
 	let organization_id: Id = Id::generate();
@@ -56,7 +56,7 @@ async fn create_organization(
 	)
 	.bind(&organization_id.to_string())
 	.bind(&name)
-	.execute(&mut *db)
+	.execute(txn.borrow_mut())
 	.await?;
 	sqlx::query(
 		"
@@ -68,7 +68,7 @@ async fn create_organization(
 	)
 	.bind(&organization_id.to_string())
 	.bind(&user.id.to_string())
-	.execute(&mut *db)
+	.execute(txn.borrow_mut())
 	.await?;
 	let response = http::Response::builder()
 		.status(http::StatusCode::SEE_OTHER)

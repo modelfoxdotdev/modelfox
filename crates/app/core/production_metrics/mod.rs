@@ -1,3 +1,5 @@
+use std::borrow::BorrowMut;
+
 pub use self::{
 	binary_classification_production_metrics::{
 		BinaryClassificationProductionPredictionMetrics,
@@ -171,7 +173,7 @@ pub struct GetProductionMetricsOutput {
 }
 
 pub async fn get_production_metrics(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	model: tangram_model::ModelReader<'_>,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
@@ -213,7 +215,7 @@ pub async fn get_production_metrics(
 	.bind(&model.id().to_string())
 	.bind(&start_date.timestamp())
 	.bind(&end_date.timestamp())
-	.fetch_all(&mut *db)
+	.fetch_all(txn.borrow_mut())
 	.await?;
 	/*
 	 Compute the number of intervals.
