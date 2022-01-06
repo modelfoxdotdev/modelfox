@@ -3108,6 +3108,7 @@ dependencies = [
  "chrono-tz",
  "dirs",
  "fnv",
+ "futures",
  "http",
  "hyper",
  "indexmap",

@@ -3,7 +3,7 @@ use crate::{
 	user::NormalUser,
 	App,
 };
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use chrono::prelude::*;
 use sqlx::prelude::*;
 use tangram_id::Id;
@@ -14,7 +14,7 @@ pub struct Repo {
 	pub owner_name: Option<String>,
 }
 
-pub async fn get_repo(db: &mut sqlx::Transaction<'_, sqlx::Any>, id: Id) -> Result<Repo> {
+pub async fn get_repo(txn: &mut sqlx::Transaction<'_, sqlx::Any>, id: Id) -> Result<Repo> {
 	let row = sqlx::query(
 		"
 			select
@@ -25,7 +25,7 @@ pub async fn get_repo(db: &mut sqlx::Transaction<'_, sqlx::Any>, id: Id) -> Resu
 		",
 	)
 	.bind(&id.to_string())
-	.fetch_one(&mut *db)
+	.fetch_one(&mut *txn)
 	.await?;
 	let id: String = row.get(0);
 	let id: Id = id.parse().unwrap();
@@ -39,7 +39,7 @@ pub async fn get_repo(db: &mut sqlx::Transaction<'_, sqlx::Any>, id: Id) -> Resu
 }
 
 pub async fn delete_repo(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	storage: &Storage,
 	repo_id: Id,
 ) -> Result<()> {
@@ -50,16 +50,16 @@ pub async fn delete_repo(
 		",
 	)
 	.bind(&repo_id.to_string())
-	.execute(&mut *db)
+	.execute(&mut *txn)
 	.await?;
-	let model_version_ids = get_model_version_ids(db, repo_id).await?;
+	let model_version_ids = get_model_version_ids(txn, repo_id).await?;
 	for model_id in model_version_ids.into_iter() {
 		storage.remove(StorageEntity::Model, model_id).await?;
 	}
 	Ok(())
 }
 
-pub async fn repos_for_root(db: &mut sqlx::Transaction<'_, sqlx::Any>) -> Result<Vec<Repo>> {
+pub async fn repos_for_root(txn: &mut sqlx::Transaction<'_, sqlx::Any>) -> Result<Vec<Repo>> {
 	let rows = sqlx::query(
 		"
 			select
@@ -68,7 +68,7 @@ pub async fn repos_for_root(db: &mut sqlx::Transaction<'_, sqlx::Any>) -> Result
 			from repos
 		",
 	)
-	.fetch_all(&mut *db)
+	.fetch_all(&mut *txn)
 	.await?;
 	let repos = rows
 		.iter()
@@ -87,7 +87,7 @@ pub async fn repos_for_root(db: &mut sqlx::Transaction<'_, sqlx::Any>) -> Result
 }
 
 pub async fn repos_for_user(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	user: &NormalUser,
 ) -> Result<Vec<Repo>> {
 	let mut repos = Vec::new();
@@ -101,7 +101,7 @@ pub async fn repos_for_user(
 		",
 	)
 	.bind(&user.id.to_string())
-	.fetch_all(&mut *db)
+	.fetch_all(&mut *txn)
 	.await?;
 	for row in rows {
 		let id = row.get(0);
@@ -128,7 +128,7 @@ pub async fn repos_for_user(
 		",
 	)
 	.bind(&user.id.to_string())
-	.fetch_all(&mut *db)
+	.fetch_all(&mut *txn)
 	.await?;
 	for row in rows {
 		let id = row.get(0);
@@ -144,7 +144,7 @@ pub async fn repos_for_user(
 }
 
 pub async fn create_root_repo(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	repo_id: Id,
 	title: &str,
 ) -> Result<()> {
@@ -160,13 +160,13 @@ pub async fn create_root_repo(
 	.bind(&repo_id.to_string())
 	.bind(&Utc::now().timestamp())
 	.bind(&title)
-	.execute(&mut *db)
+	.execute(&mut *txn)
 	.await?;
 	Ok(())
 }
 
 pub async fn create_user_repo(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	user_id: Id,
 	repo_id: Id,
 	title: &str,
@@ -184,13 +184,13 @@ pub async fn create_user_repo(
 	.bind(&Utc::now().timestamp())
 	.bind(&title)
 	.bind(&user_id.to_string())
-	.execute(&mut *db)
+	.execute(&mut *txn)
 	.await?;
 	Ok(())
 }
 
 pub async fn create_org_repo(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	org_id: Id,
 	repo_id: Id,
 	title: &str,
@@ -208,13 +208,13 @@ pub async fn create_org_repo(
 	.bind(&Utc::now().timestamp())
 	.bind(&title)
 	.bind(&org_id.to_string())
-	.execute(&mut *db)
+	.execute(&mut *txn)
 	.await?;
 	Ok(())
 }
 
 pub async fn add_model_version(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	data_storage: &Storage,
 	repo_id: Id,
 	model_id: Id,
@@ -232,7 +232,7 @@ pub async fn add_model_version(
 	.bind(&model_id.to_string())
 	.bind(&Utc::now().timestamp())
 	.bind(&repo_id.to_string())
-	.execute(&mut *db)
+	.execute(&mut *txn)
 	.await?;
 	data_storage
 		.set(StorageEntity::Model, model_id, bytes)
@@ -241,7 +241,7 @@ pub async fn add_model_version(
 }
 
 pub async fn delete_model_version(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	data_storage: &Storage,
 	model_id: Id,
 ) -> Result<()> {
@@ -252,14 +252,14 @@ pub async fn delete_model_version(
 		",
 	)
 	.bind(&model_id.to_string())
-	.execute(&mut *db)
+	.execute(&mut *txn)
 	.await?;
 	data_storage.remove(StorageEntity::Model, model_id).await?;
 	Ok(())
 }
 
 pub async fn get_model_version_ids(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	repo_id: Id,
 ) -> Result<Vec<Id>> {
 	Ok(sqlx::query(
@@ -274,7 +274,7 @@ pub async fn get_model_version_ids(
 		",
 	)
 	.bind(&repo_id.to_string())
-	.fetch_all(&mut *db)
+	.fetch_all(&mut *txn)
 	.await?
 	.iter()
 	.map(|row| row.get::<String, _>(0).parse().unwrap())
@@ -282,14 +282,15 @@ pub async fn get_model_version_ids(
 }
 
 impl App {
-	pub async fn create_root_repo(&self, title: &str) -> Result<Id> {
-		let mut db = match self.state.database_pool.begin().await {
-			Ok(db) => db,
-			Err(_) => return Err(anyhow!("unable to access database pool!")),
-		};
+	pub async fn create_root_repo(
+		&self,
+		txn: &mut sqlx::Transaction<'_, sqlx::Any>,
+		title: &str,
+	) -> Result<Id> {
+		let mut txn = txn.begin().await?;
 		let id = Id::generate();
-		create_root_repo(&mut db, id, title).await?;
-		db.commit().await?;
+		create_root_repo(&mut txn, id, title).await?;
+		txn.commit().await?;
 		Ok(id)
 	}
 }

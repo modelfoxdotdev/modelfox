@@ -8,11 +8,13 @@ use crate::{
 	AppState,
 };
 use anyhow::{anyhow, Result};
+use futures::{select, FutureExt};
 //use lettre::AsyncTransport;
 use serde::{Deserialize, Serialize};
 use sqlx::Row;
-use std::{fmt, io, str::FromStr};
+use std::{fmt, io, str::FromStr, sync::Arc};
 use tangram_id::Id;
+use tokio::sync::Notify;
 
 // Task
 
@@ -576,7 +578,7 @@ pub async fn find_current_data(
 }
 
 /// Manage periodic alerting
-pub async fn alert_manager(app: &AppState) -> Result<()> {
+pub async fn alert_manager(app: Arc<AppState>, notify: Arc<Notify>) -> Result<()> {
 	// TODO - webhook check.
 	// Scrape the DB for any incomplete webhook attempts, and spawn an exponential decay thread for any found
 
@@ -610,15 +612,20 @@ pub async fn alert_manager(app: &AppState) -> Result<()> {
 
 	// Each interval:
 	loop {
-		interval.tick().await;
+		// If we've been notified of shutdown, break the loop.  Otherwise, continue and handle interval
+		select! {
+			_ = interval.tick().fuse() => {},
+			_ = notify.notified().fuse() => break,
+		}
 		// Grab all currently enabled alerts
-		let enabled = get_overdue_monitors(app).await?;
+		let enabled = get_overdue_monitors(&app).await?;
 		// TODO get_overdue_alerts: "which alerts are currently ready to be processed" - if last run is more than one cadence period ago
 		// For each alert:
 		for monitor in enabled.alerts() {
-			handle_monitor(app, monitor).await?;
+			handle_monitor(&app, monitor).await?;
 		}
 	}
+	Ok(())
 }
 
 async fn handle_monitor(app: &AppState, monitor: &Monitor) -> Result<()> {

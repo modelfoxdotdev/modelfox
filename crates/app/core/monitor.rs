@@ -4,6 +4,7 @@ use crate::alerts::{
 	AlertMethod, Monitor, MonitorThreshold,
 };
 use anyhow::{anyhow, Result};
+use sqlx::Acquire;
 use tangram_id::Id;
 
 impl App {
@@ -36,13 +37,11 @@ impl App {
 
 	pub async fn create_monitor_from_config(
 		&self,
+		txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 		model_id: Id,
 		config: &MonitorConfig,
 	) -> Result<()> {
-		let mut db = match self.state.database_pool.begin().await {
-			Ok(db) => db,
-			Err(_) => return Err(anyhow!("unable to access database pool!")),
-		};
+		let mut txn = txn.begin().await?;
 
 		let title = match &config.title {
 			Some(s) => s,
@@ -50,7 +49,7 @@ impl App {
 		};
 
 		self.create_monitor(CreateMonitorArgs {
-			db: &mut db,
+			db: &mut txn,
 			cadence: config.cadence,
 			methods: vec![AlertMethod::Stdout].as_slice(),
 			model_id,
@@ -59,7 +58,7 @@ impl App {
 		})
 		.await?;
 
-		db.commit().await?;
+		txn.commit().await?;
 		Ok(())
 	}
 

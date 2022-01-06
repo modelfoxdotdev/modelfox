@@ -21,8 +21,6 @@ use tangram_table::TableView;
 pub struct Args {
 	#[clap(long)]
 	pub examples_count: usize,
-	#[clap(long)]
-	pub monitors_count: usize,
 }
 
 #[derive(Clone, ArgEnum)]
@@ -49,20 +47,18 @@ const HEART_DISEASE: DatasetConfig = DatasetConfig {
 
 #[tokio::main]
 pub async fn main() -> Result<()> {
-	// Broadcast channel for handling task shutdown
-	//let (tx, mut rx) = tokio::sync::broadcast::channel(1);
 	let args = Args::parse();
-	// FIXME - const generic for dataset?
 	let dataset = HEART_DISEASE;
 	let table =
 		tangram_table::Table::from_path(Path::new(dataset.path), Default::default(), &mut |_| {})?;
 	let mut rng = rand::thread_rng();
-
 	reset_data()?;
 	let app = App::new(tangram_app_core::options::Options::default()).await?;
-	let repo_id = app.create_root_repo("seed repo").await?;
-	let model_id = app.add_model_to_repo(repo_id, dataset.model_path).await?;
-
+	let mut txn = app.begin_transaction().await?;
+	let repo_id = app.create_root_repo(&mut txn, "Heart Disease").await?;
+	let model_id = app
+		.add_model_to_repo(&mut txn, repo_id, dataset.model_path)
+		.await?;
 	let events: Vec<MonitorEvent> = (0..args.examples_count)
 		.flat_map(|_| {
 			let id = Id::generate();
@@ -99,74 +95,59 @@ pub async fn main() -> Result<()> {
 			events
 		})
 		.collect();
-
-	let monitors: Vec<MonitorConfig> = (0..args.monitors_count)
-		.flat_map(|_| vec![generate_fake_monitor()])
-		.collect();
-
+	let monitors = generate_fake_monitors();
 	for config in monitors {
-		app.create_monitor_from_config(model_id, &config).await?;
+		app.create_monitor_from_config(&mut txn, model_id, &config)
+			.await?;
 	}
-	app.track_events(events).await?;
+	app.track_events(&mut txn, events).await?;
+	app.commit_transaction(txn).await?;
 	Ok(())
 }
 
-fn generate_fake_monitor() -> MonitorConfig {
-	let mut rng = rand::thread_rng();
-	// random cadence
-	let cadence = match rng.gen_range(0..4) {
-		0 => AlertCadence::Hourly,
-		1 => AlertCadence::Daily,
-		2 => AlertCadence::Weekly,
-		3 => AlertCadence::Monthly,
-		_ => unreachable!(),
-	};
-
-	let mode = if rng.gen::<bool>() {
-		MonitorThresholdMode::Absolute
-	} else {
-		MonitorThresholdMode::Percentage
-	};
-	// NOTE - what values are valid for aboslute and percentage?  Uses 0..=100 now
-	let mut pick_variance = |_mode: MonitorThresholdMode, force_some: bool| {
-		if force_some || rng.gen::<bool>() {
-			Some(rng.gen_range(0.0..=100.0))
-		} else {
-			None
-		}
-	};
-	// Pick variances, ensuring at least one has a value
-	let variance_lower = pick_variance(mode, false);
-	let variance_upper = pick_variance(mode, variance_lower.is_none());
-	// The only model is a classification, so it will always be one of these
-	let metric = if rng.gen::<bool>() {
-		AlertMetric::RootMeanSquaredError
-	} else {
-		AlertMetric::MeanSquaredError
-	};
-	let threshold = MonitorThreshold {
-		metric,
-		mode,
-		variance_lower,
-		variance_upper,
-	};
-
-	let title = if rng.gen::<bool>() {
-		Some(
-			rng.sample_iter(&rand::distributions::Alphanumeric)
-				.take(rand::thread_rng().gen_range(5..20))
-				.map(char::from)
-				.collect(),
-		)
-	} else {
-		None
-	};
-
-	MonitorConfig {
-		cadence,
-		threshold,
-		title,
-	}
+fn generate_fake_monitors() -> Vec<MonitorConfig> {
+	vec![
+		MonitorConfig {
+			cadence: AlertCadence::Hourly,
+			threshold: MonitorThreshold {
+				metric: AlertMetric::Accuracy,
+				mode: MonitorThresholdMode::Absolute,
+				variance_lower: Some(0.5),
+				variance_upper: Some(0.5),
+			},
+			title: None,
+		},
+		MonitorConfig {
+			cadence: AlertCadence::Daily,
+			threshold: MonitorThreshold {
+				metric: AlertMetric::Accuracy,
+				mode: MonitorThresholdMode::Percentage,
+				variance_lower: Some(0.3),
+				variance_upper: None,
+			},
+			title: None,
+		},
+		MonitorConfig {
+			cadence: AlertCadence::Weekly,
+			threshold: MonitorThreshold {
+				metric: AlertMetric::Accuracy,
+				mode: MonitorThresholdMode::Absolute,
+				variance_lower: Some(0.2),
+				variance_upper: Some(0.1),
+			},
+			title: None,
+		},
+		MonitorConfig {
+			cadence: AlertCadence::Monthly,
+			threshold: MonitorThreshold {
+				metric: AlertMetric::Accuracy,
+				mode: MonitorThresholdMode::Percentage,
+				variance_lower: None,
+				variance_upper: Some(0.1),
+			},
+			title: None,
+		},
+	]
 }
 
 fn generate_fake_prediction(target: &serde_json::Value, dataset: &DatasetConfig) -> PredictOutput {

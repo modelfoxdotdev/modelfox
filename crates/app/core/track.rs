@@ -21,17 +21,18 @@ use tracing::error;
 use super::App;
 
 impl App {
-	pub async fn track_events(&self, events: Vec<MonitorEvent>) -> Result<()> {
-		let mut db = match self.state.database_pool.begin().await {
-			Ok(db) => db,
-			Err(_) => return Err(anyhow!("unable to access database pool")),
-		};
+	pub async fn track_events(
+		&self,
+		txn: &mut sqlx::Transaction<'_, sqlx::Any>,
+		events: Vec<MonitorEvent>,
+	) -> Result<()> {
+		let mut txn = txn.begin().await?;
 		let mut model_cache = BTreeMap::new();
 		for event in events {
 			match event {
 				MonitorEvent::Prediction(monitor_event) => {
 					let handle_prediction_result = handle_prediction_monitor_event(
-						&mut db,
+						&mut txn,
 						&self.state.storage,
 						&mut model_cache,
 						monitor_event,
@@ -44,7 +45,7 @@ impl App {
 				}
 				MonitorEvent::TrueValue(monitor_event) => {
 					let handle_true_value_result = handle_true_value_monitor_event(
-						&mut db,
+						&mut txn,
 						&self.state.storage,
 						&mut model_cache,
 						monitor_event,
@@ -59,13 +60,13 @@ impl App {
 				}
 			}
 		}
-		db.commit().await?;
+		txn.commit().await?;
 		Ok(())
 	}
 }
 
 pub async fn handle_prediction_monitor_event(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	data_storage: &Storage,
 	model_cache: &mut BTreeMap<Id, Mmap>,
 	monitor_event: PredictionMonitorEvent,
@@ -80,13 +81,14 @@ pub async fn handle_prediction_monitor_event(
 		}
 	};
 	let model = tangram_model::from_bytes(bytes)?;
-	write_prediction_monitor_event(db, model_id, &monitor_event).await?;
-	insert_or_update_production_stats_for_monitor_event(db, model_id, model, monitor_event).await?;
+	write_prediction_monitor_event(txn, model_id, &monitor_event).await?;
+	insert_or_update_production_stats_for_monitor_event(txn, model_id, model, monitor_event)
+		.await?;
 	Ok(())
 }
 
 pub async fn write_prediction_monitor_event(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	model_id: Id,
 	monitor_event: &PredictionMonitorEvent,
 ) -> Result<()> {
@@ -101,7 +103,7 @@ pub async fn write_prediction_monitor_event(
 	)
 	.bind(&model_id.to_string())
 	.bind(&identifier.to_string())
-	.fetch_one(&mut *db)
+	.fetch_one(&mut *txn)
 	.await?;
 	let prediction_count: i64 = row.get(0);
 	if prediction_count > 0 {
@@ -127,13 +129,13 @@ pub async fn write_prediction_monitor_event(
 	.bind(&input)
 	.bind(&options)
 	.bind(&output)
-	.execute(&mut *db)
+	.execute(&mut *txn)
 	.await?;
 	Ok(())
 }
 
 pub async fn handle_true_value_monitor_event(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	data_storage: &Storage,
 	model_cache: &mut BTreeMap<Id, Mmap>,
 	monitor_event: TrueValueMonitorEvent,
@@ -148,14 +150,14 @@ pub async fn handle_true_value_monitor_event(
 		}
 	};
 	let model = tangram_model::from_bytes(bytes)?;
-	write_true_value_monitor_event(db, model_id, &monitor_event).await?;
-	insert_or_update_production_metrics_for_monitor_event(db, model_id, model, monitor_event)
+	write_true_value_monitor_event(txn, model_id, &monitor_event).await?;
+	insert_or_update_production_metrics_for_monitor_event(txn, model_id, model, monitor_event)
 		.await?;
 	Ok(())
 }
 
 pub async fn write_true_value_monitor_event(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	model_id: Id,
 	monitor_event: &TrueValueMonitorEvent,
 ) -> Result<()> {
@@ -170,7 +172,7 @@ pub async fn write_true_value_monitor_event(
 	)
 	.bind(&model_id.to_string())
 	.bind(&identifier.to_string())
-	.fetch_one(&mut *db)
+	.fetch_one(&mut *txn)
 	.await?;
 	let true_value_count: i64 = row.get(0);
 	if true_value_count > 0 {
@@ -192,13 +194,13 @@ pub async fn write_true_value_monitor_event(
 	.bind(&date.timestamp())
 	.bind(&identifier.to_string())
 	.bind(&true_value.to_string())
-	.execute(&mut *db)
+	.execute(&mut *txn)
 	.await?;
 	Ok(())
 }
 
 pub async fn insert_or_update_production_stats_for_monitor_event(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	model_id: Id,
 	model: tangram_model::ModelReader<'_>,
 	monitor_event: PredictionMonitorEvent,
@@ -219,7 +221,7 @@ pub async fn insert_or_update_production_stats_for_monitor_event(
 	)
 	.bind(&model_id.to_string())
 	.bind(&hour.timestamp())
-	.fetch_all(&mut *db)
+	.fetch_all(&mut *txn)
 	.await?;
 	if let Some(row) = rows.get(0) {
 		let data: String = row.get(0);
@@ -240,7 +242,7 @@ pub async fn insert_or_update_production_stats_for_monitor_event(
 		.bind(&data)
 		.bind(&model_id.to_string())
 		.bind(&hour.timestamp())
-		.execute(&mut *db)
+		.execute(&mut *txn)
 		.await?;
 	} else {
 		let start_date = hour;
@@ -259,14 +261,14 @@ pub async fn insert_or_update_production_stats_for_monitor_event(
 		.bind(&model_id.to_string())
 		.bind(&data)
 		.bind(&hour.timestamp())
-		.execute(&mut *db)
+		.execute(&mut *txn)
 		.await?;
 	}
 	Ok(())
 }
 
 pub async fn insert_or_update_production_metrics_for_monitor_event(
-	db: &mut sqlx::Transaction<'_, sqlx::Any>,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	model_id: Id,
 	model: tangram_model::ModelReader<'_>,
 	monitor_event: TrueValueMonitorEvent,
@@ -286,7 +288,7 @@ pub async fn insert_or_update_production_metrics_for_monitor_event(
 	)
 	.bind(&model_id.to_string())
 	.bind(&identifier)
-	.fetch_all(&mut *db)
+	.fetch_all(&mut *txn)
 	.await?;
 	if rows.is_empty() {
 		bail!("Failed to find prediction with identifier {}", identifier);
@@ -337,7 +339,7 @@ pub async fn insert_or_update_production_metrics_for_monitor_event(
 	)
 	.bind(&model_id.to_string())
 	.bind(&hour.timestamp())
-	.fetch_optional(&mut *db)
+	.fetch_optional(&mut *txn)
 	.await?;
 	if let Some(row) = row {
 		let data: String = row.get(0);
@@ -358,7 +360,7 @@ pub async fn insert_or_update_production_metrics_for_monitor_event(
 		.bind(&data)
 		.bind(&model_id.to_string())
 		.bind(&hour.timestamp())
-		.execute(&mut *db)
+		.execute(&mut *txn)
 		.await?;
 	} else {
 		let start_date = hour;
@@ -377,7 +379,7 @@ pub async fn insert_or_update_production_metrics_for_monitor_event(
 		.bind(&model_id.to_string())
 		.bind(&data)
 		.bind(&hour.timestamp())
-		.execute(&mut *db)
+		.execute(&mut *txn)
 		.await?;
 	}
 	Ok(())

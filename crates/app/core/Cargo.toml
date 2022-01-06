@@ -16,6 +16,7 @@ anyhow = { version = "1", features = ["backtrace"] }
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.6", features = ["serde"] }
 dirs = "4"
+futures = "0.3"
 fnv = "1"
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }

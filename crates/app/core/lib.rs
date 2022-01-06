@@ -5,7 +5,7 @@ use crate::{
 };
 use anyhow::{anyhow, bail, Result};
 use std::{path::PathBuf, sync::Arc};
-use tokio::task::JoinHandle;
+use tokio::sync::Notify;
 use url::Url;
 
 pub mod alerts;
@@ -35,7 +35,7 @@ pub struct AppState {
 
 pub struct App {
 	pub state: Arc<AppState>,
-	_tasks: Vec<JoinHandle<()>>,
+	tasks: Vec<Arc<Notify>>,
 }
 
 struct CreateDatabasePoolOptions {
@@ -170,28 +170,39 @@ impl App {
 			storage,
 		};
 		let state = Arc::new(state);
-		let alert_manager_handle = tokio::spawn({
+		let alert_manager_notify = Arc::new(Notify::new());
+		tokio::spawn({
 			let state = Arc::clone(&state);
+			let alert_manager_notify = Arc::clone(&alert_manager_notify);
 			async move {
-				alert_manager(&state).await.unwrap();
+				alert_manager(state, alert_manager_notify).await.unwrap();
 			}
 		});
 		let app = App {
 			state,
-			_tasks: vec![alert_manager_handle],
+			tasks: vec![alert_manager_notify],
 		};
 		Ok(app)
 	}
+
+	pub async fn begin_transaction(&self) -> Result<sqlx::Transaction<'_, sqlx::Any>> {
+		Ok(self.state.database_pool.begin().await?)
+	}
+
+	pub async fn commit_transaction(&self, txn: sqlx::Transaction<'_, sqlx::Any>) -> Result<()> {
+		txn.commit().await?;
+		Ok(())
+	}
 }
 
-/*
 impl Drop for App {
 	fn drop(&mut self) {
 		// Notify each task in self.tasks to end.
-		todo!()
+		for notify in &self.tasks {
+			notify.notify_one();
+		}
 	}
 }
-*/
 
 /// Remove all contents of the data dir, including the database
 pub fn reset_data() -> Result<()> {
