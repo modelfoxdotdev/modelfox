@@ -186,11 +186,11 @@ impl App {
 	}
 
 	pub async fn begin_transaction(&self) -> Result<sqlx::Transaction<'_, sqlx::Any>> {
-		Ok(self.state.database_pool.begin().await?)
+		Ok(self.state.begin_transaction().await?)
 	}
 
 	pub async fn commit_transaction(&self, txn: sqlx::Transaction<'_, sqlx::Any>) -> Result<()> {
-		txn.commit().await?;
+		self.state.commit_transaction(txn).await?;
 		Ok(())
 	}
 }
@@ -201,6 +201,17 @@ impl Drop for App {
 		for notify in &self.tasks {
 			notify.notify_one();
 		}
+	}
+}
+
+impl AppState {
+	pub async fn begin_transaction(&self) -> Result<sqlx::Transaction<'_, sqlx::Any>> {
+		Ok(self.database_pool.begin().await?)
+	}
+
+	pub async fn commit_transaction(&self, txn: sqlx::Transaction<'_, sqlx::Any>) -> Result<()> {
+		txn.commit().await?;
+		Ok(())
 	}
 }
 

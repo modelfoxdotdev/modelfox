@@ -19,10 +19,12 @@ sunfish = "0.3"
 
 [features]
 default = [
-	"tangram_app_new_monitor_client",
-	"tangram_app_new_monitor_server",
+	"tangram_app_alerts_index_server",
+	"tangram_app_alerts_server",
 	"tangram_app_monitors_edit_server",
 	"tangram_app_monitors_index_server",
+	"tangram_app_new_monitor_client",
+	"tangram_app_new_monitor_server",
 	"tangram_app_training_metrics_precision_recall_client",
   "tangram_app_edit_organization_server",
   "tangram_app_health_server",
@@ -112,6 +114,8 @@ toml = "0.5"
 tracing = "0.1"
 url = { version = "2", features = ["serde"] }
 
+tangram_app_alerts_server = { path = "routes/repos/_/models/_/alerts/_/server", optional = true }
+tangram_app_alerts_index_server = { path = "routes/repos/_/models/_/alerts/index/server", optional = true }
 tangram_app_edit_organization_server = { path = "routes/organizations/_/edit/server", optional = true }
 tangram_app_health_server = { path = "routes/health/server", optional = true }
 tangram_app_index_server = { path = "routes/index/server", optional = true }

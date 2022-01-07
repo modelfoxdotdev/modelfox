@@ -3020,6 +3020,8 @@ dependencies = [
  "sha2 0.10.0",
  "sqlx",
  "sunfish",
+ "tangram_app_alerts_index_server",
+ "tangram_app_alerts_server",
  "tangram_app_context",
  "tangram_app_core",
  "tangram_app_edit_organization_server",
@@ -3088,6 +3090,65 @@ dependencies = [
  "toml",
  "tracing",
  "url",
+]
+
+[[package]]
+name = "tangram_app_alerts_index_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+ "tangram_app_context",
+ "tangram_app_core",
+ "tangram_app_layouts",
+ "tangram_app_ui",
+ "tangram_charts",
+ "tangram_core",
+ "tangram_id",
+ "tangram_model",
+ "tangram_ui",
+ "tangram_zip",
+]
+
+[[package]]
+name = "tangram_app_alerts_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+ "tangram_app_context",
+ "tangram_app_core",
+ "tangram_app_layouts",
+ "tangram_app_ui",
+ "tangram_core",
+ "tangram_id",
+ "tangram_model",
+ "tangram_ui",
+ "tangram_zip",
+ "time 0.3.5",
+ "tracing",
 ]
 
 [[package]]

@@ -1,18 +1,19 @@
 use crate::{
 	heuristics::{
 		ALERT_METRICS_HEARTBEAT_DURATION_PRODUCTION, ALERT_METRICS_HEARTBEAT_DURATION_TESTING,
+		ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_DEBUG_THRESHOLD,
 		ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_THRESHOLD,
 	},
 	model::get_model_bytes,
 	production_metrics::{ProductionMetrics, ProductionPredictionMetricsOutput},
-	AppState,
+	App, AppState,
 };
 use anyhow::{anyhow, Result};
 use futures::{select, FutureExt};
 //use lettre::AsyncTransport;
 use serde::{Deserialize, Serialize};
-use sqlx::Row;
-use std::{fmt, io, str::FromStr, sync::Arc};
+use sqlx::prelude::*;
+use std::{borrow::BorrowMut, fmt, io, str::FromStr, sync::Arc};
 use tangram_id::Id;
 use tokio::sync::Notify;
 
@@ -301,7 +302,6 @@ impl AlertResult {
 	}
 }
 
-// FIXME - Monitor.  Monitor produces alerts
 /// Thresholds for generating an Alert
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Monitor {
@@ -368,11 +368,11 @@ impl Monitors {
 /// Collection for the alert results from a single run
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AlertData {
-	pub preference: Monitor,
+	pub id: Id,
+	pub monitor: Monitor,
 	pub results: Vec<AlertResult>,
+	pub timestamp: i64,
 }
-
-// Helpers
 
 // Database interaction
 
@@ -469,7 +469,7 @@ pub async fn create_monitor(
 				($1, $2, $3, $4, $5)
 		",
 	)
-	.bind(Id::generate().to_string())
+	.bind(monitor.id.to_string())
 	.bind(model_id.to_string())
 	.bind(monitor_json)
 	.bind(monitor.cadence.to_string()) // FIXME cadence Encode
@@ -521,10 +521,10 @@ pub async fn update_monitor(
 pub async fn find_current_data(
 	metric: AlertMetric,
 	model_id: Id,
-	context: &AppState,
+	app_state: &AppState,
 ) -> Result<f32> {
 	// Grab the model from the DB
-	let bytes = get_model_bytes(&context.storage, model_id).await?;
+	let bytes = get_model_bytes(&app_state.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
 	// Determine model type
 	let model_inner = model.inner();
@@ -546,7 +546,7 @@ pub async fn find_current_data(
 					binary_classifier
 						.read()
 						.test_metrics()
-						.default_threshold() // TODO ask if this is correct?
+						.default_threshold()
 						.accuracy()
 				}
 				tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
@@ -601,7 +601,7 @@ pub async fn alert_manager(app: Arc<AppState>, notify: Arc<Notify>) -> Result<()
 			ALERT_METRICS_HEARTBEAT_DURATION_PRODUCTION,
 		)
 	} else {
-		// In every mode other than release, don't introduce a delay.  The period is currently 5 seconds.
+		// In every mode other than release, don't introduce a delay.
 		(
 			tokio::time::Instant::now(),
 			ALERT_METRICS_HEARTBEAT_DURATION_TESTING,
@@ -619,7 +619,6 @@ pub async fn alert_manager(app: Arc<AppState>, notify: Arc<Notify>) -> Result<()
 		}
 		// Grab all currently enabled alerts
 		let enabled = get_overdue_monitors(&app).await?;
-		// TODO get_overdue_alerts: "which alerts are currently ready to be processed" - if last run is more than one cadence period ago
 		// For each alert:
 		for monitor in enabled.alerts() {
 			handle_monitor(&app, monitor).await?;
@@ -629,17 +628,19 @@ pub async fn alert_manager(app: Arc<AppState>, notify: Arc<Notify>) -> Result<()
 }
 
 async fn handle_monitor(app: &AppState, monitor: &Monitor) -> Result<()> {
-	// TODO Do separate for dev and release mode
-	let not_enough_existing_metrics = get_total_production_metrics(app).await?
-		< ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_THRESHOLD;
+	let minimum_metrics_threshold = if cfg!(not(debug_assertions)) {
+		ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_THRESHOLD
+	} else {
+		ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_DEBUG_THRESHOLD
+	};
+
+	let mut txn = app.begin_transaction().await?;
+	let not_enough_existing_metrics =
+		get_total_production_metrics(txn.borrow_mut()).await? < minimum_metrics_threshold;
 	if not_enough_existing_metrics {
 		return Ok(());
 	}
-
-	let already_handled = check_ongoing(monitor.id, &app.database_pool).await?;
-	if already_handled {
-		return Ok(());
-	}
+	app.commit_transaction(txn).await?;
 
 	let results = check_metrics(monitor, app).await?;
 	let exceeded_thresholds: Vec<&AlertResult> = results
@@ -662,35 +663,43 @@ async fn handle_monitor(app: &AppState, monitor: &Monitor) -> Result<()> {
 	push_alerts(&exceeded_thresholds, &monitor.methods, app).await?;
 
 	let alert_data = AlertData {
-		preference: monitor.to_owned(),
+		id: Id::generate(),
+		monitor: monitor.to_owned(),
 		results: results.to_owned(),
+		timestamp: time::OffsetDateTime::now_utc().unix_timestamp(),
 	};
-	write_alert(alert_data, monitor.id, &app.database_pool).await?;
+
+	let mut txn = app.begin_transaction().await?;
+	write_alert(alert_data, monitor.id, txn.borrow_mut()).await?;
+	app.commit_transaction(txn).await?;
 
 	Ok(())
 }
 
 /// Return the current observed values for each heuristic
-async fn check_metrics(preference: &Monitor, context: &AppState) -> Result<Vec<AlertResult>> {
+async fn check_metrics(monitor: &Monitor, app_state: &AppState) -> Result<Vec<AlertResult>> {
 	let mut results = Vec::new();
 	let current_training_value =
-		find_current_data(preference.threshold.metric, preference.model_id, context).await?;
+		find_current_data(monitor.threshold.metric, monitor.model_id, app_state).await?;
+	dbg!(current_training_value);
+	let mut txn = app_state.begin_transaction().await?;
 	let current_production_value =
-		get_production_metric(preference.threshold.metric, preference.model_id, context).await?;
+		get_production_metric(monitor.threshold.metric, monitor.model_id, txn.borrow_mut()).await?;
+	dbg!(current_production_value);
 	if current_production_value.is_none() {
 		return Err(anyhow!("Unable to find production metric value"));
 	}
 	let current_production_value = current_production_value.unwrap();
-	let observed_variance = match preference.threshold.mode {
+	let observed_variance = match monitor.threshold.mode {
 		MonitorThresholdMode::Absolute => current_training_value - current_production_value,
-		MonitorThresholdMode::Percentage => todo!(),
+		MonitorThresholdMode::Percentage => ((current_training_value - current_production_value) / current_training_value) * 100.0
 	};
-
 	results.push(AlertResult {
-		metric: preference.threshold.metric,
+		metric: monitor.threshold.metric,
 		observed_value: current_training_value,
 		observed_variance,
 	});
+	app_state.commit_transaction(txn).await?;
 	Ok(results)
 }
 
@@ -698,15 +707,8 @@ async fn check_metrics(preference: &Monitor, context: &AppState) -> Result<Vec<A
 pub async fn get_production_metric(
 	metric: AlertMetric,
 	model_id: Id,
-	context: &AppState,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 ) -> Result<Option<f32>> {
-	let mut db = match context.database_pool.begin().await {
-		Ok(db) => db,
-		Err(_) => {
-			eprintln!("Oh no! Failed to read database!");
-			return Err(anyhow!("Database unavailable"));
-		}
-	};
 	let row = sqlx::query(
 		"
 			select
@@ -722,7 +724,7 @@ pub async fn get_production_metric(
 		",
 	)
 	.bind(model_id.to_string())
-	.fetch_optional(&mut db)
+	.fetch_optional(txn.borrow_mut())
 	.await?;
 	if let Some(row) = row {
 		let data: String = row.get(0);
@@ -754,14 +756,7 @@ pub async fn get_production_metric(
 	}
 }
 
-async fn get_total_production_metrics(context: &AppState) -> Result<i64> {
-	let mut db = match context.database_pool.begin().await {
-		Ok(db) => db,
-		Err(_) => {
-			eprintln!("Oh no! Failed to read database!");
-			return Err(anyhow!("Database unavailable"));
-		}
-	};
+async fn get_total_production_metrics(txn: &mut sqlx::Transaction<'_, sqlx::Any>) -> Result<i64> {
 	let result = sqlx::query(
 		"
 			select
@@ -769,9 +764,8 @@ async fn get_total_production_metrics(context: &AppState) -> Result<i64> {
 			from production_metrics
 		",
 	)
-	.fetch_one(&mut db)
+	.fetch_one(txn.borrow_mut())
 	.await?;
-	db.commit().await?;
 	let result: i64 = result.get(0);
 	Ok(result)
 }
@@ -788,51 +782,13 @@ async fn push_alerts(
 	Ok(())
 }
 
-/// Read the DB to see if the given cadence is already in process
-async fn check_ongoing(id: Id, database_pool: &sqlx::AnyPool) -> Result<bool> {
-	let mut db = match database_pool.begin().await {
-		Ok(db) => db,
-		Err(_) => {
-			eprintln!("Oh no! Failed to read database!");
-			return Err(anyhow!("Database unavailable"));
-		}
-	};
-	let ten_minutes_in_seconds: i32 = 10 * 60;
-	let now = time::OffsetDateTime::now_utc().unix_timestamp();
-	let existing = sqlx::query(
-		"
-			select
-				*
-			from
-				alerts
-			where
-				id = $1 and
-				$2 - alerts.date < $3
-		",
-	)
-	.bind(id.to_string())
-	.bind(&now)
-	.bind(&ten_minutes_in_seconds)
-	.fetch_optional(&mut db)
-	.await?;
-	db.commit().await?;
-	Ok(existing.is_some())
-}
-
 /// Log the completion of an alert handling process
 async fn write_alert(
 	alert_data: AlertData,
 	monitor_id: Id,
-	database_pool: &sqlx::AnyPool,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 ) -> Result<()> {
-	let mut db = match database_pool.begin().await {
-		Ok(db) => db,
-		Err(_) => {
-			eprintln!("Oh no! Failed to write alert progress to DB");
-			return Err(anyhow!("Database unavailable"));
-		}
-	};
-
+	let mut db = txn.begin().await?;
 	let data = serde_json::to_string(&alert_data)?;
 
 	sqlx::query(
@@ -843,11 +799,78 @@ async fn write_alert(
 		 	($1, $2, $3, $4)
 		",
 	)
-	.bind(Id::generate().to_string())
+	.bind(alert_data.id.to_string())
 	.bind(monitor_id.to_string())
 	.bind(data)
-	.execute(&mut db)
+	.bind(alert_data.timestamp)
+	.execute(db.borrow_mut())
 	.await?;
 	db.commit().await?;
 	Ok(())
+}
+
+impl App {
+	/// Retrieve all recorded alerts across all monitors for a given model
+	pub async fn get_all_alerts_for_model(
+		&self,
+		txn: &mut sqlx::Transaction<'_, sqlx::Any>,
+		model_id: Id,
+	) -> Result<Vec<AlertData>> {
+		let rows = sqlx::query(
+			"
+			select
+				alerts.data
+			from
+				monitors
+			join
+				alerts
+			on
+				monitors.id = alerts.monitor_id
+			where 
+				monitors.model_id = $1
+		",
+		)
+		.bind(model_id.to_string())
+		.fetch_all(txn.borrow_mut())
+		.await?;
+		let result = rows
+			.iter()
+			.map(|row| {
+				let data: String = row.get(0);
+				let data: AlertData =
+					serde_json::from_str(&data).expect("Found malformed alert data");
+				data
+			})
+			.collect();
+		Ok(result)
+	}
+
+	/// Retrieve a specific alert by id
+	pub async fn get_alert(
+		&self,
+		txn: &mut sqlx::Transaction<'_, sqlx::Any>,
+		alert_id: Id,
+	) -> Result<Option<AlertData>> {
+		let result = sqlx::query(
+			"
+				select
+					data
+				from
+					alerts
+				where
+					id = $1
+			",
+		)
+		.bind(alert_id.to_string())
+		.fetch_optional(txn.borrow_mut())
+		.await?;
+
+		if let Some(row) = result {
+			let data: String = row.get(0);
+			let data: AlertData = serde_json::from_str(&data).expect("Malformed alert data");
+			Ok(Some(data))
+		} else {
+			Ok(None)
+		}
+	}
 }
