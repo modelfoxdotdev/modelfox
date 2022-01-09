@@ -1,5 +1,5 @@
 {
 	"imports": {
-		"https://js.tangram.dev/": "../../../dist/js.tangram.dev/"
+		"https://js.tangram.dev/deno": "../../../dist/deno/mod.ts"
 	}
 }

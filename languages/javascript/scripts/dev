@@ -1,13 +1,17 @@
 set -e
 
 rm -rf dist/
+mkdir dist/
+mkdir dist/web/
+mkdir dist/bundler/
+mkdir dist/node/
+mkdir dist/deno/
 
 # install npm deps
 npm install
 
 # tangram_node
 cargo build -p tangram_node
-mkdir dist/node/
 cp ../../target/debug/libtangram_node.so dist/node/tangram_x86_64-linux-gnu.node
 
 # tangram_wasm
@@ -23,23 +27,19 @@ npx tsc --module esnext --outDir dist/node/
 cp common.ts dist/deno/common.ts
 
 # web
-mkdir -p dist/web/
 wasm-bindgen --target web --out-dir dist/web/ ../../target/wasm32-unknown-unknown/debug/tangram_wasm.wasm
 cp entrypoints/web.js dist/web/index.js
 
 # bundler
-mkdir -p dist/bundler/
 wasm-bindgen --target bundler --out-dir dist/bundler/ ../../target/wasm32-unknown-unknown/debug/tangram_wasm.wasm
 cp entrypoints/bundler.js dist/bundler/index.js
 
 # node
-mkdir -p dist/node/
 wasm-bindgen --target nodejs --out-dir dist/node/ ../../target/wasm32-unknown-unknown/debug/tangram_wasm.wasm
 mv dist/node/tangram_wasm.js dist/node/tangram_wasm.cjs
 cp entrypoints/node.js dist/node/index.js
 cp entrypoints/node.cjs dist/node/index.cjs
 
 # deno
-mkdir -p dist/deno/
 wasm-bindgen --target deno --out-dir dist/deno/ ../../target/wasm32-unknown-unknown/debug/tangram_wasm.wasm
 cp entrypoints/deno.ts dist/deno/mod.ts

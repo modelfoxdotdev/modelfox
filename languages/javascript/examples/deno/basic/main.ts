@@ -9,7 +9,7 @@ let modelPath = path.join(
 )
 // Load the model from the path.
 let modelData = await Deno.readFile(modelPath)
-let model = new tangram.Model(modelData.buffer)
+let model = new tangram.Model(modelData)
 
 // Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
 let input = {
