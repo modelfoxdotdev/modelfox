@@ -4680,6 +4680,7 @@ dependencies = [
  "tracing-wasm",
  "tree-sitter-highlight",
  "tree-sitter-javascript",
+ "tree-sitter-rust",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -5493,6 +5494,16 @@ name = "tree-sitter-javascript"
 version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2490fab08630b2c8943c320f7b63473cbf65511c8d83aec551beb9b4375906ed"
+dependencies = [
+ "cc",
+ "tree-sitter",
+]
+
+[[package]]
+name = "tree-sitter-rust"
+version = "0.20.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3df540a493d754015d22eaf57c38f58804be3713a22f6062db983ec15f85c3c9"
 dependencies = [
  "cc",
  "tree-sitter",

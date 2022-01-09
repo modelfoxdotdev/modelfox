@@ -344,7 +344,7 @@ pub fn highlight(code: &str, language: Language) -> String {
 	highlight_configuration!(PHP, tree_sitter_javascript);
 	highlight_configuration!(PYTHON, tree_sitter_javascript);
 	highlight_configuration!(RUBY, tree_sitter_javascript);
-	highlight_configuration!(RUST, tree_sitter_javascript);
+	highlight_configuration!(RUST, tree_sitter_rust);
 	let highlight_configuration = match language {
 		Language::Elixir => &ELIXIR,
 		Language::Go => &GO,

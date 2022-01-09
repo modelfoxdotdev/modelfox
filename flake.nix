@@ -153,15 +153,16 @@
         ];
 
         CARGO_UNSTABLE_MULTITARGET = "true";
+        CFLAGS = "-fno-sanitize=undefined";
 
         # aarch64-linux-gnu
         CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER = pkgs.writeShellScriptBin "linker" ''
           for arg do
             shift
-            [ "$arg" = "-lgcc_s" ] && set -- "$@" "-lunwind" && continue
+            [ "$arg" = "-lgcc_s" ] && continue
             set -- "$@" "$arg"
           done
-          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target aarch64-linux-gnu.2.28 $@
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target aarch64-linux-gnu.2.28 -lunwind $@
         '' + /bin/linker;
         CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUSTFLAGS = "-C target-feature=-outline-atomics";
         CC_aarch64_unknown_linux_gnu = pkgs.writeShellScriptBin "cc" ''
@@ -172,10 +173,10 @@
         CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER = pkgs.writeShellScriptBin "linker" ''
           for arg do
             shift
-            [ "$arg" = "-lgcc_s" ] && set -- "$@" "-lunwind" && continue
+            [ "$arg" = "-lgcc_s" ] && continue
             set -- "$@" "$arg"
           done
-          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target aarch64-linux-musl -dynamic $@
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target aarch64-linux-musl -lunwind -dynamic $@
         '' + /bin/linker;
         CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS = "-C target-feature=-crt-static";
         CC_aarch64_unknown_linux_musl = pkgs.writeShellScriptBin "cc" ''
@@ -197,10 +198,10 @@
         CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = pkgs.writeShellScriptBin "linker" ''
           for arg do
             shift
-            [ "$arg" = "-lgcc_s" ] && set -- "$@" "-lunwind" && continue
+            [ "$arg" = "-lgcc_s" ] && continue
             set -- "$@" "$arg"
           done
-          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-linux-gnu.2.28 --ld-path=$(which mold) $@
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-linux-gnu.2.28 -lunwind --ld-path=$(which mold) $@
         '' + /bin/linker;
         CC_x86_64_unknown_linux_gnu = pkgs.writeShellScriptBin "cc" ''
           ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-linux-gnu.2.28 $@
@@ -210,10 +211,10 @@
         CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER = pkgs.writeShellScriptBin "linker" ''
           for arg do
             shift
-            [ "$arg" = "-lgcc_s" ] && set -- "$@" "-lunwind" && continue
+            [ "$arg" = "-lgcc_s" ] && continue
             set -- "$@" "$arg"
           done
-          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-linux-musl -dynamic $@
+          ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-linux-musl -lunwind -dynamic $@
         '' + /bin/linker;
         CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS = "-C target-feature=-crt-static";
         CC_x86_64_unknown_linux_musl = pkgs.writeShellScriptBin "cc" ''
