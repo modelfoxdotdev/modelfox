@@ -1,13 +1,13 @@
-//! This module exposes an HTTP endpoint for predicting against a pregenerated model
+//! This module runs an HTTP server for making predictions with a tangram model.
 //!
-//! Start the server, pointing to a valid `.tangram` file:
+//! Start the server with a `.tangram` file:
 //! ```not-rust
 //! $ tangram serve --model heart_disease.tangram
 //! ```
 //!
 //! Make a request:
 //! ```not-rust
-//! $ curl -X POST 127.0.0.1:8080/predict -H 'Content-Type: application/json' -d '{ "inputs": [{"age": 63.0,"gender": "male","chest_pain": "typical angina","resting_blood_pressure": 145.0,"cholesterol": 233.0,"fasting_blood_sugar_greater_than_120": "true","resting_ecg_result": "probable or definite left ventricular hypertrophy","exercise_max_heart_rate": 150.0,"exercise_induced_angina": "no","exercise_st_depression": 2.3,"exercise_st_slope": "downsloping","fluoroscopy_vessels_colored": "0","thallium_stress_test": "fixed defect"}]}'
+//! $ curl -X POST http://localhost:8080/predict -H 'Content-Type: application/json' -d '{ "inputs": [{"age": 63.0,"gender": "male","chest_pain": "typical angina","resting_blood_pressure": 145.0,"cholesterol": 233.0,"fasting_blood_sugar_greater_than_120": "true","resting_ecg_result": "probable or definite left ventricular hypertrophy","exercise_max_heart_rate": 150.0,"exercise_induced_angina": "no","exercise_st_depression": 2.3,"exercise_st_slope": "downsloping","fluoroscopy_vessels_colored": "0","thallium_stress_test": "fixed defect"}]}'
 //![{"type":"binary_classification","class_name":"Positive","probability":0.560434,"feature_contributions":null}]
 //! ```
 
@@ -97,7 +97,7 @@ mod test {
 	use serde_json::{json, Value};
 
 	fn test_model() -> tangram_core::predict::Model {
-		let bytes = std::fs::read("heart_disease.tangram").unwrap();
+		let bytes = std::fs::read("../../heart_disease.tangram").unwrap();
 		let model = tangram_model::from_bytes(&bytes).unwrap();
 		tangram_core::predict::Model::from(model)
 	}
@@ -157,7 +157,7 @@ mod test {
     {
       "class_name": "Positive",
       "feature_contributions": null,
-      "probability": 0.560434,
+      "probability": 0.5603724,
       "type": "binary_classification"
     }
   ]
@@ -166,25 +166,27 @@ mod test {
 
 	#[tokio::test]
 	async fn test_predict_with_options() {
-		let payload = json!({ "inputs": [{
-			"age": 63.0,
-			"gender": "male",
-			"chest_pain": "typical angina",
-			"resting_blood_pressure": 145.0,
-			"cholesterol": 233.0,
-			"fasting_blood_sugar_greater_than_120": "true",
-			"resting_ecg_result": "probable or definite left ventricular hypertrophy",
-			"exercise_max_heart_rate": 150.0,
-			"exercise_induced_angina": "no",
-			"exercise_st_depression": 2.3,
-			"exercise_st_slope": "downsloping",
-			"fluoroscopy_vessels_colored": "0",
-			"thallium_stress_test": "fixed defect"
-		}],
-		"options": {
-			"threshold": 0.4,
-			"compute_feature_contributions": true
-		}});
+		let payload = json!({
+			"inputs": [{
+				"age": 63.0,
+				"gender": "male",
+				"chest_pain": "typical angina",
+				"resting_blood_pressure": 145.0,
+				"cholesterol": 233.0,
+				"fasting_blood_sugar_greater_than_120": "true",
+				"resting_ecg_result": "probable or definite left ventricular hypertrophy",
+				"exercise_max_heart_rate": 150.0,
+				"exercise_induced_angina": "no",
+				"exercise_st_depression": 2.3,
+				"exercise_st_slope": "downsloping",
+				"fluoroscopy_vessels_colored": "0",
+				"thallium_stress_test": "fixed defect",
+			}],
+			"options": {
+				"threshold": 0.4,
+				"compute_feature_contributions": true,
+			},
+		});
 
 		let mut request = hyper::Request::builder()
 			.method(http::Method::POST)
@@ -202,238 +204,238 @@ mod test {
 		let body = hyper::body::to_bytes(response.into_body()).await.unwrap();
 		let body: Value = serde_json::from_slice(&body).unwrap();
 		insta::assert_json_snapshot!(body, @r###"
-     [
-       {
-         "class_name": "Positive",
-         "feature_contributions": {
-           "baseline_value": 0.20128278,
-           "entries": [
-             {
-               "column_name": "age",
-               "feature_contribution_value": 0.12275841,
-               "feature_value": 0.9329086,
-               "type": "normalized"
-             },
-             {
-               "column_name": "gender",
-               "feature_contribution_value": 0.0,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": null
-             },
-             {
-               "column_name": "gender",
-               "feature_contribution_value": 0.12700649,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": "female"
-             },
-             {
-               "column_name": "gender",
-               "feature_contribution_value": 0.119262576,
-               "feature_value": true,
-               "type": "one_hot_encoded",
-               "variant": "male"
-             },
-             {
-               "column_name": "chest_pain",
-               "feature_contribution_value": 0.0,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": null
-             },
-             {
-               "column_name": "chest_pain",
-               "feature_contribution_value": -0.3736595,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": "asymptomatic"
-             },
-             {
-               "column_name": "chest_pain",
-               "feature_contribution_value": 0.0072757024,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": "atypical angina"
-             },
-             {
-               "column_name": "chest_pain",
-               "feature_contribution_value": 0.10761015,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": "non-angina pain"
-             },
-             {
-               "column_name": "chest_pain",
-               "feature_contribution_value": -0.19594865,
-               "feature_value": true,
-               "type": "one_hot_encoded",
-               "variant": "typical angina"
-             },
-             {
-               "column_name": "resting_blood_pressure",
-               "feature_contribution_value": 0.115394905,
-               "feature_value": 0.82200927,
-               "type": "normalized"
-             },
-             {
-               "column_name": "cholesterol",
-               "feature_contribution_value": -0.035092965,
-               "feature_value": -0.23350535,
-               "type": "normalized"
-             },
-             {
-               "column_name": "fasting_blood_sugar_greater_than_120",
-               "feature_contribution_value": 0.0,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": null
-             },
-             {
-               "column_name": "fasting_blood_sugar_greater_than_120",
-               "feature_contribution_value": -0.052730173,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": "false"
-             },
-             {
-               "column_name": "fasting_blood_sugar_greater_than_120",
-               "feature_contribution_value": -0.074512005,
-               "feature_value": true,
-               "type": "one_hot_encoded",
-               "variant": "true"
-             },
-             {
-               "column_name": "resting_ecg_result",
-               "feature_contribution_value": 0.0,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": null
-             },
-             {
-               "column_name": "resting_ecg_result",
-               "feature_contribution_value": -0.00006990708,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": "ST-T wave abnormality"
-             },
-             {
-               "column_name": "resting_ecg_result",
-               "feature_contribution_value": 0.07310219,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": "normal"
-             },
-             {
-               "column_name": "resting_ecg_result",
-               "feature_contribution_value": 0.05366865,
-               "feature_value": true,
-               "type": "one_hot_encoded",
-               "variant": "probable or definite left ventricular hypertrophy"
-             },
-             {
-               "column_name": "exercise_max_heart_rate",
-               "feature_contribution_value": -0.01721257,
-               "feature_value": 0.03279825,
-               "type": "normalized"
-             },
-             {
-               "column_name": "exercise_induced_angina",
-               "feature_contribution_value": 0.0,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": null
-             },
-             {
-               "column_name": "exercise_induced_angina",
-               "feature_contribution_value": -0.079578854,
-               "feature_value": true,
-               "type": "one_hot_encoded",
-               "variant": "no"
-             },
-             {
-               "column_name": "exercise_induced_angina",
-               "feature_contribution_value": -0.070175245,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": "yes"
-             },
-             {
-               "column_name": "exercise_st_depression",
-               "feature_contribution_value": 0.54184896,
-               "feature_value": 1.1320461,
-               "type": "normalized"
-             },
-             {
-               "column_name": "exercise_st_slope",
-               "feature_contribution_value": 0.0,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": null
-             },
-             {
-               "column_name": "exercise_st_slope",
-               "feature_contribution_value": 0.060956795,
-               "feature_value": true,
-               "type": "one_hot_encoded",
-               "variant": "downsloping"
-             },
-             {
-               "column_name": "exercise_st_slope",
-               "feature_contribution_value": -0.10917909,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": "flat"
-             },
-             {
-               "column_name": "exercise_st_slope",
-               "feature_contribution_value": 0.1394263,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": "upsloping"
-             },
-             {
-               "column_name": "fluoroscopy_vessels_colored",
-               "feature_contribution_value": -0.56697065,
-               "feature_value": -0.7464805,
-               "type": "normalized"
-             },
-             {
-               "column_name": "thallium_stress_test",
-               "feature_contribution_value": -0.00017653508,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": null
-             },
-             {
-               "column_name": "thallium_stress_test",
-               "feature_contribution_value": 0.0515052,
-               "feature_value": true,
-               "type": "one_hot_encoded",
-               "variant": "fixed defect"
-             },
-             {
-               "column_name": "thallium_stress_test",
-               "feature_contribution_value": 0.34776008,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": "normal"
-             },
-             {
-               "column_name": "thallium_stress_test",
-               "feature_contribution_value": -0.25062957,
-               "feature_value": false,
-               "type": "one_hot_encoded",
-               "variant": "reversible defect"
-             }
-           ],
-           "output_value": 0.24292351
-         },
-         "probability": 0.560434,
-         "type": "binary_classification"
-       }
-     ]
-     "###);
+  [
+    {
+      "class_name": "Positive",
+      "feature_contributions": {
+        "baseline_value": 0.20125619,
+        "entries": [
+          {
+            "column_name": "age",
+            "feature_contribution_value": 0.12281423,
+            "feature_value": 0.9329086,
+            "type": "normalized"
+          },
+          {
+            "column_name": "gender",
+            "feature_contribution_value": 0.0,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": null
+          },
+          {
+            "column_name": "gender",
+            "feature_contribution_value": 0.12701331,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": "female"
+          },
+          {
+            "column_name": "gender",
+            "feature_contribution_value": 0.11925187,
+            "feature_value": true,
+            "type": "one_hot_encoded",
+            "variant": "male"
+          },
+          {
+            "column_name": "chest_pain",
+            "feature_contribution_value": 0.0,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": null
+          },
+          {
+            "column_name": "chest_pain",
+            "feature_contribution_value": -0.37381193,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": "asymptomatic"
+          },
+          {
+            "column_name": "chest_pain",
+            "feature_contribution_value": 0.0072756815,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": "atypical angina"
+          },
+          {
+            "column_name": "chest_pain",
+            "feature_contribution_value": 0.10764625,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": "non-angina pain"
+          },
+          {
+            "column_name": "chest_pain",
+            "feature_contribution_value": -0.19596988,
+            "feature_value": true,
+            "type": "one_hot_encoded",
+            "variant": "typical angina"
+          },
+          {
+            "column_name": "resting_blood_pressure",
+            "feature_contribution_value": 0.11539073,
+            "feature_value": 0.82200927,
+            "type": "normalized"
+          },
+          {
+            "column_name": "cholesterol",
+            "feature_contribution_value": -0.035095416,
+            "feature_value": -0.23350535,
+            "type": "normalized"
+          },
+          {
+            "column_name": "fasting_blood_sugar_greater_than_120",
+            "feature_contribution_value": 0.0,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": null
+          },
+          {
+            "column_name": "fasting_blood_sugar_greater_than_120",
+            "feature_contribution_value": -0.052783936,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": "false"
+          },
+          {
+            "column_name": "fasting_blood_sugar_greater_than_120",
+            "feature_contribution_value": -0.07468275,
+            "feature_value": true,
+            "type": "one_hot_encoded",
+            "variant": "true"
+          },
+          {
+            "column_name": "resting_ecg_result",
+            "feature_contribution_value": 0.0,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": null
+          },
+          {
+            "column_name": "resting_ecg_result",
+            "feature_contribution_value": -0.00006990314,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": "ST-T wave abnormality"
+          },
+          {
+            "column_name": "resting_ecg_result",
+            "feature_contribution_value": 0.07311806,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": "normal"
+          },
+          {
+            "column_name": "resting_ecg_result",
+            "feature_contribution_value": 0.053654764,
+            "feature_value": true,
+            "type": "one_hot_encoded",
+            "variant": "probable or definite left ventricular hypertrophy"
+          },
+          {
+            "column_name": "exercise_max_heart_rate",
+            "feature_contribution_value": -0.017210105,
+            "feature_value": 0.03279825,
+            "type": "normalized"
+          },
+          {
+            "column_name": "exercise_induced_angina",
+            "feature_contribution_value": 0.0,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": null
+          },
+          {
+            "column_name": "exercise_induced_angina",
+            "feature_contribution_value": -0.07957997,
+            "feature_value": true,
+            "type": "one_hot_encoded",
+            "variant": "no"
+          },
+          {
+            "column_name": "exercise_induced_angina",
+            "feature_contribution_value": -0.07015497,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": "yes"
+          },
+          {
+            "column_name": "exercise_st_depression",
+            "feature_contribution_value": 0.5418354,
+            "feature_value": 1.1320461,
+            "type": "normalized"
+          },
+          {
+            "column_name": "exercise_st_slope",
+            "feature_contribution_value": 0.0,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": null
+          },
+          {
+            "column_name": "exercise_st_slope",
+            "feature_contribution_value": 0.060970727,
+            "feature_value": true,
+            "type": "one_hot_encoded",
+            "variant": "downsloping"
+          },
+          {
+            "column_name": "exercise_st_slope",
+            "feature_contribution_value": -0.109167024,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": "flat"
+          },
+          {
+            "column_name": "exercise_st_slope",
+            "feature_contribution_value": 0.13944851,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": "upsloping"
+          },
+          {
+            "column_name": "fluoroscopy_vessels_colored",
+            "feature_contribution_value": -0.566962,
+            "feature_value": -0.7464805,
+            "type": "normalized"
+          },
+          {
+            "column_name": "thallium_stress_test",
+            "feature_contribution_value": -0.00017654974,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": null
+          },
+          {
+            "column_name": "thallium_stress_test",
+            "feature_contribution_value": 0.051504944,
+            "feature_value": true,
+            "type": "one_hot_encoded",
+            "variant": "fixed defect"
+          },
+          {
+            "column_name": "thallium_stress_test",
+            "feature_contribution_value": 0.34775603,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": "normal"
+          },
+          {
+            "column_name": "thallium_stress_test",
+            "feature_contribution_value": -0.25059882,
+            "feature_value": false,
+            "type": "one_hot_encoded",
+            "variant": "reversible defect"
+          }
+        ],
+        "output_value": 0.24267349
+      },
+      "probability": 0.5603724,
+      "type": "binary_classification"
+    }
+  ]
+  "###);
 	}
 
 	#[tokio::test]
