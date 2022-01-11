@@ -6,7 +6,10 @@ Gem::Specification.new do |s|
   s.authors = ["Tangram"]
   s.email = "help@tangram.dev"
   s.files = Dir["**/**"].grep_v(/^tangram.gem$/).grep_v(/^examples/)
-  s.homepage = "https://rubygems.org/gems/tangram"
+  s.homepage = "https://www.tangram.dev/"
+  s.metadata = {
+    "source_code_uri" => "https://github.com/tangramdotdev/tangram/tree/main/languages/ruby"
+  }
   s.license = "MIT"
   s.add_dependency "ffi", "~> 1"
 end
