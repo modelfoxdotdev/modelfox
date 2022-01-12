@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{bail, Result};
 use chrono::{Datelike, TimeZone, Timelike, Utc};
 use clap::{ArgEnum, Parser};
 use num::ToPrimitive;
@@ -16,10 +16,13 @@ use tangram_app_core::{
 };
 use tangram_id::Id;
 use tangram_table::TableView;
+use url::Url;
 
 #[derive(Parser)]
 pub struct Args {
 	#[clap(long)]
+	pub database_url: Option<Url>,
+	#[clap(long, default_value = "1000")]
 	pub examples_count: usize,
 }
 
@@ -53,7 +56,8 @@ pub async fn main() -> Result<()> {
 		tangram_table::Table::from_path(Path::new(dataset.path), Default::default(), &mut |_| {})?;
 	let mut rng = rand::thread_rng();
 	reset_data()?;
-	let app = App::new(tangram_app_core::options::Options::default()).await?;
+	let options = init_options(args.database_url)?;
+	let app = App::new(options).await?;
 	let mut txn = app.begin_transaction().await?;
 	let repo_id = app.create_root_repo(&mut txn, "Heart Disease").await?;
 	let model_id = app
@@ -103,6 +107,26 @@ pub async fn main() -> Result<()> {
 	app.track_events(&mut txn, events).await?;
 	app.commit_transaction(txn).await?;
 	Ok(())
+}
+
+fn init_options(database_url: Option<Url>) -> Result<tangram_app_core::options::Options> {
+	let mut options = tangram_app_core::options::Options::default();
+	if database_url.is_none() {
+		return Ok(options);
+	}
+
+	let database_url = database_url.unwrap();
+	match database_url.scheme() {
+		"postgres" | "sqlite" => {
+			let database_options = tangram_app_core::options::DatabaseOptions {
+				max_connections: None,
+				url: database_url,
+			};
+			options.database = database_options;
+			Ok(options)
+		}
+		_ => bail!("Unsupported database URL scheme"),
+	}
 }
 
 fn generate_fake_monitors() -> Vec<MonitorConfig> {

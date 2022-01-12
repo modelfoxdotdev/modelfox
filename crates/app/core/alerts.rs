@@ -26,7 +26,7 @@ use tokio::sync::Notify;
 #[serde(tag = "type")]
 pub enum AlertCadence {
 	#[serde(rename = "testing")]
-	Testing,
+	Testing = 0,
 	#[serde(rename = "hourly")]
 	Hourly,
 	#[serde(rename = "daily")]
@@ -35,16 +35,6 @@ pub enum AlertCadence {
 	Weekly,
 	#[serde(rename = "monthly")]
 	Monthly,
-}
-
-// store timestamp, truncate to significant portion.
-
-impl AlertCadence {
-	pub fn duration(&self) -> tokio::time::Duration {
-		// This is really not a duration, it's looking for the time until the next interval?
-		// think about this more
-		todo!()
-	}
 }
 
 impl Default for AlertCadence {
@@ -79,6 +69,35 @@ impl FromStr for AlertCadence {
 				io::ErrorKind::InvalidInput,
 				format!("Unsupported cadence {}", s),
 			)),
+		}
+	}
+}
+
+impl TryFrom<u8> for AlertCadence {
+	type Error = std::io::Error;
+	fn try_from(value: u8) -> Result<Self, Self::Error> {
+		match value {
+			0 => Ok(AlertCadence::Testing),
+			1 => Ok(AlertCadence::Hourly),
+			2 => Ok(AlertCadence::Daily),
+			3 => Ok(AlertCadence::Weekly),
+			4 => Ok(AlertCadence::Monthly),
+			_ => Err(std::io::Error::new(
+				std::io::ErrorKind::InvalidInput,
+				"Must be integer in 0..=4",
+			)),
+		}
+	}
+}
+
+impl From<AlertCadence> for u8 {
+	fn from(cadence: AlertCadence) -> Self {
+		match cadence {
+			AlertCadence::Testing => 0,
+			AlertCadence::Hourly => 1,
+			AlertCadence::Daily => 2,
+			AlertCadence::Weekly => 3,
+			AlertCadence::Monthly => 4,
 		}
 	}
 }
@@ -427,7 +446,7 @@ pub async fn check_for_duplicate_monitor(
 	monitor: &Monitor,
 	model_id: Id,
 ) -> Result<bool> {
-	// Pull all rows with matching metric and cadence
+	// Pull all rows with matching model
 	// Verify none of them have identical thresholds
 	let rows = sqlx::query(
 		"
@@ -472,8 +491,8 @@ pub async fn create_monitor(
 	.bind(monitor.id.to_string())
 	.bind(model_id.to_string())
 	.bind(monitor_json)
-	.bind(monitor.cadence.to_string()) // FIXME cadence Encode
-	.bind(time::OffsetDateTime::now_utc().unix_timestamp().to_string())
+	.bind(u8::from(monitor.cadence) as i64) // FIXME cadence Encode
+	.bind(time::OffsetDateTime::now_utc().unix_timestamp())
 	.execute(db)
 	.await?;
 	Ok(())
@@ -692,7 +711,9 @@ async fn check_metrics(monitor: &Monitor, app_state: &AppState) -> Result<Vec<Al
 	let current_production_value = current_production_value.unwrap();
 	let observed_variance = match monitor.threshold.mode {
 		MonitorThresholdMode::Absolute => current_training_value - current_production_value,
-		MonitorThresholdMode::Percentage => ((current_training_value - current_production_value) / current_training_value) * 100.0
+		MonitorThresholdMode::Percentage => {
+			((current_training_value - current_production_value) / current_training_value) * 100.0
+		}
 	};
 	results.push(AlertResult {
 		metric: monitor.threshold.metric,
