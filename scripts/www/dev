@@ -1,3 +1,6 @@
 cargo run -p tangram_dev -- \
-  --watch crates \
+  --watch . \
+  --ignore .git \
+  --ignore languages \
+  --ignore target \
   --command "cargo run -p tangram_www -- serve"
