@@ -55,7 +55,7 @@ pub async fn main() -> Result<()> {
 	let table =
 		tangram_table::Table::from_path(Path::new(dataset.path), Default::default(), &mut |_| {})?;
 	let mut rng = rand::thread_rng();
-	reset_data()?;
+	reset_data(&args.database_url).await?;
 	let options = init_options(args.database_url)?;
 	let app = App::new(options).await?;
 	let mut txn = app.begin_transaction().await?;
