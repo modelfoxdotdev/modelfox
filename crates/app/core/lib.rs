@@ -231,8 +231,7 @@ impl AppState {
 /// Remove all contents of the data dir, including the database
 pub async fn reset_data(database_url: &Option<Url>) -> Result<()> {
 	if let Some(database_url) = database_url {
-		match database_url.scheme() {
-			"postgres" => {
+		if database_url.scheme() == "postgres" {
 				let pool = PgPoolOptions::new()
 					.max_connections(1)
 					.connect(database_url.as_str())
@@ -247,8 +246,7 @@ pub async fn reset_data(database_url: &Option<Url>) -> Result<()> {
 				sqlx::query("GRANT ALL ON SCHEMA public TO public")
 					.execute(&pool)
 					.await?;
-			}
-			_ => { /* No action for any other schema */ }
+			
 		}
 	}
 	std::fs::remove_dir_all(data_path()?)?;
