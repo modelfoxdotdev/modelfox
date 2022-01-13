@@ -1,5 +1,5 @@
 use crate::{
-	alerts::alert_manager,
+	alerts::{alert_sender, monitor_checker},
 	options::{Options, StorageOptions},
 	storage::{LocalStorage, S3Storage, Storage},
 };
@@ -27,6 +27,7 @@ pub mod timezone;
 pub mod track;
 pub mod user;
 
+#[derive(Debug)]
 pub struct AppState {
 	pub database_pool: sqlx::AnyPool,
 	pub options: Options,
@@ -36,7 +37,8 @@ pub struct AppState {
 
 pub struct App {
 	pub state: Arc<AppState>,
-	tasks: Vec<Arc<Notify>>,
+	monitor_checker_notify: Arc<Notify>,
+	alert_sender_notify: Arc<Notify>,
 }
 
 struct CreateDatabasePoolOptions {
@@ -53,8 +55,9 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 			.create_if_missing(true)
 			.foreign_keys(true)
 			.journal_mode(sqlx::sqlite::SqliteJournalMode::Wal)
+			.shared_cache(true)
 			.into();
-		let pool_max_connections = options.database_max_connections.unwrap_or(1);
+		let pool_max_connections = options.database_max_connections.unwrap_or(10);
 		(pool_options, pool_max_connections)
 	} else if database_url.starts_with("postgres:") {
 		let pool_options = database_url
@@ -171,17 +174,28 @@ impl App {
 			storage,
 		};
 		let state = Arc::new(state);
-		let alert_manager_notify = Arc::new(Notify::new());
+		let monitor_checker_notify = Arc::new(Notify::new());
+		let alert_sender_notify = Arc::new(Notify::new());
 		tokio::spawn({
 			let state = Arc::clone(&state);
-			let alert_manager_notify = Arc::clone(&alert_manager_notify);
+			let monitor_checker_notify = Arc::clone(&monitor_checker_notify);
 			async move {
-				alert_manager(state, alert_manager_notify).await.unwrap();
+				monitor_checker(state, monitor_checker_notify)
+					.await
+					.unwrap();
+			}
+		});
+		tokio::spawn({
+			let state = Arc::clone(&state);
+			let alert_sender_notify = Arc::clone(&alert_sender_notify);
+			async move {
+				alert_sender(state, alert_sender_notify).await.unwrap();
 			}
 		});
 		let app = App {
 			state,
-			tasks: vec![alert_manager_notify],
+			monitor_checker_notify,
+			alert_sender_notify,
 		};
 		Ok(app)
 	}
@@ -198,10 +212,8 @@ impl App {
 
 impl Drop for App {
 	fn drop(&mut self) {
-		// Notify each task in self.tasks to end.
-		for notify in &self.tasks {
-			notify.notify_one();
-		}
+		self.alert_sender_notify.notify_one();
+		self.monitor_checker_notify.notify_one();
 	}
 }
 
@@ -236,7 +248,7 @@ pub async fn reset_data(database_url: &Option<Url>) -> Result<()> {
 					.execute(&pool)
 					.await?;
 			}
-			_ => {/* No action for any other schema */}
+			_ => { /* No action for any other schema */ }
 		}
 	}
 	std::fs::remove_dir_all(data_path()?)?;

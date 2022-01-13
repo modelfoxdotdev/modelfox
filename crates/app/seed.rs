@@ -136,8 +136,8 @@ fn generate_fake_monitors() -> Vec<MonitorConfig> {
 			threshold: MonitorThreshold {
 				metric: AlertMetric::Accuracy,
 				mode: MonitorThresholdMode::Absolute,
-				variance_lower: Some(0.5),
-				variance_upper: Some(0.5),
+				difference_lower: Some(0.5),
+				difference_upper: Some(0.5),
 			},
 			title: None,
 		},
@@ -146,8 +146,8 @@ fn generate_fake_monitors() -> Vec<MonitorConfig> {
 			threshold: MonitorThreshold {
 				metric: AlertMetric::Accuracy,
 				mode: MonitorThresholdMode::Percentage,
-				variance_lower: Some(0.3),
-				variance_upper: None,
+				difference_lower: Some(0.3),
+				difference_upper: None,
 			},
 			title: None,
 		},
@@ -156,8 +156,8 @@ fn generate_fake_monitors() -> Vec<MonitorConfig> {
 			threshold: MonitorThreshold {
 				metric: AlertMetric::Accuracy,
 				mode: MonitorThresholdMode::Absolute,
-				variance_lower: Some(0.2),
-				variance_upper: Some(0.1),
+				difference_lower: Some(0.2),
+				difference_upper: Some(0.1),
 			},
 			title: None,
 		},
@@ -166,8 +166,8 @@ fn generate_fake_monitors() -> Vec<MonitorConfig> {
 			threshold: MonitorThreshold {
 				metric: AlertMetric::Accuracy,
 				mode: MonitorThresholdMode::Percentage,
-				variance_lower: None,
-				variance_upper: Some(0.1),
+				difference_lower: None,
+				difference_upper: Some(0.1),
 			},
 			title: None,
 		},

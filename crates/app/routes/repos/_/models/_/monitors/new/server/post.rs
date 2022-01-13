@@ -93,7 +93,6 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		methods.push(AlertMethod::Webhook(webhook));
 	}
 	let threshold_bounds = validate_threshold_bounds(threshold_lower, threshold_upper);
-	dbg!(&threshold_bounds);
 	if threshold_bounds.is_none() {
 		let page = Page {
 			model_layout_info,
@@ -107,12 +106,12 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			.unwrap();
 		return Ok(response);
 	}
-	let (variance_lower, variance_upper) = extract_threshold_bounds(threshold_bounds.unwrap())?;
+	let (difference_lower, difference_upper) = extract_threshold_bounds(threshold_bounds.unwrap())?;
 	let threshold = MonitorThreshold {
 		metric,
 		mode: MonitorThresholdMode::from_str(&mode)?,
-		variance_lower,
-		variance_upper,
+		difference_lower,
+		difference_upper,
 	};
 	let args = tangram_app_core::monitor::CreateMonitorArgs {
 		db: &mut db,

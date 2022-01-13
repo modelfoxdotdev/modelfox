@@ -80,10 +80,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	};
 	let action: Action = match serde_urlencoded::from_bytes(&data) {
 		Ok(action) => action,
-		Err(_) => {
-			dbg!(data);
-			return Ok(bad_request());
-		}
+		Err(_) => return Ok(bad_request())
 	};
 	let bytes = get_model_bytes(&app_state.storage, model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
@@ -145,8 +142,8 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			let threshold = MonitorThreshold {
 				metric,
 				mode: MonitorThresholdMode::from_str(&mode)?,
-				variance_lower,
-				variance_upper,
+				difference_lower: variance_lower,
+				difference_upper: variance_upper,
 			};
 			let cadence = AlertCadence::from_str(&cadence)?;
 			let args = tangram_app_core::monitor::UpdateMonitorArgs {

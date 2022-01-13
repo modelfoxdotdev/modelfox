@@ -42,7 +42,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		return Ok(not_found());
 	}
 	let model_layout_info =
-		model_layout_info(&mut db, app_state, model_id, ModelNavItem::Monitors).await?;
+		model_layout_info(&mut db, app_state, model_id, ModelNavItem::Alerts).await?;
 	let alerts = app.get_all_alerts_for_model(&mut db, model_id).await?;
 	let alerts_table = if !alerts.is_empty() {
 		let rows = alerts

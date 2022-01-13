@@ -16,10 +16,7 @@ use sqlx::prelude::*;
 use std::{borrow::BorrowMut, fmt, io, str::FromStr, sync::Arc};
 use tangram_id::Id;
 use tokio::sync::Notify;
-
-// Task
-
-// Types
+use tracing::info_span;
 
 /// Alert cadence
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
@@ -114,39 +111,14 @@ pub enum AlertMethod {
 	Webhook(String),
 }
 
-impl AlertMethod {
-	pub async fn send_alert(
-		&self,
-		exceeded_thresholds: &[&AlertResult],
-		_context: &AppState,
-	) -> Result<()> {
-		match self {
-			AlertMethod::Email(_address) => {
-				// TODO re-enable this code!
-				/*
-				let email = lettre::Message::builder()
-					.from("Tangram <noreply@tangram.dev>".parse()?)
-					.to(address.parse()?)
-					.subject("Tangram Metrics Alert")
-					.body(format!(
-						"Exceeded alert thresholds: {:?}",
-						exceeded_thresholds
-					))?;
-				if let Some(smtp_transport) = &context.smtp_transport {
-					smtp_transport.send(email).await?;
-				} else {
-					return Err(anyhow!("No SMTP Transport in context"));
-				}
-				*/
-			}
-			AlertMethod::Stdout => println!("exceeded thresholds: {:?}", exceeded_thresholds),
-			AlertMethod::Webhook(_url) => {
-				// Spawn a thread
-				// Attempt the POST, record status in DB.
-				// If status has failed, attempt again until it succeeds.
-			}
-		}
-		Ok(())
+impl fmt::Display for AlertMethod {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		let s = match self {
+			AlertMethod::Email(addr) => format!("Email: {}", addr),
+			AlertMethod::Stdout => "stdout".to_owned(),
+			AlertMethod::Webhook(url) => format!("Webhook URL: {}", url),
+		};
+		write!(f, "{}", s)
 	}
 }
 
@@ -264,8 +236,8 @@ impl FromStr for MonitorThresholdMode {
 pub struct MonitorThreshold {
 	pub metric: AlertMetric,
 	pub mode: MonitorThresholdMode,
-	pub variance_lower: Option<f32>,
-	pub variance_upper: Option<f32>,
+	pub difference_lower: Option<f32>,
+	pub difference_upper: Option<f32>,
 }
 
 impl Default for MonitorThreshold {
@@ -273,8 +245,8 @@ impl Default for MonitorThreshold {
 		MonitorThreshold {
 			metric: AlertMetric::Accuracy,
 			mode: MonitorThresholdMode::Absolute,
-			variance_lower: Some(0.1),
-			variance_upper: Some(0.1),
+			difference_lower: Some(0.1),
+			difference_upper: Some(0.1),
 		}
 	}
 }
@@ -310,14 +282,15 @@ pub fn validate_threshold_bounds(lower: String, upper: String) -> Option<(String
 #[derive(Debug, Clone, Copy, Deserialize, Serialize)]
 pub struct AlertResult {
 	pub metric: AlertMetric,
-	pub observed_value: f32,
-	pub observed_variance: f32,
+	pub production_value: f32,
+	pub training_value: f32,
+	pub difference: f32,
 }
 
 impl AlertResult {
 	/// Should this result send an alert?
 	pub fn exceeds_threshold(&self, tolerance: f32) -> bool {
-		self.observed_variance.abs() > tolerance
+		self.difference.abs() > tolerance
 	}
 }
 
@@ -334,53 +307,107 @@ pub struct Monitor {
 
 impl Monitor {
 	pub fn get_thresholds(&self) -> (Option<f32>, Option<f32>) {
-		(self.threshold.variance_upper, self.threshold.variance_lower)
+		(
+			self.threshold.difference_upper,
+			self.threshold.difference_lower,
+		)
 	}
+
 	/// Check if the given timestamp is more than one cadence interval behind the current time
-	// FIXME - this is not correct.  Check when the last one was, when the next one should be, etc.
-	// For now, just returns true all the time.
-	pub fn is_overdue(&self) -> bool {
-		//let now = time::OffsetDateTime::now_utc().unix_timestamp() as u64;
-		//let offset = now - timestamp;
-		//offset > self.cadence.duration().as_secs()
-		true
+	pub async fn is_overdue(&self, txn: &mut sqlx::Transaction<'_, sqlx::Any>) -> Result<bool> {
+		// check when the last alert from this cadence was recorded
+		let last_run = {
+			let result = sqlx::query(
+				"
+					select
+						last_checked
+					from
+						monitors
+					where
+						monitors.id = $1
+				",
+			)
+			.bind(&self.id.to_string())
+			.fetch_optional(txn.borrow_mut())
+			.await?;
+			if let Some(row) = result {
+				let timestamp = row.try_get(0);
+				if timestamp.is_err() {
+					None
+				} else {
+					Some(time::OffsetDateTime::from_unix_timestamp(
+						timestamp.unwrap(),
+					)?)
+				}
+			} else {
+				None
+			}
+		};
+		// If there is no previous run, we know we need to run.  Early return
+		if last_run.is_none() {
+			return Ok(true);
+		}
+		// Otherwise, unwrap it and calculate the expected next run
+		let last_run = last_run.unwrap();
+
+		// For each cadence, advance by one unit from the previous recorded timestamp
+		use time::Duration;
+		let next_due = match &self.cadence {
+			AlertCadence::Testing => last_run.checked_add(Duration::SECOND).unwrap(),
+			AlertCadence::Hourly => last_run.checked_add(Duration::HOUR).unwrap(),
+			AlertCadence::Daily => last_run.checked_add(Duration::DAY).unwrap(),
+			AlertCadence::Weekly => last_run.checked_add(Duration::WEEK).unwrap(),
+			AlertCadence::Monthly => {
+				let last_run_year = last_run.year();
+				let last_run_month = last_run.month();
+				let next_run_month = last_run_month.next();
+				let next_run_year = if last_run_month == time::Month::December {
+					last_run_year + 1
+				} else {
+					last_run_year
+				};
+				let last_run_day = last_run.day();
+				let days_in_next_run_month =
+					time::util::days_in_year_month(next_run_year, next_run_month);
+
+				let next_run_day = if last_run_day + 1 > days_in_next_run_month {
+					days_in_next_run_month
+				} else {
+					last_run_day + 1
+				};
+				let next_run_date =
+					time::Date::from_calendar_date(next_run_year, next_run_month, next_run_day)?;
+				last_run.replace_date(next_run_date)
+			}
+		};
+
+		// if we're over the next one, return true.
+		let now = time::OffsetDateTime::now_utc();
+		Ok(now >= next_due)
+	}
+
+	pub async fn update_timestamp(&self, txn: &mut sqlx::Transaction<'_, sqlx::Any>) -> Result<()> {
+		let now = time::OffsetDateTime::now_utc().unix_timestamp();
+		sqlx::query(
+			"
+				update
+					monitors
+				set
+					last_checked = $1
+				where
+					id = $2
+			",
+		)
+		.bind(now)
+		.bind(self.id.to_string())
+		.execute(txn.borrow_mut())
+		.await?;
+
+		Ok(())
 	}
 
 	pub fn default_title(&self) -> String {
 		format!("{} {}", self.cadence, self.threshold.metric)
-	}
-}
-
-/// Manager for all enabled alerts
-#[derive(Debug, Default)]
-pub struct Monitors(Vec<Monitor>);
-
-impl From<Vec<Monitor>> for Monitors {
-	fn from(v: Vec<Monitor>) -> Self {
-		Self(v)
-	}
-}
-
-impl Monitors {
-	// Retrieve all currently enabled cadences
-	pub fn get_cadences(&self) -> Vec<AlertCadence> {
-		self.0
-			.iter()
-			.map(|ah| ah.cadence)
-			.collect::<Vec<AlertCadence>>()
-	}
-	pub fn alerts(&self) -> &[Monitor] {
-		&self.0
-	}
-
-	/// Retrieve the heuristics for the given cadence, if present
-	pub fn cadence(&self, cadence: AlertCadence) -> Option<&Monitor> {
-		for heuristics in &self.0 {
-			if heuristics.cadence == cadence {
-				return Some(heuristics);
-			}
-		}
-		None
 	}
 }
 
@@ -389,7 +416,7 @@ impl Monitors {
 pub struct AlertData {
 	pub id: Id,
 	pub monitor: Monitor,
-	pub results: Vec<AlertResult>,
+	pub result: AlertResult,
 	pub timestamp: i64,
 }
 
@@ -417,8 +444,8 @@ pub async fn get_monitor(
 	Ok(monitor)
 }
 
-pub async fn get_overdue_monitors(app: &AppState) -> Result<Monitors> {
-	let mut db = app.database_pool.begin().await?;
+pub async fn get_overdue_monitors(app: &AppState) -> Result<Vec<Monitor>> {
+	let mut txn = app.begin_transaction().await?;
 	let rows = sqlx::query(
 		"
 			select
@@ -427,18 +454,24 @@ pub async fn get_overdue_monitors(app: &AppState) -> Result<Monitors> {
 				monitors
 		",
 	)
-	.fetch_all(&mut db)
+	.fetch_all(txn.borrow_mut())
 	.await?;
-	db.commit().await?;
 	let monitors: Vec<Monitor> = rows
 		.iter()
 		.map(|row| {
 			let monitor: String = row.get(0);
 			serde_json::from_str(&monitor).unwrap()
 		})
-		.filter(|monitor: &Monitor| monitor.is_overdue())
 		.collect();
-	Ok(Monitors::from(monitors))
+	let mut result = Vec::new();
+	// TODO do this in the query, not in Rust.
+	for monitor in monitors {
+		if monitor.is_overdue(txn.borrow_mut()).await? {
+			result.push(monitor);
+		}
+	}
+	app.commit_transaction(txn).await?;
+	Ok(result)
 }
 
 pub async fn check_for_duplicate_monitor(
@@ -483,16 +516,15 @@ pub async fn create_monitor(
 	sqlx::query(
 		"
 			insert into monitors
-				(id, model_id, data, cadence, date)
+				(id, model_id, data, cadence)
 			values
-				($1, $2, $3, $4, $5)
+				($1, $2, $3, $4)
 		",
 	)
 	.bind(monitor.id.to_string())
 	.bind(model_id.to_string())
 	.bind(monitor_json)
 	.bind(u8::from(monitor.cadence) as i64) // FIXME cadence Encode
-	.bind(time::OffsetDateTime::now_utc().unix_timestamp())
 	.execute(db)
 	.await?;
 	Ok(())
@@ -597,15 +629,10 @@ pub async fn find_current_data(
 }
 
 /// Manage periodic alerting
-pub async fn alert_manager(app: Arc<AppState>, notify: Arc<Notify>) -> Result<()> {
-	// TODO - webhook check.
-	// Scrape the DB for any incomplete webhook attempts, and spawn an exponential decay thread for any found
-
+pub async fn monitor_checker(app: Arc<AppState>, notify: Arc<Notify>) -> Result<()> {
 	let (begin, period) = if cfg!(not(debug_assertions)) {
 		// In release mode, calculate time until next heartbeat
 		// Start heartbeat at the top of the hour, run once per hour
-		// FIXME - see https://github.com/tangramdotdev/tangram/blob/879c3805e81238e4c30c26725e1bdca5cd0d095e/crates/app/routes/track/server/post.rs#L231
-		// that uses chrono, do the same thing with time
 		let now = time::OffsetDateTime::now_utc();
 		let now_timestamp = now.unix_timestamp();
 		let hour = now.hour();
@@ -631,22 +658,50 @@ pub async fn alert_manager(app: Arc<AppState>, notify: Arc<Notify>) -> Result<()
 
 	// Each interval:
 	loop {
+		let _span = info_span!("monitor_checker_heartbeat");
+		tracing::info!("Begin monitor_checker heartbeat");
 		// If we've been notified of shutdown, break the loop.  Otherwise, continue and handle interval
 		select! {
 			_ = interval.tick().fuse() => {},
 			_ = notify.notified().fuse() => break,
 		}
-		// Grab all currently enabled alerts
-		let enabled = get_overdue_monitors(&app).await?;
-		// For each alert:
-		for monitor in enabled.alerts() {
-			handle_monitor(&app, monitor).await?;
+		let monitors = get_overdue_monitors(&app).await?;
+		for monitor in monitors {
+			app.check_monitor(&monitor).await?;
 		}
+		tracing::info!("End monitor_checker heartbeat");
 	}
 	Ok(())
 }
 
-async fn handle_monitor(app: &AppState, monitor: &Monitor) -> Result<()> {
+/// Read database for unsent alerts
+#[tracing::instrument(level = "info")]
+pub async fn alert_sender(app: Arc<AppState>, notify: Arc<Notify>) -> Result<()> {
+	let mut interval = tokio::time::interval_at(
+		tokio::time::Instant::now(),
+		tokio::time::Duration::from_secs(60),
+	);
+
+	loop {
+		let _span = info_span!("alert_sender_heartbeat");
+		select! {
+			_ = interval.tick().fuse() => {},
+			_ = notify.notified().fuse() => break,
+		}
+		tracing::info!("Begin alert_sender heartbeat");
+		let mut txn = app.begin_transaction().await?;
+		let unsent_alerts = app.get_unsent_alerts(txn.borrow_mut()).await?;
+		for alert in unsent_alerts {
+			app.send_alert(alert, txn.borrow_mut()).await?;
+		}
+		app.commit_transaction(txn).await?;
+		tracing::info!("End alert_sender heartbeat");
+	}
+
+	Ok(())
+}
+
+pub async fn bring_monitor_up_to_date(app: &AppState, monitor: &Monitor) -> Result<()> {
 	let minimum_metrics_threshold = if cfg!(not(debug_assertions)) {
 		ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_THRESHOLD
 	} else {
@@ -654,74 +709,70 @@ async fn handle_monitor(app: &AppState, monitor: &Monitor) -> Result<()> {
 	};
 
 	let mut txn = app.begin_transaction().await?;
+
 	let not_enough_existing_metrics =
 		get_total_production_metrics(txn.borrow_mut()).await? < minimum_metrics_threshold;
 	if not_enough_existing_metrics {
 		return Ok(());
 	}
-	app.commit_transaction(txn).await?;
 
-	let results = check_metrics(monitor, app).await?;
-	let exceeded_thresholds: Vec<&AlertResult> = results
-		.iter()
-		.filter(|r| {
-			let (upper, lower) = monitor.get_thresholds();
-			let upper_exceeded = if let Some(u) = upper {
-				r.observed_variance > u
-			} else {
-				false
-			};
-			let lower_exceeded = if let Some(l) = lower {
-				r.observed_variance < l
-			} else {
-				false
-			};
-			upper_exceeded || lower_exceeded
-		})
-		.collect();
-	push_alerts(&exceeded_thresholds, &monitor.methods, app).await?;
-
-	let alert_data = AlertData {
-		id: Id::generate(),
-		monitor: monitor.to_owned(),
-		results: results.to_owned(),
-		timestamp: time::OffsetDateTime::now_utc().unix_timestamp(),
+	let result = check_metrics(monitor, app).await?;
+	let exceeded_thresholds: bool = {
+		let (upper, lower) = monitor.get_thresholds();
+		let upper_exceeded = if let Some(upper) = upper {
+			result.difference > upper
+		} else {
+			false
+		};
+		let lower_exceeded = if let Some(lower) = lower {
+			result.difference < lower
+		} else {
+			false
+		};
+		upper_exceeded || lower_exceeded
 	};
 
-	let mut txn = app.begin_transaction().await?;
-	write_alert(alert_data, monitor.id, txn.borrow_mut()).await?;
+	if exceeded_thresholds {
+		let alert_data = AlertData {
+			id: Id::generate(),
+			monitor: monitor.to_owned(),
+			result: result.to_owned(),
+			timestamp: time::OffsetDateTime::now_utc().unix_timestamp(),
+		};
+		write_alert(alert_data, monitor.id, txn.borrow_mut()).await?;
+	}
 	app.commit_transaction(txn).await?;
 
 	Ok(())
 }
 
 /// Return the current observed values for each heuristic
-async fn check_metrics(monitor: &Monitor, app_state: &AppState) -> Result<Vec<AlertResult>> {
-	let mut results = Vec::new();
+async fn check_metrics(monitor: &Monitor, app_state: &AppState) -> Result<AlertResult> {
 	let current_training_value =
 		find_current_data(monitor.threshold.metric, monitor.model_id, app_state).await?;
-	dbg!(current_training_value);
 	let mut txn = app_state.begin_transaction().await?;
 	let current_production_value =
 		get_production_metric(monitor.threshold.metric, monitor.model_id, txn.borrow_mut()).await?;
-	dbg!(current_production_value);
 	if current_production_value.is_none() {
 		return Err(anyhow!("Unable to find production metric value"));
 	}
 	let current_production_value = current_production_value.unwrap();
-	let observed_variance = match monitor.threshold.mode {
-		MonitorThresholdMode::Absolute => current_training_value - current_production_value,
+	let observed_difference = match monitor.threshold.mode {
+		MonitorThresholdMode::Absolute => current_production_value - current_training_value,
 		MonitorThresholdMode::Percentage => {
-			((current_training_value - current_production_value) / current_training_value) * 100.0
+			((current_production_value - current_training_value) / current_training_value) * 100.0
 		}
 	};
-	results.push(AlertResult {
+	let result = AlertResult {
 		metric: monitor.threshold.metric,
-		observed_value: current_training_value,
-		observed_variance,
-	});
+		production_value: current_production_value,
+		training_value: current_training_value,
+		difference: observed_difference,
+	};
+	// Update monitor last-checked time
+	monitor.update_timestamp(txn.borrow_mut()).await?;
 	app_state.commit_transaction(txn).await?;
-	Ok(results)
+	Ok(result)
 }
 
 /// Retrieve the latest value for the given metric from the production_metrics table
@@ -791,15 +842,24 @@ async fn get_total_production_metrics(txn: &mut sqlx::Transaction<'_, sqlx::Any>
 	Ok(result)
 }
 
-/// Send alerts containing all exceeded thresholds to each enabled alert method
-async fn push_alerts(
-	exceeded_thresholds: &[&AlertResult],
-	methods: &[AlertMethod],
-	context: &AppState,
+/// Update an alert record to indicate it has been sent
+pub async fn set_alert_sent(
+	alert_id: Id,
+	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 ) -> Result<()> {
-	for method in methods {
-		method.send_alert(exceeded_thresholds, context).await?;
-	}
+	sqlx::query(
+		"
+			update
+				alerts
+			set 
+				sent = 1
+			where
+				id = $1
+		",
+	)
+	.bind(alert_id.to_string())
+	.execute(txn.borrow_mut())
+	.await?;
 	Ok(())
 }
 
@@ -815,9 +875,9 @@ async fn write_alert(
 	sqlx::query(
 		"
 		 insert into alerts
-		 	(id, monitor_id, data, date)
+		 	(id, monitor_id, data, sent, date)
 		 values
-		 	($1, $2, $3, $4)
+		 	($1, $2, $3, 0, $4)
 		",
 	)
 	.bind(alert_data.id.to_string())
@@ -893,5 +953,77 @@ impl App {
 		} else {
 			Ok(None)
 		}
+	}
+}
+
+impl AppState {
+	pub async fn get_unsent_alerts(
+		&self,
+		txn: &mut sqlx::Transaction<'_, sqlx::Any>,
+	) -> Result<Vec<AlertData>> {
+		let results = sqlx::query(
+			"
+				select
+					data
+				from
+					alerts
+				where
+					sent = 0
+			",
+		)
+		.fetch_all(txn.borrow_mut())
+		.await?;
+		Ok(results
+			.into_iter()
+			.map(|row| {
+				let alert_data: String = row.get(0);
+				let alert_data: AlertData =
+					serde_json::from_str(&alert_data).expect("Malformed alert data");
+				alert_data
+			})
+			.collect())
+	}
+
+	pub async fn send_alert(
+		&self,
+		alert: AlertData,
+		txn: &mut sqlx::Transaction<'_, sqlx::Any>,
+	) -> Result<()> {
+		for method in alert.monitor.methods {
+			match method {
+				AlertMethod::Email(_address) => {
+					// TODO re-enable this code!
+					/*
+					let email = lettre::Message::builder()
+						.from("Tangram <noreply@tangram.dev>".parse()?)
+						.to(address.parse()?)
+						.subject("Tangram Metrics Alert")
+						.body(format!(
+							"Exceeded alert thresholds: {:?}",
+							exceeded_thresholds
+						))?;
+					if let Some(smtp_transport) = &context.smtp_transport {
+						smtp_transport.send(email).await?;
+					} else {
+						return Err(anyhow!("No SMTP Transport in context"));
+					}
+					*/
+				}
+				AlertMethod::Stdout => println!("exceeded thresholds: {:?}", alert.result),
+				AlertMethod::Webhook(_url) => {
+					// Spawn a task
+					// Attempt the POST, record status in DB.
+					// If status has failed, attempt again until it succeeds.
+
+					// multi-step handshake
+					// first, confirm DB is idle
+					// commit to Sending
+					// send
+					// commit to Idle
+				}
+			}
+		}
+		set_alert_sent(alert.id, txn.borrow_mut()).await?;
+		Ok(())
 	}
 }

@@ -40,12 +40,12 @@ impl Component for Page {
 				AlertMethod::Email(e) => e.to_string(),
 				_ => acc,
 			});
-		let lower = if let Some(l) = self.monitor.threshold.variance_lower {
+		let lower = if let Some(l) = self.monitor.threshold.difference_lower {
 			l.to_string()
 		} else {
 			String::new()
 		};
-		let upper = if let Some(u) = self.monitor.threshold.variance_upper {
+		let upper = if let Some(u) = self.monitor.threshold.difference_upper {
 			u.to_string()
 		} else {
 			String::new()

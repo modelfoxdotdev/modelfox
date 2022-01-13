@@ -4,9 +4,7 @@ use pinwheel::prelude::*;
 use std::{str::FromStr, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
-	alerts::AlertModelType,
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
-	model::get_model_bytes,
 	path_components,
 	user::{authorize_user, authorize_user_for_model},
 };
@@ -40,11 +38,8 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
-	let bytes = get_model_bytes(&app_state.storage, model_id).await?;
-	let model = tangram_model::from_bytes(&bytes)?;
-	let model_type = AlertModelType::from(model.inner());
 	let model_layout_info =
-		model_layout_info(&mut db, app_state, model_id, ModelNavItem::Monitors).await?;
+		model_layout_info(&mut db, app_state, model_id, ModelNavItem::Alerts).await?;
 	let alert = app.get_alert(&mut db, Id::from_str(alert_id)?).await?;
 	if alert.is_none() {
 		error!("Alert {} not found in database", alert_id);
@@ -54,7 +49,6 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		alert: alert.unwrap(),
 		alert_id: alert_id.to_string(),
 		model_layout_info,
-		model_type,
 		error: None,
 	};
 	app.commit_transaction(db).await?;

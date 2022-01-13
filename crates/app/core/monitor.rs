@@ -1,13 +1,19 @@
-use super::App;
+use super::{App, AppState};
 use crate::alerts::{
 	check_for_duplicate_monitor, create_monitor, get_monitor, update_monitor, AlertCadence,
-	AlertMethod, Monitor, MonitorThreshold,
+	AlertMethod, Monitor, MonitorThreshold, bring_monitor_up_to_date
 };
 use anyhow::{anyhow, Result};
 use sqlx::Acquire;
 use tangram_id::Id;
 
 impl App {
+	/// Check a monitor, writing an alert to the DB if necessary
+	pub async fn check_monitor(&self, monitor: &Monitor) -> Result<()> {
+		self.state.check_monitor(monitor).await?;
+		Ok(())
+	}
+
 	pub async fn create_monitor(&self, args: CreateMonitorArgs<'_, '_>) -> Result<()> {
 		let CreateMonitorArgs {
 			db,
@@ -94,6 +100,13 @@ impl App {
 			return Err(anyhow!("Identical alert already exists"));
 		}
 		update_monitor(db, &monitor, monitor_id).await?;
+		Ok(())
+	}
+}
+
+impl AppState {
+	pub async fn check_monitor(&self, monitor: &Monitor) -> Result<()> {
+		bring_monitor_up_to_date(self, monitor).await?;
 		Ok(())
 	}
 }

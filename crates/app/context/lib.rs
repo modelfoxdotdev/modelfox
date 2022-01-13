@@ -20,5 +20,4 @@ impl Context {
 	}
 }
 
-/// FIXME - this will be an enum of feature flags
 pub struct FeatureFlag;

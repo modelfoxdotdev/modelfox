@@ -49,7 +49,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 			select
 				id,
 				data,
-				date
+				last_checked
 			from monitors
 			where model_id = $1
 		",
