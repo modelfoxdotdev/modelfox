@@ -1,13 +1,26 @@
+use crate::App;
 use anyhow::{anyhow, Result};
-use std::path::PathBuf;
+use async_trait::async_trait;
+use bytes::Bytes;
+use std::{
+	collections::HashMap,
+	path::PathBuf,
+	sync::{Arc, RwLock},
+};
 use tangram_id::Id;
 use tokio::fs;
 
 #[derive(Debug)]
 #[allow(clippy::large_enum_variant)]
 pub enum Storage {
+	InMemory(InMemoryStorage),
 	Local(LocalStorage),
 	S3(S3Storage),
+}
+
+#[derive(Debug)]
+pub struct InMemoryStorage {
+	storage: Arc<RwLock<HashMap<Id, Bytes>>>,
 }
 
 #[derive(Debug)]
@@ -21,9 +34,62 @@ pub struct S3Storage {
 	cache_path: PathBuf,
 }
 
+pub enum BytesOrFilePath {
+	Bytes(Bytes),
+	Path(PathBuf),
+}
+
+impl From<Bytes> for BytesOrFilePath {
+	fn from(bytes: Bytes) -> Self {
+		BytesOrFilePath::Bytes(bytes)
+	}
+}
+
+impl From<PathBuf> for BytesOrFilePath {
+	fn from(path_buf: PathBuf) -> Self {
+		BytesOrFilePath::Path(path_buf)
+	}
+}
+
+impl TryFrom<BytesOrFilePath> for Bytes {
+	type Error = anyhow::Error;
+	fn try_from(value: BytesOrFilePath) -> Result<Self, Self::Error> {
+		match value {
+			BytesOrFilePath::Bytes(bytes) => Ok(bytes),
+			BytesOrFilePath::Path(_) => {
+				Err(anyhow!("Attempt to extract PathBuf from Bytes variant"))
+			}
+		}
+	}
+}
+
+impl TryFrom<BytesOrFilePath> for PathBuf {
+	type Error = anyhow::Error;
+	fn try_from(value: BytesOrFilePath) -> Result<Self, Self::Error> {
+		match value {
+			BytesOrFilePath::Bytes(_) => {
+				Err(anyhow!("Attempt to extract bytes from FilePath variant"))
+			}
+			BytesOrFilePath::Path(path_buf) => Ok(path_buf),
+		}
+	}
+}
+
+/// This trait represents types which can serve as storage buckets for the Tangram app.
+#[async_trait]
+trait StorageTrait {
+	/// Retrieve an entity from storage.
+	async fn get(&self, entity: StorageEntity, id: Id) -> Result<BytesOrFilePath>;
+	/// Add the provided bytes to the storage.
+	async fn set(&self, entity: StorageEntity, id: Id, data: &[u8]) -> Result<()>;
+	/// Delete an item from storage.
+	async fn remove(&self, entity: StorageEntity, id: Id) -> Result<()>;
+}
+
 impl Storage {
-	pub async fn get(&self, entity: StorageEntity, id: Id) -> Result<PathBuf> {
+	pub async fn get(&self, entity: StorageEntity, id: Id) -> Result<BytesOrFilePath> {
 		match self {
+			Storage::InMemory(s) => s.get(entity, id).await,
 			Storage::Local(s) => s.get(entity, id).await,
 			Storage::S3(s) => s.get(entity, id).await,
 		}
@@ -31,6 +97,7 @@ impl Storage {
 
 	pub async fn set(&self, entity: StorageEntity, id: Id, data: &[u8]) -> Result<()> {
 		match self {
+			Storage::InMemory(s) => s.set(entity, id, data).await,
 			Storage::Local(s) => s.set(entity, id, data).await,
 			Storage::S3(s) => s.set(entity, id, data).await,
 		}
@@ -38,20 +105,69 @@ impl Storage {
 
 	pub async fn remove(&self, entity: StorageEntity, id: Id) -> Result<()> {
 		match self {
+			Storage::InMemory(s) => s.remove(entity, id).await,
 			Storage::Local(s) => s.remove(entity, id).await,
 			Storage::S3(s) => s.remove(entity, id).await,
 		}
 	}
 }
 
-impl LocalStorage {
-	pub async fn get(&self, entity: StorageEntity, id: Id) -> Result<PathBuf> {
-		let entity_path = self.path.join(entity.dir_name());
-		let path = entity_path.join(id.to_string());
-		Ok(path)
+impl InMemoryStorage {
+	pub fn new() -> Self {
+		Self {
+			storage: Arc::new(RwLock::new(HashMap::new())),
+		}
+	}
+}
+
+impl Default for InMemoryStorage {
+	fn default() -> Self {
+		Self::new()
+	}
+}
+
+#[async_trait]
+impl StorageTrait for InMemoryStorage {
+	async fn get(&self, _entity: StorageEntity, id: Id) -> Result<BytesOrFilePath> {
+		let storage = Arc::clone(&self.storage);
+		let ret = if let Ok(read_guard) = storage.read() {
+			if let Some(bytes) = (*read_guard).get(&id) {
+				Ok(BytesOrFilePath::from(bytes.clone()))
+			} else {
+				Err(anyhow!("No such ID in storage"))
+			}
+		} else {
+			Err(anyhow!("Could not access in-memory storage"))
+		};
+		ret
 	}
 
-	pub async fn set(&self, entity: StorageEntity, id: Id, data: &[u8]) -> Result<()> {
+	async fn set(&self, _entity: StorageEntity, id: Id, data: &[u8]) -> Result<()> {
+		let storage = Arc::clone(&self.storage);
+		if let Ok(mut write_guard) = storage.write() {
+			(*write_guard).insert(id, Bytes::from(data.to_owned()));
+		}
+		Ok(())
+	}
+
+	async fn remove(&self, _entity: StorageEntity, id: Id) -> Result<()> {
+		let storage = Arc::clone(&self.storage);
+		if let Ok(mut write_guard) = storage.write() {
+			(*write_guard).remove(&id);
+		}
+		Ok(())
+	}
+}
+
+#[async_trait]
+impl StorageTrait for LocalStorage {
+	async fn get(&self, entity: StorageEntity, id: Id) -> Result<BytesOrFilePath> {
+		let entity_path = self.path.join(entity.dir_name());
+		let path = entity_path.join(id.to_string());
+		Ok(BytesOrFilePath::from(path))
+	}
+
+	async fn set(&self, entity: StorageEntity, id: Id, data: &[u8]) -> Result<()> {
 		let entity_path = self.path.join(entity.dir_name());
 		fs::create_dir_all(&entity_path).await?;
 		let item_path = entity_path.join(id.to_string());
@@ -59,7 +175,7 @@ impl LocalStorage {
 		Ok(())
 	}
 
-	pub async fn remove(&self, entity: StorageEntity, id: Id) -> Result<()> {
+	async fn remove(&self, entity: StorageEntity, id: Id) -> Result<()> {
 		let entity_path = self.path.join(entity.dir_name());
 		let item_path = entity_path.join(id.to_string());
 		fs::remove_file(item_path).await?;
@@ -87,13 +203,16 @@ impl S3Storage {
 		.map_err(|e| anyhow!(e.to_string()))?;
 		Ok(S3Storage { bucket, cache_path })
 	}
+}
 
-	pub async fn get(&self, entity: StorageEntity, id: Id) -> Result<PathBuf> {
+#[async_trait]
+impl StorageTrait for S3Storage {
+	async fn get(&self, entity: StorageEntity, id: Id) -> Result<BytesOrFilePath> {
 		// Attempt to retrieve the item from the cache.
 		let entity_cache_path = self.cache_path.join(entity.dir_name());
 		let item_cache_path = entity_cache_path.join(id.to_string());
 		if fs::metadata(&item_cache_path).await.is_ok() {
-			return Ok(item_cache_path);
+			return Ok(BytesOrFilePath::from(item_cache_path));
 		}
 		// Retrieve the item from s3 and cache it.
 		let (data, _) = self
@@ -104,10 +223,10 @@ impl S3Storage {
 		// Add the item to the cache.
 		fs::create_dir_all(&entity_cache_path).await?;
 		fs::write(&item_cache_path, data).await?;
-		Ok(item_cache_path)
+		Ok(BytesOrFilePath::from(item_cache_path))
 	}
 
-	pub async fn set(&self, entity: StorageEntity, id: Id, data: &[u8]) -> Result<()> {
+	async fn set(&self, entity: StorageEntity, id: Id, data: &[u8]) -> Result<()> {
 		let entity_cache_path = self.cache_path.join(entity.dir_name());
 		fs::create_dir_all(&entity_cache_path).await?;
 		let item_cache_path = entity_cache_path.join(id.to_string());
@@ -121,7 +240,7 @@ impl S3Storage {
 		Ok(())
 	}
 
-	pub async fn remove(&self, entity: StorageEntity, id: Id) -> Result<()> {
+	async fn remove(&self, entity: StorageEntity, id: Id) -> Result<()> {
 		// Remove the item from the cache if it exists.
 		let entity_cache_path = self.cache_path.join(entity.dir_name());
 		let item_cache_path = entity_cache_path.join(id.to_string());
@@ -151,5 +270,11 @@ impl StorageEntity {
 		match self {
 			StorageEntity::Model => "models",
 		}
+	}
+}
+
+impl App {
+	pub fn storage(&self) -> &Storage {
+		&self.state.storage
 	}
 }

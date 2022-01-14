@@ -1,4 +1,4 @@
-use crate::{data_path, default_database_url};
+use crate::{data_path, default_database_url, App};
 use std::net::IpAddr;
 use std::path::PathBuf;
 use url::Url;
@@ -33,6 +33,7 @@ pub struct SmtpOptions {
 
 #[derive(Debug, Clone)]
 pub enum StorageOptions {
+	InMemory,
 	Local(LocalStorageOptions),
 	S3(S3StorageOptions),
 }
@@ -91,5 +92,11 @@ impl Default for Options {
 			storage,
 			url: None,
 		}
+	}
+}
+
+impl App {
+	pub fn options(&self) -> &Options {
+		&self.state.options
 	}
 }

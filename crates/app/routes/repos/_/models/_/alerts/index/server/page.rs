@@ -59,11 +59,8 @@ impl Component for AlertsTable {
 				ui::TableBody::new().children(self.rows.into_iter().map(|row| {
 					ui::TableRow::new()
 						.child(
-							ui::TableCell::new().child(
-								ui::Link::new()
-									.href(format!("./{}", row.id))
-									.child(row.id),
-							),
+							ui::TableCell::new()
+								.child(ui::Link::new().href(format!("./{}", row.id)).child(row.id)),
 						)
 						.child(ui::TableCell::new().child(row.last_updated))
 				})),

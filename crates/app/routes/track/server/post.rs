@@ -17,7 +17,7 @@ enum MonitorEventSet {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app_state = &context.app.state;
+	let app = &context.app;
 	let bytes = match hyper::body::to_bytes(request.body_mut()).await {
 		Ok(bytes) => bytes,
 		Err(e) => {
@@ -36,7 +36,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		MonitorEventSet::Single(monitor_event) => vec![monitor_event],
 		MonitorEventSet::Multiple(monitor_event) => monitor_event,
 	};
-	let mut db = match app_state.database_pool.begin().await {
+	let mut db = match app.begin_transaction().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
@@ -46,7 +46,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			MonitorEvent::Prediction(monitor_event) => {
 				let handle_prediction_result = handle_prediction_monitor_event(
 					&mut db,
-					&app_state.storage,
+					app.storage(),
 					&mut model_cache,
 					monitor_event,
 				)
@@ -59,7 +59,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			MonitorEvent::TrueValue(monitor_event) => {
 				let handle_true_value_result = handle_true_value_monitor_event(
 					&mut db,
-					&app_state.storage,
+					app.storage(),
 					&mut model_cache,
 					monitor_event,
 				)
@@ -70,7 +70,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			}
 		}
 	}
-	db.commit().await?;
+	app.commit_transaction(db).await?;
 	let response = http::Response::builder()
 		.status(http::StatusCode::ACCEPTED)
 		.body(hyper::Body::empty())

@@ -17,12 +17,11 @@ struct Action {
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
 	let app = &context.app;
-	let app_state = &app.state;
 	let mut txn = match app.begin_transaction().await {
 		Ok(txn) => txn,
-		Err(_) => return Ok(service_unavailable())
+		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut txn, app_state.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut txn, app.options().auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -52,14 +51,14 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		};
 		match *owner_type {
 			"user" => {
-				create_user_repo(&mut txn, owner_id, repo_id, &title).await?;
+				create_user_repo(&mut txn, owner_id, repo_id, &title, app.clock()).await?;
 				repo_id
 			}
 			"organization" => {
 				if !authorize_user_for_organization(&mut txn, &user, owner_id).await? {
 					return Ok(not_found());
 				};
-				create_org_repo(&mut txn, owner_id, repo_id, title.as_str()).await?;
+				create_org_repo(&mut txn, owner_id, repo_id, title.as_str(), app.clock()).await?;
 				repo_id
 			}
 			_ => return Ok(bad_request()),

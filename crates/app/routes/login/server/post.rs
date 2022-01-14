@@ -1,6 +1,5 @@
 use crate::page::{Page, Stage};
 use anyhow::Result;
-use chrono::prelude::*;
 use lettre::AsyncTransport;
 use pinwheel::prelude::*;
 use rand::Rng;
@@ -18,7 +17,7 @@ struct Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app_state = &context.app.state;
+	let app = &context.app;
 	// Read the post data.
 	let data = match hyper::body::to_bytes(request.body_mut()).await {
 		Ok(data) => data,
@@ -28,7 +27,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(data) => data,
 		Err(_) => return Ok(bad_request()),
 	};
-	let mut db = match app_state.database_pool.begin().await {
+	let mut db = match app.begin_transaction().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
@@ -63,11 +62,11 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	.await?
 	.get(0);
 	let user_id: Id = user_id.parse()?;
-	if app_state.options.auth_enabled() {
+	if app.options().auth_enabled() {
 		if let Some(code) = code {
 			// Verify the code.
 			let ten_minutes_in_seconds: i32 = 10 * 60;
-			let now = Utc::now().timestamp();
+			let now = app.clock().now_utc().unix_timestamp();
 			let row = sqlx::query(
 				"
 					select
@@ -121,7 +120,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			// Generate a code and redirect back to the login form.
 			let code: u64 = rand::thread_rng().gen_range(0..1_000_000);
 			let code = format!("{:06}", code);
-			let now = Utc::now().timestamp();
+			let now = app.clock().now_utc().unix_timestamp();
 			let code_id = Id::generate();
 			sqlx::query(
 				"
@@ -139,7 +138,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			.bind(&code)
 			.execute(db.borrow_mut())
 			.await?;
-			if let Some(smtp_transport) = app_state.smtp_transport.clone() {
+			if let Some(smtp_transport) = app.smtp_transport() {
 				send_code_email(smtp_transport, email.clone(), code).await?;
 			}
 			db.commit().await?;
@@ -155,7 +154,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	}
 	let token = create_token(&mut db, user_id).await?;
 	db.commit().await?;
-	let set_cookie = set_cookie_header_value(token, app_state.options.cookie_domain.as_deref());
+	let set_cookie = set_cookie_header_value(token, app.options().cookie_domain.as_deref());
 	let response = http::Response::builder()
 		.status(http::StatusCode::SEE_OTHER)
 		.header(http::header::LOCATION, "/")
@@ -210,7 +209,7 @@ fn set_cookie_header_value(token: Id, domain: Option<&str>) -> String {
 }
 
 async fn send_code_email(
-	smtp_transport: lettre::AsyncSmtpTransport<lettre::Tokio1Executor>,
+	smtp_transport: &lettre::AsyncSmtpTransport<lettre::Tokio1Executor>,
 	email: String,
 	code: String,
 ) -> Result<()> {

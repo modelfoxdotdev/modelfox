@@ -1,7 +1,7 @@
 use super::{App, AppState};
 use crate::alerts::{
-	check_for_duplicate_monitor, create_monitor, get_monitor, update_monitor, AlertCadence,
-	AlertMethod, Monitor, MonitorThreshold, bring_monitor_up_to_date
+	bring_monitor_up_to_date, check_for_duplicate_monitor, create_monitor, get_monitor,
+	update_monitor, AlertCadence, AlertMethod, Monitor, MonitorThreshold,
 };
 use anyhow::{anyhow, Result};
 use sqlx::Acquire;
@@ -99,7 +99,7 @@ impl App {
 		if check_for_duplicate_monitor(db, &monitor, model_id).await? {
 			return Err(anyhow!("Identical alert already exists"));
 		}
-		update_monitor(db, &monitor, monitor_id).await?;
+		update_monitor(db, &monitor, monitor_id, &self.state.clock).await?;
 		Ok(())
 	}
 }

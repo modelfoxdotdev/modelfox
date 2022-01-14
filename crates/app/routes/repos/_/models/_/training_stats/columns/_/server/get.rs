@@ -20,12 +20,12 @@ use tangram_ui as ui;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app_state = &context.app.state;
-	let mut db = match app_state.database_pool.begin().await {
+	let app = &context.app;
+	let mut db = match app.begin_transaction().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, app_state.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app.options().auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -44,7 +44,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
-	let bytes = get_model_bytes(&app_state.storage, model_id).await?;
+	let bytes = get_model_bytes(app.storage(), model_id).await?;
 	let model = tangram_model::from_bytes(&bytes)?;
 	let (column_stats, target_column_stats) = match model.inner() {
 		tangram_model::ModelInnerReader::Regressor(regressor) => {
@@ -168,7 +168,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		}
 	};
 	let model_layout_info =
-		model_layout_info(&mut db, app_state, model_id, ModelNavItem::TrainingStats).await?;
+		model_layout_info(&mut db, app, model_id, ModelNavItem::TrainingStats).await?;
 	let page = Page {
 		inner,
 		model_layout_info,
@@ -178,5 +178,6 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))
 		.unwrap();
+	app.commit_transaction(db).await?;
 	Ok(response)
 }

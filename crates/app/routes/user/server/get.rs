@@ -17,19 +17,19 @@ use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app_state = &context.app.state;
-	if !app_state.options.auth_enabled() {
+	let app = &context.app;
+	if !app.options().auth_enabled() {
 		return Ok(not_found());
 	}
-	let mut db = match app_state.database_pool.begin().await {
+	let mut db = match app.begin_transaction().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, app_state.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app.options().auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
-	let app_layout_info = app_layout_info(app_state).await?;
+	let app_layout_info = app_layout_info(app).await?;
 	let page = match user {
 		User::Root => {
 			let repos = get_root_user_repositories(&mut db).await?;
@@ -100,6 +100,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))
 		.unwrap();
+	app.commit_transaction(db).await?;
 	Ok(response)
 }
 

@@ -15,7 +15,6 @@ use tracing::error;
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = request.extensions().get::<Arc<Context>>().unwrap().clone();
 	let app = &context.app;
-	let app_state = &app.state;
 	let (model_id, alert_id) = if let ["repos", _, "models", model_id, "alerts", alert_id] =
 		path_components(request).as_slice()
 	{
@@ -31,15 +30,14 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, app_state.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app.options().auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
-	let model_layout_info =
-		model_layout_info(&mut db, app_state, model_id, ModelNavItem::Alerts).await?;
+	let model_layout_info = model_layout_info(&mut db, app, model_id, ModelNavItem::Alerts).await?;
 	let alert = app.get_alert(&mut db, Id::from_str(alert_id)?).await?;
 	if alert.is_none() {
 		error!("Alert {} not found in database", alert_id);

@@ -1,4 +1,5 @@
 use crate::{
+	clock::Clock,
 	heuristics::{
 		ALERT_METRICS_HEARTBEAT_DURATION_PRODUCTION, ALERT_METRICS_HEARTBEAT_DURATION_TESTING,
 		ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_DEBUG_THRESHOLD,
@@ -314,7 +315,11 @@ impl Monitor {
 	}
 
 	/// Check if the given timestamp is more than one cadence interval behind the current time
-	pub async fn is_overdue(&self, txn: &mut sqlx::Transaction<'_, sqlx::Any>) -> Result<bool> {
+	pub async fn is_overdue(
+		&self,
+		txn: &mut sqlx::Transaction<'_, sqlx::Any>,
+		clock: &Clock,
+	) -> Result<bool> {
 		// check when the last alert from this cadence was recorded
 		let last_run = {
 			let result = sqlx::query(
@@ -382,12 +387,16 @@ impl Monitor {
 		};
 
 		// if we're over the next one, return true.
-		let now = time::OffsetDateTime::now_utc();
+		let now = clock.now_utc();
 		Ok(now >= next_due)
 	}
 
-	pub async fn update_timestamp(&self, txn: &mut sqlx::Transaction<'_, sqlx::Any>) -> Result<()> {
-		let now = time::OffsetDateTime::now_utc().unix_timestamp();
+	pub async fn update_timestamp(
+		&self,
+		txn: &mut sqlx::Transaction<'_, sqlx::Any>,
+		clock: &Clock,
+	) -> Result<()> {
+		let now = clock.now_utc().unix_timestamp();
 		sqlx::query(
 			"
 				update
@@ -444,8 +453,8 @@ pub async fn get_monitor(
 	Ok(monitor)
 }
 
-pub async fn get_overdue_monitors(app: &AppState) -> Result<Vec<Monitor>> {
-	let mut txn = app.begin_transaction().await?;
+pub async fn get_overdue_monitors(app_state: &AppState) -> Result<Vec<Monitor>> {
+	let mut txn = app_state.begin_transaction().await?;
 	let rows = sqlx::query(
 		"
 			select
@@ -466,11 +475,14 @@ pub async fn get_overdue_monitors(app: &AppState) -> Result<Vec<Monitor>> {
 	let mut result = Vec::new();
 	// TODO do this in the query, not in Rust.
 	for monitor in monitors {
-		if monitor.is_overdue(txn.borrow_mut()).await? {
+		if monitor
+			.is_overdue(txn.borrow_mut(), &app_state.clock)
+			.await?
+		{
 			result.push(monitor);
 		}
 	}
-	app.commit_transaction(txn).await?;
+	app_state.commit_transaction(txn).await?;
 	Ok(result)
 }
 
@@ -550,6 +562,7 @@ pub async fn update_monitor(
 	db: &mut sqlx::Transaction<'_, sqlx::Any>,
 	new_monitor: &Monitor,
 	monitor_id: Id,
+	clock: &Clock,
 ) -> Result<()> {
 	let monitor_json = serde_json::to_string(new_monitor)?;
 	sqlx::query(
@@ -561,7 +574,7 @@ pub async fn update_monitor(
 		",
 	)
 	.bind(monitor_json)
-	.bind(time::OffsetDateTime::now_utc().unix_timestamp().to_string())
+	.bind(clock.now_utc().unix_timestamp().to_string())
 	.bind(monitor_id.to_string())
 	.execute(db)
 	.await?;
@@ -633,7 +646,7 @@ pub async fn monitor_checker(app: Arc<AppState>, notify: Arc<Notify>) -> Result<
 	let (begin, period) = if cfg!(not(debug_assertions)) {
 		// In release mode, calculate time until next heartbeat
 		// Start heartbeat at the top of the hour, run once per hour
-		let now = time::OffsetDateTime::now_utc();
+		let now = app.clock.now_utc();
 		let now_timestamp = now.unix_timestamp();
 		let hour = now.hour();
 		let next_start = now.replace_time(time::Time::from_hms(hour + 1, 0, 0)?);
@@ -770,7 +783,9 @@ async fn check_metrics(monitor: &Monitor, app_state: &AppState) -> Result<AlertR
 		difference: observed_difference,
 	};
 	// Update monitor last-checked time
-	monitor.update_timestamp(txn.borrow_mut()).await?;
+	monitor
+		.update_timestamp(txn.borrow_mut(), &app_state.clock)
+		.await?;
 	app_state.commit_transaction(txn).await?;
 	Ok(result)
 }
@@ -1027,3 +1042,4 @@ impl AppState {
 		Ok(())
 	}
 }
+

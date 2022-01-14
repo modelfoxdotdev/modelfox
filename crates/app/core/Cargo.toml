@@ -13,6 +13,8 @@ insta = "1"
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
+async-trait = "0.1"
+bytes = "1"
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.6", features = ["serde"] }
 dirs = "4"
@@ -41,10 +43,11 @@ tangram_finite = { path = "../../finite" }
 tangram_id = { path = "../../id" }
 tangram_metrics = { path = "../../metrics" }
 tangram_model = { path = "../../model" }
+tangram_table = { path = "../../table" }
 tangram_text = { path = "../../text" }
 tangram_ui = { path = "../../ui" }
 tangram_zip = { path = "../../zip" }
-time = "0.3"
+time = { version = "0.3", features = ["macros"] }
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 url = { version = "2", features = ["serde"] }

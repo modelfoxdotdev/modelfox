@@ -7,7 +7,7 @@ use tangram_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	repos::get_model_version_ids,
 	user::{authorize_user, authorize_user_for_model},
-	AppState,
+	App,
 };
 use tangram_app_ui::topbar::{Topbar, TopbarAvatar};
 use tangram_id::Id;
@@ -46,7 +46,7 @@ impl ModelLayout {
 
 pub async fn model_layout_info(
 	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
-	app_state: &AppState,
+	app: &App,
 	model_id: Id,
 	selected_item: ModelNavItem,
 ) -> Result<ModelLayoutInfo> {
@@ -96,7 +96,7 @@ pub async fn model_layout_info(
 	} else {
 		None
 	};
-	let topbar_avatar = if app_state.options.auth_enabled() {
+	let topbar_avatar = if app.options().auth_enabled() {
 		Some(TopbarAvatar { avatar_url: None })
 	} else {
 		None
@@ -127,12 +127,12 @@ pub async fn post(
 	model_id: &str,
 ) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app_state = &context.app.state;
-	let mut db = match app_state.database_pool.begin().await {
+	let app = &context.app;
+	let mut db = match app.begin_transaction().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, app_state.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app.options().auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -144,7 +144,7 @@ pub async fn post(
 		return Ok(not_found());
 	}
 	let response = delete_model(&mut db, model_id).await?;
-	db.commit().await?;
+	app.commit_transaction(db).await?;
 	Ok(response)
 }
 

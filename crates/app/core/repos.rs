@@ -1,10 +1,10 @@
 use crate::{
+	clock::Clock,
 	storage::{Storage, StorageEntity},
 	user::NormalUser,
 	App,
 };
 use anyhow::Result;
-use chrono::prelude::*;
 use sqlx::prelude::*;
 use std::borrow::BorrowMut;
 use tangram_id::Id;
@@ -148,6 +148,7 @@ pub async fn create_root_repo(
 	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	repo_id: Id,
 	title: &str,
+	clock: &Clock,
 ) -> Result<()> {
 	sqlx::query(
 		"
@@ -159,7 +160,7 @@ pub async fn create_root_repo(
 		",
 	)
 	.bind(&repo_id.to_string())
-	.bind(&Utc::now().timestamp())
+	.bind(clock.now_utc().unix_timestamp())
 	.bind(&title)
 	.execute(txn.borrow_mut())
 	.await?;
@@ -171,6 +172,7 @@ pub async fn create_user_repo(
 	user_id: Id,
 	repo_id: Id,
 	title: &str,
+	clock: &Clock,
 ) -> Result<()> {
 	sqlx::query(
 		"
@@ -182,7 +184,7 @@ pub async fn create_user_repo(
 		",
 	)
 	.bind(&repo_id.to_string())
-	.bind(&Utc::now().timestamp())
+	.bind(clock.now_utc().unix_timestamp())
 	.bind(&title)
 	.bind(&user_id.to_string())
 	.execute(txn.borrow_mut())
@@ -195,6 +197,7 @@ pub async fn create_org_repo(
 	org_id: Id,
 	repo_id: Id,
 	title: &str,
+	clock: &Clock,
 ) -> Result<()> {
 	sqlx::query(
 		"
@@ -206,7 +209,7 @@ pub async fn create_org_repo(
 		",
 	)
 	.bind(&repo_id.to_string())
-	.bind(&Utc::now().timestamp())
+	.bind(clock.now_utc().unix_timestamp())
 	.bind(&title)
 	.bind(&org_id.to_string())
 	.execute(txn.borrow_mut())
@@ -216,7 +219,7 @@ pub async fn create_org_repo(
 
 pub async fn add_model_version(
 	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
-	data_storage: &Storage,
+	app: &App,
 	repo_id: Id,
 	model_id: Id,
 	bytes: &[u8],
@@ -231,11 +234,11 @@ pub async fn add_model_version(
 		",
 	)
 	.bind(&model_id.to_string())
-	.bind(&Utc::now().timestamp())
+	.bind(app.clock().now_utc().unix_timestamp())
 	.bind(&repo_id.to_string())
 	.execute(txn.borrow_mut())
 	.await?;
-	data_storage
+	app.storage()
 		.set(StorageEntity::Model, model_id, bytes)
 		.await?;
 	Ok(())
@@ -290,7 +293,7 @@ impl App {
 	) -> Result<Id> {
 		let mut txn = txn.begin().await?;
 		let id = Id::generate();
-		create_root_repo(&mut txn, id, title).await?;
+		create_root_repo(&mut txn, id, title, &self.state.clock).await?;
 		txn.commit().await?;
 		Ok(id)
 	}

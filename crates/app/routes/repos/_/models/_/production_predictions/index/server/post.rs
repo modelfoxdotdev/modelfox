@@ -15,7 +15,7 @@ struct Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app_state = &context.app.state;
+	let app = &context.app;
 	let model_id = if let ["repos", _, "models", model_id, "production_predictions", ""] =
 		path_components(request).as_slice()
 	{
@@ -23,11 +23,11 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	} else {
 		bail!("unexpected path");
 	};
-	let mut db = match app_state.database_pool.begin().await {
+	let mut db = match app.begin_transaction().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, app_state.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app.options().auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -53,5 +53,6 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		.header(http::header::LOCATION, path)
 		.body(hyper::Body::empty())
 		.unwrap();
+	app.commit_transaction(db).await?;
 	Ok(response)
 }

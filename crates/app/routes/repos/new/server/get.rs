@@ -12,16 +12,16 @@ use tangram_app_layouts::app_layout::app_layout_info;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app_state = &context.app.state;
-	let mut db = match app_state.database_pool.begin().await {
+	let app = &context.app;
+	let mut db = match app.begin_transaction().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, app_state.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app.options().auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
-	let app_layout_info = app_layout_info(app_state).await?;
+	let app_layout_info = app_layout_info(app).await?;
 	let owners = match user {
 		User::Root => None,
 		User::Normal(user) => {
@@ -66,5 +66,6 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		.status(http::StatusCode::OK)
 		.body(hyper::Body::from(html))
 		.unwrap();
+	app.commit_transaction(db).await?;
 	Ok(response)
 }

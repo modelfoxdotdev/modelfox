@@ -15,14 +15,14 @@ struct Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app_state = &context.app.state;
+	let app = &context.app;
 	let organization_id =
 		if let ["organizations", organization_id, "edit"] = *path_components(request).as_slice() {
 			organization_id.to_owned()
 		} else {
 			bail!("unexpected path");
 		};
-	if !app_state.options.auth_enabled() {
+	if !app.options().auth_enabled() {
 		return Ok(not_found());
 	}
 	let data = match hyper::body::to_bytes(request.body_mut()).await {
@@ -33,11 +33,11 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(action) => action,
 		Err(_) => return Ok(bad_request()),
 	};
-	let mut db = match app_state.database_pool.begin().await {
+	let mut db = match app.begin_transaction().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_user(request, &mut db, app_state.options.auth_enabled()).await? {
+	let user = match authorize_user(request, &mut db, app.options().auth_enabled()).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(redirect_to_login()),
 	};
@@ -60,7 +60,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	.bind(&organization_id.to_string())
 	.execute(db.borrow_mut())
 	.await?;
-	db.commit().await?;
+	app.commit_transaction(db).await?;
 	let response = http::Response::builder()
 		.status(http::StatusCode::SEE_OTHER)
 		.header(

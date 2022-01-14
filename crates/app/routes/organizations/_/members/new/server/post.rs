@@ -8,7 +8,7 @@ use tangram_app_core::{
 	path_components,
 	user::NormalUser,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
-	AppState,
+	App,
 };
 use tangram_id::Id;
 use url::Url;
@@ -21,7 +21,7 @@ struct Action {
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
-	let app_state = &context.app.state;
+	let app = &context.app;
 	let organization_id = if let ["organizations", organization_id, "members", "new"] =
 		*path_components(request).as_slice()
 	{
@@ -29,10 +29,10 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	} else {
 		bail!("unexpected path");
 	};
-	if !app_state.options.auth_enabled() {
+	if !app.options().auth_enabled() {
 		return Ok(not_found());
 	}
-	let mut db = match app_state.database_pool.begin().await {
+	let mut db = match app.begin_transaction().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
@@ -55,8 +55,8 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(action) => action,
 		Err(_) => return Ok(bad_request()),
 	};
-	let response = add_member(action, user, &mut db, app_state, organization_id).await?;
-	db.commit().await?;
+	let response = add_member(action, user, &mut db, app, organization_id).await?;
+	app.commit_transaction(db).await?;
 	Ok(response)
 }
 
@@ -64,7 +64,7 @@ async fn add_member(
 	action: Action,
 	user: NormalUser,
 	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
-	app_state: &AppState,
+	app: &App,
 	organization_id: Id,
 ) -> Result<http::Response<hyper::Body>> {
 	// Create the new user.
@@ -116,9 +116,9 @@ async fn add_member(
 	.execute(txn.borrow_mut())
 	.await?;
 	// Send the new user an invitation email.
-	if let Some(smtp_transport) = app_state.smtp_transport.clone() {
-		let url = app_state
-			.options
+	if let Some(smtp_transport) = app.state.smtp_transport.clone() {
+		let url = app
+			.options()
 			.url
 			.clone()
 			.ok_or_else(|| anyhow!("url option is required when smtp is enabled"))?;

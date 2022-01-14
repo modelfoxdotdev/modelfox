@@ -1,15 +1,18 @@
 use crate::{
 	alerts::{alert_sender, monitor_checker},
+	clock::Clock,
 	options::{Options, StorageOptions},
 	storage::{LocalStorage, S3Storage, Storage},
 };
 use anyhow::{anyhow, bail, Result};
 use sqlx::postgres::PgPoolOptions;
 use std::{path::PathBuf, sync::Arc};
+use storage::InMemoryStorage;
 use tokio::sync::Notify;
 use url::Url;
 
 pub mod alerts;
+pub mod clock;
 pub mod cookies;
 pub mod error;
 pub mod heuristics;
@@ -27,8 +30,12 @@ pub mod timezone;
 pub mod track;
 pub mod user;
 
+#[cfg(test)]
+pub mod test_common;
+
 #[derive(Debug)]
 pub struct AppState {
+	pub clock: Clock,
 	pub database_pool: sqlx::AnyPool,
 	pub options: Options,
 	pub smtp_transport: Option<lettre::AsyncSmtpTransport<lettre::Tokio1Executor>>,
@@ -158,6 +165,7 @@ impl App {
 		};
 		let storage = match options.storage.clone() {
 			StorageOptions::Local(options) => Storage::Local(LocalStorage { path: options.path }),
+			StorageOptions::InMemory => Storage::InMemory(InMemoryStorage::new()),
 			StorageOptions::S3(options) => Storage::S3(S3Storage::new(
 				options.access_key,
 				options.secret_key,
@@ -168,6 +176,7 @@ impl App {
 			)?),
 		};
 		let state = AppState {
+			clock: Clock::new(),
 			database_pool,
 			options,
 			smtp_transport,
@@ -208,6 +217,10 @@ impl App {
 		self.state.commit_transaction(txn).await?;
 		Ok(())
 	}
+
+	pub fn smtp_transport(&self) -> Option<&lettre::AsyncSmtpTransport<lettre::Tokio1Executor>> {
+		self.state.smtp_transport.as_ref()
+	}
 }
 
 impl Drop for App {
@@ -232,21 +245,20 @@ impl AppState {
 pub async fn reset_data(database_url: &Option<Url>) -> Result<()> {
 	if let Some(database_url) = database_url {
 		if database_url.scheme() == "postgres" {
-				let pool = PgPoolOptions::new()
-					.max_connections(1)
-					.connect(database_url.as_str())
-					.await?;
-				sqlx::query("DROP SCHEMA public CASCADE")
-					.execute(&pool)
-					.await?;
-				sqlx::query("CREATE SCHEMA public").execute(&pool).await?;
-				sqlx::query("GRANT ALL ON SCHEMA public TO postgres")
-					.execute(&pool)
-					.await?;
-				sqlx::query("GRANT ALL ON SCHEMA public TO public")
-					.execute(&pool)
-					.await?;
-			
+			let pool = PgPoolOptions::new()
+				.max_connections(1)
+				.connect(database_url.as_str())
+				.await?;
+			sqlx::query("DROP SCHEMA public CASCADE")
+				.execute(&pool)
+				.await?;
+			sqlx::query("CREATE SCHEMA public").execute(&pool).await?;
+			sqlx::query("GRANT ALL ON SCHEMA public TO postgres")
+				.execute(&pool)
+				.await?;
+			sqlx::query("GRANT ALL ON SCHEMA public TO public")
+				.execute(&pool)
+				.await?;
 		}
 	}
 	std::fs::remove_dir_all(data_path()?)?;
