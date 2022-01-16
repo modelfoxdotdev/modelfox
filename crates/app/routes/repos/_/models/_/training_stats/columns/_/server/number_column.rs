@@ -40,7 +40,7 @@ impl Component for NumberColumn {
 		}];
 		let number_quantiles_title = Some(format!("Distribution of Values for {}", self.name));
 		ui::S1::new()
-			.child(ui::H1::new().child(self.name.clone()))
+			.child(ui::H1::new(self.name.clone()))
 			.child(
 				ui::S2::new()
 					.child(

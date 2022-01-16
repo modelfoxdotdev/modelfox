@@ -23,7 +23,7 @@ impl Component for Page {
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
-						.child(ui::H1::new().child("Training Metrics"))
+						.child(ui::H1::new("Training Metrics"))
 						.child(
 							ui::TabBar::new()
 								.child(ui::TabLink::new("./".to_owned(), false).child("Overview"))
@@ -59,7 +59,7 @@ impl Component for PrecisionRecallSection {
 	fn into_node(self) -> Node {
 		let precision_recall_definition = "Precision is the percentage of examples that were labeled as this class that are actually this class. Recall is the percentage of examples that are of this class that were labeled as this class.";
 		ui::S2::new()
-			.child(ui::H2::new().child("Precision and Recall"))
+			.child(ui::H2::new("Precision and Recall"))
 			.child(ui::P::new().child(precision_recall_definition))
 			.child(
 				MetricsRow::new()
@@ -92,7 +92,7 @@ impl Component for ConfusionMatrixSection {
 	fn into_node(self) -> Node {
 		let confusion_matrix_definition = "A confusion matrix categorizes predictions into false negatives, false positives, true negatives, and true positives.";
 		ui::S2::new()
-			.child(ui::H2::new().child("Confusion Matrix"))
+			.child(ui::H2::new("Confusion Matrix"))
 			.child(ui::P::new().child(confusion_matrix_definition))
 			.child(ui::ConfusionMatrix {
 				class_label: self.class,

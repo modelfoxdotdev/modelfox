@@ -70,11 +70,8 @@ impl Component for Page {
 		Document::new()
 			.client("tangram_app_playground_client")
 			.child(
-				ModelLayout::new(self.model_layout_info).child(
-					ui::S1::new()
-						.child(ui::H1::new().child("Playground"))
-						.child(inner),
-				),
+				ModelLayout::new(self.model_layout_info)
+					.child(ui::S1::new().child(ui::H1::new("Playground")).child(inner)),
 			)
 			.into_node()
 	}

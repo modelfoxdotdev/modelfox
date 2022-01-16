@@ -135,7 +135,7 @@ impl Component for Tuning {
 				})
 		};
 		ui::S1::new()
-			.child(ui::H1::new().child("Tuning"))
+			.child(ui::H1::new("Tuning"))
 			.child(ui::P::new().child("Drag the silder to choose a threshold."))
 			.child(
 				ui::Slider::new(ui::SliderInit {

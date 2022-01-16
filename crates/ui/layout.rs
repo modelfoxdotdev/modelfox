@@ -1,4 +1,5 @@
 use pinwheel::prelude::*;
+use std::borrow::Cow;
 
 #[derive(builder, children, Default, new)]
 #[new(default)]
@@ -39,12 +40,12 @@ impl Component for SpaceBetween {
 	}
 }
 
-#[derive(builder, children, Default, new)]
-#[new(default)]
+#[derive(builder, new)]
 pub struct H1 {
+	pub title: Cow<'static, str>,
+	#[new(default)]
 	#[builder]
 	pub center: Option<bool>,
-	pub children: Vec<Node>,
 }
 
 impl Component for H1 {
@@ -54,19 +55,16 @@ impl Component for H1 {
 		} else {
 			None
 		};
-		h1().class("h1")
-			.class(center)
-			.child(self.children)
-			.into_node()
+		h1().class("h1").class(center).child(self.title).into_node()
 	}
 }
 
-#[derive(builder, children, Default, new)]
-#[new(default)]
+#[derive(builder, new)]
 pub struct H2 {
+	pub title: Cow<'static, str>,
+	#[new(default)]
 	#[builder]
 	pub center: Option<bool>,
-	pub children: Vec<Node>,
 }
 
 impl Component for H2 {
@@ -76,10 +74,7 @@ impl Component for H2 {
 		} else {
 			None
 		};
-		h2().class("h2")
-			.class(center)
-			.child(self.children)
-			.into_node()
+		h2().class("h2").class(center).child(self.title).into_node()
 	}
 }
 

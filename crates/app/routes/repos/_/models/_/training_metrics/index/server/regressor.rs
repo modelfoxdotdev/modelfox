@@ -15,7 +15,7 @@ impl Component for Regressor {
 		let rmse_description = "The Root Mean Squared Error (RMSE) is the square root of the mean of the squared differences between each of the predicted values and their corresponding actual value. A perfect model has a RMSE of 0 because it always predicts the correct value.";
 		let mse_description = "The Mean Squared Error (MSE) is the mean of the squared differences between each of the predicted values and their corresponding actual value. A perfect model has a MSE of 0 because it always predictions the correct value.";
 		ui::S1::new()
-			.child(ui::H1::new().child("Training Metrics"))
+			.child(ui::H1::new("Training Metrics"))
 			.child(
 				ui::S2::new()
 					.child(ui::P::new().child(rmse_description))

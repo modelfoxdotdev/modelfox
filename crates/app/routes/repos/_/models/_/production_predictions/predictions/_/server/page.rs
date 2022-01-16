@@ -22,7 +22,7 @@ impl Component for Page {
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
-						.child(ui::H1::new().child("Prediction"))
+						.child(ui::H1::new("Prediction"))
 						.child(PredictionTable {
 							identifier: self.identifier,
 							date: self.date,

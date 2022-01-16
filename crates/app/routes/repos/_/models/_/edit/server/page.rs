@@ -21,7 +21,7 @@ impl Component for Page {
 			.child(
 				AppLayout::new(self.app_layout_info).child(
 					ui::S1::new()
-						.child(PageHeading::new().child(ui::H1::new().child(self.model_heading)))
+						.child(PageHeading::new().child(ui::H1::new(self.model_heading)))
 						.child(ModelInfoTable {
 							model_id: self.model_id,
 							created_at: self.created_at,
@@ -66,7 +66,7 @@ struct UpdateTagForm {
 impl Component for UpdateTagForm {
 	fn into_node(self) -> Node {
 		ui::S2::new()
-			.child(ui::H2::new().child("Tag"))
+			.child(ui::H2::new("Tag"))
 			.child(
 				ui::Form::new()
 					.post(true)
@@ -97,7 +97,7 @@ struct DangerZone;
 impl Component for DangerZone {
 	fn into_node(self) -> Node {
 		ui::S2::new()
-			.child(ui::H2::new().child("Danger Zone"))
+			.child(ui::H2::new("Danger Zone"))
 			.child(
 				ui::Form::new()
 					.post(true)

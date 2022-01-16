@@ -95,7 +95,7 @@ pub trait Content: Sized {
 			.unwrap()?;
 		let mut markdown = String::new();
 		reader.read_to_string(&mut markdown)?;
-		let markdown = ui::Markdown::new(markdown.into());
+		let markdown = ui::Markdown::new(markdown);
 		Ok(ContentItem {
 			path: post_path,
 			slug,

@@ -13,15 +13,13 @@ pub struct Page {
 
 impl Component for Page {
 	fn into_node(self) -> Node {
-		let heading = PageHeading::new()
-			.child(ui::H1::new().child("Repositories"))
-			.child(
-				PageHeadingButtons::new().child(
-					ui::Button::new()
-						.href("/repos/new".to_owned())
-						.child("Create Repo"),
-				),
-			);
+		let heading = PageHeading::new().child(ui::H1::new("Repositories")).child(
+			PageHeadingButtons::new().child(
+				ui::Button::new()
+					.href("/repos/new".to_owned())
+					.child("Create Repo"),
+			),
+		);
 		let body = if let Some(repos_table) = self.repos_table {
 			repos_table.into_node()
 		} else {

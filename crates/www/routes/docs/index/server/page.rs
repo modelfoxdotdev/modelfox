@@ -22,7 +22,7 @@ impl Component for Page {
 				"Learn about your models and monitor them in production from your browser.",
 			));
 		let content = ui::S1::new()
-			.child(ui::H1::new().child("Overview"))
+			.child(ui::H1::new("Overview"))
 			.child(ui::S2::new().child(p1).child(p2).child(list));
 		let layout = DocsLayout::new()
 			.selected_page(DocsPage::Overview)

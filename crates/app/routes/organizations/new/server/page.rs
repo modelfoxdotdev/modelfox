@@ -16,7 +16,7 @@ impl Component for Page {
 			.child(
 				AppLayout::new(self.app_layout_info).child(
 					ui::S1::new()
-						.child(ui::H1::new().child("Create New Organization"))
+						.child(ui::H1::new("Create New Organization"))
 						.child(
 							ui::Form::new()
 								.post(true)

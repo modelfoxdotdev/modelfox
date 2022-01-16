@@ -20,7 +20,7 @@ impl Component for Page {
 		};
 		let heading = div()
 			.style("line-height", "1.5")
-			.child(ui::H1::new().child(blog_post.front_matter.title.clone()))
+			.child(ui::H1::new(blog_post.front_matter.title.clone()))
 			.child(div().class("blog-post-date").child(format!(
 				"Originally published on {}",
 				blog_post.front_matter.date
@@ -30,11 +30,11 @@ impl Component for Page {
 		let about_tangram = div().child(
 			ui::Card::new().child(
 				ui::Markdown::new(
-					"Tangram makes it easy for programmers to train, deploy, and monitor machine learning models. With Tangram, developers can train models and make predictions on the command line or with libraries for languages including [Elixir](https://hex.pm/packages/tangram), [Golang](https://pkg.go.dev/github.com/tangramdotdev/tangram-go), [Javascript](https://www.npmjs.com/package/@tangramdotdev/tangram), [PHP](https://packagist.org/packages/tangram/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](https://lib.rs/tangram), and learn about their models and monitor them in production from a web application. Watch the demo on the [homepage](https://www.tangram.dev).".into()))
+					"Tangram makes it easy for programmers to train, deploy, and monitor machine learning models. With Tangram, developers can train models and make predictions on the command line or with libraries for languages including [Elixir](https://hex.pm/packages/tangram), [Golang](https://pkg.go.dev/github.com/tangramdotdev/tangram-go), [Javascript](https://www.npmjs.com/package/@tangramdotdev/tangram), [PHP](https://packagist.org/packages/tangram/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](https://lib.rs/tangram), and learn about their models and monitor them in production from a web application. Watch the demo on the [homepage](https://www.tangram.dev)."))
 			);
 		let jobs = div().child(
 			ui::Card::new().child(
-				ui::Markdown::new("We are hiring! Tangram is open source and everything is written in Rust, from the core machine learning algorithms to the web application. Check it out on [GitHub](https://www.github.com/tangramdotdev/tangram). We are looking for programmers who love developer tools and are excited to build machine learning tools with Rust! If you are interested, email us at jobs@tangram.dev.".into())
+				ui::Markdown::new("We are hiring! Tangram is open source and everything is written in Rust, from the core machine learning algorithms to the web application. Check it out on [GitHub](https://www.github.com/tangramdotdev/tangram). We are looking for programmers who love developer tools and are excited to build machine learning tools with Rust! If you are interested, email us at jobs@tangram.dev.")
 			));
 		Document::new()
 			.child(

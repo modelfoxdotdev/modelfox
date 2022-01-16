@@ -14,7 +14,7 @@ impl Component for Page {
 			.child(
 				DocsLayout::new().selected_page(DocsPage::Install).child(
 					ui::S1::new()
-						.child(ui::H1::new().child("Install"))
+						.child(ui::H1::new("Install"))
 						.child(
 							ui::P::new()
 								.child("Tangram supports ")
@@ -31,9 +31,9 @@ impl Component for Page {
 								)
 								.child(" include Docker or building manually from source."),
 						)
-						.child(div().id("MacOS").child(ui::H2::new().child("MacOS")))
+						.child(div().id("MacOS").child(ui::H2::new("MacOS")))
 						.child(Homebrew)
-						.child(div().id("Linux").child(ui::H2::new().child("Linux")))
+						.child(div().id("Linux").child(ui::H2::new("Linux")))
 						.child(Deb {
 							distribution: "ubuntu".to_owned(),
 							version: "hirsute".to_owned(),
@@ -77,13 +77,9 @@ impl Component for Page {
 						.child(Fedora)
 						.child(Nix)
 						.child(Rhel)
-						.child(div().id("Windows").child(ui::H2::new().child("Windows")))
+						.child(div().id("Windows").child(ui::H2::new("Windows")))
 						.child(Scoop)
-						.child(
-							div()
-								.id("other-options")
-								.child(ui::H2::new().child("Other")),
-						)
+						.child(div().id("other-options").child(ui::H2::new("Other")))
 						.child(Docker)
 						.child(Manual),
 				),
@@ -98,7 +94,7 @@ impl Component for Homebrew {
 	fn into_node(self) -> Node {
 		let code = "brew install tangramdotdev/tap/tangram";
 		ui::S2::new()
-			.child(ui::H2::new().child("Homebrew"))
+			.child(ui::H2::new("Homebrew"))
 			.child(
 				ui::P::new()
 					.child("Install the tangram package from the ")
@@ -129,7 +125,7 @@ impl Component for Alpine {
 			"#
 		);
 		ui::S2::new()
-			.child(ui::H2::new().child("Alpine"))
+			.child(ui::H2::new("Alpine"))
 			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
@@ -156,7 +152,7 @@ impl Component for Deb {
 			version = self.version,
 		);
 		ui::S2::new()
-			.child(ui::H2::new().child(self.title))
+			.child(ui::H2::new(self.title))
 			.child(ui::Window::new().child(ui::Code::new().code(Cow::Owned(code))))
 			.into_node()
 	}
@@ -175,7 +171,7 @@ impl Component for AmazonLinux2 {
 			"#
 		);
 		ui::S2::new()
-			.child(ui::H2::new().child("Amazon Linux 2"))
+			.child(ui::H2::new("Amazon Linux 2"))
 			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
@@ -194,7 +190,7 @@ impl Component for Centos7 {
 			"#
 		);
 		ui::S2::new()
-			.child(ui::H2::new().child("Centos 7"))
+			.child(ui::H2::new("Centos 7"))
 			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
@@ -213,7 +209,7 @@ impl Component for Fedora {
 			"#
 		);
 		ui::S2::new()
-			.child(ui::H2::new().child("Fedora"))
+			.child(ui::H2::new("Fedora"))
 			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
@@ -232,7 +228,7 @@ impl Component for Nix {
 			"#
 		);
 		ui::S2::new()
-			.child(ui::H2::new().child("Nix"))
+			.child(ui::H2::new("Nix"))
 			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
@@ -251,7 +247,7 @@ impl Component for Rhel {
 			"#
 		);
 		ui::S2::new()
-			.child(ui::H2::new().child("RHEL 8"))
+			.child(ui::H2::new("RHEL 8"))
 			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
@@ -270,7 +266,7 @@ impl Component for Centos8 {
 			"#
 		);
 		ui::S2::new()
-			.child(ui::H2::new().child("Centos 8"))
+			.child(ui::H2::new("Centos 8"))
 			.child(ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(code))))
 			.into_node()
 	}
@@ -282,7 +278,7 @@ impl Component for Arch {
 	fn into_node(self) -> Node {
 		let code = "yay -S tangram-bin";
 		ui::S2::new()
-			.child(ui::H2::new().child("Arch"))
+			.child(ui::H2::new("Arch"))
 			.child(
 				ui::P::new()
 					.child("Install the tangram package from the ")
@@ -309,7 +305,7 @@ impl Component for Scoop {
 			"#
 		);
 		ui::S2::new()
-			.child(ui::H2::new().child("Scoop"))
+			.child(ui::H2::new("Scoop"))
 			.child(
 				ui::P::new()
 					.child("Install the tangram package from the ")
@@ -331,7 +327,7 @@ impl Component for Docker {
 	fn into_node(self) -> Node {
 		let code = "docker run --rm -it tangramdotdev/tangram";
 		ui::S2::new()
-			.child(ui::H2::new().child("Docker"))
+			.child(ui::H2::new("Docker"))
 			.child(
 				ui::P::new()
 					.child("Run the tangramdotdev/tangram docker image from ")
@@ -361,7 +357,7 @@ impl Component for Manual {
 			.child("hello@tangram.dev"))
 			.child(" so we can consider supporting your preferred installation method.");
 		ui::S2::new()
-			.child(ui::H2::new().child("Install Manually"))
+			.child(ui::H2::new("Install Manually"))
 			.child(p)
 			.into_node()
 	}

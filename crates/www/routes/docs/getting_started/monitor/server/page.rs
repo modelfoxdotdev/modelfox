@@ -23,13 +23,13 @@ pub struct Page;
 impl Component for Page {
 	fn into_node(self) -> Node {
 		let p1 = ui::Markdown::new(
-			r#"Once our model is deployed, we want to make sure that it performs as well in production as it did in training. We can opt in to logging by calling `logPrediction`. Later on, as we get official diagnoses for patients, we can call `logTrueValue` and use the same identifier as we used in the call to `logPrediction`."#.into(),
+			r#"Once our model is deployed, we want to make sure that it performs as well in production as it did in training. We can opt in to logging by calling `logPrediction`. Later on, as we get official diagnoses for patients, we can call `logTrueValue` and use the same identifier as we used in the call to `logPrediction`."#,
 		);
 		let p2 = ui::P::new().child("Back in the app, we can look up a prediction by its identifier, and get an explanation that shows how each feature affects the output.");
 		let p3 = ui::P::new().child("Now let's see how accurate our model has been in production. Let's open the app and choose Production Metrics in the sidebar.");
 		let p4 = ui::P::new().child(r#"Uh oh! It's a bit lower than we expected. Let's try to find the cause. Under "Production Stats", we see that the "chest_pain" column has an alert and a high invalid values count. Click on the column to view more details."#);
 		let p5 = ui::P::new().child(r#"It looks like there is a large discrepancy between the value "asymptomatic" in production versus training. In the table below, we see a high number of invalid values with the string "asx". It looks like we are accidentally using the string "asx" in our code instead of "asymptomatic" for the chest pain column. We can update our code to use the correct value and follow the metrics going forward to confirm they bounce back."#);
-		let p6 = ui::Markdown::new("Hooray! You made it to the end! In this guide, we learned how to train a model, make predictions from our code, tune our model, and monitor it in production. If you want help using Tangram with your own data, send us an email at [hello@tangram.dev](mailto:hello@tangram.dev) or ask a question on [GitHub Discussions](https://github.com/tangramdotdev/tangram/discussions).".into());
+		let p6 = ui::Markdown::new("Hooray! You made it to the end! In this guide, we learned how to train a model, make predictions from our code, tune our model, and monitor it in production. If you want help using Tangram with your own data, send us an email at [hello@tangram.dev](mailto:hello@tangram.dev) or ask a question on [GitHub Discussions](https://github.com/tangramdotdev/tangram/discussions).");
 		let section = ui::S2::new()
 			.child(p1)
 			.child(Log)
@@ -50,7 +50,7 @@ impl Component for Page {
 					.selected_page(DocsPage::GettingStarted(GettingStartedPage::Monitor))
 					.child(
 						ui::S1::new()
-							.child(ui::H1::new().child("Monitor"))
+							.child(ui::H1::new("Monitor"))
 							.child(section)
 							.child(prev_next_buttons),
 					),
@@ -309,8 +309,8 @@ impl Component for ProductionStats {
 		ui::Window::new()
 			.child(
 				ui::S1::new()
-					.child(ui::H1::new().child("Production Stats"))
-					.child(ui::H2::new().child("Column Stats"))
+					.child(ui::H1::new("Production Stats"))
+					.child(ui::H2::new("Column Stats"))
 					.child(ColumnStatsTable { rows }),
 			)
 			.into_node()
@@ -324,7 +324,7 @@ impl Component for ProductionMetrics {
 		ui::Window::new()
 			.child(
 				ui::S1::new()
-					.child(ui::H1::new().child("Production Metrics"))
+					.child(ui::H1::new("Production Metrics"))
 					.child(
 						ui::NumberComparisonCard::new(Some(0.83333), Some(0.78867))
 							.color_a(ui::colors::BLUE.to_owned())
@@ -425,7 +425,7 @@ impl Component for ProductionColumnStats {
 			.child(
 				ui::S1::new()
 					.child(ui::Alert::new(ui::Level::Danger).child("High Invalid Values Count"))
-					.child(ui::H1::new().child("chest_pain"))
+					.child(ui::H1::new("chest_pain"))
 					.child(EnumColumnStatsSection {
 						overall_chart_data,
 						column_name: "chest_pain".to_owned(),
@@ -522,7 +522,7 @@ impl Component for ProductionExplanations {
 		ui::Window::new()
 			.child(
 				ui::S1::new()
-					.child(ui::H1::new().child("Production Predictions".to_owned()))
+					.child(ui::H1::new("Production Predictions".to_owned()))
 					.child(
 						div()
 							.class("production-explanations-grid")

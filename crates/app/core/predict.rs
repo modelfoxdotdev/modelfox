@@ -34,7 +34,7 @@ impl Component for PredictOutput {
 		fragment()
 			.child(
 				ui::S2::new()
-					.child(ui::H2::new().child("Input"))
+					.child(ui::H2::new("Input"))
 					.child(self.input_table),
 			)
 			.child(inner)
@@ -184,12 +184,12 @@ pub struct RegressionPredictOutput {
 impl Component for RegressionPredictOutput {
 	fn into_node(self) -> Node {
 		ui::S2::new()
-			.child(ui::H2::new().child("Output"))
+			.child(ui::H2::new("Output"))
 			.child(ui::NumberCard::new(
 				"Prediction".to_owned(),
 				ui::format_float(self.value),
 			))
-			.child(ui::H2::new().child("Explanation"))
+			.child(ui::H2::new("Explanation"))
 			.child(
 				ui::P::new()
 					.child("This chart shows how the features contributed to the model's output."),
@@ -218,7 +218,7 @@ pub struct BinaryClassificationPredictOutput {
 
 impl Component for BinaryClassificationPredictOutput {
 	fn into_node(self) -> Node {
-		let output = ui::S2::new().child(ui::H2::new().child("Output")).child(
+		let output = ui::S2::new().child(ui::H2::new("Output")).child(
 			MetricsRow::new()
 				.child(ui::NumberCard::new(
 					"Prediction".to_owned(),
@@ -230,7 +230,7 @@ impl Component for BinaryClassificationPredictOutput {
 				)),
 		);
 		let explanation = ui::S2::new()
-			.child(ui::H2::new().child("Explanation"))
+			.child(ui::H2::new("Explanation"))
 			.child(
 				ui::P::new()
 					.child("This chart shows how the features contributed to the model's output."),
@@ -281,7 +281,7 @@ impl Component for MulticlassClassificationPredictOutput {
 			.unwrap()
 			.clone()];
 		ui::S2::new()
-			.child(ui::H2::new().child("Output"))
+			.child(ui::H2::new("Output"))
 			.child(ui::NumberCard::new(
 				"Prediction".to_owned(),
 				self.class_name,
@@ -297,7 +297,7 @@ impl Component for MulticlassClassificationPredictOutput {
 					.title("Predicted Probabilities".to_owned())
 					.y_min(0.0),
 			))
-			.child(ui::H2::new().child("Explanation"))
+			.child(ui::H2::new("Explanation"))
 			.child(
 				ui::P::new()
 					.child("This chart shows how the features contributed to the model's output."),

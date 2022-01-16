@@ -16,7 +16,7 @@ impl Component for Page {
 			.child(ui::ListItem::new().child("Set up production monitoring and debug our model's performance."));
 		let prev_next_buttons = PrevNextButtons::new().next("train", "Train a model.");
 		let content = ui::S1::new()
-			.child(ui::H1::new().child("Getting Started"))
+			.child(ui::H1::new("Getting Started"))
 			.child(
 				ui::S2::new()
 					.child(ui::P::new().child("Thanks for trying Tangram!"))

@@ -19,7 +19,7 @@ impl Component for EnumColumn {
 	fn into_node(self) -> Node {
 		let name = self.name;
 		ui::S1::new()
-			.child(ui::H1::new().child(name.clone()))
+			.child(ui::H1::new(name.clone()))
 			.child(
 				ui::S2::new()
 					.child(

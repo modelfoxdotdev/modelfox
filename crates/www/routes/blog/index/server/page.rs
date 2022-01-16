@@ -21,7 +21,7 @@ impl Component for Page {
 			.child(
 				PageLayout::new().child(
 					ui::S1::new()
-						.child(ui::H1::new().child("Blog"))
+						.child(ui::H1::new("Blog"))
 						.child(ui::S2::new().children(blog_posts)),
 				),
 			)

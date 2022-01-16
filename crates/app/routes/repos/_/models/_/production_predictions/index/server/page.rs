@@ -116,7 +116,7 @@ impl Component for Page {
 				.into_node()
 		};
 		let inner = ui::S1::new()
-			.child(ui::H1::new().child("Production Predictions"))
+			.child(ui::H1::new("Production Predictions"))
 			.child(predictions);
 		Document::new()
 			.child(ModelLayout::new(self.model_layout_info).child(inner))

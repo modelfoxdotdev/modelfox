@@ -76,7 +76,7 @@ impl Component for Page {
 		let parametric_pr_curve_definition  = "The parametric precision recall curve shows the value of precision on the y axis for each value of recall on the x axis where each point is at a distinct threshold.";
 		let non_parametric_pr_curve_definition = "The non-parametric precision recall curve shows the value of precision and recall the model would get on the y axis for each threshold on the x axis.";
 		let content = ui::S1::new()
-			.child(ui::H1::new().child("Training Metrics"))
+			.child(ui::H1::new("Training Metrics"))
 			.child(
 				ui::TabBar::new()
 					.child(ui::TabLink::new("./".to_owned(), false).child("Overview"))
@@ -85,7 +85,7 @@ impl Component for Page {
 			)
 			.child(
 				ui::S2::new()
-					.child(ui::H2::new().child("Parametric Precision Recall Curve"))
+					.child(ui::H2::new("Parametric Precision Recall Curve"))
 					.child(ui::P::new().child(parametric_pr_curve_definition))
 					.child(
 						ui::Card::new().child(Dehydrate::new(
@@ -105,7 +105,7 @@ impl Component for Page {
 			)
 			.child(
 				ui::S2::new()
-					.child(ui::H2::new().child("Non-Parametric Precision Recall Curve"))
+					.child(ui::H2::new("Non-Parametric Precision Recall Curve"))
 					.child(ui::P::new().child(non_parametric_pr_curve_definition))
 					.child(
 						ui::Card::new().child(Dehydrate::new(

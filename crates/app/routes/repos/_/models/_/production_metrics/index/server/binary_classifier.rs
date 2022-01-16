@@ -78,7 +78,7 @@ impl Component for BinaryClassifierProductionMetrics {
 		let accuracy_chart_title =
 			interval_chart_title(&self.date_window_interval, "Accuracy".to_owned());
 		ui::S1::new()
-			.child(ui::H1::new().child("Production Metrics"))
+			.child(ui::H1::new("Production Metrics"))
 			.child(
 				ui::S2::new()
 					.child(
@@ -105,7 +105,7 @@ impl Component for BinaryClassifierProductionMetrics {
 			)
 			.child(
 				ui::S2::new()
-					.child(ui::H2::new().child("Accuracy"))
+					.child(ui::H2::new("Accuracy"))
 					.child(
 						ui::P::new()
 							.child("Accuracy is the percentage of predictions that were correct."),

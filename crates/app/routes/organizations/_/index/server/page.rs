@@ -22,7 +22,7 @@ impl Component for Page {
 			.child(
 				AppLayout::new(self.app_layout_info).child(
 					ui::S1::new()
-						.child(ui::H1::new().child(self.name))
+						.child(ui::H1::new(self.name))
 						.child(self.details_section)
 						.child(self.members_section)
 						.child(self.repos_section)
@@ -47,15 +47,13 @@ impl Component for DetailsSection {
 	fn into_node(self) -> Node {
 		ui::S2::new()
 			.child(
-				ui::SpaceBetween::new()
-					.child(ui::H2::new().child("Details"))
-					.child(
-						ui::Button::new()
-							.href(format!("/organizations/{}/edit", self.organization_id))
-							.color(ui::colors::GRAY.to_owned())
-							.disabled(false)
-							.child("Edit"),
-					),
+				ui::SpaceBetween::new().child(ui::H2::new("Details")).child(
+					ui::Button::new()
+						.href(format!("/organizations/{}/edit", self.organization_id))
+						.color(ui::colors::GRAY.to_owned())
+						.disabled(false)
+						.child("Edit"),
+				),
 			)
 			.child(
 				ui::TextField::new()
@@ -77,16 +75,14 @@ impl Component for MembersSection {
 	fn into_node(self) -> Node {
 		ui::S2::new()
 			.child(
-				ui::SpaceBetween::new()
-					.child(ui::H2::new().child("Members"))
-					.child(
-						ui::Button::new()
-							.href(format!(
-								"/organizations/{}/members/new",
-								self.organization_id,
-							))
-							.child("Invite Team Member"),
-					),
+				ui::SpaceBetween::new().child(ui::H2::new("Members")).child(
+					ui::Button::new()
+						.href(format!(
+							"/organizations/{}/members/new",
+							self.organization_id,
+						))
+						.child("Invite Team Member"),
+				),
 			)
 			.child(self.members_table)
 			.into_node()
@@ -183,13 +179,11 @@ impl Component for ReposSection {
 			});
 		ui::S2::new()
 			.child(
-				ui::SpaceBetween::new()
-					.child(ui::H2::new().child("Repos"))
-					.child(
-						ui::Button::new()
-							.href("/repos/new".to_owned())
-							.child("Create New Repo"),
-					),
+				ui::SpaceBetween::new().child(ui::H2::new("Repos")).child(
+					ui::Button::new()
+						.href("/repos/new".to_owned())
+						.child("Create New Repo"),
+				),
 			)
 			.child(repos_table_or_empty_message)
 			.into_node()
@@ -234,7 +228,7 @@ struct DangerZoneSection;
 impl Component for DangerZoneSection {
 	fn into_node(self) -> Node {
 		ui::S2::new()
-			.child(ui::H2::new().child("Danger Zone"))
+			.child(ui::H2::new("Danger Zone"))
 			.child(
 				ui::Form::new()
 					.post(true)

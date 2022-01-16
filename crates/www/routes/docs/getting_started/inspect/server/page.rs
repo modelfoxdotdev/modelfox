@@ -229,22 +229,22 @@ impl Component for Page {
 
 				Click Training Metrics in the sidebar and have a look at the confusion matrix.
 			"#
-		).into());
+		));
 		let m2 = ui::Markdown::new(ui::doc!(
 			r#"
 				It looks like false negatives are a bit high. This means we are predicting people are healthy when they actually aren't. It would be better if the model had fewer false negatives, even if it means more false positives, because doctors can rule out heart disease with further testing. Let's make that change by going to the Tuning page. Drag the tuning slider to see how different thresholds affect precision and recall.
 			"#
-		).into());
+		));
 		let m3 = ui::Markdown::new(ui::doc!(
 			r#"
 				When we lower the threhold, we predict that more people have heart disease which results in lower precision but higher recall. Once you've chosen a threshold, you can update your prediction code to use it.
 			"#
-		).into());
+		));
 		let prev_next_buttons = PrevNextButtons::new()
 			.prev("predict/", "Make a prediction.")
 			.next("monitor", "Monitor your model in production.");
 		let content = ui::S1::new()
-			.child(ui::H1::new().child("Inspect"))
+			.child(ui::H1::new("Inspect"))
 			.child(
 				ui::S2::new()
 					.child(m1)
@@ -273,17 +273,15 @@ pub struct TrainingMetrics;
 impl Component for TrainingMetrics {
 	fn into_node(self) -> Node {
 		ui::Window::new()
-			.child(
-				ui::S1::new()
-					.child(ui::H1::new().child("Training Metrics"))
-					.child(ui::ConfusionMatrix {
-						class_label: "positive".to_owned(),
-						false_negatives: Some(20),
-						false_positives: Some(19),
-						true_negatives: Some(299),
-						true_positives: Some(400),
-					}),
-			)
+			.child(ui::S1::new().child(ui::H1::new("Training Metrics")).child(
+				ui::ConfusionMatrix {
+					class_label: "positive".to_owned(),
+					false_negatives: Some(20),
+					false_positives: Some(19),
+					true_negatives: Some(299),
+					true_positives: Some(400),
+				},
+			))
 			.into_node()
 	}
 }

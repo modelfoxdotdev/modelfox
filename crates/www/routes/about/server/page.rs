@@ -15,7 +15,7 @@ impl Component for Page {
 			.child("We would love to hear from you, please don't hesistate to reach out! ")
 			.child(link);
 		let tangram = ui::S2::new()
-			.child(ui::H1::new().child("About"))
+			.child(ui::H1::new("About"))
 			.child(p1)
 			.child(p2);
 		let david = Person::new()
@@ -37,7 +37,7 @@ impl Component for Page {
 			.gravatar("https://gravatar.com/avatar/98c040317325f49915f91168ec8805bc?s=100")
 			.twitter("https://twitter.com/ben_deciduously".to_string());
 		let team = ui::S2::new()
-			.child(ui::H1::new().child("Team"))
+			.child(ui::H1::new("Team"))
 			.child(david)
 			.child(bella)
 			.child(ben);

@@ -24,10 +24,7 @@ impl Component for Page {
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
-						.child(
-							PageHeading::new()
-								.child(ui::H1::new().child("Alerts History".to_string())),
-						)
+						.child(PageHeading::new().child(ui::H1::new("Alerts History".to_string())))
 						.child(alerts_table_or_empty_message),
 				),
 			)

@@ -17,8 +17,8 @@ impl Component for Page {
 					)))
 					.child(
 						ui::S1::new()
-							.child(ui::H1::new().child("Predict with the CLI"))
-							.child(ui::Markdown::new(include_str!("./page.md").into()))
+							.child(ui::H1::new("Predict with the CLI"))
+							.child(ui::Markdown::new(include_str!("./page.md")))
 							.child(
 								PrevNextButtons::new()
 									.prev("../train", "Train a model.")

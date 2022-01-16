@@ -26,22 +26,20 @@ impl Component for Page {
 				AppLayout::new(self.app_layout_info).child(
 					ui::S1::new()
 						.child(
-							PageHeading::new()
-								.child(ui::H1::new().child(self.title))
-								.child(
-									PageHeadingButtons::new()
-										.child(
-											ui::Button::new()
-												.color(ui::colors::GRAY.to_owned())
-												.href("edit".to_owned())
-												.child("Edit"),
-										)
-										.child(
-											ui::Button::new()
-												.href("models/new".to_owned())
-												.child("Upload Model"),
-										),
-								),
+							PageHeading::new().child(ui::H1::new(self.title)).child(
+								PageHeadingButtons::new()
+									.child(
+										ui::Button::new()
+											.color(ui::colors::GRAY.to_owned())
+											.href("edit".to_owned())
+											.child("Edit"),
+									)
+									.child(
+										ui::Button::new()
+											.href("models/new".to_owned())
+											.child("Upload Model"),
+									),
+							),
 						)
 						.child(models_table_or_empty_message),
 				),

@@ -85,7 +85,7 @@ impl Component for RegressorProductionMetrics {
 		let mse_chart_title =
 			interval_chart_title(&self.date_window_interval, "Mean Squared Error".to_owned());
 		ui::S1::new()
-			.child(ui::H1::new().child("Production Metrics"))
+			.child(ui::H1::new("Production Metrics"))
 			.child(
 				ui::S2::new()
 					.child(

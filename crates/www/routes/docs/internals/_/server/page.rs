@@ -15,7 +15,7 @@ impl Component for Page {
 	fn into_node(self) -> Node {
 		let internal = DocsInternals::from_slug(self.slug).unwrap();
 		let content = ui::S1::new()
-			.child(ui::H1::new().child(internal.front_matter.title))
+			.child(ui::H1::new(internal.front_matter.title))
 			.child(internal.markdown);
 		let layout = DocsLayout::new()
 			.selected_page(DocsPage::Internals(internal.slug))

@@ -123,7 +123,7 @@ impl Component for Inner {
 		let overall_training_metrics = selected_class_overall_metrics.training;
 		let overall_production_metrics = selected_class_overall_metrics.production;
 		ui::S1::new()
-			.child(ui::H1::new().child("Production Metrics"))
+			.child(ui::H1::new("Production Metrics"))
 			.child(
 				ui::TabBar::new()
 					.child(ui::TabLink::new("".to_owned(), false).child("Overview"))
@@ -292,7 +292,7 @@ impl Component for PrecisionRecallSection {
 			},
 		];
 		ui::S2::new()
-			.child(ui::H2::new().child("Precision and Recall"))
+			.child(ui::H2::new("Precision and Recall"))
 			.child(
 				MetricsRow::new()
 					.child(
@@ -389,7 +389,7 @@ struct ConfusionMatrixSection {
 impl Component for ConfusionMatrixSection {
 	fn into_node(self) -> Node {
 		ui::S2::new()
-			.child(ui::H2::new().child("Confusion Matrix"))
+			.child(ui::H2::new("Confusion Matrix"))
 			.child(ui::ConfusionMatrix {
 				class_label: self.class,
 				false_negatives: self.confusion_matrix.false_negatives,
@@ -437,7 +437,7 @@ impl Component for ProductionTrainingSection {
 				true_positive: production.true_positive_fraction,
 			});
 		ui::S2::new()
-			.child(ui::H2::new().child("Production v. Training Confusion Matrix"))
+			.child(ui::H2::new("Production v. Training Confusion Matrix"))
 			.child(ui::ConfusionMatrixComparison {
 				class_label: self.class,
 				color_a: TRAINING_COLOR.to_owned(),

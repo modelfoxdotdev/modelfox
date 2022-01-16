@@ -110,7 +110,7 @@ impl Component for TextColumnTokensSection {
 		if !self.text_ngrams_table.rows.is_empty() {
 			Some(
 				ui::S2::new()
-					.child(ui::H2::new().child(format!(
+					.child(ui::H2::new(format!(
 						"Top {} Unique NGrams",
 						self.text_ngrams_table.rows.len()
 					)))

@@ -55,9 +55,9 @@ impl Component for Benchmarks {
 			let cpu = self.cpu.signal() =>
 			Benchmark { dataset: *dataset, cpu: *cpu }
 		};
-		let tangram_tree_benchmarks_description = ui::Markdown::new("Tangram Tree is a pure Rust implementation of Gradient Boosted Decision Trees. It has the smallest memory footprint of the leading GBDT implementations and achieves state of the art speed and accuracy. Check it out on [GitHub](https://github.com/tangramdotdev/tangram/blob/main/crates/tree).".into());
+		let tangram_tree_benchmarks_description = ui::Markdown::new("Tangram Tree is a pure Rust implementation of Gradient Boosted Decision Trees. It has the smallest memory footprint of the leading GBDT implementations and achieves state of the art speed and accuracy. Check it out on [GitHub](https://github.com/tangramdotdev/tangram/blob/main/crates/tree).");
 		ui::S1::new()
-			.child(ui::H1::new().child("Tangram Tree Benchmarks"))
+			.child(ui::H1::new("Tangram Tree Benchmarks"))
 			.child(tangram_tree_benchmarks_description)
 			.child_signal(self.dataset.signal().map({
 				let dataset = self.dataset.clone();
@@ -109,9 +109,9 @@ impl Component for Benchmark {
 					r#"
 						The allstate dataset contains 35 columns. There are 10,547,432 rows in the train dataset and 2,636,858 rows in the test dataset. The target column is `claim_amount` and it is a regression task.
 					"#
-				).into());
+				));
 				let duration = ui::S2::new()
-					.child(ui::H2::new().child("Training Time (lower is better)"))
+					.child(ui::H2::new("Training Time (lower is better)"))
 					.child(
 						div()
 							.class("benchmarks-table-chart-grid")
@@ -125,7 +125,7 @@ impl Component for Benchmark {
 							}),
 					);
 				let memory = ui::S2::new()
-					.child(ui::H2::new().child("Memory Usage (lower is better)"))
+					.child(ui::H2::new("Memory Usage (lower is better)"))
 					.child(
 						div()
 							.class("benchmarks-table-chart-grid")
@@ -139,7 +139,7 @@ impl Component for Benchmark {
 							}),
 					);
 				let mse = ui::S2::new()
-					.child(ui::H2::new().child("Mean Squared Error (lower is better)"))
+					.child(ui::H2::new("Mean Squared Error (lower is better)"))
 					.child(
 						div()
 							.class("benchmarks-table-chart-grid")
@@ -164,9 +164,9 @@ impl Component for Benchmark {
 					r#"
 						The flights dataset contains 9 columns. There are 10,000,000 rows in the train dataset and 100,000 rows in the test dataset. The target column is `dep_delayed_15min` and it is a binary classification task.
 					"#
-				).into());
+				));
 				let duration = ui::S2::new()
-					.child(ui::H2::new().child("Training Time (lower is better)"))
+					.child(ui::H2::new("Training Time (lower is better)"))
 					.child(
 						div()
 							.class("benchmarks-table-chart-grid")
@@ -180,7 +180,7 @@ impl Component for Benchmark {
 							}),
 					);
 				let memory = ui::S2::new()
-					.child(ui::H2::new().child("Memory Usage (lower is better)"))
+					.child(ui::H2::new("Memory Usage (lower is better)"))
 					.child(
 						div()
 							.class("benchmarks-table-chart-grid")
@@ -194,7 +194,7 @@ impl Component for Benchmark {
 							}),
 					);
 				let auc = ui::S2::new()
-					.child(ui::H2::new().child("AUC (higher is better)".to_owned()))
+					.child(ui::H2::new("AUC (higher is better)".to_owned()))
 					.child(
 						div()
 							.class("benchmarks-table-chart-grid")
@@ -219,9 +219,9 @@ impl Component for Benchmark {
 					r#"
 						The higgs dataset contains 28 numeric columns and the target column `signal`. There are 10,500,000 rows in the train dataset and 500,000 rows in the test dataset. It is a binary classifiation task.
 					"#
-				).into());
+				));
 				let duration = ui::S2::new()
-					.child(ui::H2::new().child("Training Time (lower is better)"))
+					.child(ui::H2::new("Training Time (lower is better)"))
 					.child(
 						div()
 							.class("benchmarks-table-chart-grid")
@@ -235,7 +235,7 @@ impl Component for Benchmark {
 							}),
 					);
 				let memory = ui::S2::new()
-					.child(ui::H2::new().child("Memory Usage (lower is better)"))
+					.child(ui::H2::new("Memory Usage (lower is better)"))
 					.child(
 						div()
 							.class("benchmarks-table-chart-grid")
@@ -249,7 +249,7 @@ impl Component for Benchmark {
 							}),
 					);
 				let auc = ui::S2::new()
-					.child(ui::H2::new().child("AUC (higher is better)".to_owned()))
+					.child(ui::H2::new("AUC (higher is better)".to_owned()))
 					.child(
 						div()
 							.class("benchmarks-table-chart-grid")

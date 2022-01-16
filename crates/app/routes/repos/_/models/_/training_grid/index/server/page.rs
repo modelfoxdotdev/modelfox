@@ -30,11 +30,11 @@ impl Component for Page {
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
-						.child(ui::H1::new().child("Training Grid"))
+						.child(ui::H1::new("Training Grid"))
 						.child(ui::P::new().child(description))
 						.child(
 							ui::S2::new()
-								.child(ui::H2::new().child("Best Model Metrics"))
+								.child(ui::H2::new("Best Model Metrics"))
 								.child(WinningModelMetricsTable {
 									best_model: self.best_model_metrics,
 									comparison_metric_name: self.comparison_metric_name.clone(),
@@ -42,19 +42,17 @@ impl Component for Page {
 						)
 						.child(
 							ui::S2::new()
-								.child(ui::H2::new().child("Best Model Hyperparameters"))
+								.child(ui::H2::new("Best Model Hyperparameters"))
 								.child(ModelHyperparametersTable {
 									hyperparameters: self.best_model_hyperparameters,
 								}),
 						)
-						.child(
-							ui::S2::new()
-								.child(ui::H2::new().child("All Models"))
-								.child(AllTrainedModelsMetricsTable {
-									trained_models: self.trained_models_metrics,
-									comparison_metric_name: self.comparison_metric_name,
-								}),
-						),
+						.child(ui::S2::new().child(ui::H2::new("All Models")).child(
+							AllTrainedModelsMetricsTable {
+								trained_models: self.trained_models_metrics,
+								comparison_metric_name: self.comparison_metric_name,
+							},
+						)),
 				),
 			)
 			.into_node()

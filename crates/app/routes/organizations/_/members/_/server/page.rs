@@ -19,7 +19,7 @@ impl Component for Page {
 			.child(
 				AppLayout::new(self.app_layout_info).child(
 					ui::S1::new()
-						.child(ui::H1::new().child("Edit Member"))
+						.child(ui::H1::new("Edit Member"))
 						.child(
 							ui::Form::new()
 								.post(true)
@@ -71,7 +71,7 @@ struct DangerZone {
 impl Component for DangerZone {
 	fn into_node(self) -> Node {
 		ui::S2::new()
-			.child(ui::H2::new().child("Danger Zone"))
+			.child(ui::H2::new("Danger Zone"))
 			.child(
 				ui::Form::new()
 					.post(true)

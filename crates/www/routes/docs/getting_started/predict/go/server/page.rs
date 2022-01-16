@@ -19,12 +19,12 @@ impl Component for Page {
 					)))
 					.child(
 						ui::S1::new()
-							.child(ui::H1::new().child("Predict with Go"))
+							.child(ui::H1::new("Predict with Go"))
 							.child(
 								ui::S2::new()
-									.child(ui::H2::new().child("1. Install."))
+									.child(ui::H2::new("1. Install."))
 									.child(Install)
-									.child(ui::H2::new().child("2. Predict."))
+									.child(ui::H2::new("2. Predict."))
 									.child(predict_text)
 									.child(Predict),
 							)

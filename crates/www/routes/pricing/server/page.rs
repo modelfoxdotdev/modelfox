@@ -6,16 +6,7 @@ pub struct Page;
 
 impl Component for Page {
 	fn into_node(self) -> Node {
-		let title = ui::H1::new().center(true).child("Pricing");
-		let subtitle = ui::H2::new()
-			.center(true)
-			.child("Contact us at ")
-			.child(
-				ui::Link::new()
-					.href("mailto:hello@tangram.dev".to_owned())
-					.child("hello@tangram.dev"),
-			)
-			.child(".");
+		let title = ui::H1::new("Pricing").center(true);
 		let free_cta = ui::Button::new()
 			.color(ui::colors::RED.to_owned())
 			.href("/docs/install".to_owned())
@@ -45,7 +36,6 @@ impl Component for Page {
 		let content = div().class("pricing-grid").child(
 			ui::S1::new()
 				.child(title)
-				.child(subtitle)
 				.child(cards)
 				.child(table)
 				.child(p),

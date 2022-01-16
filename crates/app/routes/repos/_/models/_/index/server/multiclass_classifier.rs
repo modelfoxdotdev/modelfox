@@ -25,7 +25,7 @@ impl Component for MulticlassClassifier {
 					.title("BAD MODEL".to_owned())
 					.child(warning)
 			}))
-			.child(ui::H1::new().child("Overview"))
+			.child(ui::H1::new("Overview"))
 			.child(self.training_summary_section)
 			.child(self.training_metrics_section)
 			.child(self.feature_importances_section)
@@ -64,7 +64,7 @@ impl Component for MulticlassClassifierMetricsSection {
 				title: Some("loss".to_owned()),
 			}]
 		});
-		let title = ui::H2::new().child("Metrics");
+		let title = ui::H2::new("Metrics");
 		let p = ui::P::new()
 			.child("Your model was evaluated on the test dataset and accurately classified ")
 			.child(b().child(ui::format_percent(self.accuracy)))

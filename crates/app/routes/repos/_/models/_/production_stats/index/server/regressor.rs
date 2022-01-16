@@ -25,7 +25,7 @@ pub struct Regressor {
 impl Component for Regressor {
 	fn into_node(self) -> Node {
 		ui::S1::new()
-			.child(ui::H1::new().child("Production Stats"))
+			.child(ui::H1::new("Production Stats"))
 			.child(DateWindowSelectForm {
 				date_window: self.date_window,
 			})

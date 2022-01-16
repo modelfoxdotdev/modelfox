@@ -59,7 +59,7 @@ impl Component for Page {
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
-						.child(ui::H1::new().child(self.column_name))
+						.child(ui::H1::new(self.column_name))
 						.child(DateWindowSelectForm {
 							date_window: self.date_window,
 						})

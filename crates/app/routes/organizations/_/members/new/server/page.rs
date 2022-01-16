@@ -15,7 +15,7 @@ impl Component for Page {
 		Document::new()
 			.child(
 				AppLayout::new(self.app_layout_info).child(
-					ui::S1::new().child(ui::H1::new().child("Invite")).child(
+					ui::S1::new().child(ui::H1::new("Invite")).child(
 						ui::Form::new()
 							.post(true)
 							.child(

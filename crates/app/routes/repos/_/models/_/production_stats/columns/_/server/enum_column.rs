@@ -133,7 +133,7 @@ pub struct EnumColumnUniqueValuesSection {
 impl Component for EnumColumnUniqueValuesSection {
 	fn into_node(self) -> Node {
 		ui::S2::new()
-			.child(ui::H2::new().child("Unique Values"))
+			.child(ui::H2::new("Unique Values"))
 			.child(EnumUniqueValuesTable {
 				rows: self.enum_unique_values_table.rows,
 			})
@@ -193,7 +193,7 @@ impl Component for EnumColumnInvalidValuesSection {
 				self.enum_invalid_values_table
 					.map(|enum_invalid_values_table| {
 						ui::S2::new()
-							.child(ui::H2::new().child("Invalid Values"))
+							.child(ui::H2::new("Invalid Values"))
 							.child(enum_invalid_values_table)
 					}),
 			)

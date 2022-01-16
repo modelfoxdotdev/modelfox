@@ -65,7 +65,7 @@ struct Header;
 impl Component for Header {
 	fn into_node(self) -> Node {
 		ui::SpaceBetween::new()
-			.child(ui::H1::new().child("User"))
+			.child(ui::H1::new("User"))
 			.child(
 				ui::Form::new()
 					.post(true)
@@ -121,7 +121,7 @@ impl Component for ReposSection {
 		ui::S2::new()
 			.child(
 				ui::SpaceBetween::new()
-					.child(ui::H2::new().child("User Repos"))
+					.child(ui::H2::new("User Repos"))
 					.child(
 						ui::Button::new()
 							.href("/repos/new".to_owned())
@@ -183,7 +183,7 @@ impl Component for OrganizationsSection {
 		ui::S2::new()
 			.child(
 				ui::SpaceBetween::new()
-					.child(ui::H2::new().child("Organizations"))
+					.child(ui::H2::new("Organizations"))
 					.child(
 						ui::Button::new()
 							.href("/organizations/new".to_owned())

@@ -18,7 +18,7 @@ impl Component for Page {
 			.child(
 				AppLayout::new(self.app_layout_info).child(
 					ui::S1::new()
-						.child(PageHeading::new().child(ui::H1::new().child("Upload Model")))
+						.child(PageHeading::new().child(ui::H1::new("Upload Model")))
 						.child(
 							ui::Form::new()
 								.enc_type("multipart/form-data".to_owned())

@@ -54,7 +54,7 @@ impl Component for Page {
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
-						.child(ui::H1::new().child(format!("Edit {} Monitor", self.monitor.title)))
+						.child(ui::H1::new(format!("Edit {} Monitor", self.monitor.title)))
 						.child(
 							ui::Form::new()
 								.post(true)
@@ -171,7 +171,7 @@ struct DangerZone;
 impl Component for DangerZone {
 	fn into_node(self) -> Node {
 		ui::S2::new()
-			.child(ui::H2::new().child("Danger Zone"))
+			.child(ui::H2::new("Danger Zone"))
 			.child(
 				ui::Form::new()
 					.post(true)

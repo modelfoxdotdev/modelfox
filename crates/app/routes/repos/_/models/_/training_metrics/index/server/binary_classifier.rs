@@ -46,7 +46,7 @@ impl Component for BinaryClassifier {
 					.title("BAD MODEL".to_owned())
 					.child(warning)
 			}))
-			.child(ui::H1::new().child("Training Metrics"))
+			.child(ui::H1::new("Training Metrics"))
 			.child(
 				ui::TabBar::new()
 					.child(ui::TabLink::new("".to_owned(), true).child("Overview"))
@@ -64,7 +64,7 @@ impl Component for BinaryClassifier {
 			)
 			.child(
 				ui::S2::new()
-					.child(ui::H2::new().child("Accuracy"))
+					.child(ui::H2::new("Accuracy"))
 					.child(
 						ui::P::new()
 							.child("Accuracy is the percentage of predictions that were correct."),
@@ -84,10 +84,9 @@ impl Component for BinaryClassifier {
 			)
 			.child(
 				ui::S2::new()
-					.child(
-						ui::H2::new()
-							.child("Area Under the Receiver Operating Characteristic Curve"),
-					)
+					.child(ui::H2::new(
+						"Area Under the Receiver Operating Characteristic Curve",
+					))
 					.child(ui::P::new().child(aucroc_description))
 					.child(ui::NumberCard::new(
 						"AUC ROC".to_owned(),
@@ -96,7 +95,7 @@ impl Component for BinaryClassifier {
 			)
 			.child(
 				ui::S2::new()
-					.child(ui::H2::new().child("Precison, Recall, and F1 Score"))
+					.child(ui::H2::new("Precison, Recall, and F1 Score"))
 					.child(definition)
 					.child(
 						MetricsRow::new()
@@ -131,7 +130,7 @@ impl Component for ConfusionMatrixSection {
 	fn into_node(self) -> Node {
 		let definition = "A confusion matrix categorizes predictions into false negatives, false positives, true negatives, and true positives.";
 		ui::S2::new()
-			.child(ui::H2::new().child("Confusion Matrix"))
+			.child(ui::H2::new("Confusion Matrix"))
 			.child(ui::P::new().child(definition))
 			.child(ui::ConfusionMatrix {
 				class_label: self.class,

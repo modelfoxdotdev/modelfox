@@ -79,7 +79,7 @@ impl Component for MulticlassClassifierProductionMetrics {
 		let accuracy_chart_title =
 			interval_chart_title(&self.date_window_interval, "Accuracy".to_owned());
 		ui::S1::new()
-			.child(ui::H1::new().child("Production Metrics"))
+			.child(ui::H1::new("Production Metrics"))
 			.child(
 				ui::TabBar::new()
 					.child(ui::TabLink::new("".to_owned(), true).child("Overview"))
@@ -117,7 +117,7 @@ impl Component for MulticlassClassifierProductionMetrics {
 			)
 			.child(
 				ui::S2::new()
-					.child(ui::H2::new().child("Accuracy"))
+					.child(ui::H2::new("Accuracy"))
 					.child(
 						ui::P::new()
 							.child("Accuracy is the percentage of predictions that were correct."),
@@ -160,7 +160,7 @@ pub struct ClassMetricsTable {
 
 impl Component for ClassMetricsTable {
 	fn into_node(self) -> Node {
-		let title = ui::H2::new().child("Precision and Recall");
+		let title = ui::H2::new("Precision and Recall");
 		let p = ui::P::new().child("Precision is the percentage of examples that were labeled as this class that are actually this class. Recall is the percentage of examples that are of this class that were labeled as this class.");
 		let table = ui::Table::new()
 			.width("100%".to_owned())

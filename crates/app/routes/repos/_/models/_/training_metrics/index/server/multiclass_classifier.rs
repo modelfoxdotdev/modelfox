@@ -20,7 +20,7 @@ impl Component for MulticlassClassifier {
 	fn into_node(self) -> Node {
 		let precision_definition = "Precision is the percentage of examples that were labeled as this class that are actually this class. Recall is the percentage of examples that are of this class that were labeled as this class.";
 		ui::S1::new()
-			.child(ui::H1::new().child("Training Metrics"))
+			.child(ui::H1::new("Training Metrics"))
 			.child(
 				ui::TabBar::new()
 					.child(ui::TabLink::new("".to_owned(), true).child("Overview"))
@@ -30,7 +30,7 @@ impl Component for MulticlassClassifier {
 			)
 			.child(
 				ui::S2::new()
-					.child(ui::H2::new().child("Accuracy"))
+					.child(ui::H2::new("Accuracy"))
 					.child(
 						ui::P::new()
 							.child("Accuracy is the percentage of predictions that were correct."),
@@ -50,7 +50,7 @@ impl Component for MulticlassClassifier {
 			)
 			.child(
 				ui::S2::new()
-					.child(ui::H2::new().child("Precision and Recall"))
+					.child(ui::H2::new("Precision and Recall"))
 					.child(ui::P::new().child(precision_definition))
 					.child(
 						ui::Table::new()

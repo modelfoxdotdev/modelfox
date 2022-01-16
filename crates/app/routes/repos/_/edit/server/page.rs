@@ -17,7 +17,7 @@ impl Component for Page {
 			.child(
 				AppLayout::new(self.app_layout_info).child(
 					ui::S1::new()
-						.child(PageHeading::new().child(ui::H1::new().child(self.title.clone())))
+						.child(PageHeading::new().child(ui::H1::new(self.title.clone())))
 						.child(UpdateTitleForm { title: self.title })
 						.child(DangerZone),
 				),
@@ -33,7 +33,7 @@ struct UpdateTitleForm {
 impl Component for UpdateTitleForm {
 	fn into_node(self) -> Node {
 		ui::S2::new()
-			.child(ui::H2::new().child("Title"))
+			.child(ui::H2::new("Title"))
 			.child(
 				ui::Form::new()
 					.post(true)
@@ -64,7 +64,7 @@ struct DangerZone;
 impl Component for DangerZone {
 	fn into_node(self) -> Node {
 		ui::S2::new()
-			.child(ui::H2::new().child("Danger Zone"))
+			.child(ui::H2::new("Danger Zone"))
 			.child(
 				ui::Form::new()
 					.post(true)

@@ -15,15 +15,13 @@ pub struct Page {
 impl Component for Page {
 	fn into_node(self) -> Node {
 		Document::new()
-			.child(
-				ModelLayout::new(self.model_layout_info).child(
-					ui::S1::new()
-						.child(ui::H1::new().child("Hyperparameters"))
-						.child(ModelHyperparametersTable {
-							hyperparameters: self.model_hyperparameters,
-						}),
+			.child(ModelLayout::new(self.model_layout_info).child(
+				ui::S1::new().child(ui::H1::new("Hyperparameters")).child(
+					ModelHyperparametersTable {
+						hyperparameters: self.model_hyperparameters,
+					},
 				),
-			)
+			))
 			.into_node()
 	}
 }

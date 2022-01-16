@@ -26,7 +26,7 @@ impl Component for Page {
 					ui::S1::new()
 						.child(
 							PageHeading::new()
-								.child(ui::H1::new().child("Production Monitors".to_string()))
+								.child(ui::H1::new("Production Monitors".to_string()))
 								.child(
 									PageHeadingButtons::new().child(
 										ui::Button::new()

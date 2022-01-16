@@ -16,7 +16,7 @@ impl Component for Page {
 						PredictPage::Index,
 					)))
 					.child(
-						ui::S1::new().child(ui::H1::new().child("Predict")).child(
+						ui::S1::new().child(ui::H1::new("Predict")).child(
 							ui::S2::new().child(
 								ui::UnorderedList::new()
 									.child(

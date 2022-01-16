@@ -36,15 +36,15 @@ impl Component for Page {
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
-						.child(ui::H1::new().child("Training Stats"))
+						.child(ui::H1::new("Training Stats"))
 						.child(
 							ui::S2::new()
-								.child(ui::H2::new().child("Target Column"))
+								.child(ui::H2::new("Target Column"))
 								.child(self.target_column_stats_table),
 						)
 						.child(
 							ui::S2::new()
-								.child(ui::H2::new().child("Columns"))
+								.child(ui::H2::new("Columns"))
 								.child(
 									MetricsRow::new()
 										.child(ui::NumberCard::new(

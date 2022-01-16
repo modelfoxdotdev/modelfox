@@ -38,7 +38,7 @@ impl Component for Page {
 					ui::S1::new()
 						.child(
 							PageHeading::new()
-								.child(ui::H1::new().child("Specify Production Alert Monitor")),
+								.child(ui::H1::new("Specify Production Alert Monitor")),
 						)
 						.child(
 							ui::Form::new()

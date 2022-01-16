@@ -24,7 +24,7 @@ pub struct MulticlassClassifier {
 impl Component for MulticlassClassifier {
 	fn into_node(self) -> Node {
 		ui::S1::new()
-			.child(ui::H1::new().child("Production Stats"))
+			.child(ui::H1::new("Production Stats"))
 			.child(DateWindowAndClassSelectForm {
 				date_window: self.date_window,
 				date_window_interval: self.date_window_interval,

@@ -15,7 +15,7 @@ impl Component for Page {
 	fn into_node(self) -> Node {
 		let guide = DocsGuide::from_slug(self.slug).unwrap();
 		let content = ui::S1::new()
-			.child(ui::H1::new().child(guide.front_matter.title))
+			.child(ui::H1::new(guide.front_matter.title))
 			.child(guide.markdown);
 		let layout = DocsLayout::new()
 			.selected_page(DocsPage::Guides(guide.slug))

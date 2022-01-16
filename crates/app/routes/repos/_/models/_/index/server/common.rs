@@ -20,7 +20,7 @@ pub struct TrainingSummarySection {
 impl Component for TrainingSummarySection {
 	fn into_node(self) -> Node {
 		ui::S2::new()
-			.child(ui::H2::new().child("Training Summary"))
+			.child(ui::H2::new("Training Summary"))
 			.child(
 				ui::P::new()
 					.child("Your dataset had ")
@@ -61,7 +61,7 @@ impl Component for FeatureImportancesSection {
 		let description =
 			"The chart and table below show which features were most important to the model.";
 		ui::S2::new()
-			.child(ui::H2::new().child("Feature Importances"))
+			.child(ui::H2::new("Feature Importances"))
 			.child(ui::P::new().child(description))
 			.child(FeatureImportancesChart {
 				values: self.feature_importances_chart_values,

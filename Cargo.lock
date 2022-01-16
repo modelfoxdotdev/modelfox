@@ -2013,8 +2013,6 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 [[package]]
 name = "pinwheel"
 version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "032a7531cae297918896ad27810de8994fab6d7740a4e88132f57ee59d72bb9c"
 dependencies = [
  "futures",
  "futures-signals",
@@ -2032,8 +2030,6 @@ dependencies = [
 [[package]]
 name = "pinwheel_elements_macro"
 version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b480f9fbb5f1ba78555a0089db2154429fc1b7ae4644f0943079c2f520855f07"
 dependencies = [
  "heck 0.3.3",
  "proc-macro2",
@@ -2044,8 +2040,6 @@ dependencies = [
 [[package]]
 name = "pinwheel_macro"
 version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7704b7143530fbceed5855ae2ffc6a2ad34363070f84b60fdfb06782eba6aaec"
 dependencies = [
  "heck 0.3.3",
  "proc-macro2",

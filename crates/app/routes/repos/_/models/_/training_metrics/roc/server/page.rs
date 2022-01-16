@@ -62,7 +62,7 @@ impl Component for Page {
 			},
 		];
 		let content = ui::S1::new()
-			.child(ui::H1::new().child("Training Metrics"))
+			.child(ui::H1::new("Training Metrics"))
 			.child(
 				ui::TabBar::new()
 					.child(ui::TabLink::new("./".to_owned(), false).child("Overview"))
@@ -71,7 +71,9 @@ impl Component for Page {
 			)
 			.child(
 				ui::S2::new()
-					.child(ui::H2::new().child("Area Under the Receiver Operating Characteristic"))
+					.child(ui::H2::new(
+						"Area Under the Receiver Operating Characteristic",
+					))
 					.child(ui::P::new().child(aucroc_description))
 					.child(ui::NumberCard::new(
 						"AUC ROC".to_owned(),
@@ -80,7 +82,7 @@ impl Component for Page {
 			)
 			.child(
 				ui::S2::new()
-					.child(ui::H2::new().child("Receiver Operating Characteristic Curve"))
+					.child(ui::H2::new("Receiver Operating Characteristic Curve"))
 					.child(ui::P::new().child(roc_description))
 					.child(
 						ui::Card::new().child(Dehydrate::new(
