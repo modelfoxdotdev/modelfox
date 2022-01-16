@@ -1,22 +1,8 @@
 use anyhow::Result;
-use clap::Parser;
-use std::{net::SocketAddr, path::PathBuf, sync::Arc};
+use std::{net::SocketAddr, sync::Arc};
 use sunfish::Sunfish;
 use tracing::error;
 use tracing_subscriber::prelude::*;
-
-#[derive(Parser)]
-enum Args {
-	#[clap(name = "serve")]
-	Serve,
-	#[clap(name = "export")]
-	Export(ExportArgs),
-}
-
-#[derive(Parser)]
-struct ExportArgs {
-	path: PathBuf,
-}
 
 struct Context {
 	sunfish: Sunfish,
@@ -25,16 +11,8 @@ struct Context {
 #[tokio::main]
 async fn main() -> Result<()> {
 	setup_tracing();
-	let args = Args::parse();
 	let sunfish = sunfish::init!();
-	match args {
-		Args::Serve => {
-			serve(sunfish).await?;
-		}
-		Args::Export(export_args) => {
-			export(sunfish, export_args.path).await?;
-		}
-	}
+	serve(sunfish).await?;
 	Ok(())
 }
 
@@ -80,13 +58,6 @@ async fn handle(mut request: http::Request<hyper::Body>) -> http::Response<hyper
 			.body(hyper::Body::from("not found"))
 			.unwrap()
 	})
-}
-
-async fn export(sunfish: Sunfish, path: PathBuf) -> Result<()> {
-	let out_dir = std::path::Path::new(env!("OUT_DIR"));
-	let dist_path = std::env::current_dir()?.join(path);
-	sunfish.export(out_dir, &dist_path)?;
-	Ok(())
 }
 
 fn setup_tracing() {

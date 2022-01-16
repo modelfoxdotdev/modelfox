@@ -1,2 +1,0 @@
-set -e
-cargo run --release -p tangram_www -- export dist/www

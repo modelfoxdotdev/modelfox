@@ -3,5 +3,6 @@
 /.envrc
 /data/
 /dist/
+/result/
 /secrets/
 /target/
