@@ -1,6 +1,4 @@
 cargo run -p tangram_dev -- \
   --watch . \
-  --ignore .git \
   --ignore languages \
-  --ignore target \
   --command "cargo run -p tangram_cli -- app"
