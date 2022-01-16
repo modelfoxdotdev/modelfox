@@ -347,15 +347,11 @@ struct Manual;
 
 impl Component for Manual {
 	fn into_node(self) -> Node {
-		let p = ui::P::new()
-			.child("If none of the above methods works for you, you can download the tarball for your CPU architecture and operating system from ")
-			.child(ui::Link::new().href("https://github.com/tangramdotdev/tangram/releases/".to_owned()).child("GitHub Releases"))
-			.child(". Untar the file and place the tangram executable somewhere on your ")
-			.child(ui::InlineCode::new("PATH"))
-			.child(". If you do this, please email us at ")
-			.child(ui::Link::new().href("mailto:hello@tangram.dev".to_owned())
-			.child("hello@tangram.dev"))
-			.child(" so we can consider supporting your preferred installation method.");
+		let p = ui::Markdown::new(ui::doc!(
+			r#"
+				If none of the above methods works for you, you can download the tarball for your CPU architecture and operating system from [GitHub Releases](https://github.com/tangramdotdev/tangram/releases/). Untar the file and place the tangram executable somewhere on your `PATH`. If you do this, please email us at [hello@tangram.dev](mailto:hello@tangram.dev) so we can consider supporting your preferred installation method.
+			"#
+		).into());
 		ui::S2::new()
 			.child(ui::H2::new("Install Manually"))
 			.child(p)
