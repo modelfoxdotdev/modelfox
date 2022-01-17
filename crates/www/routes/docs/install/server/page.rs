@@ -351,7 +351,7 @@ impl Component for Manual {
 			r#"
 				If none of the above methods works for you, you can download the tarball for your CPU architecture and operating system from [GitHub Releases](https://github.com/tangramdotdev/tangram/releases/). Untar the file and place the tangram executable somewhere on your `PATH`. If you do this, please email us at [hello@tangram.dev](mailto:hello@tangram.dev) so we can consider supporting your preferred installation method.
 			"#
-		).into());
+		));
 		ui::S2::new()
 			.child(ui::H2::new("Install Manually"))
 			.child(p)
