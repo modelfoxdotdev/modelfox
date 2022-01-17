@@ -1,9 +1,11 @@
 use crate::date_window::{DateWindow, DateWindowInterval};
-use chrono::prelude::*;
-use chrono_tz::Tz;
 
-pub fn format_date_window(date: DateTime<Utc>, date_window: &DateWindow, timezone: Tz) -> String {
-	let date = date.with_timezone(&timezone);
+pub fn format_date_window(
+	date: time::OffsetDateTime,
+	date_window: &DateWindow,
+	offset: time::UtcOffset,
+) -> String {
+	let date = date.to_offset(offset);
 	match date_window {
 		DateWindow::Today => format_day(date),
 		DateWindow::ThisMonth => format_month(date),
@@ -12,11 +14,11 @@ pub fn format_date_window(date: DateTime<Utc>, date_window: &DateWindow, timezon
 }
 
 pub fn format_date_window_interval(
-	date: DateTime<Utc>,
+	date: time::OffsetDateTime,
 	date_window_interval: &DateWindowInterval,
-	timezone: Tz,
+	offset: time::UtcOffset,
 ) -> String {
-	let date = date.with_timezone(&timezone);
+	let date = date.to_offset(offset);
 	match date_window_interval {
 		DateWindowInterval::Hourly => format_hour(date),
 		DateWindowInterval::Daily => format_day_of_month(date),
@@ -40,22 +42,27 @@ pub fn overall_chart_title(date_window: &DateWindow, title: String) -> String {
 	}
 }
 
-pub fn format_hour(date: DateTime<Tz>) -> String {
-	date.format("%-l%P").to_string()
+pub fn format_hour(date: time::OffsetDateTime) -> String {
+	let format = time::format_description::parse("%-l%P").unwrap();
+	date.format(&format).unwrap()
 }
 
-pub fn format_day(date: DateTime<Tz>) -> String {
-	date.format("%a %b %d %Y").to_string()
+pub fn format_day(date: time::OffsetDateTime) -> String {
+	let format = time::format_description::parse("%a %b %d %Y").unwrap();
+	date.format(&format).unwrap()
 }
 
-pub fn format_day_of_month(date: DateTime<Tz>) -> String {
-	date.format("%b %d").to_string()
+pub fn format_day_of_month(date: time::OffsetDateTime) -> String {
+	let format = time::format_description::parse("%b %d").unwrap();
+	date.format(&format).unwrap()
 }
 
-pub fn format_month(date: DateTime<Tz>) -> String {
-	date.format("%b %Y").to_string()
+pub fn format_month(date: time::OffsetDateTime) -> String {
+	let format = time::format_description::parse("%b %Y").unwrap();
+	date.format(&format).unwrap()
 }
 
-pub fn format_year(date: DateTime<Tz>) -> String {
-	date.format("%Y").to_string()
+pub fn format_year(date: time::OffsetDateTime) -> String {
+	let format = time::format_description::parse("%Y").unwrap();
+	date.format(&format).unwrap()
 }

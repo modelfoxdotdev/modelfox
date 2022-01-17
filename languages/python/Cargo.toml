@@ -13,7 +13,6 @@ path = "lib.rs"
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-chrono = { version = "0.4", features = ["serde"] }
 memmap = "0.7"
 pyo3 = { version = "0.15", features = ["abi3-py37", "extension-module"] }
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
@@ -21,4 +20,5 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tangram_core = { path = "../../crates/core" }
 tangram_model = { path = "../../crates/model" }
+time = { version = "0.3", features = ["formatting", "serde"] }
 url = { version = "2", features = ["serde"] }

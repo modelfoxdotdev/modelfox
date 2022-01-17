@@ -1,5 +1,4 @@
 use anyhow::{bail, Result};
-use chrono::{Datelike, TimeZone, Timelike, Utc};
 use clap::{ArgEnum, Parser};
 use num::ToPrimitive;
 use rand::Rng;
@@ -246,9 +245,9 @@ fn generate_fake_prediction_iris(
 	})
 }
 
-fn get_random_date() -> chrono::DateTime<Utc> {
-	let end_time = chrono::Utc::now().timestamp();
-	let start_time = chrono::Utc::now()
+fn get_random_date() -> time::OffsetDateTime {
+	let end_time = time::OffsetDateTime::now_utc().timestamp();
+	let start_time = time::OffsetDateTime::now_utc()
 		.with_month(1)
 		.unwrap()
 		.with_day(1)

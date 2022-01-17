@@ -1,7 +1,5 @@
 use crate::page::{MonitorsTable, MonitorsTableRow, Page};
 use anyhow::{bail, Result};
-use chrono::prelude::*;
-use chrono_tz::Tz;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
@@ -67,7 +65,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				let monitor: Monitor = serde_json::from_str(&monitor).unwrap();
 				let name = monitor.title;
 				let last_updated: i64 = row.get(2);
-				let last_updated: DateTime<Tz> =
+				let last_updated: time::OffsetDateTime =
 					Utc.timestamp(last_updated, 0).with_timezone(&timezone);
 				MonitorsTableRow {
 					id: id.to_string(),

@@ -1,7 +1,5 @@
 use crate::page::{ModelsTable, ModelsTableRow, Page};
 use anyhow::{bail, Result};
-use chrono::prelude::*;
-use chrono_tz::Tz;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
@@ -64,7 +62,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				let id: Id = id.parse().unwrap();
 				let tag: Option<String> = row.get(1);
 				let created_at: i64 = row.get(2);
-				let created_at: DateTime<Tz> =
+				let created_at: time::OffsetDateTime =
 					Utc.timestamp(created_at, 0).with_timezone(&timezone);
 				ModelsTableRow {
 					id: id.to_string(),

@@ -650,7 +650,7 @@ enum Event {
 
 #[derive(Debug, serde::Serialize)]
 struct PredictionEvent {
-	date: chrono::DateTime<chrono::Utc>,
+	date: time::OffsetDateTime,
 	identifier: NumberOrString,
 	input: PredictInput,
 	options: Option<PredictOptions>,
@@ -660,7 +660,7 @@ struct PredictionEvent {
 
 #[derive(Debug, serde::Serialize)]
 struct TrueValueEvent {
-	date: chrono::DateTime<chrono::Utc>,
+	date: time::OffsetDateTime,
 	identifier: NumberOrString,
 	model_id: String,
 	true_value: NumberOrString,
@@ -848,7 +848,7 @@ where
 
 	fn prediction_event(&self, args: LogPredictionArgs<Input, Output>) -> PredictionEvent {
 		PredictionEvent {
-			date: chrono::Utc::now(),
+			date: time::OffsetDateTime::now_utc(),
 			identifier: args.identifier,
 			input: args.input.into(),
 			options: args.options,
@@ -859,7 +859,7 @@ where
 
 	fn true_value_event(&self, args: LogTrueValueArgs) -> TrueValueEvent {
 		TrueValueEvent {
-			date: chrono::Utc::now(),
+			date: time::OffsetDateTime::now_utc(),
 			identifier: args.identifier,
 			model_id: self.id().to_owned(),
 			true_value: args.true_value,

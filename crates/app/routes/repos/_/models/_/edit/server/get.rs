@@ -1,7 +1,5 @@
 use crate::page::Page;
 use anyhow::{bail, Result};
-use chrono::prelude::*;
-use chrono_tz::Tz;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
@@ -54,7 +52,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	.fetch_one(&mut db)
 	.await?;
 	let created_at: i64 = row.get(1);
-	let created_at: DateTime<Tz> = Utc.timestamp(created_at, 0).with_timezone(&timezone);
+	let created_at: time::OffsetDateTime = Utc.timestamp(created_at, 0).with_timezone(&timezone);
 	let created_at = created_at.to_string();
 	let model_tag: Option<String> = row.get(0);
 	let model_heading = model_tag.clone().unwrap_or_else(|| model_id.to_string());

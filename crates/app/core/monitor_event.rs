@@ -15,7 +15,7 @@ pub enum MonitorEvent {
 pub struct PredictionMonitorEvent {
 	#[serde(alias = "modelId")]
 	pub model_id: Id,
-	pub date: chrono::DateTime<chrono::Utc>,
+	pub date: time::OffsetDateTime,
 	pub identifier: NumberOrString,
 	pub options: Option<PredictOptions>,
 	pub input: HashMap<String, serde_json::Value>,
@@ -33,7 +33,7 @@ pub struct PredictOptions {
 pub struct TrueValueMonitorEvent {
 	#[serde(alias = "modelId")]
 	pub model_id: Id,
-	pub date: chrono::DateTime<chrono::Utc>,
+	pub date: time::OffsetDateTime,
 	pub identifier: NumberOrString,
 	#[serde(alias = "trueValue")]
 	pub true_value: serde_json::Value,

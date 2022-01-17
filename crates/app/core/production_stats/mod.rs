@@ -3,8 +3,6 @@ use std::borrow::BorrowMut;
 pub use self::{column_stats::*, number_stats::*, prediction_stats::*};
 use crate::monitor_event::PredictionMonitorEvent;
 use anyhow::Result;
-use chrono::prelude::*;
-use chrono_tz::Tz;
 use num::ToPrimitive;
 use sqlx::prelude::*;
 use tangram_app_ui::date_window::{DateWindow, DateWindowInterval};
@@ -16,8 +14,8 @@ mod prediction_stats;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 pub struct ProductionStats {
-	pub start_date: DateTime<Utc>,
-	pub end_date: DateTime<Utc>,
+	pub start_date: time::OffsetDateTime,
+	pub end_date: time::OffsetDateTime,
 	pub row_count: u64,
 	pub column_stats: Vec<ProductionColumnStats>,
 	pub prediction_stats: ProductionPredictionStats,
@@ -25,8 +23,8 @@ pub struct ProductionStats {
 
 #[derive(Debug)]
 pub struct ProductionStatsOutput {
-	pub start_date: DateTime<Utc>,
-	pub end_date: DateTime<Utc>,
+	pub start_date: time::OffsetDateTime,
+	pub end_date: time::OffsetDateTime,
 	pub row_count: u64,
 	pub column_stats: Vec<ProductionColumnStatsOutput>,
 	pub prediction_stats: ProductionPredictionStatsOutput,
@@ -35,8 +33,8 @@ pub struct ProductionStatsOutput {
 impl ProductionStats {
 	pub fn new(
 		model: tangram_model::ModelReader,
-		start_date: DateTime<Utc>,
-		end_date: DateTime<Utc>,
+		start_date: time::OffsetDateTime,
+		end_date: time::OffsetDateTime,
 	) -> ProductionStats {
 		let train_column_stats = match model.inner() {
 			tangram_model::ModelInnerReader::Regressor(regressor) => {
@@ -110,13 +108,13 @@ pub async fn get_production_stats(
 	model: tangram_model::ModelReader<'_>,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
-	timezone: Tz,
+	offset: time::UtcOffset,
 ) -> Result<GetProductionStatsOutput> {
 	// Compute the start date given the date window.
 	// * For today, use the start of this day in this timezone.
 	// * For this month, use the start of this month in this timezone.
 	// * For this year, use the start of this year in this timezone.
-	let now: DateTime<Tz> = Utc::now().with_timezone(&timezone);
+	let now = time::OffsetDateTime::now_utc().to_offset(offset);
 	let start_date = match date_window {
 		DateWindow::Today => timezone
 			.ymd(now.year(), now.month(), now.day())
@@ -125,10 +123,11 @@ pub async fn get_production_stats(
 		DateWindow::ThisYear => timezone.ymd(now.year(), 1, 1).and_hms(0, 0, 0),
 	};
 	let end_date = match date_window {
-		DateWindow::Today => start_date + chrono::Duration::days(1),
+		DateWindow::Today => start_date + time::Duration::days(1),
 		DateWindow::ThisMonth => {
-			start_date
-				+ chrono::Duration::days(n_days_in_month(start_date.year(), start_date.month()))
+			let days_in_month =
+				time::util::days_in_year_month(start_date.year(), start_date.month());
+			start_date + time::Duration::days(days_in_month.into())
 		}
 		DateWindow::ThisYear => timezone.ymd(now.year() + 1, 1, 1).and_hms(0, 0, 0),
 	};
@@ -172,13 +171,18 @@ pub async fn get_production_stats(
 				DateWindowInterval::Monthly => start_date.with_month0(i).unwrap(),
 			};
 			let end = match date_window_interval {
-				DateWindowInterval::Hourly => start + chrono::Duration::hours(1),
-				DateWindowInterval::Daily => start + chrono::Duration::days(1),
+				DateWindowInterval::Hourly => start + time::Duration::hours(1),
+				DateWindowInterval::Daily => start + time::Duration::days(1),
 				DateWindowInterval::Monthly => {
-					start + chrono::Duration::days(n_days_in_month(start.year(), start.month()))
+					let days_in_month = time::util::days_in_year_month(start.year(), start.month());
+					start + time::Duration::days(days_in_month.into())
 				}
 			};
-			ProductionStats::new(model, start.with_timezone(&Utc), end.with_timezone(&Utc))
+			ProductionStats::new(
+				model,
+				start.to_offset(time::UtcOffset::UTC),
+				end.to_offset(time::UtcOffset::UTC),
+			)
 		})
 		.collect();
 	// Merge each hourly production stats entry into its corresponding interval.
@@ -209,8 +213,8 @@ pub async fn get_production_stats(
 		.fold(
 			ProductionStats::new(
 				model,
-				start_date.with_timezone(&Utc),
-				end_date.with_timezone(&Utc),
+				start_date.to_offset(time::UtcOffset::UTC),
+				end_date.to_offset(time::UtcOffset::UTC),
 			),
 			|mut stats, next| {
 				stats.merge(next.clone());
@@ -229,15 +233,4 @@ pub async fn get_production_stats(
 		overall,
 		intervals,
 	})
-}
-
-fn n_days_in_month(year: i32, month: u32) -> i64 {
-	let (end_year, end_month) = if month == 12 {
-		(year + 1, 1)
-	} else {
-		(year, month + 1)
-	};
-	let start = NaiveDate::from_ymd(year, month, 1);
-	let end = NaiveDate::from_ymd(end_year, end_month, 1);
-	(end - start).num_days()
 }

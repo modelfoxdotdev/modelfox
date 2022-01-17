@@ -615,7 +615,9 @@ fn deb(
 			}
 			// Write the Release file.
 			let release_file_path = distribution_path.join("Release");
-			let date = chrono::Utc::now().to_rfc2822();
+			let date = time::OffsetDateTime::now_utc()
+				.format(&time::format_description::well_known::Rfc2822)
+				.unwrap();
 			let md5 = md5_lines.join("\n");
 			let sha1 = sha1_lines.join("\n");
 			let sha256 = sha256_lines.join("\n");

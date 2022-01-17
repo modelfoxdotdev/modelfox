@@ -1,7 +1,5 @@
 use crate::page::Page;
 use anyhow::{bail, Result};
-use chrono::prelude::*;
-use chrono_tz::Tz;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::{borrow::BorrowMut, sync::Arc};
@@ -79,7 +77,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		None => return Ok(not_found()),
 	};
 	let date: i64 = row.get(1);
-	let date: DateTime<Tz> = Utc.timestamp(date, 0).with_timezone(&timezone);
+	let date: time::OffsetDateTime = Utc.timestamp(date, 0).with_timezone(&timezone);
 	let identifier: String = row.get(2);
 	let input: String = row.get(3);
 	let input: PredictInput = serde_json::from_str(&input)?;
