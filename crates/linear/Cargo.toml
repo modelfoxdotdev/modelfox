@@ -47,7 +47,7 @@ name = "tangram_linear_benchmark_iris"
 path = "benchmarks/iris.rs"
 
 [dependencies]
-buffalo = { version = "0.2", features = ["ndarray_0_15"] }
+buffalo = { version = "0.3", features = ["bitvec", "ndarray_0_15"] }
 clap = { version = "3", features = ["derive"] }
 ndarray = { version = "0.15", features = ["rayon"] }
 num = "0.4"

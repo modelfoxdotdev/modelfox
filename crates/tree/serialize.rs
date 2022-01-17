@@ -84,7 +84,7 @@ pub struct BranchSplitDiscrete {
 	#[buffalo(id = 0, required)]
 	pub feature_index: u64,
 	#[buffalo(id = 1, required)]
-	pub directions: BitVec<Lsb0, u8>,
+	pub directions: BitVec<u8, Lsb0>,
 }
 
 #[derive(buffalo::Read, buffalo::Write)]

@@ -1193,7 +1193,7 @@ fn choose_best_split_for_discrete_feature(
 	// For each bin, determine if splitting at that bin's value would produce a better split.
 	let init_split_direction: bool = SplitDirection::Right.into();
 	let mut directions =
-		bitvec![Lsb0, u8; init_split_direction as isize; binning_instructions.n_bins()];
+		bitvec![u8, Lsb0; init_split_direction as isize; binning_instructions.n_bins()];
 	for (bin_index, bin_stats_entry) in
 		sorted_bin_stats_for_feature[0..bin_stats_for_feature.len() - 1].iter()
 	{

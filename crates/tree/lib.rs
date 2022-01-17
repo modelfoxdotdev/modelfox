@@ -281,7 +281,7 @@ pub struct BranchSplitDiscrete {
 	/// This is the index of the feature to get the value for.
 	pub feature_index: usize,
 	/// This specifies which direction, left or right, an example should be sent, based on the value of the chosen feature.
-	pub directions: BitVec<Lsb0, u8>,
+	pub directions: BitVec<u8, Lsb0>,
 }
 
 /// The leaves in a tree hold the values to output for examples that get sent to them.

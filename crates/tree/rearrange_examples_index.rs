@@ -130,7 +130,7 @@ unsafe fn rearrange_examples_index_serial_continuous<T>(
 unsafe fn rearrange_examples_index_serial_discrete<T>(
 	left: &mut usize,
 	right: &mut usize,
-	directions: &BitSlice<Lsb0, u8>,
+	directions: &BitSlice<u8, Lsb0>,
 	examples_index: &mut [u32],
 	binned_feature_values: &[T],
 ) where
@@ -328,7 +328,7 @@ unsafe fn rearrange_examples_index_parallel_step_one_continuous<T>(
 unsafe fn rearrange_examples_index_parallel_step_one_discrete<T>(
 	n_left: &mut usize,
 	n_right: &mut usize,
-	directions: &BitSlice<Lsb0, u8>,
+	directions: &BitSlice<u8, Lsb0>,
 	examples_index: &[u32],
 	examples_index_left_buffer: &mut [u32],
 	examples_index_right_buffer: &mut [u32],

@@ -116,7 +116,7 @@ pub struct TrainBranchSplitContinuous {
 #[derive(Clone, Debug)]
 pub struct TrainBranchSplitDiscrete {
 	pub feature_index: usize,
-	pub directions: BitVec<Lsb0, u8>,
+	pub directions: BitVec<u8, Lsb0>,
 }
 
 #[derive(Debug)]
