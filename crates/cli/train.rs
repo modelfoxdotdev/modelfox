@@ -36,9 +36,12 @@ pub fn train(args: TrainArgs) -> Result<()> {
 	}));
 	let result = std::panic::catch_unwind(|| {
 		let mut progress_thread = if args.progress {
-			let terminal = Terminal::new()?;
-			let progress_thread = ProgressThread::start(terminal);
-			Some(progress_thread)
+			if let Ok(terminal) = Terminal::new() {
+				let progress_thread = ProgressThread::start(terminal);
+				Some(progress_thread)
+			} else {
+				None
+			}
 		} else {
 			None
 		};
