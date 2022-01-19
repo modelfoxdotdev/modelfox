@@ -95,11 +95,11 @@
             (inputs.windows_sdk.defaultPackage.${system})
           ];
           outputHashMode = "recursive";
-          outputHash = "sha256-0tMWa9FcZYLbkBiHQCDFvxoY2sf0/A1FxhCqgUVobx4=";
+          outputHash = "sha256-bKtb5nAFT0J2TBrurTtkS1eFP+ewaRkWj63rKsresL4=";
         }
         ''
           windows_sdk \
-            --manifest-url https://download.visualstudio.microsoft.com/download/pr/b763973d-da6e-4025-834d-d8bc48e7d37f/81eb5576c4f6514b8744516eac345f5bb062723cec3dbd36aba0594a50482ef3/VisualStudio.vsman \
+            --manifest-url https://download.visualstudio.microsoft.com/download/pr/9a26f37e-6001-429b-a5db-c5455b93953c/25b853a26e065037b83c3dd6aac74bfbfd1f09c9639d1f8c877ecc8d11ea0feb/VisualStudio.vsman \
             --package Microsoft.VisualStudio.VC.Llvm.Clang \
             --package Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
             --package Microsoft.VisualStudio.Component.Windows10SDK.19041 \
