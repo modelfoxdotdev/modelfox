@@ -114,24 +114,24 @@
     rec {
       defaultApp = inputs.flake-utils.lib.mkApp {
         drv = defaultPackage;
-      }; 
-      apps.www = inputs.flake-utils.lib.mkApp {
-        drv = packages.www;
       };
       defaultPackage = (pkgs.makeRustPlatform {
         rustc = rust;
         cargo = rust;
-      }).buildRustPackage({
+      }).buildRustPackage ({
         name = "tangram";
         src = ./.;
         doCheck = false;
         cargoSha256 = "sha256-ELmX2iAmWEHiZ0tdkHSk7P6Q7LkKMzT6zqkog4tmrjg=";
         cargoBuildFlags = "--package tangram_cli";
-      }); 
+      });
+      apps.www = inputs.flake-utils.lib.mkApp {
+        drv = packages.www;
+      };
       packages.www = (pkgs.makeRustPlatform {
         rustc = rust;
         cargo = rust;
-      }).buildRustPackage({
+      }).buildRustPackage ({
         name = "tangram_www";
         src = ./.;
         doCheck = false;
