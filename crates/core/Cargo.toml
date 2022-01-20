@@ -43,6 +43,7 @@ tangram_table = { version = "0.7.0", path = "../table" }
 tangram_text = { version = "0.7.0", path = "../text" }
 tangram_tree = { version = "0.7.0", path = "../tree" }
 tangram_zip = { version = "0.7.0", path = "../zip" }
+time = { version = "0.3", features = ["formatting", "serde"] }
 
 [target.wasm32-unknown-unknown.dependencies]
 getrandom = { version = "0.2", features = ["js"] }

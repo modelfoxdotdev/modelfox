@@ -11,7 +11,6 @@ use crate::{
 	},
 };
 use anyhow::{bail, Result};
-use chrono_tz::Tz;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use std::collections::BTreeMap;
@@ -172,7 +171,7 @@ fn number_column(
 	train_column_stats: tangram_model::NumberColumnStatsReader,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
-	timezone: Tz,
+	utc_offset: time::UtcOffset,
 ) -> NumberColumn {
 	let overall = get_production_stats_output
 		.overall
@@ -283,7 +282,7 @@ fn enum_column(
 	overall_train_row_count: u64,
 	date_window: DateWindow,
 	_date_window_interval: DateWindowInterval,
-	_timezone: Tz,
+	_utc_offset: time::UtcOffset,
 ) -> EnumColumn {
 	let overall = get_production_stats_output
 		.overall
@@ -374,7 +373,7 @@ fn text_column(
 	train_column_stats: tangram_model::TextColumnStatsReader,
 	date_window: DateWindow,
 	_date_window_interval: DateWindowInterval,
-	_timezone: Tz,
+	_utc_offset: time::UtcOffset,
 ) -> TextColumn {
 	let overall = get_production_stats_output
 		.overall

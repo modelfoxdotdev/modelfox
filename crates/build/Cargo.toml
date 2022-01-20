@@ -13,7 +13,6 @@ path = "main.rs"
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
 cbindgen = "0.20"
-chrono = { version = "0.4", features = ["serde"] }
 clap = { version = "3", features = ["derive"] }
 digest = "0.10"
 dirs = "4"
@@ -30,4 +29,5 @@ sha-1 = "0.10"
 sha2 = "0.10"
 tar = "0.4"
 tempfile = "3"
+time = { version = "0.3", features = ["formatting", "serde"] }
 url = { version = "2", features = ["serde"] }

@@ -541,7 +541,9 @@ impl Trainer {
 		let model = Model {
 			id,
 			version: env!("CARGO_PKG_VERSION").to_owned(),
-			date: chrono::Utc::now().to_rfc3339(),
+			date: time::OffsetDateTime::now_utc()
+				.format(&time::format_description::well_known::Rfc3339)
+				.unwrap(),
 			inner,
 		};
 		handle_progress_event(ProgressEvent::FinalizeDone);

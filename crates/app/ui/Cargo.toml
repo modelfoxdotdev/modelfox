@@ -9,8 +9,7 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
-chrono = { version = "0.4", features = ["serde"] }
-chrono-tz = { version = "0.6", features = ["serde"] }
 pinwheel = "0.2"
 serde = { version = "1", features = ["derive"] }
 tangram_ui = { path = "../../ui" }
+time = { version = "0.3", features = ["formatting", "serde"] }

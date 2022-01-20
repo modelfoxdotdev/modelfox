@@ -264,7 +264,7 @@ impl Model {
 		options: Option<PredictOptions>,
 	) -> PredictionEvent {
 		PredictionEvent {
-			date: chrono::Utc::now(),
+			date: time::OffsetDateTime::now_utc(),
 			identifier,
 			input,
 			options,
@@ -279,7 +279,7 @@ impl Model {
 		true_value: NumberOrString,
 	) -> TrueValueEvent {
 		TrueValueEvent {
-			date: chrono::Utc::now(),
+			date: time::OffsetDateTime::now_utc(),
 			identifier,
 			model_id: self.id(),
 			true_value,
@@ -858,7 +858,7 @@ enum Event {
 #[pyclass]
 #[derive(Debug, serde::Serialize)]
 struct PredictionEvent {
-	date: chrono::DateTime<chrono::Utc>,
+	date: time::OffsetDateTime,
 	identifier: NumberOrString,
 	input: PredictInput,
 	options: Option<PredictOptions>,
@@ -868,7 +868,7 @@ struct PredictionEvent {
 
 #[derive(Debug, serde::Serialize)]
 struct TrueValueEvent {
-	date: chrono::DateTime<chrono::Utc>,
+	date: time::OffsetDateTime,
 	identifier: NumberOrString,
 	model_id: String,
 	true_value: NumberOrString,

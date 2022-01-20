@@ -15,11 +15,9 @@ insta = "1"
 anyhow = { version = "1", features = ["backtrace"] }
 async-trait = "0.1"
 bytes = "1"
-chrono = { version = "0.4", features = ["serde"] }
-chrono-tz = { version = "0.6", features = ["serde"] }
 dirs = "4"
-futures = "0.3"
 fnv = "1"
+futures = "0.3"
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
 indexmap = { version = "1.6", features = ["serde-1"] }
@@ -33,7 +31,7 @@ rand = "0.8"
 rust-s3 = { version = "0.28" , default-features = false, features = ["tokio-rustls-tls"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }
+sqlx = { version = "0.5", default-features = false, features = ["any", "postgres", "runtime-tokio-rustls", "sqlite"] }
 sunfish = "0.3"
 tangram_app_migrations = { path = "../../app/migrations" }
 tangram_app_ui = { path = "../../app/ui" }
@@ -47,7 +45,7 @@ tangram_table = { path = "../../table" }
 tangram_text = { path = "../../text" }
 tangram_ui = { path = "../../ui" }
 tangram_zip = { path = "../../zip" }
-time = { version = "0.3", features = ["macros"] }
+time = { version = "0.3", features = ["formatting", "macros", "serde"] }
 tokio = { version = "1", features = ["full"] }
 tracing = "0.1"
 url = { version = "2", features = ["serde"] }

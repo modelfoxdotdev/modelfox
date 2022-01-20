@@ -1,4 +1,3 @@
-use chrono::Datelike;
 use pinwheel::prelude::*;
 use tangram_ui as ui;
 use tangram_www_ui::logo::{Logo, LogoColorScheme};
@@ -87,7 +86,7 @@ impl Component for Footer {
 			)
 			.child(p().class("footer-copyright").child(format!(
 				"Copyright © {} Tangram, Inc",
-				chrono::Utc::now().year()
+				time::OffsetDateTime::now_utc().year()
 			)));
 		let sections = div()
 			.class("footer-sections")

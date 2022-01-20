@@ -1,7 +1,5 @@
 use crate::page::{Page, Pagination, PredictionTable, PredictionTableRow};
 use anyhow::{bail, Result};
-use chrono::prelude::*;
-use chrono_tz::Tz;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
@@ -177,7 +175,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 			let id: String = row.get(0);
 			let id = id.parse().unwrap();
 			let date: i64 = row.get(1);
-			let date: DateTime<Tz> = Utc.timestamp(date, 0).with_timezone(&timezone);
+			let date: time::OffsetDateTime = Utc.timestamp(date, 0).with_timezone(&timezone);
 			let identifier: String = row.get(2);
 			let output: String = row.get(4);
 			let output: PredictOutput = serde_json::from_str(&output).unwrap();

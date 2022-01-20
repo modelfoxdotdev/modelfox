@@ -7,7 +7,6 @@ use crate::{
 	},
 };
 use anyhow::{bail, Result};
-use chrono_tz::Tz;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use std::sync::Arc;
@@ -157,7 +156,7 @@ fn compute_regressor(
 	production_stats: GetProductionStatsOutput,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
-	timezone: Tz,
+	utc_offset: time::UtcOffset,
 ) -> Regressor {
 	let model = model.inner().as_regressor().unwrap();
 	let target_column_stats = model.overall_target_column_stats();
@@ -228,7 +227,7 @@ fn compute_binary_classifier(
 	production_stats: GetProductionStatsOutput,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
-	timezone: Tz,
+	utc_offset: time::UtcOffset,
 ) -> BinaryClassifier {
 	let model = model.inner().as_binary_classifier().unwrap();
 	let target_column_stats = model.overall_target_column_stats();
@@ -316,7 +315,7 @@ fn compute_multiclass_classifier(
 	production_stats: GetProductionStatsOutput,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
-	timezone: Tz,
+	utc_offset: time::UtcOffset,
 	search_params: Option<SearchParams>,
 ) -> MulticlassClassifier {
 	let model = model.inner().as_multiclass_classifier().unwrap();

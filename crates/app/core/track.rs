@@ -10,7 +10,6 @@ use crate::{
 	storage::Storage,
 };
 use anyhow::{anyhow, bail, Result};
-use chrono::prelude::*;
 use memmap::Mmap;
 use num::ToPrimitive;
 use sqlx::prelude::*;
@@ -124,7 +123,7 @@ pub async fn write_prediction_monitor_event(
 	)
 	.bind(&prediction_monitor_event_id.to_string())
 	.bind(&model_id.to_string())
-	.bind(&date.timestamp())
+	.bind(&date.unix_timestamp())
 	.bind(&identifier.to_string())
 	.bind(&input)
 	.bind(&options)
@@ -191,7 +190,7 @@ pub async fn write_true_value_monitor_event(
 	)
 	.bind(&true_value_monitor_event_id.to_string())
 	.bind(&model_id.to_string())
-	.bind(&date.timestamp())
+	.bind(&date.unix_timestamp())
 	.bind(&identifier.to_string())
 	.bind(&true_value.to_string())
 	.execute(txn.borrow_mut())
@@ -246,7 +245,7 @@ pub async fn insert_or_update_production_stats_for_monitor_event(
 		.await?;
 	} else {
 		let start_date = hour;
-		let end_date = hour + chrono::Duration::hours(1);
+		let end_date = hour + time::Duration::hours(1);
 		let mut production_stats = ProductionStats::new(model, start_date, end_date);
 		production_stats.update(model, monitor_event);
 		let data = serde_json::to_string(&production_stats)?;
@@ -305,7 +304,7 @@ pub async fn insert_or_update_production_metrics_for_monitor_event(
 		.ok_or_else(|| anyhow!("Failed to find prediction with identifier {}", identifier))?;
 	let output: String = row.get(0);
 	let date: i64 = row.get(1);
-	let date = Utc.timestamp(date, 0);
+	let date = time::OffsetDateTime::from_unix_timestamp(date).unwrap();
 	let hour = date
 		.with_minute(0)
 		.unwrap()
@@ -364,7 +363,7 @@ pub async fn insert_or_update_production_metrics_for_monitor_event(
 		.await?;
 	} else {
 		let start_date = hour;
-		let end_date = hour + chrono::Duration::hours(1);
+		let end_date = hour + time::Duration::hours(1);
 		let mut production_metrics = ProductionMetrics::new(model, start_date, end_date);
 		production_metrics.update((prediction, true_value));
 		let data = serde_json::to_string(&production_metrics)?;

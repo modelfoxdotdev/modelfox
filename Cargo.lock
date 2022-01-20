@@ -341,29 +341,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "chrono-tz"
-version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58549f1842da3080ce63002102d5bc954c7bc843d4f47818e642abdc36253552"
-dependencies = [
- "chrono",
- "chrono-tz-build",
- "phf",
- "serde",
-]
-
-[[package]]
-name = "chrono-tz-build"
-version = "0.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db058d493fb2f65f41861bfed7e3fe6335264a9f0f92710cab5bdf01fef09069"
-dependencies = [
- "parse-zoneinfo",
- "phf",
- "phf_codegen",
-]
-
-[[package]]
 name = "clap"
 version = "2.34.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1804,6 +1781,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "num_threads"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "71a1eb3a36534514077c1e079ada2fb170ef30c47d203aa6916138cf882ecd52"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "object"
 version = "0.27.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1888,15 +1874,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "parse-zoneinfo"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c705f256449c60da65e11ff6626e0c16a0a0b96aaa348de61376b249bc340f41"
-dependencies = [
- "regex",
-]
-
-[[package]]
 name = "paste"
 version = "0.1.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1938,45 +1915,6 @@ name = "percent-encoding"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d4fd5641d01c8f18a23da7b6fe29298ff4b55afcccdf78973b24cf3175fee32e"
-
-[[package]]
-name = "phf"
-version = "0.10.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fabbf1ead8a5bcbc20f5f8b939ee3f5b0f6f281b6ad3468b84656b658b455259"
-dependencies = [
- "phf_shared",
-]
-
-[[package]]
-name = "phf_codegen"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4fb1c3a8bc4dd4e5cfce29b44ffc14bedd2ee294559a294e2a4d4c9e9a6a13cd"
-dependencies = [
- "phf_generator",
- "phf_shared",
-]
-
-[[package]]
-name = "phf_generator"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d5285893bb5eb82e6aaf5d59ee909a06a16737a8970984dd7746ba9283498d6"
-dependencies = [
- "phf_shared",
- "rand",
-]
-
-[[package]]
-name = "phf_shared"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6796ad771acdc0123d2a88dc428b5e38ef24456743ddb1744ed628f9815c096"
-dependencies = [
- "siphasher",
- "uncased",
-]
 
 [[package]]
 name = "pin-project"
@@ -2727,12 +2665,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2e24979f63a11545f5f2c60141afe249d4f19f84581ea2138065e400941d83d3"
 
 [[package]]
-name = "siphasher"
-version = "0.3.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "533494a8f9b724d33625ab53c6c4800f7cc445895924a8ef649222dcb76e938b"
-
-[[package]]
 name = "slab"
 version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2817,7 +2749,6 @@ dependencies = [
  "bitflags",
  "byteorder",
  "bytes",
- "chrono",
  "crossbeam-channel",
  "crossbeam-queue",
  "crossbeam-utils",
@@ -2984,7 +2915,6 @@ name = "tangram"
 version = "0.7.0"
 dependencies = [
  "anyhow",
- "chrono",
  "memmap",
  "reqwest",
  "serde",
@@ -2992,6 +2922,7 @@ dependencies = [
  "tangram_core",
  "tangram_macro",
  "tangram_model",
+ "time 0.3.5",
  "tokio",
  "url",
 ]
@@ -3002,8 +2933,6 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "base64 0.13.0",
- "chrono",
- "chrono-tz",
  "clap 3.0.7",
  "futures",
  "glob",
@@ -3098,8 +3027,6 @@ name = "tangram_app_alerts_index_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
- "chrono-tz",
  "futures",
  "http",
  "hyper",
@@ -3120,6 +3047,7 @@ dependencies = [
  "tangram_model",
  "tangram_ui",
  "tangram_zip",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -3127,8 +3055,6 @@ name = "tangram_app_alerts_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
- "chrono-tz",
  "futures",
  "http",
  "hyper",
@@ -3168,8 +3094,6 @@ dependencies = [
  "anyhow",
  "async-trait",
  "bytes",
- "chrono",
- "chrono-tz",
  "dirs",
  "fnv",
  "futures",
@@ -3232,7 +3156,6 @@ name = "tangram_app_health_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
  "futures",
  "http",
  "hyper",
@@ -3247,6 +3170,7 @@ dependencies = [
  "tangram_core",
  "tangram_id",
  "tangram_model",
+ "time 0.3.5",
  "tracing",
  "url",
 ]
@@ -3315,6 +3239,7 @@ dependencies = [
  "tangram_app_layouts",
  "tangram_id",
  "tangram_ui",
+ "time 0.3.5",
  "url",
 ]
 
@@ -3334,8 +3259,6 @@ name = "tangram_app_model_download_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
- "chrono-tz",
  "futures",
  "http",
  "hyper",
@@ -3354,6 +3277,7 @@ dependencies = [
  "tangram_id",
  "tangram_model",
  "tangram_ui",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -3361,8 +3285,6 @@ name = "tangram_app_model_edit_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
- "chrono-tz",
  "futures",
  "http",
  "hyper",
@@ -3381,6 +3303,7 @@ dependencies = [
  "tangram_id",
  "tangram_model",
  "tangram_ui",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -3426,8 +3349,6 @@ name = "tangram_app_monitors_edit_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
- "chrono-tz",
  "futures",
  "http",
  "hyper",
@@ -3455,8 +3376,6 @@ name = "tangram_app_monitors_index_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
- "chrono-tz",
  "futures",
  "http",
  "hyper",
@@ -3477,6 +3396,7 @@ dependencies = [
  "tangram_model",
  "tangram_ui",
  "tangram_zip",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -3790,8 +3710,6 @@ name = "tangram_app_production_prediction_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
- "chrono-tz",
  "futures",
  "http",
  "hyper",
@@ -3809,6 +3727,7 @@ dependencies = [
  "tangram_id",
  "tangram_model",
  "tangram_ui",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -3816,8 +3735,6 @@ name = "tangram_app_production_predictions_index_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
- "chrono-tz",
  "futures",
  "http",
  "hyper",
@@ -3834,6 +3751,7 @@ dependencies = [
  "tangram_id",
  "tangram_model",
  "tangram_ui",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -3851,8 +3769,6 @@ name = "tangram_app_production_stats_column_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
- "chrono-tz",
  "futures",
  "http",
  "hyper",
@@ -3873,6 +3789,7 @@ dependencies = [
  "tangram_model",
  "tangram_ui",
  "tangram_zip",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -3890,8 +3807,6 @@ name = "tangram_app_production_stats_index_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
- "chrono-tz",
  "futures",
  "http",
  "hyper",
@@ -3911,6 +3826,7 @@ dependencies = [
  "tangram_model",
  "tangram_ui",
  "tangram_zip",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -3918,8 +3834,6 @@ name = "tangram_app_repo_edit_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
- "chrono-tz",
  "futures",
  "http",
  "hyper",
@@ -3935,6 +3849,7 @@ dependencies = [
  "tangram_id",
  "tangram_model",
  "tangram_ui",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -3942,8 +3857,6 @@ name = "tangram_app_repo_index_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
- "chrono-tz",
  "futures",
  "http",
  "hyper",
@@ -3959,6 +3872,7 @@ dependencies = [
  "tangram_id",
  "tangram_model",
  "tangram_ui",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -3966,7 +3880,6 @@ name = "tangram_app_track_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
  "futures",
  "http",
  "hyper",
@@ -3981,6 +3894,7 @@ dependencies = [
  "tangram_core",
  "tangram_id",
  "tangram_model",
+ "time 0.3.5",
  "tracing",
  "url",
 ]
@@ -4269,11 +4183,10 @@ dependencies = [
 name = "tangram_app_ui"
 version = "0.0.0"
 dependencies = [
- "chrono",
- "chrono-tz",
  "pinwheel",
  "serde",
  "tangram_ui",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -4302,7 +4215,6 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "cbindgen",
- "chrono",
  "clap 3.0.7",
  "digest 0.10.1",
  "dirs",
@@ -4319,6 +4231,7 @@ dependencies = [
  "sha2 0.10.1",
  "tar",
  "tempfile",
+ "time 0.3.5",
  "url",
 ]
 
@@ -4414,6 +4327,7 @@ dependencies = [
  "tangram_text",
  "tangram_tree",
  "tangram_zip",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -4496,7 +4410,6 @@ version = "0.0.0"
 dependencies = [
  "anyhow",
  "base64 0.13.0",
- "chrono",
  "clap 3.0.7",
  "duct",
  "indoc 1.0.3",
@@ -4593,7 +4506,6 @@ name = "tangram_python"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "chrono",
  "memmap",
  "pyo3",
  "reqwest",
@@ -4601,6 +4513,7 @@ dependencies = [
  "serde_json",
  "tangram_core",
  "tangram_model",
+ "time 0.3.5",
  "url",
 ]
 
@@ -5114,12 +5027,12 @@ dependencies = [
 name = "tangram_www_layouts"
 version = "0.0.0"
 dependencies = [
- "chrono",
  "pinwheel",
  "sunfish",
  "tangram_ui",
  "tangram_www_content",
  "tangram_www_ui",
+ "time 0.3.5",
 ]
 
 [[package]]
@@ -5256,18 +5169,19 @@ dependencies = [
 [[package]]
 name = "time"
 version = "0.3.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41effe7cfa8af36f439fac33861b66b049edc6f9a32331e2312660529c1c24ad"
+source = "git+https://github.com/time-rs/time?rev=2b9e193afa36cd873ba92bd696ccd5ae5ac72d31#2b9e193afa36cd873ba92bd696ccd5ae5ac72d31"
 dependencies = [
+ "itoa 1.0.1",
  "libc",
+ "num_threads",
+ "serde",
  "time-macros",
 ]
 
 [[package]]
 name = "time-macros"
 version = "0.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "25eb0ca3468fc0acc11828786797f6ef9aa1555e4a211a60d64cc8e4d1be47d6"
+source = "git+https://github.com/time-rs/time?rev=2b9e193afa36cd873ba92bd696ccd5ae5ac72d31#2b9e193afa36cd873ba92bd696ccd5ae5ac72d31"
 
 [[package]]
 name = "tinyvec"
@@ -5530,15 +5444,6 @@ name = "typenum"
 version = "1.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dcf81ac59edc17cc8697ff311e8f5ef2d99fcbd9817b34cec66f90b6c3dfd987"
-
-[[package]]
-name = "uncased"
-version = "0.9.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5baeed7327e25054889b9bd4f975f32e5f4c5d434042d59ab6cd4142c0a76ed0"
-dependencies = [
- "version_check",
-]
 
 [[package]]
 name = "unicase"

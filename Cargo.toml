@@ -10,6 +10,9 @@ members = [
 	"languages/rust/examples/*",
 ]
 
+[patch.crates-io]
+time = { git = "https://github.com/time-rs/time", rev = "2b9e193afa36cd873ba92bd696ccd5ae5ac72d31" }
+
 [profile.dev.build-override]
 debug-assertions = false
 opt-level = 3

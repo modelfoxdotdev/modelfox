@@ -1,7 +1,5 @@
 use crate::page::{AlertsTable, AlertsTableRow, Page};
 use anyhow::{bail, Result};
-use chrono::prelude::*;
-use chrono_tz::Tz;
 use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_context::Context;
@@ -46,7 +44,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		let rows = alerts
 			.iter()
 			.map(|row| {
-				let last_updated: DateTime<Tz> =
+				let last_updated: time::OffsetDateTime =
 					Utc.timestamp(row.timestamp, 0).with_timezone(&timezone);
 				AlertsTableRow {
 					id: row.id.to_string(),
