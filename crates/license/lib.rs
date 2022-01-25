@@ -1,10 +1,10 @@
 use anyhow::{anyhow, Result};
+use digest::Digest;
 use rsa::{
 	pkcs1::{FromRsaPrivateKey, FromRsaPublicKey},
 	PublicKey, RsaPrivateKey, RsaPublicKey,
 };
 use serde_json::json;
-use sha2::Digest;
 use tangram_id::Id;
 
 pub const TANGRAM_LICENSE_PUBLIC_KEY: &str = include_str!("./license.public.rsa");

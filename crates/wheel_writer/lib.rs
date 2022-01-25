@@ -33,10 +33,11 @@ homepage = "https://en.wikipedia.org/wiki/Much_Ado_About_Nothing"
 */
 
 use anyhow::{Context, Result};
+use digest::Digest;
 use indoc::formatdoc;
 use regex::Regex;
 use serde_derive::Deserialize;
-use sha2::{Digest, Sha256};
+use sha2::Sha256;
 use std::{
 	collections::HashMap,
 	fmt,

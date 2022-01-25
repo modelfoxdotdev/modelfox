@@ -17,6 +17,7 @@ path = "main.rs"
 anyhow = "1"
 base64 = "0.13"
 clap = { version = "3", features = ["derive"] }
+digest = "0.10"
 indoc = "1"
 regex = "1.5"
 serde = "1"
