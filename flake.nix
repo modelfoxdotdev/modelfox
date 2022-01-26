@@ -95,15 +95,26 @@
             (inputs.windows_sdk.defaultPackage.${system})
           ];
           outputHashMode = "recursive";
-          outputHash = "sha256-bKtb5nAFT0J2TBrurTtkS1eFP+ewaRkWj63rKsresL4=";
+          outputHash = "sha256-aTl/4x7qiJGGTLO+JH4z1uyrAiCMF8iWqRIDNrtS73E=";
         }
         ''
+          PACKAGES=$(mktemp)
+          CACHE=$(mktemp -d)
           windows_sdk \
-            --manifest-url https://download.visualstudio.microsoft.com/download/pr/9a26f37e-6001-429b-a5db-c5455b93953c/25b853a26e065037b83c3dd6aac74bfbfd1f09c9639d1f8c877ecc8d11ea0feb/VisualStudio.vsman \
+            choose-packages \
+            --manifest ${./scripts/windows_sdk.vsman} \
             --package Microsoft.VisualStudio.VC.Llvm.Clang \
             --package Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
             --package Microsoft.VisualStudio.Component.Windows10SDK.19041 \
-            --cache $(mktemp -d) \
+            --output $PACKAGES
+          windows_sdk \
+            download-packages \
+            --packages $PACKAGES \
+            --cache $CACHE
+          windows_sdk \
+            extract-packages \
+            --packages $PACKAGES \
+            --cache $CACHE \
             --output $out
         '';
       macos_sdk = builtins.fetchTarball {
@@ -122,7 +133,7 @@
         name = "tangram";
         src = ./.;
         doCheck = false;
-        cargoSha256 = "sha256-ELmX2iAmWEHiZ0tdkHSk7P6Q7LkKMzT6zqkog4tmrjg=";
+        cargoLock = { lockFile = ./Cargo.lock; };
         cargoBuildFlags = "--package tangram_cli";
       });
       apps.www = inputs.flake-utils.lib.mkApp {
@@ -135,11 +146,12 @@
         name = "tangram_www";
         src = ./.;
         doCheck = false;
-        cargoSha256 = "sha256-ELmX2iAmWEHiZ0tdkHSk7P6Q7LkKMzT6zqkog4tmrjg=";
+        cargoLock = { lockFile = ./Cargo.lock; };
         cargoBuildFlags = "--package tangram_www";
       });
       devShell = pkgs.mkShell {
         packages = with pkgs; [
+          (inputs.windows_sdk.defaultPackage.${system})
           abuild
           cachix
           cargo-insta
@@ -276,17 +288,17 @@
           lld-link \
             /libpath:"${windows_sdk}/VC/Tools/Llvm/lib" \
             /libpath:"${windows_sdk}/VC/Tools/MSVC/14.29.30133/lib/x64" \
-            /libpath:"${windows_sdk}/Windows Kits/10/Lib/10.0.19041.0/ucrt/x64" \
-            /libpath:"${windows_sdk}/Windows Kits/10/Lib/10.0.19041.0/um/x64" \
+            /libpath:"${windows_sdk}/Program Files/Windows Kits/10/Lib/10.0.19041.0/ucrt/x64" \
+            /libpath:"${windows_sdk}/Program Files/Windows Kits/10/Lib/10.0.19041.0/um/x64" \
             $@
         '' + /bin/linker;
         CC_x86_64_pc_windows_msvc = pkgs.writeShellScriptBin "cc" ''
           clang-cl \
             /I "${windows_sdk}/VC/Tools/Llvm/lib/clang/12.0.0/include" \
             /I "${windows_sdk}/VC/Tools/MSVC/14.29.30133/include" \
-            /I "${windows_sdk}/Windows Kits/10/Include/10.0.19041.0/ucrt" \
-            /I "${windows_sdk}/Windows Kits/10/Include/10.0.19041.0/um" \
-            /I "${windows_sdk}/Windows Kits/10/Include/10.0.19041.0/shared" \
+            /I "${windows_sdk}/Program Files/Windows Kits/10/Include/10.0.19041.0/ucrt" \
+            /I "${windows_sdk}/Program Files/Windows Kits/10/Include/10.0.19041.0/um" \
+            /I "${windows_sdk}/Program Files/Windows Kits/10/Include/10.0.19041.0/shared" \
             $@
         '' + /bin/cc;
       };
