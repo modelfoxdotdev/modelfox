@@ -9,14 +9,14 @@ use tangram_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
 	path_components,
-	predict::{
-		compute_feature_contributions_chart_series, compute_input_table,
-		BinaryClassificationPredictOutput, MulticlassClassificationPredictOutput, PredictOutput,
-		PredictOutputInner, RegressionPredictOutput,
-	},
 	user::{authorize_user, authorize_user_for_model},
 };
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use tangram_app_ui::predict::{
+	compute_feature_contributions_chart_series, compute_input_table,
+	BinaryClassificationPredictOutput, MulticlassClassificationPredictOutput, PredictOutput,
+	PredictOutputInner, RegressionPredictOutput,
+};
 use tangram_core::predict::{PredictInputValue, PredictOptions};
 use tangram_id::Id;
 

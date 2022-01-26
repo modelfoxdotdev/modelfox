@@ -1,12 +1,12 @@
 pub mod class_select_field;
 pub mod colors;
 pub mod column_type;
-pub mod date_window;
 pub mod date_window_select_field;
 pub mod logo;
 pub mod metrics_row;
 pub mod page_heading;
 pub mod pagination;
+pub mod predict;
 pub mod time;
 pub mod tokens;
 pub mod topbar;

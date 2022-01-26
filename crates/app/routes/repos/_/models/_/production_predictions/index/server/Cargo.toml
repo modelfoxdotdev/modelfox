@@ -25,6 +25,7 @@ sunfish = "0.3"
 tangram_app_context = { path = "../../../../../../../../context" }
 tangram_app_core = { path = "../../../../../../../../core" }
 tangram_app_layouts = { path = "../../../../../../../../layouts" }
+tangram_app_monitor_event = { path = "../../../../../../../../monitor_event" }
 tangram_id = { path = "../../../../../../../../../id" }
 tangram_model = { path = "../../../../../../../../../model" }
 tangram_ui = { path = "../../../../../../../../../ui" }

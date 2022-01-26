@@ -11,6 +11,7 @@ path = "lib.rs"
 [dependencies]
 pinwheel = "0.2"
 tangram_app_core = { path = "../../../../../../app/core" }
+tangram_app_date_window = { path = "../../../../../../app/date_window" }
 tangram_app_production_stats_column_server = { path = "../../../../../../app/routes/repos/_/models/_/production_stats/columns/_/server"}
 tangram_app_production_stats_index_server = { path = "../../../../../../app/routes/repos/_/models/_/production_stats/index/server"}
 tangram_app_ui = { path = "../../../../../../app/ui" }

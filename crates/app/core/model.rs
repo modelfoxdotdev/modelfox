@@ -1,23 +1,31 @@
 use crate::{
 	repos::add_model_version,
-	storage::{Storage, StorageEntity},
+	storage::{BytesOrFilePath, Storage, StorageEntity},
 	App,
 };
 use anyhow::Result;
-use memmap::Mmap;
+use memmap::{Mmap, MmapMut};
 use sqlx::Acquire;
 use std::{
-	io::Read,
-	path::{Path, PathBuf},
+	io::{Read, Write},
+	path::Path,
 };
 use tangram_id::Id;
 
 /// Retrieves the model with the specified id.
 pub async fn get_model_bytes(data_storage: &Storage, model_id: Id) -> Result<Mmap> {
-	let path = data_storage.get(StorageEntity::Model, model_id).await?;
-	let path = PathBuf::try_from(path)?;
-	let file = std::fs::File::open(path)?;
-	let mmap = unsafe { Mmap::map(&file)? };
+	let stored_model = data_storage.get(StorageEntity::Model, model_id).await?;
+	let mmap = match stored_model {
+		BytesOrFilePath::Path(path) => {
+			let file = std::fs::File::open(path)?;
+			unsafe { Mmap::map(&file)? }
+		}
+		BytesOrFilePath::Bytes(bytes) => {
+			let mut mmap = MmapMut::map_anon(bytes.len())?;
+			(&mut mmap[..]).write_all(&bytes)?;
+			mmap.make_read_only()?
+		}
+	};
 	Ok(mmap)
 }
 

@@ -23,7 +23,9 @@ sqlx = { version = "0.5", default-features = false, features = ["any", "chrono",
 sunfish = "0.3"
 tangram_app_context = { path = "../../../../../../../../context" }
 tangram_app_core = { path = "../../../../../../../../core" }
+tangram_app_date_window = { path = "../../../../../../../../date_window" }
 tangram_app_layouts = { path = "../../../../../../../../layouts" }
+tangram_app_production_stats = { path = "../../../../../../../../production_stats" }
 tangram_app_ui = { path = "../../../../../../../../ui" }
 tangram_charts = { path = "../../../../../../../../../charts" }
 tangram_core = { path = "../../../../../../../../../core" }

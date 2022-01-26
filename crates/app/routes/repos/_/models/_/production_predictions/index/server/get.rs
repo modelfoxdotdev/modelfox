@@ -10,12 +10,12 @@ use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	heuristics::PRODUCTION_PREDICTIONS_NUM_PREDICTIONS_PER_PAGE_TABLE,
-	monitor_event::PredictOutput,
 	path_components,
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 };
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use tangram_app_monitor_event::PredictOutput;
 use tangram_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {

@@ -37,7 +37,9 @@ pub struct AlertsTable {
 }
 
 pub struct AlertsTableRow {
-	pub id: String,
+	pub alert_type: String,
+	pub href: String,
+	pub range: String,
 	pub last_updated: String,
 }
 
@@ -48,17 +50,22 @@ impl Component for AlertsTable {
 			.child(
 				ui::TableHeader::new().child(
 					ui::TableRow::new()
-						.child(ui::TableHeaderCell::new().child("Name"))
-						.child(ui::TableHeaderCell::new().child("Date")),
+						.child(ui::TableHeaderCell::new().child("Type"))
+						.child(ui::TableHeaderCell::new().child("Monitor Range"))
+						.child(ui::TableHeaderCell::new().child("Recorded")),
 				),
 			)
 			.child(
 				ui::TableBody::new().children(self.rows.into_iter().map(|row| {
 					ui::TableRow::new()
 						.child(
-							ui::TableCell::new()
-								.child(ui::Link::new().href(format!("./{}", row.id)).child(row.id)),
+							ui::TableCell::new().child(
+								ui::Link::new()
+									.href(format!("./{}", row.href))
+									.child(row.alert_type),
+							),
 						)
+						.child(ui::TableCell::new().child(row.range))
 						.child(ui::TableCell::new().child(row.last_updated))
 				})),
 			)

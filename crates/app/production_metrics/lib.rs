@@ -13,13 +13,13 @@ pub use self::{
 		RegressionProductionPredictionMetrics, RegressionProductionPredictionMetricsOutput,
 	},
 };
-use crate::monitor_event::NumberOrString;
 use anyhow::Result;
 use chrono::prelude::*;
 use chrono_tz::Tz;
 use num::ToPrimitive;
 use sqlx::prelude::*;
-use tangram_app_ui::date_window::{DateWindow, DateWindowInterval};
+use tangram_app_date_window::{DateWindow, DateWindowInterval};
+use tangram_app_monitor_event::NumberOrString;
 
 mod binary_classification_production_metrics;
 mod multiclass_classification_production_metrics;

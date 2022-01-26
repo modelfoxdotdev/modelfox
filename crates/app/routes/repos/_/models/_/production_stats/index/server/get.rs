@@ -20,20 +20,17 @@ use tangram_app_core::{
 	},
 	model::get_model_bytes,
 	path_components,
-	production_stats::{
-		get_production_stats, GetProductionStatsOutput, ProductionColumnStatsOutput,
-		ProductionPredictionStatsOutput, RegressionProductionPredictionStatsOutput,
-	},
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 };
+use tangram_app_date_window::{get_date_window_and_interval, DateWindow, DateWindowInterval};
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_app_ui::time::{format_date_window, format_date_window_interval};
-use tangram_app_ui::{
-	column_type::ColumnType,
-	date_window::DateWindow,
-	date_window::{get_date_window_and_interval, DateWindowInterval},
+use tangram_app_production_stats::{
+	get_production_stats, GetProductionStatsOutput, ProductionColumnStatsOutput,
+	ProductionPredictionStatsOutput, RegressionProductionPredictionStatsOutput,
 };
+use tangram_app_ui::column_type::ColumnType;
+use tangram_app_ui::time::{format_date_window, format_date_window_interval};
 use tangram_id::Id;
 
 #[derive(serde::Deserialize, Default)]

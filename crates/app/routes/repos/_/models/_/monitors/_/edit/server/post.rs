@@ -4,13 +4,13 @@ use pinwheel::prelude::*;
 use std::{str, str::FromStr, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
-	alerts::{
-		delete_monitor, extract_threshold_bounds, get_monitor, validate_threshold_bounds,
-		AlertCadence, AlertMethod, AlertMetric, AlertModelType, Monitor, MonitorThreshold,
-		MonitorThresholdMode,
-	},
+	alert::{AlertMethod, AlertMetric},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
+	monitor::{
+		delete_monitor, extract_threshold_bounds, get_monitor, validate_threshold_bounds,
+		AlertModelType, Monitor, MonitorCadence, MonitorThreshold, MonitorThresholdMode,
+	},
 	path_components,
 	user::{authorize_user, authorize_user_for_model, authorize_user_for_repo},
 };
@@ -145,8 +145,8 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				difference_lower: variance_lower,
 				difference_upper: variance_upper,
 			};
-			let cadence = AlertCadence::from_str(&cadence)?;
-			let args = tangram_app_core::monitor::UpdateMonitorArgs {
+			let cadence = MonitorCadence::from_str(&cadence)?;
+			let args = tangram_app_core::monitor_checker::UpdateMonitorArgs {
 				db: &mut db,
 				monitor_id: Id::from_str(&monitor_id)?,
 				cadence,

@@ -1,8 +1,8 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
+use tangram_app_date_window::DateWindow;
 use tangram_app_ui::{
-	colors::PRODUCTION_COLOR, date_window::DateWindow, metrics_row::MetricsRow,
-	time::overall_chart_title,
+	colors::PRODUCTION_COLOR, metrics_row::MetricsRow, time::overall_chart_title,
 };
 use tangram_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},

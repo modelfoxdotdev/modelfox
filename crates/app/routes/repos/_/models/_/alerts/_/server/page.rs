@@ -1,105 +1,65 @@
 use pinwheel::prelude::*;
-use tangram_app_core::alerts::AlertData;
+use tangram_app_core::{alert::Alert, monitor::MonitorThresholdMode};
 use tangram_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-use tangram_app_ui::page_heading::PageHeading;
+use tangram_app_ui::{
+	colors::{BASELINE_COLOR, TRAINING_COLOR},
+	page_heading::PageHeading,
+};
 use tangram_ui as ui;
 
 pub struct Page {
-	pub alert: AlertData,
+	pub alert: Alert,
 	pub alert_id: String,
 	pub model_layout_info: ModelLayoutInfo,
 	pub error: Option<String>,
 }
 
+pub fn alert_description(alert: &Alert) -> String {
+	let time_range = alert.formated_time_range();
+	let cadence = alert.monitor.cadence;
+	let metric = alert.monitor.threshold.metric;
+	let production_value = alert.result.production_value;
+	let training_value = alert.result.training_value;
+	let difference = alert.result.difference;
+	let method_str = alert
+		.monitor
+		.methods
+		.iter()
+		.map(|method| method.to_string())
+		.collect::<Vec<String>>()
+		.join(",");
+	format!("During the period from {time_range}, this {cadence} {metric} alert observed a production value of {production_value}, which is {difference} difference from the training metric {training_value}.  Alerts were sent to the following methods: {method_str}.")
+}
+
 impl Component for Page {
 	fn into_node(self) -> Node {
-		let alert_data_table = AlertDataTable::from(self.alert);
+		let formatter = match self.alert.monitor.threshold.mode {
+			MonitorThresholdMode::Absolute => ui::NumberFormatter::Float(Default::default()),
+			MonitorThresholdMode::Percentage => ui::NumberFormatter::Percent(Default::default()),
+		};
 		Document::new()
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()
+						.child(PageHeading::new().child(ui::H1::new(self.alert.title())))
+						.child(ui::P::new().child(alert_description(&self.alert)))
 						.child(
-							PageHeading::new()
-								.child(ui::H1::new(format!("Alert {}", self.alert_id))),
-						)
-						.child(alert_data_table),
+							ui::NumberComparisonCard::new(
+								Some(self.alert.training_value()),
+								Some(self.alert.production_value()),
+							)
+							.color_a(BASELINE_COLOR.to_owned())
+							.color_b(TRAINING_COLOR.to_owned())
+							.title(self.alert.metric().to_string())
+							.value_a_title("Training Metric".to_owned())
+							.value_b_title("Production Metric".to_owned())
+							.number_formatter(formatter),
+						),
 				),
 			)
 			.into_node()
-	}
-}
-
-struct AlertDataTable {
-	id: String,
-	datetime: String,
-	cadence: String,
-	metric: String,
-	mode: String,
-	production_value: String,
-	training_value: String,
-	difference: String,
-	methods: String,
-}
-
-impl Component for AlertDataTable {
-	fn into_node(self) -> Node {
-		let row = |name: &str, value: String| {
-			ui::TableRow::new()
-				.child(ui::TableCell::new().child(name.to_owned()))
-				.child(ui::TableCell::new().child(value))
-		};
-		ui::Table::new()
-			.width("100%".to_owned())
-			.child(
-				ui::TableHeader::new().child(
-					ui::TableRow::new()
-						.child(ui::TableHeaderCell::new().child("Attribute"))
-						.child(ui::TableHeaderCell::new().child("Value")),
-				),
-			)
-			.child(
-				ui::TableBody::new()
-					.child(row("ID", self.id))
-					.child(row("Date", self.datetime))
-					.child(row("Cadence", self.cadence))
-					.child(row("Metric", self.metric))
-					.child(row("Threshold Mode", self.mode))
-					.child(row("Training Value", self.training_value))
-					.child(row("Production Value", self.production_value))
-					.child(row("Difference", self.difference))
-					.child(row("Alert Methods", self.methods)),
-			)
-			.into_node()
-	}
-}
-
-impl From<AlertData> for AlertDataTable {
-	fn from(alert_data: AlertData) -> Self {
-		let methods = alert_data.monitor.methods;
-		let methods = match methods.len() {
-			0 => "N/A".to_owned(),
-			1 => methods[0].to_string(),
-			_ => methods
-				.iter()
-				.map(|method| method.to_string())
-				.collect::<Vec<String>>()
-				.join(", "),
-		};
-		Self {
-			id: alert_data.id.to_string(),
-			datetime: time::OffsetDateTime::from_unix_timestamp(alert_data.timestamp)
-				.expect("Unreadable timestamp")
-				.to_string(),
-			cadence: alert_data.monitor.cadence.to_string(),
-			metric: alert_data.result.metric.to_string(),
-			mode: alert_data.monitor.threshold.mode.to_string(),
-			production_value: alert_data.result.production_value.to_string(),
-			training_value: alert_data.result.training_value.to_string(),
-			difference: alert_data.result.difference.to_string(),
-			methods,
-		}
 	}
 }

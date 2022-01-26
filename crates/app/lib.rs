@@ -1,7 +1,7 @@
 use anyhow::Result;
 use std::sync::Arc;
 use tangram_app_context::Context;
-pub use tangram_app_core::options;
+pub use tangram_app_core::{clock::Clock, options};
 use tangram_app_core::{options::Options, App};
 use tracing::error;
 

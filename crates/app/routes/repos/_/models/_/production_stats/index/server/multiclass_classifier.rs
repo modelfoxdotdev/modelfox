@@ -3,10 +3,9 @@ use crate::common::{
 	ClassifierChartEntry, ColumnStatsTable, PredictionCountChart, PredictionCountChartEntry,
 };
 use pinwheel::prelude::*;
+use tangram_app_date_window::{DateWindow, DateWindowInterval};
 use tangram_app_ui::{
-	class_select_field::ClassSelectField,
-	date_window::{DateWindow, DateWindowInterval},
-	date_window_select_field::DateWindowSelectField,
+	class_select_field::ClassSelectField, date_window_select_field::DateWindowSelectField,
 };
 use tangram_ui as ui;
 

@@ -1,11 +1,12 @@
 use pinwheel::prelude::*;
+use tangram_app_date_window::DateWindow;
 use tangram_app_production_stats_column_server::{
 	EnumColumnInvalidValuesSection, EnumColumnOverallHistogramEntry, EnumColumnStatsSection,
 	EnumColumnUniqueValuesSection, EnumInvalidValuesTable, EnumInvalidValuesTableRow,
 	EnumUniqueValuesTable, EnumUniqueValuesTableRow,
 };
 use tangram_app_production_stats_index_server::{ColumnStatsTable, ColumnStatsTableRow};
-use tangram_app_ui::{column_type::ColumnType, date_window::DateWindow};
+use tangram_app_ui::column_type::ColumnType;
 use tangram_charts::{
 	components::FeatureContributionsChart,
 	feature_contributions_chart::{

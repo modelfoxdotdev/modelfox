@@ -22,17 +22,15 @@ use tangram_app_core::{
 	heuristics::PRODUCTION_STATS_TEXT_COLUMN_MAX_TOKENS_TO_SHOW_IN_TABLE,
 	model::get_model_bytes,
 	path_components,
-	production_stats::{
-		get_production_stats, GetProductionStatsOutput, ProductionColumnStatsOutput,
-	},
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 };
+use tangram_app_date_window::{get_date_window_and_interval, DateWindow, DateWindowInterval};
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_app_ui::{
-	date_window::{get_date_window_and_interval, DateWindow, DateWindowInterval},
-	time::format_date_window_interval,
+use tangram_app_production_stats::{
+	get_production_stats, GetProductionStatsOutput, ProductionColumnStatsOutput,
 };
+use tangram_app_ui::time::format_date_window_interval;
 use tangram_id::Id;
 use tangram_ui as ui;
 

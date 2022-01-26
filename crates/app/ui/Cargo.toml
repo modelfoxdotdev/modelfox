@@ -11,6 +11,11 @@ path = "lib.rs"
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.6", features = ["serde"] }
+num = "0.4"
 pinwheel = "0.2"
 serde = { version = "1", features = ["derive"] }
+tangram_charts = { path = "../../charts" }
+tangram_core = { path = "../../core" }
+tangram_app_date_window = { path = "../date_window" }
+tangram_model = { path = "../../model" }
 tangram_ui = { path = "../../ui" }

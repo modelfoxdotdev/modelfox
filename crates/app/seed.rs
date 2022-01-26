@@ -5,14 +5,15 @@ use num::ToPrimitive;
 use rand::Rng;
 use std::{collections::HashMap, path::Path};
 use tangram_app_core::{
-	alerts::{AlertCadence, AlertMetric, MonitorThreshold, MonitorThresholdMode},
-	monitor::MonitorConfig,
-	monitor_event::{
-		BinaryClassificationPredictOutput, MonitorEvent, MulticlassClassificationPredictOutput,
-		NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,
-		TrueValueMonitorEvent,
-	},
+	alert::AlertMetric,
+	monitor::{MonitorCadence, MonitorThreshold, MonitorThresholdMode},
+	monitor_checker::MonitorConfig,
 	reset_data, App,
+};
+use tangram_app_monitor_event::{
+	BinaryClassificationPredictOutput, MonitorEvent, MulticlassClassificationPredictOutput,
+	NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,
+	TrueValueMonitorEvent,
 };
 use tangram_id::Id;
 use tangram_table::TableView;
@@ -132,7 +133,7 @@ fn init_options(database_url: Option<Url>) -> Result<tangram_app_core::options::
 fn generate_fake_monitors() -> Vec<MonitorConfig> {
 	vec![
 		MonitorConfig {
-			cadence: AlertCadence::Hourly,
+			cadence: MonitorCadence::Hourly,
 			threshold: MonitorThreshold {
 				metric: AlertMetric::Accuracy,
 				mode: MonitorThresholdMode::Absolute,
@@ -142,7 +143,7 @@ fn generate_fake_monitors() -> Vec<MonitorConfig> {
 			title: None,
 		},
 		MonitorConfig {
-			cadence: AlertCadence::Daily,
+			cadence: MonitorCadence::Daily,
 			threshold: MonitorThreshold {
 				metric: AlertMetric::Accuracy,
 				mode: MonitorThresholdMode::Percentage,
@@ -152,7 +153,7 @@ fn generate_fake_monitors() -> Vec<MonitorConfig> {
 			title: None,
 		},
 		MonitorConfig {
-			cadence: AlertCadence::Weekly,
+			cadence: MonitorCadence::Weekly,
 			threshold: MonitorThreshold {
 				metric: AlertMetric::Accuracy,
 				mode: MonitorThresholdMode::Absolute,
@@ -162,7 +163,7 @@ fn generate_fake_monitors() -> Vec<MonitorConfig> {
 			title: None,
 		},
 		MonitorConfig {
-			cadence: AlertCadence::Monthly,
+			cadence: MonitorCadence::Monthly,
 			threshold: MonitorThreshold {
 				metric: AlertMetric::Accuracy,
 				mode: MonitorThresholdMode::Percentage,

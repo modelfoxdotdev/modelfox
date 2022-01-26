@@ -1,13 +1,13 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_app_core::predict::PredictOutput;
 use tangram_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
 use tangram_app_playground_common::ColumnChart;
-use tangram_app_ui::tokens::{
-	EnumColumnToken, NumberColumnToken, TextColumnToken, UnknownColumnToken,
+use tangram_app_ui::{
+	predict::PredictOutput,
+	tokens::{EnumColumnToken, NumberColumnToken, TextColumnToken, UnknownColumnToken},
 };
 use tangram_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},

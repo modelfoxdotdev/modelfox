@@ -1,6 +1,6 @@
-use super::number_stats::{NumberStats, NumberStatsOutput};
-use crate::monitor_event::PredictOutput;
+use crate::number_stats::{NumberStats, NumberStatsOutput};
 use std::collections::BTreeMap;
+use tangram_app_monitor_event::PredictOutput;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 #[serde(tag = "type")]

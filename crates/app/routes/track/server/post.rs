@@ -3,9 +3,9 @@ use std::{collections::BTreeMap, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{bad_request, service_unavailable},
-	monitor_event::MonitorEvent,
 	track::{handle_prediction_monitor_event, handle_true_value_monitor_event},
 };
+use tangram_app_monitor_event::MonitorEvent;
 use tracing::error;
 
 #[derive(Debug, serde::Deserialize)]

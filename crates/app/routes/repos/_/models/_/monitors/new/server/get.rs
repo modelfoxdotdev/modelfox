@@ -4,9 +4,9 @@ use pinwheel::prelude::*;
 use std::sync::Arc;
 use tangram_app_context::Context;
 use tangram_app_core::{
-	alerts::AlertModelType,
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
+	monitor::AlertModelType,
 	path_components,
 	user::{authorize_user, authorize_user_for_model, authorize_user_for_repo},
 };

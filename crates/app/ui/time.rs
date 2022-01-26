@@ -1,6 +1,6 @@
-use crate::date_window::{DateWindow, DateWindowInterval};
 use chrono::prelude::*;
 use chrono_tz::Tz;
+use tangram_app_date_window::{DateWindow, DateWindowInterval};
 
 pub fn format_date_window(date: DateTime<Utc>, date_window: &DateWindow, timezone: Tz) -> String {
 	let date = date.with_timezone(&timezone);

@@ -1,8 +1,12 @@
 pub const ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_THRESHOLD: i64 = 100;
 pub const ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_DEBUG_THRESHOLD: i64 = 1;
-pub const ALERT_METRICS_HEARTBEAT_DURATION_TESTING: std::time::Duration =
+pub const MONITOR_CHECKER_HEARTBEAT_DURATION_TESTING: std::time::Duration =
 	std::time::Duration::from_secs(5);
-pub const ALERT_METRICS_HEARTBEAT_DURATION_PRODUCTION: std::time::Duration =
+pub const ALERT_SENDER_HEARTBEAT_DURATION_TESTING: std::time::Duration =
+	std::time::Duration::from_secs(5);
+pub const MONITOR_CHECKER_HEARTBEAT_DURATION_PRODUCTION: std::time::Duration =
+	std::time::Duration::from_secs(60 * 60);
+pub const ALERT_SENDER_HEARTBEAT_DURATION_PRODUCTION: std::time::Duration =
 	std::time::Duration::from_secs(60 * 60);
 pub const PRODUCTION_PREDICTIONS_NUM_PREDICTIONS_PER_PAGE_TABLE: i64 = 10;
 pub const PRODUCTION_STATS_LARGE_ABSENT_RATIO_THRESHOLD_TO_TRIGGER_ALERT: f32 = 0.1;

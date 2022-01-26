@@ -3,10 +3,8 @@ use crate::common::{
 };
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_app_ui::{
-	date_window::{DateWindow, DateWindowInterval},
-	time::{interval_chart_title, overall_chart_title},
-};
+use tangram_app_date_window::{DateWindow, DateWindowInterval};
+use tangram_app_ui::time::{interval_chart_title, overall_chart_title};
 use tangram_charts::{
 	box_chart::{BoxChartPoint, BoxChartSeries, BoxChartValue},
 	components::BoxChart,

@@ -1,5 +1,5 @@
-use crate::monitor_event::NumberOrString;
 use num::ToPrimitive;
+use tangram_app_monitor_event::NumberOrString;
 
 #[derive(serde::Deserialize, serde::Serialize, Clone)]
 pub struct BinaryClassificationProductionPredictionMetrics {

@@ -1,8 +1,8 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
+use tangram_app_date_window::{DateWindow, DateWindowInterval};
 use tangram_app_ui::{
 	column_type::ColumnType,
-	date_window::{DateWindow, DateWindowInterval},
 	date_window_select_field::DateWindowSelectField,
 	time::{interval_chart_title, overall_chart_title},
 	tokens::ColumnTypeToken,

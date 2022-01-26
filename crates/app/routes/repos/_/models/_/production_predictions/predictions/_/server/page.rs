@@ -1,9 +1,9 @@
 use pinwheel::prelude::*;
-use tangram_app_core::predict::PredictOutput;
 use tangram_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
+use tangram_app_ui::predict::PredictOutput;
 use tangram_id::Id;
 use tangram_ui as ui;
 

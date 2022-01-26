@@ -1,9 +1,9 @@
 use crate::page::{IntervalBoxChartDataPoint, OverallBoxChartData};
 use num::ToPrimitive;
 use pinwheel::prelude::*;
+use tangram_app_date_window::{DateWindow, DateWindowInterval};
 use tangram_app_ui::{
 	colors::{PRODUCTION_COLOR, TRAINING_COLOR},
-	date_window::{DateWindow, DateWindowInterval},
 	metrics_row::MetricsRow,
 	time::{interval_chart_title, overall_chart_title},
 };

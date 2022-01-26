@@ -1,9 +1,9 @@
-use num::ToPrimitive;
-use pinwheel::prelude::*;
-use tangram_app_ui::{
+use crate::{
 	metrics_row::MetricsRow,
 	tokens::{EnumColumnToken, NumberColumnToken, TextColumnToken, UnknownColumnToken},
 };
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 use tangram_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	components::{BarChart, FeatureContributionsChart},

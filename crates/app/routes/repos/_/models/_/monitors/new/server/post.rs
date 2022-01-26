@@ -1,15 +1,17 @@
 use crate::page::Page;
 use anyhow::{bail, Result};
 use pinwheel::prelude::*;
-use std::{str, str::FromStr, sync::Arc};
+use std::{str::FromStr, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
-	alerts::{
-		extract_threshold_bounds, validate_threshold_bounds, AlertCadence, AlertMethod,
-		AlertMetric, AlertModelType, MonitorThreshold, MonitorThresholdMode,
-	},
+	alert::{AlertMethod, AlertMetric},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
+	monitor::{
+		extract_threshold_bounds, validate_threshold_bounds, AlertModelType, MonitorCadence,
+		MonitorThreshold, MonitorThresholdMode,
+	},
+	monitor_checker::CreateMonitorArgs,
 	path_components,
 	user::{authorize_user, authorize_user_for_model, authorize_user_for_repo},
 };
@@ -113,9 +115,9 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		difference_lower,
 		difference_upper,
 	};
-	let args = tangram_app_core::monitor::CreateMonitorArgs {
+	let args = CreateMonitorArgs {
 		db: &mut db,
-		cadence: AlertCadence::from_str(&cadence)?,
+		cadence: MonitorCadence::from_str(&cadence)?,
 		methods: &methods,
 		model_id,
 		threshold,

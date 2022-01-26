@@ -1,0 +1,12 @@
+[package]
+edition = "2021"
+rust-version = "1.56"
+name = "tangram_app_date_window"
+publish = false
+version = "0.0.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }

@@ -1,5 +1,6 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
+use tangram_app_date_window::{DateWindow, DateWindowInterval};
 use tangram_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
@@ -7,7 +8,6 @@ use tangram_app_layouts::{
 use tangram_app_ui::{
 	class_select_field::ClassSelectField,
 	colors::{PRODUCTION_COLOR, TRAINING_COLOR},
-	date_window::{DateWindow, DateWindowInterval},
 	date_window_select_field::DateWindowSelectField,
 	metrics_row::MetricsRow,
 	time::interval_chart_title,

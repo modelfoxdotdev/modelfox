@@ -1,6 +1,7 @@
 use crate::{
-	alerts::{alert_sender, monitor_checker},
+	alert_sender::{alert_sender, AlertSenderMessage},
 	clock::Clock,
+	monitor_checker::{monitor_checker, MonitorCheckerMessage},
 	options::{Options, StorageOptions},
 	storage::{LocalStorage, S3Storage, Storage},
 };
@@ -8,22 +9,20 @@ use anyhow::{anyhow, bail, Result};
 use sqlx::postgres::PgPoolOptions;
 use std::{path::PathBuf, sync::Arc};
 use storage::InMemoryStorage;
-use tokio::sync::Notify;
+use tokio::sync::mpsc;
 use url::Url;
 
-pub mod alerts;
+pub mod alert;
+pub mod alert_sender;
 pub mod clock;
 pub mod cookies;
 pub mod error;
 pub mod heuristics;
 pub mod model;
 pub mod monitor;
-pub mod monitor_event;
+pub mod monitor_checker;
 pub mod options;
 pub mod organizations;
-pub mod predict;
-pub mod production_metrics;
-pub mod production_stats;
 pub mod repos;
 pub mod storage;
 pub mod timezone;
@@ -33,6 +32,12 @@ pub mod user;
 #[cfg(test)]
 pub mod test_common;
 
+pub struct App {
+	pub state: Arc<AppState>,
+	monitor_checker_sender: mpsc::UnboundedSender<MonitorCheckerMessage>,
+	alert_sender_sender: mpsc::UnboundedSender<AlertSenderMessage>,
+}
+
 #[derive(Debug)]
 pub struct AppState {
 	pub clock: Clock,
@@ -40,12 +45,6 @@ pub struct AppState {
 	pub options: Options,
 	pub smtp_transport: Option<lettre::AsyncSmtpTransport<lettre::Tokio1Executor>>,
 	pub storage: Storage,
-}
-
-pub struct App {
-	pub state: Arc<AppState>,
-	monitor_checker_notify: Arc<Notify>,
-	alert_sender_notify: Arc<Notify>,
 }
 
 struct CreateDatabasePoolOptions {
@@ -183,28 +182,27 @@ impl App {
 			storage,
 		};
 		let state = Arc::new(state);
-		let monitor_checker_notify = Arc::new(Notify::new());
-		let alert_sender_notify = Arc::new(Notify::new());
+		let (monitor_checker_sender, monitor_checker_receiver) =
+			tokio::sync::mpsc::unbounded_channel();
+		let (alert_sender_sender, alert_sender_receiver) = tokio::sync::mpsc::unbounded_channel();
 		tokio::spawn({
 			let state = Arc::clone(&state);
-			let monitor_checker_notify = Arc::clone(&monitor_checker_notify);
 			async move {
-				monitor_checker(state, monitor_checker_notify)
+				monitor_checker(state, monitor_checker_receiver)
 					.await
 					.unwrap();
 			}
 		});
 		tokio::spawn({
 			let state = Arc::clone(&state);
-			let alert_sender_notify = Arc::clone(&alert_sender_notify);
 			async move {
-				alert_sender(state, alert_sender_notify).await.unwrap();
+				alert_sender(state, alert_sender_receiver).await.unwrap();
 			}
 		});
 		let app = App {
 			state,
-			monitor_checker_notify,
-			alert_sender_notify,
+			monitor_checker_sender,
+			alert_sender_sender,
 		};
 		Ok(app)
 	}
@@ -223,13 +221,6 @@ impl App {
 	}
 }
 
-impl Drop for App {
-	fn drop(&mut self) {
-		self.alert_sender_notify.notify_one();
-		self.monitor_checker_notify.notify_one();
-	}
-}
-
 impl AppState {
 	pub async fn begin_transaction(&self) -> Result<sqlx::Transaction<'_, sqlx::Any>> {
 		Ok(self.database_pool.begin().await?)
@@ -241,8 +232,8 @@ impl AppState {
 	}
 }
 
-/// Remove all contents of the data dir, including the database
-pub async fn reset_data(database_url: &Option<Url>) -> Result<()> {
+/// Reset the database state
+pub async fn reset_database(database_url: &Option<Url>) -> Result<()> {
 	if let Some(database_url) = database_url {
 		if database_url.scheme() == "postgres" {
 			let pool = PgPoolOptions::new()
@@ -261,6 +252,12 @@ pub async fn reset_data(database_url: &Option<Url>) -> Result<()> {
 				.await?;
 		}
 	}
+	Ok(())
+}
+
+/// Remove all contents of the data dir, including the database
+pub async fn reset_data(database_url: &Option<Url>) -> Result<()> {
+	reset_database(database_url).await?;
 	std::fs::remove_dir_all(data_path()?)?;
 	Ok(())
 }

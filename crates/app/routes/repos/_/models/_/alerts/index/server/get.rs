@@ -49,7 +49,9 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				let last_updated: DateTime<Tz> =
 					Utc.timestamp(row.timestamp, 0).with_timezone(&timezone);
 				AlertsTableRow {
-					id: row.id.to_string(),
+					alert_type: row.cadence_and_metric(),
+					href: row.id.to_string(),
+					range: row.formated_time_range(),
 					last_updated: last_updated.to_string(),
 				}
 			})

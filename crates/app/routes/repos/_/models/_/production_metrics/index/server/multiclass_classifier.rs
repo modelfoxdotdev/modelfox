@@ -3,9 +3,9 @@ use crate::page::{
 };
 use num::ToPrimitive;
 use pinwheel::prelude::*;
+use tangram_app_date_window::{DateWindow, DateWindowInterval};
 use tangram_app_ui::{
 	colors::{PRODUCTION_COLOR, TRAINING_COLOR},
-	date_window::{DateWindow, DateWindowInterval},
 	date_window_select_field::DateWindowSelectField,
 	metrics_row::MetricsRow,
 	time::interval_chart_title,

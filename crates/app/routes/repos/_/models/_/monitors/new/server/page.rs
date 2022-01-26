@@ -1,5 +1,5 @@
 use pinwheel::prelude::*;
-use tangram_app_core::alerts::AlertModelType;
+use tangram_app_core::monitor::AlertModelType;
 use tangram_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},

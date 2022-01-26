@@ -12,17 +12,15 @@ use tangram_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
 	path_components,
-	production_metrics::{
-		get_production_metrics, GetProductionMetricsOutput, ProductionPredictionMetricsOutput,
-	},
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 };
+use tangram_app_date_window::{get_date_window_and_interval, DateWindow};
 use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_app_ui::{
-	date_window::{get_date_window_and_interval, DateWindow},
-	time::format_date_window_interval,
+use tangram_app_production_metrics::{
+	get_production_metrics, GetProductionMetricsOutput, ProductionPredictionMetricsOutput,
 };
+use tangram_app_ui::time::format_date_window_interval;
 use tangram_id::Id;
 use tangram_zip::zip;
 

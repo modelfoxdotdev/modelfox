@@ -4,7 +4,7 @@ use crate::common::{
 	PredictionCountChartEntry,
 };
 use pinwheel::prelude::*;
-use tangram_app_ui::date_window::{DateWindow, DateWindowInterval};
+use tangram_app_date_window::{DateWindow, DateWindowInterval};
 use tangram_ui as ui;
 
 pub struct BinaryClassifier {

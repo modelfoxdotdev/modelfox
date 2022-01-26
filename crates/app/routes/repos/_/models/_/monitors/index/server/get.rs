@@ -7,8 +7,8 @@ use sqlx::prelude::*;
 use std::sync::Arc;
 use tangram_app_context::Context;
 use tangram_app_core::{
-	alerts::Monitor,
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
+	monitor::Monitor,
 	path_components,
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
