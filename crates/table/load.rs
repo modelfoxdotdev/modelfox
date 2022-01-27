@@ -1,5 +1,9 @@
 use super::*;
 use anyhow::Result;
+use arrow2::{
+	array::{ArrayRef, BooleanArray, Utf8Array},
+	types::NativeType,
+};
 use modelfox_progress_counter::ProgressCounter;
 use modelfox_zip::zip;
 use std::{
@@ -8,15 +12,15 @@ use std::{
 };
 
 #[derive(Clone)]
-pub struct FromCsvOptions<'a> {
+pub struct Options<'a> {
 	pub column_types: Option<BTreeMap<String, TableColumnType>>,
 	pub infer_options: InferOptions,
 	pub invalid_values: &'a [&'a str],
 }
 
-impl<'a> Default for FromCsvOptions<'a> {
-	fn default() -> FromCsvOptions<'a> {
-		FromCsvOptions {
+impl<'a> Default for Options<'a> {
+	fn default() -> Options<'a> {
+		Options {
 			column_types: None,
 			infer_options: InferOptions::default(),
 			invalid_values: DEFAULT_INVALID_VALUES,
@@ -54,7 +58,7 @@ pub enum LoadProgressEvent {
 impl Table {
 	pub fn from_bytes(
 		bytes: &[u8],
-		options: FromCsvOptions,
+		options: Options,
 		handle_progress_event: &mut impl FnMut(LoadProgressEvent),
 	) -> Result<Table> {
 		let len = bytes.len();
@@ -68,7 +72,7 @@ impl Table {
 
 	pub fn from_path(
 		path: &Path,
-		options: FromCsvOptions,
+		options: Options,
 		handle_progress_event: &mut impl FnMut(LoadProgressEvent),
 	) -> Result<Table> {
 		let len = std::fs::metadata(path)?.len();
@@ -83,7 +87,7 @@ impl Table {
 	pub fn from_csv<R>(
 		reader: &mut csv::Reader<R>,
 		len: u64,
-		options: FromCsvOptions,
+		options: Options,
 		handle_progress_event: &mut impl FnMut(LoadProgressEvent),
 	) -> Result<Table>
 	where
@@ -94,38 +98,12 @@ impl Table {
 			.into_iter()
 			.map(|column_name| column_name.to_owned())
 			.collect();
-		let n_columns = column_names.len();
 		let start_position = reader.position().clone();
-		let infer_options = &options.infer_options;
 		let mut n_rows = None;
 
-		#[derive(Clone, Debug)]
-		enum ColumnTypeOrInferStats<'a> {
-			ColumnType(TableColumnType),
-			InferStats(InferStats<'a>),
-		}
-
 		// Retrieve any column types present in the options.
-		let mut column_types: Vec<ColumnTypeOrInferStats> = if let Some(column_types) =
-			options.column_types
-		{
-			column_names
-				.iter()
-				.map(|column_name| {
-					column_types
-						.get(column_name)
-						.map(|column_type| ColumnTypeOrInferStats::ColumnType(column_type.clone()))
-						.unwrap_or_else(|| {
-							ColumnTypeOrInferStats::InferStats(InferStats::new(infer_options))
-						})
-				})
-				.collect()
-		} else {
-			vec![
-				ColumnTypeOrInferStats::InferStats(InferStats::new(&options.infer_options));
-				n_columns
-			]
-		};
+		let mut column_types: Vec<ColumnTypeOrInferStats> =
+			get_column_types(column_names.as_slice(), &options);
 
 		// Passing over the csv to infer column types is only necessary if one or more columns did not have its type specified.
 		let needs_infer =
@@ -190,19 +168,8 @@ impl Table {
 		};
 
 		// Create the table.
-		let column_names = column_names.into_iter().map(Some).collect();
-		let mut table = Table::new(column_names, column_types);
-		// If an inference pass was done, reserve storage for the values because we know how many rows are in the csv.
-		if let Some(n_rows) = n_rows {
-			for column in table.columns.iter_mut() {
-				match column {
-					TableColumn::Unknown(_) => {}
-					TableColumn::Number(column) => column.data.reserve_exact(n_rows),
-					TableColumn::Enum(column) => column.data.reserve_exact(n_rows),
-					TableColumn::Text(column) => column.data.reserve_exact(n_rows),
-				}
-			}
-		}
+		let mut table = create_table(column_names, column_types, n_rows);
+
 		// Read each csv record and insert the values into the columns of the table.
 		let mut record = csv::ByteRecord::new();
 		let progress_counter = ProgressCounter::new(len);
@@ -235,6 +202,299 @@ impl Table {
 		}
 		handle_progress_event(LoadProgressEvent::LoadDone);
 		Ok(table)
+	}
+
+	pub fn from_arrow_arrays(
+		column_names: Vec<String>,
+		arrow_arrays: Vec<ArrayRef>,
+		options: Options,
+		handle_progress_event: &mut impl FnMut(LoadProgressEvent),
+	) -> Result<Table> {
+		let n_rows = arrow_arrays[0].len();
+		let n_columns = column_names.len();
+
+		// Retrieve any column types present in the options.
+		let column_types: Vec<ColumnTypeOrInferStats> =
+			get_column_types(column_names.as_slice(), &options);
+
+		// Passing over the arrays to infer column types is only necessary if one or more columns did not have its type specified.
+		let needs_infer =
+			column_types.iter().any(
+				|column_type_or_infer_stats| match column_type_or_infer_stats {
+					ColumnTypeOrInferStats::ColumnType(_) => false,
+					ColumnTypeOrInferStats::InferStats(_) => true,
+				},
+			);
+
+		// If the infer pass is necessary, pass over the dataset and infer the types for those columns whose types were not specified.
+		// TODO: add progress for the infer step
+		// 				let progress_counter =
+		// 					ProgressCounter::new((n_rows * infer_stats.len()).to_u64().unwrap());
+		// 				handle_progress_event(LoadProgressEvent::InferStarted(progress_counter.clone()));
+		let column_types: Vec<TableColumnType> = if needs_infer {
+			let column_types = column_types
+				.into_iter()
+				.zip(arrow_arrays.iter())
+				.map(|(column_type_or_infer_stats, arrow_array)| {
+					match column_type_or_infer_stats {
+						ColumnTypeOrInferStats::ColumnType(column_type) => column_type.to_owned(),
+						ColumnTypeOrInferStats::InferStats(mut infer_stats) => {
+							// Iterate over each array and update the infer stats for the columns that need to be inferred.
+							let physical_ty = arrow_array.data_type().to_physical_type();
+							match physical_ty {
+								arrow2::datatypes::PhysicalType::Primitive(primitive) => {
+									match primitive {
+										arrow2::datatypes::PrimitiveType::Int8 => {
+											TableColumnType::Number
+										}
+										arrow2::datatypes::PrimitiveType::Int16 => {
+											TableColumnType::Number
+										}
+										arrow2::datatypes::PrimitiveType::Int32 => {
+											TableColumnType::Number
+										}
+										arrow2::datatypes::PrimitiveType::Int64 => {
+											TableColumnType::Number
+										}
+										arrow2::datatypes::PrimitiveType::UInt8 => {
+											TableColumnType::Number
+										}
+										arrow2::datatypes::PrimitiveType::UInt16 => {
+											TableColumnType::Number
+										}
+										arrow2::datatypes::PrimitiveType::UInt32 => {
+											TableColumnType::Number
+										}
+										arrow2::datatypes::PrimitiveType::UInt64 => {
+											TableColumnType::Number
+										}
+										arrow2::datatypes::PrimitiveType::Float64 => {
+											TableColumnType::Number
+										}
+										arrow2::datatypes::PrimitiveType::Float32 => {
+											TableColumnType::Number
+										}
+										primitive_type => {
+											unimplemented!("{:?}", primitive_type)
+										}
+									}
+								}
+								arrow2::datatypes::PhysicalType::Boolean => TableColumnType::Enum {
+									variants: vec!["true".to_owned(), "false".to_owned()],
+								},
+								arrow2::datatypes::PhysicalType::Utf8 => {
+									let array = arrow_array
+										.as_any()
+										.downcast_ref::<Utf8Array<i32>>()
+										.unwrap();
+									for value in array.iter() {
+										infer_stats.update(value.map_or("None", |v| v));
+									}
+									infer_stats.finalize()
+								}
+								_ => unimplemented!(),
+							}
+						}
+					}
+				})
+				.collect::<Vec<_>>();
+			handle_progress_event(LoadProgressEvent::InferDone);
+			column_types
+		} else {
+			column_types
+				.into_iter()
+				.map(
+					|column_type_or_infer_stats| match column_type_or_infer_stats {
+						ColumnTypeOrInferStats::ColumnType(column_type) => column_type,
+						_ => unreachable!(),
+					},
+				)
+				.collect()
+		};
+
+		// Create the table.
+		let mut table = create_table(column_names, column_types, Some(n_rows));
+
+		// Read each array and insert the values into the columns of the table.
+		let progress_counter = ProgressCounter::new((n_rows * n_columns).to_u64().unwrap());
+		handle_progress_event(LoadProgressEvent::LoadStarted(progress_counter.clone()));
+		for (column, array) in zip!(table.columns.iter_mut(), arrow_arrays) {
+			let physical_ty = array.data_type().to_physical_type();
+			match column {
+				TableColumn::Unknown(column) => {
+					column.len += array.len();
+					progress_counter.inc(array.len().to_u64().unwrap());
+				}
+				TableColumn::Number(column) => {
+					match physical_ty {
+						arrow2::datatypes::PhysicalType::Primitive(primitive) => match primitive {
+							arrow2::datatypes::PrimitiveType::Int8 => {
+								copy_primitive_data::<i8>(array, column, &progress_counter);
+							}
+							arrow2::datatypes::PrimitiveType::Int16 => {
+								copy_primitive_data::<i16>(array, column, &progress_counter);
+							}
+							arrow2::datatypes::PrimitiveType::Int32 => {
+								copy_primitive_data::<i32>(array, column, &progress_counter);
+							}
+							arrow2::datatypes::PrimitiveType::Int64 => {
+								copy_primitive_data::<i64>(array, column, &progress_counter);
+							}
+							arrow2::datatypes::PrimitiveType::UInt8 => {
+								copy_primitive_data::<u8>(array, column, &progress_counter);
+							}
+							arrow2::datatypes::PrimitiveType::UInt16 => {
+								copy_primitive_data::<u16>(array, column, &progress_counter);
+							}
+							arrow2::datatypes::PrimitiveType::UInt32 => {
+								copy_primitive_data::<u32>(array, column, &progress_counter);
+							}
+							arrow2::datatypes::PrimitiveType::UInt64 => {
+								copy_primitive_data::<u64>(array, column, &progress_counter);
+							}
+							arrow2::datatypes::PrimitiveType::Float32 => {
+								copy_primitive_data::<f32>(array, column, &progress_counter);
+							}
+							arrow2::datatypes::PrimitiveType::Float64 => {
+								copy_primitive_data::<f64>(array, column, &progress_counter);
+							}
+							_ => unimplemented!(),
+						},
+						_ => unimplemented!(),
+					};
+				}
+				TableColumn::Enum(column) => {
+					match physical_ty {
+						arrow2::datatypes::PhysicalType::Utf8 => {
+							if let Some(array) = array.as_any().downcast_ref::<Utf8Array<i32>>() {
+								for value in array.iter() {
+									let value =
+										value.and_then(|value| column.value_for_variant(value));
+									column.data.push(value);
+									progress_counter.inc(1);
+								}
+							} else {
+								let array =
+									array.as_any().downcast_ref::<Utf8Array<i64>>().unwrap();
+								for value in array.iter() {
+									let value =
+										value.and_then(|value| column.value_for_variant(value));
+									column.data.push(value);
+									progress_counter.inc(1);
+								}
+							}
+						}
+						arrow2::datatypes::PhysicalType::Boolean => {
+							let array = array.as_any().downcast_ref::<BooleanArray>().unwrap();
+							for value in array.iter() {
+								let value = value.and_then(|value| {
+									column.value_for_variant(match value {
+										true => "true",
+										false => "false",
+									})
+								});
+								column.data.push(value);
+								progress_counter.inc(1);
+							}
+						}
+						_ => unimplemented!(),
+					};
+				}
+				TableColumn::Text(column) => match physical_ty {
+					arrow2::datatypes::PhysicalType::Utf8 => {
+						if let Some(array) = array.as_any().downcast_ref::<Utf8Array<i32>>() {
+							for value in array.iter() {
+								column
+									.data
+									.push(value.map_or("".to_owned(), ToOwned::to_owned));
+								progress_counter.inc(1);
+							}
+						} else {
+							let array = array.as_any().downcast_ref::<Utf8Array<i64>>().unwrap();
+							for value in array.iter() {
+								column
+									.data
+									.push(value.map_or("".to_owned(), ToOwned::to_owned));
+								progress_counter.inc(1);
+							}
+						}
+					}
+					_ => unimplemented!(),
+				},
+			}
+		}
+		handle_progress_event(LoadProgressEvent::LoadDone);
+		Ok(table)
+	}
+}
+
+fn copy_primitive_data<T>(
+	array: ArrayRef,
+	column: &mut NumberTableColumn,
+	progress_counter: &ProgressCounter,
+) where
+	T: NativeType + num::ToPrimitive,
+{
+	let array = array
+		.as_any()
+		.downcast_ref::<arrow2::array::PrimitiveArray<T>>()
+		.unwrap();
+	for value in array.iter() {
+		let value = match value.and_then(|value| value.to_f32()) {
+			Some(value) => value,
+			_ => std::f32::NAN,
+		};
+		column.data.push(value);
+		progress_counter.inc(1);
+	}
+}
+
+fn create_table(
+	column_names: Vec<String>,
+	column_types: Vec<TableColumnType>,
+	n_rows: Option<usize>,
+) -> Table {
+	let column_names = column_names.into_iter().map(Some).collect();
+	let mut table = Table::new(column_names, column_types);
+	// If an inference pass was done, reserve storage for the values because we know how many rows are in the csv.
+	if let Some(n_rows) = n_rows {
+		for column in table.columns.iter_mut() {
+			match column {
+				TableColumn::Unknown(_) => {}
+				TableColumn::Number(column) => column.data.reserve_exact(n_rows),
+				TableColumn::Enum(column) => column.data.reserve_exact(n_rows),
+				TableColumn::Text(column) => column.data.reserve_exact(n_rows),
+			}
+		}
+	}
+	table
+}
+
+#[derive(Clone, Debug)]
+enum ColumnTypeOrInferStats<'a> {
+	ColumnType(TableColumnType),
+	InferStats(InferStats<'a>),
+}
+
+fn get_column_types<'a>(
+	column_names: &[String],
+	options: &'a Options<'a>,
+) -> Vec<ColumnTypeOrInferStats<'a>> {
+	let n_columns = column_names.len();
+	if let Some(column_types) = &options.column_types {
+		column_names
+			.iter()
+			.map(|column_name| {
+				column_types
+					.get(column_name)
+					.map(|column_type| ColumnTypeOrInferStats::ColumnType(column_type.clone()))
+					.unwrap_or_else(|| {
+						ColumnTypeOrInferStats::InferStats(InferStats::new(&options.infer_options))
+					})
+			})
+			.collect()
+	} else {
+		vec![ColumnTypeOrInferStats::InferStats(InferStats::new(&options.infer_options)); n_columns]
 	}
 }
 
@@ -332,7 +592,7 @@ fn test_infer() {
 	let table = Table::from_csv(
 		&mut csv::Reader::from_reader(std::io::Cursor::new(csv)),
 		csv.len().to_u64().unwrap(),
-		FromCsvOptions {
+		Options {
 			column_types: None,
 			infer_options: InferOptions {
 				enum_max_unique_values: 1,
@@ -410,7 +670,7 @@ fn test_column_types() {
 	let table = Table::from_csv(
 		&mut csv::Reader::from_reader(std::io::Cursor::new(csv)),
 		csv.len().to_u64().unwrap(),
-		FromCsvOptions {
+		Options {
 			column_types: Some(column_types),
 			infer_options: InferOptions {
 				enum_max_unique_values: 2,

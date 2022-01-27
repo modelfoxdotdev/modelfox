@@ -18,6 +18,7 @@ use crate::{
 	test,
 };
 use anyhow::{anyhow, bail, Result};
+use arrow2::array::ArrayRef;
 use modelfox_id::Id;
 use modelfox_kill_chip::KillChip;
 use modelfox_progress_counter::ProgressCounter;
@@ -41,6 +42,15 @@ pub enum TrainingDataSource {
 	TrainAndTest {
 		train: std::path::PathBuf,
 		test: std::path::PathBuf,
+	},
+	ArrowArrays {
+		arrays: Vec<ArrayRef>,
+		column_names: Vec<String>,
+	},
+	ArrowArraysTrainAndTest {
+		arrays_train: Vec<ArrayRef>,
+		arrays_test: Vec<ArrayRef>,
+		column_names: Vec<String>,
 	},
 }
 
@@ -66,14 +76,12 @@ pub struct Trainer {
 
 impl Trainer {
 	pub fn prepare(
-		id: Id,
 		input: TrainingDataSource,
 		target_column_name: &str,
-		config_path: Option<&Path>,
+		config: Config,
 		handle_progress_event: &mut dyn FnMut(ProgressEvent),
 	) -> Result<Trainer> {
-		// Load the config from the config file, if provided.
-		let config = load_config(config_path)?;
+		let id = modelfox_id::Id::generate();
 
 		// Load the train and test tables from the csv file(s).
 		let dataset = match input {
@@ -97,6 +105,28 @@ impl Trainer {
 					handle_progress_event,
 				)?)
 			}
+			TrainingDataSource::ArrowArrays {
+				arrays,
+				column_names,
+			} => Dataset::Train(load_and_shuffle_dataset_arrow_arrays(
+				arrays,
+				column_names,
+				&config,
+				target_column_name,
+				handle_progress_event,
+			)?),
+			TrainingDataSource::ArrowArraysTrainAndTest {
+				arrays_train,
+				arrays_test,
+				column_names,
+			} => Dataset::TrainAndTest(load_and_shuffle_dataset_arrow_arrays_train_and_test(
+				arrays_train,
+				arrays_test,
+				column_names,
+				&config,
+				target_column_name,
+				handle_progress_event,
+			)?),
 		};
 		let (table_train, table_comparison, table_test) = dataset.split();
 
@@ -304,8 +334,6 @@ impl Trainer {
 			| TrainModelOutput::TreeMulticlassClassifier(_) => "Tree",
 		};
 		let grid_len = train_grid_item_outputs.len();
-		let comparison_metric_value =
-			train_grid_item_outputs[best_grid_item_index].comparison_metric_value;
 
 		// Test the best model.
 		let test_metrics = test_model(&train_model_output, &table_test, &mut |progress_event| {
@@ -551,18 +579,50 @@ impl Trainer {
 			Task::Regression => "regression",
 		};
 		let comparison_metric_str = match comparison_metric {
-			ComparisonMetric::BinaryClassification(bcm) => match bcm {
-				BinaryClassificationComparisonMetric::AucRoc => "AUC ROC",
-			},
-			ComparisonMetric::MulticlassClassification(mccm) => match mccm {
-				MulticlassClassificationComparisonMetric::Accuracy => "Accuracy",
-			},
 			ComparisonMetric::Regression(rcm) => match rcm {
 				RegressionComparisonMetric::MeanAbsoluteError => "mean absolute error",
 				RegressionComparisonMetric::MeanSquaredError => "mean squared error",
 				RegressionComparisonMetric::RootMeanSquaredError => "root mean squared error",
 				RegressionComparisonMetric::R2 => "r2",
 			},
+			ComparisonMetric::BinaryClassification(bcm) => match bcm {
+				BinaryClassificationComparisonMetric::AucRoc => "AUC ROC",
+			},
+			ComparisonMetric::MulticlassClassification(mccm) => match mccm {
+				MulticlassClassificationComparisonMetric::Accuracy => "Accuracy",
+			},
+		};
+		let test_metric_value = match comparison_metric {
+			ComparisonMetric::Regression(rcm) => {
+				let test_metrics = match &model.inner {
+					ModelInner::Regressor(r) => &r.test_metrics,
+					_ => unreachable!(),
+				};
+				match rcm {
+					RegressionComparisonMetric::MeanAbsoluteError => test_metrics.mae,
+					RegressionComparisonMetric::MeanSquaredError => test_metrics.mse,
+					RegressionComparisonMetric::RootMeanSquaredError => test_metrics.rmse,
+					RegressionComparisonMetric::R2 => test_metrics.r2,
+				}
+			}
+			ComparisonMetric::BinaryClassification(bcm) => {
+				let test_metrics = match &model.inner {
+					ModelInner::BinaryClassifier(b) => &b.test_metrics,
+					_ => unreachable!(),
+				};
+				match bcm {
+					BinaryClassificationComparisonMetric::AucRoc => test_metrics.auc_roc_approx,
+				}
+			}
+			ComparisonMetric::MulticlassClassification(mccm) => {
+				let test_metrics = match &model.inner {
+					ModelInner::MulticlassClassifier(m) => &m.test_metrics,
+					_ => unreachable!(),
+				};
+				match mccm {
+					MulticlassClassificationComparisonMetric::Accuracy => test_metrics.accuracy,
+				}
+			}
 		};
 		handle_progress_event(ProgressEvent::Info(format!(
 			"Selected {} Model {} of {} for {} result ({}: {})",
@@ -571,13 +631,13 @@ impl Trainer {
 			grid_len,
 			task_str,
 			comparison_metric_str,
-			comparison_metric_value
+			test_metric_value
 		)));
 		Ok(model)
 	}
 }
 
-fn load_config(config_path: Option<&Path>) -> Result<Config> {
+pub fn load_config(config_path: Option<&Path>) -> Result<Config> {
 	if let Some(config_path) = config_path {
 		let config = std::fs::read_to_string(config_path)?;
 		let extension = config_path.extension().and_then(|s| s.to_str());
@@ -705,7 +765,7 @@ fn load_and_shuffle_dataset_stdin(
 	// Get the column types from the config, if set.
 	let mut table = Table::from_bytes(
 		&buf,
-		modelfox_table::FromCsvOptions {
+		modelfox_table::Options {
 			column_types: column_types_from_config(config),
 			infer_options: Default::default(),
 			..Default::default()
@@ -737,7 +797,7 @@ fn load_and_shuffle_dataset_train(
 	// Get the column types from the config, if set.
 	let mut table = Table::from_path(
 		file_path,
-		modelfox_table::FromCsvOptions {
+		modelfox_table::Options {
 			column_types: column_types_from_config(config),
 			infer_options: Default::default(),
 			..Default::default()
@@ -771,7 +831,7 @@ fn load_and_shuffle_dataset_train_and_test(
 	let column_types = column_types_from_config(config);
 	let mut table_train = Table::from_path(
 		file_path_train,
-		modelfox_table::FromCsvOptions {
+		modelfox_table::Options {
 			column_types,
 			infer_options: Default::default(),
 			..Default::default()
@@ -804,7 +864,7 @@ fn load_and_shuffle_dataset_train_and_test(
 		.collect();
 	let mut table_test = Table::from_path(
 		file_path_test,
-		modelfox_table::FromCsvOptions {
+		modelfox_table::Options {
 			column_types: Some(column_types),
 			infer_options: Default::default(),
 			..Default::default()
@@ -846,6 +906,102 @@ fn column_types_from_config(config: &Config) -> Option<BTreeMap<String, TableCol
 			})
 			.collect(),
 	)
+}
+
+fn load_and_shuffle_dataset_arrow_arrays_train_and_test(
+	arrays_train: Vec<ArrayRef>,
+	arrays_test: Vec<ArrayRef>,
+	column_names: Vec<String>,
+	config: &Config,
+	target_column_name: &str,
+	handle_progress_event: &mut dyn FnMut(ProgressEvent),
+) -> Result<DatasetTrainAndTest> {
+	let column_types = column_types_from_config(config);
+	let mut table_train = modelfox_table::Table::from_arrow_arrays(
+		column_names.clone(),
+		arrays_train,
+		modelfox_table::Options {
+			column_types,
+			infer_options: Default::default(),
+			..Default::default()
+		},
+		&mut |_| {},
+	)
+	.unwrap();
+	// Force the column types for table_test to be the same as table_train.
+	let column_types = table_train
+		.columns()
+		.iter()
+		.map(|column| match column {
+			TableColumn::Unknown(column) => {
+				(column.name().to_owned().unwrap(), TableColumnType::Unknown)
+			}
+			TableColumn::Enum(column) => (
+				column.name().to_owned().unwrap(),
+				TableColumnType::Enum {
+					variants: column.variants().to_owned(),
+				},
+			),
+			TableColumn::Number(column) => {
+				(column.name().to_owned().unwrap(), TableColumnType::Number)
+			}
+			TableColumn::Text(column) => (column.name().to_owned().unwrap(), TableColumnType::Text),
+		})
+		.collect();
+	let mut table_test = modelfox_table::Table::from_arrow_arrays(
+		column_names,
+		arrays_test,
+		modelfox_table::Options {
+			column_types: Some(column_types),
+			infer_options: Default::default(),
+			..Default::default()
+		},
+		&mut |_| {},
+	)
+	.unwrap();
+	if table_train.columns().len() != table_test.columns().len() {
+		bail!("Training data and test data must contain the same number of columns.")
+	}
+	// Drop any rows with invalid data in the target column
+	drop_invalid_target_rows(&mut table_train, target_column_name, handle_progress_event);
+	drop_invalid_target_rows(&mut table_test, target_column_name, handle_progress_event);
+	shuffle_table(&mut table_train, config, handle_progress_event);
+	Ok(DatasetTrainAndTest {
+		table_train,
+		table_test,
+		comparison_fraction: config.dataset.comparison_fraction,
+	})
+}
+
+fn load_and_shuffle_dataset_arrow_arrays(
+	arrays: Vec<ArrayRef>,
+	column_names: Vec<String>,
+	config: &Config,
+	target_column_name: &str,
+	handle_progress_event: &mut dyn FnMut(ProgressEvent),
+) -> Result<DatasetTrain> {
+	let column_types = column_types_from_config(config);
+	let mut table = modelfox_table::Table::from_arrow_arrays(
+		column_names,
+		arrays,
+		modelfox_table::Options {
+			column_types,
+			infer_options: Default::default(),
+			..Default::default()
+		},
+		&mut |_| {},
+	)
+	.unwrap();
+	// Drop any rows with invalid data in the target column
+	drop_invalid_target_rows(&mut table, target_column_name, handle_progress_event);
+	// Shuffle the table if enabled.
+	shuffle_table(&mut table, config, handle_progress_event);
+	// Split the table into train and test tables.
+	Ok(DatasetTrain {
+		table,
+		comparison_fraction: config.dataset.comparison_fraction,
+		test_fraction: config.dataset.test_fraction,
+	})
 }
 
 /// Shuffle the table.
@@ -1008,6 +1164,7 @@ fn compute_baseline_metrics(
 	}
 }
 
+#[derive(Clone, Debug)]
 pub struct TrainGridItemOutput {
 	pub train_model_output: TrainModelOutput,
 	pub comparison_metrics: Metrics,
@@ -1588,6 +1745,15 @@ fn compute_tree_options(options: &grid::TreeModelTrainOptions) -> modelfox_tree:
 		compute_losses: true,
 		..Default::default()
 	};
+	if let Some(binned_features_layout) = options.binned_features_layout.as_ref() {
+		let binned_features_layout = match binned_features_layout {
+			grid::BinnedFeaturesLayout::RowMajor => modelfox_tree::BinnedFeaturesLayout::RowMajor,
+			grid::BinnedFeaturesLayout::ColumnMajor => {
+				modelfox_tree::BinnedFeaturesLayout::ColumnMajor
+			}
+		};
+		tree_options.binned_features_layout = binned_features_layout;
+	}
 	if let Some(early_stopping_options) = options.early_stopping_options.as_ref() {
 		tree_options.early_stopping_options = Some(modelfox_tree::EarlyStoppingOptions {
 			early_stopping_fraction: early_stopping_options.early_stopping_fraction,

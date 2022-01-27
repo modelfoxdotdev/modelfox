@@ -1,15 +1,17 @@
 use itertools::Itertools;
 use modelfox_zip::zip;
 use num::ToPrimitive;
+use serde::Serialize;
 use std::num::NonZeroUsize;
 
 /// `BinaryClassificationMetrics` computes common metrics used to evaluate binary classifiers at a number of classification thresholds.
+#[derive(Debug, Clone)]
 pub struct BinaryClassificationMetrics {
 	/// This field maps thresholds to the confusion matrix for prediction at that threshold.
 	confusion_matrices_for_thresholds: Vec<(f32, BinaryConfusionMatrix)>,
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 struct BinaryConfusionMatrix {
 	false_negatives: u64,
 	false_positives: u64,
@@ -39,7 +41,7 @@ pub struct BinaryClassificationMetricsInput<'a> {
 }
 
 /// BinaryClassificationMetrics contains common metrics used to evaluate binary classifiers.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct BinaryClassificationMetricsOutput {
 	/// The area under the receiver operating characteristic curve is computed using a fixed number of thresholds equal to `n_thresholds` which is passed to [`BinaryClassificationMetrics::new`].
 	pub auc_roc_approx: f32,
@@ -48,7 +50,7 @@ pub struct BinaryClassificationMetricsOutput {
 }
 
 /// The output from [`BinaryClassificationMetrics`].
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct BinaryClassificationMetricsOutputForThreshold {
 	/// The classification threshold.
 	pub threshold: f32,

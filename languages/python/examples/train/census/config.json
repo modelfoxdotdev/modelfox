@@ -1,0 +1,11 @@
+{
+  "train": {
+    "grid": [
+      {
+        "learning_rate": 0.01,
+        "max_rounds": 1500,
+        "model": "tree"
+      }
+    ]
+  }
+}

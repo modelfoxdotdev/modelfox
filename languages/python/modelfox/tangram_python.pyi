@@ -84,13 +84,60 @@ class PredictOptions:
         compute_feature_contributions: Optional[bool],
     ) -> PredictOptions: ...
 
+Metrics = Union[
+    RegressionMetrics,
+    BinaryClassificationMetrics,
+    MulticlassClassificationMetrics,
+]
+
+class RegressionMetrics:
+    mse: float
+    rmse: float
+    mae: float
+    r2: float
+
+class BinaryClassificationMetrics:
+    auc_roc_approx: float
+    thresholds: List[BinaryClassificationMetricsOutputForThreshold]
+
+class BinaryClassificationMetricsOutputForThreshold:
+    threshold: float
+    true_positives: float
+    false_positives: float
+    true_negatives: float
+    false_negatives: float
+    accuracy: float
+    precision: float
+    recall: float
+    f1_score: float
+    true_positive_rate: float
+    false_positive_rate: float
+
+class MulticlassClassificationMetrics:
+    class_metrics: List[ClassMetrics]
+    accuracy: float
+    precision_unweighted: float
+    precision_weighted: float
+    recall_unweighted: float
+    recall_weighted: float
+
+class ClassMetrics:
+    true_positives: float
+    false_positives: float
+    true_negatives: float
+    false_negatives: float
+    accuracy: float
+    precision: float
+    recall: float
+    f1_score: float
+
 PredictOutput = Union[
     RegressionPredictOutput,
     BinaryClassificationPredictOutput,
     MulticlassClassificationPredictOutput,
 ]
 
-class RegressionPredictOutput:
+class RegresionPredictOutput:
     value: float
     feature_contributions: FeatureContributions
 

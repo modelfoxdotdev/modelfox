@@ -155,7 +155,7 @@ fn main() {
 		.iter()
 		.map(ToString::to_string)
 		.collect();
-	let options = modelfox_table::FromCsvOptions {
+	let options = modelfox_table::Options {
 		column_types: Some(BTreeMap::from([
 			("age".to_owned(), TableColumnType::Number),
 			(

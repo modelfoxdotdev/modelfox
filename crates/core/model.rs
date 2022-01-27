@@ -9,8 +9,10 @@ use anyhow::Result;
 use modelfox_id::Id;
 use modelfox_zip::zip;
 use num::ToPrimitive;
+use serde::Serialize;
 use std::path::Path;
 
+#[derive(Debug, Clone)]
 pub struct Model {
 	pub id: Id,
 	pub version: String,
@@ -18,12 +20,14 @@ pub struct Model {
 	pub inner: ModelInner,
 }
 
+#[derive(Debug, Clone)]
 pub enum ModelInner {
 	Regressor(Regressor),
 	BinaryClassifier(BinaryClassifier),
 	MulticlassClassifier(MulticlassClassifier),
 }
 
+#[derive(Debug, Clone)]
 pub struct Regressor {
 	pub target_column_name: String,
 	pub train_row_count: usize,
@@ -44,6 +48,7 @@ pub struct Regressor {
 	pub test_metrics: modelfox_metrics::RegressionMetricsOutput,
 }
 
+#[derive(Debug, Clone)]
 pub struct BinaryClassifier {
 	pub target_column_name: String,
 	pub negative_class: String,
@@ -66,6 +71,7 @@ pub struct BinaryClassifier {
 	pub test_metrics: modelfox_metrics::BinaryClassificationMetricsOutput,
 }
 
+#[derive(Debug, Clone)]
 pub struct MulticlassClassifier {
 	pub target_column_name: String,
 	pub classes: Vec<String>,
@@ -87,28 +93,30 @@ pub struct MulticlassClassifier {
 	pub test_metrics: modelfox_metrics::MulticlassClassificationMetricsOutput,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub enum Task {
 	BinaryClassification,
 	MulticlassClassification,
 	Regression,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub enum BinaryClassificationComparisonMetric {
 	AucRoc,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub enum MulticlassClassificationComparisonMetric {
 	Accuracy,
 }
 
+#[derive(Debug, Clone)]
 pub enum RegressionModel {
 	Linear(LinearRegressionModel),
 	Tree(TreeRegressionModel),
 }
 
+#[derive(Debug, Clone)]
 pub struct LinearRegressionModel {
 	pub model: modelfox_linear::Regressor,
 	pub train_options: modelfox_linear::TrainOptions,
@@ -117,6 +125,7 @@ pub struct LinearRegressionModel {
 	pub feature_importances: Vec<f32>,
 }
 
+#[derive(Debug, Clone)]
 pub struct TreeRegressionModel {
 	pub model: modelfox_tree::Regressor,
 	pub train_options: modelfox_tree::TrainOptions,
@@ -125,7 +134,7 @@ pub struct TreeRegressionModel {
 	pub feature_importances: Vec<f32>,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub enum RegressionComparisonMetric {
 	MeanAbsoluteError,
 	MeanSquaredError,
@@ -133,11 +142,13 @@ pub enum RegressionComparisonMetric {
 	R2,
 }
 
+#[derive(Debug, Clone)]
 pub enum BinaryClassificationModel {
 	Linear(LinearBinaryClassificationModel),
 	Tree(TreeBinaryClassificationModel),
 }
 
+#[derive(Debug, Clone)]
 pub struct LinearBinaryClassificationModel {
 	pub model: modelfox_linear::BinaryClassifier,
 	pub train_options: modelfox_linear::TrainOptions,
@@ -146,6 +157,7 @@ pub struct LinearBinaryClassificationModel {
 	pub feature_importances: Vec<f32>,
 }
 
+#[derive(Debug, Clone)]
 pub struct TreeBinaryClassificationModel {
 	pub model: modelfox_tree::BinaryClassifier,
 	pub train_options: modelfox_tree::TrainOptions,
@@ -154,11 +166,13 @@ pub struct TreeBinaryClassificationModel {
 	pub feature_importances: Vec<f32>,
 }
 
+#[derive(Debug, Clone)]
 pub enum MulticlassClassificationModel {
 	Linear(LinearMulticlassClassificationModel),
 	Tree(TreeMulticlassClassificationModel),
 }
 
+#[derive(Debug, Clone)]
 pub struct LinearMulticlassClassificationModel {
 	pub model: modelfox_linear::MulticlassClassifier,
 	pub train_options: modelfox_linear::TrainOptions,
@@ -167,6 +181,7 @@ pub struct LinearMulticlassClassificationModel {
 	pub feature_importances: Vec<f32>,
 }
 
+#[derive(Debug, Clone)]
 pub struct TreeMulticlassClassificationModel {
 	pub model: modelfox_tree::MulticlassClassifier,
 	pub train_options: modelfox_tree::TrainOptions,
@@ -175,13 +190,14 @@ pub struct TreeMulticlassClassificationModel {
 	pub feature_importances: Vec<f32>,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub enum ComparisonMetric {
 	Regression(RegressionComparisonMetric),
 	BinaryClassification(BinaryClassificationComparisonMetric),
 	MulticlassClassification(MulticlassClassificationComparisonMetric),
 }
 
+#[derive(Debug, Clone, Serialize)]
 pub enum Metrics {
 	Regression(modelfox_metrics::RegressionMetricsOutput),
 	BinaryClassification(modelfox_metrics::BinaryClassificationMetricsOutput),
@@ -190,12 +206,15 @@ pub enum Metrics {
 
 impl Model {
 	pub fn to_path(&self, path: &Path) -> Result<()> {
+		let bytes = self.to_bytes()?;
+		modelfox_model::to_path(path, &bytes)?;
+		Ok(())
+	}
+	pub fn to_bytes(&self) -> Result<Vec<u8>> {
 		let mut writer = buffalo::Writer::new();
 		let model = serialize_model(self, &mut writer);
 		writer.write(&model);
-		let bytes = writer.into_bytes();
-		modelfox_model::to_path(path, &bytes)?;
-		Ok(())
+		Ok(writer.into_bytes())
 	}
 }
 

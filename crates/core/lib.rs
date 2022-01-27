@@ -1,4 +1,4 @@
-mod config;
+pub mod config;
 mod features;
 mod grid;
 pub mod heuristics;

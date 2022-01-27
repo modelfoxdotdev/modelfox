@@ -1,0 +1,19 @@
+[package]
+edition = "2018"
+name = "tangram_wasm"
+publish = false
+version = "0.0.0"
+
+[lib]
+crate-type = ["cdylib"]
+name = "tangram_wasm"
+path = "lib.rs"
+
+[dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
+serde = { version = "1", features = ["derive"] }
+serde_bytes = "0.11"
+serde-wasm-bindgen = "0.3"
+tangram_core = { path = "../../../crates/core" }
+tangram_model = { path = "../../../crates/model" }
+wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }

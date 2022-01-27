@@ -1,0 +1,25 @@
+[package]
+edition = "2021"
+homepage = "https://github.com/modelfoxdotdev/modelfox"
+license = "MIT"
+name = "modelfox_ctrlc"
+version = "0.1.0"
+
+[lib]
+path = "lib.rs"
+
+[dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
+modelfox_kill_chip = { path = "../kill_chip" }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = [
+  "consoleapi",
+  "handleapi",
+  "processenv",
+  "winbase",
+  "wincon",
+] }

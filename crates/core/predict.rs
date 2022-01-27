@@ -341,6 +341,168 @@ impl<'a> From<modelfox_model::ModelReader<'a>> for Model {
 	}
 }
 
+impl<'a> From<crate::model::Model> for Model {
+	fn from(model: crate::model::Model) -> Self {
+		Model {
+			id: model.id.to_string(),
+			inner: model.inner.into(),
+		}
+	}
+}
+
+impl<'a> From<crate::model::ModelInner> for ModelInner {
+	fn from(model: crate::model::ModelInner) -> Self {
+		match model {
+			crate::model::ModelInner::Regressor(inner) => ModelInner::Regressor(inner.into()),
+			crate::model::ModelInner::BinaryClassifier(inner) => {
+				ModelInner::BinaryClassifier(inner.into())
+			}
+			crate::model::ModelInner::MulticlassClassifier(inner) => {
+				ModelInner::MulticlassClassifier(inner.into())
+			}
+		}
+	}
+}
+
+impl<'a> From<crate::model::Regressor> for Regressor {
+	fn from(model: crate::model::Regressor) -> Self {
+		let columns = model
+			.train_column_stats
+			.into_iter()
+			.map(Into::into)
+			.collect::<Vec<_>>();
+		match model.model {
+			crate::model::RegressionModel::Linear(model) => {
+				let feature_groups = model
+					.feature_groups
+					.into_iter()
+					.map(Into::into)
+					.collect::<Vec<_>>();
+				Regressor {
+					columns,
+					feature_groups,
+					model: RegressionModel::Linear(model.model),
+				}
+			}
+			crate::model::RegressionModel::Tree(model) => {
+				let feature_groups = model
+					.feature_groups
+					.into_iter()
+					.map(Into::into)
+					.collect::<Vec<_>>();
+				Regressor {
+					columns,
+					feature_groups,
+					model: RegressionModel::Tree(model.model),
+				}
+			}
+		}
+	}
+}
+
+impl<'a> From<crate::model::BinaryClassifier> for BinaryClassifier {
+	fn from(model: crate::model::BinaryClassifier) -> Self {
+		let columns = model
+			.train_column_stats
+			.into_iter()
+			.map(Into::into)
+			.collect::<Vec<_>>();
+		let negative_class = model.negative_class;
+		let positive_class = model.positive_class;
+		match model.model {
+			crate::model::BinaryClassificationModel::Linear(model) => BinaryClassifier {
+				feature_groups: model
+					.feature_groups
+					.into_iter()
+					.map(Into::into)
+					.collect::<Vec<_>>(),
+				model: BinaryClassificationModel::Linear(model.model),
+				columns,
+				negative_class,
+				positive_class,
+			},
+			crate::model::BinaryClassificationModel::Tree(model) => BinaryClassifier {
+				feature_groups: model
+					.feature_groups
+					.into_iter()
+					.map(Into::into)
+					.collect::<Vec<_>>(),
+				model: BinaryClassificationModel::Tree(model.model),
+				columns,
+				negative_class,
+				positive_class,
+			},
+		}
+	}
+}
+
+impl<'a> From<crate::model::MulticlassClassifier> for MulticlassClassifier {
+	fn from(model: crate::model::MulticlassClassifier) -> Self {
+		let columns = model
+			.train_column_stats
+			.into_iter()
+			.map(Into::into)
+			.collect::<Vec<_>>();
+		let classes = model.classes;
+		match model.model {
+			crate::model::MulticlassClassificationModel::Linear(model) => {
+				let feature_groups = model
+					.feature_groups
+					.into_iter()
+					.map(Into::into)
+					.collect::<Vec<_>>();
+				MulticlassClassifier {
+					model: MulticlassClassificationModel::Linear(model.model),
+					columns,
+					classes,
+					feature_groups,
+				}
+			}
+			crate::model::MulticlassClassificationModel::Tree(model) => {
+				let feature_groups = model
+					.feature_groups
+					.into_iter()
+					.map(Into::into)
+					.collect::<Vec<_>>();
+				MulticlassClassifier {
+					columns,
+					classes,
+					feature_groups,
+					model: MulticlassClassificationModel::Tree(model.model),
+				}
+			}
+		}
+	}
+}
+
+impl<'a> From<crate::stats::ColumnStatsOutput> for Column {
+	fn from(column_stats: crate::stats::ColumnStatsOutput) -> Self {
+		match column_stats {
+			crate::stats::ColumnStatsOutput::Unknown(column_stats) => {
+				let name = column_stats.column_name;
+				Column::Unknown(UnknownColumn { name })
+			}
+			crate::stats::ColumnStatsOutput::Number(column_stats) => {
+				let name = column_stats.column_name;
+				Column::Number(NumberColumn { name })
+			}
+			crate::stats::ColumnStatsOutput::Enum(column_stats) => {
+				let name = column_stats.column_name;
+				let variants = column_stats
+					.histogram
+					.iter()
+					.map(|(key, _)| key.to_owned())
+					.collect::<Vec<_>>();
+				Column::Enum(EnumColumn { name, variants })
+			}
+			crate::stats::ColumnStatsOutput::Text(column_stats) => {
+				let name = column_stats.column_name;
+				Column::Text(TextColumn { name })
+			}
+		}
+	}
+}
+
 fn deserialize_model(model: modelfox_model::ModelReader) -> Model {
 	let id = model.id().parse().unwrap();
 	let inner = deserialize_model_inner(model.inner());

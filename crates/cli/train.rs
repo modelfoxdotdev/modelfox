@@ -79,11 +79,13 @@ pub fn train(args: TrainArgs) -> Result<()> {
 			_ => bail!("Must provide an output path when using stdin for input!"),
 		};
 		// Load the dataset, compute stats, and prepare for training.
+		// Load the config from the config file, if provided.
+		let config = modelfox_core::train::load_config(args.config.as_deref())?;
+
 		let mut trainer = modelfox_core::train::Trainer::prepare(
-			modelfox_id::Id::generate(),
 			input,
 			&args.target,
-			args.config.as_deref(),
+			config,
 			&mut handle_progress_event,
 		)?;
 		if let Some(progress_thread) = progress_thread.as_mut() {
@@ -96,9 +98,9 @@ pub fn train(args: TrainArgs) -> Result<()> {
 				progress_thread.send_progress_event(progress_event)
 			}
 		};
-		let kill_chip = unsafe { ctrl_c::register_ctrl_c_handler()? };
+		let kill_chip = unsafe { modelfox_ctrlc::register_ctrl_c_handler()? };
 		let train_grid_item_outputs = trainer.train_grid(kill_chip, &mut handle_progress_event)?;
-		unsafe { ctrl_c::unregister_ctrl_c_handler()? };
+		unsafe { modelfox_ctrlc::unregister_ctrl_c_handler()? };
 		if kill_chip.is_activated() {
 			if let Some(progress_thread) = progress_thread.as_mut() {
 				progress_thread.send_progress_event(ProgressEvent::Info(
@@ -715,87 +717,6 @@ impl std::fmt::Display for DisplayDuration {
 	}
 }
 
-#[cfg(unix)]
-mod ctrl_c {
-
-	use anyhow::Result;
-	use modelfox_kill_chip::KillChip;
-
-	static mut KILL_CHIP: KillChip = KillChip::new();
-
-	unsafe extern "C" fn kill_chip_handler(_: u32) {
-		let previous_value = KILL_CHIP.activate();
-		if previous_value {
-			libc::_exit(1);
-		}
-	}
-
-	pub unsafe fn register_ctrl_c_handler() -> Result<&'static KillChip> {
-		let res = libc::signal(libc::SIGINT, kill_chip_handler as libc::sighandler_t);
-		if res == libc::SIG_ERR {
-			return Err(std::io::Error::last_os_error().into());
-		}
-		Ok(&KILL_CHIP)
-	}
-
-	pub unsafe fn unregister_ctrl_c_handler() -> Result<()> {
-		let res = libc::signal(libc::SIGINT, libc::SIG_DFL);
-		if res == libc::SIG_ERR {
-			return Err(std::io::Error::last_os_error().into());
-		}
-		Ok(())
-	}
-}
-
-#[cfg(windows)]
-mod ctrl_c {
-
-	use anyhow::Result;
-	use modelfox_kill_chip::KillChip;
-	use winapi::{
-		shared::minwindef::{BOOL, DWORD, FALSE, TRUE},
-		um::{consoleapi::SetConsoleCtrlHandler, processthreadsapi::ExitProcess},
-	};
-
-	static mut KILL_CHIP: KillChip = KillChip::new();
-
-	unsafe extern "system" fn kill_chip_handler(_: DWORD) -> BOOL {
-		let previous_value = KILL_CHIP.activate();
-		if previous_value {
-			ExitProcess(1);
-		}
-		TRUE
-	}
-
-	pub unsafe fn register_ctrl_c_handler() -> Result<&'static KillChip> {
-		let err = SetConsoleCtrlHandler(Some(kill_chip_handler), TRUE);
-		if err == 0 {
-			return Err(std::io::Error::last_os_error().into());
-		}
-		Ok(&KILL_CHIP)
-	}
-
-	pub unsafe fn unregister_ctrl_c_handler() -> Result<()> {
-		let err = SetConsoleCtrlHandler(Some(kill_chip_handler), FALSE);
-		if err == 0 {
-			return Err(std::io::Error::last_os_error().into());
-		}
-		Ok(())
-	}
-}
-
-pub struct Timer(Instant);
-
-impl Timer {
-	pub fn start() -> Timer {
-		Timer(Instant::now())
-	}
-
-	pub fn stop(self) -> Duration {
-		self.0.elapsed()
-	}
-}
-
 /// This function checks if a file with the given name and extension already exists at the path `base`, and if it does, it appends " 1", " 2", etc. to it until it finds a name that will not overwrite an existing file.
 fn available_path(dir: &Path, name: &str, extension: &str) -> Result<PathBuf> {
 	let mut i = 0;
@@ -822,5 +743,17 @@ fn available_path(dir: &Path, name: &str, extension: &str) -> Result<PathBuf> {
 				continue;
 			}
 		}
+	}
+}
+
+pub struct Timer(Instant);
+
+impl Timer {
+	pub fn start() -> Timer {
+		Timer(Instant::now())
+	}
+
+	pub fn stop(self) -> Duration {
+		self.0.elapsed()
 	}
 }

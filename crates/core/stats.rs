@@ -115,7 +115,7 @@ pub struct TextColumnStatsNGramEntry {
 pub struct StatsOutput(pub Vec<ColumnStatsOutput>);
 
 /// This enum describes the different types of column stats.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum ColumnStatsOutput {
 	Unknown(UnknownColumnStatsOutput),
 	Number(NumberColumnStatsOutput),
@@ -136,7 +136,7 @@ impl ColumnStatsOutput {
 }
 
 /// This struct contains stats for unknown columns.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct UnknownColumnStatsOutput {
 	/// This is the name of the column as it appears in the csv.
 	pub column_name: String,
@@ -145,7 +145,7 @@ pub struct UnknownColumnStatsOutput {
 }
 
 /// This struct contains stats for number columns.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct NumberColumnStatsOutput {
 	/// This is the name of the column as it appears in the csv.
 	pub column_name: String,
@@ -176,7 +176,7 @@ pub struct NumberColumnStatsOutput {
 }
 
 /// This struct contains stats for enum columns.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct EnumColumnStatsOutput {
 	/// This is the name of the column as it appears in the csv.
 	pub column_name: String,
@@ -191,7 +191,7 @@ pub struct EnumColumnStatsOutput {
 }
 
 /// This struct contains stats for text columns.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct TextColumnStatsOutput {
 	/// This is the name of the column.
 	pub column_name: String,

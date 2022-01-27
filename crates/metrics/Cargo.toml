@@ -23,5 +23,6 @@ insta = { workspace = true }
 itertools = { workspace = true }
 ndarray = { workspace = true }
 num = { workspace = true }
+serde = { workspace = true }
 
 modelfox_zip = { workspace = true }

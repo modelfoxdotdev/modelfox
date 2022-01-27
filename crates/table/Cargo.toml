@@ -26,6 +26,7 @@ fast-float = { workspace = true }
 fnv = { workspace = true }
 ndarray = { workspace = true }
 num = { workspace = true }
+arrow2 = { workspace = true }
 
 modelfox_progress_counter = { workspace = true }
 modelfox_zip = { workspace = true }

@@ -2,9 +2,10 @@ use num::ToPrimitive;
 use std::iter::IntoIterator;
 use std::num::NonZeroU64;
 
-#[derive(Default)]
+#[derive(Debug, Clone, Default)]
 pub struct MeanVariance(Option<MeanVarianceInner>);
 
+#[derive(Debug, Clone)]
 struct MeanVarianceInner {
 	n: NonZeroU64,
 	m2: f64,

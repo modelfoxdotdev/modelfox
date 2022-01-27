@@ -135,7 +135,6 @@ async fn update_member(
 	member_id: Id,
 	member_fields: MemberFields,
 ) -> Result<()> {
-	dbg!(&member_fields);
 	sqlx::query(
 		"
 			update

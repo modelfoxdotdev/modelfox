@@ -1,0 +1,18 @@
+[package]
+edition = "2018"
+name = "tangram_node"
+publish = false
+version = "0.0.0"
+
+[lib]
+crate-type = ["cdylib"]
+name = "tangram_node"
+path = "lib.rs"
+
+[dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
+memmap = "0.7"
+node_api = { version = "0.3", features = ["serde_1"] }
+serde = { version = "1", features = ["derive"] }
+tangram_core = { path = "../../../crates/core" }
+tangram_model = { path = "../../../crates/model" }

@@ -93,7 +93,7 @@ fn main() {
 	.map(ToString::to_string)
 	.collect();
 	let target_variants = ["N", "Y"].iter().map(ToString::to_string).collect();
-	let options = modelfox_table::FromCsvOptions {
+	let options = modelfox_table::Options {
 		column_types: Some(BTreeMap::from([
 			(
 				"month".to_owned(),

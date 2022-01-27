@@ -1,6 +1,7 @@
 use anyhow::anyhow;
+use arrow2::{array::ArrayRef, ffi};
 use memmap::Mmap;
-use pyo3::{prelude::*, type_object::PyTypeObject, types::PyType};
+use pyo3::{ffi::Py_uintptr_t, prelude::*, type_object::PyTypeObject, types::PyType, FromPyObject};
 use std::collections::BTreeMap;
 use url::Url;
 
@@ -9,6 +10,9 @@ use url::Url;
 fn modelfox(py: Python, m: &PyModule) -> PyResult<()> {
 	m.add_class::<LoadModelOptions>()?;
 	m.add_class::<Model>()?;
+	m.add_class::<RegressionMetrics>()?;
+	m.add_class::<BinaryClassificationMetrics>()?;
+	m.add_class::<MulticlassClassificationMetrics>()?;
 	m.add_class::<PredictOptions>()?;
 	m.add_class::<RegressionPredictOutput>()?;
 	m.add_class::<BinaryClassificationPredictOutput>()?;
@@ -20,6 +24,8 @@ fn modelfox(py: Python, m: &PyModule) -> PyResult<()> {
 	m.add_class::<BagOfWordsFeatureContribution>()?;
 	m.add_class::<BagOfWordsCosineSimilarityFeatureContribution>()?;
 	m.add_class::<WordEmbeddingFeatureContribution>()?;
+	m.add_function(wrap_pyfunction!(train_inner, m)?)?;
+	m.add("Metrics", metrics(py)?)?;
 	m.add("PredictInput", predict_input(py)?)?;
 	m.add("PredictOutput", predict_output(py)?)?;
 	m.add("FeatureContributionEntry", feature_contribution_entry(py)?)?;
@@ -36,6 +42,14 @@ struct Model {
 	model: modelfox_core::predict::Model,
 	log_queue: Vec<Event>,
 	modelfox_url: Url,
+	core_model: CoreModel,
+}
+
+#[derive(Debug)]
+enum CoreModel {
+	Path(String),
+	Model(modelfox_core::model::Model),
+	Bytes(Vec<u8>),
 }
 
 #[pymethods]
@@ -58,7 +72,7 @@ impl Model {
 		path: String,
 		options: Option<LoadModelOptions>,
 	) -> PyResult<Model> {
-		let file = std::fs::File::open(path)?;
+		let file = std::fs::File::open(&path)?;
 		let bytes = unsafe { Mmap::map(&file)? };
 		let model = modelfox_model::from_bytes(&bytes).map_err(ModelFoxError)?;
 		let model = modelfox_core::predict::Model::from(model);
@@ -72,6 +86,7 @@ impl Model {
 			model,
 			log_queue: Vec::new(),
 			modelfox_url,
+			core_model: CoreModel::Path(path),
 		};
 		Ok(model)
 	}
@@ -106,6 +121,7 @@ impl Model {
 			model,
 			log_queue: Vec::new(),
 			modelfox_url,
+			core_model: CoreModel::Bytes(bytes),
 		};
 		Ok(model)
 	}
@@ -116,6 +132,35 @@ impl Model {
 	#[getter]
 	fn id(&self) -> String {
 		self.model.id.clone()
+	}
+
+	/**
+	Set the model's modelfox_url.
+		*/
+	#[setter]
+	fn set_modelfox_url(&mut self, url: String) -> PyResult<()> {
+		let modelfox_url = url
+			.parse()
+			.map_err(|_| modelfoxError(anyhow!("Failed to parse modelfox_url")))?;
+		self.modelfox_url = modelfox_url;
+		Ok(())
+	}
+
+	#[pyo3(text_signature = "(path)")]
+	fn to_path(&self, path: String) -> PyResult<()> {
+		let path: std::path::PathBuf = path.into();
+		match &self.core_model {
+			CoreModel::Model(model) => model
+				.to_path(&path)
+				.map_err(|err| modelfoxError(err.into()))?,
+			CoreModel::Path(current_model_path) => std::fs::copy(current_model_path, path)
+				.map_err(|err| modelfoxError(err.into()))
+				.map(|_| {})?,
+			CoreModel::Bytes(bytes) => {
+				modelfox_model::to_path(&path, &bytes).map_err(|err| modelfoxError(err.into()))?;
+			}
+		};
+		Ok(())
 	}
 
 	/**
@@ -161,7 +206,7 @@ impl Model {
 		input (`PredictInput`): A single `PredictInput`.
 		output (`PredictOutput`): A single `PredictOutput`.
 		options (Optional[`PredictOptions`]): This is the same `PredictOptions` value that you passed to `predict`.
-	  */
+		*/
 	#[args(identifier, input, output, options = "None")]
 	#[pyo3(text_signature = "(identifier, input, output, options=None)")]
 	fn log_prediction(
@@ -235,6 +280,138 @@ impl Model {
 		let events = self.log_queue.drain(0..self.log_queue.len()).collect();
 		self.log_events(events)
 	}
+
+	/**
+	Retrieve the model's test metrics.
+		*/
+	fn test_metrics(&self) -> PyResult<Metrics> {
+		match &self.core_model {
+			CoreModel::Path(path) => test_metrics_from_path(path),
+			CoreModel::Bytes(bytes) => test_metrics_from_bytes(bytes),
+			CoreModel::Model(model) => test_metrics_from_model(model),
+		}
+	}
+}
+
+fn test_metrics_from_path(path: &str) -> PyResult<Metrics> {
+	let file = std::fs::File::open(&path)?;
+	let bytes = unsafe { Mmap::map(&file)? };
+	let model = modelfox_model::from_bytes(&bytes).map_err(modelfoxError)?;
+	let metrics = test_metrics_from_model_reader(model);
+	Ok(metrics)
+}
+
+fn test_metrics_from_bytes(bytes: &[u8]) -> PyResult<Metrics> {
+	let model = modelfox_model::from_bytes(&bytes).map_err(modelfoxError)?;
+	let metrics = test_metrics_from_model_reader(model);
+	Ok(metrics)
+}
+
+fn test_metrics_from_model(model: &modelfox_core::model::Model) -> PyResult<Metrics> {
+	let metrics = match &model.inner {
+		modelfox_core::model::ModelInner::Regressor(regressor) => {
+			Metrics::Regression((&regressor.test_metrics).into())
+		}
+		modelfox_core::model::ModelInner::BinaryClassifier(binary_classifier) => {
+			Metrics::BinaryClassification((&binary_classifier.test_metrics).into())
+		}
+		modelfox_core::model::ModelInner::MulticlassClassifier(multiclass_classifier) => {
+			Metrics::MulticlassClassification((&multiclass_classifier.test_metrics).into())
+		}
+	};
+	Ok(metrics)
+}
+
+fn test_metrics_from_model_reader(reader: modelfox_model::ModelReader) -> Metrics {
+	match reader.inner() {
+		modelfox_model::ModelInnerReader::Regressor(reader) => {
+			let metrics = regressor_test_metrics_from_reader(reader.read());
+			Metrics::Regression(metrics)
+		}
+		modelfox_model::ModelInnerReader::BinaryClassifier(reader) => {
+			let metrics = binary_classifier_test_metrics_from_reader(reader.read());
+			Metrics::BinaryClassification(metrics)
+		}
+		modelfox_model::ModelInnerReader::MulticlassClassifier(reader) => {
+			let metrics = multiclass_classifier_test_metrics_from_reader(reader.read());
+			Metrics::MulticlassClassification(metrics)
+		}
+	}
+}
+
+fn regressor_test_metrics_from_reader(
+	reader: modelfox_model::RegressorReader,
+) -> RegressionMetrics {
+	RegressionMetrics {
+		mse: reader.test_metrics().mse(),
+		rmse: reader.test_metrics().rmse(),
+		mae: reader.test_metrics().mae(),
+		r2: reader.test_metrics().r2(),
+	}
+}
+
+fn binary_classifier_test_metrics_from_reader(
+	reader: modelfox_model::BinaryClassifierReader,
+) -> BinaryClassificationMetrics {
+	BinaryClassificationMetrics {
+		auc_roc: reader.test_metrics().auc_roc(),
+		default_threshold: threshold_metrics_from_reader(reader.test_metrics().default_threshold()),
+		thresholds: reader
+			.test_metrics()
+			.thresholds()
+			.iter()
+			.map(|reader| threshold_metrics_from_reader(reader))
+			.collect::<Vec<_>>(),
+	}
+}
+
+fn threshold_metrics_from_reader(
+	reader: modelfox_model::BinaryClassificationMetricsForThresholdReader,
+) -> BinaryClassificationMetricsForThreshold {
+	BinaryClassificationMetricsForThreshold {
+		threshold: reader.threshold(),
+		true_positives: reader.true_positives(),
+		false_positives: reader.false_positives(),
+		true_negatives: reader.true_negatives(),
+		false_negatives: reader.false_negatives(),
+		accuracy: reader.accuracy(),
+		precision: reader.precision(),
+		recall: reader.recall(),
+		f1_score: reader.f1_score(),
+		true_positive_rate: reader.true_positive_rate(),
+		false_positive_rate: reader.false_positive_rate(),
+	}
+}
+
+fn multiclass_classifier_test_metrics_from_reader(
+	reader: modelfox_model::MulticlassClassifierReader,
+) -> MulticlassClassificationMetrics {
+	let reader = reader.test_metrics();
+	MulticlassClassificationMetrics {
+		class_metrics: reader
+			.class_metrics()
+			.iter()
+			.map(class_metrics_from_reader)
+			.collect::<Vec<_>>(),
+		accuracy: reader.accuracy(),
+		precision_unweighted: reader.precision_unweighted(),
+		precision_weighted: reader.precision_weighted(),
+		recall_unweighted: reader.recall_unweighted(),
+		recall_weighted: reader.recall_weighted(),
+	}
+}
+
+fn class_metrics_from_reader(reader: modelfox_model::ClassMetricsReader) -> ClassMetrics {
+	ClassMetrics {
+		true_positives: reader.true_positives(),
+		false_positives: reader.false_positives(),
+		true_negatives: reader.true_negatives(),
+		false_negatives: reader.false_negatives(),
+		accuracy: reader.accuracy(),
+		precision: reader.precision(),
+		recall: reader.recall(),
+		f1_score: reader.f1_score(),
+	}
 }
 
 impl Model {
@@ -283,6 +460,227 @@ impl Model {
 			true_value,
 		}
 	}
+}
+
+#[derive(Debug, serde::Serialize)]
+#[serde(untagged)]
+enum Metrics {
+	Regression(RegressionMetrics),
+	BinaryClassification(BinaryClassificationMetrics),
+	MulticlassClassification(MulticlassClassificationMetrics),
+}
+
+impl IntoPy<PyObject> for Metrics {
+	fn into_py(self, py: Python) -> PyObject {
+		match self {
+			Metrics::Regression(s) => s.into_py(py),
+			Metrics::BinaryClassification(s) => s.into_py(py),
+			Metrics::MulticlassClassification(s) => s.into_py(py),
+		}
+	}
+}
+
+#[derive(Clone, Debug, serde::Serialize)]
+#[pyclass]
+pub struct RegressionMetrics {
+	/// The mean squared error is equal to the mean of the squared errors. For a given example, the error is the difference between the true value and the model's predicted value.
+	#[pyo3(get)]
+	pub mse: f32,
+	/// The root mean squared error is equal to the square root of the mean squared error.
+	#[pyo3(get)]
+	pub rmse: f32,
+	/// The mean of the absolute value of the errors.
+	#[pyo3(get)]
+	pub mae: f32,
+	/// The r-squared value. https://en.wikipedia.org/wiki/Coefficient_of_determination.
+	#[pyo3(get)]
+	pub r2: f32,
+}
+
+impl From<&modelfox_metrics::RegressionMetricsOutput> for RegressionMetrics {
+	fn from(metrics: &modelfox_metrics::RegressionMetricsOutput) -> Self {
+		RegressionMetrics {
+			mse: metrics.mse,
+			rmse: metrics.rmse,
+			mae: metrics.mae,
+			r2: metrics.r2,
+		}
+	}
+}
+
+impl From<&modelfox_metrics::BinaryClassificationMetricsOutput> for BinaryClassificationMetrics {
+	fn from(metrics: &modelfox_metrics::BinaryClassificationMetricsOutput) -> Self {
+		let default_threshold = (&metrics.thresholds[metrics.thresholds.len() / 2]).into();
+		BinaryClassificationMetrics {
+			auc_roc: metrics.auc_roc_approx,
+			default_threshold,
+			thresholds: metrics
+				.thresholds
+				.iter()
+				.map(Into::into)
+				.collect::<Vec<_>>(),
+		}
+	}
+}
+
+impl From<&modelfox_metrics::BinaryClassificationMetricsOutputForThreshold>
+	for BinaryClassificationMetricsForThreshold
+{
+	fn from(metrics: &modelfox_metrics::BinaryClassificationMetricsOutputForThreshold) -> Self {
+		BinaryClassificationMetricsForThreshold {
+			threshold: metrics.threshold,
+			true_positives: metrics.true_positives,
+			false_positives: metrics.false_positives,
+			true_negatives: metrics.true_negatives,
+			false_negatives: metrics.false_negatives,
+			accuracy: metrics.accuracy,
+			precision: metrics.precision,
+			recall: metrics.recall,
+			f1_score: metrics.f1_score,
+			true_positive_rate: metrics.true_positive_rate,
+			false_positive_rate: metrics.false_positive_rate,
+		}
+	}
+}
+
+impl From<&modelfox_metrics::MulticlassClassificationMetricsOutput>
+	for MulticlassClassificationMetrics
+{
+	fn from(metrics: &modelfox_metrics::MulticlassClassificationMetricsOutput) -> Self {
+		MulticlassClassificationMetrics {
+			class_metrics: metrics
+				.class_metrics
+				.iter()
+				.map(|class_metrics| class_metrics.into())
+				.collect::<Vec<_>>(),
+			accuracy: metrics.accuracy,
+			precision_unweighted: metrics.precision_unweighted,
+			precision_weighted: metrics.precision_weighted,
+			recall_unweighted: metrics.recall_unweighted,
+			recall_weighted: metrics.recall_weighted,
+		}
+	}
+}
+
+impl From<&modelfox_metrics::ClassMetrics> for ClassMetrics {
+	fn from(metrics: &modelfox_metrics::ClassMetrics) -> Self {
+		ClassMetrics {
+			true_positives: metrics.true_positives,
+			false_positives: metrics.false_positives,
+			true_negatives: metrics.true_negatives,
+			false_negatives: metrics.false_negatives,
+			accuracy: metrics.accuracy,
+			precision: metrics.precision,
+			recall: metrics.recall,
+			f1_score: metrics.f1_score,
+		}
+	}
+}
+
+#[derive(Clone, Debug, serde::Serialize)]
+#[pyclass]
+/// BinaryClassificationMetrics contains common metrics used to evaluate binary classifiers.
+pub struct BinaryClassificationMetrics {
+	/// The area under the receiver operating characteristic curve is computed using a fixed number of thresholds equal to `n_thresholds`.
+	#[pyo3(get)]
+	pub auc_roc: f32,
+	/// This contains metrics specific to the default classification threshold of 0.5.
+	#[pyo3(get)]
+	pub default_threshold: BinaryClassificationMetricsForThreshold,
+	/// This contains metrics specific to each classification threshold.
+	#[pyo3(get)]
+	pub thresholds: Vec<BinaryClassificationMetricsForThreshold>,
+}
+
+#[derive(Clone, Debug, serde::Serialize)]
+#[pyclass]
+pub struct BinaryClassificationMetricsForThreshold {
+	/// The classification threshold.
+	#[pyo3(get)]
+	pub threshold: f32,
+	/// The total number of examples whose label is equal to the positive class that the model predicted as belonging to the positive class.
+	#[pyo3(get)]
+	pub true_positives: u64,
+	/// The total number of examples whose label is equal to the negative class that the model predicted as belonging to the positive class.
+	#[pyo3(get)]
+	pub false_positives: u64,
+	/// The total number of examples whose label is equal to the negative class that the model predicted as belonging to the negative class.
+	#[pyo3(get)]
+	pub true_negatives: u64,
+	/// The total number of examples whose label is equal to the positive class that the model predicted as belonging to the negative class.
+	#[pyo3(get)]
+	pub false_negatives: u64,
+	/// The fraction of examples that were correctly classified.
+	#[pyo3(get)]
+	pub accuracy: f32,
+	/// The precision is the fraction of examples the model predicted as belonging to the positive class whose label is actually the positive class. true_positives / (true_positives + false_positives). See [Precision and Recall](https://en.wikipedia.org/wiki/Precision_and_recall).
+	#[pyo3(get)]
+	pub precision: Option<f32>,
+	/// The recall is the fraction of examples whose label is equal to the positive class that the model predicted as belonging to the positive class. `recall = true_positives / (true_positives + false_negatives)`.
+	#[pyo3(get)]
+	pub recall: Option<f32>,
+	/// The f1 score is the harmonic mean of the precision and the recall. See [F1 Score](https://en.wikipedia.org/wiki/F1_score).
+	#[pyo3(get)]
+	pub f1_score: Option<f32>,
+	/// The true positive rate is the fraction of examples whose label is equal to the positive class that the model predicted as belonging to the positive class. Also known as the recall. See [Sensitivity and Specificity](https://en.wikipedia.org/wiki/Sensitivity_and_specificity).
+	#[pyo3(get)]
+	pub true_positive_rate: f32,
+	/// The false positive rate is the fraction of examples whose label is equal to the negative class that the model falsely predicted as belonging to the positive class. false_positives / (false_positives + true_negatives). See [False Positive Rate](https://en.wikipedia.org/wiki/False_positive_rate)
+	#[pyo3(get)]
+	pub false_positive_rate: f32,
+}
+
+#[pyclass]
+#[derive(Clone, Debug, serde::Serialize)]
+struct MulticlassClassificationMetrics {
+	/// The class metrics contain class specific metrics.
+	#[pyo3(get)]
+	pub class_metrics: Vec<ClassMetrics>,
+	/// The accuracy is the fraction of all of the predictions that are correct.
+	#[pyo3(get)]
+	pub accuracy: f32,
+	/// The unweighted precision equal to the mean of each class's precision.
+	#[pyo3(get)]
+	pub precision_unweighted: f32,
+	/// The weighted precision is a weighted mean of each class's precision weighted by the fraction of the total examples in the class.
+	#[pyo3(get)]
+	pub precision_weighted: f32,
+	/// The unweighted recall equal to the mean of each class's recall.
+	#[pyo3(get)]
+	pub recall_unweighted: f32,
+	/// The weighted recall is a weighted mean of each class's recall weighted by the fraction of the total examples in the class.
+	#[pyo3(get)]
+	pub recall_weighted: f32,
+}
+
+#[pyclass]
+#[derive(Clone, Debug, serde::Serialize)]
+/// ClassMetrics are class specific metrics used to evaluate the model's performance on each individual class.
+pub struct ClassMetrics {
+	/// This is the total number of examples whose label is equal to this class that the model predicted as belonging to this class.
+	#[pyo3(get)]
+	pub true_positives: u64,
+	/// This is the total number of examples whose label is *not* equal to this class that the model predicted as belonging to this class.
+	#[pyo3(get)]
+	pub false_positives: u64,
+	/// This is the total number of examples whose label is *not* equal to this class that the model predicted as *not* belonging to this class.
+	#[pyo3(get)]
+	pub true_negatives: u64,
+	/// This is the total number of examples whose label is equal to this class that the model predicted as *not* belonging to this class.
+	#[pyo3(get)]
+	pub false_negatives: u64,
+	/// The accuracy is the fraction of examples of this class that were correctly classified.
+	#[pyo3(get)]
+	pub accuracy: f32,
+	/// The precision is the fraction of examples the model predicted as belonging to this class whose label is actually equal to this class. `precision = true_positives / (true_positives + false_positives)`. See [Precision and Recall](https://en.wikipedia.org/wiki/Precision_and_recall).
+	#[pyo3(get)]
+	pub precision: f32,
+	/// The recall is the fraction of examples in the dataset whose label is equal to this class that the model predicted as equal to this class. `recall = true_positives / (true_positives + false_negatives)`.
+	#[pyo3(get)]
+	pub recall: f32,
+	/// The f1 score is the harmonic mean of the precision and the recall. See [F1 Score](https://en.wikipedia.org/wiki/F1_score).
+	#[pyo3(get, set)]
+	pub f1_score: f32,
 }
 
 /**
@@ -899,6 +1297,17 @@ fn predict_output(py: Python) -> PyResult<PyObject> {
 	Ok(predict_output.into())
 }
 
+fn metrics(py: Python) -> PyResult<PyObject> {
+	let typing = py.import("typing")?;
+	let py_union = typing.getattr("Union")?;
+	let metrics = py_union.get_item((
+		RegressionMetrics::type_object(py),
+		BinaryClassificationMetrics::type_object(py),
+		MulticlassClassificationMetrics::type_object(py),
+	))?;
+	Ok(metrics.into())
+}
+
 fn feature_contribution_entry(py: Python) -> PyResult<PyObject> {
 	let typing = py.import("typing")?;
 	let py_union = typing.getattr("Union")?;
@@ -925,6 +1334,10 @@ fn ngram(py: Python) -> PyResult<PyObject> {
 
 struct ModelFoxError(anyhow::Error);
 
+repr!(RegressionMetrics);
+repr!(BinaryClassificationMetrics);
+repr!(MulticlassClassificationMetrics);
+
 impl std::fmt::Display for ModelFoxError {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
 		self.0.fmt(f)
@@ -934,5 +1347,551 @@ impl std::fmt::Display for ModelFoxError {
 impl From<ModelFoxError> for PyErr {
 	fn from(error: ModelFoxError) -> PyErr {
 		PyErr::new::<pyo3::exceptions::PyTypeError, _>(error.to_string())
+	}
+}
+
+#[derive(Clone, Debug)]
+enum ColumnType {
+	Number(NumberColumn),
+	Enum(EnumColumn),
+	Text(TextColumn),
+}
+
+#[derive(FromPyObject, Clone, Debug)]
+struct NumberColumn {
+	name: String,
+}
+
+#[derive(FromPyObject, Clone, Debug)]
+struct EnumColumn {
+	name: String,
+	variants: Vec<String>,
+}
+
+#[derive(FromPyObject, Clone, Debug)]
+struct TextColumn {
+	name: String,
+}
+
+impl<'source> FromPyObject<'source> for ColumnType {
+	fn extract(ob: &'source PyAny) -> PyResult<Self> {
+		let ty: &str = ob.get_item("type")?.extract()?;
+		let name: String = ob.get_item("name")?.extract()?;
+		match ty {
+			"number" => Ok(ColumnType::Number(NumberColumn { name })),
+			"text" => Ok(ColumnType::Text(TextColumn { name })),
+			"enum" => {
+				let variants: Vec<String> = ob.get_item("variants")?.extract()?;
+				Ok(ColumnType::Enum(EnumColumn { name, variants }))
+			}
+			&_ => Err(pyo3::exceptions::PyValueError::new_err(format!(
+				"invalid variant type {}",
+				ty,
+			))),
+		}
+	}
+}
+
+impl Into<modelfox_core::config::Column> for ColumnType {
+	fn into(self) -> modelfox_core::config::Column {
+		match self {
+			ColumnType::Number(column) => {
+				modelfox_core::config::Column::Number(modelfox_core::config::NumberColumn {
+					name: column.name,
+				})
+			}
+			ColumnType::Enum(column) => {
+				modelfox_core::config::Column::Enum(modelfox_core::config::EnumColumn {
+					name: column.name,
+					variants: column.variants,
+				})
+			}
+			ColumnType::Text(column) => {
+				modelfox_core::config::Column::Text(modelfox_core::config::TextColumn {
+					name: column.name,
+				})
+			}
+		}
+	}
+}
+
+#[derive(Clone)]
+pub struct FromArrowOptions<'a> {
+	pub column_types: Option<BTreeMap<String, modelfox_table::TableColumnType>>,
+	pub infer_options: modelfox_table::InferOptions,
+	pub invalid_values: &'a [&'a str],
+}
+
+impl<'a> Default for FromArrowOptions<'a> {
+	fn default() -> Self {
+		Self {
+			column_types: Default::default(),
+			infer_options: Default::default(),
+			invalid_values: Default::default(),
+		}
+	}
+}
+
+#[pyfunction]
+fn train_inner(
+	arrow_arrays_train: Vec<(String, &PyAny)>,
+	target: String,
+	arrow_arrays_test: Option<Vec<(String, &PyAny)>>,
+	column_types: Option<Vec<ColumnType>>,
+	shuffle_enabled: Option<bool>,
+	shuffle_seed: Option<u64>,
+	test_fraction: Option<f32>,
+	comparison_fraction: Option<f32>,
+	autogrid: Option<AutoGridOptions>,
+	grid: Option<Vec<GridItem>>,
+	comparison_metric: Option<ComparisonMetric>,
+) -> PyResult<Model> {
+	let kill_chip = unsafe { modelfox_ctrlc::register_ctrl_c_handler().unwrap() };
+
+	// Construct the dataset
+	let column_names = arrow_arrays_train
+		.iter()
+		.map(|(name, _)| name.to_owned())
+		.collect::<Vec<_>>();
+	let arrays_train = arrow_arrays_train
+		.into_iter()
+		.map(|(_, array)| array_to_rust(array).unwrap())
+		.collect::<Vec<_>>();
+	let arrays_test = arrow_arrays_test.map(|arrays| {
+		arrays
+			.into_iter()
+			.map(|(_, array)| array_to_rust(array).unwrap())
+			.collect::<Vec<_>>()
+	});
+	let dataset = match arrays_test {
+		Some(arrays_test) => modelfox_core::train::TrainingDataSource::ArrowArraysTrainAndTest {
+			arrays_train,
+			arrays_test,
+			column_names,
+		},
+		None => modelfox_core::train::TrainingDataSource::ArrowArrays {
+			arrays: arrays_train,
+			column_names,
+		},
+	};
+
+	// Construct the config options
+	let config = make_config(
+		column_types,
+		shuffle_enabled,
+		shuffle_seed,
+		test_fraction,
+		comparison_fraction,
+		autogrid,
+		grid,
+		comparison_metric,
+	);
+
+	let mut trainer =
+		modelfox_core::train::Trainer::prepare(dataset, &target, config, &mut |_| {}).unwrap();
+	let train_grid_item_outputs = trainer.train_grid(kill_chip, &mut |_| {}).unwrap();
+	let model = trainer
+		.test_and_assemble_model(train_grid_item_outputs, &mut |_| {})
+		.unwrap();
+
+	let modelfox_url = "https://app.modelfox.dev".to_owned();
+	let modelfox_url = modelfox_url.parse().unwrap();
+
+	let model = Model {
+		model: model.clone().into(),
+		log_queue: Vec::new(),
+		modelfox_url,
+		core_model: CoreModel::Model(model),
+	};
+	Ok(model)
+}
+
+fn make_config(
+	column_types: Option<Vec<ColumnType>>,
+	shuffle_enabled: Option<bool>,
+	shuffle_seed: Option<u64>,
+	test_fraction: Option<f32>,
+	comparison_fraction: Option<f32>,
+	autogrid: Option<AutoGridOptions>,
+	grid: Option<Vec<GridItem>>,
+	comparison_metric: Option<ComparisonMetric>,
+) -> modelfox_core::config::Config {
+	let column_types: Option<Vec<modelfox_core::config::Column>> =
+		column_types.map(|column_config| {
+			column_config
+				.into_iter()
+				.map(|column| column.into())
+				.collect()
+		});
+	let mut dataset_config = modelfox_core::config::Dataset::default();
+	dataset_config.columns = column_types.unwrap_or_default();
+	if let Some(shuffle_seed) = shuffle_seed {
+		dataset_config.shuffle.seed = shuffle_seed
+	}
+	if let Some(shuffle_enabled) = shuffle_enabled {
+		dataset_config.shuffle.enable = shuffle_enabled
+	}
+	if let Some(test_fraction) = test_fraction {
+		dataset_config.test_fraction = test_fraction
+	}
+	if let Some(comparison_fraction) = comparison_fraction {
+		dataset_config.comparison_fraction = comparison_fraction
+	}
+	modelfox_core::config::Config {
+		dataset: dataset_config,
+		features: Default::default(),
+		train: modelfox_core::config::Train {
+			autogrid: autogrid.map(Into::into),
+			grid: grid.map(|grid| grid.into_iter().map(Into::into).collect::<Vec<_>>()),
+			comparison_metric: comparison_metric.map(Into::into),
+		},
+	}
+}
+
+#[derive(Debug, FromPyObject)]
+struct AutoGridOptions {
+	model_types: Vec<ModelType>,
+}
+
+impl Into<modelfox_core::config::AutoGridOptions> for AutoGridOptions {
+	fn into(self) -> modelfox_core::config::AutoGridOptions {
+		modelfox_core::config::AutoGridOptions {
+			model_types: Some(
+				self.model_types
+					.into_iter()
+					.map(|item| item.into())
+					.collect(),
+			),
+		}
+	}
+}
+
+#[derive(Debug)]
+enum ModelType {
+	Linear,
+	Tree,
+}
+
+impl<'source> FromPyObject<'source> for ModelType {
+	fn extract(ob: &'source PyAny) -> PyResult<Self> {
+		let ty: &str = ob.get_item("type")?.extract()?;
+		match ty {
+			"linear" => Ok(ModelType::Linear),
+			"tree" => Ok(ModelType::Tree),
+			&_ => Err(pyo3::exceptions::PyValueError::new_err(format!(
+				"invalid variant type {}",
+				ty,
+			))),
+		}
+	}
+}
+
+impl Into<modelfox_core::config::ModelType> for ModelType {
+	fn into(self) -> modelfox_core::config::ModelType {
+		match self {
+			ModelType::Linear => modelfox_core::config::ModelType::Linear,
+			ModelType::Tree => modelfox_core::config::ModelType::Tree,
+		}
+	}
+}
+
+#[derive(Debug)]
+enum GridItem {
+	Tree(TreeGridItem),
+	Linear(LinearGridItem),
+}
+
+impl<'source> FromPyObject<'source> for GridItem {
+	fn extract(ob: &'source PyAny) -> PyResult<Self> {
+		let ty: &str = ob.get_item("type")?.extract()?;
+		match ty {
+			"linear" => Ok(GridItem::Linear(ob.extract()?)),
+			"tree" => Ok(GridItem::Tree(ob.extract()?)),
+			&_ => Err(pyo3::exceptions::PyValueError::new_err(format!(
+				"invalid variant type {}",
+				ty,
+			))),
+		}
+	}
+}
+
+impl Into<modelfox_core::config::GridItem> for GridItem {
+	fn into(self) -> modelfox_core::config::GridItem {
+		match self {
+			GridItem::Tree(item) => modelfox_core::config::GridItem::Tree(item.into()),
+			GridItem::Linear(item) => modelfox_core::config::GridItem::Linear(item.into()),
+		}
+	}
+}
+
+#[derive(Default, Debug)]
+struct LinearGridItem {
+	early_stopping_options: Option<EarlyStoppingOptions>,
+	l2_regularization: Option<f32>,
+	learning_rate: Option<f32>,
+	max_epochs: Option<u64>,
+	n_examples_per_batch: Option<u64>,
+}
+
+impl<'source> FromPyObject<'source> for LinearGridItem {
+	fn extract(ob: &'source PyAny) -> PyResult<Self> {
+		let mut linear_grid_item: LinearGridItem = Default::default();
+		if let Ok(item) = ob.get_item("early_stopping_options") {
+			linear_grid_item.early_stopping_options = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("l2_regularization") {
+			linear_grid_item.l2_regularization = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("learning_rate") {
+			linear_grid_item.learning_rate = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("max_epochs") {
+			linear_grid_item.max_epochs = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("n_examples_per_batch") {
+			linear_grid_item.n_examples_per_batch = Some(item.extract()?);
+		}
+		Ok(linear_grid_item)
+	}
+}
+
+impl Into<modelfox_core::config::LinearGridItem> for LinearGridItem {
+	fn into(self) -> modelfox_core::config::LinearGridItem {
+		modelfox_core::config::LinearGridItem {
+			early_stopping_options: self.early_stopping_options.map(Into::into),
+			l2_regularization: self.l2_regularization.map(Into::into),
+			learning_rate: self.learning_rate,
+			max_epochs: self.max_epochs,
+			n_examples_per_batch: self.n_examples_per_batch.map(Into::into),
+		}
+	}
+}
+
+#[derive(Default, Debug)]
+struct TreeGridItem {
+	binned_features_layout: Option<BinnedFeaturesLayout>,
+	early_stopping_options: Option<EarlyStoppingOptions>,
+	l2_regularization_for_continuous_splits: Option<f32>,
+	l2_regularization_for_discrete_splits: Option<f32>,
+	learning_rate: Option<f32>,
+	max_depth: Option<u64>,
+	max_examples_for_computing_bin_thresholds: Option<u64>,
+	max_leaf_nodes: Option<u64>,
+	max_rounds: Option<u64>,
+	max_valid_bins_for_number_features: Option<u8>,
+	min_examples_per_node: Option<u64>,
+	min_gain_to_split: Option<f32>,
+	min_sum_hessians_per_node: Option<f32>,
+	smoothing_factor_for_discrete_bin_sorting: Option<f32>,
+}
+
+impl<'source> FromPyObject<'source> for TreeGridItem {
+	fn extract(ob: &'source PyAny) -> PyResult<Self> {
+		let mut tree_grid_item: TreeGridItem = Default::default();
+		if let Ok(item) = ob.get_item("binned_features_layout") {
+			tree_grid_item.binned_features_layout = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("early_stopping_options") {
+			tree_grid_item.early_stopping_options = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("l2_regularization_for_continuous_splits") {
+			tree_grid_item.l2_regularization_for_continuous_splits = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("l2_regularization_for_discrete_splits") {
+			tree_grid_item.l2_regularization_for_discrete_splits = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("learning_rate") {
+			tree_grid_item.learning_rate = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("max_depth") {
+			tree_grid_item.max_depth = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("max_examples_for_computing_bin_thresholds") {
+			tree_grid_item.max_examples_for_computing_bin_thresholds = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("max_leaf_nodes") {
+			tree_grid_item.max_leaf_nodes = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("max_rounds") {
+			tree_grid_item.max_rounds = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("max_valid_bins_for_number_features") {
+			tree_grid_item.max_valid_bins_for_number_features = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("min_examples_per_node") {
+			tree_grid_item.min_examples_per_node = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("min_gain_to_split") {
+			tree_grid_item.min_gain_to_split = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("min_sum_hessians_per_node") {
+			tree_grid_item.min_sum_hessians_per_node = Some(item.extract()?);
+		}
+		if let Ok(item) = ob.get_item("smoothing_factor_for_discrete_bin_sorting") {
+			tree_grid_item.smoothing_factor_for_discrete_bin_sorting = Some(item.extract()?);
+		}
+		Ok(tree_grid_item)
+	}
+}
+
+impl Into<modelfox_core::config::TreeGridItem> for TreeGridItem {
+	fn into(self) -> modelfox_core::config::TreeGridItem {
+		modelfox_core::config::TreeGridItem {
+			binned_features_layout: self.binned_features_layout.map(Into::into),
+			early_stopping_options: self.early_stopping_options.map(Into::into),
+			l2_regularization_for_continuous_splits: self.l2_regularization_for_continuous_splits,
+			l2_regularization_for_discrete_splits: self.l2_regularization_for_discrete_splits,
+			learning_rate: self.learning_rate,
+			max_depth: self.max_depth,
+			max_examples_for_computing_bin_thresholds: self
+				.max_examples_for_computing_bin_thresholds,
+			max_leaf_nodes: self.max_leaf_nodes,
+			max_rounds: self.max_rounds,
+			max_valid_bins_for_number_features: self.max_valid_bins_for_number_features,
+			min_examples_per_node: self.min_examples_per_node,
+			min_gain_to_split: self.min_gain_to_split,
+			min_sum_hessians_per_node: self.min_sum_hessians_per_node,
+			smoothing_factor_for_discrete_bin_sorting: self
+				.smoothing_factor_for_discrete_bin_sorting,
+		}
+	}
+}
+
+#[derive(Debug)]
+enum BinnedFeaturesLayout {
+	RowMajor,
+	ColumnMajor,
+}
+
+impl<'source> FromPyObject<'source> for BinnedFeaturesLayout {
+	fn extract(ob: &'source PyAny) -> PyResult<Self> {
+		let ty: &str = ob.extract()?;
+		match ty {
+			"row_major" => Ok(BinnedFeaturesLayout::RowMajor),
+			"column_major" => Ok(BinnedFeaturesLayout::ColumnMajor),
+			&_ => Err(pyo3::exceptions::PyValueError::new_err(format!(
+				"invalid variant type {}",
+				ty,
+			))),
+		}
+	}
+}
+
+impl Into<modelfox_core::config::BinnedFeaturesLayout> for BinnedFeaturesLayout {
+	fn into(self) -> modelfox_core::config::BinnedFeaturesLayout {
+		match self {
+			BinnedFeaturesLayout::RowMajor => modelfox_core::config::BinnedFeaturesLayout::RowMajor,
+			BinnedFeaturesLayout::ColumnMajor => {
+				modelfox_core::config::BinnedFeaturesLayout::ColumnMajor
+			}
+		}
+	}
+}
+
+#[derive(Debug)]
+struct EarlyStoppingOptions {
+	early_stopping_fraction: f32,
+	n_rounds_without_improvement_to_stop: usize,
+	min_decrease_in_loss_for_significant_change: f32,
+}
+
+impl Default for EarlyStoppingOptions {
+	fn default() -> Self {
+		Self {
+			early_stopping_fraction: 0.1,
+			n_rounds_without_improvement_to_stop: 5,
+			min_decrease_in_loss_for_significant_change: 1e-5,
+		}
+	}
+}
+
+impl<'source> FromPyObject<'source> for EarlyStoppingOptions {
+	fn extract(ob: &'source PyAny) -> PyResult<Self> {
+		let mut early_stopping_options = EarlyStoppingOptions::default();
+		if let Ok(item) = ob.get_item("early_stopping_fraction") {
+			early_stopping_options.early_stopping_fraction = item.extract()?;
+		}
+		if let Ok(item) = ob.get_item("n_rounds_without_improvement_to_stop") {
+			early_stopping_options.n_rounds_without_improvement_to_stop = item.extract()?;
+		}
+		if let Ok(item) = ob.get_item("min_decrease_in_loss_for_significant_change") {
+			early_stopping_options.min_decrease_in_loss_for_significant_change = item.extract()?;
+		}
+		Ok(early_stopping_options)
+	}
+}
+
+impl Into<modelfox_core::config::EarlyStoppingOptions> for EarlyStoppingOptions {
+	fn into(self) -> modelfox_core::config::EarlyStoppingOptions {
+		modelfox_core::config::EarlyStoppingOptions {
+			early_stopping_fraction: self.early_stopping_fraction,
+			n_rounds_without_improvement_to_stop: self.n_rounds_without_improvement_to_stop,
+			min_decrease_in_loss_for_significant_change: self
+				.min_decrease_in_loss_for_significant_change,
+		}
+	}
+}
+
+#[derive(Debug)]
+enum ComparisonMetric {
+	Mae,
+	Mse,
+	Rmse,
+	R2,
+	Accuracy,
+	Auc,
+	F1,
+}
+
+impl<'source> FromPyObject<'source> for ComparisonMetric {
+	fn extract(ob: &'source PyAny) -> PyResult<Self> {
+		let ty: &str = ob.extract()?;
+		match ty {
+			"mae" => Ok(ComparisonMetric::Mae),
+			"mse" => Ok(ComparisonMetric::Mse),
+			"rmse" => Ok(ComparisonMetric::Rmse),
+			"r2" => Ok(ComparisonMetric::R2),
+			"accuracy" => Ok(ComparisonMetric::Accuracy),
+			"auc" => Ok(ComparisonMetric::Auc),
+			"f1" => Ok(ComparisonMetric::F1),
+			&_ => Err(pyo3::exceptions::PyValueError::new_err(format!(
+				"invalid variant type {}",
+				ty,
+			))),
+		}
+	}
+}
+
+impl Into<modelfox_core::config::ComparisonMetric> for ComparisonMetric {
+	fn into(self) -> modelfox_core::config::ComparisonMetric {
+		match self {
+			ComparisonMetric::Mae => modelfox_core::config::ComparisonMetric::Mae,
+			ComparisonMetric::Mse => modelfox_core::config::ComparisonMetric::Mse,
+			ComparisonMetric::Rmse => modelfox_core::config::ComparisonMetric::Rmse,
+			ComparisonMetric::R2 => modelfox_core::config::ComparisonMetric::R2,
+			ComparisonMetric::Accuracy => modelfox_core::config::ComparisonMetric::Accuracy,
+			ComparisonMetric::Auc => modelfox_core::config::ComparisonMetric::Auc,
+			ComparisonMetric::F1 => modelfox_core::config::ComparisonMetric::F1,
+		}
+	}
+}
+
+pub fn array_to_rust(obj: &PyAny) -> PyResult<ArrayRef> {
+	// https://github.com/jorgecarleitao/arrow2/blob/aee543eea6fc6bc9d7b79234d6b8304a84d95fd5/arrow-pyarrow-integration-testing/src/lib.rs
+	let array = Box::new(ffi::Ffi_ArrowArray::empty());
+	let schema = Box::new(ffi::Ffi_ArrowSchema::empty());
+
+	let array_ptr = &*array as *const ffi::Ffi_ArrowArray;
+	let schema_ptr = &*schema as *const ffi::Ffi_ArrowSchema;
+
+	obj.call_method1(
+		"_export_to_c",
+		(array_ptr as Py_uintptr_t, schema_ptr as Py_uintptr_t),
+	)?;
+
+	unsafe {
+		let field = ffi::import_field_from_c(schema.as_ref()).unwrap();
+		let array = ffi::import_array_from_c(array, &field).unwrap();
+		Ok(array.into())
 	}
 }

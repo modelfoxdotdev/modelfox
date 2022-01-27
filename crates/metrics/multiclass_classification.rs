@@ -1,9 +1,11 @@
 use modelfox_zip::zip;
 use ndarray::prelude::*;
 use num::ToPrimitive;
+use serde::Serialize;
 use std::num::NonZeroUsize;
 
 /// MulticlassClassificationMetrics computes common metrics used to evaluate multiclass classifiers.
+#[derive(Debug, Clone)]
 pub struct MulticlassClassificationMetrics {
 	/// The shape of the confusion matrix is (n_classes x n_classes).
 	confusion_matrix: Array2<u64>,
@@ -18,7 +20,7 @@ pub struct MulticlassClassificationMetricsInput<'a> {
 }
 
 /// The output from [`MulticlassClassificationMetrics`].
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize)]
 pub struct MulticlassClassificationMetricsOutput {
 	/// The class metrics contain class specific metrics.
 	pub class_metrics: Vec<ClassMetrics>,
@@ -35,7 +37,7 @@ pub struct MulticlassClassificationMetricsOutput {
 }
 
 /// ClassMetrics are class specific metrics used to evaluate the model's performance on each individual class.
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize)]
 pub struct ClassMetrics {
 	/// This is the total number of examples whose label is equal to this class that the model predicted as belonging to this class.
 	pub true_positives: u64,
