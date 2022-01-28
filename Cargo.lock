@@ -3198,6 +3198,7 @@ dependencies = [
  "serde_json",
  "sqlx",
  "sunfish",
+ "tangram",
  "tangram_app_migrations",
  "tangram_app_monitor_event",
  "tangram_app_production_metrics",

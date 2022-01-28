@@ -1,5 +1,4 @@
 use anyhow::{anyhow, bail, Result};
-use lettre::AsyncTransport;
 use sqlx::prelude::*;
 use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
@@ -8,7 +7,7 @@ use tangram_app_core::{
 	path_components,
 	user::NormalUser,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
-	App,
+	App, Mailer,
 };
 use tangram_id::Id;
 use url::Url;
@@ -32,11 +31,11 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	if !app.options().auth_enabled() {
 		return Ok(not_found());
 	}
-	let mut db = match app.begin_transaction().await {
+	let mut txn = match app.begin_transaction().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
-	let user = match authorize_normal_user(request, &mut db).await? {
+	let user = match authorize_normal_user(request, &mut txn).await? {
 		Ok(user) => user,
 		Err(_) => return Ok(unauthorized()),
 	};
@@ -44,7 +43,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(organization_id) => organization_id,
 		Err(_) => return Ok(bad_request()),
 	};
-	if !authorize_normal_user_for_organization(&mut db, &user, organization_id).await? {
+	if !authorize_normal_user_for_organization(&mut txn, &user, organization_id).await? {
 		return Ok(not_found());
 	};
 	let data = match hyper::body::to_bytes(request.body_mut()).await {
@@ -55,8 +54,8 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(action) => action,
 		Err(_) => return Ok(bad_request()),
 	};
-	let response = add_member(action, user, &mut db, app, organization_id).await?;
-	app.commit_transaction(db).await?;
+	let response = add_member(action, user, &mut txn, app, organization_id).await?;
+	app.commit_transaction(txn).await?;
 	Ok(response)
 }
 
@@ -122,12 +121,14 @@ async fn add_member(
 			.url
 			.clone()
 			.ok_or_else(|| anyhow!("url option is required when smtp is enabled"))?;
-		tokio::spawn(send_invitation_email(
-			smtp_transport,
-			action.email.clone(),
-			user.email.clone(),
-			url,
-		));
+		tokio::spawn({
+			send_invitation_email(
+				smtp_transport,
+				action.email.clone(),
+				user.email.clone(),
+				url,
+			)
+		});
 	}
 	let response = http::Response::builder()
 		.status(http::StatusCode::SEE_OTHER)
@@ -141,7 +142,7 @@ async fn add_member(
 }
 
 async fn send_invitation_email(
-	smtp_transport: lettre::AsyncSmtpTransport<lettre::Tokio1Executor>,
+	smtp_transport: Mailer,
 	invitee_email: String,
 	inviter_email: String,
 	url: Url,

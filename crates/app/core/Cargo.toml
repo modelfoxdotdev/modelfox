@@ -10,6 +10,7 @@ path = "lib.rs"
 
 [dev-dependencies]
 insta = "1"
+tangram = { path = "../../../languages/rust" }
 tracing-test = "0.2"
 
 [dependencies]

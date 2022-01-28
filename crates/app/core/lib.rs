@@ -43,8 +43,20 @@ pub struct AppState {
 	pub clock: Clock,
 	pub database_pool: sqlx::AnyPool,
 	pub options: Options,
-	pub smtp_transport: Option<lettre::AsyncSmtpTransport<lettre::Tokio1Executor>>,
+	pub smtp_transport: Option<Mailer>,
 	pub storage: Storage,
+}
+
+#[derive(Debug, Clone)]
+pub enum Mailer {
+	Production(lettre::AsyncSmtpTransport<lettre::Tokio1Executor>),
+	Testing(lettre::transport::stub::StubTransport),
+}
+
+impl Mailer {
+	pub async fn send(&self, _email: lettre::Message) -> Result<()> {
+		todo!()
+	}
 }
 
 struct CreateDatabasePoolOptions {
@@ -154,11 +166,11 @@ impl App {
 		}
 		// Create the smtp transport.
 		let smtp_transport = if let Some(smtp) = options.smtp.as_ref() {
-			Some(
+			Some(Mailer::Production(
 				lettre::AsyncSmtpTransport::<lettre::Tokio1Executor>::relay(&smtp.host)?
 					.credentials((&smtp.username, &smtp.password).into())
 					.build(),
-			)
+			))
 		} else {
 			None
 		};
@@ -216,7 +228,7 @@ impl App {
 		Ok(())
 	}
 
-	pub fn smtp_transport(&self) -> Option<&lettre::AsyncSmtpTransport<lettre::Tokio1Executor>> {
+	pub fn smtp_transport(&self) -> Option<&Mailer> {
 		self.state.smtp_transport.as_ref()
 	}
 }

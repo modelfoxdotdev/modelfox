@@ -1,12 +1,14 @@
 use crate::page::{Page, Stage};
 use anyhow::Result;
-use lettre::AsyncTransport;
 use pinwheel::prelude::*;
 use rand::Rng;
 use sqlx::prelude::*;
 use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
-use tangram_app_core::error::{bad_request, service_unavailable};
+use tangram_app_core::{
+	error::{bad_request, service_unavailable},
+	Mailer,
+};
 use tangram_id::Id;
 
 #[derive(serde::Deserialize)]
@@ -208,11 +210,7 @@ fn set_cookie_header_value(token: Id, domain: Option<&str>) -> String {
 	)
 }
 
-async fn send_code_email(
-	smtp_transport: &lettre::AsyncSmtpTransport<lettre::Tokio1Executor>,
-	email: String,
-	code: String,
-) -> Result<()> {
+async fn send_code_email(smtp_transport: &Mailer, email: String, code: String) -> Result<()> {
 	let email = lettre::Message::builder()
 		.from("Tangram <noreply@tangram.dev>".parse()?)
 		.to(email.parse()?)
