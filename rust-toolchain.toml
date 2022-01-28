@@ -1,3 +1,9 @@
 [toolchain]
-channel = "stable"
+
+# New Rust versions can introduce new Clippy lints, which can spuriously cause
+# the build to fail---so we pin the latest stable version here, and fix any new 
+# lints when we manually upgrade to the latest Rust version.
+channel = "1.58.1"
+
+# Install the wasm target so we can build the web frontend
 targets = [ "wasm32-unknown-unknown" ]
