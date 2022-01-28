@@ -42,7 +42,7 @@ struct DatasetConfig {
 }
 
 const HEART_DISEASE: DatasetConfig = DatasetConfig {
-	path: "data/heart_disease.csv",
+	path: "heart_disease.csv",
 	model_path: "heart_disease.tangram",
 	name: "heart_disease",
 	target: "diagnosis",

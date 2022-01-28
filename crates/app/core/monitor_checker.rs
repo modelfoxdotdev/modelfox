@@ -531,6 +531,7 @@ mod test {
 			.await
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
+		dbg!(&all_alerts);
 		assert_eq!(all_alerts.len(), 1);
 
 		// Scroll to one day, check that daily alert is created

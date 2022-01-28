@@ -67,7 +67,7 @@ pub async fn init_heart_disease_model(app: &App) -> Result<Id> {
 pub async fn seed_events(app: &App, examples_count: usize, model_id: Id) -> Result<()> {
 	let target = "diagnosis";
 	let class_names = Some(&["Negative", "Positive"]);
-	let data_path = workspace_root().join("data").join("heart_disease.csv");
+	let data_path = workspace_root().join("heart_disease.csv");
 	let table = tangram_table::Table::from_path(&data_path, Default::default(), &mut |_| {})?;
 	let mut idx = 0;
 	let events: Vec<MonitorEvent> = (0..examples_count)
@@ -231,7 +231,7 @@ enum Diagnosis {
 }
 /// Returns the ID of the prediction as well as the predicted value
 pub async fn seed_single_prediction_event(app: &App, model_id: Id) -> Result<(Id, String)> {
-	let data_path = workspace_root().join("data").join("heart_disease.csv");
+	let data_path = workspace_root().join("heart_disease.csv");
 	let table = tangram_table::Table::from_path(&data_path, Default::default(), &mut |_| {})?;
 
 	let id = Id::generate();
@@ -366,8 +366,8 @@ pub async fn seed_monitors(app: &App, model_id: Id) -> Result<()> {
 			threshold: MonitorThreshold {
 				metric: AlertMetric::Accuracy,
 				mode: MonitorThresholdMode::Absolute,
-				difference_lower: Some(0.5),
-				difference_upper: Some(0.5),
+				difference_lower: Some(0.1),
+				difference_upper: Some(0.1),
 			},
 			title: None,
 		},
@@ -376,7 +376,7 @@ pub async fn seed_monitors(app: &App, model_id: Id) -> Result<()> {
 			threshold: MonitorThreshold {
 				metric: AlertMetric::Accuracy,
 				mode: MonitorThresholdMode::Percentage,
-				difference_lower: Some(0.3),
+				difference_lower: Some(20.0),
 				difference_upper: None,
 			},
 			title: None,
