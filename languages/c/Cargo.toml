@@ -10,6 +10,7 @@ version = "0.7.0"
 crate-type = ["cdylib", "staticlib"]
 name = "tangram"
 path = "lib.rs"
+doc = false
 
 [dependencies]
 libc = "0.2.91"
