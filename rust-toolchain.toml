@@ -5,5 +5,7 @@
 # lints when we manually upgrade to the latest Rust version.
 channel = "1.58.1"
 
+components = [ "clippy", "rustfmt" ]
+
 # Install the wasm target so we can build the web frontend
 targets = [ "wasm32-unknown-unknown" ]
