@@ -266,11 +266,8 @@ impl UnknownProductionColumnStats {
 	pub fn update(&mut self, value: Option<&serde_json::Value>) {
 		self.row_count += 1;
 		match value {
-			None => {
+			None | Some(serde_json::Value::Null) => {
 				self.absent_count += 1;
-			}
-			Some(serde_json::Value::Null) => {
-				self.invalid_count += 1;
 			}
 			Some(serde_json::Value::String(value)) if value.is_empty() => {
 				self.invalid_count += 1;
@@ -308,10 +305,11 @@ impl NumberProductionColumnStats {
 	pub fn update(&mut self, value: Option<&serde_json::Value>) {
 		self.row_count += 1;
 		let value = match value {
-			None => {
+			None | Some(serde_json::Value::Null) => {
 				self.absent_count += 1;
 				return;
 			}
+
 			Some(serde_json::Value::String(value)) => match value.parse() {
 				Ok(value) => value,
 				Err(_) => {
@@ -319,6 +317,7 @@ impl NumberProductionColumnStats {
 					return;
 				}
 			},
+
 			Some(serde_json::Value::Number(value)) => match value.as_f64() {
 				Some(value) => value.to_f32().unwrap(),
 				None => {
@@ -326,14 +325,12 @@ impl NumberProductionColumnStats {
 					return;
 				}
 			},
+
 			Some(serde_json::Value::Bool(_)) => {
 				self.invalid_count += 1;
 				return;
 			}
-			Some(serde_json::Value::Null) => {
-				self.invalid_count += 1;
-				return;
-			}
+
 			_ => {
 				self.invalid_count += 1;
 				return;
@@ -392,10 +389,11 @@ impl EnumProductionColumnStats {
 	pub fn update(&mut self, value: Option<&serde_json::Value>) {
 		self.row_count += 1;
 		let value = match value {
-			None => {
+			None | Some(serde_json::Value::Null) => {
 				self.absent_count += 1;
 				return;
 			}
+
 			Some(serde_json::Value::Number(_)) => {
 				self.invalid_count += 1;
 				return;
@@ -403,10 +401,7 @@ impl EnumProductionColumnStats {
 			Some(serde_json::Value::Bool(true)) => "true",
 			Some(serde_json::Value::Bool(false)) => "false",
 			Some(serde_json::Value::String(value)) => value,
-			Some(serde_json::Value::Null) => {
-				self.invalid_count += 1;
-				return;
-			}
+
 			_ => {
 				self.invalid_count += 1;
 				return;
@@ -490,7 +485,7 @@ impl TextProductionColumnStats {
 		self.row_count += 1;
 		let value = match value {
 			Some(serde_json::Value::String(value)) => value,
-			None => {
+			None | Some(serde_json::Value::Null) => {
 				self.absent_count += 1;
 				return;
 			}
