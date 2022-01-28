@@ -89,6 +89,37 @@
           (targets.x86_64-pc-windows-gnu.toolchainOf toolchain).rust-std
           (targets.x86_64-pc-windows-msvc.toolchainOf toolchain).rust-std
         ]);
+      windows_sdk_packages = pkgs.runCommand "packages"
+        {
+          nativeBuildInputs = with pkgs; [
+            (inputs.windows_sdk.defaultPackage.${system})
+          ];
+          outputHashMode = "recursive";
+          outputHash = "sha256-jrOGFuXPNjw8NqZQTz7Xl99LGfFBkwRcy+xuY7D6TYk=";
+        }
+        ''
+          windows_sdk \
+            choose-packages \
+            --manifest ${./scripts/windows_sdk.vsman} \
+            --package Microsoft.VisualStudio.VC.Llvm.Clang \
+            --package Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
+            --package Microsoft.VisualStudio.Component.Windows10SDK.19041 \
+            --output $out
+        '';
+      windows_sdk_cache = pkgs.runCommand "packages"
+        {
+          nativeBuildInputs = with pkgs; [
+            (inputs.windows_sdk.defaultPackage.${system})
+          ];
+          outputHashMode = "recursive";
+          outputHash = "sha256-NcIMWa6qG8IZWRPIadvrWK167A9wj8TPmXkAplM1X4c=";
+        }
+        ''
+          windows_sdk \
+            download-packages \
+            --packages ${windows_sdk_packages} \
+            --cache $out
+        '';
       windows_sdk = pkgs.runCommand "windows_sdk"
         {
           nativeBuildInputs = with pkgs; [
@@ -98,23 +129,10 @@
           outputHash = "sha256-aTl/4x7qiJGGTLO+JH4z1uyrAiCMF8iWqRIDNrtS73E=";
         }
         ''
-          PACKAGES=$(mktemp)
-          CACHE=$(mktemp -d)
-          windows_sdk \
-            choose-packages \
-            --manifest ${./scripts/windows_sdk.vsman} \
-            --package Microsoft.VisualStudio.VC.Llvm.Clang \
-            --package Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
-            --package Microsoft.VisualStudio.Component.Windows10SDK.19041 \
-            --output $PACKAGES
-          windows_sdk \
-            download-packages \
-            --packages $PACKAGES \
-            --cache $CACHE
           windows_sdk \
             extract-packages \
-            --packages $PACKAGES \
-            --cache $CACHE \
+            --packages ${windows_sdk_packages} \
+            --cache ${windows_sdk_cache} \
             --output $out
         '';
       macos_sdk = builtins.fetchTarball {
