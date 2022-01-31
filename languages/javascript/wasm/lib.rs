@@ -1,3 +1,8 @@
+// wasm_bindgen generates some code in their proc macro that contains unused unit expressions.
+// This has been fixed in https://github.com/rustwasm/wasm-bindgen/issues/2774 , but not yet
+// released.
+#![allow(clippy::unused_unit)]
+
 use std::collections::BTreeMap;
 use wasm_bindgen::{prelude::*, JsValue};
 
