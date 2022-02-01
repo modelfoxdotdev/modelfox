@@ -7,7 +7,7 @@ use tangram_app_core::{
 	path_components,
 	user::NormalUser,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
-	App, Mailer,
+	App,
 };
 use tangram_id::Id;
 use url::Url;
@@ -54,7 +54,14 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(action) => action,
 		Err(_) => return Ok(bad_request()),
 	};
-	let response = add_member(action, user, &mut txn, app, organization_id).await?;
+	let response = add_member(
+		action,
+		user,
+		&mut txn,
+		Arc::clone(&context),
+		organization_id,
+	)
+	.await?;
 	app.commit_transaction(txn).await?;
 	Ok(response)
 }
@@ -63,7 +70,7 @@ async fn add_member(
 	action: Action,
 	user: NormalUser,
 	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
-	app: &App,
+	context: Arc<Context>,
 	organization_id: Id,
 ) -> Result<http::Response<hyper::Body>> {
 	// Create the new user.
@@ -115,21 +122,13 @@ async fn add_member(
 	.execute(txn.borrow_mut())
 	.await?;
 	// Send the new user an invitation email.
-	if let Some(smtp_transport) = app.state.smtp_transport.clone() {
-		let url = app
-			.options()
-			.url
-			.clone()
-			.ok_or_else(|| anyhow!("url option is required when smtp is enabled"))?;
-		tokio::spawn({
-			send_invitation_email(
-				smtp_transport,
-				action.email.clone(),
-				user.email.clone(),
-				url,
-			)
-		});
-	}
+	let url = context
+		.app
+		.options()
+		.url
+		.clone()
+		.ok_or_else(|| anyhow!("url option is required when smtp is enabled"))?;
+	send_invitation_email(&context.app, action.email.clone(), user.email.clone(), url).await?;
 	let response = http::Response::builder()
 		.status(http::StatusCode::SEE_OTHER)
 		.header(
@@ -142,7 +141,7 @@ async fn add_member(
 }
 
 async fn send_invitation_email(
-	smtp_transport: Mailer,
+	app: &App,
 	invitee_email: String,
 	inviter_email: String,
 	url: Url,
@@ -158,6 +157,6 @@ async fn send_invitation_email(
 			"{} invited you to join their team on Tangram. Click the link below to login.\n\n{}",
 			inviter_email, href
 		))?;
-	smtp_transport.send(email).await?;
+	app.send_email(email).await;
 	Ok(())
 }

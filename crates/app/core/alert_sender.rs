@@ -87,3 +87,46 @@ impl App {
 		Ok(())
 	}
 }
+/*
+#[cfg(test)]
+mod test {
+	use super::*;
+	use crate::{
+		alert::{AlertMethod, AlertMetric},
+		monitor::{MonitorCadence, MonitorThreshold, MonitorThresholdMode},
+		monitor_checker::MonitorConfig,
+		test_common::*,
+	};
+	use tracing_test::traced_test;
+	#[tokio::test]
+	#[traced_test]
+	async fn test_alert_email_send() {
+		// Seed app, generate an alert, assert the email is sent
+		let app = init_test_app().await.unwrap();
+		app.clock().resume();
+		let model_id = init_heart_disease_model(&app).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		let test_monitor = MonitorConfig {
+			cadence: MonitorCadence::Hourly,
+			threshold: MonitorThreshold {
+				metric: AlertMetric::Accuracy,
+				mode: MonitorThresholdMode::Absolute,
+				difference_lower: Some(0.05),
+				difference_upper: Some(0.05),
+			},
+			title: None,
+			methods: vec![AlertMethod::Email("ben@tangram.dev".to_owned())],
+		};
+		seed_single_monitor(&app, &test_monitor, model_id)
+			.await
+			.unwrap();
+		seed_events(&app, 100, model_id).await.unwrap();
+		app.clock().pause();
+		app.clock()
+			.advance(std::time::Duration::from_secs(60 * 60))
+			.await;
+		app.clock().resume();
+		app.check_monitors().await.unwrap();
+	}
+}
+*/

@@ -5,7 +5,7 @@ use num::ToPrimitive;
 use rand::Rng;
 use std::{collections::HashMap, path::Path};
 use tangram_app_core::{
-	alert::AlertMetric,
+	alert::{AlertMethod, AlertMetric},
 	monitor::{MonitorCadence, MonitorThreshold, MonitorThresholdMode},
 	monitor_checker::MonitorConfig,
 	reset_data, App,
@@ -141,6 +141,7 @@ fn generate_fake_monitors() -> Vec<MonitorConfig> {
 				difference_upper: Some(0.5),
 			},
 			title: None,
+			methods: vec![AlertMethod::Stdout],
 		},
 		MonitorConfig {
 			cadence: MonitorCadence::Daily,
@@ -151,6 +152,7 @@ fn generate_fake_monitors() -> Vec<MonitorConfig> {
 				difference_upper: None,
 			},
 			title: None,
+			methods: vec![AlertMethod::Stdout],
 		},
 		MonitorConfig {
 			cadence: MonitorCadence::Weekly,
@@ -161,6 +163,7 @@ fn generate_fake_monitors() -> Vec<MonitorConfig> {
 				difference_upper: Some(0.1),
 			},
 			title: None,
+			methods: vec![AlertMethod::Stdout],
 		},
 		MonitorConfig {
 			cadence: MonitorCadence::Monthly,
@@ -171,6 +174,7 @@ fn generate_fake_monitors() -> Vec<MonitorConfig> {
 				difference_upper: Some(0.1),
 			},
 			title: None,
+			methods: vec![AlertMethod::Stdout],
 		},
 	]
 }

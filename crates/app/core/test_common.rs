@@ -1,7 +1,7 @@
 //! Functionality used to test core app components.
 
 use crate::{
-	alert::AlertMetric,
+	alert::{AlertMethod, AlertMetric},
 	model::get_model_bytes,
 	monitor::{MonitorCadence, MonitorThreshold, MonitorThresholdMode},
 	monitor_checker::MonitorConfig,
@@ -370,6 +370,7 @@ pub async fn seed_monitors(app: &App, model_id: Id) -> Result<()> {
 				difference_upper: Some(0.1),
 			},
 			title: None,
+			methods: vec![AlertMethod::Stdout],
 		},
 		MonitorConfig {
 			cadence: MonitorCadence::Daily,
@@ -380,6 +381,7 @@ pub async fn seed_monitors(app: &App, model_id: Id) -> Result<()> {
 				difference_upper: None,
 			},
 			title: None,
+			methods: vec![AlertMethod::Stdout],
 		},
 		MonitorConfig {
 			cadence: MonitorCadence::Weekly,
@@ -390,6 +392,7 @@ pub async fn seed_monitors(app: &App, model_id: Id) -> Result<()> {
 				difference_upper: Some(0.1),
 			},
 			title: None,
+			methods: vec![AlertMethod::Stdout],
 		},
 		MonitorConfig {
 			cadence: MonitorCadence::Monthly,
@@ -400,6 +403,7 @@ pub async fn seed_monitors(app: &App, model_id: Id) -> Result<()> {
 				difference_upper: Some(0.1),
 			},
 			title: None,
+			methods: vec![AlertMethod::Stdout],
 		},
 	];
 	for monitor_config in monitor_configs {

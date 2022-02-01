@@ -242,7 +242,7 @@ impl App {
 		self.create_monitor(CreateMonitorArgs {
 			db: &mut txn,
 			cadence: config.cadence,
-			methods: vec![AlertMethod::Stdout].as_slice(),
+			methods: config.methods.as_slice(),
 			model_id,
 			threshold: config.threshold,
 			title,
@@ -319,6 +319,7 @@ pub struct MonitorConfig {
 	pub cadence: MonitorCadence,
 	pub threshold: MonitorThreshold,
 	pub title: Option<String>,
+	pub methods: Vec<AlertMethod>,
 }
 
 pub async fn bring_monitor_up_to_date(app: &AppState, monitor: &Monitor) -> Result<()> {
@@ -548,7 +549,6 @@ mod test {
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
 		// 2x hourly
-		dbg!(&all_alerts);
 		assert_eq!(all_alerts.len(), 2);
 
 		// Add six more days, check that weekly alert is created
@@ -586,7 +586,7 @@ mod test {
 
 	#[tokio::test]
 	#[traced_test]
-	async fn test_resolve_monitor() {
+	async fn test_resolve_monitor_lower_absolute() {
 		// start an app, seed event, seed monitor, assert alert.
 		let app = init_test_app().await.unwrap();
 		app.clock().resume();
@@ -601,9 +601,10 @@ mod test {
 				metric: AlertMetric::Accuracy,
 				mode: MonitorThresholdMode::Absolute,
 				difference_lower: Some(0.1),
-				difference_upper: Some(0.1),
+				difference_upper: None,
 			},
 			title: None,
+			methods: vec![AlertMethod::Stdout],
 		};
 		seed_single_monitor(&app, &test_monitor, model_id)
 			.await
@@ -648,7 +649,215 @@ mod test {
 			.await
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
-		dbg!(&all_alerts);
+		assert_eq!(all_alerts.len(), 1);
+	}
+
+	#[tokio::test]
+	#[traced_test]
+	async fn test_resolve_monitor_upper_absolute() {
+		// start an app, seed event, seed monitor, assert alert.
+		let app = init_test_app().await.unwrap();
+		app.clock().resume();
+
+		let model_id = init_heart_disease_model(&app).await.unwrap();
+
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+
+		let test_monitor = MonitorConfig {
+			cadence: MonitorCadence::Hourly,
+			threshold: MonitorThreshold {
+				metric: AlertMetric::Accuracy,
+				mode: MonitorThresholdMode::Absolute,
+				difference_lower: None,
+				difference_upper: Some(0.12),
+			},
+			title: None,
+			methods: vec![AlertMethod::Stdout],
+		};
+		seed_single_monitor(&app, &test_monitor, model_id)
+			.await
+			.unwrap();
+
+		// scroll time, assert first heartbeat generates alert
+		app.clock().pause();
+		app.clock()
+			.advance(std::time::Duration::from_secs(60 * 60))
+			.await;
+		app.clock().resume();
+		app.check_monitors().await.unwrap();
+		let mut txn = app.begin_transaction().await.unwrap();
+		let all_alerts = app
+			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
+			.await
+			.unwrap();
+		app.commit_transaction(txn).await.unwrap();
+		assert_eq!(all_alerts.len(), 1);
+
+		//seed further event that should address monitor
+		// The following produces a production_value of 0.88 repeating
+		seed_monitor_event_pair(&app, model_id, false)
+			.await
+			.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+
+		// scroll to next heartbeat, assert no new alert is created.
+		app.clock().pause();
+		app.clock()
+			.advance(std::time::Duration::from_secs(60 * 60))
+			.await;
+		app.clock().resume();
+		app.check_monitors().await.unwrap();
+		let mut txn = app.begin_transaction().await.unwrap();
+		let all_alerts = app
+			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
+			.await
+			.unwrap();
+		app.commit_transaction(txn).await.unwrap();
+		assert_eq!(all_alerts.len(), 1);
+	}
+
+	#[tokio::test]
+	#[traced_test]
+	async fn test_resolve_monitor_lower_percentage() {
+		// start an app, seed event, seed monitor, assert alert.
+		let app = init_test_app().await.unwrap();
+		app.clock().resume();
+
+		let model_id = init_heart_disease_model(&app).await.unwrap();
+
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+
+		let test_monitor = MonitorConfig {
+			cadence: MonitorCadence::Hourly,
+			threshold: MonitorThreshold {
+				metric: AlertMetric::Accuracy,
+				mode: MonitorThresholdMode::Percentage,
+				difference_lower: Some(15.0),
+				difference_upper: None,
+			},
+			title: None,
+			methods: vec![AlertMethod::Stdout],
+		};
+		seed_single_monitor(&app, &test_monitor, model_id)
+			.await
+			.unwrap();
+
+		// scroll time, assert first heartbeat generates alert
+		app.clock().pause();
+		app.clock()
+			.advance(std::time::Duration::from_secs(60 * 60))
+			.await;
+		app.clock().resume();
+		app.check_monitors().await.unwrap();
+		let mut txn = app.begin_transaction().await.unwrap();
+		let all_alerts = app
+			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
+			.await
+			.unwrap();
+		app.commit_transaction(txn).await.unwrap();
+		assert_eq!(all_alerts.len(), 1);
+
+		//seed further event that should address monitor
+		// The following produces a production_value of 0.8333 repeating
+		seed_monitor_event_pair(&app, model_id, false)
+			.await
+			.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+
+		// scroll to next heartbeat, assert no new alert is created.
+		app.clock().pause();
+		app.clock()
+			.advance(std::time::Duration::from_secs(60 * 60))
+			.await;
+		app.clock().resume();
+		app.check_monitors().await.unwrap();
+		let mut txn = app.begin_transaction().await.unwrap();
+		let all_alerts = app
+			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
+			.await
+			.unwrap();
+		app.commit_transaction(txn).await.unwrap();
+		assert_eq!(all_alerts.len(), 1);
+	}
+
+	#[tokio::test]
+	#[traced_test]
+	async fn test_resolve_monitor_upper_percentage() {
+		// start an app, seed event, seed monitor, assert alert.
+		let app = init_test_app().await.unwrap();
+		app.clock().resume();
+
+		let model_id = init_heart_disease_model(&app).await.unwrap();
+
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+
+		let test_monitor = MonitorConfig {
+			cadence: MonitorCadence::Hourly,
+			threshold: MonitorThreshold {
+				metric: AlertMetric::Accuracy,
+				mode: MonitorThresholdMode::Percentage,
+				difference_lower: None,
+				difference_upper: Some(15.0),
+			},
+			title: None,
+			methods: vec![AlertMethod::Stdout],
+		};
+		seed_single_monitor(&app, &test_monitor, model_id)
+			.await
+			.unwrap();
+
+		// scroll time, assert first heartbeat generates alert
+		app.clock().pause();
+		app.clock()
+			.advance(std::time::Duration::from_secs(60 * 60))
+			.await;
+		app.clock().resume();
+		app.check_monitors().await.unwrap();
+		let mut txn = app.begin_transaction().await.unwrap();
+		let all_alerts = app
+			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
+			.await
+			.unwrap();
+		app.commit_transaction(txn).await.unwrap();
+		assert_eq!(all_alerts.len(), 1);
+
+		//seed further event that should address monitor
+		// The following produces a production_value of 0.875
+		seed_monitor_event_pair(&app, model_id, false)
+			.await
+			.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
+
+		// scroll to next heartbeat, assert no new alert is created.
+		app.clock().pause();
+		app.clock()
+			.advance(std::time::Duration::from_secs(60 * 60))
+			.await;
+		app.clock().resume();
+		app.check_monitors().await.unwrap();
+		let mut txn = app.begin_transaction().await.unwrap();
+		let all_alerts = app
+			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
+			.await
+			.unwrap();
+		app.commit_transaction(txn).await.unwrap();
 		assert_eq!(all_alerts.len(), 1);
 	}
 }

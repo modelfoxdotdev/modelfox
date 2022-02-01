@@ -6,6 +6,7 @@ use crate::{
 	storage::{LocalStorage, S3Storage, Storage},
 };
 use anyhow::{anyhow, bail, Result};
+use lettre::AsyncTransport;
 use sqlx::postgres::PgPoolOptions;
 use std::{path::PathBuf, sync::Arc};
 use storage::InMemoryStorage;
@@ -33,7 +34,7 @@ pub mod user;
 pub mod test_common;
 
 pub struct App {
-	pub state: Arc<AppState>,
+	state: Arc<AppState>,
 	monitor_checker_sender: mpsc::UnboundedSender<MonitorCheckerMessage>,
 	alert_sender_sender: mpsc::UnboundedSender<AlertSenderMessage>,
 }
@@ -54,8 +55,16 @@ pub enum Mailer {
 }
 
 impl Mailer {
-	pub async fn send(&self, _email: lettre::Message) -> Result<()> {
-		todo!()
+	pub async fn send(&self, email: lettre::Message) -> Result<()> {
+		match self {
+			Mailer::Production(transport) => {
+				transport.send(email).await?;
+			}
+			Mailer::Testing(transport) => {
+				transport.send(email).await?;
+			}
+		};
+		Ok(())
 	}
 }
 
@@ -228,8 +237,20 @@ impl App {
 		Ok(())
 	}
 
-	pub fn smtp_transport(&self) -> Option<&Mailer> {
-		self.state.smtp_transport.as_ref()
+	pub async fn db_acquire(&self) -> Result<sqlx::pool::PoolConnection<sqlx::Any>> {
+		Ok(self.state.database_pool.acquire().await?)
+	}
+
+	pub async fn send_email(&self, message: lettre::Message) {
+		if let Some(smtp_transport) = self.smtp_transport() {
+			tokio::spawn(async move { smtp_transport.send(message).await.unwrap() });
+		} else {
+			tracing::info!("App attempted to send email, but no smtp_transport is configured.");
+		}
+	}
+
+	pub fn smtp_transport(&self) -> Option<Mailer> {
+		self.state.smtp_transport.clone()
 	}
 }
 

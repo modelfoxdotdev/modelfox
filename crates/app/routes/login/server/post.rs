@@ -7,7 +7,7 @@ use std::{borrow::BorrowMut, sync::Arc};
 use tangram_app_context::Context;
 use tangram_app_core::{
 	error::{bad_request, service_unavailable},
-	Mailer,
+	App,
 };
 use tangram_id::Id;
 
@@ -29,7 +29,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Ok(data) => data,
 		Err(_) => return Ok(bad_request()),
 	};
-	let mut db = match app.begin_transaction().await {
+	let mut txn = match app.begin_transaction().await {
 		Ok(db) => db,
 		Err(_) => return Ok(service_unavailable()),
 	};
@@ -47,7 +47,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	)
 	.bind(&user_id.to_string())
 	.bind(&email)
-	.execute(db.borrow_mut())
+	.execute(txn.borrow_mut())
 	.await?;
 	// Retrieve the user's id.
 	let user_id: String = sqlx::query(
@@ -60,7 +60,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		",
 	)
 	.bind(&email)
-	.fetch_one(db.borrow_mut())
+	.fetch_one(txn.borrow_mut())
 	.await?
 	.get(0);
 	let user_id: Id = user_id.parse()?;
@@ -87,7 +87,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			.bind(&ten_minutes_in_seconds)
 			.bind(&email)
 			.bind(&code)
-			.fetch_optional(db.borrow_mut())
+			.fetch_optional(txn.borrow_mut())
 			.await?;
 			let row = if let Some(row) = row {
 				row
@@ -116,7 +116,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				",
 			)
 			.bind(&code_id.to_string())
-			.execute(&mut db)
+			.execute(txn.borrow_mut())
 			.await?;
 		} else {
 			// Generate a code and redirect back to the login form.
@@ -138,12 +138,10 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			.bind(false)
 			.bind(&user_id.to_string())
 			.bind(&code)
-			.execute(db.borrow_mut())
+			.execute(txn.borrow_mut())
 			.await?;
-			if let Some(smtp_transport) = app.smtp_transport() {
-				send_code_email(smtp_transport, email.clone(), code).await?;
-			}
-			db.commit().await?;
+			send_code_email(app, email.clone(), code).await?;
+			app.commit_transaction(txn).await?;
 			let response = http::Response::builder()
 				.status(http::StatusCode::SEE_OTHER)
 				.header(
@@ -154,8 +152,8 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			return Ok(response);
 		}
 	}
-	let token = create_token(&mut db, user_id).await?;
-	db.commit().await?;
+	let token = create_token(txn.borrow_mut(), user_id).await?;
+	app.commit_transaction(txn).await?;
 	let set_cookie = set_cookie_header_value(token, app.options().cookie_domain.as_deref());
 	let response = http::Response::builder()
 		.status(http::StatusCode::SEE_OTHER)
@@ -210,12 +208,12 @@ fn set_cookie_header_value(token: Id, domain: Option<&str>) -> String {
 	)
 }
 
-async fn send_code_email(smtp_transport: &Mailer, email: String, code: String) -> Result<()> {
+async fn send_code_email(app: &App, email: String, code: String) -> Result<()> {
 	let email = lettre::Message::builder()
 		.from("Tangram <noreply@tangram.dev>".parse()?)
 		.to(email.parse()?)
 		.subject("Tangram Login Code")
 		.body(format!("Your Tangram login code is {}.", code))?;
-	smtp_transport.send(email).await?;
+	app.send_email(email).await;
 	Ok(())
 }
