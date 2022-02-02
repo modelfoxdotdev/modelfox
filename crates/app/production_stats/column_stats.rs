@@ -129,14 +129,14 @@ impl ProductionColumnStats {
 				let stats = stats.read();
 				let name = stats.column_name();
 
-				// Figure out which values this enum can take by reading them out of the model
-				let known_values = stats
+				// Read the list of this enum's variants out of the model
+				let known_variants = stats
 					.histogram()
 					.iter()
 					.map(|(value, _)| value) // Get the value, ignore the histogram count
 					.collect::<Vec<_>>();
 
-				ProductionColumnStats::Enum(EnumProductionColumnStats::new(name, &known_values))
+				ProductionColumnStats::Enum(EnumProductionColumnStats::new(name, &known_variants))
 			}
 		}
 	}
@@ -369,9 +369,9 @@ impl NumberProductionColumnStats {
 }
 
 impl EnumProductionColumnStats {
-	pub fn new(name: &str, known_values: &[&str]) -> EnumProductionColumnStats {
+	pub fn new(name: &str, known_variants: &[&str]) -> EnumProductionColumnStats {
 		// Make an empty histogram, using the values we know about.
-		let histogram = known_values
+		let histogram = known_variants
 			.into_iter()
 			.map(|value| (value.to_string(), 0))
 			.collect();
@@ -635,8 +635,8 @@ mod tests {
 	/// (Regression test for https://github.com/tangramdotdev/tangram/issues/85)
 	#[test]
 	fn null_enum_is_absent() {
-		let enum_values = &["some", "values", "for", "the", "enum"];
-		let mut stat = EnumProductionColumnStats::new("enum_stat", enum_values);
+		let enum_variants = &["the", "variants", "of", "the", "enum"];
+		let mut stat = EnumProductionColumnStats::new("enum_stat", enum_variants);
 
 		// Update the stat with `null`
 		stat.update(Some(&Value::Null));
