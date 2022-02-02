@@ -130,13 +130,13 @@ impl ProductionColumnStats {
 				let name = stats.column_name();
 
 				// Read the list of this enum's variants out of the model
-				let known_variants = stats
+				let variants = stats
 					.histogram()
 					.iter()
 					.map(|(value, _)| value) // Get the value, ignore the histogram count
 					.collect::<Vec<_>>();
 
-				ProductionColumnStats::Enum(EnumProductionColumnStats::new(name, &known_variants))
+				ProductionColumnStats::Enum(EnumProductionColumnStats::new(name, &variants))
 			}
 		}
 	}
@@ -369,9 +369,9 @@ impl NumberProductionColumnStats {
 }
 
 impl EnumProductionColumnStats {
-	pub fn new(name: &str, known_variants: &[&str]) -> EnumProductionColumnStats {
+	pub fn new(name: &str, variants: &[&str]) -> EnumProductionColumnStats {
 		// Make an empty histogram, using the values we know about.
-		let histogram = known_variants
+		let histogram = variants
 			.iter()
 			.map(|value| (value.to_string(), 0))
 			.collect();
