@@ -372,7 +372,7 @@ impl EnumProductionColumnStats {
 	pub fn new(name: &str, known_variants: &[&str]) -> EnumProductionColumnStats {
 		// Make an empty histogram, using the values we know about.
 		let histogram = known_variants
-			.into_iter()
+			.iter()
 			.map(|value| (value.to_string(), 0))
 			.collect();
 
