@@ -109,23 +109,39 @@ impl ProductionColumnStats {
 		match column_stats {
 			tangram_model::ColumnStatsReader::UnknownColumn(stats) => {
 				let stats = stats.read();
-				ProductionColumnStats::Unknown(UnknownProductionColumnStats::new(stats))
+				let name = stats.column_name();
+				ProductionColumnStats::Unknown(UnknownProductionColumnStats::new(name))
 			}
+
 			tangram_model::ColumnStatsReader::TextColumn(stats) => {
 				let stats = stats.read();
-				ProductionColumnStats::Text(TextProductionColumnStats::new(stats))
+				let name = stats.column_name();
+				ProductionColumnStats::Text(TextProductionColumnStats::new(name))
 			}
+
 			tangram_model::ColumnStatsReader::NumberColumn(stats) => {
 				let stats = stats.read();
-				ProductionColumnStats::Number(NumberProductionColumnStats::new(stats))
+				let name = stats.column_name();
+				ProductionColumnStats::Number(NumberProductionColumnStats::new(name))
 			}
+
 			tangram_model::ColumnStatsReader::EnumColumn(stats) => {
 				let stats = stats.read();
-				ProductionColumnStats::Enum(EnumProductionColumnStats::new(stats))
+				let name = stats.column_name();
+
+				// Read the list of this enum's variants out of the model
+				let known_variants = stats
+					.histogram()
+					.iter()
+					.map(|(value, _)| value) // Get the value, ignore the histogram count
+					.collect::<Vec<_>>();
+
+				ProductionColumnStats::Enum(EnumProductionColumnStats::new(name, &known_variants))
 			}
 		}
 	}
 
+	/// Get the name of the column this stats instance represents.
 	pub fn column_name(&self) -> &str {
 		match self {
 			ProductionColumnStats::Unknown(s) => s.column_name.as_str(),
@@ -135,15 +151,65 @@ impl ProductionColumnStats {
 		}
 	}
 
+	/// Incorporate a data value into the statistics being tracked.
 	pub fn update(&mut self, model: tangram_model::ModelReader, value: Option<&serde_json::Value>) {
+		let column_name = self.column_name().to_string();
 		match self {
 			ProductionColumnStats::Unknown(stats) => stats.update(value),
-			ProductionColumnStats::Text(stats) => stats.update(model, value),
+			ProductionColumnStats::Text(stats) => {
+				// To update text stats, we need to know which ngrams we're looking for, and how
+				// to tokenize the input.  We'll read that configuration out of the model data.
+
+				// Get this model's stats information for all columns
+				let col_stats = match model.inner() {
+					tangram_model::ModelInnerReader::Regressor(regressor) => {
+						regressor.read().train_column_stats()
+					}
+					tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+						binary_classifier.read().train_column_stats()
+					}
+					tangram_model::ModelInnerReader::MulticlassClassifier(
+						multiclass_classifier,
+					) => multiclass_classifier.read().train_column_stats(),
+				};
+
+				// Get the stats from the model for this text column
+				let text_column_stats = col_stats
+					.iter()
+					.find(|column| column.column_name() == column_name)
+					.unwrap()
+					.as_text_column()
+					.unwrap();
+
+				// Get the tokenizer configuration this column uses.
+				let tokenizer: Tokenizer = text_column_stats.tokenizer().into();
+
+				// Get which ngrams we're tracking, and the types of those ngrams.
+				let tracked_ngrams: IndexSet<NGramRef> = text_column_stats
+					.top_ngrams()
+					.iter()
+					.map(|(ngram, _)| ngram.into())
+					.collect();
+				let ngram_types: IndexSet<NGramType> = text_column_stats
+					.ngram_types()
+					.iter()
+					.map(|ngram_type| match ngram_type {
+						tangram_model::NGramTypeReader::Unigram(_) => NGramType::Unigram,
+						tangram_model::NGramTypeReader::Bigram(_) => NGramType::Bigram,
+					})
+					.collect();
+
+				// Interpret the value and update the statistics.
+				stats.update(value, &tokenizer, &tracked_ngrams, &ngram_types)
+			}
 			ProductionColumnStats::Number(stats) => stats.update(value),
 			ProductionColumnStats::Enum(stats) => stats.update(value),
 		}
 	}
 
+	/// Merge this statistics information with another of the same type.
+	///
+	/// If [merge] is called with a different variant of [ProductionColumnStats], it's a no-op.
 	pub fn merge(&mut self, other: ProductionColumnStats) {
 		match self {
 			ProductionColumnStats::Unknown(stats) => {
@@ -188,11 +254,9 @@ impl ProductionColumnStats {
 }
 
 impl UnknownProductionColumnStats {
-	pub fn new(
-		column_stats: tangram_model::UnknownColumnStatsReader,
-	) -> UnknownProductionColumnStats {
+	pub fn new(name: &str) -> UnknownProductionColumnStats {
 		UnknownProductionColumnStats {
-			column_name: column_stats.column_name().to_owned(),
+			column_name: name.to_string(),
 			invalid_count: 0,
 			absent_count: 0,
 			row_count: 0,
@@ -202,11 +266,8 @@ impl UnknownProductionColumnStats {
 	pub fn update(&mut self, value: Option<&serde_json::Value>) {
 		self.row_count += 1;
 		match value {
-			None => {
+			None | Some(serde_json::Value::Null) => {
 				self.absent_count += 1;
-			}
-			Some(serde_json::Value::Null) => {
-				self.invalid_count += 1;
 			}
 			Some(serde_json::Value::String(value)) if value.is_empty() => {
 				self.invalid_count += 1;
@@ -231,11 +292,9 @@ impl UnknownProductionColumnStats {
 }
 
 impl NumberProductionColumnStats {
-	pub fn new(
-		column_stats: tangram_model::NumberColumnStatsReader,
-	) -> NumberProductionColumnStats {
+	pub fn new(name: &str) -> NumberProductionColumnStats {
 		NumberProductionColumnStats {
-			column_name: column_stats.column_name().to_owned(),
+			column_name: name.to_string(),
 			absent_count: 0,
 			invalid_count: 0,
 			stats: None,
@@ -246,10 +305,11 @@ impl NumberProductionColumnStats {
 	pub fn update(&mut self, value: Option<&serde_json::Value>) {
 		self.row_count += 1;
 		let value = match value {
-			None => {
+			None | Some(serde_json::Value::Null) => {
 				self.absent_count += 1;
 				return;
 			}
+
 			Some(serde_json::Value::String(value)) => match value.parse() {
 				Ok(value) => value,
 				Err(_) => {
@@ -257,6 +317,7 @@ impl NumberProductionColumnStats {
 					return;
 				}
 			},
+
 			Some(serde_json::Value::Number(value)) => match value.as_f64() {
 				Some(value) => value.to_f32().unwrap(),
 				None => {
@@ -264,14 +325,12 @@ impl NumberProductionColumnStats {
 					return;
 				}
 			},
+
 			Some(serde_json::Value::Bool(_)) => {
 				self.invalid_count += 1;
 				return;
 			}
-			Some(serde_json::Value::Null) => {
-				self.invalid_count += 1;
-				return;
-			}
+
 			_ => {
 				self.invalid_count += 1;
 				return;
@@ -310,14 +369,15 @@ impl NumberProductionColumnStats {
 }
 
 impl EnumProductionColumnStats {
-	pub fn new(column_stats: tangram_model::EnumColumnStatsReader) -> EnumProductionColumnStats {
-		let histogram = column_stats
-			.histogram()
-			.iter()
-			.map(|(value, _)| (value.to_owned(), 0))
+	pub fn new(name: &str, known_variants: &[&str]) -> EnumProductionColumnStats {
+		// Make an empty histogram, using the values we know about.
+		let histogram = known_variants
+			.into_iter()
+			.map(|value| (value.to_string(), 0))
 			.collect();
+
 		EnumProductionColumnStats {
-			column_name: column_stats.column_name().to_owned(),
+			column_name: name.to_string(),
 			invalid_count: 0,
 			absent_count: 0,
 			histogram,
@@ -329,10 +389,11 @@ impl EnumProductionColumnStats {
 	pub fn update(&mut self, value: Option<&serde_json::Value>) {
 		self.row_count += 1;
 		let value = match value {
-			None => {
+			None | Some(serde_json::Value::Null) => {
 				self.absent_count += 1;
 				return;
 			}
+
 			Some(serde_json::Value::Number(_)) => {
 				self.invalid_count += 1;
 				return;
@@ -340,10 +401,7 @@ impl EnumProductionColumnStats {
 			Some(serde_json::Value::Bool(true)) => "true",
 			Some(serde_json::Value::Bool(false)) => "false",
 			Some(serde_json::Value::String(value)) => value,
-			Some(serde_json::Value::Null) => {
-				self.invalid_count += 1;
-				return;
-			}
+
 			_ => {
 				self.invalid_count += 1;
 				return;
@@ -405,10 +463,10 @@ impl EnumProductionColumnStats {
 }
 
 impl TextProductionColumnStats {
-	fn new(column_stats: tangram_model::TextColumnStatsReader) -> TextProductionColumnStats {
+	fn new(name: &str) -> TextProductionColumnStats {
 		TextProductionColumnStats {
 			absent_count: 0,
-			column_name: column_stats.column_name().to_owned(),
+			column_name: name.to_string(),
 			invalid_count: 0,
 			row_count: 0,
 			ngrams: Default::default(),
@@ -416,56 +474,18 @@ impl TextProductionColumnStats {
 		}
 	}
 
-	pub fn update(&mut self, model: tangram_model::ModelReader, value: Option<&serde_json::Value>) {
-		let text_column = match model.inner() {
-			tangram_model::ModelInnerReader::Regressor(regressor) => regressor
-				.read()
-				.train_column_stats()
-				.iter()
-				.find(|column| column.column_name() == self.column_name)
-				.unwrap()
-				.as_text_column()
-				.unwrap(),
-			tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
-				binary_classifier
-					.read()
-					.train_column_stats()
-					.iter()
-					.find(|column| column.column_name() == self.column_name)
-					.unwrap()
-					.as_text_column()
-					.unwrap()
-			}
-			tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
-				multiclass_classifier
-					.read()
-					.train_column_stats()
-					.iter()
-					.find(|column| column.column_name() == self.column_name)
-					.unwrap()
-					.as_text_column()
-					.unwrap()
-			}
-		};
-		let tracked_ngrams: IndexSet<NGramRef> = text_column
-			.top_ngrams()
-			.iter()
-			.map(|(ngram, _)| ngram.into())
-			.collect();
-		let tokenizer: Tokenizer = text_column.tokenizer().into();
-		let ngram_types: IndexSet<NGramType> = text_column
-			.ngram_types()
-			.iter()
-			.map(|ngram_type| match ngram_type {
-				tangram_model::NGramTypeReader::Unigram(_) => NGramType::Unigram,
-				tangram_model::NGramTypeReader::Bigram(_) => NGramType::Bigram,
-			})
-			.collect();
-
+	pub fn update(
+		&mut self,
+		value: Option<&serde_json::Value>,
+		tokenizer: &Tokenizer,
+		tracked_ngrams: &IndexSet<NGramRef>,
+		ngram_types: &IndexSet<NGramType>,
+	) {
+		// Pull out a string from the value, if we have it. Otherwise, include an absent or invalid value.
 		self.row_count += 1;
 		let value = match value {
 			Some(serde_json::Value::String(value)) => value,
-			None => {
+			None | Some(serde_json::Value::Null) => {
 				self.absent_count += 1;
 				return;
 			}
@@ -474,30 +494,27 @@ impl TextProductionColumnStats {
 				return;
 			}
 		};
+
 		let mut ngrams_for_row = FnvHashSet::default();
-		let unigram_iter = if ngram_types.contains(&NGramType::Unigram) {
-			Some(
-				tokenizer
-					.tokenize(value)
-					.map(tangram_text::NGramRef::Unigram),
-			)
-		} else {
-			None
-		};
-		let bigram_iter = if ngram_types.contains(&NGramType::Bigram) {
-			Some(
-				tokenizer
-					.tokenize(value)
-					.tuple_windows()
-					.map(|(token_a, token_b)| tangram_text::NGramRef::Bigram(token_a, token_b)),
-			)
-		} else {
-			None
-		};
+
+		let unigram_iter = ngram_types.contains(&NGramType::Unigram).then(|| {
+			tokenizer
+				.tokenize(value)
+				.map(tangram_text::NGramRef::Unigram)
+		});
+
+		let bigram_iter = ngram_types.contains(&NGramType::Bigram).then(|| {
+			tokenizer
+				.tokenize(value)
+				.tuple_windows()
+				.map(|(token_a, token_b)| tangram_text::NGramRef::Bigram(token_a, token_b))
+		});
+
 		let ngram_iter = unigram_iter
 			.into_iter()
 			.flatten()
 			.chain(bigram_iter.into_iter().flatten());
+
 		for ngram in ngram_iter {
 			if tracked_ngrams.contains(&ngram) {
 				if let Some(entry) = self.ngrams.get_mut(&ngram) {
@@ -566,5 +583,102 @@ impl ProductionColumnStatsOutput {
 			ProductionColumnStatsOutput::Number(s) => s.column_name.as_str(),
 			ProductionColumnStatsOutput::Enum(s) => s.column_name.as_str(),
 		}
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+	use serde_json::Value;
+
+	/// Ensure that updating a number statistic with `null` reports an absent value
+	/// (Regression test for https://github.com/tangramdotdev/tangram/issues/85)
+	#[test]
+	fn null_number_is_absent() {
+		let mut stats = NumberProductionColumnStats::new("number_stats");
+
+		// Update the stats with `null`
+		stats.update(Some(&Value::Null));
+
+		// Check that the stats report an absent value correctly
+		assert_eq!(
+			stats.absent_count, 1,
+			"The stats didn't consider 'null' to be an absent value."
+		);
+		assert_eq!(
+			stats.invalid_count, 0,
+			"The stats wrongly reported an invalid value. Should be absent instead."
+		);
+	}
+
+	/// Ensure that updating an unknown statistic with `null` reports an absent value
+	/// (Regression test for https://github.com/tangramdotdev/tangram/issues/85)
+	#[test]
+	fn null_unknown_is_absent() {
+		let mut stats = UnknownProductionColumnStats::new("unknown_stat");
+
+		// Update the stats with `null`
+		stats.update(Some(&Value::Null));
+
+		// Check that the stats report an absent value correctly
+		assert_eq!(
+			stats.absent_count, 1,
+			"The stats didn't consider 'null' to be an absent value."
+		);
+		assert_eq!(
+			stats.invalid_count, 0,
+			"The stats wrongly reported an invalid value. Should be absent instead."
+		);
+	}
+
+	/// Ensure that updating an enum statistic with `null` reports an absent value
+	/// (Regression test for https://github.com/tangramdotdev/tangram/issues/85)
+	#[test]
+	fn null_enum_is_absent() {
+		let enum_variants = &["the", "variants", "of", "the", "enum"];
+		let mut stats = EnumProductionColumnStats::new("enum_stat", enum_variants);
+
+		// Update the stats with `null`
+		stats.update(Some(&Value::Null));
+
+		// Check that the stats report an absent value correctly
+		assert_eq!(
+			stats.absent_count, 1,
+			"The stats didn't consider 'null' to be an absent value."
+		);
+		assert_eq!(
+			stats.invalid_count, 0,
+			"The stats wrongly reported an invalid value. Should be absent instead."
+		);
+	}
+
+	/// Ensure that updating a text statistic with `null` reports an absent value
+	/// (Regression test for https://github.com/tangramdotdev/tangram/issues/85)
+	#[test]
+	fn null_text_is_absent() {
+		let mut stats = TextProductionColumnStats::new("text_stat");
+
+		// Use a dummy tokenizer/ngram info
+		let tokenizer = Tokenizer::default();
+		let ngram_types = &[].into_iter().collect();
+		let tracked_ngrams = &[].into_iter().collect();
+
+		// Update the stat
+		stats.update(
+			Some(&Value::Null),
+			&tokenizer,
+			&ngram_types,
+			&tracked_ngrams,
+		);
+
+		// Check that the stats report an absent value correctly
+		assert_eq!(
+			stats.absent_count, 1,
+			"The stats didn't consider 'null' to be an absent value."
+		);
+		assert_eq!(
+			stats.invalid_count, 0,
+			"The stats wrongly reported an invalid value. Should be absent instead."
+		);
 	}
 }
