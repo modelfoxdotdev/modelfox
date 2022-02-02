@@ -157,7 +157,7 @@ impl ProductionColumnStats {
 		match self {
 			ProductionColumnStats::Unknown(stats) => stats.update(value),
 			ProductionColumnStats::Text(stats) => {
-				// To update a text stat, we need to know which ngrams we're looking for, and how
+				// To update text stats, we need to know which ngrams we're looking for, and how
 				// to tokenize the input.  We'll read that configuration out of the model data.
 
 				// Get this model's stats information for all columns
@@ -199,7 +199,7 @@ impl ProductionColumnStats {
 					})
 					.collect();
 
-				// Interpret the value and update the statistic.
+				// Interpret the value and update the statistics.
 				stats.update(value, &tokenizer, &tracked_ngrams, &ngram_types)
 			}
 			ProductionColumnStats::Number(stats) => stats.update(value),
@@ -595,19 +595,19 @@ mod tests {
 	/// (Regression test for https://github.com/tangramdotdev/tangram/issues/85)
 	#[test]
 	fn null_number_is_absent() {
-		let mut stat = NumberProductionColumnStats::new("number_stat");
+		let mut stats = NumberProductionColumnStats::new("number_stats");
 
-		// Update the stat with `null`
-		stat.update(Some(&Value::Null));
+		// Update the stats with `null`
+		stats.update(Some(&Value::Null));
 
-		// Check that the stat reports an absent value correctly
+		// Check that the stats report an absent value correctly
 		assert_eq!(
-			stat.absent_count, 1,
-			"The stat didn't consider 'null' to be an absent value."
+			stats.absent_count, 1,
+			"The stats didn't consider 'null' to be an absent value."
 		);
 		assert_eq!(
-			stat.invalid_count, 0,
-			"The stat wrongly reported an invalid value. Should be absent instead."
+			stats.invalid_count, 0,
+			"The stats wrongly reported an invalid value. Should be absent instead."
 		);
 	}
 
@@ -615,19 +615,19 @@ mod tests {
 	/// (Regression test for https://github.com/tangramdotdev/tangram/issues/85)
 	#[test]
 	fn null_unknown_is_absent() {
-		let mut stat = UnknownProductionColumnStats::new("unknown_stat");
+		let mut stats = UnknownProductionColumnStats::new("unknown_stat");
 
-		// Update the stat with `null`
-		stat.update(Some(&Value::Null));
+		// Update the stats with `null`
+		stats.update(Some(&Value::Null));
 
-		// Check that the stat reports an absent value correctly
+		// Check that the stats report an absent value correctly
 		assert_eq!(
-			stat.absent_count, 1,
-			"The stat didn't consider 'null' to be an absent value."
+			stats.absent_count, 1,
+			"The stats didn't consider 'null' to be an absent value."
 		);
 		assert_eq!(
-			stat.invalid_count, 0,
-			"The stat wrongly reported an invalid value. Should be absent instead."
+			stats.invalid_count, 0,
+			"The stats wrongly reported an invalid value. Should be absent instead."
 		);
 	}
 
@@ -636,19 +636,19 @@ mod tests {
 	#[test]
 	fn null_enum_is_absent() {
 		let enum_variants = &["the", "variants", "of", "the", "enum"];
-		let mut stat = EnumProductionColumnStats::new("enum_stat", enum_variants);
+		let mut stats = EnumProductionColumnStats::new("enum_stat", enum_variants);
 
-		// Update the stat with `null`
-		stat.update(Some(&Value::Null));
+		// Update the stats with `null`
+		stats.update(Some(&Value::Null));
 
-		// Check that the stat reports an absent value correctly
+		// Check that the stats report an absent value correctly
 		assert_eq!(
-			stat.absent_count, 1,
-			"The stat didn't consider 'null' to be an absent value."
+			stats.absent_count, 1,
+			"The stats didn't consider 'null' to be an absent value."
 		);
 		assert_eq!(
-			stat.invalid_count, 0,
-			"The stat wrongly reported an invalid value. Should be absent instead."
+			stats.invalid_count, 0,
+			"The stats wrongly reported an invalid value. Should be absent instead."
 		);
 	}
 
@@ -656,7 +656,7 @@ mod tests {
 	/// (Regression test for https://github.com/tangramdotdev/tangram/issues/85)
 	#[test]
 	fn null_text_is_absent() {
-		let mut stat = TextProductionColumnStats::new("text_stat");
+		let mut stats = TextProductionColumnStats::new("text_stat");
 
 		// Use a dummy tokenizer/ngram info
 		let tokenizer = Tokenizer::default();
@@ -664,21 +664,21 @@ mod tests {
 		let tracked_ngrams = &[].into_iter().collect();
 
 		// Update the stat
-		stat.update(
+		stats.update(
 			Some(&Value::Null),
 			&tokenizer,
 			&ngram_types,
 			&tracked_ngrams,
 		);
 
-		// Check that the stat reports an absent value correctly
+		// Check that the stats report an absent value correctly
 		assert_eq!(
-			stat.absent_count, 1,
-			"The stat didn't consider 'null' to be an absent value."
+			stats.absent_count, 1,
+			"The stats didn't consider 'null' to be an absent value."
 		);
 		assert_eq!(
-			stat.invalid_count, 0,
-			"The stat wrongly reported an invalid value. Should be absent instead."
+			stats.invalid_count, 0,
+			"The stats wrongly reported an invalid value. Should be absent instead."
 		);
 	}
 }
