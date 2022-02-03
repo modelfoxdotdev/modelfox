@@ -89,18 +89,35 @@
           (targets.x86_64-pc-windows-gnu.toolchainOf toolchain).rust-std
           (targets.x86_64-pc-windows-msvc.toolchainOf toolchain).rust-std
         ]);
+      windows_sdk_manifest_url = "https://download.visualstudio.microsoft.com/download/pr/9a26f37e-6001-429b-a5db-c5455b93953c/25b853a26e065037b83c3dd6aac74bfbfd1f09c9639d1f8c877ecc8d11ea0feb/VisualStudio.vsman";
+      windows_sdk_manifest_sha256 = "6a2676b65e32c04db17e80d7d87ba60b0c75dd3465c7db5e76ae3db8ca409d85";
+      windows_sdk_manifest = pkgs.runCommand "manifest"
+        {
+          nativeBuildInputs = with pkgs; [
+            (inputs.windows_sdk.defaultPackage.${system})
+          ];
+          outputHashMode = "recursive";
+          outputHash = "sha256-Y6bShDDL0kUsLslJxbPDFFOUOq0Y60TPDT1s4L3Gdgc=";
+        }
+        ''
+          windows_sdk \
+            download-manifest \
+            --manifest-url ${windows_sdk_manifest_url} \
+            --sha256 ${windows_sdk_manifest_sha256} \
+            --output $out
+        '';
       windows_sdk_packages = pkgs.runCommand "packages"
         {
           nativeBuildInputs = with pkgs; [
             (inputs.windows_sdk.defaultPackage.${system})
           ];
           outputHashMode = "recursive";
-          outputHash = "sha256-jrOGFuXPNjw8NqZQTz7Xl99LGfFBkwRcy+xuY7D6TYk=";
+          outputHash = "sha256-8j4LEopZUYs22Hl9y9+js5lVLVzG/ug0qOjeqbEY//Y=";
         }
         ''
           windows_sdk \
             choose-packages \
-            --manifest ${./scripts/windows_sdk.vsman} \
+            --manifest ${windows_sdk_manifest} \
             --package Microsoft.VisualStudio.VC.Llvm.Clang \
             --package Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
             --package Microsoft.VisualStudio.Component.Windows10SDK.19041 \
@@ -112,7 +129,7 @@
             (inputs.windows_sdk.defaultPackage.${system})
           ];
           outputHashMode = "recursive";
-          outputHash = "sha256-NcIMWa6qG8IZWRPIadvrWK167A9wj8TPmXkAplM1X4c=";
+          outputHash = "sha256-p7vhv81dccFS8krmo0wvoH0gVJRmyohk9M2tjhz23HA=";
         }
         ''
           windows_sdk \
@@ -126,7 +143,7 @@
             (inputs.windows_sdk.defaultPackage.${system})
           ];
           outputHashMode = "recursive";
-          outputHash = "sha256-80J04A+sd2ivL5/0OlKGvBF9C6wrx+YMiBqg+zRSGn8=";
+          outputHash = "sha256-9NzAi6NKrUK0TgO5uyUjsI5IcrPEeC+csLcUrlWqIhM=";
         }
         ''
           windows_sdk \
