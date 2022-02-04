@@ -116,10 +116,27 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			// Validate metric type
 			let mut methods = vec![AlertMethod::Stdout];
 			if !email.is_empty() {
-				methods.push(AlertMethod::Email(email));
+				methods.push(AlertMethod::Email(email.into()));
 			}
 			if !webhook.is_empty() {
-				methods.push(AlertMethod::Webhook(webhook));
+				match webhook.try_into() {
+					Ok(webhook) => methods.push(AlertMethod::Webhook(webhook)),
+					Err(_) => {
+						let page = Page {
+							monitor: get_monitor(&mut db, Id::from_str(&monitor_id)?).await?,
+							monitor_id,
+							model_layout_info,
+							model_type,
+							error: Some("Received malformed webhook url.".to_owned()),
+						};
+						let html = html(page);
+						let response = http::Response::builder()
+							.status(http::StatusCode::BAD_REQUEST)
+							.body(hyper::Body::from(html))
+							.unwrap();
+						return Ok(response);
+					}
+				}
 			}
 			let threshold_bounds = validate_threshold_bounds(threshold_lower, threshold_upper);
 			if threshold_bounds.is_none() {

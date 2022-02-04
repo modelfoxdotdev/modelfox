@@ -8,6 +8,10 @@ pub const MONITOR_CHECKER_HEARTBEAT_DURATION_PRODUCTION: std::time::Duration =
 	std::time::Duration::from_secs(60 * 60);
 pub const ALERT_SENDER_HEARTBEAT_DURATION_PRODUCTION: std::time::Duration =
 	std::time::Duration::from_secs(60 * 60);
+pub const ALERT_SENDER_MAXIMUM_RETRY_PERIODS: u32 = 10;
+pub const ALERT_SENDER_RETRY_INITIAL_PERIOD: std::time::Duration =
+	std::time::Duration::from_secs(60);
+pub const ALERT_SENDER_RETRY_DECAY_FACTOR: u64 = 2;
 pub const PRODUCTION_PREDICTIONS_NUM_PREDICTIONS_PER_PAGE_TABLE: i64 = 10;
 pub const PRODUCTION_STATS_LARGE_ABSENT_RATIO_THRESHOLD_TO_TRIGGER_ALERT: f32 = 0.1;
 pub const PRODUCTION_STATS_LARGE_INVALID_RATIO_THRESHOLD_TO_TRIGGER_ALERT: f32 = 0.1;

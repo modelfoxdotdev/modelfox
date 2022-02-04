@@ -157,6 +157,6 @@ async fn send_invitation_email(
 			"{} invited you to join their team on Tangram. Click the link below to login.\n\n{}",
 			inviter_email, href
 		))?;
-	app.send_email(email).await;
+	app.send_email(email).await?;
 	Ok(())
 }

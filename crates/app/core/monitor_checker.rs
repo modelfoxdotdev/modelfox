@@ -322,14 +322,14 @@ pub struct MonitorConfig {
 	pub methods: Vec<AlertMethod>,
 }
 
-pub async fn bring_monitor_up_to_date(app: &AppState, monitor: &Monitor) -> Result<()> {
+pub async fn bring_monitor_up_to_date(app_state: &AppState, monitor: &Monitor) -> Result<()> {
 	let minimum_metrics_threshold = if cfg!(not(debug_assertions)) {
 		ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_THRESHOLD
 	} else {
 		ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_DEBUG_THRESHOLD
 	};
 
-	let mut txn = app.begin_transaction().await?;
+	let mut txn = app_state.begin_transaction().await?;
 
 	let not_enough_existing_metrics =
 		get_total_production_metrics(txn.borrow_mut()).await? < minimum_metrics_threshold;
@@ -337,7 +337,7 @@ pub async fn bring_monitor_up_to_date(app: &AppState, monitor: &Monitor) -> Resu
 		return Ok(());
 	}
 
-	let result = check_metrics(monitor, app).await?;
+	let result = check_metrics(monitor, app_state).await?;
 	let exceeded_thresholds: bool = {
 		let (upper, lower) = monitor.get_thresholds();
 		let upper_exceeded = if let Some(upper) = upper {
@@ -360,9 +360,9 @@ pub async fn bring_monitor_up_to_date(app: &AppState, monitor: &Monitor) -> Resu
 			result: result.to_owned(),
 			timestamp: time::OffsetDateTime::now_utc().unix_timestamp(),
 		};
-		write_alert(alert_data, monitor.id, txn.borrow_mut()).await?;
+		write_alert(app_state, alert_data, monitor.id, txn.borrow_mut()).await?;
 	}
-	app.commit_transaction(txn).await?;
+	app_state.commit_transaction(txn).await?;
 
 	Ok(())
 }

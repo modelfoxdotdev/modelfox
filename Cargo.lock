@@ -3209,6 +3209,7 @@ dependencies = [
  "tangram_id",
  "tangram_metrics",
  "tangram_model",
+ "tangram_serve",
  "tangram_table",
  "tangram_text",
  "tangram_zip",

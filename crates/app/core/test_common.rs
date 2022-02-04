@@ -19,14 +19,12 @@ use tangram_app_monitor_event::{
 use tangram_id::Id;
 use tangram_table::TableView;
 
-const SQLITE_IN_MEMORY: &str = "sqlite::memory:";
-
 pub fn init_test_options() -> crate::options::Options {
 	let mut options = crate::options::Options::default();
 	// set in-memory SQLite DB
-	let database_url = SQLITE_IN_MEMORY.parse().expect("Malformed URL");
+	let database_url = "sqlite::memory:".parse().expect("Malformed URL");
 	let database_options = crate::options::DatabaseOptions {
-		max_connections: None,
+		max_connections: Some(10),
 		url: database_url,
 	};
 	options.database = database_options;

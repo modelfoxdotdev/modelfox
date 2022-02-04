@@ -7,6 +7,7 @@ use crate::{
 };
 use anyhow::{anyhow, bail, Result};
 use lettre::AsyncTransport;
+use serde::Serialize;
 use sqlx::postgres::PgPoolOptions;
 use std::{path::PathBuf, sync::Arc};
 use storage::InMemoryStorage;
@@ -43,9 +44,36 @@ pub struct App {
 pub struct AppState {
 	pub clock: Clock,
 	pub database_pool: sqlx::AnyPool,
+	pub http_sender: HttpSender,
 	pub options: Options,
 	pub smtp_transport: Option<Mailer>,
 	pub storage: Storage,
+}
+
+#[derive(Debug, Clone)]
+pub enum HttpSender {
+	Production,
+	Testing,
+}
+
+impl HttpSender {
+	pub async fn post_payload<S: Serialize>(
+		&self,
+		payload: S,
+		url: Url,
+	) -> Result<http::Response<hyper::Body>> {
+		match self {
+			HttpSender::Production => {
+				let client = hyper::Client::new();
+				let request = hyper::Request::builder()
+					.method(hyper::Method::POST)
+					.uri(url.as_str())
+					.body(hyper::Body::from(serde_json::to_string(&payload)?))?;
+				Ok(client.request(request).await?)
+			}
+			HttpSender::Testing => Ok(http::Response::builder().body(hyper::Body::empty())?),
+		}
+	}
 }
 
 #[derive(Debug, Clone)]
@@ -55,6 +83,11 @@ pub enum Mailer {
 }
 
 impl Mailer {
+	#[cfg(test)]
+	pub fn test_mailer() -> Self {
+		Mailer::Testing(lettre::transport::stub::StubTransport::new_ok())
+	}
+
 	pub async fn send(&self, email: lettre::Message) -> Result<()> {
 		match self {
 			Mailer::Production(transport) => {
@@ -174,6 +207,9 @@ impl App {
 			tangram_app_migrations::verify(&database_pool).await?;
 		}
 		// Create the smtp transport.
+		#[cfg(test)]
+		let smtp_transport = Some(Mailer::test_mailer());
+		#[cfg(not(test))]
 		let smtp_transport = if let Some(smtp) = options.smtp.as_ref() {
 			Some(Mailer::Production(
 				lettre::AsyncSmtpTransport::<lettre::Tokio1Executor>::relay(&smtp.host)?
@@ -195,9 +231,14 @@ impl App {
 				options.cache_path,
 			)?),
 		};
+		#[cfg(test)]
+		let http_sender = HttpSender::Testing;
+		#[cfg(not(test))]
+		let http_sender = HttpSender::Production;
 		let state = AppState {
 			clock: Clock::new(),
 			database_pool,
+			http_sender,
 			options,
 			smtp_transport,
 			storage,
@@ -241,12 +282,8 @@ impl App {
 		Ok(self.state.database_pool.acquire().await?)
 	}
 
-	pub async fn send_email(&self, message: lettre::Message) {
-		if let Some(smtp_transport) = self.smtp_transport() {
-			tokio::spawn(async move { smtp_transport.send(message).await.unwrap() });
-		} else {
-			tracing::info!("App attempted to send email, but no smtp_transport is configured.");
-		}
+	pub async fn send_email(&self, message: lettre::Message) -> Result<()> {
+		self.state.send_email(message).await
 	}
 
 	pub fn smtp_transport(&self) -> Option<Mailer> {
@@ -262,6 +299,22 @@ impl AppState {
 	pub async fn commit_transaction(&self, txn: sqlx::Transaction<'_, sqlx::Any>) -> Result<()> {
 		txn.commit().await?;
 		Ok(())
+	}
+
+	pub async fn send_email(&self, message: lettre::Message) -> Result<()> {
+		if let Some(smtp_transport) = self.smtp_transport.clone() {
+			let result = tokio::spawn(async move { smtp_transport.send(message).await }).await;
+			match result {
+				Ok(email_result) => match email_result {
+					Ok(_) => Ok(()),
+					Err(e) => Err(anyhow!("Error encountered sending SMTP email: {}", e)),
+				},
+				Err(_join_error) => bail!("Email sender task failed spectacularly"),
+			}
+		} else {
+			tracing::info!("App attempted to send email, but no smtp_transport is configured.");
+			Ok(())
+		}
 	}
 }
 
