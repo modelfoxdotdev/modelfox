@@ -55,7 +55,7 @@ Train a model from a CSV file on the command line. Make predictions from Elixir,
 Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.
 
 - Run `tangram train` to train a model from a CSV file on the command line.
-- Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramdotdev/tangram-go), [JavaScript](https://www.npmjs.com/package/@tangramdotdev/tangram), [PHP](https://packagist.org/packages/tangram/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](lib.rs/tangram).
+- Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramdotdev/tangram-go), [JavaScript](https://www.npmjs.com/package/@tangramdotdev/tangram), [PHP](https://packagist.org/packages/tangram/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](https://lib.rs/crates/tangram).
 - Run `tangram app` to learn more about your models and monitor them in production.
 
 ### Install
