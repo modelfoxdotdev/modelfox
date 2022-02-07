@@ -664,12 +664,7 @@ mod tests {
 		let tracked_ngrams = &[].into_iter().collect();
 
 		// Update the stat
-		stats.update(
-			Some(&Value::Null),
-			&tokenizer,
-			&ngram_types,
-			&tracked_ngrams,
-		);
+		stats.update(Some(&Value::Null), &tokenizer, ngram_types, tracked_ngrams);
 
 		// Check that the stats report an absent value correctly
 		assert_eq!(

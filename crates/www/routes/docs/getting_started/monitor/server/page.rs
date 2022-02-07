@@ -383,7 +383,7 @@ impl Component for ProductionColumnStats {
 			),
 		];
 
-		let enum_unique_values_table_props = EnumUniqueValuesTable {
+		let enum_unique_values_table = EnumUniqueValuesTable {
 			rows: vec![
 				EnumUniqueValuesTableRow {
 					name: "asymptomatic".to_owned(),
@@ -433,7 +433,7 @@ impl Component for ProductionColumnStats {
 						date_window: DateWindow::ThisMonth,
 					})
 					.child(EnumColumnUniqueValuesSection {
-						enum_unique_values_table: enum_unique_values_table_props,
+						enum_unique_values_table,
 					})
 					.child(EnumColumnInvalidValuesSection {
 						enum_invalid_values_table: Some(enum_invalid_values_table_props),
