@@ -24,7 +24,7 @@ pub fn init_test_options() -> crate::options::Options {
 	// set in-memory SQLite DB
 	let database_url = "sqlite::memory:".parse().expect("Malformed URL");
 	let database_options = crate::options::DatabaseOptions {
-		max_connections: Some(1),
+		max_connections: Some(2),
 		url: database_url,
 	};
 	options.database = database_options;

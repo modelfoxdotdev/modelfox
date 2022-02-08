@@ -493,6 +493,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 
 		// Scroll to allow alert_sender to pick up alert
 		app.clock().pause();
@@ -501,6 +502,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 
 		// Assert exactly one success has been logged.
 		let mut txn = app.begin_transaction().await.unwrap();
@@ -564,6 +566,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 
 		// Assert exactly one success has been logged.
 		let mut txn = app.begin_transaction().await.unwrap();
@@ -629,6 +632,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(10))
 			.await;
 		app.clock().resume();
+		app.check_monitors().await.unwrap();
 		app.check_alert_sends().await.unwrap();
 
 		// Assert exactly two successes have been logged.
