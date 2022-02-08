@@ -61,6 +61,20 @@ pub async fn alert_sender(
 	Ok(())
 }
 
+impl App {
+	/// Send a message to the alert_sender and wait for it to reply back indicating it has run.
+	#[tracing::instrument(level = "info", skip_all)]
+	pub async fn check_alert_sends(&self) -> Result<()> {
+		tracing::info!("starting check_alert_sends");
+		let (sender, receiver) = oneshot::channel();
+		self.alert_sender_sender
+			.send(AlertSenderMessage::Run(sender))?;
+		receiver.await?;
+		tracing::info!("finished check_monitors, response received");
+		Ok(())
+	}
+}
+
 pub async fn handle_alert_send(
 	app_state: &AppState,
 	alert_send: &AlertSend,
@@ -608,14 +622,14 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 		// Scroll to allow alert_sender to pick up alert
 		app.clock().pause();
 		app.clock()
 			.advance(std::time::Duration::from_secs(10))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 
 		// Assert exactly two successes have been logged.
 		let mut txn = app.begin_transaction().await.unwrap();
