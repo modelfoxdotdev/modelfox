@@ -625,6 +625,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
+		app.check_monitors().await.unwrap();
 		app.check_alert_sends().await.unwrap();
 		// Scroll to allow alert_sender to pick up alert
 		app.clock().pause();
