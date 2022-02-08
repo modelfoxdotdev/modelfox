@@ -511,6 +511,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -526,6 +527,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -542,6 +544,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -574,6 +577,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -617,6 +621,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -643,6 +648,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -685,6 +691,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -714,6 +721,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -756,6 +764,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -782,6 +791,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -824,6 +834,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -852,6 +863,7 @@ mod test {
 			.await;
 		app.clock().resume();
 		app.check_monitors().await.unwrap();
+		app.check_alert_sends().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
