@@ -11,7 +11,7 @@ use serde::Serialize;
 use sqlx::postgres::PgPoolOptions;
 use std::{path::PathBuf, sync::Arc};
 use storage::InMemoryStorage;
-use tokio::sync::mpsc;
+use tokio::sync::{mpsc, oneshot};
 use url::Url;
 
 pub mod alert;
@@ -288,6 +288,23 @@ impl App {
 
 	pub fn smtp_transport(&self) -> Option<Mailer> {
 		self.state.smtp_transport.clone()
+	}
+
+	/// Send a message to the monitor checker and wait for it to reply back indicating it has run.
+	#[tracing::instrument(level = "info", skip_all)]
+	pub async fn sync_tasks(&self) -> Result<()> {
+		tracing::info!("starting sync_tasks");
+		let (sender, receiver) = oneshot::channel();
+		self.monitor_checker_sender
+			.send(MonitorCheckerMessage::Run(sender))?;
+		receiver.await?;
+		tracing::info!("check_monitors response received");
+		let (sender, receiver) = oneshot::channel();
+		self.alert_sender_sender
+			.send(AlertSenderMessage::Run(sender))?;
+		receiver.await?;
+		tracing::info!("alert_sender response received");
+		Ok(())
 	}
 }
 

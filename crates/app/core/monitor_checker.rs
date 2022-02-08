@@ -187,18 +187,6 @@ impl App {
 		Ok(())
 	}
 
-	/// Send a message to the monitor checker and wait for it to reply back indicating it has run.
-	#[tracing::instrument(level = "info", skip_all)]
-	pub async fn check_monitors(&self) -> Result<()> {
-		tracing::info!("starting check_monitors");
-		let (sender, receiver) = oneshot::channel();
-		self.monitor_checker_sender
-			.send(MonitorCheckerMessage::Run(sender))?;
-		receiver.await?;
-		tracing::info!("finished check_monitors, response received");
-		Ok(())
-	}
-
 	pub async fn create_monitor(&self, args: CreateMonitorArgs<'_, '_>) -> Result<()> {
 		let CreateMonitorArgs {
 			db,
@@ -495,7 +483,7 @@ mod test {
 		app.commit_transaction(txn).await.unwrap();
 
 		// Ensure that at the beginning, we have no alerts.
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -510,8 +498,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 30))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
-		app.check_alert_sends().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -526,8 +513,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 30))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
-		app.check_alert_sends().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -543,8 +529,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60 * 23))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
-		app.check_alert_sends().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -560,7 +545,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60 * 24 * 6))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -576,8 +561,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60 * 24 * 7 * 3))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
-		app.check_alert_sends().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -620,8 +604,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
-		app.check_alert_sends().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -647,8 +630,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
-		app.check_alert_sends().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -690,8 +672,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
-		app.check_alert_sends().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -720,8 +701,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
-		app.check_alert_sends().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -763,8 +743,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
-		app.check_alert_sends().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -790,8 +769,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
-		app.check_alert_sends().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -833,8 +811,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
-		app.check_alert_sends().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -862,8 +839,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
-		app.check_alert_sends().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
