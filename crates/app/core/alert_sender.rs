@@ -452,8 +452,11 @@ mod test {
 	#[tokio::test]
 	#[traced_test]
 	async fn test_alert_email_send() {
+		let mut ctx = TestContext::new("email_send").await;
 		// Seed app, generate an alert, assert the email is sent
-		let app = init_test_app().await.unwrap();
+		let app = init_test_app(init_test_options_postgres("email_send"))
+			.await
+			.unwrap();
 		app.clock().resume();
 		let model_id = init_heart_disease_model(&app).await.unwrap();
 		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
@@ -510,13 +513,17 @@ mod test {
 			.unwrap();
 		assert_eq!(num_failed, 0);
 		app.commit_transaction(txn).await.unwrap();
+		ctx.drop().await;
 	}
 
 	#[tokio::test]
 	#[traced_test]
 	async fn test_alert_webhook_send() {
+		let mut ctx = TestContext::new("webhook_send").await;
 		// Seed app, generate an alert, assert the email is sent
-		let app = init_test_app().await.unwrap();
+		let app = init_test_app(init_test_options_postgres("webhook_send"))
+			.await
+			.unwrap();
 		app.clock().resume();
 		let model_id = init_heart_disease_model(&app).await.unwrap();
 		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
@@ -573,13 +580,17 @@ mod test {
 			.unwrap();
 		assert_eq!(num_failed, 0);
 		app.commit_transaction(txn).await.unwrap();
+		ctx.drop().await;
 	}
 
 	#[tokio::test]
 	#[traced_test]
 	async fn test_alert_multiple_methods_send() {
+		let mut ctx = TestContext::new("multiple_methods_send").await;
 		// Seed app, generate an alert, assert the email is sent
-		let app = init_test_app().await.unwrap();
+		let app = init_test_app(init_test_options_postgres("multiple_methods_send"))
+			.await
+			.unwrap();
 		app.clock().resume();
 		let model_id = init_heart_disease_model(&app).await.unwrap();
 		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
@@ -639,5 +650,6 @@ mod test {
 			.unwrap();
 		assert_eq!(num_failed, 0);
 		app.commit_transaction(txn).await.unwrap();
+		ctx.drop().await;
 	}
 }
