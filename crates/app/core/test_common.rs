@@ -21,7 +21,7 @@ use tangram_id::Id;
 use tangram_table::TableView;
 use url::Url;
 
-const TEST_POSTGRES_URL: &str = "postgres://postgres:example@0.0.0.0:5432";
+const TEST_POSTGRES_URL: &str = "postgres://postgres:test@0.0.0.0:5432";
 
 /// The TestContext handles establishing a PostgreSQL database to use for an individual test.
 ///
@@ -46,9 +46,15 @@ impl TestContext {
 		let pool = PgPool::connect(postgres_url.as_str())
 			.await
 			.expect("Failed to connect to test database");
+		// First, clear the deck in case of previous fail
+		let query_str = format!("DROP DATABASE IF EXISTS {}", db_name);
+		sqlx::query(&query_str)
+			.execute(&pool)
+			.await
+			.expect("Could not clean up existing DB");
+		// Create new DB
 		let query_str = format!("CREATE DATABASE {}", db_name);
 		sqlx::query(&query_str)
-			.bind(db_name)
 			.execute(&pool)
 			.await
 			.expect("Could not create test database");
@@ -81,7 +87,6 @@ impl TestContext {
 		// Drop database
 		let query_str = format!("DROP DATABASE {}", self.db_name);
 		sqlx::query(&query_str)
-			.bind(&self.db_name)
 			.execute(&pool)
 			.await
 			.expect("Could not drop test database");

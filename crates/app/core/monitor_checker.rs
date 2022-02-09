@@ -489,7 +489,7 @@ mod test {
 		// Ensure that at the beginning, we have no alerts.
 		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
-		let all_alerts = app
+		let _all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
 			.await
 			.unwrap();
@@ -524,7 +524,6 @@ mod test {
 			.await
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
-		dbg!(&all_alerts);
 		//assert_eq!(all_alerts.len(), 1);
 
 		// Scroll to one day, check that daily alert is created
