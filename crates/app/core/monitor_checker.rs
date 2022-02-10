@@ -3,7 +3,7 @@ use crate::{
 	heuristics::{
 		ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_DEBUG_THRESHOLD,
 		ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_THRESHOLD,
-		MONITOR_CHECKER_HEARTBEAT_DURATION_PRODUCTION,
+		MONITOR_CHECKER_HEARTBEAT_DURATION_PRODUCTION, MONITOR_CHECKER_HEARTBEAT_DURATION_TESTING,
 	},
 	model::get_model_bytes,
 	monitor::{
@@ -52,8 +52,8 @@ pub async fn monitor_checker(
 	} else {
 		// In every mode other than release, don't introduce a delay, just start in one heartbeat.
 		(
-			tokio::time::Instant::now() + MONITOR_CHECKER_HEARTBEAT_DURATION_PRODUCTION,
-			MONITOR_CHECKER_HEARTBEAT_DURATION_PRODUCTION,
+			tokio::time::Instant::now() + MONITOR_CHECKER_HEARTBEAT_DURATION_TESTING,
+			MONITOR_CHECKER_HEARTBEAT_DURATION_TESTING,
 		)
 	};
 	// start interval.

@@ -170,10 +170,9 @@ async fn handle_alert_send_with_decay(
 			// change period
 			let old_secs = ALERT_SENDER_RETRY_INITIAL_PERIOD.as_secs();
 			let new_secs = old_secs * ALERT_SENDER_RETRY_DECAY_FACTOR.pow(retry_count);
-			dbg!(new_secs);
 			let period = std::time::Duration::from_secs(new_secs);
-			let mut interval = tokio::time::interval(period);
-			//interval.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Skip);
+			let mut interval =
+				tokio::time::interval_at(tokio::time::Instant::now() + period, period);
 			interval.tick().await;
 		}
 	}
@@ -649,65 +648,4 @@ mod test {
 		app.commit_transaction(txn).await.unwrap();
 		ctx.drop().await;
 	}
-
-	/*
-	#[tokio::test]
-	#[traced_test]
-	async fn test_retry_failed_send() {
-		let mut ctx = TestContext::new("retry_failed_send").await;
-		let app = init_test_app(init_test_options_postgres("retry_failed_send"))
-			.await
-			.unwrap();
-		app.set_mocked_http_success_mode(false);
-		app.clock().resume();
-		let model_id = init_heart_disease_model(&app).await.unwrap();
-		seed_monitor_event_pair(&app, model_id, true).await.unwrap();
-		let test_monitor = MonitorConfig {
-			cadence: MonitorCadence::Hourly,
-			threshold: MonitorThreshold {
-				metric: AlertMetric::Accuracy,
-				mode: MonitorThresholdMode::Absolute,
-				difference_lower: Some(0.05),
-				difference_upper: Some(0.05),
-			},
-			title: None,
-			methods: vec![AlertMethod::Webhook(
-				AlertMethodWebhook::try_from("http://0.0.0.0:8085/webhook".to_owned()).unwrap(),
-			)],
-		};
-		seed_single_monitor(&app, &test_monitor, model_id)
-			.await
-			.unwrap();
-		seed_events(&app, 100, model_id).await.unwrap();
-		app.clock().pause();
-		app.clock()
-			.advance(std::time::Duration::from_secs(60 * 60))
-			.await;
-		app.clock().resume();
-		app.sync_tasks().await.unwrap();
-		// Scroll to allow alert_sender to pick up alert
-		app.clock().pause();
-		app.clock()
-			.advance(std::time::Duration::from_secs(10))
-			.await;
-		app.clock().resume();
-		app.sync_tasks().await.unwrap();
-
-		// Assert no success has been logged.
-		app.clock().pause();
-		let mut txn = app.begin_transaction().await.unwrap();
-		let num_successes =
-			get_total_sends_with_status(txn.borrow_mut(), AlertSendStatus::Succeeded)
-				.await
-				.unwrap();
-		assert_eq!(num_successes, 0);
-
-		// Assert there is one Retrying request
-		let num_sending = get_total_sends_with_status(txn.borrow_mut(), AlertSendStatus::Retrying)
-			.await
-			.unwrap();
-		assert_eq!(num_sending, 1);
-		ctx.drop().await;
-	}
-	*/
 }
