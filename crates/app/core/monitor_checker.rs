@@ -187,18 +187,6 @@ impl App {
 		Ok(())
 	}
 
-	/// Send a message to the monitor checker and wait for it to reply back indicating it has run.
-	#[tracing::instrument(level = "info", skip_all)]
-	pub async fn check_monitors(&self) -> Result<()> {
-		tracing::info!("starting check_monitors");
-		let (sender, receiver) = oneshot::channel();
-		self.monitor_checker_sender
-			.send(MonitorCheckerMessage::Run(sender))?;
-		receiver.await?;
-		tracing::info!("finished check_monitors, response received");
-		Ok(())
-	}
-
 	pub async fn create_monitor(&self, args: CreateMonitorArgs<'_, '_>) -> Result<()> {
 		let CreateMonitorArgs {
 			db,
@@ -322,14 +310,14 @@ pub struct MonitorConfig {
 	pub methods: Vec<AlertMethod>,
 }
 
-pub async fn bring_monitor_up_to_date(app: &AppState, monitor: &Monitor) -> Result<()> {
+pub async fn bring_monitor_up_to_date(app_state: &AppState, monitor: &Monitor) -> Result<()> {
 	let minimum_metrics_threshold = if cfg!(not(debug_assertions)) {
 		ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_THRESHOLD
 	} else {
 		ALERT_METRICS_MINIMUM_PRODUCTION_METRICS_DEBUG_THRESHOLD
 	};
 
-	let mut txn = app.begin_transaction().await?;
+	let mut txn = app_state.begin_transaction().await?;
 
 	let not_enough_existing_metrics =
 		get_total_production_metrics(txn.borrow_mut()).await? < minimum_metrics_threshold;
@@ -337,7 +325,7 @@ pub async fn bring_monitor_up_to_date(app: &AppState, monitor: &Monitor) -> Resu
 		return Ok(());
 	}
 
-	let result = check_metrics(monitor, app).await?;
+	let result = check_metrics(monitor, app_state).await?;
 	let exceeded_thresholds: bool = {
 		let (upper, lower) = monitor.get_thresholds();
 		let upper_exceeded = if let Some(upper) = upper {
@@ -360,9 +348,9 @@ pub async fn bring_monitor_up_to_date(app: &AppState, monitor: &Monitor) -> Resu
 			result: result.to_owned(),
 			timestamp: time::OffsetDateTime::now_utc().unix_timestamp(),
 		};
-		write_alert(alert_data, monitor.id, txn.borrow_mut()).await?;
+		write_alert(app_state, alert_data, monitor.id, txn.borrow_mut()).await?;
 	}
-	app.commit_transaction(txn).await?;
+	app_state.commit_transaction(txn).await?;
 
 	Ok(())
 }
@@ -473,8 +461,9 @@ mod test {
 	#[tokio::test]
 	#[traced_test]
 	async fn test_monitor_checker() {
+		//let mut ctx = TestContext::new("monitor_checker").await;
 		// init app
-		let app = init_test_app().await.unwrap();
+		let app = init_test_app(init_test_options_sqlite()).await.unwrap();
 		app.clock().resume();
 
 		// seed repo and model
@@ -495,7 +484,6 @@ mod test {
 		app.commit_transaction(txn).await.unwrap();
 
 		// Ensure that at the beginning, we have no alerts.
-		app.check_monitors().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -504,13 +492,13 @@ mod test {
 		app.commit_transaction(txn).await.unwrap();
 		assert_eq!(all_alerts.len(), 0);
 
-		// Scroll half an hour, we should still have no alerts.
+		// Scroll halfway to heartbeat, ensure no alert still
 		app.clock().pause();
 		app.clock()
 			.advance(std::time::Duration::from_secs(60 * 30))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -519,20 +507,19 @@ mod test {
 		app.commit_transaction(txn).await.unwrap();
 		assert_eq!(all_alerts.len(), 0);
 
-		// Add another half hour, check that hourly alert is created
+		// Scroll to heartbeat, check that hourly alert is created
 		app.clock().pause();
 		app.clock()
 			.advance(std::time::Duration::from_secs(60 * 30))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
 			.await
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
-		dbg!(&all_alerts);
 		assert_eq!(all_alerts.len(), 1);
 
 		// Scroll to one day, check that daily alert is created
@@ -541,7 +528,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60 * 23))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -557,7 +544,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60 * 24 * 6))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -573,7 +560,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60 * 24 * 7 * 3))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -582,13 +569,17 @@ mod test {
 		app.commit_transaction(txn).await.unwrap();
 		//4x hourly, 2x weekly, no daily, no monthly
 		assert_eq!(all_alerts.len(), 6);
+		//ctx.drop().await;
 	}
 
 	#[tokio::test]
 	#[traced_test]
 	async fn test_resolve_monitor_lower_absolute() {
+		let mut ctx = TestContext::new("lower_absolute").await;
 		// start an app, seed event, seed monitor, assert alert.
-		let app = init_test_app().await.unwrap();
+		let app = init_test_app(init_test_options_postgres("lower_absolute"))
+			.await
+			.unwrap();
 		app.clock().resume();
 
 		let model_id = init_heart_disease_model(&app).await.unwrap();
@@ -616,7 +607,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -642,7 +633,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -650,13 +641,17 @@ mod test {
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
 		assert_eq!(all_alerts.len(), 1);
+		ctx.drop().await;
 	}
 
 	#[tokio::test]
 	#[traced_test]
 	async fn test_resolve_monitor_upper_absolute() {
+		let mut ctx = TestContext::new("upper_absolute").await;
 		// start an app, seed event, seed monitor, assert alert.
-		let app = init_test_app().await.unwrap();
+		let app = init_test_app(init_test_options_postgres("upper_absolute"))
+			.await
+			.unwrap();
 		app.clock().resume();
 
 		let model_id = init_heart_disease_model(&app).await.unwrap();
@@ -684,7 +679,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -713,7 +708,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -721,13 +716,17 @@ mod test {
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
 		assert_eq!(all_alerts.len(), 1);
+		ctx.drop().await;
 	}
 
 	#[tokio::test]
 	#[traced_test]
 	async fn test_resolve_monitor_lower_percentage() {
+		let mut ctx = TestContext::new("lower_percentage").await;
 		// start an app, seed event, seed monitor, assert alert.
-		let app = init_test_app().await.unwrap();
+		let app = init_test_app(init_test_options_postgres("lower_percentage"))
+			.await
+			.unwrap();
 		app.clock().resume();
 
 		let model_id = init_heart_disease_model(&app).await.unwrap();
@@ -755,7 +754,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -781,7 +780,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -789,13 +788,17 @@ mod test {
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
 		assert_eq!(all_alerts.len(), 1);
+		ctx.drop().await;
 	}
 
 	#[tokio::test]
 	#[traced_test]
 	async fn test_resolve_monitor_upper_percentage() {
+		let mut ctx = TestContext::new("upper_percentage").await;
 		// start an app, seed event, seed monitor, assert alert.
-		let app = init_test_app().await.unwrap();
+		let app = init_test_app(init_test_options_postgres("upper_percentage"))
+			.await
+			.unwrap();
 		app.clock().resume();
 
 		let model_id = init_heart_disease_model(&app).await.unwrap();
@@ -823,7 +826,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -851,7 +854,7 @@ mod test {
 			.advance(std::time::Duration::from_secs(60 * 60))
 			.await;
 		app.clock().resume();
-		app.check_monitors().await.unwrap();
+		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
 		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
@@ -859,5 +862,6 @@ mod test {
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
 		assert_eq!(all_alerts.len(), 1);
+		ctx.drop().await;
 	}
 }

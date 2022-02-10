@@ -3,7 +3,7 @@
 #[cfg(test)]
 use std::sync::{Arc, RwLock};
 
-use crate::App;
+use crate::{App, AppState};
 use time::OffsetDateTime;
 
 #[derive(Debug)]
@@ -76,7 +76,13 @@ impl Default for Clock {
 
 impl App {
 	pub fn clock(&self) -> &Clock {
-		&self.state.clock
+		self.state.clock()
+	}
+}
+
+impl AppState {
+	pub fn clock(&self) -> &Clock {
+		&self.clock
 	}
 }
 

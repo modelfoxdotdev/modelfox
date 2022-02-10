@@ -1,5 +1,5 @@
 use crate::{
-	alert_sender::set_alert_sent,
+	alert_sender::create_alert_send,
 	monitor::{AlertModelType, Monitor},
 	App, AppState,
 };
@@ -9,6 +9,7 @@ use sqlx::prelude::*;
 use std::{borrow::BorrowMut, fmt, io, str::FromStr};
 use tangram_id::Id;
 use time::{macros::format_description, OffsetDateTime};
+use url::Url;
 
 /// Collection for the alert results from a single run
 #[derive(Debug, Deserialize, Clone, Serialize)]
@@ -63,23 +64,74 @@ impl Alert {
 }
 
 /// The various ways to receive alerts
-// FIXME - using tag = type and renaming here causes sqlx to panic!!
+
 #[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(tag = "type")]
 pub enum AlertMethod {
 	/// Send an email to the stored address
-	Email(String),
+	#[serde(rename = "email")]
+	Email(AlertMethodEmail),
 	/// Dump the alert to STDOUT - mostly useful for testing
+	#[serde(rename = "stdout")]
 	Stdout,
 	/// POST the alert to the given URL as a webhook
-	Webhook(String),
+	#[serde(rename = "webhook")]
+	Webhook(AlertMethodWebhook),
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
+pub struct AlertMethodEmail {
+	pub email: String,
+}
+
+impl fmt::Display for AlertMethodEmail {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		write!(f, "Email: {}", self.email)
+	}
+}
+
+impl From<String> for AlertMethodEmail {
+	fn from(email: String) -> Self {
+		AlertMethodEmail { email }
+	}
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq)]
+pub struct AlertMethodWebhook {
+	pub url: Url,
+}
+
+impl From<Url> for AlertMethodWebhook {
+	fn from(url: Url) -> Self {
+		AlertMethodWebhook { url }
+	}
+}
+
+impl TryFrom<String> for AlertMethodWebhook {
+	type Error = io::Error;
+	fn try_from(value: String) -> Result<Self, Self::Error> {
+		match Url::from_str(&value) {
+			Ok(url) => Ok(url.into()),
+			Err(e) => Err(io::Error::new(
+				io::ErrorKind::InvalidInput,
+				format!("{}", e),
+			)),
+		}
+	}
+}
+
+impl fmt::Display for AlertMethodWebhook {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		write!(f, "Webhook URL: {}", self.url)
+	}
 }
 
 impl fmt::Display for AlertMethod {
 	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
 		let s = match self {
-			AlertMethod::Email(addr) => format!("Email: {}", addr),
+			AlertMethod::Email(email) => email.to_string(),
 			AlertMethod::Stdout => "stdout".to_owned(),
-			AlertMethod::Webhook(url) => format!("Webhook URL: {}", url),
+			AlertMethod::Webhook(webhook) => webhook.to_string(),
 		};
 		write!(f, "{}", s)
 	}
@@ -161,18 +213,20 @@ impl AlertResult {
 
 /// Log the completion of an alert handling process
 pub async fn write_alert(
+	app: &AppState,
 	alert_data: Alert,
 	monitor_id: Id,
 	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 ) -> Result<()> {
 	let mut txn = txn.begin().await?;
+	// First, log the alert in the alerts table
 	let data = serde_json::to_string(&alert_data)?;
 	sqlx::query(
 		"
 		 insert into alerts
-		 	(id, monitor_id, data, sent, date)
+		 	(id, monitor_id, data, date)
 		 values
-		 	($1, $2, $3, 0, $4)
+		 	($1, $2, $3, $4)
 		",
 	)
 	.bind(alert_data.id.to_string())
@@ -181,6 +235,10 @@ pub async fn write_alert(
 	.bind(alert_data.timestamp)
 	.execute(txn.borrow_mut())
 	.await?;
+	// Then, log a new unsent entry for each AlertMethod in the alert_sends table.
+	for method in alert_data.monitor.methods {
+		create_alert_send(app, alert_data.id, method, txn.borrow_mut()).await?;
+	}
 	txn.commit().await?;
 	Ok(())
 }
@@ -226,6 +284,16 @@ impl App {
 		txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 		alert_id: Id,
 	) -> Result<Option<Alert>> {
+		Ok(self.state.get_alert(txn, alert_id).await?)
+	}
+}
+
+impl AppState {
+	pub async fn get_alert(
+		&self,
+		txn: &mut sqlx::Transaction<'_, sqlx::Any>,
+		alert_id: Id,
+	) -> Result<Option<Alert>> {
 		let result = sqlx::query(
 			"
 				select
@@ -247,77 +315,5 @@ impl App {
 		} else {
 			Ok(None)
 		}
-	}
-}
-
-impl AppState {
-	pub async fn get_unsent_alerts(
-		&self,
-		txn: &mut sqlx::Transaction<'_, sqlx::Any>,
-	) -> Result<Vec<Alert>> {
-		let results = sqlx::query(
-			"
-				select
-					data
-				from
-					alerts
-				where
-					sent = 0
-			",
-		)
-		.fetch_all(txn.borrow_mut())
-		.await?;
-		Ok(results
-			.into_iter()
-			.map(|row| {
-				let alert_data: String = row.get(0);
-				let alert_data: Alert =
-					serde_json::from_str(&alert_data).expect("Malformed alert data");
-				alert_data
-			})
-			.collect())
-	}
-
-	pub async fn send_alert(
-		&self,
-		alert: Alert,
-		txn: &mut sqlx::Transaction<'_, sqlx::Any>,
-	) -> Result<()> {
-		for method in alert.monitor.methods {
-			match method {
-				AlertMethod::Email(_address) => {
-					// TODO re-enable this code!
-					/*
-					let email = lettre::Message::builder()
-						.from("Tangram <noreply@tangram.dev>".parse()?)
-						.to(address.parse()?)
-						.subject("Tangram Metrics Alert")
-						.body(format!(
-							"Exceeded alert thresholds: {:?}",
-							exceeded_thresholds
-						))?;
-					if let Some(smtp_transport) = &context.smtp_transport {
-						smtp_transport.send(email).await?;
-					} else {
-						return Err(anyhow!("No SMTP Transport in context"));
-					}
-					*/
-				}
-				AlertMethod::Stdout => println!("exceeded thresholds: {:?}", alert.result),
-				AlertMethod::Webhook(_url) => {
-					// Spawn a task
-					// Attempt the POST, record status in DB.
-					// If status has failed, attempt again until it succeeds.
-
-					// multi-step handshake
-					// first, confirm DB is idle
-					// commit to Sending
-					// send
-					// commit to Idle
-				}
-			}
-		}
-		set_alert_sent(alert.id, txn.borrow_mut()).await?;
-		Ok(())
 	}
 }

@@ -214,6 +214,6 @@ async fn send_code_email(app: &App, email: String, code: String) -> Result<()> {
 		.to(email.parse()?)
 		.subject("Tangram Login Code")
 		.body(format!("Your Tangram login code is {}.", code))?;
-	app.send_email(email).await;
+	app.send_email(email).await?;
 	Ok(())
 }

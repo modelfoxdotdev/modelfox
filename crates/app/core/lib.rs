@@ -7,10 +7,14 @@ use crate::{
 };
 use anyhow::{anyhow, bail, Result};
 use lettre::AsyncTransport;
+use serde::Serialize;
 use sqlx::postgres::PgPoolOptions;
-use std::{path::PathBuf, sync::Arc};
+use std::{
+	path::PathBuf,
+	sync::{Arc, RwLock},
+};
 use storage::InMemoryStorage;
-use tokio::sync::mpsc;
+use tokio::sync::{mpsc, oneshot};
 use url::Url;
 
 pub mod alert;
@@ -43,9 +47,56 @@ pub struct App {
 pub struct AppState {
 	pub clock: Clock,
 	pub database_pool: sqlx::AnyPool,
+	pub http_sender: HttpSender,
 	pub options: Options,
 	pub smtp_transport: Option<Mailer>,
 	pub storage: Storage,
+}
+
+#[derive(Debug)]
+pub enum HttpSender {
+	Production,
+	Testing(RwLock<bool>),
+}
+
+impl HttpSender {
+	pub async fn post_payload<S: Serialize>(
+		&self,
+		payload: S,
+		url: Url,
+	) -> Result<http::Response<hyper::Body>> {
+		match self {
+			HttpSender::Production => {
+				let client = hyper::Client::new();
+				let request = hyper::Request::builder()
+					.method(hyper::Method::POST)
+					.uri(url.as_str())
+					.body(hyper::Body::from(serde_json::to_string(&payload)?))?;
+				Ok(client.request(request).await?)
+			}
+			HttpSender::Testing(should_succeed) => {
+				let lock = should_succeed.read().unwrap();
+				if *lock {
+					Ok(http::Response::builder().body(hyper::Body::empty())?)
+				} else {
+					Ok(http::Response::builder()
+						.status(http::StatusCode::NOT_FOUND)
+						.body(hyper::Body::empty())?)
+				}
+			}
+		}
+	}
+
+	#[cfg(test)]
+	pub fn set_success_mode(&self, should_succeed: bool) {
+		match self {
+			HttpSender::Production => { /* no-op, this is meaningless for production */ }
+			HttpSender::Testing(lock) => {
+				let mut lock = lock.write().unwrap();
+				*lock = should_succeed;
+			}
+		}
+	}
 }
 
 #[derive(Debug, Clone)]
@@ -55,6 +106,11 @@ pub enum Mailer {
 }
 
 impl Mailer {
+	#[cfg(test)]
+	pub fn test_mailer() -> Self {
+		Mailer::Testing(lettre::transport::stub::StubTransport::new_ok())
+	}
+
 	pub async fn send(&self, email: lettre::Message) -> Result<()> {
 		match self {
 			Mailer::Production(transport) => {
@@ -174,6 +230,9 @@ impl App {
 			tangram_app_migrations::verify(&database_pool).await?;
 		}
 		// Create the smtp transport.
+		#[cfg(test)]
+		let smtp_transport = Some(Mailer::test_mailer());
+		#[cfg(not(test))]
 		let smtp_transport = if let Some(smtp) = options.smtp.as_ref() {
 			Some(Mailer::Production(
 				lettre::AsyncSmtpTransport::<lettre::Tokio1Executor>::relay(&smtp.host)?
@@ -195,9 +254,14 @@ impl App {
 				options.cache_path,
 			)?),
 		};
+		#[cfg(test)]
+		let http_sender = HttpSender::Testing(RwLock::new(true));
+		#[cfg(not(test))]
+		let http_sender = HttpSender::Production;
 		let state = AppState {
 			clock: Clock::new(),
 			database_pool,
+			http_sender,
 			options,
 			smtp_transport,
 			storage,
@@ -241,16 +305,34 @@ impl App {
 		Ok(self.state.database_pool.acquire().await?)
 	}
 
-	pub async fn send_email(&self, message: lettre::Message) {
-		if let Some(smtp_transport) = self.smtp_transport() {
-			tokio::spawn(async move { smtp_transport.send(message).await.unwrap() });
-		} else {
-			tracing::info!("App attempted to send email, but no smtp_transport is configured.");
-		}
+	pub async fn send_email(&self, message: lettre::Message) -> Result<()> {
+		self.state.send_email(message).await
 	}
 
 	pub fn smtp_transport(&self) -> Option<Mailer> {
 		self.state.smtp_transport.clone()
+	}
+
+	/// Send a message to the monitor checker and wait for it to reply back indicating it has run.
+	#[tracing::instrument(level = "info", skip_all)]
+	pub async fn sync_tasks(&self) -> Result<()> {
+		tracing::info!("starting sync_tasks");
+		let (sender, receiver) = oneshot::channel();
+		self.monitor_checker_sender
+			.send(MonitorCheckerMessage::Run(sender))?;
+		receiver.await?;
+		tracing::info!("check_monitors response received");
+		let (sender, receiver) = oneshot::channel();
+		self.alert_sender_sender
+			.send(AlertSenderMessage::Run(sender))?;
+		receiver.await?;
+		tracing::info!("alert_sender response received");
+		Ok(())
+	}
+
+	#[cfg(test)]
+	pub fn set_mocked_http_success_mode(&self, should_succeed: bool) {
+		self.state.set_mocked_http_success_mode(should_succeed);
 	}
 }
 
@@ -262,6 +344,27 @@ impl AppState {
 	pub async fn commit_transaction(&self, txn: sqlx::Transaction<'_, sqlx::Any>) -> Result<()> {
 		txn.commit().await?;
 		Ok(())
+	}
+
+	pub async fn send_email(&self, message: lettre::Message) -> Result<()> {
+		if let Some(smtp_transport) = self.smtp_transport.clone() {
+			let result = tokio::spawn(async move { smtp_transport.send(message).await }).await;
+			match result {
+				Ok(email_result) => match email_result {
+					Ok(_) => Ok(()),
+					Err(e) => Err(anyhow!("Error encountered sending SMTP email: {}", e)),
+				},
+				Err(_join_error) => bail!("Email sender task failed spectacularly"),
+			}
+		} else {
+			tracing::info!("App attempted to send email, but no smtp_transport is configured.");
+			Ok(())
+		}
+	}
+
+	#[cfg(test)]
+	pub fn set_mocked_http_success_mode(&self, should_succeed: bool) {
+		self.http_sender.set_success_mode(should_succeed);
 	}
 }
 
