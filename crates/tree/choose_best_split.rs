@@ -2,9 +2,8 @@
 use crate::timing::Timing;
 use crate::{
 	compute_bin_stats::{
-		compute_bin_stats_column_major_not_root, compute_bin_stats_column_major_root,
-		compute_bin_stats_row_major_not_root, compute_bin_stats_row_major_root,
-		compute_bin_stats_subtraction, BinStats, BinStatsEntry,
+		compute_bin_stats_column_major, compute_bin_stats_row_major, compute_bin_stats_subtraction,
+		BinStats, BinStatsEntry,
 	},
 	compute_binned_features::{
 		BinnedFeaturesColumnMajor, BinnedFeaturesRowMajor, BinnedFeaturesRowMajorInner,
@@ -249,8 +248,9 @@ fn choose_best_split_root_column_major(
 			),
 		)| {
 			// Compute the bin stats.
-			compute_bin_stats_column_major_root(
+			compute_bin_stats_column_major::<true>(
 				bin_stats_for_feature,
+				&[],
 				binned_feature_column,
 				gradients,
 				hessians,
@@ -318,13 +318,14 @@ fn choose_best_split_root_row_major(
 		.map(|examples_index_chunk| {
 			let mut bin_stats_chunk: Vec<BinStatsEntry> =
 				bin_stats.iter().map(|_| BinStatsEntry::default()).collect();
-			compute_bin_stats_row_major_root(
+			compute_bin_stats_row_major::<true>(
 				bin_stats_chunk.as_mut_slice(),
 				examples_index_chunk,
 				binned_features_row_major,
 				gradients,
 				hessians,
 				hessians_are_constant,
+				&[],
 			);
 			bin_stats_chunk
 		})
@@ -700,7 +701,7 @@ fn compute_bin_stats_and_choose_best_splits_not_root_column_major(
 				return (None, None);
 			}
 			// Compute the bin stats for the child with fewer examples.
-			compute_bin_stats_column_major_not_root(
+			compute_bin_stats_column_major::<false>(
 				smaller_child_bin_stats_for_feature,
 				smaller_child_examples_index,
 				binned_features_column,
@@ -812,7 +813,7 @@ fn compute_bin_stats_and_choose_best_splits_not_root_row_major(
 	// Compute the bin stats for the child with fewer examples.
 	let smaller_child_n_examples = smaller_child_examples_index.len();
 	if smaller_child_n_examples < MIN_EXAMPLES_TO_PARALLELIZE {
-		compute_bin_stats_row_major_not_root(
+		compute_bin_stats_row_major::<false>(
 			smaller_child_bin_stats.as_mut_slice(),
 			smaller_child_examples_index,
 			binned_features_row_major,
@@ -830,7 +831,7 @@ fn compute_bin_stats_and_choose_best_splits_not_root_row_major(
 					.iter()
 					.map(|_| BinStatsEntry::default())
 					.collect();
-				compute_bin_stats_row_major_not_root(
+				compute_bin_stats_row_major::<false>(
 					smaller_child_bin_stats_chunk.as_mut_slice(),
 					smaller_child_examples_index_chunk,
 					binned_features_row_major,
