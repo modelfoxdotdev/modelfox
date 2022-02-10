@@ -171,23 +171,17 @@ unsafe fn compute_bin_stats_column_major_root<T, const HESSIANS: bool>(
 ) where
 	T: ToPrimitive,
 {
-	if HESSIANS {
-		let len = gradients.len();
-		for i in 0..len {
-			let ordered_gradient = *gradients.get_unchecked(i);
+	let len = gradients.len();
+	for i in 0..len {
+		let ordered_gradient = *gradients.get_unchecked(i);
+		let bin_index = binned_feature_values.get_unchecked(i).to_usize().unwrap();
+		let bin_stats = bin_stats_for_feature.get_unchecked_mut(bin_index);
+		bin_stats.sum_gradients += ordered_gradient as f64;
+		bin_stats.sum_hessians += 1.0;
+		if HESSIANS {
 			let ordered_hessian = *hessians.get_unchecked(i);
-			let bin_index = binned_feature_values.get_unchecked(i).to_usize().unwrap();
-			let bin_stats = bin_stats_for_feature.get_unchecked_mut(bin_index);
-			bin_stats.sum_gradients += ordered_gradient as f64;
 			bin_stats.sum_hessians += ordered_hessian as f64;
-		}
-	} else {
-		let len = gradients.len();
-		for i in 0..len {
-			let ordered_gradient = *gradients.get_unchecked(i);
-			let bin_index = binned_feature_values.get_unchecked(i).to_usize().unwrap();
-			let bin_stats = bin_stats_for_feature.get_unchecked_mut(bin_index);
-			bin_stats.sum_gradients += ordered_gradient as f64;
+		} else {
 			bin_stats.sum_hessians += 1.0;
 		}
 	}
