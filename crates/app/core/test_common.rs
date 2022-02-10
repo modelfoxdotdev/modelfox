@@ -31,6 +31,8 @@ const TEST_POSTGRES_URL: &str = "postgres://postgres:test@0.0.0.0:5432";
 /// async fn cool_test {
 /// 	let mut ctx = TestContext::new("cool_test").await;
 /// 	// test logic!
+/// 	let app = init_test_app(init_test_options_postgres("cool_test")).await.unwrap();
+/// 	// ...
 /// 	ctx.drop().await;
 /// }
 /// ```

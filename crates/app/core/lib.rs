@@ -9,7 +9,10 @@ use anyhow::{anyhow, bail, Result};
 use lettre::AsyncTransport;
 use serde::Serialize;
 use sqlx::postgres::PgPoolOptions;
-use std::{path::PathBuf, sync::Arc};
+use std::{
+	path::PathBuf,
+	sync::{Arc, RwLock},
+};
 use storage::InMemoryStorage;
 use tokio::sync::{mpsc, oneshot};
 use url::Url;
@@ -50,10 +53,10 @@ pub struct AppState {
 	pub storage: Storage,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum HttpSender {
 	Production,
-	Testing,
+	Testing(RwLock<bool>),
 }
 
 impl HttpSender {
@@ -71,7 +74,27 @@ impl HttpSender {
 					.body(hyper::Body::from(serde_json::to_string(&payload)?))?;
 				Ok(client.request(request).await?)
 			}
-			HttpSender::Testing => Ok(http::Response::builder().body(hyper::Body::empty())?),
+			HttpSender::Testing(should_succeed) => {
+				let lock = should_succeed.read().unwrap();
+				if *lock {
+					Ok(http::Response::builder().body(hyper::Body::empty())?)
+				} else {
+					Ok(http::Response::builder()
+						.status(http::StatusCode::NOT_FOUND)
+						.body(hyper::Body::empty())?)
+				}
+			}
+		}
+	}
+
+	#[cfg(test)]
+	pub fn set_success_mode(&self, should_succeed: bool) {
+		match self {
+			HttpSender::Production => { /* no-op, this is meaningless for production */ }
+			HttpSender::Testing(lock) => {
+				let mut lock = lock.write().unwrap();
+				*lock = should_succeed;
+			}
 		}
 	}
 }
@@ -232,7 +255,7 @@ impl App {
 			)?),
 		};
 		#[cfg(test)]
-		let http_sender = HttpSender::Testing;
+		let http_sender = HttpSender::Testing(RwLock::new(true));
 		#[cfg(not(test))]
 		let http_sender = HttpSender::Production;
 		let state = AppState {
@@ -306,6 +329,11 @@ impl App {
 		tracing::info!("alert_sender response received");
 		Ok(())
 	}
+
+	#[cfg(test)]
+	pub fn set_mocked_http_success_mode(&self, should_succeed: bool) {
+		self.state.set_mocked_http_success_mode(should_succeed);
+	}
 }
 
 impl AppState {
@@ -332,6 +360,11 @@ impl AppState {
 			tracing::info!("App attempted to send email, but no smtp_transport is configured.");
 			Ok(())
 		}
+	}
+
+	#[cfg(test)]
+	pub fn set_mocked_http_success_mode(&self, should_succeed: bool) {
+		self.http_sender.set_success_mode(should_succeed);
 	}
 }
 

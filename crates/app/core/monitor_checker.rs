@@ -461,12 +461,9 @@ mod test {
 	#[tokio::test]
 	#[traced_test]
 	async fn test_monitor_checker() {
-		// FIXME - this test is broken with postgres, it seems to run immedaitely instead of waiting a heartbeat.
-		let mut ctx = TestContext::new("monitor_checker").await;
+		//let mut ctx = TestContext::new("monitor_checker").await;
 		// init app
-		let app = init_test_app(init_test_options_postgres("monitor_checker"))
-			.await
-			.unwrap();
+		let app = init_test_app(init_test_options_sqlite()).await.unwrap();
 		app.clock().resume();
 
 		// seed repo and model
@@ -487,16 +484,15 @@ mod test {
 		app.commit_transaction(txn).await.unwrap();
 
 		// Ensure that at the beginning, we have no alerts.
-		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
-		let _all_alerts = app
+		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
 			.await
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
-		//assert_eq!(all_alerts.len(), 0);
+		assert_eq!(all_alerts.len(), 0);
 
-		// Scroll half an hour, we should still have no alerts.
+		// Scroll halfway to heartbeat, ensure no alert still
 		app.clock().pause();
 		app.clock()
 			.advance(std::time::Duration::from_secs(60 * 30))
@@ -504,14 +500,14 @@ mod test {
 		app.clock().resume();
 		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
-		let _all_alerts = app
+		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
 			.await
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
-		//assert_eq!(all_alerts.len(), 0);
+		assert_eq!(all_alerts.len(), 0);
 
-		// Add another half hour, check that hourly alert is created
+		// Scroll to heartbeat, check that hourly alert is created
 		app.clock().pause();
 		app.clock()
 			.advance(std::time::Duration::from_secs(60 * 30))
@@ -519,12 +515,12 @@ mod test {
 		app.clock().resume();
 		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
-		let _all_alerts = app
+		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
 			.await
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
-		//assert_eq!(all_alerts.len(), 1);
+		assert_eq!(all_alerts.len(), 1);
 
 		// Scroll to one day, check that daily alert is created
 		app.clock().pause();
@@ -534,13 +530,13 @@ mod test {
 		app.clock().resume();
 		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
-		let _all_alerts = app
+		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
 			.await
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
 		// 2x hourly
-		//assert_eq!(all_alerts.len(), 2);
+		assert_eq!(all_alerts.len(), 2);
 
 		// Add six more days, check that weekly alert is created
 		app.clock().pause();
@@ -550,13 +546,13 @@ mod test {
 		app.clock().resume();
 		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
-		let _all_alerts = app
+		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
 			.await
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
 		// 2x hourly, 2x weekly, no daily
-		//assert_eq!(all_alerts.len(), 4);
+		assert_eq!(all_alerts.len(), 4);
 
 		// Add three more weeks, check that monthly alert is created.
 		app.clock().pause();
@@ -566,14 +562,14 @@ mod test {
 		app.clock().resume();
 		app.sync_tasks().await.unwrap();
 		let mut txn = app.begin_transaction().await.unwrap();
-		let _all_alerts = app
+		let all_alerts = app
 			.get_all_alerts_for_model(txn.borrow_mut(), model_id)
 			.await
 			.unwrap();
 		app.commit_transaction(txn).await.unwrap();
 		//4x hourly, 2x weekly, no daily, no monthly
-		//assert_eq!(all_alerts.len(), 6);
-		ctx.drop().await;
+		assert_eq!(all_alerts.len(), 6);
+		//ctx.drop().await;
 	}
 
 	#[tokio::test]
