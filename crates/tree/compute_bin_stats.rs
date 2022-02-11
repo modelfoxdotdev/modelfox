@@ -2,8 +2,6 @@ use crate::compute_binned_features::{BinnedFeaturesColumnMajorColumn, BinnedFeat
 use num::ToPrimitive;
 use tangram_zip::zip;
 
-//const HESSIANS_ARE_CONSTANT: bool = false;
-
 /// This struct tracks the sum of gradients and hessians for all examples across all bins for all features.
 #[derive(Clone, Debug)]
 pub enum BinStats {
