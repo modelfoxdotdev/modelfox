@@ -191,7 +191,7 @@ impl Trainer {
 		};
 
 		// Compute the baseline metrics.
-		let progress_counter = ProgressCounter::new(train_row_count as u64);
+		let progress_counter = ProgressCounter::new(test_row_count as u64);
 		handle_progress_event(ProgressEvent::ComputeBaselineMetrics(
 			progress_counter.clone(),
 		));

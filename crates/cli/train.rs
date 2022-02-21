@@ -97,7 +97,8 @@ pub fn train(args: TrainArgs) -> Result<()> {
 			}
 		};
 		let kill_chip = unsafe { ctrl_c::register_ctrl_c_handler()? };
-		let train_grid_item_outputs = trainer.train_grid(kill_chip, &mut handle_progress_event)?;
+		let train_grid_item_outputs =
+			trainer.train_grid(Some(kill_chip), &mut handle_progress_event)?;
 		unsafe { ctrl_c::unregister_ctrl_c_handler()? };
 		if kill_chip.is_activated() {
 			if let Some(progress_thread) = progress_thread.as_mut() {
@@ -594,7 +595,9 @@ impl ProgressBar {
 		let fraction = if fraction.is_nan() { 0.0 } else { fraction };
 		write!(terminal, "{} {}", self.emoji, self.title)?;
 		let elapsed = self.start.elapsed();
-		let eta = if fraction > std::f64::EPSILON {
+		let eta = if fraction > 1.0 {
+			None
+		} else if fraction > std::f64::EPSILON {
 			let current_elapsed = self.last_change.duration_since(self.start);
 			let current_elapsed_secs = current_elapsed.as_secs().to_f64().unwrap()
 				+ current_elapsed.subsec_nanos().to_f64().unwrap() / 1_000_000_000f64;
