@@ -97,8 +97,7 @@ pub fn train(args: TrainArgs) -> Result<()> {
 			}
 		};
 		let kill_chip = unsafe { ctrl_c::register_ctrl_c_handler()? };
-		let train_grid_item_outputs =
-			trainer.train_grid(Some(kill_chip), &mut handle_progress_event)?;
+		let train_grid_item_outputs = trainer.train_grid(kill_chip, &mut handle_progress_event)?;
 		unsafe { ctrl_c::unregister_ctrl_c_handler()? };
 		if kill_chip.is_activated() {
 			if let Some(progress_thread) = progress_thread.as_mut() {
