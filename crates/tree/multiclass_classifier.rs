@@ -123,7 +123,7 @@ pub fn update_logits(
 	mut predictions: ArrayViewMut2<f32>,
 ) {
 	let features_rows = binned_features.axis_iter(Axis(0));
-	let logits_rows = predictions.axis_iter_mut(Axis(1));
+	let logits_rows = predictions.axis_iter_mut(Axis(0));
 	for (features, mut logits) in zip!(features_rows, logits_rows) {
 		for (logit, tree) in zip!(logits.iter_mut(), trees_for_round.iter()) {
 			*logit += tree.predict(features.as_slice().unwrap());

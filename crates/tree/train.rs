@@ -180,12 +180,12 @@ pub fn train(
 	let mut predictions_early_stopping = if early_stopping_enabled {
 		let mut predictions_early_stopping = unsafe {
 			Array::uninit((
-				n_trees_per_round,
 				labels_early_stopping.as_ref().unwrap().len(),
+				n_trees_per_round,
 			))
 			.assume_init()
 		};
-		for mut predictions in predictions_early_stopping.axis_iter_mut(Axis(1)) {
+		for mut predictions in predictions_early_stopping.axis_iter_mut(Axis(0)) {
 			predictions.assign(&biases);
 		}
 		Some(predictions_early_stopping)
