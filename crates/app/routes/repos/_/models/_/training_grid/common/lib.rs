@@ -22,11 +22,29 @@ pub fn hyperparameters_for_grid_item(
 					hyperparameters.n_examples_per_batch().to_string(),
 				),
 				(
-					"early_stopping_enabled".to_owned(),
+					"early_stopping:early_stopping_fraction".to_owned(),
 					hyperparameters
 						.early_stopping_options()
-						.is_some()
-						.to_string(),
+						.map(|options| options.early_stopping_fraction().to_string())
+						.unwrap_or("None".to_string()),
+				),
+				(
+					"early_stopping:n_rounds_without_improvement_to_stop".to_owned(),
+					hyperparameters
+						.early_stopping_options()
+						.map(|options| options.n_rounds_without_improvement_to_stop().to_string())
+						.unwrap_or("None".to_string()),
+				),
+				(
+					"early_stopping:min_decrease_in_loss_for_significant_change".to_owned(),
+					hyperparameters
+						.early_stopping_options()
+						.map(|options| {
+							options
+								.min_decrease_in_loss_for_significant_change()
+								.to_string()
+						})
+						.unwrap_or("None".to_string()),
 				),
 			]
 		}
@@ -45,11 +63,29 @@ pub fn hyperparameters_for_grid_item(
 					},
 				),
 				(
-					"early_stopping_enabled".to_owned(),
+					"early_stopping:early_stopping_fraction".to_owned(),
 					hyperparameters
 						.early_stopping_options()
-						.is_some()
-						.to_string(),
+						.map(|options| options.early_stopping_fraction().to_string())
+						.unwrap_or("None".to_string()),
+				),
+				(
+					"early_stopping:n_rounds_without_improvement_to_stop".to_owned(),
+					hyperparameters
+						.early_stopping_options()
+						.map(|options| options.n_rounds_without_improvement_to_stop().to_string())
+						.unwrap_or("None".to_string()),
+				),
+				(
+					"early_stopping:min_decrease_in_loss_for_significant_change".to_owned(),
+					hyperparameters
+						.early_stopping_options()
+						.map(|options| {
+							options
+								.min_decrease_in_loss_for_significant_change()
+								.to_string()
+						})
+						.unwrap_or("None".to_string()),
 				),
 				(
 					"l2_regularization_for_continuous_splits".to_owned(),
