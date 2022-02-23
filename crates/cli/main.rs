@@ -20,7 +20,7 @@ mod train;
 #[clap(
 	version = concat!(env!("CARGO_PKG_VERSION")),
 	about = "Train and deploy a machine learning model in minutes.",
-	setting = clap::AppSettings::DisableHelpSubcommand,
+	disable_help_subcommand = true,
 )]
 struct Args {
 	#[clap(subcommand)]
