@@ -1,8 +1,9 @@
 use crate::progress::ModelTestProgressEvent;
 use ndarray::prelude::*;
+use rayon::prelude::*;
 use tangram_progress_counter::ProgressCounter;
 use tangram_table::prelude::*;
-use tangram_zip::zip;
+use tangram_zip::pzip;
 
 pub fn test_linear_regressor(
 	table_test: &TableView,
@@ -28,34 +29,28 @@ pub fn test_linear_regressor(
 	let progress_total = table_test.nrows() as u64;
 	let progress_counter = ProgressCounter::new(progress_total);
 	handle_progress_event(ModelTestProgressEvent::Test(progress_counter.clone()));
-	struct State {
-		predictions: Array1<f32>,
-		test_metrics: tangram_metrics::RegressionMetrics,
-	}
-	let State { test_metrics, .. } = zip!(
+	let test_metrics = pzip!(
 		features.axis_chunks_iter(Axis(0), n_examples_per_batch),
-		labels.as_slice().chunks(n_examples_per_batch),
+		ArrayView1::from(labels.as_slice()).axis_chunks_iter(Axis(0), n_examples_per_batch),
 	)
 	.fold(
-		{
-			let predictions = Array::zeros(n_examples_per_batch);
-			let test_metrics = tangram_metrics::RegressionMetrics::default();
-			State {
-				predictions,
-				test_metrics,
-			}
-		},
-		|mut state, (features, labels)| {
-			let slice = s![0..features.nrows()];
-			model.predict(features, state.predictions.slice_mut(slice));
-			state
-				.test_metrics
-				.update(tangram_metrics::RegressionMetricsInput {
-					predictions: state.predictions.slice(slice).as_slice().unwrap(),
-					labels,
-				});
+		|| tangram_metrics::RegressionMetrics::default(),
+		|mut test_metrics, (features, labels)| {
+			let mut predictions = Array::zeros(features.nrows());
+			model.predict(features, predictions.view_mut());
+			test_metrics.update(tangram_metrics::RegressionMetricsInput {
+				predictions: predictions.as_slice().unwrap(),
+				labels: labels.as_slice().unwrap(),
+			});
 			progress_counter.inc(labels.len() as u64);
-			state
+			test_metrics
+		},
+	)
+	.reduce(
+		|| tangram_metrics::RegressionMetrics::default(),
+		|mut metrics_a, metrics_b| {
+			metrics_a.merge(metrics_b);
+			metrics_a
 		},
 	);
 	let test_metrics = test_metrics.finalize();
@@ -86,34 +81,28 @@ pub fn test_tree_regressor(
 	let labels = table_test.columns().get(target_column_index).unwrap();
 	let labels = labels.as_number().unwrap();
 	let n_examples_per_batch = 256;
-	struct State {
-		predictions: Array1<f32>,
-		test_metrics: tangram_metrics::RegressionMetrics,
-	}
-	let State { test_metrics, .. } = zip!(
+	let test_metrics = pzip!(
 		features.axis_chunks_iter(Axis(0), n_examples_per_batch),
-		labels.as_slice().chunks(n_examples_per_batch),
+		ArrayView1::from(labels.as_slice()).axis_chunks_iter(Axis(0), n_examples_per_batch),
 	)
 	.fold(
-		{
-			let predictions = Array::zeros(n_examples_per_batch);
-			let test_metrics = tangram_metrics::RegressionMetrics::default();
-			State {
-				predictions,
-				test_metrics,
-			}
-		},
-		|mut state, (features, labels)| {
-			let slice = s![0..features.nrows()];
-			model.predict(features, state.predictions.slice_mut(slice));
-			state
-				.test_metrics
-				.update(tangram_metrics::RegressionMetricsInput {
-					predictions: state.predictions.slice(slice).as_slice().unwrap(),
-					labels,
-				});
+		|| tangram_metrics::RegressionMetrics::default(),
+		|mut test_metrics, (features, labels)| {
+			let mut predictions = Array::zeros(features.nrows());
+			model.predict(features, predictions.view_mut());
+			test_metrics.update(tangram_metrics::RegressionMetricsInput {
+				predictions: predictions.as_slice().unwrap(),
+				labels: labels.as_slice().unwrap(),
+			});
 			progress_counter.inc(labels.len() as u64);
-			state
+			test_metrics
+		},
+	)
+	.reduce(
+		|| tangram_metrics::RegressionMetrics::default(),
+		|mut metrics_a, metrics_b| {
+			metrics_a.merge(metrics_b);
+			metrics_a
 		},
 	);
 	let test_metrics = test_metrics.finalize();
@@ -149,36 +138,29 @@ pub fn test_linear_binary_classifier(
 		.as_enum()
 		.unwrap();
 	let n_examples_per_batch = 256;
-	struct State {
-		predictions: Array1<f32>,
-		test_metrics: tangram_metrics::BinaryClassificationMetrics,
-	}
-	let State { test_metrics, .. } = zip!(
+	let test_metrics = pzip!(
 		features.axis_chunks_iter(Axis(0), n_examples_per_batch),
 		ArrayView1::from(labels.as_slice()).axis_chunks_iter(Axis(0), n_examples_per_batch),
 	)
 	.fold(
-		{
-			let predictions = Array::zeros(n_examples_per_batch);
-			State {
-				predictions,
-				test_metrics: tangram_metrics::BinaryClassificationMetrics::new(99),
-			}
-		},
-		|mut state, (features, labels)| {
-			let slice = s![0..features.nrows()];
-			let mut predictions = state.predictions.slice_mut(slice);
+		|| tangram_metrics::BinaryClassificationMetrics::new(99),
+		|mut test_metrics, (features, labels)| {
+			let mut predictions = Array::zeros(features.nrows());
 			model.predict(features, predictions.view_mut());
-			state
-				.test_metrics
-				.update(tangram_metrics::BinaryClassificationMetricsInput {
-					probabilities: predictions.as_slice().unwrap(),
-					labels: labels.as_slice().unwrap(),
-				});
+			test_metrics.update(tangram_metrics::BinaryClassificationMetricsInput {
+				probabilities: predictions.as_slice().unwrap(),
+				labels: labels.as_slice().unwrap(),
+			});
 			progress_counter.inc(labels.len() as u64);
-			state
+			test_metrics
 		},
-	);
+	)
+	.reduce(|| tangram_metrics::BinaryClassificationMetrics::new(99), {
+		|mut metrics_a, metrics_b| {
+			metrics_a.merge(metrics_b);
+			metrics_a
+		}
+	});
 	let test_metrics = test_metrics.finalize();
 	handle_progress_event(ModelTestProgressEvent::TestDone);
 	test_metrics
@@ -212,36 +194,29 @@ pub fn test_tree_binary_classifier(
 		.as_enum()
 		.unwrap();
 	let n_examples_per_batch = 256;
-	struct State {
-		predictions: Array1<f32>,
-		test_metrics: tangram_metrics::BinaryClassificationMetrics,
-	}
-	let State { test_metrics, .. } = zip!(
+	let test_metrics = pzip!(
 		features.axis_chunks_iter(Axis(0), n_examples_per_batch),
 		ArrayView1::from(labels.as_slice()).axis_chunks_iter(Axis(0), n_examples_per_batch),
 	)
 	.fold(
-		{
-			let predictions = Array::zeros(n_examples_per_batch);
-			State {
-				predictions,
-				test_metrics: tangram_metrics::BinaryClassificationMetrics::new(99),
-			}
-		},
-		|mut state, (features, labels)| {
-			let slice = s![0..features.nrows()];
-			let mut predictions = state.predictions.slice_mut(slice);
+		|| tangram_metrics::BinaryClassificationMetrics::new(99),
+		|mut test_metrics, (features, labels)| {
+			let mut predictions = Array::zeros(features.nrows());
 			model.predict(features, predictions.view_mut());
-			state
-				.test_metrics
-				.update(tangram_metrics::BinaryClassificationMetricsInput {
-					probabilities: predictions.as_slice().unwrap(),
-					labels: labels.as_slice().unwrap(),
-				});
+			test_metrics.update(tangram_metrics::BinaryClassificationMetricsInput {
+				probabilities: predictions.as_slice().unwrap(),
+				labels: labels.as_slice().unwrap(),
+			});
 			progress_counter.inc(labels.len() as u64);
-			state
+			test_metrics
 		},
-	);
+	)
+	.reduce(|| tangram_metrics::BinaryClassificationMetrics::new(99), {
+		|mut metrics_a, metrics_b| {
+			metrics_a.merge(metrics_b);
+			metrics_a
+		}
+	});
 	let test_metrics = test_metrics.finalize();
 	handle_progress_event(ModelTestProgressEvent::TestDone);
 	test_metrics
@@ -276,37 +251,29 @@ pub fn test_linear_multiclass_classifier(
 		.unwrap();
 	let n_classes = labels.variants().len();
 	let n_examples_per_batch = 256;
-	struct State {
-		predictions: Array2<f32>,
-		test_metrics: tangram_metrics::MulticlassClassificationMetrics,
-	}
-	let State { test_metrics, .. } = zip!(
+	let test_metrics = pzip!(
 		features.axis_chunks_iter(Axis(0), n_examples_per_batch),
 		ArrayView1::from(labels.as_slice()).axis_chunks_iter(Axis(0), n_examples_per_batch),
 	)
 	.fold(
-		{
-			let predictions = Array::zeros((n_examples_per_batch, n_classes));
-			let test_metrics = tangram_metrics::MulticlassClassificationMetrics::new(n_classes);
-			State {
-				predictions,
-				test_metrics,
-			}
-		},
-		|mut state, (features, labels)| {
-			let slice = s![0..features.nrows(), ..];
-			let predictions = state.predictions.slice_mut(slice);
-			model.predict(features, predictions);
-			let predictions = state.predictions.slice(slice);
+		|| tangram_metrics::MulticlassClassificationMetrics::new(n_classes),
+		|mut test_metrics, (features, labels)| {
+			let mut predictions = Array::zeros((features.nrows(), n_classes));
+			model.predict(features, predictions.view_mut());
 			let labels = labels.view();
-			state
-				.test_metrics
-				.update(tangram_metrics::MulticlassClassificationMetricsInput {
-					probabilities: predictions,
-					labels,
-				});
+			test_metrics.update(tangram_metrics::MulticlassClassificationMetricsInput {
+				probabilities: predictions.view(),
+				labels,
+			});
 			progress_counter.inc(labels.len() as u64);
-			state
+			test_metrics
+		},
+	)
+	.reduce(
+		|| tangram_metrics::MulticlassClassificationMetrics::new(n_classes),
+		|mut metrics_a, metrics_b| {
+			metrics_a.merge(metrics_b);
+			metrics_a
 		},
 	);
 	let test_metrics = test_metrics.finalize();
@@ -343,37 +310,29 @@ pub fn test_tree_multiclass_classifier(
 		.unwrap();
 	let n_classes = labels.variants().len();
 	let n_examples_per_batch = 256;
-	struct State {
-		predictions: Array2<f32>,
-		test_metrics: tangram_metrics::MulticlassClassificationMetrics,
-	}
-	let State { test_metrics, .. } = zip!(
+	let test_metrics = pzip!(
 		features.axis_chunks_iter(Axis(0), n_examples_per_batch),
 		ArrayView1::from(labels.as_slice()).axis_chunks_iter(Axis(0), n_examples_per_batch),
 	)
 	.fold(
-		{
-			let predictions = Array::zeros((n_examples_per_batch, n_classes));
-			let test_metrics = tangram_metrics::MulticlassClassificationMetrics::new(n_classes);
-			State {
-				predictions,
-				test_metrics,
-			}
-		},
-		|mut state, (features, labels)| {
-			let slice = s![0..features.nrows(), ..];
-			let predictions = state.predictions.slice_mut(slice);
-			model.predict(features, predictions);
-			let predictions = state.predictions.slice(slice);
+		|| tangram_metrics::MulticlassClassificationMetrics::new(n_classes),
+		|mut test_metrics, (features, labels)| {
+			let mut predictions = Array::zeros((features.nrows(), n_classes));
+			model.predict(features, predictions.view_mut());
 			let labels = labels.view();
-			state
-				.test_metrics
-				.update(tangram_metrics::MulticlassClassificationMetricsInput {
-					probabilities: predictions,
-					labels,
-				});
+			test_metrics.update(tangram_metrics::MulticlassClassificationMetricsInput {
+				probabilities: predictions.view(),
+				labels,
+			});
 			progress_counter.inc(labels.len() as u64);
-			state
+			test_metrics
+		},
+	)
+	.reduce(
+		|| tangram_metrics::MulticlassClassificationMetrics::new(n_classes),
+		|mut metrics_a, metrics_b| {
+			metrics_a.merge(metrics_b);
+			metrics_a
 		},
 	);
 	let test_metrics = test_metrics.finalize();

@@ -4524,6 +4524,7 @@ dependencies = [
  "num",
  "rand",
  "rand_xoshiro",
+ "rayon",
  "serde",
  "serde_json",
  "serde_yaml",
