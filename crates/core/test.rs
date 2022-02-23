@@ -34,7 +34,7 @@ pub fn test_linear_regressor(
 		ArrayView1::from(labels.as_slice()).axis_chunks_iter(Axis(0), n_examples_per_batch),
 	)
 	.fold(
-		|| tangram_metrics::RegressionMetrics::default(),
+		tangram_metrics::RegressionMetrics::default,
 		|mut test_metrics, (features, labels)| {
 			let mut predictions = Array::zeros(features.nrows());
 			model.predict(features, predictions.view_mut());
@@ -47,7 +47,7 @@ pub fn test_linear_regressor(
 		},
 	)
 	.reduce(
-		|| tangram_metrics::RegressionMetrics::default(),
+		tangram_metrics::RegressionMetrics::default,
 		|mut metrics_a, metrics_b| {
 			metrics_a.merge(metrics_b);
 			metrics_a
@@ -86,7 +86,7 @@ pub fn test_tree_regressor(
 		ArrayView1::from(labels.as_slice()).axis_chunks_iter(Axis(0), n_examples_per_batch),
 	)
 	.fold(
-		|| tangram_metrics::RegressionMetrics::default(),
+		tangram_metrics::RegressionMetrics::default,
 		|mut test_metrics, (features, labels)| {
 			let mut predictions = Array::zeros(features.nrows());
 			model.predict(features, predictions.view_mut());
@@ -99,7 +99,7 @@ pub fn test_tree_regressor(
 		},
 	)
 	.reduce(
-		|| tangram_metrics::RegressionMetrics::default(),
+		tangram_metrics::RegressionMetrics::default,
 		|mut metrics_a, metrics_b| {
 			metrics_a.merge(metrics_b);
 			metrics_a

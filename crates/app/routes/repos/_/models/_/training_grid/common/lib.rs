@@ -26,14 +26,14 @@ pub fn hyperparameters_for_grid_item(
 					hyperparameters
 						.early_stopping_options()
 						.map(|options| options.early_stopping_fraction().to_string())
-						.unwrap_or("None".to_string()),
+						.unwrap_or_else(|| "None".to_string()),
 				),
 				(
 					"early_stopping:n_rounds_without_improvement_to_stop".to_owned(),
 					hyperparameters
 						.early_stopping_options()
 						.map(|options| options.n_rounds_without_improvement_to_stop().to_string())
-						.unwrap_or("None".to_string()),
+						.unwrap_or_else(|| "None".to_string()),
 				),
 				(
 					"early_stopping:min_decrease_in_loss_for_significant_change".to_owned(),
@@ -44,7 +44,7 @@ pub fn hyperparameters_for_grid_item(
 								.min_decrease_in_loss_for_significant_change()
 								.to_string()
 						})
-						.unwrap_or("None".to_string()),
+						.unwrap_or_else(|| "None".to_string()),
 				),
 			]
 		}
@@ -67,14 +67,14 @@ pub fn hyperparameters_for_grid_item(
 					hyperparameters
 						.early_stopping_options()
 						.map(|options| options.early_stopping_fraction().to_string())
-						.unwrap_or("None".to_string()),
+						.unwrap_or_else(|| "None".to_string()),
 				),
 				(
 					"early_stopping:n_rounds_without_improvement_to_stop".to_owned(),
 					hyperparameters
 						.early_stopping_options()
 						.map(|options| options.n_rounds_without_improvement_to_stop().to_string())
-						.unwrap_or("None".to_string()),
+						.unwrap_or_else(|| "None".to_string()),
 				),
 				(
 					"early_stopping:min_decrease_in_loss_for_significant_change".to_owned(),
@@ -85,7 +85,7 @@ pub fn hyperparameters_for_grid_item(
 								.min_decrease_in_loss_for_significant_change()
 								.to_string()
 						})
-						.unwrap_or("None".to_string()),
+						.unwrap_or_else(|| "None".to_string()),
 				),
 				(
 					"l2_regularization_for_continuous_splits".to_owned(),
