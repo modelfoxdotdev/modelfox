@@ -80,9 +80,11 @@
       rust =
         let
           toolchain = {
-            channel = "nightly";
-            date = "2022-02-24";
-            sha256 = "sha256-TpJKRroEs7V2BTo2GFPJlEScYVArFY2MnGpYTxbnSo8=";
+            channel = "1.59.0";
+            sha256 = "sha256-4IUZZWXHBBxcwRuQm9ekOwzc0oNqH/9NkI1ejW7KajU=";
+            # channel = "nightly";
+            # date = "2022-02-24";
+            # sha256 = "sha256-TpJKRroEs7V2BTo2GFPJlEScYVArFY2MnGpYTxbnSo8=";
           };
         in
         with inputs.fenix.packages.${system}; combine (with toolchainOf toolchain; [

@@ -714,9 +714,9 @@ dependencies = [
 
 [[package]]
 name = "erl_nif"
-version = "0.3.1"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a980653d149cae3384e2361668e26a34f75902ddf022039d2e57d0707535e971"
+checksum = "944b261d1824570a1ac25b9c0ea3d4ff5eb13789d9947addad6fed67cd8e4cc7"
 dependencies = [
  "erl_nif_macro",
  "erl_nif_sys",
@@ -726,9 +726,9 @@ dependencies = [
 
 [[package]]
 name = "erl_nif_macro"
-version = "0.3.1"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b12641bbf82cd47a898e4a73c46a364f7bdca0c5fa36ffdebdc2ff335722c936"
+checksum = "d965abb89bc7faed214d442d73dfdffbf9606d746ce99bcdaf29b2977b25d3a1"
 dependencies = [
  "itertools",
  "proc-macro2",
@@ -738,9 +738,9 @@ dependencies = [
 
 [[package]]
 name = "erl_nif_sys"
-version = "0.3.1"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75284532b48cd2815f3a139b59aa4bd963da61ee8d5d153989e900191f475c70"
+checksum = "b48cbdc6a1146831a0f62508ef5deb2d63a3c6c88d0557ad835fa1c11c8a4209"
 dependencies = [
  "erl_nif_macro",
 ]
@@ -1645,9 +1645,9 @@ dependencies = [
 
 [[package]]
 name = "node_api"
-version = "0.3.1"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac497348e4fc2e4e77fe22a43beea143345be011297cbb675f5b5c6acac43254"
+checksum = "0649fbcdbfd097c5bcfc5ccd68b5450cfffc44908bde2cbf4f240b286ea71ade"
 dependencies = [
  "node_api_macro",
  "node_api_system",
@@ -1657,9 +1657,9 @@ dependencies = [
 
 [[package]]
 name = "node_api_macro"
-version = "0.3.1"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d022b6052711dd72d72c469d854310efcbe3aafb4874497a719fc89e6cd6cb00"
+checksum = "cf033736300d91c69f1f727f5bb596f51ae7764782d1197fcfad9dbcd44e8b8b"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1668,9 +1668,9 @@ dependencies = [
 
 [[package]]
 name = "node_api_system"
-version = "0.3.1"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75951d33b04dabfd577d1d2cba0b7ed3287c626165b18b63b869414e0835a80e"
+checksum = "a777610928f3449d5f15112aeb838682c54cb1a49f573348a2e7454d7edac84b"
 dependencies = [
  "reqwest",
 ]
@@ -6329,11 +6329,3 @@ dependencies = [
  "thiserror",
  "time 0.1.43",
 ]
-
-[[patch.unused]]
-name = "erl_nif"
-version = "0.4.0"
-
-[[patch.unused]]
-name = "node_api"
-version = "0.4.0"
