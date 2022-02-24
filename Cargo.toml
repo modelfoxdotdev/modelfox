@@ -17,3 +17,7 @@ overflow-checks = false
 
 [profile.release]
 lto = true
+
+[patch.crates-io]
+erl_nif = { path = "../erl_nif" }
+node_api = { path = "../node_api" }

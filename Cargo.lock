@@ -6329,3 +6329,11 @@ dependencies = [
  "thiserror",
  "time 0.1.43",
 ]
+
+[[patch.unused]]
+name = "erl_nif"
+version = "0.4.0"
+
+[[patch.unused]]
+name = "node_api"
+version = "0.4.0"

@@ -64,6 +64,19 @@
           })
         ];
       };
+      node-import-lib = pkgs.runCommand "node-import-lib"
+        {
+          nativeBuildInputs = with pkgs; [
+            cacert
+            curl
+          ];
+          outputHashMode = "recursive";
+          outputHash = "sha256-UDGJrdZHB1ZLKUKYWzU5DCnXNPOLjC9Elwzkhuit/OE=";
+        }
+        ''
+          mkdir $out
+          curl https://nodejs.org/dist/v16.4.0/win-x64/node.lib --output $out/node.lib
+        '';
       rust =
         let
           toolchain = {
@@ -316,6 +329,9 @@
             /I "${windows_sdk}/Program Files/Windows Kits/10/Include/10.0.19041.0/shared" \
             $@
         '' + /bin/cc;
+
+        # win-x64 node import lib
+        NODE_API_WINDOWS_X64_IMPORT_LIBRARY = node-import-lib;
       };
     }
     );
