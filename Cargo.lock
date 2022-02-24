@@ -1643,7 +1643,7 @@ dependencies = [
 [[package]]
 name = "node_api"
 version = "0.4.1"
-source = "git+https://github.com/tangramdotdev/node_api#b12b58a462e2a3c99380bdcbb2d10686bc1afdfc"
+source = "git+https://github.com/tangramdotdev/node_api#f78de46537c14dd03760312c4d34441a8d18e908"
 dependencies = [
  "node_api_macro",
  "node_api_system",
@@ -1654,7 +1654,7 @@ dependencies = [
 [[package]]
 name = "node_api_macro"
 version = "0.4.1"
-source = "git+https://github.com/tangramdotdev/node_api#b12b58a462e2a3c99380bdcbb2d10686bc1afdfc"
+source = "git+https://github.com/tangramdotdev/node_api#f78de46537c14dd03760312c4d34441a8d18e908"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1664,10 +1664,7 @@ dependencies = [
 [[package]]
 name = "node_api_system"
 version = "0.4.1"
-source = "git+https://github.com/tangramdotdev/node_api#b12b58a462e2a3c99380bdcbb2d10686bc1afdfc"
-dependencies = [
- "reqwest",
-]
+source = "git+https://github.com/tangramdotdev/node_api#f78de46537c14dd03760312c4d34441a8d18e908"
 
 [[package]]
 name = "nom"
@@ -4689,6 +4686,7 @@ dependencies = [
  "anyhow",
  "memmap",
  "node_api",
+ "reqwest",
  "serde",
  "tangram_core",
  "tangram_model",

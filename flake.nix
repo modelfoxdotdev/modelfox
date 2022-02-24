@@ -64,7 +64,7 @@
           })
         ];
       };
-      node-import-lib = pkgs.runCommand "node-import-lib"
+      x86_64_windows_node_import_lib = pkgs.runCommand "x86_64_windows_node_import_lib"
         {
           nativeBuildInputs = with pkgs; [
             cacert
@@ -80,11 +80,9 @@
       rust =
         let
           toolchain = {
-            channel = "1.59.0";
-            sha256 = "sha256-4IUZZWXHBBxcwRuQm9ekOwzc0oNqH/9NkI1ejW7KajU=";
-            # channel = "nightly";
-            # date = "2022-02-24";
-            # sha256 = "sha256-TpJKRroEs7V2BTo2GFPJlEScYVArFY2MnGpYTxbnSo8=";
+            channel = "nightly";
+            date = "2022-02-24";
+            sha256 = "sha256-TpJKRroEs7V2BTo2GFPJlEScYVArFY2MnGpYTxbnSo8=";
           };
         in
         with inputs.fenix.packages.${system}; combine (with toolchainOf toolchain; [
@@ -331,9 +329,7 @@
             /I "${windows_sdk}/Program Files/Windows Kits/10/Include/10.0.19041.0/shared" \
             $@
         '' + /bin/cc;
-
-        # win-x64 node import lib
-        NODE_API_WINDOWS_X64_IMPORT_LIBRARY = node-import-lib;
+        X64_64_WINDOWS_NODE_API_LINK_SEARCH_PATH = x86_64_windows_node_import_lib;
       };
     }
     );
