@@ -228,6 +228,7 @@ impl Component for EnumField {
 					BarChart::new()
 						.hide_legend(true)
 						.series(series)
+						.y_min(0.0)
 						.should_draw_x_axis_labels(false)
 						.should_draw_y_axis_labels(false),
 				),
