@@ -1,6 +1,5 @@
 [package]
 edition = "2021"
-rust-version = "1.56"
 license = "MIT"
 name = "libtangram"
 publish = false

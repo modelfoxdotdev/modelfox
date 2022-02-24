@@ -1,7 +1,6 @@
 [package]
 authors = ["Tangram"]
 edition = "2021"
-rust-version = "1.56"
 name = "tangram_python"
 publish = false
 version = "0.0.0"

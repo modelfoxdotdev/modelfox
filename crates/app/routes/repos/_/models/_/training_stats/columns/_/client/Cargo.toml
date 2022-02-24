@@ -1,6 +1,5 @@
 [package]
 edition = "2021"
-rust-version = "1.56"
 name = "tangram_app_training_stats_column_client"
 publish = false
 version = "0.0.0"

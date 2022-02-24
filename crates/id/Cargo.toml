@@ -1,4 +1,5 @@
 [package]
+authors = ["Tangram <root@tangram.dev"]
 description = "Tangram makes it easy for programmers to train, deploy, and monitor machine learning models."
 documentation = "https://docs.rs/tangram"
 edition = "2021"
@@ -7,7 +8,6 @@ license = "MIT"
 name = "tangram_id"
 publish = true
 repository = "https://github.com/tangramdotdev/tangram"
-rust-version = "1.56"
 version = "0.7.0"
 
 [lib]

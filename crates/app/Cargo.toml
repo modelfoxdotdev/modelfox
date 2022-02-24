@@ -1,6 +1,5 @@
 [package]
 edition = "2021"
-rust-version = "1.56"
 license = "UNLICENSED"
 name = "tangram_app"
 publish = false
@@ -19,13 +18,8 @@ sunfish = "0.3"
 
 [features]
 default = [
-	"tangram_app_alerts_index_server",
-	"tangram_app_alerts_server",
-	"tangram_app_monitors_edit_server",
-	"tangram_app_monitors_index_server",
-	"tangram_app_new_monitor_client",
-	"tangram_app_new_monitor_server",
-	"tangram_app_training_metrics_precision_recall_client",
+  "tangram_app_alerts_index_server",
+  "tangram_app_alerts_server",
   "tangram_app_edit_organization_server",
   "tangram_app_health_server",
   "tangram_app_index_server",
@@ -34,9 +28,13 @@ default = [
   "tangram_app_model_edit_server",
   "tangram_app_model_index_client",
   "tangram_app_model_index_server",
+  "tangram_app_monitors_edit_server",
+  "tangram_app_monitors_index_server",
   "tangram_app_new_member_server",
   "tangram_app_new_model_client",
   "tangram_app_new_model_server",
+  "tangram_app_new_monitor_client",
+  "tangram_app_new_monitor_server",
   "tangram_app_new_organization_server",
   "tangram_app_new_repo_server",
   "tangram_app_organization_index_server",
@@ -62,6 +60,7 @@ default = [
   "tangram_app_training_grid_index_server",
   "tangram_app_training_grid_item_server",
   "tangram_app_training_metrics_index_server",
+  "tangram_app_training_metrics_precision_recall_client",
   "tangram_app_training_metrics_precision_recall_server",
   "tangram_app_training_metrics_roc_client",
   "tangram_app_training_metrics_roc_server",

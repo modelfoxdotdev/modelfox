@@ -1,6 +1,5 @@
 [package]
 edition = "2021"
-rust-version = "1.56"
 license = "UNLICENSED"
 name = "tangram_www"
 publish = false

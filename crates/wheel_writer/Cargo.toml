@@ -2,7 +2,6 @@
 authors = ["Tangram <root@tangram.dev"]
 edition = "2021"
 name = "wheel_writer"
-rust-version = "1.56"
 version = "0.0.0"
 
 [lib]
