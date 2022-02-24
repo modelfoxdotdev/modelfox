@@ -715,7 +715,7 @@ dependencies = [
 [[package]]
 name = "erl_nif"
 version = "0.4.0"
-source = "git+https://github.com/tangramdotdev/erl_nif#b2137768fe78baa37afd53f2aa13cac0a8613d1a"
+source = "git+https://github.com/tangramdotdev/erl_nif#fdb92759448cfe98811904664e24822ef667e1b4"
 dependencies = [
  "erl_nif_macro",
  "erl_nif_sys",
@@ -726,7 +726,7 @@ dependencies = [
 [[package]]
 name = "erl_nif_macro"
 version = "0.4.0"
-source = "git+https://github.com/tangramdotdev/erl_nif#b2137768fe78baa37afd53f2aa13cac0a8613d1a"
+source = "git+https://github.com/tangramdotdev/erl_nif#fdb92759448cfe98811904664e24822ef667e1b4"
 dependencies = [
  "itertools",
  "proc-macro2",
@@ -737,7 +737,7 @@ dependencies = [
 [[package]]
 name = "erl_nif_sys"
 version = "0.4.0"
-source = "git+https://github.com/tangramdotdev/erl_nif#b2137768fe78baa37afd53f2aa13cac0a8613d1a"
+source = "git+https://github.com/tangramdotdev/erl_nif#fdb92759448cfe98811904664e24822ef667e1b4"
 dependencies = [
  "erl_nif_macro",
 ]
@@ -1643,17 +1643,18 @@ dependencies = [
 [[package]]
 name = "node_api"
 version = "0.4.1"
-source = "git+https://github.com/tangramdotdev/node_api#8b712c8c0296cceaf916f75ce480ecc8299cb128"
+source = "git+https://github.com/tangramdotdev/node_api#b12b58a462e2a3c99380bdcbb2d10686bc1afdfc"
 dependencies = [
  "node_api_macro",
  "node_api_system",
  "num",
+ "serde",
 ]
 
 [[package]]
 name = "node_api_macro"
 version = "0.4.1"
-source = "git+https://github.com/tangramdotdev/node_api#8b712c8c0296cceaf916f75ce480ecc8299cb128"
+source = "git+https://github.com/tangramdotdev/node_api#b12b58a462e2a3c99380bdcbb2d10686bc1afdfc"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1663,7 +1664,7 @@ dependencies = [
 [[package]]
 name = "node_api_system"
 version = "0.4.1"
-source = "git+https://github.com/tangramdotdev/node_api#8b712c8c0296cceaf916f75ce480ecc8299cb128"
+source = "git+https://github.com/tangramdotdev/node_api#b12b58a462e2a3c99380bdcbb2d10686bc1afdfc"
 dependencies = [
  "reqwest",
 ]
