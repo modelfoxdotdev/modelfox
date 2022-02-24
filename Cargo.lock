@@ -715,8 +715,7 @@ dependencies = [
 [[package]]
 name = "erl_nif"
 version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "944b261d1824570a1ac25b9c0ea3d4ff5eb13789d9947addad6fed67cd8e4cc7"
+source = "git+https://github.com/tangramdotdev/erl_nif#b2137768fe78baa37afd53f2aa13cac0a8613d1a"
 dependencies = [
  "erl_nif_macro",
  "erl_nif_sys",
@@ -727,8 +726,7 @@ dependencies = [
 [[package]]
 name = "erl_nif_macro"
 version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d965abb89bc7faed214d442d73dfdffbf9606d746ce99bcdaf29b2977b25d3a1"
+source = "git+https://github.com/tangramdotdev/erl_nif#b2137768fe78baa37afd53f2aa13cac0a8613d1a"
 dependencies = [
  "itertools",
  "proc-macro2",
@@ -739,8 +737,7 @@ dependencies = [
 [[package]]
 name = "erl_nif_sys"
 version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b48cbdc6a1146831a0f62508ef5deb2d63a3c6c88d0557ad835fa1c11c8a4209"
+source = "git+https://github.com/tangramdotdev/erl_nif#b2137768fe78baa37afd53f2aa13cac0a8613d1a"
 dependencies = [
  "erl_nif_macro",
 ]
@@ -1646,20 +1643,17 @@ dependencies = [
 [[package]]
 name = "node_api"
 version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0649fbcdbfd097c5bcfc5ccd68b5450cfffc44908bde2cbf4f240b286ea71ade"
+source = "git+https://github.com/tangramdotdev/node_api#8b712c8c0296cceaf916f75ce480ecc8299cb128"
 dependencies = [
  "node_api_macro",
  "node_api_system",
  "num",
- "serde",
 ]
 
 [[package]]
 name = "node_api_macro"
 version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf033736300d91c69f1f727f5bb596f51ae7764782d1197fcfad9dbcd44e8b8b"
+source = "git+https://github.com/tangramdotdev/node_api#8b712c8c0296cceaf916f75ce480ecc8299cb128"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1669,8 +1663,7 @@ dependencies = [
 [[package]]
 name = "node_api_system"
 version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a777610928f3449d5f15112aeb838682c54cb1a49f573348a2e7454d7edac84b"
+source = "git+https://github.com/tangramdotdev/node_api#8b712c8c0296cceaf916f75ce480ecc8299cb128"
 dependencies = [
  "reqwest",
 ]
