@@ -236,9 +236,9 @@ dependencies = [
 
 [[package]]
 name = "buffalo"
-version = "0.3.1"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1bcea4e68903d14fa85f7415d4e6091380b43d20dcc96be2bb9f2c145042b94"
+checksum = "90e8d7cba4ccc77062bc0bb9c2a532f4472c7ca49affa5c0d21f49fee18d9b8d"
 dependencies = [
  "bitvec",
  "buffalo_macro",
@@ -3117,7 +3117,6 @@ dependencies = [
  "tangram_model",
  "tangram_serve",
  "tangram_table",
- "tangram_ui",
  "tangram_zip",
  "time 0.3.7",
  "tokio",
@@ -3215,7 +3214,6 @@ dependencies = [
  "memmap",
  "ndarray",
  "num",
- "pinwheel",
  "rand",
  "rust-s3",
  "serde",
@@ -3227,7 +3225,6 @@ dependencies = [
  "tangram_app_monitor_event",
  "tangram_app_production_metrics",
  "tangram_app_production_stats",
- "tangram_charts",
  "tangram_core",
  "tangram_finite",
  "tangram_id",

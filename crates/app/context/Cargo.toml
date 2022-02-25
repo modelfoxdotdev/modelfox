@@ -9,14 +9,5 @@ path = "lib.rs"
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-#futures = "0.3"
-#http = "0.2"
-#hyper = { version = "0.14", features = ["full"] }
-#pinwheel = "0.2"
-#serde = { version = "1", features = ["derive"] }
-#sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }
 sunfish = "0.3"
 tangram_app_core = { path = "../core" }
-#tangram_app_ui = { path = "../../app/ui" }
-#tangram_id = { path = "../../id" }
-#tangram_ui = { path = "../../ui" }

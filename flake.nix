@@ -51,8 +51,10 @@
               src = self.fetchFromGitHub {
                 owner = "ziglang";
                 repo = "zig";
-                rev = "88d1258e08e668e620d5f8f4681315e555acbcd2";
-                hash = "sha256-zNPrze2XxF+4ZwTq0LN2Y9tmPHd7lY6Nb3Cy9KN2Il8=";
+                rev = "a76910b691179390b122b9c42a5575c00d40583a";
+                hash = "sha256-f8CT7BBc1KOLJJs/4OoIqK6/m1lkfLcN3w/bn5enqBQ=";
+                # rev = "88d1258e08e668e620d5f8f4681315e555acbcd2";
+                # hash = "sha256-zNPrze2XxF+4ZwTq0LN2Y9tmPHd7lY6Nb3Cy9KN2Il8=";
               };
               patches = [
                 (self.fetchpatch {
@@ -243,6 +245,11 @@
 
         # aarch64-linux-gnu
         CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER = pkgs.writeShellScriptBin "linker" ''
+          for arg do
+            shift
+            [ "$arg" = "-lgcc_s" ] && set -- "$@" "-lunwind" && continue
+            set -- "$@" "$arg"
+          done
           ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target aarch64-linux-gnu.2.28 $@
         '' + /bin/linker;
         CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_RUSTFLAGS = "-C target-feature=-outline-atomics";
@@ -252,6 +259,11 @@
 
         # aarch64-linux-musl
         CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER = pkgs.writeShellScriptBin "linker" ''
+          for arg do
+            shift
+            [ "$arg" = "-lgcc_s" ] && set -- "$@" "-lunwind" && continue
+            set -- "$@" "$arg"
+          done
           ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target aarch64-linux-musl -dynamic $@
         '' + /bin/linker;
         CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_RUSTFLAGS = "-C target-feature=-crt-static";
@@ -272,6 +284,11 @@
 
         # x86_64-linux-gnu
         CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = pkgs.writeShellScriptBin "linker" ''
+          for arg do
+            shift
+            [ "$arg" = "-lgcc_s" ] && set -- "$@" "-lunwind" && continue
+            set -- "$@" "$arg"
+          done
           ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-linux-gnu.2.28 --ld-path=$(which mold) $@
         '' + /bin/linker;
         CC_x86_64_unknown_linux_gnu = pkgs.writeShellScriptBin "cc" ''
@@ -280,6 +297,11 @@
 
         # x86_64-linux-musl
         CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER = pkgs.writeShellScriptBin "linker" ''
+          for arg do
+            shift
+            [ "$arg" = "-lgcc_s" ] && set -- "$@" "-lunwind" && continue
+            set -- "$@" "$arg"
+          done
           ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target x86_64-linux-musl -dynamic $@
         '' + /bin/linker;
         CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS = "-C target-feature=-crt-static";

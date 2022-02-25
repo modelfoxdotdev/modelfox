@@ -30,7 +30,6 @@ lettre = { version = "0.10.0-rc.2", default-features = false, features = ["build
 memmap = "0.7"
 ndarray = { version = "0.15", features = ["rayon"] }
 num = "0.4"
-pinwheel = "0.2"
 rand = "0.8"
 rust-s3 = { version = "0.28", default-features = false, features = ["tokio-rustls-tls"] }
 serde = { version = "1", features = ["derive"] }
@@ -41,7 +40,6 @@ tangram_app_migrations = { path = "../migrations" }
 tangram_app_monitor_event = { path = "../monitor_event" }
 tangram_app_production_metrics = { path = "../production_metrics" }
 tangram_app_production_stats = { path = "../production_stats" }
-tangram_charts = { path = "../../charts" }
 tangram_core = { path = "../../core" }
 tangram_finite = { path = "../../finite" }
 tangram_id = { path = "../../id" }
