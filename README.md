@@ -149,7 +149,7 @@ Now you can:
 
 ## Building from Source
 
-This repository is a Cargo workspace, and does not require anything other than the latest stable Rust toolchain to get started with.
+This repository is a Cargo workspace, and does not require anything other than the latest nightly Rust toolchain to get started with.
 
 1. Install [Rust](rust-lang.org) on Linux, macOS, or Windows.
 2. Clone this repo and `cd` into it.

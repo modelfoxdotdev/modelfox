@@ -20,5 +20,6 @@ lto = true
 strip = true
 
 [patch.crates-io]
+sunfish = { git = "https://github.com/tangramdotdev/sunfish" }
 erl_nif = { git = "https://github.com/tangramdotdev/erl_nif" }
 node_api = { git = "https://github.com/tangramdotdev/node_api" }

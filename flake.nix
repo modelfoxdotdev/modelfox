@@ -238,6 +238,7 @@
           zig
         ];
 
+        CARGO_UNSTABLE_BINDEPS = "true";
         CARGO_UNSTABLE_MULTITARGET = "true";
         CARGO_UNSTABLE_TARGET_APPLIES_TO_HOST = "true";
         CARGO_UNSTABLE_HOST_CONFIG = "true";

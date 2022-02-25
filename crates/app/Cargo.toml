@@ -12,10 +12,6 @@ path = "lib.rs"
 name = "tangram_app_seed"
 path = "seed.rs"
 
-[build-dependencies]
-anyhow = { version = "1", features = ["backtrace"] }
-sunfish = "0.3"
-
 [features]
 default = [
   "tangram_app_alerts_index_server",
@@ -72,6 +68,24 @@ default = [
   "tangram_app_user_server",
 ]
 
+[build-dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
+sunfish = "0.3"
+tangram_app_model_index_client = { path = "routes/repos/_/models/_/index/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+tangram_app_new_model_client = { path = "routes/repos/_/models/new/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+tangram_app_new_monitor_client = { path = "routes/repos/_/models/_/monitors/new/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+tangram_app_playground_client = { path = "routes/repos/_/models/_/playground/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+tangram_app_production_class_metrics_client = { path = "routes/repos/_/models/_/production_metrics/class_metrics/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+tangram_app_production_metrics_index_client = { path = "routes/repos/_/models/_/production_metrics/index/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+tangram_app_production_prediction_client = { path = "routes/repos/_/models/_/production_predictions/predictions/_/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+tangram_app_production_stats_column_client = { path = "routes/repos/_/models/_/production_stats/columns/_/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+tangram_app_production_stats_index_client = { path = "routes/repos/_/models/_/production_stats/index/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+tangram_app_training_class_metrics_client = { path = "routes/repos/_/models/_/training_metrics/class_metrics/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+tangram_app_training_metrics_precision_recall_client = { path = "routes/repos/_/models/_/training_metrics/precision_recall/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+tangram_app_training_metrics_roc_client = { path = "routes/repos/_/models/_/training_metrics/roc/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+tangram_app_training_stats_column_client = { path = "routes/repos/_/models/_/training_stats/columns/_/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+tangram_app_tuning_client = { path = "routes/repos/_/models/_/tuning/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
 base64 = "0.13"
@@ -121,47 +135,33 @@ tangram_app_index_server = { path = "routes/index/server", optional = true }
 tangram_app_login_server = { path = "routes/login/server", optional = true }
 tangram_app_model_download_server = { path = "routes/repos/_/models/_/download/server", optional = true }
 tangram_app_model_edit_server = { path = "routes/repos/_/models/_/edit/server", optional = true }
-tangram_app_model_index_client = { path = "routes/repos/_/models/_/index/client", optional = true }
 tangram_app_model_index_server = { path = "routes/repos/_/models/_/index/server", optional = true }
 tangram_app_monitors_edit_server = { path = "routes/repos/_/models/_/monitors/_/edit/server", optional = true }
 tangram_app_monitors_index_server = { path = "routes/repos/_/models/_/monitors/index/server", optional = true }
 tangram_app_new_member_server = { path = "routes/organizations/_/members/new/server", optional = true }
-tangram_app_new_model_client = { path = "routes/repos/_/models/new/client", optional = true }
 tangram_app_new_model_server = { path = "routes/repos/_/models/new/server", optional = true }
-tangram_app_new_monitor_client = { path = "routes/repos/_/models/_/monitors/new/client", optional = true }
 tangram_app_new_monitor_server = { path = "routes/repos/_/models/_/monitors/new/server", optional = true }
 tangram_app_new_organization_server = { path = "routes/organizations/new/server", optional = true }
 tangram_app_new_repo_server = { path = "routes/repos/new/server", optional = true }
 tangram_app_organization_index_server = { path = "routes/organizations/_/index/server", optional = true }
 tangram_app_organization_member_server = { path = "routes/organizations/_/members/_/server", optional = true }
-tangram_app_playground_client = { path = "routes/repos/_/models/_/playground/client", optional = true }
 tangram_app_playground_server = { path = "routes/repos/_/models/_/playground/server", optional = true }
-tangram_app_production_class_metrics_client = { path = "routes/repos/_/models/_/production_metrics/class_metrics/client", optional = true }
 tangram_app_production_class_metrics_server = { path = "routes/repos/_/models/_/production_metrics/class_metrics/server", optional = true }
-tangram_app_production_metrics_index_client = { path = "routes/repos/_/models/_/production_metrics/index/client", optional = true }
 tangram_app_production_metrics_index_server = { path = "routes/repos/_/models/_/production_metrics/index/server", optional = true }
-tangram_app_production_prediction_client = { path = "routes/repos/_/models/_/production_predictions/predictions/_/client", optional = true }
 tangram_app_production_prediction_server = { path = "routes/repos/_/models/_/production_predictions/predictions/_/server", optional = true }
 tangram_app_production_predictions_index_server = { path = "routes/repos/_/models/_/production_predictions/index/server", optional = true }
-tangram_app_production_stats_column_client = { path = "routes/repos/_/models/_/production_stats/columns/_/client", optional = true }
 tangram_app_production_stats_column_server = { path = "routes/repos/_/models/_/production_stats/columns/_/server", optional = true }
-tangram_app_production_stats_index_client = { path = "routes/repos/_/models/_/production_stats/index/client", optional = true }
 tangram_app_production_stats_index_server = { path = "routes/repos/_/models/_/production_stats/index/server", optional = true }
 tangram_app_repo_edit_server = { path = "routes/repos/_/edit/server", optional = true }
 tangram_app_repo_index_server = { path = "routes/repos/_/index/server", optional = true }
 tangram_app_track_server = { path = "routes/track/server", optional = true }
-tangram_app_training_class_metrics_client = { path = "routes/repos/_/models/_/training_metrics/class_metrics/client", optional = true }
 tangram_app_training_class_metrics_server = { path = "routes/repos/_/models/_/training_metrics/class_metrics/server", optional = true }
 tangram_app_training_grid_index_server = { path = "routes/repos/_/models/_/training_grid/index/server", optional = true }
 tangram_app_training_grid_item_server = { path = "routes/repos/_/models/_/training_grid/grid_item/_/server", optional = true }
 tangram_app_training_metrics_index_server = { path = "routes/repos/_/models/_/training_metrics/index/server", optional = true }
-tangram_app_training_metrics_precision_recall_client = { path = "routes/repos/_/models/_/training_metrics/precision_recall/client", optional = true }
 tangram_app_training_metrics_precision_recall_server = { path = "routes/repos/_/models/_/training_metrics/precision_recall/server", optional = true }
-tangram_app_training_metrics_roc_client = { path = "routes/repos/_/models/_/training_metrics/roc/client", optional = true }
 tangram_app_training_metrics_roc_server = { path = "routes/repos/_/models/_/training_metrics/roc/server", optional = true }
-tangram_app_training_stats_column_client = { path = "routes/repos/_/models/_/training_stats/columns/_/client", optional = true }
 tangram_app_training_stats_column_server = { path = "routes/repos/_/models/_/training_stats/columns/_/server", optional = true }
 tangram_app_training_stats_index_server = { path = "routes/repos/_/models/_/training_stats/index/server", optional = true }
-tangram_app_tuning_client = { path = "routes/repos/_/models/_/tuning/client", optional = true }
 tangram_app_tuning_server = { path = "routes/repos/_/models/_/tuning/server", optional = true }
 tangram_app_user_server = { path = "routes/user/server", optional = true }
