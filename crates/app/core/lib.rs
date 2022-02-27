@@ -293,7 +293,7 @@ impl App {
 	}
 
 	pub async fn begin_transaction(&self) -> Result<sqlx::Transaction<'_, sqlx::Any>> {
-		Ok(self.state.begin_transaction().await?)
+		self.state.begin_transaction().await
 	}
 
 	pub async fn commit_transaction(&self, txn: sqlx::Transaction<'_, sqlx::Any>) -> Result<()> {

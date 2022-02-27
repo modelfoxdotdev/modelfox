@@ -284,7 +284,7 @@ impl App {
 		txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 		alert_id: Id,
 	) -> Result<Option<Alert>> {
-		Ok(self.state.get_alert(txn, alert_id).await?)
+		self.state.get_alert(txn, alert_id).await
 	}
 }
 
