@@ -238,15 +238,6 @@
           zig
         ];
 
-        CARGO_UNSTABLE_BINDEPS = "true";
-        CARGO_UNSTABLE_MULTITARGET = "true";
-        CARGO_UNSTABLE_TARGET_APPLIES_TO_HOST = "true";
-        CARGO_UNSTABLE_HOST_CONFIG = "true";
-
-        CARGO_TARGET_APPLIES_TO_HOST = "false";
-
-        CFLAGS = "-fno-sanitize=undefined";
-
         # aarch64-linux-gnu
         CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER = pkgs.writeShellScriptBin "linker" ''
           ZIG_GLOBAL_CACHE_DIR=$(mktemp -d) zig cc -target aarch64-linux-gnu.2.28 $@

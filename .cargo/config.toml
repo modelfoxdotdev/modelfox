@@ -1,2 +1,11 @@
+target-applies-to-host = false
+
+[unstable]
+bindeps = true
+host-config = true
+multitarget = true
+target-applies-to-host = true
+
 [env]
+CFLAGS = "-fno-sanitize=undefined"
 PYO3_NO_PYTHON = "1"
