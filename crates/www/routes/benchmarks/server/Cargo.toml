@@ -13,7 +13,7 @@ http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
 num = "0.4"
 pinwheel = "0.2"
-sunfish = "0.3"
+sunfish = "0.4"
 tangram_charts = { path = "../../../../charts" }
 tangram_ui = { path = "../../../../ui" }
 tangram_www_benchmarks_common = { path = "../common" }

@@ -43,7 +43,7 @@ default = [
 
 [build-dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-sunfish = "0.3"
+sunfish = "0.4"
 tangram_www_benchmarks_client = { path = "routes/benchmarks/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
 tangram_www_index_client = { path = "routes/index/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
 tangram_www_docs_getting_started_monitor_client = {path = "routes/docs/getting_started/monitor/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
@@ -57,7 +57,7 @@ http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-sunfish = "0.3"
+sunfish = "0.4"
 tangram_id = { path = "../id" }
 tangram_serve = { path = "../serve" }
 tangram_www_content = { path = "content" }

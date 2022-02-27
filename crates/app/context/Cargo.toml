@@ -9,5 +9,5 @@ path = "lib.rs"
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-sunfish = "0.3"
+sunfish = "0.4"
 tangram_app_core = { path = "../core" }

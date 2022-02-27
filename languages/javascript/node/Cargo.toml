@@ -15,7 +15,7 @@ reqwest = { version = "0.11", default-features = false, features = ["blocking", 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
 memmap = "0.7"
-node_api = { version = "0.4", features = ["serde"] }
+node_api = { version = "0.5", features = ["serde"] }
 serde = { version = "1", features = ["derive"] }
 tangram_core = { path = "../../../crates/core" }
 tangram_model = { path = "../../../crates/model" }

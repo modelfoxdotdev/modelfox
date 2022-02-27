@@ -15,7 +15,7 @@ hyper = { version = "0.14", features = ["full"] }
 num = "0.4"
 pinwheel = "0.2"
 serde = { version = "1", features = ["derive"] }
-sunfish = "0.3"
+sunfish = "0.4"
 tangram_app_context = { path = "../../../../../../../context" }
 tangram_app_core = { path = "../../../../../../../core" }
 tangram_app_layouts = { path = "../../../../../../../layouts" }

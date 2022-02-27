@@ -714,8 +714,9 @@ dependencies = [
 
 [[package]]
 name = "erl_nif"
-version = "0.4.0"
-source = "git+https://github.com/tangramdotdev/erl_nif#fdb92759448cfe98811904664e24822ef667e1b4"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "10b8e3cb6fa53e293748b1468d376fcc193a59fd922b9232b276327aeac2c42b"
 dependencies = [
  "erl_nif_macro",
  "erl_nif_sys",
@@ -725,8 +726,9 @@ dependencies = [
 
 [[package]]
 name = "erl_nif_macro"
-version = "0.4.0"
-source = "git+https://github.com/tangramdotdev/erl_nif#fdb92759448cfe98811904664e24822ef667e1b4"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a52486306e34c36fd7c504e2c4d6de2c73fd03d7dacb4deb06de50e1502764a9"
 dependencies = [
  "itertools",
  "proc-macro2",
@@ -736,8 +738,9 @@ dependencies = [
 
 [[package]]
 name = "erl_nif_sys"
-version = "0.4.0"
-source = "git+https://github.com/tangramdotdev/erl_nif#fdb92759448cfe98811904664e24822ef667e1b4"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bd082df5b829187d57e06d2619ae2c2a8abf616229449511324f43bb6a81240a"
 dependencies = [
  "erl_nif_macro",
 ]
@@ -1642,8 +1645,9 @@ dependencies = [
 
 [[package]]
 name = "node_api"
-version = "0.4.1"
-source = "git+https://github.com/tangramdotdev/node_api#f78de46537c14dd03760312c4d34441a8d18e908"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3355102646aaf9dcef8e5ab11737893b4ee33e42050bbe7c84f0131a9e143f2b"
 dependencies = [
  "node_api_macro",
  "node_api_system",
@@ -1653,8 +1657,9 @@ dependencies = [
 
 [[package]]
 name = "node_api_macro"
-version = "0.4.1"
-source = "git+https://github.com/tangramdotdev/node_api#f78de46537c14dd03760312c4d34441a8d18e908"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db556e86c68ddb8f29510b07bccb4285449464d6e2c11d3a75b0edde1e7812f5"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1663,8 +1668,9 @@ dependencies = [
 
 [[package]]
 name = "node_api_system"
-version = "0.4.1"
-source = "git+https://github.com/tangramdotdev/node_api#f78de46537c14dd03760312c4d34441a8d18e908"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9f1ecfa3ac2b16c3ce0b870705bb320519014ef8617d78cca9c20b0570c79d3d"
 
 [[package]]
 name = "nom"
@@ -2951,8 +2957,9 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "sunfish"
-version = "0.3.2"
-source = "git+https://github.com/tangramdotdev/sunfish#1a7dc43246505fd3071b6971f0d0cf5cde4e6f9b"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6a75e2543a2ece3ddf72779158aefd6818c20e8b54803cf358fc7c9f22b6e4da"
 dependencies = [
  "anyhow",
  "futures",
@@ -2975,8 +2982,9 @@ dependencies = [
 
 [[package]]
 name = "sunfish_macro"
-version = "0.3.2"
-source = "git+https://github.com/tangramdotdev/sunfish#1a7dc43246505fd3071b6971f0d0cf5cde4e6f9b"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ff5fb0cd2c098e1a45b1bf585d5e4150e1c78aa80ef936b7e0c3fc6853c1e3d2"
 dependencies = [
  "glob",
  "proc-macro2",
