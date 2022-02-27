@@ -7,7 +7,7 @@
       url = "github:numtide/flake-utils";
     };
     fenix = {
-      url = "github:nix-community/fenix";
+      url = "github:rvolosatovs/fenix/fix/rustc-patch";
     };
     windows_sdk = {
       url = "github:tangramdotdev/windows_sdk";
@@ -183,7 +183,6 @@
         doCheck = false;
         cargoLock = { lockFile = ./Cargo.lock; };
         cargoBuildFlags = "--package tangram_cli";
-        CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = pkgs.lld;
       });
       apps.www = inputs.flake-utils.lib.mkApp {
         drv = packages.www;
@@ -197,7 +196,6 @@
         doCheck = false;
         cargoLock = { lockFile = ./Cargo.lock; };
         cargoBuildFlags = "--package tangram_www";
-        CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_LINKER = pkgs.lld;
       });
       devShell = pkgs.mkShell {
         packages = with pkgs; [
