@@ -62,7 +62,8 @@ struct S3StorageConfig {
 }
 
 #[cfg(feature = "tangram_app")]
-pub fn app(args: AppArgs) -> Result<()> {
+#[tokio::main]
+pub async fn app(args: AppArgs) -> Result<()> {
 	let config: Option<AppConfig> = if let Some(config_path) = args.config {
 		let config = std::fs::read(config_path)?;
 		Some(serde_json::from_slice(&config)?)
@@ -190,5 +191,5 @@ pub fn app(args: AppArgs) -> Result<()> {
 		storage,
 		url,
 	};
-	tangram_app::run(options)
+	tangram_app::run(options).await
 }

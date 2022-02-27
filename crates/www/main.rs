@@ -12,11 +12,6 @@ struct Context {
 async fn main() -> Result<()> {
 	setup_tracing();
 	let sunfish = sunfish::init!();
-	serve(sunfish).await?;
-	Ok(())
-}
-
-async fn serve(sunfish: Sunfish) -> Result<()> {
 	let host_from_env = if let Ok(host) = std::env::var("HOST") {
 		Some(host.parse()?)
 	} else {
