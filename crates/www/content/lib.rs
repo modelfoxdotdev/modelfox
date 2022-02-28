@@ -1,8 +1,7 @@
 use anyhow::Result;
-use std::{
-	io::Read,
-	path::{Path, PathBuf},
-};
+use std::io::Read;
+use std::path::{Path, PathBuf};
+use sunfish::{embed, embed::EmbeddedDirectory};
 use tangram_ui as ui;
 
 pub struct BlogPost;
@@ -21,8 +20,10 @@ pub struct BlogPostAuthor {
 }
 
 impl Content for BlogPost {
-	const PATH: &'static str = "crates/www/content/blog";
 	type FrontMatter = BlogPostFrontMatter;
+	fn content() -> EmbeddedDirectory {
+		embed!("crates/www/content/blog")
+	}
 }
 
 pub struct DocsGuide;
@@ -33,8 +34,10 @@ pub struct DocsGuideFrontMatter {
 }
 
 impl Content for DocsGuide {
-	const PATH: &'static str = "crates/www/content/docs_guides";
 	type FrontMatter = DocsGuideFrontMatter;
+	fn content() -> EmbeddedDirectory {
+		embed!("crates/www/content/docs_guides")
+	}
 }
 
 pub struct DocsInternals;
@@ -45,8 +48,10 @@ pub struct DocsInternalsFrontMatter {
 }
 
 impl Content for DocsInternals {
-	const PATH: &'static str = "crates/www/content/docs_internals";
 	type FrontMatter = DocsInternalsFrontMatter;
+	fn content() -> EmbeddedDirectory {
+		embed!("crates/www/content/docs_internals")
+	}
 }
 
 pub struct ContentItem<T> {
@@ -57,24 +62,25 @@ pub struct ContentItem<T> {
 }
 
 pub trait Content: Sized {
-	const PATH: &'static str;
 	type FrontMatter: serde::de::DeserializeOwned;
+	fn content() -> EmbeddedDirectory;
 
 	fn slugs() -> Result<Vec<String>> {
-		let entries = std::fs::read_dir(Path::new(Self::PATH)).unwrap();
-		let slug_and_paths = entries
+		let content = Self::content();
+		let slug_and_paths = content
+			.0
 			.into_iter()
-			.map(|entry| {
+			.map(|(entry, _)| {
 				entry
+					.parent()
 					.unwrap()
-					.path()
 					.file_name()
 					.unwrap()
 					.to_str()
 					.unwrap()
 					.to_owned()
 			})
-			.collect();
+			.collect::<Vec<_>>();
 		Ok(slug_and_paths)
 	}
 
@@ -86,9 +92,9 @@ pub trait Content: Sized {
 	}
 
 	fn from_slug(slug: String) -> Result<ContentItem<Self::FrontMatter>> {
-		let dir_path = Path::new(Self::PATH).join(&slug);
-		let post_path = dir_path.join("post.md");
-		let mut reader = std::io::BufReader::new(std::fs::File::open(&post_path)?);
+		let post_path = Path::new(&slug).join("post.md");
+		let post = Self::content().read(&post_path).unwrap().data;
+		let mut reader = std::io::Cursor::new(post);
 		let front_matter: Self::FrontMatter = serde_json::Deserializer::from_reader(&mut reader)
 			.into_iter()
 			.next()

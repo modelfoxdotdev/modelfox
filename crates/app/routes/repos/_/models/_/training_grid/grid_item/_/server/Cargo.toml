@@ -13,7 +13,7 @@ futures = "0.3"
 http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
 pinwheel = "0.2"
-sunfish = "0.4"
+sunfish = "0.5"
 tangram_app_context = { path = "../../../../../../../../../context" }
 tangram_app_core = { path = "../../../../../../../../../core" }
 tangram_app_layouts = { path = "../../../../../../../../../layouts" }

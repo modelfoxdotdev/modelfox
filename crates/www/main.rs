@@ -56,10 +56,25 @@ async fn handle(mut request: http::Request<hyper::Body>) -> http::Response<hyper
 }
 
 fn setup_tracing() {
-	let env_layer = tracing_subscriber::EnvFilter::new("[]=info");
-	let format_layer = tracing_subscriber::fmt::layer().pretty();
-	let subscriber = tracing_subscriber::registry()
-		.with(env_layer)
-		.with(format_layer);
-	subscriber.init();
+	let env_layer = tracing_subscriber::EnvFilter::try_from_env("TANGRAM_TRACING");
+	let env_layer = if cfg!(debug_assertions) {
+		Some(env_layer.unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("[]=info")))
+	} else {
+		env_layer.ok()
+	};
+	if let Some(env_layer) = env_layer {
+		if cfg!(debug_assertions) {
+			let format_layer = tracing_subscriber::fmt::layer().pretty();
+			let subscriber = tracing_subscriber::registry()
+				.with(env_layer)
+				.with(format_layer);
+			subscriber.init();
+		} else {
+			let json_layer = tracing_subscriber::fmt::layer().json();
+			let subscriber = tracing_subscriber::registry()
+				.with(env_layer)
+				.with(json_layer);
+			subscriber.init();
+		}
+	}
 }

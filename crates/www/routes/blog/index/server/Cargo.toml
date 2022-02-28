@@ -10,6 +10,6 @@ path = "lib.rs"
 [dependencies]
 pinwheel = "0.2"
 tangram_ui = { path = "../../../../../ui" }
-sunfish = "0.4"
+sunfish = "0.5"
 tangram_www_content = { path = "../../../../content" }
 tangram_www_layouts = { path = "../../../../layouts" }
