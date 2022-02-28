@@ -12,5 +12,5 @@ anyhow = { version = "1", features = ["backtrace"] }
 pinwheel = "0.2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-sunfish = "0.5"
+sunfish = "0.6"
 tangram_ui = { path = "../../ui" }

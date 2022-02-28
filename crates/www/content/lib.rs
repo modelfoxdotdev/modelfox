@@ -1,7 +1,7 @@
 use anyhow::Result;
 use std::io::Read;
 use std::path::{Path, PathBuf};
-use sunfish::{embed, embed::EmbeddedDirectory};
+use sunfish::{include_dir, include_dir::IncludeDir};
 use tangram_ui as ui;
 
 pub struct BlogPost;
@@ -21,8 +21,8 @@ pub struct BlogPostAuthor {
 
 impl Content for BlogPost {
 	type FrontMatter = BlogPostFrontMatter;
-	fn content() -> EmbeddedDirectory {
-		embed!("crates/www/content/blog")
+	fn content() -> IncludeDir {
+		include_dir!("crates/www/content/blog")
 	}
 }
 
@@ -35,8 +35,8 @@ pub struct DocsGuideFrontMatter {
 
 impl Content for DocsGuide {
 	type FrontMatter = DocsGuideFrontMatter;
-	fn content() -> EmbeddedDirectory {
-		embed!("crates/www/content/docs_guides")
+	fn content() -> IncludeDir {
+		include_dir!("crates/www/content/docs_guides")
 	}
 }
 
@@ -49,8 +49,8 @@ pub struct DocsInternalsFrontMatter {
 
 impl Content for DocsInternals {
 	type FrontMatter = DocsInternalsFrontMatter;
-	fn content() -> EmbeddedDirectory {
-		embed!("crates/www/content/docs_internals")
+	fn content() -> IncludeDir {
+		include_dir!("crates/www/content/docs_internals")
 	}
 }
 
@@ -63,7 +63,7 @@ pub struct ContentItem<T> {
 
 pub trait Content: Sized {
 	type FrontMatter: serde::de::DeserializeOwned;
-	fn content() -> EmbeddedDirectory;
+	fn content() -> IncludeDir;
 
 	fn slugs() -> Result<Vec<String>> {
 		let content = Self::content();

@@ -10,7 +10,7 @@ path = "lib.rs"
 [dependencies]
 chrono = { version = "0.4", features = ["serde"] }
 pinwheel = "0.2"
-sunfish = "0.5"
+sunfish = "0.6"
 tangram_ui = { path = "../../ui" }
 tangram_www_content = { path = "../content" }
 tangram_www_ui = { path = "../ui" }
