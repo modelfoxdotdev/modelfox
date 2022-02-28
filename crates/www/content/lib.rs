@@ -1,7 +1,7 @@
 use anyhow::Result;
 use std::io::Read;
 use std::path::{Path, PathBuf};
-use sunfish::{embed::IncludeDir, include_dir};
+use sunfish::{include_dir, include_dir::IncludeDir};
 use tangram_ui as ui;
 
 pub struct BlogPost;
