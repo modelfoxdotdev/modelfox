@@ -14,7 +14,7 @@ path = "main.rs"
 default = ["train", "serve", "app"]
 train = []
 serve = ["bytes", "hyper", "tangram_serve", "tokio"]
-app = ["tangram_app", "tangram_app_core", "tokio"]
+app = ["tangram_app", "tangram_app/default", "tangram_app_core", "tokio"]
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
