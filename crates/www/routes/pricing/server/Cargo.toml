@@ -11,4 +11,4 @@ path = "lib.rs"
 pinwheel = "0.2"
 tangram_www_layouts = { path = "../../../layouts" }
 tangram_ui = { path = "../../../../ui" }
-sunfish = "0.6"
+sunfish = "0.7"

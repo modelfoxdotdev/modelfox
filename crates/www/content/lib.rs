@@ -68,7 +68,6 @@ pub trait Content: Sized {
 	fn slugs() -> Result<Vec<String>> {
 		let content = Self::content();
 		let slug_and_paths = content
-			.0
 			.into_iter()
 			.map(|(entry, _)| {
 				entry
@@ -93,7 +92,7 @@ pub trait Content: Sized {
 
 	fn from_slug(slug: String) -> Result<ContentItem<Self::FrontMatter>> {
 		let post_path = Path::new(&slug).join("post.md");
-		let post = Self::content().read(&post_path).unwrap().data;
+		let post = Self::content().read(&post_path).unwrap().data();
 		let mut reader = std::io::Cursor::new(post);
 		let front_matter: Self::FrontMatter = serde_json::Deserializer::from_reader(&mut reader)
 			.into_iter()

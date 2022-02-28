@@ -70,7 +70,7 @@ default = [
 
 [build-dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-sunfish = "0.6"
+sunfish = "0.7"
 tangram_app_model_index_client = { path = "routes/repos/_/models/_/index/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
 tangram_app_new_model_client = { path = "routes/repos/_/models/new/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
 tangram_app_new_monitor_client = { path = "routes/repos/_/models/_/monitors/new/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
@@ -107,7 +107,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.10"
 sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }
-sunfish = "0.6"
+sunfish = "0.7"
 tangram_app_context = { path = "context" }
 tangram_app_core = { path = "core" }
 tangram_app_layouts = { path = "layouts" }
