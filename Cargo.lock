@@ -2343,9 +2343,9 @@ dependencies = [
 
 [[package]]
 name = "redox_syscall"
-version = "0.2.10"
+version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8383f39639269cde97d255a32bdb68c047337295414940c68bdd30c2e13203ff"
+checksum = "8380fe0152551244f0747b1bf41737e0f8a74f97a14ccefd1148187271634f3c"
 dependencies = [
  "bitflags",
 ]
@@ -2957,9 +2957,9 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "sunfish"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "daba11cf8dc98ecb085484687eb48b75f9c82c5dd63ca1e7254f0cd627e4a5fc"
+checksum = "1d0406445b88aa6ad7f527ed2c35bca1b52b41d674af8e770a0158d67acd1dba"
 dependencies = [
  "anyhow",
  "digest 0.10.3",
@@ -2984,9 +2984,9 @@ dependencies = [
 
 [[package]]
 name = "sunfish_macro"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8b220be78a7fd8bc98c216d9163a065533e820c5cf8c90c40be54144c5f8375a"
+checksum = "6e4196cc99898be070001843ef09b4f82a8aa44efbc2b1997d07ee1ce836a3e4"
 dependencies = [
  "digest 0.10.3",
  "glob",
