@@ -1,5 +1,5 @@
 use super::*;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use std::{
 	collections::{BTreeMap, BTreeSet},
 	path::Path,
@@ -71,7 +71,9 @@ impl Table {
 		options: FromCsvOptions,
 		handle_progress_event: &mut impl FnMut(LoadProgressEvent),
 	) -> Result<Table> {
-		let len = std::fs::metadata(path)?.len();
+		let len = std::fs::metadata(path)
+			.with_context(|| format!("Unable to open the input file \"{}\"", path.display()))?
+			.len();
 		Table::from_csv(
 			&mut csv::Reader::from_path(path)?,
 			len,

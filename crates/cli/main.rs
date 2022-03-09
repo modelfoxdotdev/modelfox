@@ -178,7 +178,7 @@ fn main() {
 		Subcommand::Serve(args) => self::serve::serve(*args),
 	};
 	if let Err(error) = result {
-		eprintln!("{}: {}", "error".red().bold(), error);
+		eprintln!("{}: {:#}", "error".red().bold(), error);
 		std::process::exit(1);
 	}
 }
