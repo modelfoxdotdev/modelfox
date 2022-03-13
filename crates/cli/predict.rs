@@ -2,6 +2,7 @@ use crate::PredictArgs;
 use anyhow::Result;
 use either::Either;
 use itertools::Itertools;
+use rayon::prelude::*;
 use tangram_core::predict::{PredictInput, PredictInputValue, PredictOptions};
 use tangram_zip::zip;
 
@@ -69,24 +70,34 @@ pub fn predict(args: PredictArgs) -> Result<()> {
 		}
 	};
 	let header = reader.headers()?.to_owned();
-	for records in &reader.records().chunks(PREDICT_CHUNK_SIZE) {
-		let input: Vec<PredictInput> = records
-			.into_iter()
-			.map(|record| -> Result<PredictInput> {
-				let record = record?;
-				let input = zip!(header.iter(), record.into_iter())
-					.map(|(column_name, value)| {
-						(
-							column_name.to_owned(),
-							PredictInputValue::String(value.to_owned()),
-						)
-					})
-					.collect();
-				Ok(PredictInput(input))
-			})
-			.collect::<Result<_, _>>()?;
-		let output = tangram_core::predict::predict(&model, &input, &options);
-		for output in output {
+	let mut record_chunks: Vec<Vec<_>> = Vec::new();
+	for record_chunk in &reader.records().chunks(PREDICT_CHUNK_SIZE) {
+		let record_chunk = record_chunk.collect();
+		record_chunks.push(record_chunk);
+	}
+	let output_chunks: Vec<Result<_, _>> = record_chunks
+		.into_par_iter()
+		.map(|records| {
+			let input: Result<Vec<PredictInput>, _> = records
+				.into_iter()
+				.map(|record| -> Result<PredictInput> {
+					let record = record?;
+					let input = zip!(header.iter(), record.into_iter())
+						.map(|(column_name, value)| {
+							(
+								column_name.to_owned(),
+								PredictInputValue::String(value.to_owned()),
+							)
+						})
+						.collect();
+					Ok(PredictInput(input))
+				})
+				.collect();
+			input.map(|input| tangram_core::predict::predict(&model, &input, &options))
+		})
+		.collect();
+	for outputs in output_chunks {
+		for output in outputs? {
 			let output = match output {
 				tangram_core::predict::PredictOutput::Regression(output) => {
 					vec![output.value.to_string()]
