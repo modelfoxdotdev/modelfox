@@ -22,12 +22,14 @@ backtrace = "0.3"
 bytes = { version = "1", optional = true }
 clap = { version = "3", features = ["derive"] }
 colored = "2"
+crossbeam-channel = "0.5"
 csv = "1"
 dirs = "4"
 either = "1"
 hyper = { version = "0.14", optional = true }
 itertools = "0.10"
 num = "0.4"
+num_cpus = "1"
 once_cell = "1"
 rayon = "1.5"
 serde = { version = "1", features = ["derive"] }
