@@ -4,12 +4,12 @@ use crate::{
 	train_tree::TrainTree,
 	Progress, TrainOptions, Tree,
 };
+use modelfox_table::prelude::*;
+use modelfox_zip::{pzip, zip};
 use ndarray::prelude::*;
 use num::{clamp, ToPrimitive};
 use rayon::prelude::*;
 use std::{num::NonZeroUsize, ops::Neg};
-use tangram_table::prelude::*;
-use tangram_zip::{pzip, zip};
 
 /// `BinaryClassifier`s predict binary target values, for example whether a patient has heart disease or not.
 #[derive(Clone, Debug)]

@@ -1,29 +1,29 @@
-rm tangram/tangram_python.so tangram/tangram_python.pyd
+rm modelfox/modelfox_python.so modelfox/modelfox_python.pyd
 
-cp ../../dist/compile/aarch64-linux-gnu/libtangram_python.so tangram/tangram_python.so
-cargo run --release -p wheel_writer -- --distribution tangram --python cp37 --abi abi3 --platform manylinux_2_28_aarch64 --metadata metadata.toml --version $VERSION --package tangram --output dist
-rm tangram/tangram_python.so
+cp ../../dist/compile/aarch64-linux-gnu/libmodelfox_python.so modelfox/modelfox_python.so
+cargo run --release -p wheel_writer -- --distribution modelfox --python cp37 --abi abi3 --platform manylinux_2_28_aarch64 --metadata metadata.toml --version $VERSION --package modelfox --output dist
+rm modelfox/modelfox_python.so
 
-cp ../../dist/compile/aarch64-linux-musl/libtangram_python.so tangram/tangram_python.so
-cargo run --release -p wheel_writer -- --distribution tangram --python cp37 --abi abi3 --platform musllinux_1_2_aarch64 --metadata metadata.toml --version $VERSION --package tangram --output dist
-rm tangram/tangram_python.so
+cp ../../dist/compile/aarch64-linux-musl/libmodelfox_python.so modelfox/modelfox_python.so
+cargo run --release -p wheel_writer -- --distribution modelfox --python cp37 --abi abi3 --platform musllinux_1_2_aarch64 --metadata metadata.toml --version $VERSION --package modelfox --output dist
+rm modelfox/modelfox_python.so
 
-cp ../../dist/compile/aarch64-macos/libtangram_python.dylib tangram/tangram_python.so
-cargo run --release -p wheel_writer -- --distribution tangram --python cp37 --abi abi3 --platform macos_11_0_arm64 --metadata metadata.toml --version $VERSION --package tangram --output dist
-rm tangram/tangram_python.so
+cp ../../dist/compile/aarch64-macos/libmodelfox_python.dylib modelfox/modelfox_python.so
+cargo run --release -p wheel_writer -- --distribution modelfox --python cp37 --abi abi3 --platform macos_11_0_arm64 --metadata metadata.toml --version $VERSION --package modelfox --output dist
+rm modelfox/modelfox_python.so
 
-cp ../../dist/compile/x86_64-linux-gnu/libtangram_python.so tangram/tangram_python.so
-cargo run --release -p wheel_writer -- --distribution tangram --python cp37 --abi abi3 --platform manylinux_2_28_x86_64 --metadata metadata.toml --version $VERSION --package tangram --output dist
-rm tangram/tangram_python.so
+cp ../../dist/compile/x86_64-linux-gnu/libmodelfox_python.so modelfox/modelfox_python.so
+cargo run --release -p wheel_writer -- --distribution modelfox --python cp37 --abi abi3 --platform manylinux_2_28_x86_64 --metadata metadata.toml --version $VERSION --package modelfox --output dist
+rm modelfox/modelfox_python.so
 
-cp ../../dist/compile/x86_64-linux-musl/libtangram_python.so tangram/tangram_python.so
-cargo run --release -p wheel_writer -- --distribution tangram --python cp37 --abi abi3 --platform musllinux_1_2_x86_64 --metadata metadata.toml --version $VERSION --package tangram --output dist
-rm tangram/tangram_python.so
+cp ../../dist/compile/x86_64-linux-musl/libmodelfox_python.so modelfox/modelfox_python.so
+cargo run --release -p wheel_writer -- --distribution modelfox --python cp37 --abi abi3 --platform musllinux_1_2_x86_64 --metadata metadata.toml --version $VERSION --package modelfox --output dist
+rm modelfox/modelfox_python.so
 
-cp ../../dist/compile/x86_64-macos/libtangram_python.dylib tangram/tangram_python.so
-cargo run --release -p wheel_writer -- --distribution tangram --python cp37 --abi abi3 --platform macos_11_0_x86_64 --metadata metadata.toml --version $VERSION --package tangram --output dist
-rm tangram/tangram_python.so
+cp ../../dist/compile/x86_64-macos/libmodelfox_python.dylib modelfox/modelfox_python.so
+cargo run --release -p wheel_writer -- --distribution modelfox --python cp37 --abi abi3 --platform macos_11_0_x86_64 --metadata metadata.toml --version $VERSION --package modelfox --output dist
+rm modelfox/modelfox_python.so
 
-cp ../../dist/compile/x86_64-windows-msvc/tangram_python.dll tangram/tangram_python.pyd
-cargo run --release -p wheel_writer -- --distribution tangram --python cp37 --abi abi3 --platform win_amd64 --metadata metadata.toml --version $VERSION --package tangram --output dist
-rm tangram/tangram_python.pyd
+cp ../../dist/compile/x86_64-windows-msvc/modelfox_python.dll modelfox/modelfox_python.pyd
+cargo run --release -p wheel_writer -- --distribution modelfox --python cp37 --abi abi3 --platform win_amd64 --metadata metadata.toml --version $VERSION --package modelfox --output dist
+rm modelfox/modelfox_python.pyd

@@ -1,11 +1,11 @@
 [package]
 edition = "2021"
-name = "tangram_dev"
+name = "modelfox_dev"
 publish = false
 version = "0.0.0"
 
 [[bin]]
-name = "tangram_dev"
+name = "modelfox_dev"
 path = "main.rs"
 
 [dependencies]

@@ -3,8 +3,8 @@ use anyhow::{bail, Result};
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use std::sync::Arc;
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	heuristics::{
 		TRAINING_STATS_TEXT_COLUMN_MAX_TOKENS_TO_SHOW_IN_CHART,
@@ -14,9 +14,9 @@ use tangram_app_core::{
 	path_components,
 	user::{authorize_user, authorize_user_for_model},
 };
-use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_id::Id;
-use tangram_ui as ui;
+use modelfox_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use modelfox_id::Id;
+use modelfox_ui as ui;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
@@ -45,23 +45,23 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		return Ok(not_found());
 	}
 	let bytes = get_model_bytes(app.storage(), model_id).await?;
-	let model = tangram_model::from_bytes(&bytes)?;
+	let model = modelfox_model::from_bytes(&bytes)?;
 	let (column_stats, target_column_stats) = match model.inner() {
-		tangram_model::ModelInnerReader::Regressor(regressor) => {
+		modelfox_model::ModelInnerReader::Regressor(regressor) => {
 			let regressor = regressor.read();
 			(
 				regressor.overall_column_stats(),
 				regressor.overall_target_column_stats(),
 			)
 		}
-		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+		modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			let binary_classifier = binary_classifier.read();
 			(
 				binary_classifier.overall_column_stats(),
 				binary_classifier.overall_target_column_stats(),
 			)
 		}
-		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+		modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 			let multiclass_classifier = multiclass_classifier.read();
 			(
 				multiclass_classifier.overall_column_stats(),
@@ -81,8 +81,8 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	};
 
 	let inner = match column {
-		tangram_model::ColumnStatsReader::UnknownColumn(_) => unimplemented!(),
-		tangram_model::ColumnStatsReader::NumberColumn(column_stats) => {
+		modelfox_model::ColumnStatsReader::UnknownColumn(_) => unimplemented!(),
+		modelfox_model::ColumnStatsReader::NumberColumn(column_stats) => {
 			let column_stats = column_stats.read();
 			Inner::Number(NumberColumn {
 				invalid_count: column_stats.invalid_count(),
@@ -97,7 +97,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				unique_count: column_stats.unique_count(),
 			})
 		}
-		tangram_model::ColumnStatsReader::EnumColumn(column_stats) => {
+		modelfox_model::ColumnStatsReader::EnumColumn(column_stats) => {
 			let column_stats = column_stats.read();
 			let total_count: u64 = column_stats
 				.histogram()
@@ -130,7 +130,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				unique_count: column_stats.unique_count(),
 			})
 		}
-		tangram_model::ColumnStatsReader::TextColumn(column_stats) => {
+		modelfox_model::ColumnStatsReader::TextColumn(column_stats) => {
 			let column_stats = column_stats.read();
 			let ngram_count = column_stats.top_ngrams().len();
 			let mut top_ngrams_chart_values = column_stats

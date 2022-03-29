@@ -5,8 +5,8 @@ use crate::{
 	one_hot_encoded::OneHotEncodedFeatureGroup, word_embedding::WordEmbeddingFeatureGroup,
 	FeatureGroup,
 };
+use modelfox_table::prelude::*;
 use ndarray::prelude::*;
-use tangram_table::prelude::*;
 
 /// Compute features as an `Array` of `f32`s.
 pub fn compute_features_array_f32(
@@ -360,7 +360,7 @@ pub fn compute_features_array_value<'a>(
 fn compute_features_array_value_for_feature_group(
 	table: &TableView,
 	feature_group: &FeatureGroup,
-	features: ArrayViewMut2<tangram_table::TableValue>,
+	features: ArrayViewMut2<modelfox_table::TableValue>,
 	progress: &impl Fn(),
 ) {
 	match &feature_group {
@@ -411,7 +411,7 @@ fn compute_features_array_value_for_feature_group(
 fn compute_features_array_value_for_identity_feature_group(
 	table: &TableView,
 	feature_group: &IdentityFeatureGroup,
-	features: ArrayViewMut2<tangram_table::TableValue>,
+	features: ArrayViewMut2<modelfox_table::TableValue>,
 	progress: &impl Fn(),
 ) {
 	let source_column = table
@@ -425,7 +425,7 @@ fn compute_features_array_value_for_identity_feature_group(
 fn compute_features_array_value_for_normalized_feature_group(
 	table: &TableView,
 	feature_group: &NormalizedFeatureGroup,
-	features: ArrayViewMut2<tangram_table::TableValue>,
+	features: ArrayViewMut2<modelfox_table::TableValue>,
 	progress: &impl Fn(),
 ) {
 	let source_column = table
@@ -439,7 +439,7 @@ fn compute_features_array_value_for_normalized_feature_group(
 fn compute_features_array_value_for_bag_of_words_feature_group(
 	table: &TableView,
 	feature_group: &BagOfWordsFeatureGroup,
-	features: ArrayViewMut2<tangram_table::TableValue>,
+	features: ArrayViewMut2<modelfox_table::TableValue>,
 	progress: &impl Fn(),
 ) {
 	// Get the data for the source column.
@@ -454,7 +454,7 @@ fn compute_features_array_value_for_bag_of_words_feature_group(
 fn compute_features_array_value_for_bag_of_words_cosine_similarity_feature_group(
 	table: &TableView,
 	feature_group: &BagOfWordsCosineSimilarityFeatureGroup,
-	features: ArrayViewMut2<tangram_table::TableValue>,
+	features: ArrayViewMut2<modelfox_table::TableValue>,
 	progress: &impl Fn(),
 ) {
 	// Get the data for the source column.
@@ -479,7 +479,7 @@ fn compute_features_array_value_for_bag_of_words_cosine_similarity_feature_group
 fn compute_features_array_value_for_word_embedding_feature_group(
 	table: &TableView,
 	feature_group: &WordEmbeddingFeatureGroup,
-	features: ArrayViewMut2<tangram_table::TableValue>,
+	features: ArrayViewMut2<modelfox_table::TableValue>,
 	progress: &impl Fn(),
 ) {
 	// Get the data for the source column.

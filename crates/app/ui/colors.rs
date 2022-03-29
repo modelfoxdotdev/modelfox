@@ -1,4 +1,4 @@
-pub use tangram_ui as ui;
+pub use modelfox_ui as ui;
 
 pub const TRAINING_COLOR: &str = ui::colors::BLUE;
 pub const PRODUCTION_COLOR: &str = ui::colors::GREEN;

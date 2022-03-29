@@ -1,7 +1,7 @@
 use crate::footer::Footer;
 use pinwheel::prelude::*;
-use tangram_ui as ui;
-use tangram_www_ui::logo::{Logo, LogoColorScheme};
+use modelfox_ui as ui;
+use modelfox_www_ui::logo::Logo;
 
 #[derive(children, Default, new)]
 #[new(default)]
@@ -25,7 +25,7 @@ struct Topbar;
 impl Component for Topbar {
 	fn into_node(self) -> Node {
 		let gh_button = div().style("line-height", "0").child(
-			a().href("https://github.com/tangramdotdev/tangram")
+			a().href("https://github.com/modelfoxdotdev/modelfox")
 				.class("github-button")
 				.class("link")
 				.style("color", "var(--text-color)")
@@ -35,19 +35,14 @@ impl Component for Topbar {
 				)
 				.attribute("data-size", "large")
 				.attribute("data-show-count", "true")
-				.attribute("aria-label", "Star tangramdotdev/tangram on GitHub")
+				.attribute("aria-label", "Star modelfoxdotdev/modelfox on GitHub")
 				.child("GitHub"),
 		);
 		let topbar_items = vec![
 			ui::TopbarItem {
 				element: Some(gh_button.into_node()),
-				href: "https://github.com/tangramdotdev/tangram".to_owned(),
+				href: "https://github.com/modelfoxdotdev/modelfox".to_owned(),
 				title: "GitHub".to_owned(),
-			},
-			ui::TopbarItem {
-				element: None,
-				href: "/jobs".to_owned(),
-				title: "Jobs".to_owned(),
 			},
 			ui::TopbarItem {
 				element: None,
@@ -71,7 +66,7 @@ impl Component for Topbar {
 			},
 			ui::TopbarItem {
 				element: None,
-				href: "https://app.tangram.dev".to_owned(),
+				href: "https://app.modelfox.dev".to_owned(),
 				title: "Login".to_owned(),
 			},
 			ui::TopbarItem {
@@ -90,8 +85,8 @@ impl Component for Topbar {
 			.background_color(ui::colors::HEADER.to_owned())
 			.dropdown_background_color(ui::colors::SURFACE.to_owned())
 			.items(topbar_items)
-			.logo(Logo::new().color_scheme(LogoColorScheme::Multi).into_node())
-			.title("tangram".to_owned())
+			.logo(Logo::new().into_node())
+			.title("ModelFox".to_owned())
 			.into_node()
 	}
 }

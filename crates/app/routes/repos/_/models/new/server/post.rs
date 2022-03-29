@@ -3,15 +3,15 @@ use anyhow::{bail, Result};
 use multer::Multipart;
 use pinwheel::prelude::*;
 use std::sync::Arc;
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{not_found, redirect_to_login, service_unavailable},
 	path_components,
 	repos::add_model_version,
 	user::{authorize_user, authorize_user_for_repo},
 };
-use tangram_app_layouts::app_layout::app_layout_info;
-use tangram_id::Id;
+use modelfox_app_layouts::app_layout::app_layout_info;
+use modelfox_id::Id;
 
 pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
@@ -120,12 +120,12 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 			return Ok(response);
 		}
 	};
-	let model = match tangram_model::from_bytes(&bytes) {
+	let model = match modelfox_model::from_bytes(&bytes) {
 		Ok(model) => model,
 		Err(_) => {
 			let page = Page {
 				app_layout_info,
-				error: Some("Invalid tangram model file.".to_owned()),
+				error: Some("Invalid modelfox model file.".to_owned()),
 			};
 			let html = html(page);
 			let response = http::Response::builder()

@@ -28,7 +28,7 @@ fn generate(generate_args: GenerateArgs) -> Result<()> {
 		.run()?
 		.stdout;
 	let private_key = String::from_utf8(private_key)?;
-	let license = tangram_license::generate(&private_key)?;
+	let license = modelfox_license::generate(&private_key)?;
 	std::fs::write(generate_args.output, license)?;
 	Ok(())
 }

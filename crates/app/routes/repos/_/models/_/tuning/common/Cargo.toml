@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_app_tuning_common"
+name = "modelfox_app_tuning_common"
 publish = false
 version = "0.0.0"
 
@@ -12,6 +12,6 @@ num = "0.4"
 pinwheel = "0.2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tangram_ui = { path = "../../../../../../../../ui" }
-tangram_app_ui = { path = "../../../../../../../../app/ui" }
+modelfox_ui = { path = "../../../../../../../../ui" }
+modelfox_app_ui = { path = "../../../../../../../../app/ui" }
 tracing = "0.1"

@@ -1,20 +1,20 @@
 use crate::page::{AccuracyChart, TrainingProductionMetrics, TrueValuesCountChartEntry};
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_app_date_window::{DateWindow, DateWindowInterval};
-use tangram_app_ui::{
+use modelfox_app_date_window::{DateWindow, DateWindowInterval};
+use modelfox_app_ui::{
 	colors::{PRODUCTION_COLOR, TRAINING_COLOR},
 	date_window_select_field::DateWindowSelectField,
 	metrics_row::MetricsRow,
 	time::interval_chart_title,
 };
-use tangram_charts::{
+use modelfox_charts::{
 	common::GridLineInterval,
 	components::LineChart,
 	line_chart::{LineChartPoint, LineChartSeries, LineStyle, PointStyle},
 };
-use tangram_finite::Finite;
-use tangram_ui as ui;
+use modelfox_finite::Finite;
+use modelfox_ui as ui;
 
 pub struct BinaryClassifierProductionMetrics {
 	pub date_window: DateWindow,

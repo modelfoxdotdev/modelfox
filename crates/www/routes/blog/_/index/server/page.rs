@@ -1,7 +1,7 @@
 use pinwheel::prelude::*;
-use tangram_ui as ui;
-use tangram_www_content::{BlogPost, Content};
-use tangram_www_layouts::{document::Document, page_layout::PageLayout};
+use modelfox_ui as ui;
+use modelfox_www_content::{BlogPost, Content};
+use modelfox_www_layouts::{document::Document, page_layout::PageLayout};
 
 #[derive(new)]
 pub struct Page {
@@ -15,7 +15,7 @@ impl Component for Page {
 			Author::new().name(author.name).gravatar(author.gravatar)
 		} else {
 			Author::new()
-				.name("Tangram Team")
+				.name("ModelFox Team")
 				.gravatar("https://gravatar.com/avatar/048af5cc491ae1881dba85a78c228902")
 		};
 		let heading = div()
@@ -26,25 +26,20 @@ impl Component for Page {
 				blog_post.front_matter.date
 			)))
 			.child(author);
-		let url = format!("https://www.tangram.dev/blog/{}", self.slug);
-		let about_tangram = div().child(
+		let url = format!("https://www.modelfox.dev/blog/{}", self.slug);
+		let about_modelfox = div().child(
 			ui::Card::new().child(
 				ui::Markdown::new(
-					"Tangram makes it easy for programmers to train, deploy, and monitor machine learning models. With Tangram, developers can train models and make predictions on the command line or with libraries for languages including [Elixir](https://hex.pm/packages/tangram), [Golang](https://pkg.go.dev/github.com/tangramdotdev/tangram-go), [Javascript](https://www.npmjs.com/package/@tangramdotdev/tangram), [PHP](https://packagist.org/packages/tangram/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](https://lib.rs/tangram), and learn about their models and monitor them in production from a web application. Watch the demo on the [homepage](https://www.tangram.dev)."))
+					"ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models. With ModelFox, developers can train models and make predictions on the command line or with libraries for languages including [Elixir](https://hex.pm/packages/modelfox), [Golang](https://pkg.go.dev/github.com/modelfoxdotdev/modelfox-go), [Javascript](https://www.npmjs.com/package/@modelfoxdotdev/modelfox), [PHP](https://packagist.org/packages/modelfox/modelfox), [Python](https://pypi.org/project/modelfox), [Ruby](https://rubygems.org/gems/modelfox), and [Rust](https://lib.rs/modelfox), and learn about their models and monitor them in production from a web application. Watch the demo on the [homepage](https://www.modelfox.dev)."))
 			);
-		let jobs = div().child(
-			ui::Card::new().child(
-				ui::Markdown::new("We are hiring! Tangram is open source and everything is written in Rust, from the core machine learning algorithms to the web application. Check it out on [GitHub](https://www.github.com/tangramdotdev/tangram). We are looking for programmers who love developer tools and are excited to build machine learning tools with Rust! If you are interested, email us at jobs@tangram.dev.")
-			));
 		Document::new()
 			.child(
 				PageLayout::new().child(
 					div().class("blog-post-content").child(
 						ui::S1::new()
 							.child(heading)
-							.child(about_tangram)
+							.child(about_modelfox)
 							.child(blog_post.markdown)
-							.child(jobs)
 							.child(
 								ShareButtons::new()
 									.title(blog_post.front_matter.title)

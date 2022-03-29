@@ -10,7 +10,7 @@ pub use self::{
 	regressor::{Regressor, RegressorTrainOutput},
 };
 use bitvec::prelude::*;
-use tangram_progress_counter::ProgressCounter;
+use modelfox_progress_counter::ProgressCounter;
 
 mod binary_classifier;
 mod choose_best_split;
@@ -30,7 +30,7 @@ mod train;
 mod train_tree;
 
 pub struct Progress<'a> {
-	pub kill_chip: &'a tangram_kill_chip::KillChip,
+	pub kill_chip: &'a modelfox_kill_chip::KillChip,
 	pub handle_progress_event: &'a mut dyn FnMut(TrainProgressEvent),
 }
 
@@ -126,7 +126,7 @@ pub struct Tree {
 
 impl Tree {
 	/// Make a prediction.
-	pub fn predict(&self, example: &[tangram_table::TableValue]) -> f32 {
+	pub fn predict(&self, example: &[modelfox_table::TableValue]) -> f32 {
 		// Start at the root node.
 		let mut node_index = 0;
 		// Traverse the tree until we get to a leaf.

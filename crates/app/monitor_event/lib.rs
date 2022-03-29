@@ -1,6 +1,6 @@
+use modelfox_finite::NotFiniteError;
 use std::{borrow::Cow, collections::HashMap};
-use tangram_finite::NotFiniteError;
-use tangram_id::Id;
+use modelfox_id::Id;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[serde(tag = "type")]

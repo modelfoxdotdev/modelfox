@@ -1,13 +1,13 @@
 use anyhow::{anyhow, Result};
 use digest::Digest;
+use modelfox_id::Id;
 use rsa::{
 	pkcs1::{FromRsaPrivateKey, FromRsaPublicKey},
 	PublicKey, RsaPrivateKey, RsaPublicKey,
 };
 use serde_json::json;
-use tangram_id::Id;
 
-pub const TANGRAM_LICENSE_PUBLIC_KEY: &str = include_str!("./license.public.rsa");
+pub const MODELFOX_LICENSE_PUBLIC_KEY: &str = include_str!("./license.public.rsa");
 
 pub fn generate(private_key: &str) -> Result<String> {
 	let private_key = RsaPrivateKey::from_pkcs1_pem(private_key)?;

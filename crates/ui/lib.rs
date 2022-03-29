@@ -5,7 +5,7 @@ pub use self::{
 	table::*, theme::*, token::*, topbar::*, window::*,
 };
 pub use indoc::{formatdoc, indoc as doc};
-pub use tangram_number_formatter::*;
+pub use modelfox_number_formatter::*;
 
 mod alert;
 mod alert_icon;

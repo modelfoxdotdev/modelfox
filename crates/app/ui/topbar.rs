@@ -1,6 +1,6 @@
-use crate::logo::{Logo, LogoColorScheme};
+use crate::logo::Logo;
 use pinwheel::prelude::*;
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 #[derive(builder, Default, new)]
 #[new(default)]
@@ -30,14 +30,14 @@ impl Component for Topbar {
 		} else {
 			None
 		};
-		let logo = Some(Logo::new().color_scheme(LogoColorScheme::Multi).into_node());
+		let logo = Some(Logo::new().into_node());
 		ui::Topbar::new()
 			.background_color(ui::colors::HEADER.to_owned())
 			.dropdown_background_color(ui::colors::SURFACE.to_owned())
 			.items(items)
 			.logo_href("/".to_owned())
 			.logo(logo)
-			.title("tangram".to_owned())
+			.title("ModelFox".to_owned())
 			.into_node()
 	}
 }

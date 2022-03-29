@@ -1,11 +1,11 @@
 use pinwheel::prelude::*;
-use tangram_app_core::monitor::AlertModelType;
-use tangram_app_layouts::{
+use modelfox_app_core::monitor::AlertModelType;
+use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-use tangram_app_ui::page_heading::PageHeading;
-use tangram_ui as ui;
+use modelfox_app_ui::page_heading::PageHeading;
+use modelfox_ui as ui;
 
 pub struct Page {
 	pub model_layout_info: ModelLayoutInfo,
@@ -32,7 +32,7 @@ impl Component for Page {
 			],
 		};
 		Document::new()
-			.client("tangram_app_new_monitor_client")
+			.client("modelfox_app_new_monitor_client")
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()

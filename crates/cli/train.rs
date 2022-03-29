@@ -1,6 +1,10 @@
 use crate::TrainArgs;
 use anyhow::{anyhow, bail, Result};
 use backtrace::Backtrace;
+use modelfox_core::progress::{
+	LoadProgressEvent, ProgressEvent, StatsProgressEvent, TrainGridItemProgressEvent,
+	TrainProgressEvent,
+};
 use num::ToPrimitive;
 use once_cell::sync::Lazy;
 use std::{
@@ -14,11 +18,7 @@ use std::{
 	thread::{spawn, JoinHandle},
 	time::{Duration, Instant},
 };
-use tangram_core::progress::{
-	LoadProgressEvent, ProgressEvent, StatsProgressEvent, TrainGridItemProgressEvent,
-	TrainProgressEvent,
-};
-use tangram_progress_counter::ProgressCounter;
+use modelfox_progress_counter::ProgressCounter;
 use tortoise::{
 	style::Color,
 	terminal::{Clear, Terminal},
@@ -51,12 +51,12 @@ pub fn train(args: TrainArgs) -> Result<()> {
 			}
 		};
 		let input = match (&args.file, &args.file_train, &args.file_test, args.stdin) {
-			(None, None, None, true) => tangram_core::train::TrainingDataSource::Stdin,
+			(None, None, None, true) => modelfox_core::train::TrainingDataSource::Stdin,
 			(Some(file_path), None, None, false) => {
-				tangram_core::train::TrainingDataSource::File(file_path.to_owned())
+				modelfox_core::train::TrainingDataSource::File(file_path.to_owned())
 			}
 			(None, Some(file_path_train), Some(file_path_test), false) => {
-				tangram_core::train::TrainingDataSource::TrainAndTest {
+				modelfox_core::train::TrainingDataSource::TrainAndTest {
 					train: file_path_train.to_owned(),
 					test: file_path_test.to_owned(),
 				}
@@ -69,18 +69,18 @@ pub fn train(args: TrainArgs) -> Result<()> {
 			(Some(file), _, None, false) => {
 				let dir = std::env::current_dir()?;
 				let csv_file_name = file.file_stem().unwrap().to_str().unwrap();
-				available_path(&dir, csv_file_name, "tangram")?
+				available_path(&dir, csv_file_name, "modelfox")?
 			}
 			(None, Some(file_train_path), None, false) => {
 				let dir = std::env::current_dir()?;
 				let csv_file_name = file_train_path.file_stem().unwrap().to_str().unwrap();
-				available_path(&dir, csv_file_name, "tangram")?
+				available_path(&dir, csv_file_name, "modelfox")?
 			}
 			_ => bail!("Must provide an output path when using stdin for input!"),
 		};
 		// Load the dataset, compute stats, and prepare for training.
-		let mut trainer = tangram_core::train::Trainer::prepare(
-			tangram_id::Id::generate(),
+		let mut trainer = modelfox_core::train::Trainer::prepare(
+			modelfox_id::Id::generate(),
 			input,
 			&args.target,
 			args.config.as_deref(),
@@ -131,10 +131,10 @@ pub fn train(args: TrainArgs) -> Result<()> {
 	// Announce that everything worked!
 	eprintln!("Your model was written to {}.", output_path.display());
 	eprintln!(
-		"For help making predictions in your code, read the docs at https://www.tangram.dev/docs."
+		"For help making predictions in your code, read the docs at https://www.modelfox.dev/docs."
 	);
 	eprintln!(
-		"To learn more about how your model works and set up production monitoring, run `tangram app`."
+		"To learn more about how your model works and set up production monitoring, run `modelfox app`."
 	);
 
 	Ok(())
@@ -239,7 +239,7 @@ fn progress_thread_handle_progress_event(
 		}
 		ProgressEvent::Load(progress_event) => match progress_event {
 			LoadProgressEvent::Train(progress_event) => match progress_event {
-				tangram_table::LoadProgressEvent::InferStarted(progress_counter) => {
+				modelfox_table::LoadProgressEvent::InferStarted(progress_counter) => {
 					let progress_bar = ProgressBar::new(
 						"🤔",
 						"Inferring train table columns.".into(),
@@ -248,10 +248,10 @@ fn progress_thread_handle_progress_event(
 					);
 					start_progress_bar(terminal, state, progress_bar)?;
 				}
-				tangram_table::LoadProgressEvent::InferDone => {
+				modelfox_table::LoadProgressEvent::InferDone => {
 					finish_progress_bar(terminal, state)?;
 				}
-				tangram_table::LoadProgressEvent::LoadStarted(progress_counter) => {
+				modelfox_table::LoadProgressEvent::LoadStarted(progress_counter) => {
 					let progress_bar = ProgressBar::new(
 						"🚚",
 						"Loading train table.".into(),
@@ -260,12 +260,12 @@ fn progress_thread_handle_progress_event(
 					);
 					start_progress_bar(terminal, state, progress_bar)?;
 				}
-				tangram_table::LoadProgressEvent::LoadDone => {
+				modelfox_table::LoadProgressEvent::LoadDone => {
 					finish_progress_bar(terminal, state)?;
 				}
 			},
 			LoadProgressEvent::Test(progress_event) => match progress_event {
-				tangram_table::LoadProgressEvent::InferStarted(progress_counter) => {
+				modelfox_table::LoadProgressEvent::InferStarted(progress_counter) => {
 					let progress_bar = ProgressBar::new(
 						"🤔",
 						"Infer train table columns.".into(),
@@ -274,10 +274,10 @@ fn progress_thread_handle_progress_event(
 					);
 					start_progress_bar(terminal, state, progress_bar)?;
 				}
-				tangram_table::LoadProgressEvent::InferDone => {
+				modelfox_table::LoadProgressEvent::InferDone => {
 					finish_progress_bar(terminal, state)?;
 				}
-				tangram_table::LoadProgressEvent::LoadStarted(progress_counter) => {
+				modelfox_table::LoadProgressEvent::LoadStarted(progress_counter) => {
 					let progress_bar = ProgressBar::new(
 						"🚚",
 						"Loading test table.".into(),
@@ -286,7 +286,7 @@ fn progress_thread_handle_progress_event(
 					);
 					start_progress_bar(terminal, state, progress_bar)?;
 				}
-				tangram_table::LoadProgressEvent::LoadDone => {
+				modelfox_table::LoadProgressEvent::LoadDone => {
 					finish_progress_bar(terminal, state)?;
 				}
 			},
@@ -362,33 +362,33 @@ fn progress_thread_handle_progress_event(
 				}
 				TrainGridItemProgressEvent::TrainModel(progress_event) => {
 					match progress_event {
-						tangram_core::progress::ModelTrainProgressEvent::Linear(progress_event) => {
-							match progress_event {
-								tangram_core::progress::LinearTrainProgressEvent::Train(
+						modelfox_core::progress::ModelTrainProgressEvent::Linear(
+							progress_event,
+						) => match progress_event {
+							modelfox_core::progress::LinearTrainProgressEvent::Train(
+								progress_counter,
+							) => {
+								let title = format!(
+									"Training model {} of {}: Linear.",
+									grid_item_index + 1,
+									grid_item_count
+								)
+								.into();
+								let progress_bar = ProgressBar::new(
+									"🚂",
+									title,
 									progress_counter,
-								) => {
-									let title = format!(
-										"Training model {} of {}: Linear.",
-										grid_item_index + 1,
-										grid_item_count
-									)
-									.into();
-									let progress_bar = ProgressBar::new(
-										"🚂",
-										title,
-										progress_counter,
-										ProgressValueFormatter::Normal,
-									);
-									start_progress_bar(terminal, state, progress_bar)?;
-								}
-								tangram_core::progress::LinearTrainProgressEvent::TrainDone => {
-									finish_progress_bar(terminal, state)?;
-								}
+									ProgressValueFormatter::Normal,
+								);
+								start_progress_bar(terminal, state, progress_bar)?;
 							}
-						}
-						tangram_core::progress::ModelTrainProgressEvent::Tree(progress_event) => {
+							modelfox_core::progress::LinearTrainProgressEvent::TrainDone => {
+								finish_progress_bar(terminal, state)?;
+							}
+						},
+						modelfox_core::progress::ModelTrainProgressEvent::Tree(progress_event) => {
 							match progress_event {
-								tangram_core::progress::TreeTrainProgressEvent::Initialize(
+								modelfox_core::progress::TreeTrainProgressEvent::Initialize(
 									progress_counter,
 								) => {
 									let title = format!(
@@ -405,10 +405,10 @@ fn progress_thread_handle_progress_event(
 									);
 									start_progress_bar(terminal, state, progress_bar)?;
 								}
-								tangram_core::progress::TreeTrainProgressEvent::InitializeDone => {
+								modelfox_core::progress::TreeTrainProgressEvent::InitializeDone => {
 									finish_progress_bar(terminal, state)?;
 								}
-								tangram_core::progress::TreeTrainProgressEvent::Train(
+								modelfox_core::progress::TreeTrainProgressEvent::Train(
 									progress_counter,
 								) => {
 									let title = format!(
@@ -425,7 +425,7 @@ fn progress_thread_handle_progress_event(
 									);
 									start_progress_bar(terminal, state, progress_bar)?;
 								}
-								tangram_core::progress::TreeTrainProgressEvent::TrainDone => {
+								modelfox_core::progress::TreeTrainProgressEvent::TrainDone => {
 									finish_progress_bar(terminal, state)?;
 								}
 							}
@@ -434,7 +434,7 @@ fn progress_thread_handle_progress_event(
 				}
 				TrainGridItemProgressEvent::ComputeModelComparisonMetrics(progress_event) => {
 					match progress_event {
-						tangram_core::progress::ModelTestProgressEvent::ComputeFeatures(
+						modelfox_core::progress::ModelTestProgressEvent::ComputeFeatures(
 							progress_counter,
 						) => {
 							let progress_bar = ProgressBar::new(
@@ -445,10 +445,10 @@ fn progress_thread_handle_progress_event(
 							);
 							start_progress_bar(terminal, state, progress_bar)?;
 						}
-						tangram_core::progress::ModelTestProgressEvent::ComputeFeaturesDone => {
+						modelfox_core::progress::ModelTestProgressEvent::ComputeFeaturesDone => {
 							finish_progress_bar(terminal, state)?;
 						}
-						tangram_core::progress::ModelTestProgressEvent::Test(progress_counter) => {
+						modelfox_core::progress::ModelTestProgressEvent::Test(progress_counter) => {
 							let progress_bar = ProgressBar::new(
 								"️⚖️",
 								"Computing comparison metric.".into(),
@@ -457,7 +457,7 @@ fn progress_thread_handle_progress_event(
 							);
 							start_progress_bar(terminal, state, progress_bar)?;
 						}
-						tangram_core::progress::ModelTestProgressEvent::TestDone => {
+						modelfox_core::progress::ModelTestProgressEvent::TestDone => {
 							finish_progress_bar(terminal, state)?;
 						}
 					}
@@ -465,7 +465,7 @@ fn progress_thread_handle_progress_event(
 			}
 		}
 		ProgressEvent::Test(progress_event) => match progress_event {
-			tangram_core::progress::ModelTestProgressEvent::ComputeFeatures(progress_counter) => {
+			modelfox_core::progress::ModelTestProgressEvent::ComputeFeatures(progress_counter) => {
 				let progress_bar = ProgressBar::new(
 					"🏭️",
 					"Computing test features.".into(),
@@ -474,10 +474,10 @@ fn progress_thread_handle_progress_event(
 				);
 				start_progress_bar(terminal, state, progress_bar)?;
 			}
-			tangram_core::progress::ModelTestProgressEvent::ComputeFeaturesDone => {
+			modelfox_core::progress::ModelTestProgressEvent::ComputeFeaturesDone => {
 				finish_progress_bar(terminal, state)?;
 			}
-			tangram_core::progress::ModelTestProgressEvent::Test(progress_counter) => {
+			modelfox_core::progress::ModelTestProgressEvent::Test(progress_counter) => {
 				let progress_bar = ProgressBar::new(
 					"🔬️",
 					"Testing.".into(),
@@ -486,7 +486,7 @@ fn progress_thread_handle_progress_event(
 				);
 				start_progress_bar(terminal, state, progress_bar)?;
 			}
-			tangram_core::progress::ModelTestProgressEvent::TestDone => {
+			modelfox_core::progress::ModelTestProgressEvent::TestDone => {
 				finish_progress_bar(terminal, state)?;
 			}
 		},
@@ -719,7 +719,7 @@ impl std::fmt::Display for DisplayDuration {
 mod ctrl_c {
 
 	use anyhow::Result;
-	use tangram_kill_chip::KillChip;
+	use modelfox_kill_chip::KillChip;
 
 	static mut KILL_CHIP: KillChip = KillChip::new();
 
@@ -751,7 +751,7 @@ mod ctrl_c {
 mod ctrl_c {
 
 	use anyhow::Result;
-	use tangram_kill_chip::KillChip;
+	use modelfox_kill_chip::KillChip;
 	use winapi::{
 		shared::minwindef::{BOOL, DWORD, FALSE, TRUE},
 		um::{consoleapi::SetConsoleCtrlHandler, processthreadsapi::ExitProcess},

@@ -23,7 +23,7 @@ impl Component for Document {
 					.attribute("rel", "icon")
 					.attribute("type", "image/png"),
 			)
-			.child(title().child("Tangram"))
+			.child(title().child("ModelFox"))
 			.child(
 				link()
 					.attribute("href", "/styles.css")
@@ -31,7 +31,7 @@ impl Component for Document {
 			)
 			.child(
 				meta()
-					.attribute("content", "Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.")
+					.attribute("content", "ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models.")
 					.attribute("name", "description"),
 			)
 			.child(
@@ -47,7 +47,7 @@ impl Component for Document {
 			.child(
 				script()
 					.attribute("defer", true)
-					.attribute("data-domain","tangram.dev")
+					.attribute("data-domain","modelfox.dev")
 					.attribute("src","https://plausible.io/js/plausible.js")
 			);
 		let client_script = self.client.map(|client| {

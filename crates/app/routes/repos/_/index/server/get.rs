@@ -5,16 +5,16 @@ use chrono_tz::Tz;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::sync::Arc;
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{not_found, redirect_to_login, service_unavailable},
 	path_components,
 	repos::get_repo,
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_repo},
 };
-use tangram_app_layouts::app_layout::app_layout_info;
-use tangram_id::Id;
+use modelfox_app_layouts::app_layout::app_layout_info;
+use modelfox_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());

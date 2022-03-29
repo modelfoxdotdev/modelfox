@@ -1,6 +1,6 @@
 use crate::number_stats::{NumberStats, NumberStatsOutput};
+use modelfox_app_monitor_event::PredictOutput;
 use std::collections::BTreeMap;
-use tangram_app_monitor_event::PredictOutput;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 #[serde(tag = "type")]
@@ -41,12 +41,12 @@ pub struct ClassificationProductionPredictionStatsOutput {
 }
 
 impl ProductionPredictionStats {
-	pub fn new(model: tangram_model::ModelReader) -> ProductionPredictionStats {
+	pub fn new(model: modelfox_model::ModelReader) -> ProductionPredictionStats {
 		match model.inner() {
-			tangram_model::ModelInnerReader::Regressor(_) => {
+			modelfox_model::ModelInnerReader::Regressor(_) => {
 				ProductionPredictionStats::Regression(RegressionProductionPredictionStats::new())
 			}
-			tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+			modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 				let binary_classifier = binary_classifier.read();
 				ProductionPredictionStats::BinaryClassification(
 					ClassificationProductionPredictionStats::new(vec![
@@ -55,7 +55,7 @@ impl ProductionPredictionStats {
 					]),
 				)
 			}
-			tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+			modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 				let multiclass_classifier = multiclass_classifier.read();
 				ProductionPredictionStats::MulticlassClassification(
 					ClassificationProductionPredictionStats::new(

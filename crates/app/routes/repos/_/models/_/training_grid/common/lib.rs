@@ -1,8 +1,8 @@
 pub fn hyperparameters_for_grid_item(
-	train_grid_item_output: &tangram_model::TrainGridItemOutputReader,
+	train_grid_item_output: &modelfox_model::TrainGridItemOutputReader,
 ) -> Vec<(String, String)> {
 	match &train_grid_item_output.hyperparameters() {
-		tangram_model::ModelTrainOptionsReader::Linear(hyperparameters) => {
+		modelfox_model::ModelTrainOptionsReader::Linear(hyperparameters) => {
 			let hyperparameters = hyperparameters.read();
 			vec![
 				(
@@ -48,16 +48,16 @@ pub fn hyperparameters_for_grid_item(
 				),
 			]
 		}
-		tangram_model::ModelTrainOptionsReader::Tree(hyperparameters) => {
+		modelfox_model::ModelTrainOptionsReader::Tree(hyperparameters) => {
 			let hyperparameters = hyperparameters.read();
 			vec![
 				(
 					"binned_features_layout".to_owned(),
 					match hyperparameters.binned_features_layout() {
-						tangram_model::BinnedFeaturesLayoutReader::RowMajor(_) => {
+						modelfox_model::BinnedFeaturesLayoutReader::RowMajor(_) => {
 							"row major".to_owned()
 						}
-						tangram_model::BinnedFeaturesLayoutReader::ColumnMajor(_) => {
+						modelfox_model::BinnedFeaturesLayoutReader::ColumnMajor(_) => {
 							"column major".to_owned()
 						}
 					},

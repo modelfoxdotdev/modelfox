@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_www_benchmarks_server"
+name = "modelfox_www_benchmarks_server"
 publish = false
 version = "0.0.0"
 
@@ -14,8 +14,8 @@ hyper = { version = "0.14", features = ["full"] }
 num = "0.4"
 pinwheel = "0.2"
 sunfish = "0.7"
-tangram_charts = { path = "../../../../charts" }
-tangram_ui = { path = "../../../../ui" }
-tangram_www_benchmarks_common = { path = "../common" }
-tangram_www_layouts = { path = "../../../layouts" }
+modelfox_charts = { path = "../../../../charts" }
+modelfox_ui = { path = "../../../../ui" }
+modelfox_www_benchmarks_common = { path = "../common" }
+modelfox_www_layouts = { path = "../../../layouts" }
 tracing = "0.1"

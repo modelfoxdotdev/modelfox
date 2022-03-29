@@ -1,10 +1,10 @@
-use ndarray::prelude::*;
-use num::ToPrimitive;
-use tangram_table::{
+use modelfox_table::{
 	EnumTableColumn, EnumTableColumnView, NumberTableColumn, NumberTableColumnView, TableColumn,
 	TableColumnView, TableValue,
 };
-use tangram_zip::zip;
+use ndarray::prelude::*;
+use num::ToPrimitive;
+use modelfox_zip::zip;
 
 /**
 An `IdentityFeatureGroup` describes the simplest possible feature engineering, which passes a single column from the input table to the output features untouched.
@@ -23,7 +23,7 @@ For an enum column:
 
 ```
 use std::num::NonZeroUsize;
-use tangram_table::prelude::*;
+use modelfox_table::prelude::*;
 
 EnumTableColumn::new(
   Some("color".to_owned()),

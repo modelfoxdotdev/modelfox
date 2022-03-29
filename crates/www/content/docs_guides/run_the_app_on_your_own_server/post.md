@@ -2,20 +2,20 @@
 "title": "Run the App on Your Own Server."
 }
 
-If you do not want to use the cloud hosted tangram app at https://app.tangram.dev, you can run it yourself!
+If you do not want to use the cloud hosted modelfox app at https://app.modelfox.dev, you can run it yourself!
 
-To get started, install the Tangram CLI and run `tangram app`. This runs the app in a configuration suitable for testing on a single computer. It stores data in the local filesystem and in a local SQLite database.
+To get started, install the ModelFox CLI and run `modelfox app`. This runs the app in a configuration suitable for testing on a single computer. It stores data in the local filesystem and in a local SQLite database.
 
 To run the app in production, you will need:
 
 - A PostgreSQL database.
 - An S3-compatible storage bucket.
 - An SMTP server such as Amazon SES.
-- A license. Send us an email at hello@tangram.dev to purchase one.
+- A license. Send us an email at hello@modelfox.dev to purchase one.
 
 ## Configuration
 
-The tangram app is configured with a JSON file. You can pass a path to a configuration file with the `--config` flag. Otherwise, the app will look for a configuration file at `tangram/app.json` in your operating system's standard configuration directory:
+The modelfox app is configured with a JSON file. You can pass a path to a configuration file with the `--config` flag. Otherwise, the app will look for a configuration file at `modelfox/app.json` in your operating system's standard configuration directory:
 
 | Platform | Location                             | Example                                  |
 | -------- | ------------------------------------ | ---------------------------------------- |
@@ -65,7 +65,7 @@ Use the `smtp` key to configure the SMTP server used to send authentication and 
 ```json
 {
 	"smtp": {
-		"host": "smtp.tangram.dev",
+		"host": "smtp.modelfox.dev",
 		"username": "username",
 		"password": "password"
 	}
@@ -74,7 +74,7 @@ Use the `smtp` key to configure the SMTP server used to send authentication and 
 
 ### storage
 
-Use the `storage` key to configure storage for `.tangram` model files.
+Use the `storage` key to configure storage for `.modelfox` model files.
 
 #### Local
 
@@ -113,6 +113,6 @@ Use the `url` key to specify the URL at which the app is accessible to users. Th
 
 ```json
 {
-	"url": "https://app.tangram.dev"
+	"url": "https://app.modelfox.dev"
 }
 ```

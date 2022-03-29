@@ -1,12 +1,12 @@
 [package]
 edition = "2021"
-name = "tangram_wasm"
+name = "modelfox_wasm"
 publish = false
 version = "0.0.0"
 
 [lib]
 crate-type = ["cdylib"]
-name = "tangram_wasm"
+name = "modelfox_wasm"
 path = "lib.rs"
 
 [dependencies]
@@ -14,6 +14,6 @@ anyhow = { version = "1", features = ["backtrace"] }
 serde = { version = "1", features = ["derive"] }
 serde_bytes = "0.11"
 serde-wasm-bindgen = "0.4"
-tangram_core = { path = "../../../crates/core" }
-tangram_model = { path = "../../../crates/model" }
+modelfox_core = { path = "../../../crates/core" }
+modelfox_model = { path = "../../../crates/model" }
 wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }

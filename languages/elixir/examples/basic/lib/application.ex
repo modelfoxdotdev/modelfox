@@ -2,10 +2,10 @@ defmodule Example do
   use Application
 
   def start(_type, _args) do
-    # Get the path to the .tangram file.
-    model_path = Path.join(:code.priv_dir(:example), "heart_disease.tangram")
+    # Get the path to the .modelfox file.
+    model_path = Path.join(:code.priv_dir(:example), "heart_disease.modelfox")
     # Load the model from the path.
-    model = Tangram.load_model_from_path(model_path)
+    model = ModelFox.load_model_from_path(model_path)
 
     # Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
     input = %{
@@ -25,7 +25,7 @@ defmodule Example do
     }
 
     # Make the prediction!
-    output = Tangram.predict(model, input)
+    output = ModelFox.predict(model, input)
 
     # Print the output.
     IO.write("Output: ")

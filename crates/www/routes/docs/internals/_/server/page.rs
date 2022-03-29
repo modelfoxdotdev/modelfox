@@ -1,7 +1,7 @@
 use pinwheel::prelude::*;
-use tangram_ui as ui;
-use tangram_www_content::{Content, DocsInternals};
-use tangram_www_layouts::{
+use modelfox_ui as ui;
+use modelfox_www_content::{Content, DocsInternals};
+use modelfox_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage},
 	document::Document,
 };

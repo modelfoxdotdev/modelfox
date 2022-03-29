@@ -1,7 +1,7 @@
 use anyhow::Result;
 use std::{borrow::BorrowMut, sync::Arc};
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
 	user::{authorize_normal_user, NormalUser},
 };

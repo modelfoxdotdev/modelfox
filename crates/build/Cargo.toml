@@ -1,12 +1,12 @@
 [package]
 edition = "2021"
 license = "MIT"
-name = "tangram_build"
+name = "modelfox_build"
 publish = false
 version = "0.0.0"
 
 [[bin]]
-name = "tangram_build"
+name = "modelfox_build"
 path = "main.rs"
 
 [dependencies]

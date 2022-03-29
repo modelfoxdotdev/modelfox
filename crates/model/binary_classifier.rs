@@ -104,7 +104,7 @@ pub enum BinaryClassificationModel {
 #[buffalo(size = "dynamic")]
 pub struct LinearBinaryClassifier {
 	#[buffalo(id = 0, required)]
-	pub model: tangram_linear::serialize::BinaryClassifier,
+	pub model: modelfox_linear::serialize::BinaryClassifier,
 	#[buffalo(id = 1, required)]
 	pub train_options: LinearModelTrainOptions,
 	#[buffalo(id = 2, required)]
@@ -119,7 +119,7 @@ pub struct LinearBinaryClassifier {
 #[buffalo(size = "dynamic")]
 pub struct TreeBinaryClassifier {
 	#[buffalo(id = 0, required)]
-	pub model: tangram_tree::serialize::BinaryClassifier,
+	pub model: modelfox_tree::serialize::BinaryClassifier,
 	#[buffalo(id = 1, required)]
 	pub train_options: TreeModelTrainOptions,
 	#[buffalo(id = 2, required)]

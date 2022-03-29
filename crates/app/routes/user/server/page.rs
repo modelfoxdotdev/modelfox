@@ -1,9 +1,9 @@
 use pinwheel::prelude::*;
-use tangram_app_layouts::{
+use modelfox_app_layouts::{
 	app_layout::{AppLayout, AppLayoutInfo},
 	document::Document,
 };
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct Page {
 	pub app_layout_info: AppLayoutInfo,
@@ -39,7 +39,7 @@ impl Component for Page {
 
 impl Component for NoAuth {
 	fn into_node(self) -> Node {
-		let text = "You are using the free version of tangram that does not support user accounts or organizations. Checkout out the different plans that allow you to collaborate with your team.";
+		let text = "You are using the free version of modelfox that does not support user accounts or organizations. Checkout out the different plans that allow you to collaborate with your team.";
 		ui::S1::new().child(ui::P::new().child(text)).into_node()
 	}
 }

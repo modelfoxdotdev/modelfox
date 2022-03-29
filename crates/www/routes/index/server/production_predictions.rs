@@ -1,11 +1,11 @@
 use pinwheel::prelude::*;
-use tangram_charts::{
+use modelfox_charts::{
 	components::FeatureContributionsChart,
 	feature_contributions_chart::{
 		FeatureContributionsChartSeries, FeatureContributionsChartValue,
 	},
 };
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct ProductionExplanations;
 

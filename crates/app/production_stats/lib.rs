@@ -1,15 +1,15 @@
 use std::borrow::BorrowMut;
 
 pub use self::{column_stats::*, number_stats::*, prediction_stats::*};
-use tangram_app_date_window::{DateWindow, DateWindowInterval};
-use tangram_app_monitor_event::PredictionMonitorEvent;
+use modelfox_app_date_window::{DateWindow, DateWindowInterval};
+use modelfox_app_monitor_event::PredictionMonitorEvent;
 
 use anyhow::Result;
 use chrono::prelude::*;
 use chrono_tz::Tz;
 use num::ToPrimitive;
 use sqlx::prelude::*;
-use tangram_zip::zip;
+use modelfox_zip::zip;
 
 mod column_stats;
 mod number_stats;
@@ -35,18 +35,18 @@ pub struct ProductionStatsOutput {
 
 impl ProductionStats {
 	pub fn new(
-		model: tangram_model::ModelReader,
+		model: modelfox_model::ModelReader,
 		start_date: DateTime<Utc>,
 		end_date: DateTime<Utc>,
 	) -> ProductionStats {
 		let train_column_stats = match model.inner() {
-			tangram_model::ModelInnerReader::Regressor(regressor) => {
+			modelfox_model::ModelInnerReader::Regressor(regressor) => {
 				regressor.read().train_column_stats()
 			}
-			tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+			modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 				binary_classifier.read().train_column_stats()
 			}
-			tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+			modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 				multiclass_classifier.read().train_column_stats()
 			}
 		};
@@ -64,7 +64,7 @@ impl ProductionStats {
 		}
 	}
 
-	pub fn update(&mut self, model: tangram_model::ModelReader, value: PredictionMonitorEvent) {
+	pub fn update(&mut self, model: modelfox_model::ModelReader, value: PredictionMonitorEvent) {
 		self.row_count += 1;
 		for column_stats in self.column_stats.iter_mut() {
 			let value = value.input.get(column_stats.column_name());
@@ -108,7 +108,7 @@ pub struct GetProductionStatsOutput {
 
 pub async fn get_production_stats(
 	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
-	model: tangram_model::ModelReader<'_>,
+	model: modelfox_model::ModelReader<'_>,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
 	timezone: Tz,

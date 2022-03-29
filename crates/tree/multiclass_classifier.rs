@@ -4,12 +4,12 @@ use crate::{
 	train_tree::TrainTree,
 	Progress, TrainOptions, Tree,
 };
+use modelfox_table::prelude::*;
+use modelfox_zip::{pzip, zip};
 use ndarray::prelude::*;
 use num::{clamp, ToPrimitive};
 use rayon::{self, prelude::*};
 use std::num::NonZeroUsize;
-use tangram_table::prelude::*;
-use tangram_zip::{pzip, zip};
 
 /// `MulticlasClassifier`s predict multiclass target values, for example which of several species a flower is.
 #[derive(Clone, Debug)]

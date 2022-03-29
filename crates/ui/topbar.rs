@@ -58,7 +58,6 @@ impl Component for Topbar {
 		});
 		div()
 			.class("topbar-wrapper")
-			.style(style::BACKGROUND_COLOR, self.background_color)
 			.child(TopbarBrand {
 				logo_element: self.logo,
 				logo_href: self.logo_href,

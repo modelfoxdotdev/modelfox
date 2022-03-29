@@ -1,4 +1,4 @@
 mix deps.get
-cargo build -p tangram_elixir
+cargo build -p modelfox_elixir
 rm -rf priv/
-install -D ../../target/debug/libtangram_elixir.so priv/x86_64-linux-gnu/libtangram_elixir.so
+install -D ../../target/debug/libmodelfox_elixir.so priv/x86_64-linux-gnu/libmodelfox_elixir.so

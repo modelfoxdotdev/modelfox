@@ -1,13 +1,13 @@
 [package]
-authors = ["Tangram <root@tangram.dev"]
-description = "Tangram makes it easy for programmers to train, deploy, and monitor machine learning models."
-documentation = "https://docs.rs/tangram"
+authors = ["ModelFox <root@modelfox.dev"]
+description = "ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models."
+documentation = "https://docs.rs/modelfox"
 edition = "2021"
-homepage = "https://github.com/tangramdotdev/tangram"
+homepage = "https://github.com/modelfoxdotdev/modelfox"
 license = "MIT"
-name = "tangram_model"
+name = "modelfox_model"
 publish = true
-repository = "https://github.com/tangramdotdev/tangram"
+repository = "https://github.com/modelfoxdotdev/modelfox"
 version = "0.7.0"
 
 [lib]
@@ -18,6 +18,6 @@ anyhow = { version = "1", features = ["backtrace"] }
 buffalo = { version = "0.4", features = ["bitvec", "ndarray"] }
 fnv = "1"
 num = "0.4"
-tangram_linear = { version = "0.7.0", path = "../linear" }
-tangram_text = { version = "0.7.0", path = "../text" }
-tangram_tree = { version = "0.7.0", path = "../tree" }
+modelfox_linear = { version = "0.7.0", path = "../linear" }
+modelfox_text = { version = "0.7.0", path = "../text" }
+modelfox_tree = { version = "0.7.0", path = "../tree" }

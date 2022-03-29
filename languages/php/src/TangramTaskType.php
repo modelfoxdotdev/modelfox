@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace tangram\tangram;
+namespace modelfox\modelfox;
 
-abstract class TangramTaskType
+abstract class ModelFoxTaskType
 {
     public const regression = 0;
     public const binary_classification = 1;

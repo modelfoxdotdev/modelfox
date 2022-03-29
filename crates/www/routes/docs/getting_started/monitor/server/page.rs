@@ -1,20 +1,20 @@
 use pinwheel::prelude::*;
-use tangram_app_date_window::DateWindow;
-use tangram_app_production_stats_column_server::{
+use modelfox_app_date_window::DateWindow;
+use modelfox_app_production_stats_column_server::{
 	EnumColumnInvalidValuesSection, EnumColumnOverallHistogramEntry, EnumColumnStatsSection,
 	EnumColumnUniqueValuesSection, EnumInvalidValuesTable, EnumInvalidValuesTableRow,
 	EnumUniqueValuesTable, EnumUniqueValuesTableRow,
 };
-use tangram_app_production_stats_index_server::{ColumnStatsTable, ColumnStatsTableRow};
-use tangram_app_ui::column_type::ColumnType;
-use tangram_charts::{
+use modelfox_app_production_stats_index_server::{ColumnStatsTable, ColumnStatsTableRow};
+use modelfox_app_ui::column_type::ColumnType;
+use modelfox_charts::{
 	components::FeatureContributionsChart,
 	feature_contributions_chart::{
 		FeatureContributionsChartSeries, FeatureContributionsChartValue,
 	},
 };
-use tangram_ui as ui;
-use tangram_www_layouts::{
+use modelfox_ui as ui;
+use modelfox_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage, GettingStartedPage, PrevNextButtons},
 	document::Document,
 };
@@ -30,7 +30,7 @@ impl Component for Page {
 		let p3 = ui::P::new().child("Now let's see how accurate our model has been in production. Let's open the app and choose Production Metrics in the sidebar.");
 		let p4 = ui::P::new().child(r#"Uh oh! It's a bit lower than we expected. Let's try to find the cause. Under "Production Stats", we see that the "chest_pain" column has an alert and a high invalid values count. Click on the column to view more details."#);
 		let p5 = ui::P::new().child(r#"It looks like there is a large discrepancy between the value "asymptomatic" in production versus training. In the table below, we see a high number of invalid values with the string "asx". It looks like we are accidentally using the string "asx" in our code instead of "asymptomatic" for the chest pain column. We can update our code to use the correct value and follow the metrics going forward to confirm they bounce back."#);
-		let p6 = ui::Markdown::new("Hooray! You made it to the end! In this guide, we learned how to train a model, make predictions from our code, tune our model, and monitor it in production. If you want help using Tangram with your own data, send us an email at [hello@tangram.dev](mailto:hello@tangram.dev) or ask a question on [GitHub Discussions](https://github.com/tangramdotdev/tangram/discussions).");
+		let p6 = ui::Markdown::new("Hooray! You made it to the end! In this guide, we learned how to train a model, make predictions from our code, tune our model, and monitor it in production. If you want help using ModelFox with your own data, send us an email at [hello@modelfox.dev](mailto:hello@modelfox.dev) or ask a question on [GitHub Discussions](https://github.com/modelfoxdotdev/modelfox/discussions).");
 		let section = ui::S2::new()
 			.child(p1)
 			.child(Log)
@@ -45,7 +45,7 @@ impl Component for Page {
 			.child(p6);
 		let prev_next_buttons = PrevNextButtons::new().prev("inspect", "Inspect your model.");
 		Document::new()
-			.client("tangram_www_docs_getting_started_monitor_client")
+			.client("modelfox_www_docs_getting_started_monitor_client")
 			.child(
 				DocsLayout::new()
 					.selected_page(DocsPage::GettingStarted(GettingStartedPage::Monitor))
@@ -68,7 +68,7 @@ impl Component for Log {
 			elixir: ui::doc!(
 				r#"
 					# Log the prediction.
-					Tangram.log_prediction(model, %Tangram.LogPredictionArgs{
+					ModelFox.log_prediction(model, %ModelFox.LogPredictionArgs{
 						identifier: id,
 						options: predict_options,
 						input: input,
@@ -76,7 +76,7 @@ impl Component for Log {
 					})
 
 					# Later on, if we get an official diagnosis for the patient, log the true value. Make sure to match the `identifier`.
-					Tangram.log_true_value(model, %Tangram.LogTrueValueArgs{
+					ModelFox.log_true_value(model, %ModelFox.LogTrueValueArgs{
 						identifier: id,
 						true_value: "Positive",
 					})
@@ -85,7 +85,7 @@ impl Component for Log {
 			go: ui::doc!(
 				r#"
 					// Log the prediction.
-					err = model.LogPrediction(tangram.LogPredictionArgs{
+					err = model.LogPrediction(modelfox.LogPredictionArgs{
 						Identifier: id,
 						Input:      input,
 						Options:    predictOptions,
@@ -96,7 +96,7 @@ impl Component for Log {
 					}
 
 					// Later on, if we get an official diagnosis for the patient, log the true value. Make sure to match the `identifier`.
-					err = model.LogTrueValue(tangram.LogTrueValueArgs{
+					err = model.LogTrueValue(modelfox.LogTrueValueArgs{
 						Identifier: id,
 						TrueValue:  "Positive",
 					})
@@ -176,7 +176,7 @@ impl Component for Log {
 			rust: ui::doc!(
 				r#"
 					// Log the prediction.
-					model.log_prediction(tangram::LogPredictionArgs {
+					model.log_prediction(modelfox::LogPredictionArgs {
 						identifier: id,
 						input,
 						options: Some(options),
@@ -184,7 +184,7 @@ impl Component for Log {
 					})?;
 
 					// Later on, if we get an official diagnosis for the patient, log the true value. Make sure to match the `identifier`.
-					model.log_true_value(tangram::LogTrueValueArgs {
+					model.log_true_value(modelfox::LogTrueValueArgs {
 						identifier: id,
 						true_value: "Positive".into(),
 					})?;

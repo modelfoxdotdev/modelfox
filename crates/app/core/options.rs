@@ -79,7 +79,7 @@ impl Default for Options {
 		};
 		let storage = StorageOptions::Local(LocalStorageOptions {
 			path: data_path()
-				.expect("Could not read or create tangram data directory")
+				.expect("Could not read or create modelfox data directory")
 				.join("data"),
 		});
 		Options {

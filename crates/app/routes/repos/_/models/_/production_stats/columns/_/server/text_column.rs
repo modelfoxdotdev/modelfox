@@ -1,14 +1,14 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_app_date_window::DateWindow;
-use tangram_app_ui::{
+use modelfox_app_date_window::DateWindow;
+use modelfox_app_ui::{
 	colors::PRODUCTION_COLOR, metrics_row::MetricsRow, time::overall_chart_title,
 };
-use tangram_charts::{
+use modelfox_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	components::BarChart,
 };
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct TextColumn {
 	pub alert: Option<String>,

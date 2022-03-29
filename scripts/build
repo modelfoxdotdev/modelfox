@@ -1,1 +1,1 @@
-cargo run -p tangram_build -- $@
+cargo run -p modelfox_build -- $@

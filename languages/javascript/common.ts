@@ -20,9 +20,9 @@ export enum Task {
  */
 export type LoadModelOptions = {
 	/**
-	 * If you are running the app locally or on your own server, use this field to provide a url that points to it. If not specified, the default value is https://app.tangram.dev.
+	 * If you are running the app locally or on your own server, use this field to provide a url that points to it. If not specified, the default value is https://app.modelfox.dev.
 	 */
-	tangramUrl?: string
+	modelfoxUrl?: string
 }
 
 /**
@@ -235,7 +235,7 @@ export type BagOfWordsFeatureContribution = {
 }
 
 /**
- * This is a sequence of `n` tokens. Tangram currently supports unigrams and bigrams.
+ * This is a sequence of `n` tokens. ModelFox currently supports unigrams and bigrams.
  */
 export type NGram = string | [string, string]
 
@@ -287,24 +287,24 @@ export type WordEmbeddingFeatureContribution = {
 export type LogPredictionArgs<
 	TaskType extends Task,
 	InputType extends PredictInput,
-> = {
-	/**
-	 * This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
-	 */
-	identifier?: string
-	/**
-	 * This is the same `PredictInput` value that you passed to [[`Model.predict`]].
-	 */
-	input: InputType
-	/**
-	 * This is the same `PredictOptions` value that you passed to [[`Model.predict`]].
-	 */
-	options?: PredictOptions
-	/**
-	 * This is the output returned by [[`Model.predict`]].
-	 */
-	output: PredictOutput<TaskType>
-}
+	> = {
+		/**
+		 * This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
+		 */
+		identifier?: string
+		/**
+		 * This is the same `PredictInput` value that you passed to [[`Model.predict`]].
+		 */
+		input: InputType
+		/**
+		 * This is the same `PredictOptions` value that you passed to [[`Model.predict`]].
+		 */
+		options?: PredictOptions
+		/**
+		 * This is the output returned by [[`Model.predict`]].
+		 */
+		output: PredictOutput<TaskType>
+	}
 
 /**
  * This is the type of the argument to `logTrueValue` and `enqueueLogTrueValue` which specifies the details of the true value to log.
@@ -349,20 +349,20 @@ export class Model<
 	TaskType extends Task,
 	InputType extends PredictInput,
 	OutputType extends PredictOutput<TaskType>,
-> {
+	> {
 	private model: unknown
-	private tangramUrl: string
+	private modelfoxUrl: string
 	private logQueue: Event<TaskType, InputType>[] = []
 
 	/**
-	 * Load a model from the `.tangram` file at `path`. This only works in Node.js. In other JavaScript environments, you should use the constructor with an `ArrayBuffer`.
-	 * @param path The path to the `.tangram` file.
+	 * Load a model from the `.modelfox` file at `path`. This only works in Node.js. In other JavaScript environments, you should use the constructor with an `ArrayBuffer`.
+	 * @param path The path to the `.modelfox` file.
 	 * @param options The options to use when loading the model.
 	 */
 	constructor(path: string, options?: LoadModelOptions)
 
 	/**
-	 * Load a model from the contents of a `.tangram` file as an `ArrayBuffer`.
+	 * Load a model from the contents of a `.modelfox` file as an `ArrayBuffer`.
 	 * @param data
 	 * @param options
 	 */
@@ -374,7 +374,7 @@ export class Model<
 		} else {
 			this.model = native.loadModelFromArrayBuffer(input)
 		}
-		this.tangramUrl = options?.tangramUrl ?? "https://app.tangram.dev"
+		this.modelfoxUrl = options?.modelfoxUrl ?? "https://app.modelfox.dev"
 	}
 
 	/**
@@ -445,10 +445,10 @@ export class Model<
 	}
 
 	private async logEvents(events: Event<TaskType, InputType>[]): Promise<void> {
-		let url = this.tangramUrl + "/track"
+		let url = this.modelfoxUrl + "/track"
 		let body = JSON.stringify(events)
 		if (typeof fetch === "undefined") {
-			throw Error("Tangram cannot find the fetch function.")
+			throw Error("ModelFox cannot find the fetch function.")
 		}
 		let response = await fetch(url, {
 			body,

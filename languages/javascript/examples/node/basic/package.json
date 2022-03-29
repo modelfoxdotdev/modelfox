@@ -1,11 +1,11 @@
 {
-	"author": "Tangram",
+	"author": "ModelFox",
 	"dependencies": {
-		"@tangramdotdev/tangram": "*"
+		"@modelfoxdotdev/modelfox": "*"
 	},
 	"license": "MIT",
 	"main": "main.js",
-	"name": "@tangramdotdev/tangram-example-node-basic",
+	"name": "@modelfoxdotdev/modelfox-example-node-basic",
 	"scripts": {
 		"start": "node main.js"
 	},

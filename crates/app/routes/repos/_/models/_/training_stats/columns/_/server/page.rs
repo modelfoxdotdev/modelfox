@@ -1,6 +1,6 @@
 pub use crate::{enum_column::*, number_column::*, text_column::*};
 use pinwheel::prelude::*;
-use tangram_app_layouts::{
+use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
@@ -24,7 +24,7 @@ impl Component for Page {
 			Inner::Text(inner) => inner.into_node(),
 		};
 		Document::new()
-			.client("tangram_app_training_stats_column_client")
+			.client("modelfox_app_training_stats_column_client")
 			.child(ModelLayout::new(self.model_layout_info).child(inner))
 			.into_node()
 	}

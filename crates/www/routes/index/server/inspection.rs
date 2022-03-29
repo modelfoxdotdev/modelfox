@@ -1,10 +1,10 @@
-use pinwheel::prelude::*;
-use tangram_charts::{
+use modelfox_charts::{
 	components::LineChart,
 	line_chart::{LineChartPoint, LineChartSeries, LineStyle, PointStyle},
 };
-use tangram_finite::Finite;
-use tangram_ui as ui;
+use modelfox_finite::Finite;
+use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 pub struct Inspection;
 
@@ -20,7 +20,7 @@ impl Component for Inspection {
 		let p1 = div()
 			.class("index-step-text")
 			.child("Run ")
-			.child(ui::InlineCode::new("tangram app"))
+			.child(ui::InlineCode::new("modelfox app"))
 			.child(" and open ")
 			.child(
 				ui::Link::new()
@@ -30,8 +30,8 @@ impl Component for Inspection {
 			.child(", or go to ")
 			.child(
 				ui::Link::new()
-					.href("https://app.tangram.dev".to_owned())
-					.child("https://app.tangram.dev"),
+					.href("https://app.modelfox.dev".to_owned())
+					.child("https://app.modelfox.dev"),
 			)
 			.child(", and upload the model you trained.");
 		let p2 = "The app shows you dataset statistics, a summary of all the models that the CLI trained, the features that were most important to your model, and metrics showing how the best model performed on the test set.";

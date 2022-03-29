@@ -5,21 +5,21 @@ import (
 	"log"
 	"os"
 
-	"github.com/tangramdotdev/tangram-go"
+	"github.com/modelfoxdotdev/modelfox-go"
 )
 
 func main() {
-	// If you are running the Tangram app on your own server you can pass the URL to it with the TANGRAM_URL environment variable.
-	tangramURL, present := os.LookupEnv("TANGRAM_URL")
+	// If you are running the ModelFox app on your own server you can pass the URL to it with the MODELFOX_URL environment variable.
+	modelfoxURL, present := os.LookupEnv("MODELFOX_URL")
 	if !present {
-		tangramURL = "https://app.tangram.dev"
+		modelfoxURL = "https://app.modelfox.dev"
 	}
 
 	// Load the model from the path.
-	options := tangram.LoadModelOptions{
-		TangramURL: tangramURL,
+	options := modelfox.LoadModelOptions{
+		ModelFoxURL: modelfoxURL,
 	}
-	model, err := tangram.LoadModelFromPath("heart_disease.tangram", &options)
+	model, err := modelfox.LoadModelFromPath("heart_disease.modelfox", &options)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,7 +27,7 @@ func main() {
 	defer model.Destroy()
 
 	// Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
-	input := tangram.PredictInput{
+	input := modelfox.PredictInput{
 		"age":                                  63,
 		"gender":                               "male",
 		"chest_pain":                           "typical angina",
@@ -43,18 +43,18 @@ func main() {
 		"thallium_stress_test":                 "fixed defect",
 	}
 
-	// Make the prediction using a custom threshold chosen on the "Tuning" page of the Tangram app.
-	predictOptions := tangram.PredictOptions{
+	// Make the prediction using a custom threshold chosen on the "Tuning" page of the ModelFox app.
+	predictOptions := modelfox.PredictOptions{
 		Threshold:                   0.5,
 		ComputeFeatureContributions: true,
 	}
-	output := model.PredictOne(input, &predictOptions).(tangram.BinaryClassificationPredictOutput)
+	output := model.PredictOne(input, &predictOptions).(modelfox.BinaryClassificationPredictOutput)
 
 	// Print the output.
 	fmt.Println("Output:", output)
 
 	// Log the prediction.
-	err = model.LogPrediction(tangram.LogPredictionArgs{
+	err = model.LogPrediction(modelfox.LogPredictionArgs{
 		Identifier: "71762b29-2296-4bf9-a1d4-59144d74c9d9",
 		Input:      input,
 		Options:    predictOptions,
@@ -65,7 +65,7 @@ func main() {
 	}
 
 	// Later on, if we get an official diagnosis for the patient, log the true value. Make sure to match the `identifier`.
-	err = model.LogTrueValue(tangram.LogTrueValueArgs{
+	err = model.LogTrueValue(modelfox.LogTrueValueArgs{
 		Identifier: "71762b29-2296-4bf9-a1d4-59144d74c9d9",
 		TrueValue:  "Positive",
 	})

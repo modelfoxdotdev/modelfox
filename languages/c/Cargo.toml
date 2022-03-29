@@ -1,13 +1,13 @@
 [package]
 edition = "2021"
 license = "MIT"
-name = "libtangram"
+name = "libmodelfox"
 publish = false
 version = "0.7.0"
 
 [lib]
 crate-type = ["cdylib", "staticlib"]
-name = "tangram"
+name = "modelfox"
 path = "lib.rs"
 doc = false
 
@@ -16,6 +16,6 @@ libc = "0.2.91"
 memmap = "0.7"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tangram_core = { path = "../../crates/core" }
+modelfox_core = { path = "../../crates/core" }
 anyhow = { version = "1", features = ["backtrace"] }
-tangram_model = { path = "../../crates/model" }
+modelfox_model = { path = "../../crates/model" }

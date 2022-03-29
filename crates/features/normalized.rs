@@ -1,10 +1,10 @@
-use ndarray::prelude::*;
-use num::ToPrimitive;
-use tangram_table::{
+use modelfox_table::{
 	EnumTableColumnView, NumberTableColumn, NumberTableColumnView, TableColumn, TableColumnView,
 	TableValue,
 };
-use tangram_zip::zip;
+use ndarray::prelude::*;
+use num::ToPrimitive;
+use modelfox_zip::zip;
 
 /**
 A `NormalizedFeatureGroup` transforms a number column to zero mean and unit variance. [Learn more](https://en.wikipedia.org/wiki/Feature_scaling#Standardization_(Z-score_Normalization).
@@ -12,7 +12,7 @@ A `NormalizedFeatureGroup` transforms a number column to zero mean and unit vari
 # Example
 
 ```
-use tangram_table::prelude::*;
+use modelfox_table::prelude::*;
 
 NumberTableColumn::new(
   Some("values".to_owned()),
@@ -50,7 +50,7 @@ impl NormalizedFeatureGroup {
 
 	fn compute_for_number_column(column: NumberTableColumnView) -> Self {
 		let mean_variance =
-			tangram_metrics::MeanVariance::compute(column.view().as_slice().iter().cloned());
+			modelfox_metrics::MeanVariance::compute(column.view().as_slice().iter().cloned());
 		Self {
 			source_column_name: column.name().unwrap().to_owned(),
 			mean: mean_variance.mean,
@@ -63,7 +63,7 @@ impl NormalizedFeatureGroup {
 		let values_iter = values
 			.iter()
 			.filter_map(|value| value.map(|value| value.get().to_f32().unwrap()));
-		let mean_variance = tangram_metrics::MeanVariance::compute(values_iter);
+		let mean_variance = modelfox_metrics::MeanVariance::compute(values_iter);
 		Self {
 			source_column_name: column.name().unwrap().to_owned(),
 			mean: mean_variance.mean,

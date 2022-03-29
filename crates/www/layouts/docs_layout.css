@@ -24,7 +24,7 @@
 }
 
 .docs-layout-left {
-	background-color: var(--header-color);
+	background-color: var(--surface-color);
 	grid-area: left;
 	padding: 1rem;
 }

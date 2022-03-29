@@ -1,1 +1,1 @@
-cargo run --bin tangram_app_seed -- $@
+cargo run --bin modelfox_app_seed -- $@

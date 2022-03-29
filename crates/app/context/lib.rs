@@ -1,4 +1,4 @@
-use tangram_app_core::App;
+use modelfox_app_core::App;
 
 pub struct Context {
 	pub app: App,

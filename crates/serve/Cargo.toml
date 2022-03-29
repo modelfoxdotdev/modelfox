@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 license = "MIT"
-name = "tangram_serve"
+name = "modelfox_serve"
 publish = false
 version = "0.0.0"
 
@@ -13,6 +13,6 @@ anyhow = "1"
 backtrace = "0.3"
 futures = "0.3"
 hyper = { version = "0.14", features = ["http1", "server", "tcp"] }
-tangram_id = { path = "../id" }
+modelfox_id = { path = "../id" }
 tokio = { version = "1", features = ["rt"] }
 tracing = "0.1"

@@ -2,16 +2,16 @@ use crate::page::Page;
 use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use std::sync::Arc;
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
 	path_components,
 	user::{authorize_user, authorize_user_for_model},
 };
-use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_app_tuning_common::{Metrics, Tuning};
-use tangram_id::Id;
+use modelfox_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use modelfox_app_tuning_common::{Metrics, Tuning};
+use modelfox_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
@@ -38,10 +38,10 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		return Ok(not_found());
 	}
 	let bytes = get_model_bytes(app.storage(), model_id).await?;
-	let model = tangram_model::from_bytes(&bytes)?;
+	let model = modelfox_model::from_bytes(&bytes)?;
 	let tuning = match model.inner() {
-		tangram_model::ModelInnerReader::Regressor(_) => None,
-		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+		modelfox_model::ModelInnerReader::Regressor(_) => None,
+		modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			let model = binary_classifier.read();
 			let metrics: Vec<Metrics> = model
 				.test_metrics()
@@ -91,7 +91,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				class: model.positive_class().to_owned(),
 			})
 		}
-		tangram_model::ModelInnerReader::MulticlassClassifier(_) => None,
+		modelfox_model::ModelInnerReader::MulticlassClassifier(_) => None,
 	};
 	let model_layout_info = model_layout_info(&mut db, app, model_id, ModelNavItem::Tuning).await?;
 	let page = Page {

@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_app_training_metrics_roc_server"
+name = "modelfox_app_training_metrics_roc_server"
 publish = false
 version = "0.0.0"
 
@@ -15,12 +15,12 @@ hyper = { version = "0.14", features = ["full"] }
 num = "0.4"
 pinwheel = "0.2"
 sunfish = "0.7"
-tangram_app_context = { path = "../../../../../../../../context" }
-tangram_app_core = { path = "../../../../../../../../core" }
-tangram_app_layouts = { path = "../../../../../../../../layouts" }
-tangram_charts = { path = "../../../../../../../../../charts" }
-tangram_core = { path = "../../../../../../../../../core" }
-tangram_finite = { path = "../../../../../../../../../finite" }
-tangram_id = { path = "../../../../../../../../../id" }
-tangram_model = { path = "../../../../../../../../../model" }
-tangram_ui = { path = "../../../../../../../../../ui" }
+modelfox_app_context = { path = "../../../../../../../../context" }
+modelfox_app_core = { path = "../../../../../../../../core" }
+modelfox_app_layouts = { path = "../../../../../../../../layouts" }
+modelfox_charts = { path = "../../../../../../../../../charts" }
+modelfox_core = { path = "../../../../../../../../../core" }
+modelfox_finite = { path = "../../../../../../../../../finite" }
+modelfox_id = { path = "../../../../../../../../../id" }
+modelfox_model = { path = "../../../../../../../../../model" }
+modelfox_ui = { path = "../../../../../../../../../ui" }

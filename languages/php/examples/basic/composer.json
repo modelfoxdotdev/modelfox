@@ -1,20 +1,20 @@
 {
-	"name": "tangram/basic-example",
-	"description": "This example demonstrates loading a model from a `.tangram` file and making a prediction.",
+	"name": "modelfox/basic-example",
+	"description": "This example demonstrates loading a model from a `.modelfox` file and making a prediction.",
 	"type": "project",
 	"require": {
-		"tangram/tangram": "0.7.0"
+		"modelfox/modelfox": "0.7.0"
 	},
 	"license": "MIT",
 	"autoload": {
 		"psr-4": {
-			"Tangram\\BasicExample\\": "src/"
+			"ModelFox\\BasicExample\\": "src/"
 		}
 	},
 	"authors": [
 		{
-			"name": "Tangram",
-			"email": "root@tangram.dev"
+			"name": "ModelFox",
+			"email": "root@modelfox.dev"
 		}
 	]
 }

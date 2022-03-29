@@ -1,12 +1,12 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_app_ui::metrics_row::MetricsRow;
-use tangram_charts::{
+use modelfox_app_ui::metrics_row::MetricsRow;
+use modelfox_charts::{
 	box_chart::BoxChartPoint,
 	box_chart::{BoxChartSeries, BoxChartValue},
 	components::BoxChart,
 };
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct NumberColumn {
 	pub invalid_count: u64,

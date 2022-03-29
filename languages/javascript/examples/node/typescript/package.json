@@ -1,7 +1,7 @@
 {
-	"author": "Tangram",
+	"author": "ModelFox",
 	"dependencies": {
-		"@tangramdotdev/tangram": "*"
+		"@modelfoxdotdev/modelfox": "*"
 	},
 	"devDependencies": {
 		"@types/node": "^17.0.7",
@@ -9,7 +9,7 @@
 	},
 	"license": "MIT",
 	"main": "main.js",
-	"name": "@tangramdotdev/tangram-example-node-typescript",
+	"name": "@modelfoxdotdev/modelfox-example-node-typescript",
 	"scripts": {
 		"build": "tsc",
 		"start": "node main.js"

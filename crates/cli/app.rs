@@ -3,8 +3,8 @@ use anyhow::{bail, Result};
 use std::path::PathBuf;
 use url::Url;
 
-#[cfg(feature = "tangram_app")]
-use tangram_app_core::{cache_path, data_path, default_database_url};
+#[cfg(feature = "modelfox_app")]
+use modelfox_app_core::{cache_path, data_path, default_database_url};
 
 #[derive(Clone, serde::Deserialize)]
 struct AppConfig {
@@ -61,20 +61,20 @@ struct S3StorageConfig {
 	pub cache_path: Option<PathBuf>,
 }
 
-#[cfg(feature = "tangram_app")]
+#[cfg(feature = "modelfox_app")]
 #[tokio::main]
 pub async fn app(args: AppArgs) -> Result<()> {
 	let config: Option<AppConfig> = if let Some(config_path) = args.config {
 		let config = std::fs::read(config_path)?;
 		Some(serde_json::from_slice(&config)?)
 	} else if let Some(config_path) = dirs::config_dir()
-		.map(|config_dir_path| config_dir_path.join("tangram").join("app.json"))
+		.map(|config_dir_path| config_dir_path.join("modelfox").join("app.json"))
 		.filter(|config_path| config_path.exists())
 	{
 		let config = std::fs::read(config_path)?;
 		Some(serde_json::from_slice(&config)?)
 	} else if let Some(config_path) = dirs::config_dir()
-		.map(|config_dir_path| config_dir_path.join("tangram").join("app.yaml"))
+		.map(|config_dir_path| config_dir_path.join("modelfox").join("app.yaml"))
 		.filter(|config_path| config_path.exists())
 	{
 		let config = std::fs::read(config_path)?;
@@ -87,7 +87,7 @@ pub async fn app(args: AppArgs) -> Result<()> {
 		.and_then(|c| c.auth.as_ref())
 		.and_then(|auth| {
 			if auth.enable {
-				Some(tangram_app::options::AuthOptions {})
+				Some(modelfox_app::options::AuthOptions {})
 			} else {
 				None
 			}
@@ -95,8 +95,8 @@ pub async fn app(args: AppArgs) -> Result<()> {
 	let cookie_domain = config.as_ref().and_then(|c| c.cookie_domain.clone());
 	let storage = if let Some(storage) = config.as_ref().and_then(|c| c.storage.as_ref()) {
 		match storage {
-			StorageConfig::Local(storage) => tangram_app::options::StorageOptions::Local(
-				tangram_app::options::LocalStorageOptions {
+			StorageConfig::Local(storage) => modelfox_app::options::StorageOptions::Local(
+				modelfox_app::options::LocalStorageOptions {
 					path: storage.path.clone(),
 				},
 			),
@@ -105,7 +105,7 @@ pub async fn app(args: AppArgs) -> Result<()> {
 					.cache_path
 					.clone()
 					.unwrap_or_else(|| cache_path().unwrap());
-				tangram_app::options::StorageOptions::S3(tangram_app::options::S3StorageOptions {
+				modelfox_app::options::StorageOptions::S3(modelfox_app::options::S3StorageOptions {
 					access_key: storage.access_key.clone(),
 					secret_key: storage.secret_key.clone(),
 					endpoint: storage.endpoint.clone(),
@@ -116,18 +116,18 @@ pub async fn app(args: AppArgs) -> Result<()> {
 			}
 		}
 	} else {
-		tangram_app::options::StorageOptions::Local(tangram_app::options::LocalStorageOptions {
+		modelfox_app::options::StorageOptions::Local(modelfox_app::options::LocalStorageOptions {
 			path: data_path()?.join("data"),
 		})
 	};
 	let database = config
 		.as_ref()
 		.and_then(|c| c.database.as_ref())
-		.map(|database| tangram_app::options::DatabaseOptions {
+		.map(|database| modelfox_app::options::DatabaseOptions {
 			max_connections: database.max_connections,
 			url: database.url.clone(),
 		})
-		.unwrap_or_else(|| tangram_app::options::DatabaseOptions {
+		.unwrap_or_else(|| modelfox_app::options::DatabaseOptions {
 			max_connections: None,
 			url: default_database_url(),
 		});
@@ -151,8 +151,8 @@ pub async fn app(args: AppArgs) -> Result<()> {
 	let license_verified: Option<bool> =
 		if let Some(license_file_path) = config.as_ref().and_then(|c| c.license.clone()) {
 			let license = std::fs::read_to_string(license_file_path)?;
-			let public_key = tangram_license::TANGRAM_LICENSE_PUBLIC_KEY;
-			Some(tangram_license::verify(&license, public_key)?)
+			let public_key = modelfox_license::MODELFOX_LICENSE_PUBLIC_KEY;
+			Some(modelfox_license::verify(&license, public_key)?)
 		} else {
 			None
 		};
@@ -168,7 +168,7 @@ pub async fn app(args: AppArgs) -> Result<()> {
 		}
 	}
 	let smtp = if let Some(smtp) = config.as_ref().and_then(|c| c.smtp.clone()) {
-		Some(tangram_app::options::SmtpOptions {
+		Some(modelfox_app::options::SmtpOptions {
 			host: smtp.host,
 			username: smtp.username,
 			password: smtp.password,
@@ -181,7 +181,7 @@ pub async fn app(args: AppArgs) -> Result<()> {
 	} else {
 		None
 	};
-	let options = tangram_app::options::Options {
+	let options = modelfox_app::options::Options {
 		auth,
 		cookie_domain,
 		database,
@@ -191,5 +191,5 @@ pub async fn app(args: AppArgs) -> Result<()> {
 		storage,
 		url,
 	};
-	tangram_app::run(options).await
+	modelfox_app::run(options).await
 }

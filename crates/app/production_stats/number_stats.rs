@@ -1,7 +1,7 @@
 use num::ToPrimitive;
 use rand::random;
 use std::num::NonZeroU64;
-use tangram_zip::zip;
+use modelfox_zip::zip;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 pub struct NumberStats {
@@ -43,7 +43,7 @@ impl NumberStats {
 
 	pub fn update(&mut self, value: f32) {
 		let (new_mean, new_m2) =
-			tangram_metrics::merge_mean_m2(self.n, self.mean, self.m2, 1, value as f64, 0.0);
+			modelfox_metrics::merge_mean_m2(self.n, self.mean, self.m2, 1, value as f64, 0.0);
 		self.n += 1;
 		self.mean = new_mean;
 		self.m2 = new_m2;
@@ -63,7 +63,7 @@ impl NumberStats {
 	}
 
 	pub fn merge(&mut self, other: NumberStats) {
-		let (new_mean, new_m2) = tangram_metrics::merge_mean_m2(
+		let (new_mean, new_m2) = modelfox_metrics::merge_mean_m2(
 			self.n, self.mean, self.m2, other.n, other.mean, other.m2,
 		);
 		self.n += other.n;
@@ -110,8 +110,8 @@ impl NumberStats {
 			p50: quantiles[1],
 			p75: quantiles[2],
 			mean: self.mean.to_f32().unwrap(),
-			variance: tangram_metrics::m2_to_variance(self.m2, NonZeroU64::new(self.n).unwrap()),
-			std: tangram_metrics::m2_to_variance(self.m2, NonZeroU64::new(self.n).unwrap()).sqrt(),
+			variance: modelfox_metrics::m2_to_variance(self.m2, NonZeroU64::new(self.n).unwrap()),
+			std: modelfox_metrics::m2_to_variance(self.m2, NonZeroU64::new(self.n).unwrap()).sqrt(),
 			min: self.min,
 			max: self.max,
 		}

@@ -1,26 +1,26 @@
-# Tangram for JavaScript
+# ModelFox for JavaScript
 
-- [Watch the Video](https://www.tangram.dev)
-- [Read the Docs](https://www.tangram.dev/docs)
+- [Watch the Video](https://www.modelfox.dev)
+- [Read the Docs](https://www.modelfox.dev/docs)
 
-The Tangram JavaScript package makes it easy to make predictions with your Tangram machine learning model from JavaScript.
+The ModelFox JavaScript package makes it easy to make predictions with your ModelFox machine learning model from JavaScript.
 
 ## Setup
 
 ### Node.js
 
 ```
-$ npm install @tangramdotdev/tangram
+$ npm install @modelfoxdotdev/modelfox
 ```
 
 ```javascript
-let tangram = require("@tangramdotdev/tangram")
+let modelfox = require("@modelfoxdotdev/modelfox")
 ```
 
 ### Deno
 
 ```javascript
-import tangram from "https://js.tangram.dev/deno"
+import modelfox from "https://js.modelfox.dev/deno"
 ```
 
 ### Bundler
@@ -28,25 +28,25 @@ import tangram from "https://js.tangram.dev/deno"
 If you are using a bundler that supports WebAssembly modules such as Webpack >= 4, you can use the package from npm.
 
 ```
-$ npm install @tangramdotdev/tangram
+$ npm install @modelfoxdotdev/modelfox
 ```
 
 ```javascript
-import tangram from "@tangramdotdev/tangram"
+import modelfox from "@modelfoxdotdev/modelfox"
 ```
 
 ### Browser
 
-If you are targeting a modern browser with support for ES Modules, WebAssembly, and top-level await, you can import the tangram library from https://js.tangram.dev.
+If you are targeting a modern browser with support for ES Modules, WebAssembly, and top-level await, you can import the modelfox library from https://js.modelfox.dev.
 
 ```javascript
-import tangram from "https://js.tangram.dev"
+import modelfox from "https://js.modelfox.dev"
 ```
 
 ## Usage
 
 ```javascript
-let model = new tangram.Model("./heart_disease.tangram")
+let model = new modelfox.Model("./heart_disease.modelfox")
 
 let input = {
 	age: 63,
@@ -57,7 +57,7 @@ let input = {
 let output = model.predict(input)
 ```
 
-For more information, [read the docs](https://www.tangram.dev/docs).
+For more information, [read the docs](https://www.modelfox.dev/docs).
 
 ## Examples
 

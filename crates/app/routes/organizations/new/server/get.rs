@@ -2,8 +2,8 @@ use crate::page::Page;
 use anyhow::Result;
 use pinwheel::prelude::*;
 use std::sync::Arc;
-use tangram_app_context::Context;
-use tangram_app_layouts::app_layout::app_layout_info;
+use modelfox_app_context::Context;
+use modelfox_app_layouts::app_layout::app_layout_info;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());

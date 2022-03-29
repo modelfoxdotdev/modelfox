@@ -1,5 +1,5 @@
+use modelfox_charts::components::{BarChart, BoxChart};
 use pinwheel::prelude::*;
-use tangram_charts::components::{BarChart, BoxChart};
 
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(tag = "type")]

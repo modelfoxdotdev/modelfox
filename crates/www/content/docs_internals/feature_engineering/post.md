@@ -2,7 +2,7 @@
 "title": "Feature Engineering"
 }
 
-Tangram chooses the appropriate feature groups to generate based on the input column types in the CSV. Tangram will either automatically infer the column types or you can provide the column types explicitly by passing a config file when invoking `tangram train`. See the guide [Train with Custom Configuration](../guides/train_with_custom_configuration).
+ModelFox chooses the appropriate feature groups to generate based on the input column types in the CSV. ModelFox will either automatically infer the column types or you can provide the column types explicitly by passing a config file when invoking `modelfox train`. See the guide [Train with Custom Configuration](../guides/train_with_custom_configuration).
 
 ## Identity Feature Groups
 

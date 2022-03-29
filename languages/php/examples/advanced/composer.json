@@ -1,20 +1,20 @@
 {
-	"name": "tangram/advanced-example",
+	"name": "modelfox/advanced-example",
 	"description": "Advanced usage example ",
 	"type": "project",
 	"require": {
-		"tangram/tangram": "0.7.0"
+		"modelfox/modelfox": "0.7.0"
 	},
 	"license": "MIT",
 	"autoload": {
 		"psr-4": {
-			"Tangram\\AdvancedExample\\": "src/"
+			"ModelFox\\AdvancedExample\\": "src/"
 		}
 	},
 	"authors": [
 		{
-			"name": "Tangram",
-			"email": "root@tangram.dev"
+			"name": "ModelFox",
+			"email": "root@modelfox.dev"
 		}
 	]
 }

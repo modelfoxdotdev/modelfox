@@ -14,9 +14,9 @@ use crate::{
 	BinnedFeaturesLayout, SplitDirection, TrainOptions,
 };
 use bitvec::prelude::*;
+use modelfox_zip::{pzip, zip};
 use num::{NumCast, ToPrimitive};
 use rayon::prelude::*;
-use tangram_zip::{pzip, zip};
 
 pub struct ChooseBestSplitRootOptions<'a> {
 	pub bin_stats_pool: &'a Pool<BinStats>,

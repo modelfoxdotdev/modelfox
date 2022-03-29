@@ -1,5 +1,5 @@
 use num::ToPrimitive;
-use tangram_app_monitor_event::NumberOrString;
+use modelfox_app_monitor_event::NumberOrString;
 
 #[derive(serde::Deserialize, serde::Serialize, Clone)]
 pub struct BinaryClassificationProductionPredictionMetrics {
@@ -125,7 +125,7 @@ impl BinaryClassificationProductionPredictionMetrics {
 
 #[test]
 fn test_binary() {
-	use tangram_zip::zip;
+	use modelfox_zip::zip;
 	let mut metrics =
 		BinaryClassificationProductionPredictionMetrics::new("Cat".to_owned(), "Dog".to_owned());
 	metrics.update((

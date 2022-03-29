@@ -2,7 +2,7 @@ use num::ToPrimitive;
 use pinwheel::prelude::*;
 use std::borrow::Cow;
 use std::rc::Rc;
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Tuning {

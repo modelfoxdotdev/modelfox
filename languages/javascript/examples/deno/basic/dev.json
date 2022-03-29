@@ -1,5 +1,5 @@
 {
 	"imports": {
-		"https://js.tangram.dev/deno": "../../../dist/deno/mod.ts"
+		"https://js.modelfox.dev/deno": "../../../dist/deno/mod.ts"
 	}
 }

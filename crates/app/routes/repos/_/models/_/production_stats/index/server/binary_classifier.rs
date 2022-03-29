@@ -4,8 +4,8 @@ use crate::common::{
 	PredictionCountChartEntry,
 };
 use pinwheel::prelude::*;
-use tangram_app_date_window::{DateWindow, DateWindowInterval};
-use tangram_ui as ui;
+use modelfox_app_date_window::{DateWindow, DateWindowInterval};
+use modelfox_ui as ui;
 
 pub struct BinaryClassifier {
 	pub date_window: DateWindow,

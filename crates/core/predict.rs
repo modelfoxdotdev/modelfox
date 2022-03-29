@@ -1,14 +1,14 @@
-use ndarray::prelude::*;
-use num::ToPrimitive;
-use std::collections::BTreeMap;
-use tangram_features::{
+use modelfox_features::{
 	bag_of_words::BagOfWordsFeatureGroupNGramEntry, BagOfWordsCosineSimilarityFeatureGroup,
 	BagOfWordsFeatureGroup, FeatureGroup, IdentityFeatureGroup, NormalizedFeatureGroup,
 	OneHotEncodedFeatureGroup, WordEmbeddingFeatureGroup,
 };
-use tangram_table::prelude::*;
-use tangram_text::NGramType;
-use tangram_zip::zip;
+use modelfox_table::prelude::*;
+use modelfox_text::NGramType;
+use ndarray::prelude::*;
+use num::ToPrimitive;
+use std::collections::BTreeMap;
+use modelfox_zip::zip;
 
 #[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
 pub struct PredictInput(pub BTreeMap<String, PredictInputValue>);
@@ -233,11 +233,11 @@ pub enum NGram {
 	Bigram(String, String),
 }
 
-impl From<tangram_text::NGram> for NGram {
-	fn from(value: tangram_text::NGram) -> NGram {
+impl From<modelfox_text::NGram> for NGram {
+	fn from(value: modelfox_text::NGram) -> NGram {
 		match value {
-			tangram_text::NGram::Unigram(token) => NGram::Unigram(token),
-			tangram_text::NGram::Bigram(token_a, token_b) => NGram::Bigram(token_a, token_b),
+			modelfox_text::NGram::Unigram(token) => NGram::Unigram(token),
+			modelfox_text::NGram::Bigram(token_a, token_b) => NGram::Bigram(token_a, token_b),
 		}
 	}
 }
@@ -267,7 +267,7 @@ pub enum ModelInner {
 #[derive(Debug)]
 pub struct Regressor {
 	pub columns: Vec<Column>,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub model: RegressionModel,
 }
 
@@ -276,7 +276,7 @@ pub struct BinaryClassifier {
 	pub columns: Vec<Column>,
 	pub negative_class: String,
 	pub positive_class: String,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub model: BinaryClassificationModel,
 }
 
@@ -284,26 +284,26 @@ pub struct BinaryClassifier {
 pub struct MulticlassClassifier {
 	pub columns: Vec<Column>,
 	pub classes: Vec<String>,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub model: MulticlassClassificationModel,
 }
 
 #[derive(Debug)]
 pub enum RegressionModel {
-	Linear(tangram_linear::Regressor),
-	Tree(tangram_tree::Regressor),
+	Linear(modelfox_linear::Regressor),
+	Tree(modelfox_tree::Regressor),
 }
 
 #[derive(Debug)]
 pub enum BinaryClassificationModel {
-	Linear(tangram_linear::BinaryClassifier),
-	Tree(tangram_tree::BinaryClassifier),
+	Linear(modelfox_linear::BinaryClassifier),
+	Tree(modelfox_tree::BinaryClassifier),
 }
 
 #[derive(Debug)]
 pub enum MulticlassClassificationModel {
-	Linear(tangram_linear::MulticlassClassifier),
-	Tree(tangram_tree::MulticlassClassifier),
+	Linear(modelfox_linear::MulticlassClassifier),
+	Tree(modelfox_tree::MulticlassClassifier),
 }
 
 #[derive(Debug)]
@@ -335,21 +335,21 @@ pub struct TextColumn {
 	name: String,
 }
 
-impl<'a> From<tangram_model::ModelReader<'a>> for Model {
-	fn from(model: tangram_model::ModelReader<'a>) -> Self {
+impl<'a> From<modelfox_model::ModelReader<'a>> for Model {
+	fn from(model: modelfox_model::ModelReader<'a>) -> Self {
 		deserialize_model(model)
 	}
 }
 
-fn deserialize_model(model: tangram_model::ModelReader) -> Model {
+fn deserialize_model(model: modelfox_model::ModelReader) -> Model {
 	let id = model.id().parse().unwrap();
 	let inner = deserialize_model_inner(model.inner());
 	Model { id, inner }
 }
 
-fn deserialize_model_inner(model_inner: tangram_model::ModelInnerReader) -> ModelInner {
+fn deserialize_model_inner(model_inner: modelfox_model::ModelInnerReader) -> ModelInner {
 	match model_inner {
-		tangram_model::ModelInnerReader::Regressor(regressor) => {
+		modelfox_model::ModelInnerReader::Regressor(regressor) => {
 			let regressor = regressor.read();
 			let columns = regressor
 				.train_column_stats()
@@ -357,13 +357,13 @@ fn deserialize_model_inner(model_inner: tangram_model::ModelInnerReader) -> Mode
 				.map(deserialize_column_stats)
 				.collect::<Vec<_>>();
 			let feature_groups = match regressor.model() {
-				tangram_model::RegressionModelReader::Linear(model) => model
+				modelfox_model::RegressionModelReader::Linear(model) => model
 					.read()
 					.feature_groups()
 					.iter()
 					.map(deserialize_feature_group)
 					.collect::<Vec<_>>(),
-				tangram_model::RegressionModelReader::Tree(model) => model
+				modelfox_model::RegressionModelReader::Tree(model) => model
 					.read()
 					.feature_groups()
 					.iter()
@@ -371,11 +371,11 @@ fn deserialize_model_inner(model_inner: tangram_model::ModelInnerReader) -> Mode
 					.collect::<Vec<_>>(),
 			};
 			let model = match regressor.model() {
-				tangram_model::RegressionModelReader::Linear(model) => RegressionModel::Linear(
-					tangram_linear::Regressor::from_reader(model.read().model()),
+				modelfox_model::RegressionModelReader::Linear(model) => RegressionModel::Linear(
+					modelfox_linear::Regressor::from_reader(model.read().model()),
 				),
-				tangram_model::RegressionModelReader::Tree(model) => RegressionModel::Tree(
-					tangram_tree::Regressor::from_reader(model.read().model()),
+				modelfox_model::RegressionModelReader::Tree(model) => RegressionModel::Tree(
+					modelfox_tree::Regressor::from_reader(model.read().model()),
 				),
 			};
 			ModelInner::Regressor(Regressor {
@@ -384,7 +384,7 @@ fn deserialize_model_inner(model_inner: tangram_model::ModelInnerReader) -> Mode
 				model,
 			})
 		}
-		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+		modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			let binary_classifier = binary_classifier.read();
 			let negative_class = binary_classifier.negative_class().to_owned();
 			let positive_class = binary_classifier.positive_class().to_owned();
@@ -394,13 +394,13 @@ fn deserialize_model_inner(model_inner: tangram_model::ModelInnerReader) -> Mode
 				.map(deserialize_column_stats)
 				.collect::<Vec<_>>();
 			let feature_groups = match binary_classifier.model() {
-				tangram_model::BinaryClassificationModelReader::Linear(model) => model
+				modelfox_model::BinaryClassificationModelReader::Linear(model) => model
 					.read()
 					.feature_groups()
 					.iter()
 					.map(deserialize_feature_group)
 					.collect::<Vec<_>>(),
-				tangram_model::BinaryClassificationModelReader::Tree(model) => model
+				modelfox_model::BinaryClassificationModelReader::Tree(model) => model
 					.read()
 					.feature_groups()
 					.iter()
@@ -408,13 +408,13 @@ fn deserialize_model_inner(model_inner: tangram_model::ModelInnerReader) -> Mode
 					.collect::<Vec<_>>(),
 			};
 			let model = match binary_classifier.model() {
-				tangram_model::BinaryClassificationModelReader::Linear(model) => {
+				modelfox_model::BinaryClassificationModelReader::Linear(model) => {
 					BinaryClassificationModel::Linear(
-						tangram_linear::BinaryClassifier::from_reader(model.read().model()),
+						modelfox_linear::BinaryClassifier::from_reader(model.read().model()),
 					)
 				}
-				tangram_model::BinaryClassificationModelReader::Tree(model) => {
-					BinaryClassificationModel::Tree(tangram_tree::BinaryClassifier::from_reader(
+				modelfox_model::BinaryClassificationModelReader::Tree(model) => {
+					BinaryClassificationModel::Tree(modelfox_tree::BinaryClassifier::from_reader(
 						model.read().model(),
 					))
 				}
@@ -427,7 +427,7 @@ fn deserialize_model_inner(model_inner: tangram_model::ModelInnerReader) -> Mode
 				model,
 			})
 		}
-		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+		modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 			let multiclass_classifier = multiclass_classifier.read();
 			let classes = multiclass_classifier
 				.classes()
@@ -440,13 +440,13 @@ fn deserialize_model_inner(model_inner: tangram_model::ModelInnerReader) -> Mode
 				.map(deserialize_column_stats)
 				.collect::<Vec<_>>();
 			let feature_groups = match multiclass_classifier.model() {
-				tangram_model::MulticlassClassificationModelReader::Linear(model) => model
+				modelfox_model::MulticlassClassificationModelReader::Linear(model) => model
 					.read()
 					.feature_groups()
 					.iter()
 					.map(deserialize_feature_group)
 					.collect::<Vec<_>>(),
-				tangram_model::MulticlassClassificationModelReader::Tree(model) => model
+				modelfox_model::MulticlassClassificationModelReader::Tree(model) => model
 					.read()
 					.feature_groups()
 					.iter()
@@ -454,14 +454,14 @@ fn deserialize_model_inner(model_inner: tangram_model::ModelInnerReader) -> Mode
 					.collect::<Vec<_>>(),
 			};
 			let model = match multiclass_classifier.model() {
-				tangram_model::MulticlassClassificationModelReader::Linear(model) => {
+				modelfox_model::MulticlassClassificationModelReader::Linear(model) => {
 					MulticlassClassificationModel::Linear(
-						tangram_linear::MulticlassClassifier::from_reader(model.read().model()),
+						modelfox_linear::MulticlassClassifier::from_reader(model.read().model()),
 					)
 				}
-				tangram_model::MulticlassClassificationModelReader::Tree(model) => {
+				modelfox_model::MulticlassClassificationModelReader::Tree(model) => {
 					MulticlassClassificationModel::Tree(
-						tangram_tree::MulticlassClassifier::from_reader(model.read().model()),
+						modelfox_tree::MulticlassClassifier::from_reader(model.read().model()),
 					)
 				}
 			};
@@ -475,19 +475,19 @@ fn deserialize_model_inner(model_inner: tangram_model::ModelInnerReader) -> Mode
 	}
 }
 
-fn deserialize_column_stats(column_stats: tangram_model::ColumnStatsReader) -> Column {
+fn deserialize_column_stats(column_stats: modelfox_model::ColumnStatsReader) -> Column {
 	match column_stats {
-		tangram_model::ColumnStatsReader::UnknownColumn(column_stats) => {
+		modelfox_model::ColumnStatsReader::UnknownColumn(column_stats) => {
 			let column_stats = column_stats.read();
 			let name = column_stats.column_name().to_owned();
 			Column::Unknown(UnknownColumn { name })
 		}
-		tangram_model::ColumnStatsReader::NumberColumn(column_stats) => {
+		modelfox_model::ColumnStatsReader::NumberColumn(column_stats) => {
 			let column_stats = column_stats.read();
 			let name = column_stats.column_name().to_owned();
 			Column::Number(NumberColumn { name })
 		}
-		tangram_model::ColumnStatsReader::EnumColumn(column_stats) => {
+		modelfox_model::ColumnStatsReader::EnumColumn(column_stats) => {
 			let column_stats = column_stats.read();
 			let name = column_stats.column_name().to_owned();
 			let variants = column_stats
@@ -497,7 +497,7 @@ fn deserialize_column_stats(column_stats: tangram_model::ColumnStatsReader) -> C
 				.collect::<Vec<_>>();
 			Column::Enum(EnumColumn { name, variants })
 		}
-		tangram_model::ColumnStatsReader::TextColumn(column_stats) => {
+		modelfox_model::ColumnStatsReader::TextColumn(column_stats) => {
 			let column_stats = column_stats.read();
 			let name = column_stats.column_name().to_owned();
 			Column::Text(TextColumn { name })
@@ -505,14 +505,14 @@ fn deserialize_column_stats(column_stats: tangram_model::ColumnStatsReader) -> C
 	}
 }
 
-fn deserialize_feature_group(feature_group: tangram_model::FeatureGroupReader) -> FeatureGroup {
+fn deserialize_feature_group(feature_group: modelfox_model::FeatureGroupReader) -> FeatureGroup {
 	match feature_group {
-		tangram_model::FeatureGroupReader::Identity(feature_group) => {
+		modelfox_model::FeatureGroupReader::Identity(feature_group) => {
 			let feature_group = feature_group.read();
 			let source_column_name = feature_group.source_column_name().to_owned();
 			FeatureGroup::Identity(IdentityFeatureGroup { source_column_name })
 		}
-		tangram_model::FeatureGroupReader::Normalized(feature_group) => {
+		modelfox_model::FeatureGroupReader::Normalized(feature_group) => {
 			let feature_group = feature_group.read();
 			let source_column_name = feature_group.source_column_name().to_owned();
 			let mean = feature_group.mean();
@@ -523,7 +523,7 @@ fn deserialize_feature_group(feature_group: tangram_model::FeatureGroupReader) -
 				variance,
 			})
 		}
-		tangram_model::FeatureGroupReader::OneHotEncoded(feature_group) => {
+		modelfox_model::FeatureGroupReader::OneHotEncoded(feature_group) => {
 			let feature_group = feature_group.read();
 			let source_column_name = feature_group.source_column_name().to_owned();
 			let variants = feature_group
@@ -536,7 +536,7 @@ fn deserialize_feature_group(feature_group: tangram_model::FeatureGroupReader) -
 				variants,
 			})
 		}
-		tangram_model::FeatureGroupReader::BagOfWords(feature_group) => {
+		modelfox_model::FeatureGroupReader::BagOfWords(feature_group) => {
 			let feature_group = feature_group.read();
 			let source_column_name = feature_group.source_column_name().to_owned();
 			let tokenizer = deserialize_tokenizer(feature_group.tokenizer());
@@ -556,8 +556,8 @@ fn deserialize_feature_group(feature_group: tangram_model::FeatureGroupReader) -
 				.ngram_types()
 				.iter()
 				.map(|ngram_type| match ngram_type {
-					tangram_model::NGramTypeReader::Unigram(_) => NGramType::Unigram,
-					tangram_model::NGramTypeReader::Bigram(_) => NGramType::Bigram,
+					modelfox_model::NGramTypeReader::Unigram(_) => NGramType::Unigram,
+					modelfox_model::NGramTypeReader::Bigram(_) => NGramType::Bigram,
 				})
 				.collect();
 			FeatureGroup::BagOfWords(BagOfWordsFeatureGroup {
@@ -568,7 +568,7 @@ fn deserialize_feature_group(feature_group: tangram_model::FeatureGroupReader) -
 				ngrams,
 			})
 		}
-		tangram_model::FeatureGroupReader::BagOfWordsCosineSimilarity(feature_group) => {
+		modelfox_model::FeatureGroupReader::BagOfWordsCosineSimilarity(feature_group) => {
 			let feature_group = feature_group.read();
 			let source_column_name_a = feature_group.source_column_name_a().to_owned();
 			let source_column_name_b = feature_group.source_column_name_b().to_owned();
@@ -589,8 +589,8 @@ fn deserialize_feature_group(feature_group: tangram_model::FeatureGroupReader) -
 				.ngram_types()
 				.iter()
 				.map(|ngram_type| match ngram_type {
-					tangram_model::NGramTypeReader::Unigram(_) => NGramType::Unigram,
-					tangram_model::NGramTypeReader::Bigram(_) => NGramType::Bigram,
+					modelfox_model::NGramTypeReader::Unigram(_) => NGramType::Unigram,
+					modelfox_model::NGramTypeReader::Bigram(_) => NGramType::Bigram,
 				})
 				.collect();
 			FeatureGroup::BagOfWordsCosineSimilarity(BagOfWordsCosineSimilarityFeatureGroup {
@@ -602,7 +602,7 @@ fn deserialize_feature_group(feature_group: tangram_model::FeatureGroupReader) -
 				ngrams,
 			})
 		}
-		tangram_model::FeatureGroupReader::WordEmbedding(feature_group) => {
+		modelfox_model::FeatureGroupReader::WordEmbedding(feature_group) => {
 			let feature_group = feature_group.read();
 			let source_column_name = feature_group.source_column_name().to_owned();
 			let tokenizer = deserialize_tokenizer(feature_group.tokenizer());
@@ -616,41 +616,41 @@ fn deserialize_feature_group(feature_group: tangram_model::FeatureGroupReader) -
 	}
 }
 
-fn deserialize_tokenizer(tokenizer: tangram_model::TokenizerReader) -> tangram_text::Tokenizer {
+fn deserialize_tokenizer(tokenizer: modelfox_model::TokenizerReader) -> modelfox_text::Tokenizer {
 	tokenizer.into()
 }
 
 fn deserialize_bag_of_words_feature_group_strategy(
-	strategy: tangram_model::BagOfWordsFeatureGroupStrategyReader,
-) -> tangram_features::bag_of_words::BagOfWordsFeatureGroupStrategy {
+	strategy: modelfox_model::BagOfWordsFeatureGroupStrategyReader,
+) -> modelfox_features::bag_of_words::BagOfWordsFeatureGroupStrategy {
 	match strategy {
-		tangram_model::BagOfWordsFeatureGroupStrategyReader::Present(_) => {
-			tangram_features::bag_of_words::BagOfWordsFeatureGroupStrategy::Present
+		modelfox_model::BagOfWordsFeatureGroupStrategyReader::Present(_) => {
+			modelfox_features::bag_of_words::BagOfWordsFeatureGroupStrategy::Present
 		}
-		tangram_model::BagOfWordsFeatureGroupStrategyReader::Count(_) => {
-			tangram_features::bag_of_words::BagOfWordsFeatureGroupStrategy::Count
+		modelfox_model::BagOfWordsFeatureGroupStrategyReader::Count(_) => {
+			modelfox_features::bag_of_words::BagOfWordsFeatureGroupStrategy::Count
 		}
-		tangram_model::BagOfWordsFeatureGroupStrategyReader::TfIdf(_) => {
-			tangram_features::bag_of_words::BagOfWordsFeatureGroupStrategy::TfIdf
+		modelfox_model::BagOfWordsFeatureGroupStrategyReader::TfIdf(_) => {
+			modelfox_features::bag_of_words::BagOfWordsFeatureGroupStrategy::TfIdf
 		}
 	}
 }
 
 fn deserialize_word_embedding_model(
-	model: tangram_model::WordEmbeddingModelReader,
-) -> tangram_text::WordEmbeddingModel {
+	model: modelfox_model::WordEmbeddingModelReader,
+) -> modelfox_text::WordEmbeddingModel {
 	model.into()
 }
 
-fn deserialize_ngram(ngram: tangram_model::NGramReader) -> tangram_text::NGram {
+fn deserialize_ngram(ngram: modelfox_model::NGramReader) -> modelfox_text::NGram {
 	match ngram {
-		tangram_model::NGramReader::Unigram(unigram) => {
+		modelfox_model::NGramReader::Unigram(unigram) => {
 			let token = unigram.read();
-			tangram_text::NGram::Unigram((*token).to_owned())
+			modelfox_text::NGram::Unigram((*token).to_owned())
 		}
-		tangram_model::NGramReader::Bigram(bigram) => {
+		modelfox_model::NGramReader::Bigram(bigram) => {
 			let (token_a, token_b) = bigram.read();
-			tangram_text::NGram::Bigram(token_a.to_owned(), token_b.to_owned())
+			modelfox_text::NGram::Bigram(token_a.to_owned(), token_b.to_owned())
 		}
 	}
 }
@@ -680,21 +680,21 @@ pub fn predict(
 	let column_types = columns
 		.iter()
 		.map(|column| match column {
-			Column::Unknown(_) => tangram_table::TableColumnType::Unknown,
-			Column::Number(_) => tangram_table::TableColumnType::Number,
-			Column::Enum(column) => tangram_table::TableColumnType::Enum {
+			Column::Unknown(_) => modelfox_table::TableColumnType::Unknown,
+			Column::Number(_) => modelfox_table::TableColumnType::Number,
+			Column::Enum(column) => modelfox_table::TableColumnType::Enum {
 				variants: column.variants.clone(),
 			},
-			Column::Text(_) => tangram_table::TableColumnType::Text,
+			Column::Text(_) => modelfox_table::TableColumnType::Text,
 		})
 		.collect();
-	let mut table = tangram_table::Table::new(column_names, column_types);
+	let mut table = modelfox_table::Table::new(column_names, column_types);
 	// Fill the table with the input.
 	for input in input {
 		for column in table.columns_mut().iter_mut() {
 			match column {
-				tangram_table::TableColumn::Unknown(column) => *column.len_mut() += 1,
-				tangram_table::TableColumn::Number(column) => {
+				modelfox_table::TableColumn::Unknown(column) => *column.len_mut() += 1,
+				modelfox_table::TableColumn::Number(column) => {
 					let value = match input.0.get(column.name().as_ref().unwrap()) {
 						Some(PredictInputValue::Number(value)) => value.to_f32().unwrap(),
 						Some(PredictInputValue::String(value)) => {
@@ -706,7 +706,7 @@ pub fn predict(
 					};
 					column.data_mut().push(value);
 				}
-				tangram_table::TableColumn::Enum(column) => {
+				modelfox_table::TableColumn::Enum(column) => {
 					let value = input
 						.0
 						.get(column.name().as_ref().unwrap())
@@ -714,7 +714,7 @@ pub fn predict(
 					let value = value.and_then(|value| column.value_for_variant(value));
 					column.data_mut().push(value);
 				}
-				tangram_table::TableColumn::Text(column) => {
+				modelfox_table::TableColumn::Text(column) => {
 					let value = input
 						.0
 						.get(column.name().as_ref().unwrap())
@@ -754,7 +754,7 @@ fn predict_regressor(
 	match &model.model {
 		RegressionModel::Linear(inner_model) => {
 			let mut predictions = Array::zeros(n_rows);
-			let features = tangram_features::compute_features_array_f32(
+			let features = modelfox_features::compute_features_array_f32(
 				&table.view(),
 				&model.feature_groups,
 				&|| {},
@@ -794,7 +794,7 @@ fn predict_regressor(
 			outputs
 		}
 		RegressionModel::Tree(inner_model) => {
-			let features = tangram_features::compute_features_array_value(
+			let features = modelfox_features::compute_features_array_value(
 				&table.view(),
 				&model.feature_groups,
 				&|| {},
@@ -821,8 +821,8 @@ fn predict_regressor(
 					let feature_contributions = compute_feature_contributions(
 						model.feature_groups.iter(),
 						features.iter().map(|v| match v {
-							tangram_table::TableValue::Number(value) => *value,
-							tangram_table::TableValue::Enum(value) => {
+							modelfox_table::TableValue::Number(value) => *value,
+							modelfox_table::TableValue::Enum(value) => {
 								value.map(|v| v.get()).unwrap_or(0).to_f32().unwrap()
 							}
 							_ => unreachable!(),
@@ -852,7 +852,7 @@ fn predict_binary_classifier(
 	match &model.model {
 		BinaryClassificationModel::Linear(inner_model) => {
 			let mut probabilities = Array::zeros(n_rows);
-			let features = tangram_features::compute_features_array_f32(
+			let features = modelfox_features::compute_features_array_f32(
 				&table.view(),
 				&model.feature_groups,
 				&|| {},
@@ -898,7 +898,7 @@ fn predict_binary_classifier(
 			outputs
 		}
 		BinaryClassificationModel::Tree(inner_model) => {
-			let features = tangram_features::compute_features_array_value(
+			let features = modelfox_features::compute_features_array_value(
 				&table.view(),
 				&model.feature_groups,
 				&|| {},
@@ -931,8 +931,8 @@ fn predict_binary_classifier(
 					let feature_contributions = compute_feature_contributions(
 						model.feature_groups.iter(),
 						features.iter().map(|v| match v {
-							tangram_table::TableValue::Number(value) => *value,
-							tangram_table::TableValue::Enum(value) => {
+							modelfox_table::TableValue::Number(value) => *value,
+							modelfox_table::TableValue::Enum(value) => {
 								value.map(|v| v.get()).unwrap_or(0).to_f32().unwrap()
 							}
 							_ => unreachable!(),
@@ -963,7 +963,7 @@ fn predict_multiclass_classifier(
 	match &model.model {
 		MulticlassClassificationModel::Linear(inner_model) => {
 			let mut probabilities = Array::zeros((n_rows, n_classes));
-			let features = tangram_features::compute_features_array_f32(
+			let features = modelfox_features::compute_features_array_f32(
 				&table.view(),
 				&model.feature_groups,
 				&|| {},
@@ -1018,7 +1018,7 @@ fn predict_multiclass_classifier(
 			outputs
 		}
 		MulticlassClassificationModel::Tree(inner_model) => {
-			let features = tangram_features::compute_features_array_value(
+			let features = modelfox_features::compute_features_array_value(
 				&table.view(),
 				&model.feature_groups,
 				&|| {},
@@ -1056,8 +1056,8 @@ fn predict_multiclass_classifier(
 							let feature_contributions = compute_feature_contributions(
 								model.feature_groups.iter(),
 								features.iter().map(|v| match v {
-									tangram_table::TableValue::Number(value) => *value,
-									tangram_table::TableValue::Enum(value) => {
+									modelfox_table::TableValue::Number(value) => *value,
+									modelfox_table::TableValue::Enum(value) => {
 										value.map(|v| v.get()).unwrap_or(0).to_f32().unwrap()
 									}
 									_ => unreachable!(),
@@ -1083,14 +1083,14 @@ fn predict_multiclass_classifier(
 }
 
 fn compute_feature_contributions<'a>(
-	feature_groups: impl Iterator<Item = &'a tangram_features::FeatureGroup>,
+	feature_groups: impl Iterator<Item = &'a modelfox_features::FeatureGroup>,
 	mut features: impl Iterator<Item = f32>,
 	mut feature_contribution_values: impl Iterator<Item = f32>,
 ) -> Vec<FeatureContributionEntry> {
 	let mut entries = Vec::new();
 	for feature_group in feature_groups {
 		match feature_group {
-			tangram_features::FeatureGroup::Identity(feature_group) => {
+			modelfox_features::FeatureGroup::Identity(feature_group) => {
 				let feature_value = features.next().unwrap();
 				let feature_contribution_value = feature_contribution_values.next().unwrap();
 				entries.push(FeatureContributionEntry::Identity(
@@ -1101,7 +1101,7 @@ fn compute_feature_contributions<'a>(
 					},
 				));
 			}
-			tangram_features::FeatureGroup::Normalized(feature_group) => {
+			modelfox_features::FeatureGroup::Normalized(feature_group) => {
 				let feature_value = features.next().unwrap();
 				let feature_contribution_value = feature_contribution_values.next().unwrap();
 				entries.push(FeatureContributionEntry::Normalized(
@@ -1112,7 +1112,7 @@ fn compute_feature_contributions<'a>(
 					},
 				));
 			}
-			tangram_features::FeatureGroup::OneHotEncoded(feature_group) => {
+			modelfox_features::FeatureGroup::OneHotEncoded(feature_group) => {
 				let feature_value = features.next().unwrap();
 				let feature_contribution_value = feature_contribution_values.next().unwrap();
 				entries.push(FeatureContributionEntry::OneHotEncoded(
@@ -1136,7 +1136,7 @@ fn compute_feature_contributions<'a>(
 					));
 				}
 			}
-			tangram_features::FeatureGroup::BagOfWords(feature_group) => {
+			modelfox_features::FeatureGroup::BagOfWords(feature_group) => {
 				for ngram in feature_group.ngrams.keys() {
 					let feature_value = features.next().unwrap();
 					let feature_contribution_value = feature_contribution_values.next().unwrap();
@@ -1150,7 +1150,7 @@ fn compute_feature_contributions<'a>(
 					));
 				}
 			}
-			tangram_features::FeatureGroup::BagOfWordsCosineSimilarity(feature_group) => {
+			modelfox_features::FeatureGroup::BagOfWordsCosineSimilarity(feature_group) => {
 				let feature_value = features.next().unwrap();
 				let feature_contribution_value = feature_contribution_values.next().unwrap();
 				entries.push(FeatureContributionEntry::BagOfWordsCosineSimilarity(
@@ -1162,7 +1162,7 @@ fn compute_feature_contributions<'a>(
 					},
 				));
 			}
-			tangram_features::FeatureGroup::WordEmbedding(feature_group) => {
+			modelfox_features::FeatureGroup::WordEmbedding(feature_group) => {
 				for value_index in 0..feature_group.model.size {
 					let feature_contribution_value = feature_contribution_values.next().unwrap();
 					entries.push(FeatureContributionEntry::WordEmbedding(

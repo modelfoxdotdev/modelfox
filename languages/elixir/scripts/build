@@ -1,8 +1,8 @@
 rm -rf priv/
-install -D ../../dist/compile/x86_64-linux-gnu/libtangram_elixir.so priv/x86_64-linux-gnu/libtangram_elixir.so
-install -D ../../dist/compile/aarch64-linux-gnu/libtangram_elixir.so priv/aarch64-linux-gnu/libtangram_elixir.so
-install -D ../../dist/compile/x86_64-linux-musl/libtangram_elixir.so priv/x86_64-linux-musl/libtangram_elixir.so
-install -D ../../dist/compile/aarch64-linux-musl/libtangram_elixir.so priv/aarch64-linux-musl/libtangram_elixir.so
-install -D ../../dist/compile/x86_64-macos/libtangram_elixir.dylib priv/x86_64-macos/libtangram_elixir.so
-install -D ../../dist/compile/aarch64-macos/libtangram_elixir.dylib priv/aarch64-macos/libtangram_elixir.so
-install -D ../../dist/compile/x86_64-windows-msvc/tangram_elixir.dll priv/x86_64-windows-msvc/tangram_elixir.dll
+install -D ../../dist/compile/x86_64-linux-gnu/libmodelfox_elixir.so priv/x86_64-linux-gnu/libmodelfox_elixir.so
+install -D ../../dist/compile/aarch64-linux-gnu/libmodelfox_elixir.so priv/aarch64-linux-gnu/libmodelfox_elixir.so
+install -D ../../dist/compile/x86_64-linux-musl/libmodelfox_elixir.so priv/x86_64-linux-musl/libmodelfox_elixir.so
+install -D ../../dist/compile/aarch64-linux-musl/libmodelfox_elixir.so priv/aarch64-linux-musl/libmodelfox_elixir.so
+install -D ../../dist/compile/x86_64-macos/libmodelfox_elixir.dylib priv/x86_64-macos/libmodelfox_elixir.so
+install -D ../../dist/compile/aarch64-macos/libmodelfox_elixir.dylib priv/aarch64-macos/libmodelfox_elixir.so
+install -D ../../dist/compile/x86_64-windows-msvc/modelfox_elixir.dll priv/x86_64-windows-msvc/modelfox_elixir.dll

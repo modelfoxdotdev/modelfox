@@ -1,8 +1,8 @@
 use crate::dataset_preview::DatasetPreview;
 use pinwheel::prelude::*;
 use std::borrow::Cow;
-use tangram_ui as ui;
-use tangram_www_layouts::{
+use modelfox_ui as ui;
+use modelfox_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage, GettingStartedPage, PrevNextButtons},
 	document::Document,
 };
@@ -14,10 +14,10 @@ impl Component for Page {
 		let install_p = ui::P::new().child("If you haven't already, ").child(
 			ui::Link::new()
 				.href("/docs/install".to_owned())
-				.child("install the Tangram CLI."),
+				.child("install the ModelFox CLI."),
 		);
 		let install = ui::S2::new()
-			.child(ui::H2::new("Install the Tangram CLI"))
+			.child(ui::H2::new("Install the ModelFox CLI"))
 			.child(install_p);
 		let data_p1 = ui::P::new().child(
 			ui::Link::new()
@@ -35,13 +35,13 @@ impl Component for Page {
 			.child(data_p3);
 		let train_p1 = ui::Markdown::new(ui::doc!(
 			r#"
-				We can train a model to predict the `diagnosis` column using the `tangram train` command, passing in the path to the CSV file and the name of the column we want to predict, called the `target` column.
+				We can train a model to predict the `diagnosis` column using the `modelfox train` command, passing in the path to the CSV file and the name of the column we want to predict, called the `target` column.
 			"#,
 		));
 		let train_window = ui::Window::new().child(ui::Code::new().code(Cow::Borrowed(
-			"$ tangram train --file heart_disease.csv --target diagnosis",
+			"$ modelfox train --file heart_disease.csv --target diagnosis",
 		)));
-		let train_p2 = ui::Markdown::new("The CLI automatically transforms the data into features, trains a number of models to predict the target column, and writes the best model to a `.tangram` file. We can use this file to make predictions from our code.");
+		let train_p2 = ui::Markdown::new("The CLI automatically transforms the data into features, trains a number of models to predict the target column, and writes the best model to a `.modelfox` file. We can use this file to make predictions from our code.");
 		let train = ui::S2::new()
 			.child(ui::H2::new("Train"))
 			.child(train_p1)

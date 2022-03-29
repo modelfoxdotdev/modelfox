@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace tangram\tangram;
+namespace modelfox\modelfox;
 
-abstract class TangramFeatureContributionEntryType
+abstract class ModelFoxFeatureContributionEntryType
 {
     public const identity = 0;
     public const normalized = 1;

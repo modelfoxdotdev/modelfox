@@ -1,15 +1,15 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_app_layouts::{
+use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-use tangram_charts::{
+use modelfox_charts::{
 	components::LineChart,
 	line_chart::{LineChartPoint, LineChartSeries, LineStyle, PointStyle},
 };
-use tangram_finite::Finite;
-use tangram_ui as ui;
+use modelfox_finite::Finite;
+use modelfox_ui as ui;
 
 pub struct Page {
 	pub id: String,
@@ -100,7 +100,7 @@ impl Component for Page {
 					),
 			);
 		Document::new()
-			.client("tangram_app_training_metrics_roc_client")
+			.client("modelfox_app_training_metrics_roc_client")
 			.child(ModelLayout::new(self.model_layout_info).child(content))
 			.into_node()
 	}

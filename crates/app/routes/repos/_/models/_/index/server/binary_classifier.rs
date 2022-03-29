@@ -1,13 +1,13 @@
 use crate::common::{FeatureImportancesSection, TrainingSummarySection};
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_app_ui::metrics_row::MetricsRow;
-use tangram_charts::{
+use modelfox_app_ui::metrics_row::MetricsRow;
+use modelfox_charts::{
 	components::LineChart,
 	line_chart::{LineChartPoint, LineChartSeries, LineStyle, PointStyle},
 };
-use tangram_finite::Finite;
-use tangram_ui as ui;
+use modelfox_finite::Finite;
+use modelfox_ui as ui;
 
 pub struct BinaryClassifier {
 	pub feature_importances_section: Option<FeatureImportancesSection>,

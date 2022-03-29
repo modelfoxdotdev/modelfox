@@ -15,9 +15,9 @@ use crate::{
 	tooltip::{draw_tooltip, DrawTooltipOptions, TooltipLabel},
 };
 use itertools::Itertools;
+use modelfox_finite::Finite;
+use modelfox_number_formatter::NumberFormatter;
 use num::ToPrimitive;
-use tangram_finite::Finite;
-use tangram_number_formatter::NumberFormatter;
 use wasm_bindgen::JsValue;
 use web_sys as dom;
 

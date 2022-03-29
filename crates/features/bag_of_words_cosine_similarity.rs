@@ -2,12 +2,12 @@ use crate::bag_of_words::{BagOfWordsFeatureGroupNGramEntry, BagOfWordsFeatureGro
 use fnv::{FnvBuildHasher, FnvHashSet};
 use indexmap::IndexMap;
 use itertools::Itertools;
-use ndarray::prelude::*;
-use num::ToPrimitive;
-use tangram_table::{
+use modelfox_table::{
 	NumberTableColumn, TableColumn, TableColumnView, TableValue, TextTableColumnView,
 };
-use tangram_text::{NGram, NGramType, Tokenizer};
+use modelfox_text::{NGram, NGramType, Tokenizer};
+use ndarray::prelude::*;
+use num::ToPrimitive;
 
 /**
 A BagOfWordsCosineSimilarityFeatureGroup creates features for comparing two text columns using the cosine similarity of the [Bag of Words](https://en.wikipedia.org/wiki/Bag-of-words_model) representation of each text column.
@@ -135,7 +135,7 @@ impl BagOfWordsCosineSimilarityFeatureGroup {
 			Some(
 				self.tokenizer
 					.tokenize(value)
-					.map(tangram_text::NGramRef::Unigram),
+					.map(modelfox_text::NGramRef::Unigram),
 			)
 		} else {
 			None
@@ -145,7 +145,7 @@ impl BagOfWordsCosineSimilarityFeatureGroup {
 				self.tokenizer
 					.tokenize(value)
 					.tuple_windows()
-					.map(|(token_a, token_b)| tangram_text::NGramRef::Bigram(token_a, token_b)),
+					.map(|(token_a, token_b)| modelfox_text::NGramRef::Bigram(token_a, token_b)),
 			)
 		} else {
 			None
@@ -259,7 +259,7 @@ impl BagOfWordsCosineSimilarityFeatureGroup {
 mod test {
 	use crate::bag_of_words::{BagOfWordsFeatureGroupNGramEntry, BagOfWordsFeatureGroupStrategy};
 	use crate::bag_of_words_cosine_similarity::*;
-	use tangram_text::{NGram, NGramType, Tokenizer};
+	use modelfox_text::{NGram, NGramType, Tokenizer};
 
 	#[test]
 	fn test_compute_bag_of_words_feature() {

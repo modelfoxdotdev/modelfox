@@ -18,8 +18,8 @@ use chrono::prelude::*;
 use chrono_tz::Tz;
 use num::ToPrimitive;
 use sqlx::prelude::*;
-use tangram_app_date_window::{DateWindow, DateWindowInterval};
-use tangram_app_monitor_event::NumberOrString;
+use modelfox_app_date_window::{DateWindow, DateWindowInterval};
+use modelfox_app_monitor_event::NumberOrString;
 
 mod binary_classification_production_metrics;
 mod multiclass_classification_production_metrics;
@@ -61,7 +61,7 @@ pub enum ProductionPredictionMetricsOutput {
 
 impl ProductionMetrics {
 	pub fn new(
-		model: tangram_model::ModelReader,
+		model: modelfox_model::ModelReader,
 		start_date: DateTime<Utc>,
 		end_date: DateTime<Utc>,
 	) -> ProductionMetrics {
@@ -97,12 +97,12 @@ impl ProductionMetrics {
 }
 
 impl ProductionPredictionMetrics {
-	pub fn new(model: tangram_model::ModelReader) -> ProductionPredictionMetrics {
+	pub fn new(model: modelfox_model::ModelReader) -> ProductionPredictionMetrics {
 		match model.inner() {
-			tangram_model::ModelInnerReader::Regressor(_) => {
+			modelfox_model::ModelInnerReader::Regressor(_) => {
 				ProductionPredictionMetrics::Regression(RegressionProductionPredictionMetrics::new())
 			}
-			tangram_model::ModelInnerReader::BinaryClassifier(model) => {
+			modelfox_model::ModelInnerReader::BinaryClassifier(model) => {
 				let model = model.read();
 				ProductionPredictionMetrics::BinaryClassification(
 					BinaryClassificationProductionPredictionMetrics::new(
@@ -111,7 +111,7 @@ impl ProductionPredictionMetrics {
 					),
 				)
 			}
-			tangram_model::ModelInnerReader::MulticlassClassifier(model) => {
+			modelfox_model::ModelInnerReader::MulticlassClassifier(model) => {
 				let model = model.read();
 				ProductionPredictionMetrics::MulticlassClassification(
 					MulticlassClassificationProductionPredictionMetrics::new(
@@ -174,7 +174,7 @@ pub struct GetProductionMetricsOutput {
 
 pub async fn get_production_metrics(
 	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
-	model: tangram_model::ModelReader<'_>,
+	model: modelfox_model::ModelReader<'_>,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
 	timezone: Tz,

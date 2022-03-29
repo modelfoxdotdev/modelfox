@@ -2,8 +2,8 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python setup.py develop --user
-rm -rf tangram.egg-info
-pdoc -d google -t . -o docs tangram
-cp ../../tangram.svg docs/tangram.svg
-echo '<html><head><meta http-equiv="refresh" content="0; URL=tangram.html" /></head></html>' > docs/index.html
+rm -rf modelfox.egg-info
+pdoc -d google -t . -o docs modelfox
+cp ../../modelfox.svg docs/modelfox.svg
+echo '<html><head><meta http-equiv="refresh" content="0; URL=modelfox.html" /></head></html>' > docs/index.html
 deactivate

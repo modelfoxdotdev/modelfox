@@ -1,13 +1,13 @@
 use fnv::{FnvBuildHasher, FnvHashSet};
 use indexmap::IndexMap;
 use itertools::Itertools;
+use modelfox_finite::Finite;
 use num::ToPrimitive;
 use std::{cmp::Ordering, collections::BTreeMap, num::NonZeroU64};
-use tangram_finite::Finite;
-use tangram_progress_counter::ProgressCounter;
-use tangram_table::prelude::*;
-use tangram_text::{NGram, NGramType, Tokenizer};
-use tangram_zip::zip;
+use modelfox_progress_counter::ProgressCounter;
+use modelfox_table::prelude::*;
+use modelfox_text::{NGram, NGramType, Tokenizer};
+use modelfox_zip::zip;
 
 /// This struct contains settings used to compute stats.
 #[derive(Clone, Debug)]
@@ -383,7 +383,7 @@ impl NumberColumnStats {
 		let mut iter = self.histogram.iter().peekable();
 		while let Some((value, count)) = iter.next() {
 			let value = value.get();
-			let (new_mean, new_m2) = tangram_metrics::merge_mean_m2(
+			let (new_mean, new_m2) = modelfox_metrics::merge_mean_m2(
 				current_count.to_u64().unwrap(),
 				mean,
 				m2,
@@ -421,7 +421,7 @@ impl NumberColumnStats {
 		let p50 = quantiles[1];
 		let p75 = quantiles[2];
 		let mean = mean.to_f32().unwrap();
-		let variance = tangram_metrics::m2_to_variance(
+		let variance = modelfox_metrics::m2_to_variance(
 			m2,
 			NonZeroU64::new(current_count.to_u64().unwrap()).unwrap(),
 		);
@@ -532,7 +532,7 @@ impl TextColumnStats {
 					stats
 						.tokenizer
 						.tokenize(value)
-						.map(tangram_text::NGramRef::Unigram),
+						.map(modelfox_text::NGramRef::Unigram),
 				)
 			} else {
 				None
@@ -541,7 +541,7 @@ impl TextColumnStats {
 				if stats.ngram_types.contains(&NGramType::Bigram) {
 					Some(
 						stats.tokenizer.tokenize(value).tuple_windows().map(
-							|(token_a, token_b)| tangram_text::NGramRef::Bigram(token_a, token_b),
+							|(token_a, token_b)| modelfox_text::NGramRef::Bigram(token_a, token_b),
 						),
 					)
 				} else {

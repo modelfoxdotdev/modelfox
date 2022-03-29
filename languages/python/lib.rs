@@ -7,8 +7,8 @@ use url::Url;
 /**
 */
 #[pymodule]
-#[pyo3(name = "tangram_python")]
-fn tangram(py: Python, m: &PyModule) -> PyResult<()> {
+#[pyo3(name = "modelfox_python")]
+fn modelfox(py: Python, m: &PyModule) -> PyResult<()> {
 	m.add_class::<LoadModelOptions>()?;
 	m.add_class::<Model>()?;
 	m.add_class::<PredictOptions>()?;
@@ -35,18 +35,18 @@ Use this class to load a model, make predictions, and log events to the app.
 #[pyclass]
 #[derive(Debug)]
 struct Model {
-	model: tangram_core::predict::Model,
+	model: modelfox_core::predict::Model,
 	log_queue: Vec<Event>,
-	tangram_url: Url,
+	modelfox_url: Url,
 }
 
 #[pymethods]
 impl Model {
 	/**
-	Load a model from a `.tangram` file at `path`.
+	Load a model from a `.modelfox` file at `path`.
 
 	Args:
-		path (str): The path to the `.tangram` file.
+		path (str): The path to the `.modelfox` file.
 		options (Optional[`LoadModelOptions`]): The options to use when loading the model.
 
 	Returns:
@@ -62,27 +62,27 @@ impl Model {
 	) -> PyResult<Model> {
 		let file = std::fs::File::open(path)?;
 		let bytes = unsafe { Mmap::map(&file)? };
-		let model = tangram_model::from_bytes(&bytes).map_err(TangramError)?;
-		let model = tangram_core::predict::Model::from(model);
-		let tangram_url = options
-			.and_then(|options| options.tangram_url)
-			.unwrap_or_else(|| "https://app.tangram.dev".to_owned());
-		let tangram_url = tangram_url
+		let model = modelfox_model::from_bytes(&bytes).map_err(ModelFoxError)?;
+		let model = modelfox_core::predict::Model::from(model);
+		let modelfox_url = options
+			.and_then(|options| options.modelfox_url)
+			.unwrap_or_else(|| "https://app.modelfox.dev".to_owned());
+		let modelfox_url = modelfox_url
 			.parse()
-			.map_err(|_| TangramError(anyhow!("Failed to parse tangram_url")))?;
+			.map_err(|_| ModelFoxError(anyhow!("Failed to parse modelfox_url")))?;
 		let model = Model {
 			model,
 			log_queue: Vec::new(),
-			tangram_url,
+			modelfox_url,
 		};
 		Ok(model)
 	}
 
 	/**
-	Load a model from bytes instead of a file. You should use this only if you already have a `.tangram` loaded into memory. Otherwise, use `Model.from_path`, which is faster because it memory maps the file.
+	Load a model from bytes instead of a file. You should use this only if you already have a `.modelfox` loaded into memory. Otherwise, use `Model.from_path`, which is faster because it memory maps the file.
 
 	Args:
-		bytes (str): The path to the `.tangram` file.
+		bytes (str): The path to the `.modelfox` file.
 		options (Optional[`LoadModelOptions`]): The options to use when loading the model.
 
 	Returns:
@@ -96,18 +96,18 @@ impl Model {
 		bytes: Vec<u8>,
 		options: Option<LoadModelOptions>,
 	) -> PyResult<Model> {
-		let model = tangram_model::from_bytes(&bytes).map_err(TangramError)?;
-		let model = tangram_core::predict::Model::from(model);
-		let tangram_url = options
-			.and_then(|options| options.tangram_url)
-			.unwrap_or_else(|| "https://app.tangram.dev".to_owned());
-		let tangram_url = tangram_url
+		let model = modelfox_model::from_bytes(&bytes).map_err(ModelFoxError)?;
+		let model = modelfox_core::predict::Model::from(model);
+		let modelfox_url = options
+			.and_then(|options| options.modelfox_url)
+			.unwrap_or_else(|| "https://app.modelfox.dev".to_owned());
+		let modelfox_url = modelfox_url
 			.parse()
-			.map_err(|_| TangramError(anyhow!("Failed to parse tangram_url")))?;
+			.map_err(|_| ModelFoxError(anyhow!("Failed to parse modelfox_url")))?;
 		let model = Model {
 			model,
 			log_queue: Vec::new(),
-			tangram_url,
+			modelfox_url,
 		};
 		Ok(model)
 	}
@@ -141,14 +141,14 @@ impl Model {
 		match input {
 			PredictInputSingleOrMultiple::Single(input) => {
 				let input = input.into();
-				let mut output = tangram_core::predict::predict(model, &[input], &options);
+				let mut output = modelfox_core::predict::predict(model, &[input], &options);
 				let output = output.remove(0);
 				let output = output.into();
 				PredictOutputSingleOrMultiple::Single(output)
 			}
 			PredictInputSingleOrMultiple::Multiple(input) => {
 				let input = input.into_iter().map(Into::into).collect::<Vec<_>>();
-				let output = tangram_core::predict::predict(model, &input, &options);
+				let output = modelfox_core::predict::predict(model, &input, &options);
 				let output = output.into_iter().map(Into::into).collect();
 				PredictOutputSingleOrMultiple::Multiple(output)
 			}
@@ -245,14 +245,14 @@ impl Model {
 	}
 
 	fn log_events(&mut self, events: Vec<Event>) -> PyResult<()> {
-		let mut url = self.tangram_url.clone();
+		let mut url = self.modelfox_url.clone();
 		url.set_path("/track");
-		let body = serde_json::to_vec(&events).map_err(|err| TangramError(err.into()))?;
+		let body = serde_json::to_vec(&events).map_err(|err| ModelFoxError(err.into()))?;
 		reqwest::blocking::Client::new()
 			.post(url)
 			.body(body)
 			.send()
-			.map_err(|err| TangramError(err.into()))?;
+			.map_err(|err| ModelFoxError(err.into()))?;
 		Ok(())
 	}
 
@@ -291,20 +291,20 @@ impl Model {
 These are the options passed when loading a model.
 
 Attributes:
-	tangram_url (Optional[str]): If you are running the app locally or on your own server, use this field to provide the url to it.
+	modelfox_url (Optional[str]): If you are running the app locally or on your own server, use this field to provide the url to it.
 */
 #[pyclass]
 #[derive(Clone, Debug)]
 struct LoadModelOptions {
 	#[pyo3(get, set)]
-	tangram_url: Option<String>,
+	modelfox_url: Option<String>,
 }
 
 #[pymethods]
 impl LoadModelOptions {
 	#[new]
-	fn new(tangram_url: Option<String>) -> LoadModelOptions {
-		LoadModelOptions { tangram_url }
+	fn new(modelfox_url: Option<String>) -> LoadModelOptions {
+		LoadModelOptions { modelfox_url }
 	}
 }
 
@@ -319,9 +319,9 @@ struct PredictInput(BTreeMap<String, PredictInputValue>);
 
 type PredictInputMultiple = Vec<PredictInput>;
 
-impl From<PredictInput> for tangram_core::predict::PredictInput {
-	fn from(value: PredictInput) -> tangram_core::predict::PredictInput {
-		tangram_core::predict::PredictInput(
+impl From<PredictInput> for modelfox_core::predict::PredictInput {
+	fn from(value: PredictInput) -> modelfox_core::predict::PredictInput {
+		modelfox_core::predict::PredictInput(
 			value
 				.0
 				.into_iter()
@@ -338,14 +338,14 @@ enum PredictInputValue {
 	String(String),
 }
 
-impl From<PredictInputValue> for tangram_core::predict::PredictInputValue {
-	fn from(value: PredictInputValue) -> tangram_core::predict::PredictInputValue {
+impl From<PredictInputValue> for modelfox_core::predict::PredictInputValue {
+	fn from(value: PredictInputValue) -> modelfox_core::predict::PredictInputValue {
 		match value {
 			PredictInputValue::Number(value) => {
-				tangram_core::predict::PredictInputValue::Number(value)
+				modelfox_core::predict::PredictInputValue::Number(value)
 			}
 			PredictInputValue::String(value) => {
-				tangram_core::predict::PredictInputValue::String(value)
+				modelfox_core::predict::PredictInputValue::String(value)
 			}
 		}
 	}
@@ -379,9 +379,9 @@ impl PredictOptions {
 	}
 }
 
-impl From<&PredictOptions> for tangram_core::predict::PredictOptions {
-	fn from(value: &PredictOptions) -> tangram_core::predict::PredictOptions {
-		let mut options = tangram_core::predict::PredictOptions::default();
+impl From<&PredictOptions> for modelfox_core::predict::PredictOptions {
+	fn from(value: &PredictOptions) -> modelfox_core::predict::PredictOptions {
+		let mut options = modelfox_core::predict::PredictOptions::default();
 		if let Some(threshold) = value.threshold {
 			options.threshold = threshold;
 		}
@@ -426,16 +426,16 @@ impl IntoPy<PyObject> for PredictOutput {
 	}
 }
 
-impl From<tangram_core::predict::PredictOutput> for PredictOutput {
-	fn from(value: tangram_core::predict::PredictOutput) -> Self {
+impl From<modelfox_core::predict::PredictOutput> for PredictOutput {
+	fn from(value: modelfox_core::predict::PredictOutput) -> Self {
 		match value {
-			tangram_core::predict::PredictOutput::Regression(value) => {
+			modelfox_core::predict::PredictOutput::Regression(value) => {
 				PredictOutput::Regression(value.into())
 			}
-			tangram_core::predict::PredictOutput::BinaryClassification(value) => {
+			modelfox_core::predict::PredictOutput::BinaryClassification(value) => {
 				PredictOutput::BinaryClassification(value.into())
 			}
-			tangram_core::predict::PredictOutput::MulticlassClassification(value) => {
+			modelfox_core::predict::PredictOutput::MulticlassClassification(value) => {
 				PredictOutput::MulticlassClassification(value.into())
 			}
 		}
@@ -459,8 +459,8 @@ struct RegressionPredictOutput {
 	feature_contributions: Option<FeatureContributions>,
 }
 
-impl From<tangram_core::predict::RegressionPredictOutput> for RegressionPredictOutput {
-	fn from(value: tangram_core::predict::RegressionPredictOutput) -> Self {
+impl From<modelfox_core::predict::RegressionPredictOutput> for RegressionPredictOutput {
+	fn from(value: modelfox_core::predict::RegressionPredictOutput) -> Self {
 		RegressionPredictOutput {
 			value: value.value,
 			feature_contributions: value.feature_contributions.map(Into::into),
@@ -488,10 +488,10 @@ struct BinaryClassificationPredictOutput {
 	feature_contributions: Option<FeatureContributions>,
 }
 
-impl From<tangram_core::predict::BinaryClassificationPredictOutput>
+impl From<modelfox_core::predict::BinaryClassificationPredictOutput>
 	for BinaryClassificationPredictOutput
 {
-	fn from(value: tangram_core::predict::BinaryClassificationPredictOutput) -> Self {
+	fn from(value: modelfox_core::predict::BinaryClassificationPredictOutput) -> Self {
 		BinaryClassificationPredictOutput {
 			class_name: value.class_name,
 			probability: value.probability,
@@ -523,10 +523,10 @@ struct MulticlassClassificationPredictOutput {
 	feature_contributions: Option<BTreeMap<String, FeatureContributions>>,
 }
 
-impl From<tangram_core::predict::MulticlassClassificationPredictOutput>
+impl From<modelfox_core::predict::MulticlassClassificationPredictOutput>
 	for MulticlassClassificationPredictOutput
 {
-	fn from(value: tangram_core::predict::MulticlassClassificationPredictOutput) -> Self {
+	fn from(value: modelfox_core::predict::MulticlassClassificationPredictOutput) -> Self {
 		MulticlassClassificationPredictOutput {
 			class_name: value.class_name,
 			probability: value.probability,
@@ -560,8 +560,8 @@ struct FeatureContributions {
 	entries: Vec<FeatureContributionEntry>,
 }
 
-impl From<tangram_core::predict::FeatureContributions> for FeatureContributions {
-	fn from(value: tangram_core::predict::FeatureContributions) -> Self {
+impl From<modelfox_core::predict::FeatureContributions> for FeatureContributions {
+	fn from(value: modelfox_core::predict::FeatureContributions) -> Self {
 		FeatureContributions {
 			baseline_value: value.baseline_value,
 			output_value: value.output_value,
@@ -601,25 +601,25 @@ impl IntoPy<PyObject> for FeatureContributionEntry {
 	}
 }
 
-impl From<tangram_core::predict::FeatureContributionEntry> for FeatureContributionEntry {
-	fn from(value: tangram_core::predict::FeatureContributionEntry) -> Self {
+impl From<modelfox_core::predict::FeatureContributionEntry> for FeatureContributionEntry {
+	fn from(value: modelfox_core::predict::FeatureContributionEntry) -> Self {
 		match value {
-			tangram_core::predict::FeatureContributionEntry::Identity(value) => {
+			modelfox_core::predict::FeatureContributionEntry::Identity(value) => {
 				FeatureContributionEntry::Identity(value.into())
 			}
-			tangram_core::predict::FeatureContributionEntry::Normalized(value) => {
+			modelfox_core::predict::FeatureContributionEntry::Normalized(value) => {
 				FeatureContributionEntry::Normalized(value.into())
 			}
-			tangram_core::predict::FeatureContributionEntry::OneHotEncoded(value) => {
+			modelfox_core::predict::FeatureContributionEntry::OneHotEncoded(value) => {
 				FeatureContributionEntry::OneHotEncoded(value.into())
 			}
-			tangram_core::predict::FeatureContributionEntry::BagOfWords(value) => {
+			modelfox_core::predict::FeatureContributionEntry::BagOfWords(value) => {
 				FeatureContributionEntry::BagOfWords(value.into())
 			}
-			tangram_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(value) => {
+			modelfox_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(value) => {
 				FeatureContributionEntry::BagOfWordsCosineSimilarity(value.into())
 			}
-			tangram_core::predict::FeatureContributionEntry::WordEmbedding(value) => {
+			modelfox_core::predict::FeatureContributionEntry::WordEmbedding(value) => {
 				FeatureContributionEntry::WordEmbedding(value.into())
 			}
 		}
@@ -645,8 +645,8 @@ struct IdentityFeatureContribution {
 	feature_value: f32,
 }
 
-impl From<tangram_core::predict::IdentityFeatureContribution> for IdentityFeatureContribution {
-	fn from(value: tangram_core::predict::IdentityFeatureContribution) -> Self {
+impl From<modelfox_core::predict::IdentityFeatureContribution> for IdentityFeatureContribution {
+	fn from(value: modelfox_core::predict::IdentityFeatureContribution) -> Self {
 		IdentityFeatureContribution {
 			column_name: value.column_name,
 			feature_contribution_value: value.feature_contribution_value,
@@ -674,8 +674,8 @@ struct NormalizedFeatureContribution {
 	feature_contribution_value: f32,
 }
 
-impl From<tangram_core::predict::NormalizedFeatureContribution> for NormalizedFeatureContribution {
-	fn from(value: tangram_core::predict::NormalizedFeatureContribution) -> Self {
+impl From<modelfox_core::predict::NormalizedFeatureContribution> for NormalizedFeatureContribution {
+	fn from(value: modelfox_core::predict::NormalizedFeatureContribution) -> Self {
 		NormalizedFeatureContribution {
 			column_name: value.column_name,
 			feature_value: value.feature_value,
@@ -706,10 +706,10 @@ struct OneHotEncodedFeatureContribution {
 	feature_contribution_value: f32,
 }
 
-impl From<tangram_core::predict::OneHotEncodedFeatureContribution>
+impl From<modelfox_core::predict::OneHotEncodedFeatureContribution>
 	for OneHotEncodedFeatureContribution
 {
-	fn from(value: tangram_core::predict::OneHotEncodedFeatureContribution) -> Self {
+	fn from(value: modelfox_core::predict::OneHotEncodedFeatureContribution) -> Self {
 		OneHotEncodedFeatureContribution {
 			column_name: value.column_name,
 			variant: value.variant,
@@ -741,8 +741,8 @@ struct BagOfWordsFeatureContribution {
 	feature_contribution_value: f32,
 }
 
-impl From<tangram_core::predict::BagOfWordsFeatureContribution> for BagOfWordsFeatureContribution {
-	fn from(value: tangram_core::predict::BagOfWordsFeatureContribution) -> Self {
+impl From<modelfox_core::predict::BagOfWordsFeatureContribution> for BagOfWordsFeatureContribution {
+	fn from(value: modelfox_core::predict::BagOfWordsFeatureContribution) -> Self {
 		BagOfWordsFeatureContribution {
 			column_name: value.column_name,
 			ngram: value.ngram.into(),
@@ -768,11 +768,11 @@ impl IntoPy<PyObject> for NGram {
 	}
 }
 
-impl From<tangram_core::predict::NGram> for NGram {
-	fn from(value: tangram_core::predict::NGram) -> Self {
+impl From<modelfox_core::predict::NGram> for NGram {
+	fn from(value: modelfox_core::predict::NGram) -> Self {
 		match value {
-			tangram_core::predict::NGram::Unigram(token) => NGram::Unigram(token),
-			tangram_core::predict::NGram::Bigram(token_a, token_b) => {
+			modelfox_core::predict::NGram::Unigram(token) => NGram::Unigram(token),
+			modelfox_core::predict::NGram::Bigram(token_a, token_b) => {
 				NGram::Bigram(token_a, token_b)
 			}
 		}
@@ -802,10 +802,10 @@ struct BagOfWordsCosineSimilarityFeatureContribution {
 	feature_contribution_value: f32,
 }
 
-impl From<tangram_core::predict::BagOfWordsCosineSimilarityFeatureContribution>
+impl From<modelfox_core::predict::BagOfWordsCosineSimilarityFeatureContribution>
 	for BagOfWordsCosineSimilarityFeatureContribution
 {
-	fn from(value: tangram_core::predict::BagOfWordsCosineSimilarityFeatureContribution) -> Self {
+	fn from(value: modelfox_core::predict::BagOfWordsCosineSimilarityFeatureContribution) -> Self {
 		BagOfWordsCosineSimilarityFeatureContribution {
 			column_name_a: value.column_name_a,
 			column_name_b: value.column_name_b,
@@ -834,10 +834,10 @@ struct WordEmbeddingFeatureContribution {
 	feature_contribution_value: f32,
 }
 
-impl From<tangram_core::predict::WordEmbeddingFeatureContribution>
+impl From<modelfox_core::predict::WordEmbeddingFeatureContribution>
 	for WordEmbeddingFeatureContribution
 {
-	fn from(value: tangram_core::predict::WordEmbeddingFeatureContribution) -> Self {
+	fn from(value: modelfox_core::predict::WordEmbeddingFeatureContribution) -> Self {
 		WordEmbeddingFeatureContribution {
 			column_name: value.column_name,
 			value_index: value.value_index,
@@ -940,16 +940,16 @@ repr!(RegressionPredictOutput);
 repr!(BinaryClassificationPredictOutput);
 repr!(MulticlassClassificationPredictOutput);
 
-struct TangramError(anyhow::Error);
+struct ModelFoxError(anyhow::Error);
 
-impl std::fmt::Display for TangramError {
+impl std::fmt::Display for ModelFoxError {
 	fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
 		self.0.fmt(f)
 	}
 }
 
-impl From<TangramError> for PyErr {
-	fn from(error: TangramError) -> PyErr {
+impl From<ModelFoxError> for PyErr {
+	fn from(error: ModelFoxError) -> PyErr {
 		PyErr::new::<pyo3::exceptions::PyTypeError, _>(error.to_string())
 	}
 }

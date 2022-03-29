@@ -1,4 +1,4 @@
-name: tangram_tree_benchmarks
+name: modelfox_tree_benchmarks
 channels:
   - conda-forge
   - h2oai

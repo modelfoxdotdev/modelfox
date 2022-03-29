@@ -1,24 +1,24 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_app_date_window::{DateWindow, DateWindowInterval};
-use tangram_app_layouts::{
+use modelfox_app_date_window::{DateWindow, DateWindowInterval};
+use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-use tangram_app_ui::{
+use modelfox_app_ui::{
 	class_select_field::ClassSelectField,
 	colors::{PRODUCTION_COLOR, TRAINING_COLOR},
 	date_window_select_field::DateWindowSelectField,
 	metrics_row::MetricsRow,
 	time::interval_chart_title,
 };
-use tangram_charts::{
+use modelfox_charts::{
 	common::GridLineInterval,
 	components::LineChart,
 	line_chart::{LineChartPoint, LineChartSeries, LineStyle, PointStyle},
 };
-use tangram_finite::Finite;
-use tangram_ui as ui;
+use modelfox_finite::Finite;
+use modelfox_ui as ui;
 
 pub struct Page {
 	pub model_layout_info: ModelLayoutInfo,
@@ -103,7 +103,7 @@ pub struct TrainingProductionMetrics {
 impl Component for Page {
 	fn into_node(self) -> Node {
 		Document::new()
-			.client("tangram_app_production_class_metrics_client")
+			.client("modelfox_app_production_class_metrics_client")
 			.child(ModelLayout::new(self.model_layout_info).child(self.inner))
 			.into_node()
 	}

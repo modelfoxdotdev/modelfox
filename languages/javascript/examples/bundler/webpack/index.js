@@ -1,11 +1,11 @@
-import * as tangram from "@tangramdotdev/tangram"
-import heartDiseaseModelUrl from "./heart_disease.tangram"
+import * as modelfox from "@modelfoxdotdev/modelfox"
+import heartDiseaseModelUrl from "./heart_disease.modelfox"
 
 // Download the model.
 let modelResponse = await fetch(heartDiseaseModelUrl)
 let modelData = await modelResponse.arrayBuffer()
 // Load the model.
-let model = new tangram.Model(modelData)
+let model = new modelfox.Model(modelData)
 
 // Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
 let input = {

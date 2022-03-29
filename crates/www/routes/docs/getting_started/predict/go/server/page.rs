@@ -1,7 +1,7 @@
 use pinwheel::prelude::*;
 use std::borrow::Cow;
-use tangram_ui as ui;
-use tangram_www_layouts::{
+use modelfox_ui as ui;
+use modelfox_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage, GettingStartedPage, PredictPage, PrevNextButtons},
 	document::Document,
 };
@@ -10,7 +10,7 @@ pub struct Page;
 
 impl Component for Page {
 	fn into_node(self) -> Node {
-		let predict_text = ui::P::new().child("First, import the tangram library and load the model file. Then, make an object with info for a new patient that matches the CSV, excluding the diagnosis column. Finally, call predict and print out the result.");
+		let predict_text = ui::P::new().child("First, import the modelfox library and load the model file. Then, make an object with info for a new patient that matches the CSV, excluding the diagnosis column. Finally, call predict and print out the result.");
 		Document::new()
 			.child(
 				DocsLayout::new()
@@ -45,7 +45,7 @@ impl Component for Install {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				go get -u github.com/tangramdotdev/tangram-go
+				go get -u github.com/modelfoxdotdev/modelfox-go
 			"#
 		);
 		ui::Window::new()
@@ -60,10 +60,10 @@ impl Component for Predict {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				import "github.com/tangramdotdev/tangram/languages/go"
+				import "github.com/modelfoxdotdev/modelfox/languages/go"
 
 				// Load the model from the path.
-				model, err := tangram.LoadModelFromPath("./heart_disease.tangram", nil)
+				model, err := modelfox.LoadModelFromPath("./heart_disease.modelfox", nil)
 				if err != nil {
 					log.Fatal(err)
 				}
@@ -73,7 +73,7 @@ impl Component for Predict {
 				// Create an example input matching the schema of the CSV file the model was trained on.
 				// Here the data is just hard-coded, but in your application you will probably get this
 				// from a database or user input.
-				input := tangram.Input{
+				input := modelfox.Input{
 					"age":                                  63,
 					"gender":                               "male",
 					"chest_pain":                           "typical angina",

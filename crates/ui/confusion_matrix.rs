@@ -1,7 +1,7 @@
 use crate as ui;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_number_formatter::PercentFormatter;
+use modelfox_number_formatter::PercentFormatter;
 
 // |---------------------------------------------------------|
 // |           ||     |                Actual                |

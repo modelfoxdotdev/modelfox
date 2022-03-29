@@ -1,5 +1,5 @@
 use pinwheel::prelude::*;
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct Pagination {
 	pub first_offset: Option<usize>,

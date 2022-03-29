@@ -13,7 +13,7 @@ use tempfile::tempdir;
 pub struct Args {
 	#[clap(long)]
 	version: String,
-	#[clap(long, default_value = "https://pkgs.tangram.dev")]
+	#[clap(long, default_value = "https://pkgs.modelfox.dev")]
 	pkgs_url: String,
 }
 
@@ -44,15 +44,15 @@ fn compile() {
 	}
 	args.extend([
 		"--package",
-		"tangram_cli",
+		"modelfox_cli",
 		"--package",
-		"libtangram",
+		"libmodelfox",
 		"--package",
-		"tangram_elixir",
+		"modelfox_elixir",
 		"--package",
-		"tangram_node",
+		"modelfox_node",
 		"--package",
-		"tangram_python",
+		"modelfox_python",
 	]);
 	cmd("cargo", args).run().unwrap();
 	cmd!(
@@ -62,7 +62,7 @@ fn compile() {
 		"--target",
 		"wasm32-unknown-unknown",
 		"--package",
-		"tangram_wasm",
+		"modelfox_wasm",
 	)
 	.run()
 	.unwrap();
@@ -77,46 +77,46 @@ fn compile() {
 		let dist_target_path = compile_path.join(target.target_name());
 		std::fs::create_dir(&dist_target_path).unwrap();
 		// cli
-		let tangram_cli_src = cargo_artifact_path.join(target_file_names.tangram_cli_file_name);
-		let tangram_cli_dst = dist_target_path.join(target_file_names.tangram_cli_file_name);
-		std::fs::copy(tangram_cli_src, tangram_cli_dst).unwrap();
-		// tangram.h
-		let tangram_h_dst = dist_target_path.join(target_file_names.tangram_h_file_name);
+		let modelfox_cli_src = cargo_artifact_path.join(target_file_names.modelfox_cli_file_name);
+		let modelfox_cli_dst = dist_target_path.join(target_file_names.modelfox_cli_file_name);
+		std::fs::copy(modelfox_cli_src, modelfox_cli_dst).unwrap();
+		// modelfox.h
+		let modelfox_h_dst = dist_target_path.join(target_file_names.modelfox_h_file_name);
 		cbindgen::generate(root_path.join("languages/c"))
 			.unwrap()
-			.write(std::fs::File::create(tangram_h_dst).unwrap());
-		// libtangram dynamic
+			.write(std::fs::File::create(modelfox_h_dst).unwrap());
+		// libmodelfox dynamic
 		std::fs::copy(
-			cargo_artifact_path.join(target_file_names.libtangram_dynamic_file_name),
-			dist_target_path.join(target_file_names.libtangram_dynamic_file_name),
+			cargo_artifact_path.join(target_file_names.libmodelfox_dynamic_file_name),
+			dist_target_path.join(target_file_names.libmodelfox_dynamic_file_name),
 		)
 		.unwrap();
-		// libtangram static
+		// libmodelfox static
 		std::fs::copy(
-			cargo_artifact_path.join(target_file_names.libtangram_static_file_name),
-			dist_target_path.join(target_file_names.libtangram_static_file_name),
+			cargo_artifact_path.join(target_file_names.libmodelfox_static_file_name),
+			dist_target_path.join(target_file_names.libmodelfox_static_file_name),
 		)
 		.unwrap();
-		// tangram_elixir
+		// modelfox_elixir
 		std::fs::copy(
-			cargo_artifact_path.join(target_file_names.tangram_elixir_file_name),
-			dist_target_path.join(target_file_names.tangram_elixir_file_name),
+			cargo_artifact_path.join(target_file_names.modelfox_elixir_file_name),
+			dist_target_path.join(target_file_names.modelfox_elixir_file_name),
 		)
 		.unwrap();
-		// tangram_node
+		// modelfox_node
 		std::fs::copy(
-			cargo_artifact_path.join(target_file_names.tangram_node_file_name),
-			dist_target_path.join(target_file_names.tangram_node_file_name),
+			cargo_artifact_path.join(target_file_names.modelfox_node_file_name),
+			dist_target_path.join(target_file_names.modelfox_node_file_name),
 		)
 		.unwrap();
-		// tangram_python
+		// modelfox_python
 		std::fs::copy(
-			cargo_artifact_path.join(target_file_names.tangram_python_file_name),
-			dist_target_path.join(target_file_names.tangram_python_file_name),
+			cargo_artifact_path.join(target_file_names.modelfox_python_file_name),
+			dist_target_path.join(target_file_names.modelfox_python_file_name),
 		)
 		.unwrap();
 	}
-	// tangram_wasm
+	// modelfox_wasm
 	let cargo_artifact_path = root_path
 		.join("target")
 		.join("wasm32-unknown-unknown")
@@ -124,8 +124,8 @@ fn compile() {
 	let dist_target_path = compile_path.join("wasm32");
 	std::fs::create_dir(&dist_target_path).unwrap();
 	std::fs::copy(
-		cargo_artifact_path.join("tangram_wasm.wasm"),
-		dist_target_path.join("tangram_wasm.wasm"),
+		cargo_artifact_path.join("modelfox_wasm.wasm"),
+		dist_target_path.join("modelfox_wasm.wasm"),
 	)
 	.unwrap();
 }
@@ -142,14 +142,14 @@ fn build_debs(version: &str) {
 		// Create /usr/bin in the deb directory.
 		let bin_path = deb_path.join("usr").join("bin");
 		std::fs::create_dir_all(&bin_path).unwrap();
-		// Copy the tangram cli to the deb's /usr/bin.
-		let tangram_cli_file_name = TargetFileNames::for_target(target).tangram_cli_file_name;
-		let tangram_cli_path = root_path
+		// Copy the modelfox cli to the deb's /usr/bin.
+		let modelfox_cli_file_name = TargetFileNames::for_target(target).modelfox_cli_file_name;
+		let modelfox_cli_path = root_path
 			.join("dist")
 			.join("compile")
 			.join(target.target_name())
-			.join(tangram_cli_file_name);
-		std::fs::copy(tangram_cli_path, bin_path.join(tangram_cli_file_name)).unwrap();
+			.join(modelfox_cli_file_name);
+		std::fs::copy(modelfox_cli_path, bin_path.join(modelfox_cli_file_name)).unwrap();
 		// Create the control file.
 		let debian_path = deb_path.join("DEBIAN");
 		std::fs::create_dir_all(&debian_path).unwrap();
@@ -161,12 +161,12 @@ fn build_debs(version: &str) {
 		};
 		let control = formatdoc!(
 			r#"
-				Package: tangram
+				Package: modelfox
 				Architecture: {architecture}
 				Version: {version}
-				Maintainer: Tangram <root@tangram.dev>
-				Homepage: https://www.tangram.dev
-				Description: Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.
+				Maintainer: ModelFox <root@modelfox.dev>
+				Homepage: https://www.modelfox.dev
+				Description: ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models.
 			"#,
 			architecture = architecture,
 			version = version,
@@ -174,7 +174,7 @@ fn build_debs(version: &str) {
 		std::fs::write(&control_path, &control).unwrap();
 		// Run dpkg-deb
 		let deb_file_name = format!(
-			"tangram_{version}_{architecture}.deb",
+			"modelfox_{version}_{architecture}.deb",
 			version = version,
 			architecture = architecture,
 		);
@@ -199,26 +199,26 @@ fn build_rpms(version: &str) {
 			std::fs::create_dir(rpm_path.join(subdir)).unwrap();
 		}
 		// Make the tar.
-		let tangram_cli_file_name = TargetFileNames::for_target(target).tangram_cli_file_name;
-		let tangram_cli_path = compile_path
+		let modelfox_cli_file_name = TargetFileNames::for_target(target).modelfox_cli_file_name;
+		let modelfox_cli_path = compile_path
 			.join(target.target_name())
-			.join(tangram_cli_file_name);
-		let tangram_path_in_tar =
-			PathBuf::from(format!("tangram-{version}/tangram", version = version));
+			.join(modelfox_cli_file_name);
+		let modelfox_path_in_tar =
+			PathBuf::from(format!("modelfox-{version}/modelfox", version = version));
 		let sources_path = rpm_path.join("SOURCES");
-		let tar_path = sources_path.join("tangram.tar.gz");
-		tar(vec![(tangram_cli_path, tangram_path_in_tar)], &tar_path);
+		let tar_path = sources_path.join("modelfox.tar.gz");
+		tar(vec![(modelfox_cli_path, modelfox_path_in_tar)], &tar_path);
 		// Write the spec file.
 		let spec = formatdoc!(
 			r#"
 				%global __strip true
 
-				Name: tangram
+				Name: modelfox
 				Version: {version}
 				Release: 1
-				Summary: Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.
+				Summary: ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models.
 				License: MIT
-				Source0: tangram.tar.gz
+				Source0: modelfox.tar.gz
 
 				%description
 				%summary
@@ -228,14 +228,14 @@ fn build_rpms(version: &str) {
 
 				%install
 				mkdir -p %buildroot/usr/bin
-				install -m 755 tangram %buildroot/usr/bin/tangram
+				install -m 755 modelfox %buildroot/usr/bin/modelfox
 
 				%files
-				%attr(0755, root, root) /usr/bin/tangram
+				%attr(0755, root, root) /usr/bin/modelfox
 			"#,
 			version = version,
 		);
-		let spec_path = rpm_path.join("SPECS/tangram.spec");
+		let spec_path = rpm_path.join("SPECS/modelfox.spec");
 		std::fs::write(&spec_path, spec).unwrap();
 		// Run rpmbuild.
 		let target = match target {
@@ -258,12 +258,12 @@ fn build_rpms(version: &str) {
 		.unwrap();
 		// Move the rpm to the release directory.
 		let src_rpm_file_name = format!(
-			"tangram-{version}-1.{target}.rpm",
+			"modelfox-{version}-1.{target}.rpm",
 			version = version,
 			target = target,
 		);
 		let dst_rpm_file_name = format!(
-			"tangram_{version}_{target}.rpm",
+			"modelfox_{version}_{target}.rpm",
 			version = version,
 			target = target,
 		);
@@ -280,21 +280,21 @@ fn build_containers(version: &str) {
 	let compile_path = root_path.join("dist").join("compile");
 	for target in [Target::AArch64LinuxMusl, Target::X8664LinuxMusl] {
 		let dockerfile_path = tempfile::NamedTempFile::new().unwrap().into_temp_path();
-		let tangram_cli_file_name = TargetFileNames::for_target(target).tangram_cli_file_name;
-		let tangram_cli_path = compile_path
+		let modelfox_cli_file_name = TargetFileNames::for_target(target).modelfox_cli_file_name;
+		let modelfox_cli_path = compile_path
 			.strip_prefix(&root_path)
 			.unwrap()
 			.join(target.target_name())
-			.join(tangram_cli_file_name);
-		let tangram_cli_path = tangram_cli_path.display();
+			.join(modelfox_cli_file_name);
+		let modelfox_cli_path = modelfox_cli_path.display();
 		let dockerfile = formatdoc!(
 			r#"
 				FROM docker.io/alpine
 				WORKDIR /
-				COPY {tangram_cli_path} .
-				ENTRYPOINT ["/tangram"]
+				COPY {modelfox_cli_path} .
+				ENTRYPOINT ["/modelfox"]
 			"#,
-			tangram_cli_path = tangram_cli_path,
+			modelfox_cli_path = modelfox_cli_path,
 		);
 		std::fs::write(&dockerfile_path, &dockerfile).unwrap();
 		let platform = match target.arch() {
@@ -302,7 +302,7 @@ fn build_containers(version: &str) {
 			Arch::X8664 => "linux/amd64",
 		};
 		let tag = format!(
-			"docker.io/tangramdotdev/tangram:{version}",
+			"docker.io/modelfoxdotdev/modelfox:{version}",
 			version = version,
 		);
 		cmd!(
@@ -398,7 +398,7 @@ fn alpine(
 		let src_path = src_tempdir.path();
 		let dst_tempdir = tempdir().unwrap();
 		let dst_path = dst_tempdir.path();
-		std::fs::copy(alpine_public_key_path, src_path.join("tangram.rsa")).unwrap();
+		std::fs::copy(alpine_public_key_path, src_path.join("modelfox.rsa")).unwrap();
 		let apkbuild_path = src_path.join("APKBUILD");
 		let arch = match target.arch() {
 			Arch::AArch64 => "aarch64",
@@ -406,16 +406,16 @@ fn alpine(
 		};
 		let apkbuild = formatdoc!(
 			r#"
-				# Contributor: Tangram <root@tangram.dev>
-				# Maintainer: Tangram <root@tangram.dev>
-				pkgname=tangram
+				# Contributor: ModelFox <root@modelfox.dev>
+				# Maintainer: ModelFox <root@modelfox.dev>
+				pkgname=modelfox
 				pkgver={version}
 				pkgrel=1
-				pkgdesc="Tangram makes it easy for programmers to train, deploy, and monitor machine learning models."
-				url="https://www.tangram.dev"
+				pkgdesc="ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models."
+				url="https://www.modelfox.dev"
 				arch={arch}
 				license="MIT"
-				source="tangram"
+				source="modelfox"
 				options="!strip"
 
 				check() {{
@@ -423,19 +423,19 @@ fn alpine(
 				}}
 
 				package() {{
-					install -D -m 755 "$srcdir"/tangram "$pkgdir"/usr/bin/tangram
+					install -D -m 755 "$srcdir"/modelfox "$pkgdir"/usr/bin/modelfox
 				}}
 			"#,
 			version = version,
 			arch = arch,
 		);
 		std::fs::write(&apkbuild_path, &apkbuild).unwrap();
-		let tangram_cli_file_name = TargetFileNames::for_target(target).tangram_cli_file_name;
-		let tangram_cli_dst_path = src_path.join("tangram");
-		let tangram_cli_path = compile_path
+		let modelfox_cli_file_name = TargetFileNames::for_target(target).modelfox_cli_file_name;
+		let modelfox_cli_dst_path = src_path.join("modelfox");
+		let modelfox_cli_path = compile_path
 			.join(target.target_name())
-			.join(tangram_cli_file_name);
-		std::fs::copy(tangram_cli_path, &tangram_cli_dst_path).unwrap();
+			.join(modelfox_cli_file_name);
+		std::fs::copy(modelfox_cli_path, &modelfox_cli_dst_path).unwrap();
 		cmd!("abuild", "-d", "-P", &dst_path, "checksum", "all")
 			.dir(&src_path)
 			.env("CBUILD", arch)
@@ -483,7 +483,7 @@ fn deb(
 		.cloned()
 		.map(|arch| {
 			let path = debs_path.join(format!(
-				"tangram_{version}_{arch}.deb",
+				"modelfox_{version}_{arch}.deb",
 				version = version,
 				arch = arch,
 			));
@@ -514,7 +514,7 @@ fn deb(
 			));
 			let list_file = formatdoc!(
 				r#"
-					# tangram packages for {distribution} {distribution_version}
+					# modelfox packages for {distribution} {distribution_version}
 					deb {pkgs_url}/stable/{distribution} {distribution_version} main
 				"#,
 				distribution = distribution,
@@ -559,17 +559,17 @@ fn deb(
 					let sha256 = hex::encode(Sha256::digest(&deb_bytes));
 					let packages_entry = formatdoc!(
 						r#"
-							Package: tangram
+							Package: modelfox
 							Version: {deb_version}
 							Architecture: {arch}
-							Maintainer: Tangram <root@tangram.dev>
-							Filename: pool/tangram_{version}_{arch}.deb
+							Maintainer: ModelFox <root@modelfox.dev>
+							Filename: pool/modelfox_{version}_{arch}.deb
 							Size: {size}
 							MD5sum: {md5}
 							SHA1: {sha1}
 							SHA256: {sha256}
-							Homepage: https://www.tangram.dev
-							Description: Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.
+							Homepage: https://www.modelfox.dev
+							Description: ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models.
 						"#,
 						deb_version = deb_version,
 						arch = arch,
@@ -625,7 +625,7 @@ fn deb(
 					Architectures: amd64 arm64
 					Components: main
 					Date: {date}
-					Description: Packages from Tangram, Inc. (https://www.tangram.dev)
+					Description: Packages from ModelFox, Inc. (https://www.modelfox.dev)
 					MD5Sum:
 					{md5}
 					SHA1:
@@ -692,7 +692,7 @@ fn rpm(
 		.cloned()
 		.map(|target| {
 			let path = rpms_path.join(format!(
-				"tangram_{version}_{target}.rpm",
+				"modelfox_{version}_{target}.rpm",
 				version = version,
 				target = target,
 			));
@@ -712,14 +712,14 @@ fn rpm(
 			.join(distribution_version.unwrap_or(""));
 		std::fs::create_dir_all(&repo_path).unwrap();
 		// Create the .repo file.
-		let repo_file_path = repo_path.join("tangram.repo");
+		let repo_file_path = repo_path.join("modelfox.repo");
 		let distribution_version_with_leading_slash = distribution_version
 			.map(|v| format!("/{v}", v = v))
 			.unwrap_or_else(|| "".to_owned());
 		let repo_file = formatdoc!(
 			r#"
-				[tangram]
-				name=Tangram
+				[modelfox]
+				name=ModelFox
 				baseurl={pkgs_url}/stable/{distribution}{distribution_version_with_leading_slash}/$basearch
 				enabled=1
 				type=rpm
@@ -768,46 +768,46 @@ fn build_release(version: &str) {
 	let compile_path = root_path.join("dist").join("compile");
 	let release_path = root_path.join("dist").join("release");
 	clean_and_create(&release_path);
-	// tangram_cli
+	// modelfox_cli
 	for target in TARGETS {
-		let tangram_cli_file_name = TargetFileNames::for_target(target).tangram_cli_file_name;
-		let tangram_cli_path = compile_path
+		let modelfox_cli_file_name = TargetFileNames::for_target(target).modelfox_cli_file_name;
+		let modelfox_cli_path = compile_path
 			.join(target.target_name())
-			.join(tangram_cli_file_name);
+			.join(modelfox_cli_file_name);
 		let target_name = target.target_name();
 		let output_path = release_path.join(format!(
-			"tangram_cli_{version}_{target_name}.tar.gz",
+			"modelfox_cli_{version}_{target_name}.tar.gz",
 			version = version,
 			target_name = target_name,
 		));
 		let inputs = vec![(
-			tangram_cli_path.clone(),
-			PathBuf::from(tangram_cli_file_name),
+			modelfox_cli_path.clone(),
+			PathBuf::from(modelfox_cli_file_name),
 		)];
 		tar(inputs, &output_path);
 	}
-	// libtangram
+	// libmodelfox
 	for target in TARGETS {
 		let target_file_names = TargetFileNames::for_target(target);
 		let target_path = compile_path.join(target.target_name());
 		let target_name = target.target_name();
 		let output_path = release_path.join(format!(
-			"libtangram_{version}_{target_name}.tar.gz",
+			"libmodelfox_{version}_{target_name}.tar.gz",
 			version = version,
 			target_name = target_name,
 		));
 		let inputs = vec![
 			(
-				target_path.join(target_file_names.tangram_h_file_name),
-				PathBuf::from(target_file_names.tangram_h_file_name),
+				target_path.join(target_file_names.modelfox_h_file_name),
+				PathBuf::from(target_file_names.modelfox_h_file_name),
 			),
 			(
-				target_path.join(target_file_names.libtangram_dynamic_file_name),
-				PathBuf::from(target_file_names.libtangram_dynamic_file_name),
+				target_path.join(target_file_names.libmodelfox_dynamic_file_name),
+				PathBuf::from(target_file_names.libmodelfox_dynamic_file_name),
 			),
 			(
-				target_path.join(target_file_names.libtangram_static_file_name),
-				PathBuf::from(target_file_names.libtangram_static_file_name),
+				target_path.join(target_file_names.libmodelfox_static_file_name),
+				PathBuf::from(target_file_names.libmodelfox_static_file_name),
 			),
 		];
 		tar(inputs, &output_path);
@@ -897,13 +897,13 @@ impl Target {
 }
 
 pub struct TargetFileNames {
-	pub tangram_cli_file_name: &'static str,
-	pub tangram_h_file_name: &'static str,
-	pub libtangram_dynamic_file_name: &'static str,
-	pub libtangram_static_file_name: &'static str,
-	pub tangram_elixir_file_name: &'static str,
-	pub tangram_node_file_name: &'static str,
-	pub tangram_python_file_name: &'static str,
+	pub modelfox_cli_file_name: &'static str,
+	pub modelfox_h_file_name: &'static str,
+	pub libmodelfox_dynamic_file_name: &'static str,
+	pub libmodelfox_static_file_name: &'static str,
+	pub modelfox_elixir_file_name: &'static str,
+	pub modelfox_node_file_name: &'static str,
+	pub modelfox_python_file_name: &'static str,
 }
 
 impl TargetFileNames {
@@ -913,40 +913,40 @@ impl TargetFileNames {
 			| Target::AArch64LinuxGnu
 			| Target::X8664LinuxMusl
 			| Target::AArch64LinuxMusl => TargetFileNames {
-				tangram_cli_file_name: "tangram",
-				tangram_h_file_name: "tangram.h",
-				libtangram_dynamic_file_name: "libtangram.so",
-				libtangram_static_file_name: "libtangram.a",
-				tangram_elixir_file_name: "libtangram_elixir.so",
-				tangram_node_file_name: "libtangram_node.so",
-				tangram_python_file_name: "libtangram_python.so",
+				modelfox_cli_file_name: "modelfox",
+				modelfox_h_file_name: "modelfox.h",
+				libmodelfox_dynamic_file_name: "libmodelfox.so",
+				libmodelfox_static_file_name: "libmodelfox.a",
+				modelfox_elixir_file_name: "libmodelfox_elixir.so",
+				modelfox_node_file_name: "libmodelfox_node.so",
+				modelfox_python_file_name: "libmodelfox_python.so",
 			},
 			Target::X8664MacOs | Target::AArch64MacOs => TargetFileNames {
-				tangram_cli_file_name: "tangram",
-				tangram_h_file_name: "tangram.h",
-				libtangram_dynamic_file_name: "libtangram.dylib",
-				libtangram_static_file_name: "libtangram.a",
-				tangram_elixir_file_name: "libtangram_elixir.dylib",
-				tangram_node_file_name: "libtangram_node.dylib",
-				tangram_python_file_name: "libtangram_python.dylib",
+				modelfox_cli_file_name: "modelfox",
+				modelfox_h_file_name: "modelfox.h",
+				libmodelfox_dynamic_file_name: "libmodelfox.dylib",
+				libmodelfox_static_file_name: "libmodelfox.a",
+				modelfox_elixir_file_name: "libmodelfox_elixir.dylib",
+				modelfox_node_file_name: "libmodelfox_node.dylib",
+				modelfox_python_file_name: "libmodelfox_python.dylib",
 			},
 			Target::X8664WindowsMsvc => TargetFileNames {
-				tangram_cli_file_name: "tangram.exe",
-				tangram_h_file_name: "tangram.h",
-				libtangram_dynamic_file_name: "tangram.dll",
-				libtangram_static_file_name: "tangram.lib",
-				tangram_elixir_file_name: "tangram_elixir.dll",
-				tangram_node_file_name: "tangram_node.dll",
-				tangram_python_file_name: "tangram_python.dll",
+				modelfox_cli_file_name: "modelfox.exe",
+				modelfox_h_file_name: "modelfox.h",
+				libmodelfox_dynamic_file_name: "modelfox.dll",
+				libmodelfox_static_file_name: "modelfox.lib",
+				modelfox_elixir_file_name: "modelfox_elixir.dll",
+				modelfox_node_file_name: "modelfox_node.dll",
+				modelfox_python_file_name: "modelfox_python.dll",
 			},
 			Target::X8664WindowsGnu => TargetFileNames {
-				tangram_cli_file_name: "tangram.exe",
-				tangram_h_file_name: "tangram.h",
-				libtangram_dynamic_file_name: "tangram.dll",
-				libtangram_static_file_name: "libtangram.a",
-				tangram_elixir_file_name: "tangram_elixir.dll",
-				tangram_node_file_name: "tangram_node.dll",
-				tangram_python_file_name: "tangram_python.dll",
+				modelfox_cli_file_name: "modelfox.exe",
+				modelfox_h_file_name: "modelfox.h",
+				libmodelfox_dynamic_file_name: "modelfox.dll",
+				libmodelfox_static_file_name: "libmodelfox.a",
+				modelfox_elixir_file_name: "modelfox_elixir.dll",
+				modelfox_node_file_name: "modelfox_node.dll",
+				modelfox_python_file_name: "modelfox_python.dll",
 			},
 		}
 	}

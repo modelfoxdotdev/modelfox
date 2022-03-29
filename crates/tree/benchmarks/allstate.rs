@@ -2,9 +2,9 @@ use ndarray::prelude::*;
 use rayon::prelude::*;
 use serde_json::json;
 use std::{collections::BTreeMap, path::Path};
-use tangram_table::prelude::*;
-use tangram_tree::Progress;
-use tangram_zip::pzip;
+use modelfox_table::prelude::*;
+use modelfox_tree::Progress;
+use modelfox_zip::pzip;
 
 fn main() {
 	// Load the data.
@@ -546,7 +546,7 @@ fn main() {
 	.iter()
 	.map(ToString::to_string)
 	.collect();
-	let options = tangram_table::FromCsvOptions {
+	let options = modelfox_table::FromCsvOptions {
 		column_types: Some(BTreeMap::from([
 			("row_id".to_owned(), TableColumnType::Number),
 			("household_id".to_owned(), TableColumnType::Number),
@@ -679,19 +679,19 @@ fn main() {
 	let labels_test = labels_test.as_number().unwrap();
 
 	// Train the model.
-	let train_options = tangram_tree::TrainOptions {
-		binned_features_layout: tangram_tree::BinnedFeaturesLayout::RowMajor,
+	let train_options = modelfox_tree::TrainOptions {
+		binned_features_layout: modelfox_tree::BinnedFeaturesLayout::RowMajor,
 		learning_rate: 0.1,
 		max_leaf_nodes: 255,
 		max_rounds: 100,
 		..Default::default()
 	};
-	let train_output = tangram_tree::Regressor::train(
+	let train_output = modelfox_tree::Regressor::train(
 		features_train.view(),
 		labels_train.view(),
 		&train_options,
 		Progress {
-			kill_chip: &tangram_kill_chip::KillChip::default(),
+			kill_chip: &modelfox_kill_chip::KillChip::default(),
 			handle_progress_event: &mut |_| {},
 		},
 	);
@@ -712,8 +712,8 @@ fn main() {
 	});
 
 	// Compute metrics.
-	let mut metrics = tangram_metrics::RegressionMetrics::new();
-	metrics.update(tangram_metrics::RegressionMetricsInput {
+	let mut metrics = modelfox_metrics::RegressionMetrics::new();
+	metrics.update(modelfox_metrics::RegressionMetricsInput {
 		predictions: predictions.as_slice().unwrap(),
 		labels: labels_test.view().as_slice(),
 	});

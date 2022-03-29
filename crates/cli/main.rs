@@ -1,13 +1,13 @@
-//! This module contains the main entrypoint to the tangram cli.
+//! This module contains the main entrypoint to the modelfox cli.
 
 use clap::Parser;
 use colored::Colorize;
 use std::path::PathBuf;
 use tracing_subscriber::prelude::*;
 
-#[cfg(feature = "tangram_app")]
+#[cfg(feature = "modelfox_app")]
 mod app;
-#[cfg(feature = "tangram_app")]
+#[cfg(feature = "modelfox_app")]
 mod migrate;
 #[cfg(feature = "train")]
 mod predict;
@@ -35,10 +35,10 @@ enum Subcommand {
 	#[cfg(feature = "train")]
 	#[clap(name = "predict")]
 	Predict(Box<PredictArgs>),
-	#[cfg(feature = "tangram_app")]
+	#[cfg(feature = "modelfox_app")]
 	#[clap(name = "app")]
 	App(Box<AppArgs>),
-	#[cfg(feature = "tangram_app")]
+	#[cfg(feature = "modelfox_app")]
 	#[clap(name = "migrate")]
 	Migrate(Box<MigrateArgs>),
 	#[cfg(feature = "serve")]
@@ -78,7 +78,7 @@ pub struct TrainArgs {
 	target: String,
 	#[clap(short, long, help = "the path to a config file")]
 	config: Option<PathBuf>,
-	#[clap(short, long, help = "the path to write the .tangram file to")]
+	#[clap(short, long, help = "the path to write the .modelfox file to")]
 	output: Option<PathBuf>,
 	#[clap(
 		long = "no-progress",
@@ -119,7 +119,7 @@ pub struct PredictArgs {
 	threshold: Option<f32>,
 }
 
-#[cfg(feature = "tangram_app")]
+#[cfg(feature = "modelfox_app")]
 #[derive(Parser)]
 #[clap(about = "Run the app.", long_about = "Run the app.")]
 pub struct AppArgs {
@@ -127,7 +127,7 @@ pub struct AppArgs {
 	config: Option<PathBuf>,
 }
 
-#[cfg(feature = "tangram_app")]
+#[cfg(feature = "modelfox_app")]
 #[derive(Parser)]
 #[clap(
 	about = "Migrate your app database.",
@@ -142,7 +142,7 @@ pub struct MigrateArgs {
 #[derive(Parser)]
 #[clap(
 	about = "Serve predictions via HTTP",
-	long_about = "Create HTTP server exposing an endpoint for running predictions against a Tangram model"
+	long_about = "Create HTTP server exposing an endpoint for running predictions against a ModelFox model"
 )]
 pub struct ServeArgs {
 	#[clap(
@@ -155,7 +155,7 @@ pub struct ServeArgs {
 	#[clap(
 		short,
 		long,
-		help = "Path to the `.tangram` file containing the model to serve"
+		help = "Path to the `.modelfox` file containing the model to serve"
 	)]
 	model: PathBuf,
 	#[clap(short, long, default_value = "8080", help = "Port to listen on")]
@@ -170,9 +170,9 @@ fn main() {
 		Subcommand::Train(args) => self::train::train(*args),
 		#[cfg(feature = "train")]
 		Subcommand::Predict(args) => self::predict::predict(*args),
-		#[cfg(feature = "tangram_app")]
+		#[cfg(feature = "modelfox_app")]
 		Subcommand::App(args) => self::app::app(*args),
-		#[cfg(feature = "tangram_app")]
+		#[cfg(feature = "modelfox_app")]
 		Subcommand::Migrate(args) => self::migrate::migrate(*args),
 		#[cfg(feature = "serve")]
 		Subcommand::Serve(args) => self::serve::serve(*args),
@@ -184,7 +184,7 @@ fn main() {
 }
 
 fn setup_tracing() {
-	let env_layer = tracing_subscriber::EnvFilter::try_from_env("TANGRAM_TRACING");
+	let env_layer = tracing_subscriber::EnvFilter::try_from_env("MODELFOX_TRACING");
 	let env_layer = if cfg!(debug_assertions) {
 		Some(env_layer.unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("[]=info")))
 	} else {

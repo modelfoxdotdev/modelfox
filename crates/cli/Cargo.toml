@@ -1,20 +1,20 @@
 [package]
-default-run = "tangram"
+default-run = "modelfox"
 edition = "2021"
 license = "MIT"
-name = "tangram_cli"
+name = "modelfox_cli"
 publish = false
 version = "0.7.0"
 
 [[bin]]
-name = "tangram"
+name = "modelfox"
 path = "main.rs"
 
 [features]
 default = ["train", "serve", "app"]
 train = []
-serve = ["bytes", "hyper", "tangram_serve", "tokio"]
-app = ["tangram_app", "tangram_app/default", "tangram_app_core", "tokio"]
+serve = ["bytes", "hyper", "modelfox_serve", "tokio"]
+app = ["modelfox_app", "modelfox_app/default", "modelfox_app_core", "tokio"]
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
@@ -33,17 +33,17 @@ rayon = "1.5"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_yaml = "0.8"
-tangram_app_core = { path = "../app/core", optional = true }
-tangram_app = { path = "../app", default-features = false, optional = true }
-tangram_core = { path = "../core" }
-tangram_id = { path = "../id" }
-tangram_kill_chip = { path = "../kill_chip" }
-tangram_license = { path = "../license" }
-tangram_model = { path = "../model" }
-tangram_progress_counter = { path = "../progress_counter" }
-tangram_serve = { path = "../serve", optional = true }
-tangram_table = { path = "../table" }
-tangram_zip = { path = "../zip" }
+modelfox_app_core = { path = "../app/core", optional = true }
+modelfox_app = { path = "../app", default-features = false, optional = true }
+modelfox_core = { path = "../core" }
+modelfox_id = { path = "../id" }
+modelfox_kill_chip = { path = "../kill_chip" }
+modelfox_license = { path = "../license" }
+modelfox_model = { path = "../model" }
+modelfox_progress_counter = { path = "../progress_counter" }
+modelfox_serve = { path = "../serve", optional = true }
+modelfox_table = { path = "../table" }
+modelfox_zip = { path = "../zip" }
 tokio = { version = "1", optional = true }
 tortoise = "0.1"
 tracing = "0.1"

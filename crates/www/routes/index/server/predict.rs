@@ -1,5 +1,5 @@
 use pinwheel::prelude::*;
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct Predict;
 
@@ -7,9 +7,9 @@ impl Component for Predict {
 	fn into_node(self) -> Node {
 		let elixir = ui::doc!(
 			r#"
-				model = Tangram.load_model_from_path("./heart_disease.tangram")
+				model = ModelFox.load_model_from_path("./heart_disease.modelfox")
 
-				output = Tangram.predict(model, %{
+				output = ModelFox.predict(model, %{
 					:age =>    63,
 					:gender => "male",
 					# ...
@@ -19,11 +19,11 @@ impl Component for Predict {
 		.into();
 		let go = ui::doc!(
 			r#"
-				import "github.com/tangramdotdev/tangram/languages/go"
+				import "github.com/modelfoxdotdev/modelfox/languages/go"
 
-				model, _ := tangram.LoadModelFromPath("./heart_disease.tangram", nil)
+				model, _ := modelfox.LoadModelFromPath("./heart_disease.modelfox", nil)
 
-				output := model.PredictOne(tangram.Input{
+				output := model.PredictOne(modelfox.Input{
 					"age":    63,
 					"gender": "male",
 					// ...
@@ -33,9 +33,9 @@ impl Component for Predict {
 		.into();
 		let javascript = ui::doc!(
 			r#"
-				const tangram = require("@tangramdotdev/tangram");
+				const modelfox = require("@modelfoxdotdev/modelfox");
 
-				const model = new tangram.Model("./heart_disease.tangram");
+				const model = new modelfox.Model("./heart_disease.modelfox");
 
 				const output = model.predict({
 					age: 63,
@@ -49,11 +49,11 @@ impl Component for Predict {
 			r#"
 				<?php
 
-				namespace tangram\tangram;
+				namespace modelfox\modelfox;
 
 				require_once(dirname(dirname(__FILE__)) . '/vendor/autoload.php');
 
-				$model_path = dirname(dirname(__FILE__)) . '/heart_disease.tangram';
+				$model_path = dirname(dirname(__FILE__)) . '/heart_disease.modelfox';
 				$model = Model::from_path($model_path);
 
 				$input = [
@@ -68,9 +68,9 @@ impl Component for Predict {
 		.into();
 		let python = ui::doc!(
 			r#"
-				import tangram
+				import modelfox
 
-				model = tangram.Model.from_path('./census.tangram')
+				model = modelfox.Model.from_path('./census.modelfox')
 
 				output = model.predict({
 					'age': 63,
@@ -82,9 +82,9 @@ impl Component for Predict {
 		.into();
 		let ruby = ui::doc!(
 			r#"
-				require 'tangram'
+				require 'modelfox'
 
-				model = Tangram::Model.from_path('./heart_disease.tangram')
+				model = ModelFox::Model.from_path('./heart_disease.modelfox')
 
 				output = model.predict({
 					age: 63,
@@ -96,10 +96,10 @@ impl Component for Predict {
 		.into();
 		let rust = ui::doc!(
 			r#"
-				let model: tangram::Model =
-				tangram::Model::from_path("./heart_disease.tangram", None).unwrap();
+				let model: modelfox::Model =
+				modelfox::Model::from_path("./heart_disease.modelfox", None).unwrap();
 
-				let input = tangram::predict_input! {
+				let input = modelfox::predict_input! {
 					"age": 63.0,
 					"gender": "male",
 					// ...
@@ -126,54 +126,54 @@ impl Component for Predict {
 			.child("Make predictions with libraries for ")
 			.child(
 				ui::Link::new()
-					.href("https://hex.pm/packages/tangram".to_owned())
+					.href("https://hex.pm/packages/modelfox".to_owned())
 					.title("Elixir".to_owned())
 					.child("Elixir"),
 			)
 			.child(", ")
 			.child(
 				ui::Link::new()
-					.href("https://pkg.go.dev/github.com/tangramdotdev/tangram-go".to_owned())
+					.href("https://pkg.go.dev/github.com/modelfoxdotdev/modelfox-go".to_owned())
 					.title("Golang".to_owned())
 					.child("Golang"),
 			)
 			.child(", ")
 			.child(
 				ui::Link::new()
-					.href("https://www.npmjs.com/package/@tangramdotdev/tangram".to_owned())
+					.href("https://www.npmjs.com/package/@modelfoxdotdev/modelfox".to_owned())
 					.title("JavaScript".to_owned())
 					.child("JavaScript"),
 			)
 			.child(", ")
 			.child(
 				ui::Link::new()
-					.href("https://packagist.org/packages/tangram/tangram".to_owned())
+					.href("https://packagist.org/packages/modelfox/modelfox".to_owned())
 					.title("PHP".to_owned())
 					.child("PHP"),
 			)
 			.child(", ")
 			.child(
 				ui::Link::new()
-					.href("https://pypi.org/project/tangram".to_owned())
+					.href("https://pypi.org/project/modelfox".to_owned())
 					.title("Python".to_owned())
 					.child("Python"),
 			)
 			.child(", ")
 			.child(
 				ui::Link::new()
-					.href("https://rubygems.org/gems/tangram".to_owned())
+					.href("https://rubygems.org/gems/modelfox".to_owned())
 					.title("Ruby".to_owned())
 					.child("Ruby"),
 			)
 			.child(", and ")
 			.child(
 				ui::Link::new()
-					.href("https://lib.rs/tangram".to_owned())
+					.href("https://lib.rs/modelfox".to_owned())
 					.title("Rust".to_owned())
 					.child("Rust"),
 			)
 			.child(".");
-		let p2 = div().class("index-step-text").child("Tangram is written in Rust and exposed to each language via native extensions, so predictions are fast and your data never travels over the network.");
+		let p2 = div().class("index-step-text").child("ModelFox is written in Rust and exposed to each language via native extensions, so predictions are fast and your data never travels over the network.");
 		let left = div().child(title).child(p1).child(br()).child(p2);
 		let right =
 			ui::Window::new().child(ui::CodeSelect::new(code_for_language).line_numbers(true));

@@ -1,7 +1,7 @@
 use futures_signals::map_ref;
+use modelfox_charts::{bar_chart::BarChartPoint, bar_chart::BarChartSeries, components::BarChart};
+use modelfox_ui as ui;
 use pinwheel::prelude::*;
-use tangram_charts::{bar_chart::BarChartPoint, bar_chart::BarChartSeries, components::BarChart};
-use tangram_ui as ui;
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Benchmarks {
@@ -55,10 +55,10 @@ impl Component for Benchmarks {
 			let cpu = self.cpu.signal() =>
 			Benchmark { dataset: *dataset, cpu: *cpu }
 		};
-		let tangram_tree_benchmarks_description = ui::Markdown::new("Tangram Tree is a pure Rust implementation of Gradient Boosted Decision Trees. It has the smallest memory footprint of the leading GBDT implementations and achieves state of the art speed and accuracy. Check it out on [GitHub](https://github.com/tangramdotdev/tangram/blob/main/crates/tree).");
+		let modelfox_tree_benchmarks_description = ui::Markdown::new("ModelFox Tree is a pure Rust implementation of Gradient Boosted Decision Trees. It has the smallest memory footprint of the leading GBDT implementations and achieves state of the art speed and accuracy. Check it out on [GitHub](https://github.com/modelfoxdotdev/modelfox/blob/main/crates/tree).");
 		ui::S1::new()
-			.child(ui::H1::new("Tangram Tree Benchmarks"))
-			.child(tangram_tree_benchmarks_description)
+			.child(ui::H1::new("ModelFox Tree Benchmarks"))
+			.child(modelfox_tree_benchmarks_description)
 			.child_signal(self.dataset.signal().map({
 				let dataset = self.dataset.clone();
 				clone!(dataset_select_field_options);
@@ -280,7 +280,7 @@ struct DurationTable {
 
 impl Component for DurationTable {
 	fn into_node(self) -> Node {
-		let tangram_entry = benchmark_data(self.cpu, self.dataset, Library::Tangram);
+		let modelfox_entry = benchmark_data(self.cpu, self.dataset, Library::ModelFox);
 		ui::Table::new()
 			.width("100%".to_owned())
 			.child(
@@ -288,24 +288,24 @@ impl Component for DurationTable {
 					ui::TableRow::new()
 						.child(ui::TableHeaderCell::new().child("Library"))
 						.child(ui::TableHeaderCell::new().child("Duration"))
-						.child(ui::TableHeaderCell::new().child("v. Tangram")),
+						.child(ui::TableHeaderCell::new().child("v. ModelFox")),
 				),
 			)
 			.child(
 				ui::TableBody::new().children(LIBRARIES.iter().cloned().map(|library| {
 					let entry = benchmark_data(self.cpu, self.dataset, library);
-					let color = if library == Library::Tangram {
+					let color = if library == Library::ModelFox {
 						Some(ui::colors::BLUE.to_owned())
 					} else {
 						None
 					};
-					let text_color = if library == Library::Tangram {
+					let text_color = if library == Library::ModelFox {
 						Some(ui::colors::FUN_TEXT.to_owned())
 					} else {
 						None
 					};
 					let duration = format_duration(entry.duration);
-					let duration_delta = format_delta(entry.duration / tangram_entry.duration);
+					let duration_delta = format_delta(entry.duration / modelfox_entry.duration);
 					ui::TableRow::new()
 						.color(color)
 						.text_color(text_color)
@@ -359,7 +359,7 @@ struct MemoryTable {
 
 impl Component for MemoryTable {
 	fn into_node(self) -> Node {
-		let tangram_entry = benchmark_data(self.cpu, self.dataset, Library::Tangram);
+		let modelfox_entry = benchmark_data(self.cpu, self.dataset, Library::ModelFox);
 		ui::Table::new()
 			.width("100%".to_owned())
 			.child(
@@ -367,24 +367,24 @@ impl Component for MemoryTable {
 					ui::TableRow::new()
 						.child(ui::TableHeaderCell::new().child("Library"))
 						.child(ui::TableHeaderCell::new().child("Memory"))
-						.child(ui::TableHeaderCell::new().child("v. Tangram")),
+						.child(ui::TableHeaderCell::new().child("v. ModelFox")),
 				),
 			)
 			.child(
 				ui::TableBody::new().children(LIBRARIES.iter().cloned().map(|library| {
 					let entry = benchmark_data(self.cpu, self.dataset, library);
-					let color = if library == Library::Tangram {
+					let color = if library == Library::ModelFox {
 						Some(ui::colors::BLUE.to_owned())
 					} else {
 						None
 					};
-					let text_color = if library == Library::Tangram {
+					let text_color = if library == Library::ModelFox {
 						Some(ui::colors::FUN_TEXT.to_owned())
 					} else {
 						None
 					};
 					let duration = format_memory(entry.memory);
-					let duration_delta = format_delta(entry.memory / tangram_entry.memory);
+					let duration_delta = format_delta(entry.memory / modelfox_entry.memory);
 					ui::TableRow::new()
 						.color(color)
 						.text_color(text_color)
@@ -438,7 +438,7 @@ struct MseTable {
 
 impl Component for MseTable {
 	fn into_node(self) -> Node {
-		let tangram_entry = benchmark_data(self.cpu, self.dataset, Library::Tangram);
+		let modelfox_entry = benchmark_data(self.cpu, self.dataset, Library::ModelFox);
 		ui::Table::new()
 			.width("100%".to_owned())
 			.child(
@@ -446,7 +446,7 @@ impl Component for MseTable {
 					ui::TableRow::new()
 						.child(ui::TableHeaderCell::new().child("Library"))
 						.child(ui::TableHeaderCell::new().child("MSE"))
-						.child(ui::TableHeaderCell::new().child("v. Tangram")),
+						.child(ui::TableHeaderCell::new().child("v. ModelFox")),
 				),
 			)
 			.child(
@@ -463,7 +463,7 @@ impl Component for MseTable {
 						None
 					};
 					let mse = ui::format_float_with_digits(entry.metric, 6);
-					let mse_delta = format_delta(entry.metric / tangram_entry.metric);
+					let mse_delta = format_delta(entry.metric / modelfox_entry.metric);
 					ui::TableRow::new()
 						.color(color)
 						.text_color(text_color)
@@ -517,7 +517,7 @@ struct AucTable {
 
 impl Component for AucTable {
 	fn into_node(self) -> Node {
-		let tangram_entry = benchmark_data(self.cpu, self.dataset, Library::Tangram);
+		let modelfox_entry = benchmark_data(self.cpu, self.dataset, Library::ModelFox);
 		ui::Table::new()
 			.width("100%".to_owned())
 			.child(
@@ -525,24 +525,24 @@ impl Component for AucTable {
 					ui::TableRow::new()
 						.child(ui::TableHeaderCell::new().child("Library"))
 						.child(ui::TableHeaderCell::new().child("AUC"))
-						.child(ui::TableHeaderCell::new().child("v. Tangram")),
+						.child(ui::TableHeaderCell::new().child("v. ModelFox")),
 				),
 			)
 			.child(
 				ui::TableBody::new().children(LIBRARIES.iter().cloned().map(|library| {
 					let entry = benchmark_data(self.cpu, self.dataset, library);
-					let color = if library == Library::Tangram {
+					let color = if library == Library::ModelFox {
 						Some(ui::colors::BLUE.to_owned())
 					} else {
 						None
 					};
-					let text_color = if library == Library::Tangram {
+					let text_color = if library == Library::ModelFox {
 						Some(ui::colors::FUN_TEXT.to_owned())
 					} else {
 						None
 					};
 					let auc = ui::format_float_with_digits(entry.metric, 4);
-					let auc_delta = format_delta(entry.metric / tangram_entry.metric);
+					let auc_delta = format_delta(entry.metric / modelfox_entry.metric);
 					ui::TableRow::new()
 						.color(color)
 						.text_color(text_color)
@@ -666,7 +666,7 @@ enum Library {
 	CatBoost,
 	LightGbm,
 	SkLearn,
-	Tangram,
+	ModelFox,
 	XgBoost,
 }
 
@@ -674,7 +674,7 @@ const LIBRARIES: &[Library] = &[
 	Library::CatBoost,
 	Library::LightGbm,
 	Library::SkLearn,
-	Library::Tangram,
+	Library::ModelFox,
 	Library::XgBoost,
 ];
 
@@ -684,7 +684,7 @@ impl std::fmt::Display for Library {
 			Library::CatBoost => write!(f, "catboost"),
 			Library::LightGbm => write!(f, "lightgbm"),
 			Library::SkLearn => write!(f, "sklearn"),
-			Library::Tangram => write!(f, "tangram"),
+			Library::ModelFox => write!(f, "modelfox"),
 			Library::XgBoost => write!(f, "xgboost"),
 		}
 	}
@@ -699,7 +699,7 @@ struct BenchmarkEntry {
 fn benchmark_data(cpu: Cpu, dataset: Dataset, library: Library) -> BenchmarkEntry {
 	match (cpu, dataset, library) {
 		// Allstate
-		(Cpu::Ryzen, Dataset::Allstate, Library::Tangram) => BenchmarkEntry {
+		(Cpu::Ryzen, Dataset::Allstate, Library::ModelFox) => BenchmarkEntry {
 			duration: 56.4639,
 			memory: 4.829028,
 			metric: 1587.9972,
@@ -725,7 +725,7 @@ fn benchmark_data(cpu: Cpu, dataset: Dataset, library: Library) -> BenchmarkEntr
 			metric: 1583.9514,
 		},
 		// Flights
-		(Cpu::Ryzen, Dataset::Flights, Library::Tangram) => BenchmarkEntry {
+		(Cpu::Ryzen, Dataset::Flights, Library::ModelFox) => BenchmarkEntry {
 			duration: 38.256,
 			memory: 1.137140,
 			metric: 0.78150725,
@@ -751,7 +751,7 @@ fn benchmark_data(cpu: Cpu, dataset: Dataset, library: Library) -> BenchmarkEntr
 			metric: 0.7589289,
 		},
 		// Higgs
-		(Cpu::Ryzen, Dataset::Higgs, Library::Tangram) => BenchmarkEntry {
+		(Cpu::Ryzen, Dataset::Higgs, Library::ModelFox) => BenchmarkEntry {
 			duration: 84.701200426,
 			memory: 2.456480,
 			metric: 0.83177507,
@@ -777,7 +777,7 @@ fn benchmark_data(cpu: Cpu, dataset: Dataset, library: Library) -> BenchmarkEntr
 			metric: 0.83165807,
 		},
 		// Allstate
-		(Cpu::M1, Dataset::Allstate, Library::Tangram) => BenchmarkEntry {
+		(Cpu::M1, Dataset::Allstate, Library::ModelFox) => BenchmarkEntry {
 			duration: 43.170980041,
 			memory: 4.944788608,
 			metric: 1587.9972,
@@ -803,7 +803,7 @@ fn benchmark_data(cpu: Cpu, dataset: Dataset, library: Library) -> BenchmarkEntr
 			metric: 1583.809,
 		},
 		// Flights
-		(Cpu::M1, Dataset::Flights, Library::Tangram) => BenchmarkEntry {
+		(Cpu::M1, Dataset::Flights, Library::ModelFox) => BenchmarkEntry {
 			duration: 35.630228,
 			memory: 1.437882560,
 			metric: 0.78150725,
@@ -829,7 +829,7 @@ fn benchmark_data(cpu: Cpu, dataset: Dataset, library: Library) -> BenchmarkEntr
 			metric: 0.7580008,
 		},
 		// Higgs
-		(Cpu::M1, Dataset::Higgs, Library::Tangram) => BenchmarkEntry {
+		(Cpu::M1, Dataset::Higgs, Library::ModelFox) => BenchmarkEntry {
 			duration: 93.630773958,
 			memory: 2.898570856,
 			metric: 0.83177507,
@@ -859,7 +859,7 @@ fn benchmark_data(cpu: Cpu, dataset: Dataset, library: Library) -> BenchmarkEntr
 
 fn color_for_library(library: Library) -> &'static str {
 	match library {
-		Library::Tangram => ui::colors::BLUE,
+		Library::ModelFox => ui::colors::BLUE,
 		Library::CatBoost => ui::colors::RED,
 		Library::LightGbm => ui::colors::PURPLE,
 		Library::SkLearn => ui::colors::ORANGE,

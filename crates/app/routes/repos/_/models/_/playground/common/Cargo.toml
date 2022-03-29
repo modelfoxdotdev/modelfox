@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_app_playground_common"
+name = "modelfox_app_playground_common"
 publish = false
 version = "0.0.0"
 
@@ -10,4 +10,4 @@ path = "lib.rs"
 [dependencies]
 pinwheel = "0.2"
 serde = { version = "1", features = ["derive"] }
-tangram_charts = { path = "../../../../../../../../charts" }
+modelfox_charts = { path = "../../../../../../../../charts" }

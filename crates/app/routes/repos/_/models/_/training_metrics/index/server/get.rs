@@ -5,15 +5,15 @@ use crate::page::{
 use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use std::sync::Arc;
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
 	path_components,
 	user::{authorize_user, authorize_user_for_model},
 };
-use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_id::Id;
+use modelfox_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use modelfox_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
@@ -41,15 +41,15 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		return Ok(not_found());
 	}
 	let bytes = get_model_bytes(app.storage(), model_id).await?;
-	let model = tangram_model::from_bytes(&bytes)?;
+	let model = modelfox_model::from_bytes(&bytes)?;
 	let inner = match model.inner() {
-		tangram_model::ModelInnerReader::Regressor(regressor) => {
+		modelfox_model::ModelInnerReader::Regressor(regressor) => {
 			Inner::Regressor(build_inner_regressor(regressor.read()))
 		}
-		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+		modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			Inner::BinaryClassifier(build_inner_binary_classifier(binary_classifier.read()))
 		}
-		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+		modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 			Inner::MulticlassClassifier(build_inner_multiclass_classifier(
 				multiclass_classifier.read(),
 			))
@@ -71,7 +71,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	Ok(response)
 }
 
-fn build_inner_regressor(model: tangram_model::RegressorReader) -> Regressor {
+fn build_inner_regressor(model: modelfox_model::RegressorReader) -> Regressor {
 	let warning = if model.baseline_metrics().rmse() > model.test_metrics().rmse() {
 		Some("Baseline RMSE is lower! Your model performs worse than if it were just guessing the mean of the target column.".into())
 	} else {
@@ -86,7 +86,7 @@ fn build_inner_regressor(model: tangram_model::RegressorReader) -> Regressor {
 	}
 }
 
-fn build_inner_binary_classifier(model: tangram_model::BinaryClassifierReader) -> BinaryClassifier {
+fn build_inner_binary_classifier(model: modelfox_model::BinaryClassifierReader) -> BinaryClassifier {
 	let test_metrics = model.test_metrics();
 	let default_threshold_test_metrics = test_metrics.default_threshold();
 	let default_threshold_baseline_metrics = model.baseline_metrics().default_threshold();
@@ -124,7 +124,7 @@ fn build_inner_binary_classifier(model: tangram_model::BinaryClassifierReader) -
 }
 
 fn build_inner_multiclass_classifier(
-	model: tangram_model::MulticlassClassifierReader,
+	model: modelfox_model::MulticlassClassifierReader,
 ) -> MulticlassClassifier {
 	let classes = model
 		.classes()

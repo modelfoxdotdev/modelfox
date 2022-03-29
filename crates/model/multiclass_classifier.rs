@@ -102,7 +102,7 @@ pub enum MulticlassClassificationModel {
 #[buffalo(size = "dynamic")]
 pub struct LinearMulticlassClassifier {
 	#[buffalo(id = 0, required)]
-	pub model: tangram_linear::serialize::MulticlassClassifier,
+	pub model: modelfox_linear::serialize::MulticlassClassifier,
 	#[buffalo(id = 1, required)]
 	pub train_options: LinearModelTrainOptions,
 	#[buffalo(id = 2, required)]
@@ -117,7 +117,7 @@ pub struct LinearMulticlassClassifier {
 #[buffalo(size = "dynamic")]
 pub struct TreeMulticlassClassifier {
 	#[buffalo(id = 0, required)]
-	pub model: tangram_tree::serialize::MulticlassClassifier,
+	pub model: modelfox_tree::serialize::MulticlassClassifier,
 	#[buffalo(id = 1, required)]
 	pub train_options: TreeModelTrainOptions,
 	#[buffalo(id = 2, required)]

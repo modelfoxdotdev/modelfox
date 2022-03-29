@@ -1,11 +1,11 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_app_layouts::{
+use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-use tangram_app_ui::{class_select_field::ClassSelectField, metrics_row::MetricsRow};
-use tangram_ui as ui;
+use modelfox_app_ui::{class_select_field::ClassSelectField, metrics_row::MetricsRow};
+use modelfox_ui as ui;
 
 pub struct Page {
 	pub classes: Vec<String>,
@@ -19,7 +19,7 @@ pub struct Page {
 impl Component for Page {
 	fn into_node(self) -> Node {
 		Document::new()
-			.client("tangram_app_training_class_metrics_client")
+			.client("modelfox_app_training_class_metrics_client")
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()

@@ -1,4 +1,4 @@
-module github.com/tangramdotdev/tangram-go
+module github.com/modelfoxdotdev/modelfox-go
 
 go 1.16
 

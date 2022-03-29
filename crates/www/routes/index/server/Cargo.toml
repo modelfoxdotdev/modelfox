@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_www_index_server"
+name = "modelfox_www_index_server"
 publish = false
 version = "0.0.0"
 
@@ -10,10 +10,10 @@ path = "lib.rs"
 [dependencies]
 pinwheel = "0.2"
 futures = "0.3"
-tangram_charts = { path = "../../../../charts" }
+modelfox_charts = { path = "../../../../charts" }
 sunfish = "0.7"
-tangram_ui = { path = "../../../../ui" }
-tangram_finite = { path = "../../../../finite" }
-tangram_www_ui = { path = "../../../ui" }
-tangram_www_index_common = { path = "../common" }
-tangram_www_layouts = { path = "../../../layouts" }
+modelfox_ui = { path = "../../../../ui" }
+modelfox_finite = { path = "../../../../finite" }
+modelfox_www_ui = { path = "../../../ui" }
+modelfox_www_index_common = { path = "../common" }
+modelfox_www_layouts = { path = "../../../layouts" }

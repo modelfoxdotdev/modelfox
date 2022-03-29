@@ -48,8 +48,8 @@ enum Library {
 	LightGbm,
 	#[clap(name = "sklearn")]
 	SkLearn,
-	#[clap(name = "tangram")]
-	Tangram,
+	#[clap(name = "modelfox")]
+	ModelFox,
 	#[clap(name = "xgboost")]
 	XgBoost,
 }
@@ -60,7 +60,7 @@ impl std::fmt::Display for Library {
 			Library::CatBoot => write!(f, "catboost"),
 			Library::LightGbm => write!(f, "lightgbm"),
 			Library::SkLearn => write!(f, "sklearn"),
-			Library::Tangram => write!(f, "tangram"),
+			Library::ModelFox => write!(f, "modelfox"),
 			Library::XgBoost => write!(f, "xgboost"),
 		}
 	}
@@ -148,9 +148,9 @@ fn main() {
 		.filter(|dataset| dataset.task() == Task::MulticlassClassification)
 		.collect::<Vec<_>>();
 
-	// Build the tangram benchmarks.
+	// Build the modelfox benchmarks.
 	for dataset in args.datasets.iter() {
-		build_tangram_benchmark(dataset);
+		build_modelfox_benchmark(dataset);
 	}
 
 	// Test the regression datasets.
@@ -175,12 +175,12 @@ fn main() {
 	}
 }
 
-fn build_tangram_benchmark(dataset: &Dataset) {
+fn build_modelfox_benchmark(dataset: &Dataset) {
 	let output = std::process::Command::new("cargo")
 		.arg("build")
 		.arg("--release")
 		.arg("-p")
-		.arg(format!("tangram_tree_benchmark_{}", dataset))
+		.arg(format!("modelfox_tree_benchmark_{}", dataset))
 		.output()
 		.unwrap();
 	assert!(output.status.success());
@@ -222,10 +222,10 @@ fn run_benchmarks(libraries: &[Library], datasets: &[Dataset]) {
 
 fn run_benchmark(dataset: &Dataset, library: &Library) -> BenchmarkOutput {
 	let output = match library {
-		Library::Tangram => std::process::Command::new("time")
+		Library::ModelFox => std::process::Command::new("time")
 			.arg("-f")
 			.arg("%M")
-			.arg(format!("target/release/tangram_tree_benchmark_{}", dataset))
+			.arg(format!("target/release/modelfox_tree_benchmark_{}", dataset))
 			.output()
 			.unwrap(),
 		_ => std::process::Command::new("time")

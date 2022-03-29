@@ -1,23 +1,23 @@
-# Tangram for Go
+# ModelFox for Go
 
-- [Watch the Video](https://www.tangram.dev)
-- [Read the Docs](https://www.tangram.dev/docs)
+- [Watch the Video](https://www.modelfox.dev)
+- [Read the Docs](https://www.modelfox.dev/docs)
 
-The Tangram Go module makes it easy to make predictions with your Tangram machine learning model from Go.
+The ModelFox Go module makes it easy to make predictions with your ModelFox machine learning model from Go.
 
 ## Usage
 
 ```
-$ go get -u github.com/tangramdotdev/tangram-go
+$ go get -u github.com/modelfoxdotdev/modelfox-go
 ```
 
 ```go
-import "github.com/tangramdotdev/tangram-go"
+import "github.com/modelfoxdotdev/modelfox-go"
 
-model, _ := tangram.LoadModelFromPath("./heart_disease.tangram", nil)
+model, _ := modelfox.LoadModelFromPath("./heart_disease.modelfox", nil)
 defer model.Destroy()
 
-input := tangram.PredictInput{
+input := modelfox.PredictInput{
   "age":    63,
   "gender": "male",
   // ...
@@ -28,11 +28,11 @@ output := model.PredictOne(input, nil)
 fmt.Println("Output:", output.ClassName)
 ```
 
-For more information, [read the docs](https://www.tangram.dev/docs).
+For more information, [read the docs](https://www.modelfox.dev/docs).
 
 ## Platform Support
 
-Tangram for Go is currently supported on the following combinations of `$GOARCH` and `$GOOS`:
+ModelFox for Go is currently supported on the following combinations of `$GOARCH` and `$GOOS`:
 
 - `amd64` `linux`
 - `arm64` `linux`
@@ -40,9 +40,9 @@ Tangram for Go is currently supported on the following combinations of `$GOARCH`
 - `arm64` `darwin`
 - `amd64` `windows`
 
-Are you interested in another platform? [Open an issue](https://github.com/tangramdotdev/tangram/issues/new) or send us an email at [help@tangram.dev](mailto:help@tangram.dev).
+Are you interested in another platform? [Open an issue](https://github.com/modelfoxdotdev/modelfox/issues/new) or send us an email at [help@modelfox.dev](mailto:help@modelfox.dev).
 
-Tangram for Go links to the tangram C library, so cgo is required. The tangram C library will be linked statically into your executable, so when you run `go build` you will still get a statically linked executable you can run anywhere without having to worry about dynamic linking errors.
+ModelFox for Go links to the modelfox C library, so cgo is required. The modelfox C library will be linked statically into your executable, so when you run `go build` you will still get a statically linked executable you can run anywhere without having to worry about dynamic linking errors.
 
 ## Examples
 

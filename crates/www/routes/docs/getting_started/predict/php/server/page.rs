@@ -1,7 +1,7 @@
 use pinwheel::prelude::*;
 use std::borrow::Cow;
-use tangram_ui as ui;
-use tangram_www_layouts::{
+use modelfox_ui as ui;
+use modelfox_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage, GettingStartedPage, PredictPage, PrevNextButtons},
 	document::Document,
 };
@@ -10,7 +10,7 @@ pub struct Page;
 
 impl Component for Page {
 	fn into_node(self) -> Node {
-		let predict_text = ui::P::new().child("First, import the tangram library and load the model file. Then, make an associative array with info for a new patient that matches the CSV, excluding the diagnosis column. Finally, call predict and print out the result.");
+		let predict_text = ui::P::new().child("First, import the modelfox library and load the model file. Then, make an associative array with info for a new patient that matches the CSV, excluding the diagnosis column. Finally, call predict and print out the result.");
 		Document::new()
 			.child(
 				DocsLayout::new()
@@ -45,7 +45,7 @@ impl Component for Install {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				composer require tangram/tangram
+				composer require modelfox/modelfox
 			"#
 		);
 		let code = ui::highlight(code, ui::Language::Php);
@@ -63,11 +63,11 @@ impl Component for Predict {
 			r#"
 				<?php
 
-				namespace tangram\tangram;
+				namespace modelfox\modelfox;
 
 				require_once(dirname(dirname(__FILE__)) . '/vendor/autoload.php');
 
-				$model_path = dirname(dirname(__FILE__)) . '/heart_disease.tangram';
+				$model_path = dirname(dirname(__FILE__)) . '/heart_disease.modelfox';
 				$model = Model::from_path($model_path);
 
 				// Create an example input matching the schema of the CSV file the model was trained on.

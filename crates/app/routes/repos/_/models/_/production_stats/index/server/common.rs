@@ -1,18 +1,18 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_app_date_window::{DateWindow, DateWindowInterval};
-use tangram_app_ui::{
+use modelfox_app_date_window::{DateWindow, DateWindowInterval};
+use modelfox_app_ui::{
 	column_type::ColumnType,
 	date_window_select_field::DateWindowSelectField,
 	time::{interval_chart_title, overall_chart_title},
 	tokens::ColumnTypeToken,
 };
-use tangram_charts::{
+use modelfox_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	components::BarChart,
 };
-use tangram_ui as ui;
-use tangram_zip::zip;
+use modelfox_ui as ui;
+use modelfox_zip::zip;
 
 pub struct PredictionCountChartEntry {
 	pub count: u64,

@@ -1415,6 +1415,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "33a33a362ce288760ec6a508b94caaec573ae7d3bbbd91b87aa0bad4456839db"
 
 [[package]]
+name = "libmodelfox"
+version = "0.7.0"
+dependencies = [
+ "anyhow",
+ "libc",
+ "memmap",
+ "modelfox_core",
+ "modelfox_model",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "libsqlite3-sys"
 version = "0.23.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1423,19 +1436,6 @@ dependencies = [
  "cc",
  "pkg-config",
  "vcpkg",
-]
-
-[[package]]
-name = "libtangram"
-version = "0.7.0"
-dependencies = [
- "anyhow",
- "libc",
- "memmap",
- "serde",
- "serde_json",
- "tangram_core",
- "tangram_model",
 ]
 
 [[package]]
@@ -1610,6 +1610,2246 @@ checksum = "b9f1c5b025cda876f66ef43a113f91ebc9f4ccef34843000e0adf6ebbab84e21"
 dependencies = [
  "winapi",
 ]
+
+[[package]]
+name = "modelfox"
+version = "0.7.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "memmap",
+ "modelfox_core",
+ "modelfox_macro",
+ "modelfox_model",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tokio",
+ "url",
+]
+
+[[package]]
+name = "modelfox_app"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "base64 0.13.0",
+ "chrono",
+ "chrono-tz",
+ "clap 3.1.3",
+ "futures",
+ "glob",
+ "http",
+ "hyper",
+ "lettre",
+ "modelfox_app_alerts_index_server",
+ "modelfox_app_alerts_server",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_edit_organization_server",
+ "modelfox_app_health_server",
+ "modelfox_app_index_server",
+ "modelfox_app_layouts",
+ "modelfox_app_login_server",
+ "modelfox_app_migrations",
+ "modelfox_app_model_download_server",
+ "modelfox_app_model_edit_server",
+ "modelfox_app_model_index_client",
+ "modelfox_app_model_index_server",
+ "modelfox_app_monitor_event",
+ "modelfox_app_monitors_edit_server",
+ "modelfox_app_monitors_index_server",
+ "modelfox_app_new_member_server",
+ "modelfox_app_new_model_client",
+ "modelfox_app_new_model_server",
+ "modelfox_app_new_monitor_client",
+ "modelfox_app_new_monitor_server",
+ "modelfox_app_new_organization_server",
+ "modelfox_app_new_repo_server",
+ "modelfox_app_organization_index_server",
+ "modelfox_app_organization_member_server",
+ "modelfox_app_playground_client",
+ "modelfox_app_playground_server",
+ "modelfox_app_production_class_metrics_client",
+ "modelfox_app_production_class_metrics_server",
+ "modelfox_app_production_metrics_index_client",
+ "modelfox_app_production_metrics_index_server",
+ "modelfox_app_production_prediction_client",
+ "modelfox_app_production_prediction_server",
+ "modelfox_app_production_predictions_index_server",
+ "modelfox_app_production_stats_column_client",
+ "modelfox_app_production_stats_column_server",
+ "modelfox_app_production_stats_index_client",
+ "modelfox_app_production_stats_index_server",
+ "modelfox_app_repo_edit_server",
+ "modelfox_app_repo_index_server",
+ "modelfox_app_track_server",
+ "modelfox_app_training_class_metrics_client",
+ "modelfox_app_training_class_metrics_server",
+ "modelfox_app_training_grid_index_server",
+ "modelfox_app_training_grid_item_server",
+ "modelfox_app_training_metrics_index_server",
+ "modelfox_app_training_metrics_precision_recall_client",
+ "modelfox_app_training_metrics_precision_recall_server",
+ "modelfox_app_training_metrics_roc_client",
+ "modelfox_app_training_metrics_roc_server",
+ "modelfox_app_training_stats_column_client",
+ "modelfox_app_training_stats_column_server",
+ "modelfox_app_training_stats_index_server",
+ "modelfox_app_tuning_client",
+ "modelfox_app_tuning_server",
+ "modelfox_app_user_server",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_metrics",
+ "modelfox_model",
+ "modelfox_serve",
+ "modelfox_table",
+ "modelfox_zip",
+ "ndarray",
+ "num",
+ "once_cell",
+ "rand",
+ "rayon",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha2 0.10.2",
+ "sqlx",
+ "sunfish",
+ "time 0.3.7",
+ "tokio",
+ "toml",
+ "tracing",
+ "url",
+]
+
+[[package]]
+name = "modelfox_app_alerts_index_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "modelfox_zip",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_alerts_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "modelfox_zip",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+ "time 0.3.7",
+ "tracing",
+]
+
+[[package]]
+name = "modelfox_app_context"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "modelfox_app_core",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_core"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bytes",
+ "chrono",
+ "chrono-tz",
+ "dirs",
+ "fnv",
+ "futures",
+ "http",
+ "hyper",
+ "indexmap",
+ "insta",
+ "itertools",
+ "lettre",
+ "memmap",
+ "modelfox",
+ "modelfox_app_migrations",
+ "modelfox_app_monitor_event",
+ "modelfox_app_production_metrics",
+ "modelfox_app_production_stats",
+ "modelfox_core",
+ "modelfox_finite",
+ "modelfox_id",
+ "modelfox_metrics",
+ "modelfox_model",
+ "modelfox_serve",
+ "modelfox_table",
+ "modelfox_text",
+ "modelfox_zip",
+ "ndarray",
+ "num",
+ "rand",
+ "rust-s3",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "sunfish",
+ "time 0.3.7",
+ "tokio",
+ "tracing",
+ "tracing-test",
+ "url",
+]
+
+[[package]]
+name = "modelfox_app_date_window"
+version = "0.0.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "modelfox_app_edit_organization_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_id",
+ "modelfox_ui",
+ "pinwheel",
+ "serde",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_health_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "futures",
+ "http",
+ "hyper",
+ "memmap",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "num",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "sunfish",
+ "tracing",
+ "url",
+]
+
+[[package]]
+name = "modelfox_app_index_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_id",
+ "modelfox_ui",
+ "pinwheel",
+ "serde",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+ "tracing",
+ "url",
+]
+
+[[package]]
+name = "modelfox_app_layouts"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_ui",
+ "modelfox_id",
+ "modelfox_ui",
+ "pinwheel",
+ "serde",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_login_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "lettre",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_id",
+ "modelfox_ui",
+ "pinwheel",
+ "rand",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+ "url",
+]
+
+[[package]]
+name = "modelfox_app_migrations"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "modelfox_zip",
+ "once_cell",
+ "sqlx",
+]
+
+[[package]]
+name = "modelfox_app_model_download_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_model_edit_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_model_index_client"
+version = "0.0.0"
+dependencies = [
+ "console_error_panic_hook",
+ "modelfox_charts",
+ "modelfox_ui",
+ "pinwheel",
+ "wasm-bindgen",
+]
+
+[[package]]
+name = "modelfox_app_model_index_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_finite",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "modelfox_zip",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_monitor_event"
+version = "0.0.0"
+dependencies = [
+ "chrono",
+ "modelfox_finite",
+ "modelfox_id",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "modelfox_app_monitors_edit_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "modelfox_zip",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+ "time 0.3.7",
+]
+
+[[package]]
+name = "modelfox_app_monitors_index_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "modelfox_zip",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_new_member_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "lettre",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_id",
+ "modelfox_ui",
+ "pinwheel",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+ "tokio",
+ "url",
+]
+
+[[package]]
+name = "modelfox_app_new_model_client"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_app_new_model_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "multer",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_new_monitor_client"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_app_new_monitor_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "multer",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+ "time 0.3.7",
+]
+
+[[package]]
+name = "modelfox_app_new_organization_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_id",
+ "modelfox_ui",
+ "pinwheel",
+ "serde",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_new_repo_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "pinwheel",
+ "serde",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_organization_index_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_id",
+ "modelfox_ui",
+ "pinwheel",
+ "serde",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_organization_member_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "lettre",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_id",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+ "tokio",
+ "url",
+]
+
+[[package]]
+name = "modelfox_app_playground_client"
+version = "0.0.0"
+dependencies = [
+ "modelfox_app_playground_common",
+ "modelfox_charts",
+ "modelfox_ui",
+ "pinwheel",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_app_playground_common"
+version = "0.0.0"
+dependencies = [
+ "modelfox_charts",
+ "pinwheel",
+ "serde",
+]
+
+[[package]]
+name = "modelfox_app_playground_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_playground_common",
+ "modelfox_app_ui",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "serde",
+ "sunfish",
+ "url",
+]
+
+[[package]]
+name = "modelfox_app_production_class_metrics_client"
+version = "0.0.0"
+dependencies = [
+ "modelfox_charts",
+ "modelfox_ui",
+ "pinwheel",
+]
+
+[[package]]
+name = "modelfox_app_production_class_metrics_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_date_window",
+ "modelfox_app_layouts",
+ "modelfox_app_production_metrics",
+ "modelfox_app_ui",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_finite",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "modelfox_zip",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_urlencoded",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_production_metrics"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "insta",
+ "modelfox_app_date_window",
+ "modelfox_app_monitor_event",
+ "modelfox_app_production_stats",
+ "modelfox_model",
+ "modelfox_zip",
+ "ndarray",
+ "num",
+ "serde",
+ "serde_json",
+ "sqlx",
+]
+
+[[package]]
+name = "modelfox_app_production_metrics_index_client"
+version = "0.0.0"
+dependencies = [
+ "modelfox_charts",
+ "modelfox_ui",
+ "pinwheel",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_app_production_metrics_index_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_date_window",
+ "modelfox_app_layouts",
+ "modelfox_app_production_metrics",
+ "modelfox_app_ui",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_finite",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "modelfox_zip",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_urlencoded",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_production_prediction_client"
+version = "0.0.0"
+dependencies = [
+ "modelfox_charts",
+ "modelfox_ui",
+ "pinwheel",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_app_production_prediction_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_production_predictions_index_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_monitor_event",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_production_stats"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "fnv",
+ "indexmap",
+ "insta",
+ "itertools",
+ "modelfox_app_date_window",
+ "modelfox_app_monitor_event",
+ "modelfox_metrics",
+ "modelfox_model",
+ "modelfox_text",
+ "modelfox_zip",
+ "ndarray",
+ "num",
+ "rand",
+ "serde",
+ "serde_json",
+ "sqlx",
+]
+
+[[package]]
+name = "modelfox_app_production_stats_column_client"
+version = "0.0.0"
+dependencies = [
+ "modelfox_charts",
+ "modelfox_ui",
+ "pinwheel",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_app_production_stats_column_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_date_window",
+ "modelfox_app_layouts",
+ "modelfox_app_production_stats",
+ "modelfox_app_ui",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "modelfox_zip",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_production_stats_index_client"
+version = "0.0.0"
+dependencies = [
+ "modelfox_charts",
+ "modelfox_ui",
+ "pinwheel",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_app_production_stats_index_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_date_window",
+ "modelfox_app_layouts",
+ "modelfox_app_production_stats",
+ "modelfox_app_ui",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "modelfox_zip",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_repo_edit_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "pinwheel",
+ "serde",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_repo_index_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "pinwheel",
+ "serde",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_track_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "futures",
+ "http",
+ "hyper",
+ "memmap",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_monitor_event",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "num",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "sunfish",
+ "tracing",
+ "url",
+]
+
+[[package]]
+name = "modelfox_app_training_class_metrics_client"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+]
+
+[[package]]
+name = "modelfox_app_training_class_metrics_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_urlencoded",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_training_grid_common"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "http",
+ "hyper",
+ "modelfox_app_core",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+]
+
+[[package]]
+name = "modelfox_app_training_grid_index_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_training_grid_common",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_training_grid_item_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_training_grid_common",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_training_metrics_index_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "modelfox_zip",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_training_metrics_precision_recall_client"
+version = "0.0.0"
+dependencies = [
+ "modelfox_charts",
+ "modelfox_ui",
+ "pinwheel",
+]
+
+[[package]]
+name = "modelfox_app_training_metrics_precision_recall_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_finite",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_training_metrics_roc_client"
+version = "0.0.0"
+dependencies = [
+ "modelfox_charts",
+ "modelfox_ui",
+ "pinwheel",
+]
+
+[[package]]
+name = "modelfox_app_training_metrics_roc_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_finite",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_training_stats_column_client"
+version = "0.0.0"
+dependencies = [
+ "console_error_panic_hook",
+ "modelfox_charts",
+ "modelfox_ui",
+ "pinwheel",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_app_training_stats_column_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_urlencoded",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_training_stats_index_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_ui",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_tuning_client"
+version = "0.0.0"
+dependencies = [
+ "modelfox_app_tuning_common",
+ "modelfox_ui",
+ "pinwheel",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_app_tuning_common"
+version = "0.0.0"
+dependencies = [
+ "modelfox_app_ui",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "tracing",
+]
+
+[[package]]
+name = "modelfox_app_tuning_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_app_tuning_common",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_model",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_app_ui"
+version = "0.0.0"
+dependencies = [
+ "chrono",
+ "chrono-tz",
+ "modelfox_app_date_window",
+ "modelfox_charts",
+ "modelfox_core",
+ "modelfox_model",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "serde",
+]
+
+[[package]]
+name = "modelfox_app_user_server"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_app_context",
+ "modelfox_app_core",
+ "modelfox_app_layouts",
+ "modelfox_id",
+ "modelfox_ui",
+ "pinwheel",
+ "serde",
+ "serde_urlencoded",
+ "sqlx",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_build"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "cbindgen",
+ "chrono",
+ "clap 3.1.3",
+ "digest 0.10.3",
+ "dirs",
+ "duct",
+ "flate2",
+ "hex",
+ "indoc 1.0.4",
+ "md-5 0.10.1",
+ "rayon",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha-1 0.10.0",
+ "sha2 0.10.2",
+ "tar",
+ "tempfile",
+ "url",
+]
+
+[[package]]
+name = "modelfox_charts"
+version = "0.0.0"
+dependencies = [
+ "futures",
+ "itertools",
+ "modelfox_finite",
+ "modelfox_number_formatter",
+ "num",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "tracing",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_cli"
+version = "0.7.0"
+dependencies = [
+ "anyhow",
+ "backtrace",
+ "bytes",
+ "clap 3.1.3",
+ "colored",
+ "csv",
+ "dirs",
+ "either",
+ "hyper",
+ "insta",
+ "itertools",
+ "libc",
+ "modelfox_app",
+ "modelfox_app_core",
+ "modelfox_core",
+ "modelfox_id",
+ "modelfox_kill_chip",
+ "modelfox_license",
+ "modelfox_model",
+ "modelfox_progress_counter",
+ "modelfox_serve",
+ "modelfox_table",
+ "modelfox_zip",
+ "num",
+ "once_cell",
+ "pretty_assertions",
+ "rayon",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tokio",
+ "tortoise",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "winapi",
+]
+
+[[package]]
+name = "modelfox_core"
+version = "0.7.0"
+dependencies = [
+ "anyhow",
+ "bitvec",
+ "buffalo",
+ "chrono",
+ "csv",
+ "fast-float",
+ "fnv",
+ "getrandom",
+ "indexmap",
+ "itertools",
+ "modelfox_features",
+ "modelfox_finite",
+ "modelfox_id",
+ "modelfox_kill_chip",
+ "modelfox_linear",
+ "modelfox_metrics",
+ "modelfox_model",
+ "modelfox_progress_counter",
+ "modelfox_table",
+ "modelfox_text",
+ "modelfox_tree",
+ "modelfox_zip",
+ "ndarray",
+ "num",
+ "rand",
+ "rand_xoshiro",
+ "rayon",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+]
+
+[[package]]
+name = "modelfox_dev"
+version = "0.0.0"
+dependencies = [
+ "clap 3.1.3",
+ "sunfish",
+ "tokio",
+]
+
+[[package]]
+name = "modelfox_elixir"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "erl_nif",
+ "memmap",
+ "modelfox_core",
+ "modelfox_model",
+ "once_cell",
+ "serde",
+]
+
+[[package]]
+name = "modelfox_example_advanced"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "modelfox",
+]
+
+[[package]]
+name = "modelfox_example_basic"
+version = "0.0.0"
+dependencies = [
+ "modelfox",
+]
+
+[[package]]
+name = "modelfox_features"
+version = "0.7.0"
+dependencies = [
+ "anyhow",
+ "fnv",
+ "indexmap",
+ "itertools",
+ "modelfox_metrics",
+ "modelfox_table",
+ "modelfox_text",
+ "modelfox_zip",
+ "ndarray",
+ "num",
+ "serde",
+]
+
+[[package]]
+name = "modelfox_finite"
+version = "0.7.0"
+dependencies = [
+ "num",
+ "serde",
+]
+
+[[package]]
+name = "modelfox_id"
+version = "0.7.0"
+dependencies = [
+ "rand",
+ "serde",
+]
+
+[[package]]
+name = "modelfox_kill_chip"
+version = "0.7.0"
+
+[[package]]
+name = "modelfox_license"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "base64 0.13.0",
+ "chrono",
+ "clap 3.1.3",
+ "digest 0.10.3",
+ "duct",
+ "indoc 1.0.4",
+ "modelfox_id",
+ "pem",
+ "rand",
+ "rsa",
+ "serde",
+ "serde_json",
+ "sha2 0.10.2",
+]
+
+[[package]]
+name = "modelfox_linear"
+version = "0.7.0"
+dependencies = [
+ "buffalo",
+ "clap 3.1.3",
+ "modelfox_features",
+ "modelfox_kill_chip",
+ "modelfox_metrics",
+ "modelfox_progress_counter",
+ "modelfox_table",
+ "modelfox_zip",
+ "ndarray",
+ "num",
+ "rayon",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "modelfox_macro"
+version = "0.7.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "modelfox_metrics"
+version = "0.7.0"
+dependencies = [
+ "insta",
+ "itertools",
+ "modelfox_zip",
+ "ndarray",
+ "num",
+]
+
+[[package]]
+name = "modelfox_model"
+version = "0.7.0"
+dependencies = [
+ "anyhow",
+ "buffalo",
+ "fnv",
+ "modelfox_linear",
+ "modelfox_text",
+ "modelfox_tree",
+ "num",
+]
+
+[[package]]
+name = "modelfox_node"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "memmap",
+ "modelfox_core",
+ "modelfox_model",
+ "node_api",
+ "reqwest",
+ "serde",
+]
+
+[[package]]
+name = "modelfox_number_formatter"
+version = "0.0.0"
+dependencies = [
+ "num",
+ "serde",
+]
+
+[[package]]
+name = "modelfox_progress_counter"
+version = "0.7.0"
+dependencies = [
+ "rayon",
+]
+
+[[package]]
+name = "modelfox_python"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "memmap",
+ "modelfox_core",
+ "modelfox_model",
+ "pyo3",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "url",
+]
+
+[[package]]
+name = "modelfox_serve"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "backtrace",
+ "futures",
+ "hyper",
+ "modelfox_id",
+ "tokio",
+ "tracing",
+]
+
+[[package]]
+name = "modelfox_table"
+version = "0.7.0"
+dependencies = [
+ "anyhow",
+ "csv",
+ "fast-float",
+ "fnv",
+ "insta",
+ "modelfox_progress_counter",
+ "modelfox_zip",
+ "ndarray",
+ "num",
+]
+
+[[package]]
+name = "modelfox_text"
+version = "0.7.0"
+dependencies = [
+ "fnv",
+ "indexmap",
+ "serde",
+]
+
+[[package]]
+name = "modelfox_tree"
+version = "0.7.0"
+dependencies = [
+ "bitvec",
+ "buffalo",
+ "clap 3.1.3",
+ "itertools",
+ "modelfox_finite",
+ "modelfox_kill_chip",
+ "modelfox_metrics",
+ "modelfox_progress_counter",
+ "modelfox_table",
+ "modelfox_zip",
+ "ndarray",
+ "num",
+ "rayon",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "modelfox_ui"
+version = "0.0.0"
+dependencies = [
+ "console_error_panic_hook",
+ "convert_case",
+ "indoc 1.0.4",
+ "modelfox_charts",
+ "modelfox_finite",
+ "modelfox_number_formatter",
+ "num",
+ "once_cell",
+ "percent-encoding",
+ "pinwheel",
+ "pulldown-cmark",
+ "serde",
+ "serde_json",
+ "tracing",
+ "tracing-wasm",
+ "tree-sitter-highlight",
+ "tree-sitter-javascript",
+ "tree-sitter-rust",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_wasm"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "modelfox_core",
+ "modelfox_model",
+ "serde",
+ "serde-wasm-bindgen",
+ "serde_bytes",
+ "wasm-bindgen",
+]
+
+[[package]]
+name = "modelfox_www"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "clap 3.1.3",
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_id",
+ "modelfox_serve",
+ "modelfox_www_about_server",
+ "modelfox_www_benchmarks_client",
+ "modelfox_www_benchmarks_server",
+ "modelfox_www_blog_index_server",
+ "modelfox_www_blog_server",
+ "modelfox_www_content",
+ "modelfox_www_docs_getting_started_index_server",
+ "modelfox_www_docs_getting_started_inspect_client",
+ "modelfox_www_docs_getting_started_inspect_server",
+ "modelfox_www_docs_getting_started_monitor_client",
+ "modelfox_www_docs_getting_started_monitor_server",
+ "modelfox_www_docs_getting_started_predict_cli_server",
+ "modelfox_www_docs_getting_started_predict_elixir_server",
+ "modelfox_www_docs_getting_started_predict_go_server",
+ "modelfox_www_docs_getting_started_predict_index_server",
+ "modelfox_www_docs_getting_started_predict_javascript_server",
+ "modelfox_www_docs_getting_started_predict_php_server",
+ "modelfox_www_docs_getting_started_predict_python_server",
+ "modelfox_www_docs_getting_started_predict_ruby_server",
+ "modelfox_www_docs_getting_started_predict_rust_server",
+ "modelfox_www_docs_getting_started_train_server",
+ "modelfox_www_docs_guide_server",
+ "modelfox_www_docs_index_server",
+ "modelfox_www_docs_install_server",
+ "modelfox_www_docs_internals_server",
+ "modelfox_www_index_client",
+ "modelfox_www_index_server",
+ "modelfox_www_pricing_server",
+ "serde",
+ "serde_json",
+ "sunfish",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "modelfox_www_about_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_benchmarks_client"
+version = "0.0.0"
+dependencies = [
+ "console_error_panic_hook",
+ "modelfox_charts",
+ "modelfox_ui",
+ "modelfox_www_benchmarks_common",
+ "pinwheel",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_www_benchmarks_common"
+version = "0.0.0"
+dependencies = [
+ "futures-signals",
+ "modelfox_charts",
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "serde",
+ "tracing",
+]
+
+[[package]]
+name = "modelfox_www_benchmarks_server"
+version = "0.0.0"
+dependencies = [
+ "futures",
+ "http",
+ "hyper",
+ "modelfox_charts",
+ "modelfox_ui",
+ "modelfox_www_benchmarks_common",
+ "modelfox_www_layouts",
+ "num",
+ "pinwheel",
+ "sunfish",
+ "tracing",
+]
+
+[[package]]
+name = "modelfox_www_blog_index_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_content",
+ "modelfox_www_layouts",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_blog_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_content",
+ "modelfox_www_layouts",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_content"
+version = "0.0.0"
+dependencies = [
+ "anyhow",
+ "modelfox_ui",
+ "pinwheel",
+ "serde",
+ "serde_json",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_index_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_inspect_client"
+version = "0.0.0"
+dependencies = [
+ "console_error_panic_hook",
+ "modelfox_charts",
+ "modelfox_ui",
+ "modelfox_www_docs_inspect_common",
+ "pinwheel",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_inspect_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_docs_inspect_common",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "num",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_monitor_client"
+version = "0.0.0"
+dependencies = [
+ "console_error_panic_hook",
+ "modelfox_charts",
+ "modelfox_ui",
+ "pinwheel",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_monitor_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_app_core",
+ "modelfox_app_date_window",
+ "modelfox_app_production_stats_column_server",
+ "modelfox_app_production_stats_index_server",
+ "modelfox_app_ui",
+ "modelfox_charts",
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_predict_cli_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_predict_elixir_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_predict_go_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_predict_index_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_predict_javascript_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_predict_php_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_predict_python_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_predict_ruby_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_predict_rust_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_getting_started_train_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_guide_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_content",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_index_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_app_core",
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_inspect_common"
+version = "0.0.0"
+dependencies = [
+ "modelfox_www_index_common",
+]
+
+[[package]]
+name = "modelfox_www_docs_install_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_docs_internals_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_content",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_index_client"
+version = "0.0.0"
+dependencies = [
+ "modelfox_charts",
+ "modelfox_ui",
+ "modelfox_www_index_common",
+ "pinwheel",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_www_index_common"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "num",
+ "pinwheel",
+ "serde",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "modelfox_www_index_server"
+version = "0.0.0"
+dependencies = [
+ "futures",
+ "modelfox_charts",
+ "modelfox_finite",
+ "modelfox_ui",
+ "modelfox_www_index_common",
+ "modelfox_www_layouts",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_layouts"
+version = "0.0.0"
+dependencies = [
+ "chrono",
+ "modelfox_ui",
+ "modelfox_www_content",
+ "modelfox_www_ui",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_pricing_server"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "modelfox_www_layouts",
+ "pinwheel",
+ "sunfish",
+]
+
+[[package]]
+name = "modelfox_www_ui"
+version = "0.0.0"
+dependencies = [
+ "modelfox_ui",
+ "pinwheel",
+]
+
+[[package]]
+name = "modelfox_zip"
+version = "0.7.0"
 
 [[package]]
 name = "multer"
@@ -3021,2257 +5261,6 @@ dependencies = [
  "syn",
  "unicode-xid",
 ]
-
-[[package]]
-name = "tangram"
-version = "0.7.0"
-dependencies = [
- "anyhow",
- "chrono",
- "memmap",
- "reqwest",
- "serde",
- "serde_json",
- "tangram_core",
- "tangram_macro",
- "tangram_model",
- "tokio",
- "url",
-]
-
-[[package]]
-name = "tangram_app"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "base64 0.13.0",
- "chrono",
- "chrono-tz",
- "clap 3.1.3",
- "futures",
- "glob",
- "http",
- "hyper",
- "lettre",
- "ndarray",
- "num",
- "once_cell",
- "rand",
- "rayon",
- "reqwest",
- "serde",
- "serde_json",
- "sha2 0.10.2",
- "sqlx",
- "sunfish",
- "tangram_app_alerts_index_server",
- "tangram_app_alerts_server",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_edit_organization_server",
- "tangram_app_health_server",
- "tangram_app_index_server",
- "tangram_app_layouts",
- "tangram_app_login_server",
- "tangram_app_migrations",
- "tangram_app_model_download_server",
- "tangram_app_model_edit_server",
- "tangram_app_model_index_client",
- "tangram_app_model_index_server",
- "tangram_app_monitor_event",
- "tangram_app_monitors_edit_server",
- "tangram_app_monitors_index_server",
- "tangram_app_new_member_server",
- "tangram_app_new_model_client",
- "tangram_app_new_model_server",
- "tangram_app_new_monitor_client",
- "tangram_app_new_monitor_server",
- "tangram_app_new_organization_server",
- "tangram_app_new_repo_server",
- "tangram_app_organization_index_server",
- "tangram_app_organization_member_server",
- "tangram_app_playground_client",
- "tangram_app_playground_server",
- "tangram_app_production_class_metrics_client",
- "tangram_app_production_class_metrics_server",
- "tangram_app_production_metrics_index_client",
- "tangram_app_production_metrics_index_server",
- "tangram_app_production_prediction_client",
- "tangram_app_production_prediction_server",
- "tangram_app_production_predictions_index_server",
- "tangram_app_production_stats_column_client",
- "tangram_app_production_stats_column_server",
- "tangram_app_production_stats_index_client",
- "tangram_app_production_stats_index_server",
- "tangram_app_repo_edit_server",
- "tangram_app_repo_index_server",
- "tangram_app_track_server",
- "tangram_app_training_class_metrics_client",
- "tangram_app_training_class_metrics_server",
- "tangram_app_training_grid_index_server",
- "tangram_app_training_grid_item_server",
- "tangram_app_training_metrics_index_server",
- "tangram_app_training_metrics_precision_recall_client",
- "tangram_app_training_metrics_precision_recall_server",
- "tangram_app_training_metrics_roc_client",
- "tangram_app_training_metrics_roc_server",
- "tangram_app_training_stats_column_client",
- "tangram_app_training_stats_column_server",
- "tangram_app_training_stats_index_server",
- "tangram_app_tuning_client",
- "tangram_app_tuning_server",
- "tangram_app_user_server",
- "tangram_charts",
- "tangram_core",
- "tangram_id",
- "tangram_metrics",
- "tangram_model",
- "tangram_serve",
- "tangram_table",
- "tangram_zip",
- "time 0.3.7",
- "tokio",
- "toml",
- "tracing",
- "url",
-]
-
-[[package]]
-name = "tangram_app_alerts_index_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_charts",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_app_alerts_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
- "tangram_zip",
- "time 0.3.7",
- "tracing",
-]
-
-[[package]]
-name = "tangram_app_context"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "sunfish",
- "tangram_app_core",
-]
-
-[[package]]
-name = "tangram_app_core"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "bytes",
- "chrono",
- "chrono-tz",
- "dirs",
- "fnv",
- "futures",
- "http",
- "hyper",
- "indexmap",
- "insta",
- "itertools",
- "lettre",
- "memmap",
- "ndarray",
- "num",
- "rand",
- "rust-s3",
- "serde",
- "serde_json",
- "sqlx",
- "sunfish",
- "tangram",
- "tangram_app_migrations",
- "tangram_app_monitor_event",
- "tangram_app_production_metrics",
- "tangram_app_production_stats",
- "tangram_core",
- "tangram_finite",
- "tangram_id",
- "tangram_metrics",
- "tangram_model",
- "tangram_serve",
- "tangram_table",
- "tangram_text",
- "tangram_zip",
- "time 0.3.7",
- "tokio",
- "tracing",
- "tracing-test",
- "url",
-]
-
-[[package]]
-name = "tangram_app_date_window"
-version = "0.0.0"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "tangram_app_edit_organization_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "pinwheel",
- "serde",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_id",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_health_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "futures",
- "http",
- "hyper",
- "memmap",
- "num",
- "serde",
- "serde_json",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tracing",
- "url",
-]
-
-[[package]]
-name = "tangram_app_index_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "pinwheel",
- "serde",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_id",
- "tangram_ui",
- "tracing",
- "url",
-]
-
-[[package]]
-name = "tangram_app_layouts"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "pinwheel",
- "serde",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_ui",
- "tangram_id",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_login_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "lettre",
- "pinwheel",
- "rand",
- "reqwest",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_id",
- "tangram_ui",
- "url",
-]
-
-[[package]]
-name = "tangram_app_migrations"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "once_cell",
- "sqlx",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_app_model_download_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_model_edit_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_model_index_client"
-version = "0.0.0"
-dependencies = [
- "console_error_panic_hook",
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
- "wasm-bindgen",
-]
-
-[[package]]
-name = "tangram_app_model_index_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_charts",
- "tangram_core",
- "tangram_finite",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_app_monitor_event"
-version = "0.0.0"
-dependencies = [
- "chrono",
- "serde",
- "serde_json",
- "tangram_finite",
- "tangram_id",
-]
-
-[[package]]
-name = "tangram_app_monitors_edit_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
- "tangram_zip",
- "time 0.3.7",
-]
-
-[[package]]
-name = "tangram_app_monitors_index_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_charts",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_app_new_member_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "lettre",
- "pinwheel",
- "reqwest",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_id",
- "tangram_ui",
- "tokio",
- "url",
-]
-
-[[package]]
-name = "tangram_app_new_model_client"
-version = "0.0.0"
-dependencies = [
- "tangram_ui",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_app_new_model_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "multer",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_new_monitor_client"
-version = "0.0.0"
-dependencies = [
- "tangram_ui",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_app_new_monitor_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "multer",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
- "time 0.3.7",
-]
-
-[[package]]
-name = "tangram_app_new_organization_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "pinwheel",
- "serde",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_id",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_new_repo_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "pinwheel",
- "serde",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_organization_index_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "pinwheel",
- "serde",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_id",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_organization_member_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "lettre",
- "num",
- "pinwheel",
- "reqwest",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_id",
- "tangram_ui",
- "tokio",
- "url",
-]
-
-[[package]]
-name = "tangram_app_playground_client"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "tangram_app_playground_common",
- "tangram_charts",
- "tangram_ui",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_app_playground_common"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "serde",
- "tangram_charts",
-]
-
-[[package]]
-name = "tangram_app_playground_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_playground_common",
- "tangram_app_ui",
- "tangram_charts",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
- "url",
-]
-
-[[package]]
-name = "tangram_app_production_class_metrics_client"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_production_class_metrics_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_urlencoded",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_date_window",
- "tangram_app_layouts",
- "tangram_app_production_metrics",
- "tangram_app_ui",
- "tangram_charts",
- "tangram_core",
- "tangram_finite",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_app_production_metrics"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "insta",
- "ndarray",
- "num",
- "serde",
- "serde_json",
- "sqlx",
- "tangram_app_date_window",
- "tangram_app_monitor_event",
- "tangram_app_production_stats",
- "tangram_model",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_app_production_metrics_index_client"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_app_production_metrics_index_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_urlencoded",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_date_window",
- "tangram_app_layouts",
- "tangram_app_production_metrics",
- "tangram_app_ui",
- "tangram_charts",
- "tangram_core",
- "tangram_finite",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_app_production_prediction_client"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_app_production_prediction_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_charts",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_production_predictions_index_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_monitor_event",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_production_stats"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "fnv",
- "indexmap",
- "insta",
- "itertools",
- "ndarray",
- "num",
- "rand",
- "serde",
- "serde_json",
- "sqlx",
- "tangram_app_date_window",
- "tangram_app_monitor_event",
- "tangram_metrics",
- "tangram_model",
- "tangram_text",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_app_production_stats_column_client"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_app_production_stats_column_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_date_window",
- "tangram_app_layouts",
- "tangram_app_production_stats",
- "tangram_app_ui",
- "tangram_charts",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_app_production_stats_index_client"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_app_production_stats_index_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_date_window",
- "tangram_app_layouts",
- "tangram_app_production_stats",
- "tangram_app_ui",
- "tangram_charts",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_app_repo_edit_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "futures",
- "http",
- "hyper",
- "pinwheel",
- "serde",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_repo_index_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "chrono-tz",
- "futures",
- "http",
- "hyper",
- "pinwheel",
- "serde",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_track_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "futures",
- "http",
- "hyper",
- "memmap",
- "num",
- "serde",
- "serde_json",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_monitor_event",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tracing",
- "url",
-]
-
-[[package]]
-name = "tangram_app_training_class_metrics_client"
-version = "0.0.0"
-dependencies = [
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_training_class_metrics_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_urlencoded",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_training_grid_common"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "tangram_app_core",
- "tangram_charts",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_training_grid_index_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_training_grid_common",
- "tangram_charts",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_training_grid_item_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "pinwheel",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_training_grid_common",
- "tangram_charts",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_training_metrics_index_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "serde_urlencoded",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_app_training_metrics_precision_recall_client"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_training_metrics_precision_recall_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_charts",
- "tangram_core",
- "tangram_finite",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_training_metrics_roc_client"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_training_metrics_roc_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_charts",
- "tangram_core",
- "tangram_finite",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_training_stats_column_client"
-version = "0.0.0"
-dependencies = [
- "console_error_panic_hook",
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_app_training_stats_column_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_urlencoded",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_charts",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_training_stats_index_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_ui",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_tuning_client"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "tangram_app_tuning_common",
- "tangram_ui",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_app_tuning_common"
-version = "0.0.0"
-dependencies = [
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "tangram_app_ui",
- "tangram_ui",
- "tracing",
-]
-
-[[package]]
-name = "tangram_app_tuning_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_app_tuning_common",
- "tangram_core",
- "tangram_id",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_ui"
-version = "0.0.0"
-dependencies = [
- "chrono",
- "chrono-tz",
- "num",
- "pinwheel",
- "serde",
- "tangram_app_date_window",
- "tangram_charts",
- "tangram_core",
- "tangram_model",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_app_user_server"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "futures",
- "http",
- "hyper",
- "pinwheel",
- "serde",
- "serde_urlencoded",
- "sqlx",
- "sunfish",
- "tangram_app_context",
- "tangram_app_core",
- "tangram_app_layouts",
- "tangram_id",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_build"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "cbindgen",
- "chrono",
- "clap 3.1.3",
- "digest 0.10.3",
- "dirs",
- "duct",
- "flate2",
- "hex",
- "indoc 1.0.4",
- "md-5 0.10.1",
- "rayon",
- "reqwest",
- "serde",
- "serde_json",
- "sha-1 0.10.0",
- "sha2 0.10.2",
- "tar",
- "tempfile",
- "url",
-]
-
-[[package]]
-name = "tangram_charts"
-version = "0.0.0"
-dependencies = [
- "futures",
- "itertools",
- "num",
- "pinwheel",
- "serde",
- "serde_json",
- "tangram_finite",
- "tangram_number_formatter",
- "tracing",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_cli"
-version = "0.7.0"
-dependencies = [
- "anyhow",
- "backtrace",
- "bytes",
- "clap 3.1.3",
- "colored",
- "csv",
- "dirs",
- "either",
- "hyper",
- "insta",
- "itertools",
- "libc",
- "num",
- "once_cell",
- "pretty_assertions",
- "rayon",
- "serde",
- "serde_json",
- "serde_yaml",
- "tangram_app",
- "tangram_app_core",
- "tangram_core",
- "tangram_id",
- "tangram_kill_chip",
- "tangram_license",
- "tangram_model",
- "tangram_progress_counter",
- "tangram_serve",
- "tangram_table",
- "tangram_zip",
- "tokio",
- "tortoise",
- "tracing",
- "tracing-subscriber",
- "url",
- "winapi",
-]
-
-[[package]]
-name = "tangram_core"
-version = "0.7.0"
-dependencies = [
- "anyhow",
- "bitvec",
- "buffalo",
- "chrono",
- "csv",
- "fast-float",
- "fnv",
- "getrandom",
- "indexmap",
- "itertools",
- "ndarray",
- "num",
- "rand",
- "rand_xoshiro",
- "rayon",
- "serde",
- "serde_json",
- "serde_yaml",
- "tangram_features",
- "tangram_finite",
- "tangram_id",
- "tangram_kill_chip",
- "tangram_linear",
- "tangram_metrics",
- "tangram_model",
- "tangram_progress_counter",
- "tangram_table",
- "tangram_text",
- "tangram_tree",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_dev"
-version = "0.0.0"
-dependencies = [
- "clap 3.1.3",
- "sunfish",
- "tokio",
-]
-
-[[package]]
-name = "tangram_elixir"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "erl_nif",
- "memmap",
- "once_cell",
- "serde",
- "tangram_core",
- "tangram_model",
-]
-
-[[package]]
-name = "tangram_example_advanced"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "tangram",
-]
-
-[[package]]
-name = "tangram_example_basic"
-version = "0.0.0"
-dependencies = [
- "tangram",
-]
-
-[[package]]
-name = "tangram_features"
-version = "0.7.0"
-dependencies = [
- "anyhow",
- "fnv",
- "indexmap",
- "itertools",
- "ndarray",
- "num",
- "serde",
- "tangram_metrics",
- "tangram_table",
- "tangram_text",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_finite"
-version = "0.7.0"
-dependencies = [
- "num",
- "serde",
-]
-
-[[package]]
-name = "tangram_id"
-version = "0.7.0"
-dependencies = [
- "rand",
- "serde",
-]
-
-[[package]]
-name = "tangram_kill_chip"
-version = "0.7.0"
-
-[[package]]
-name = "tangram_license"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "base64 0.13.0",
- "chrono",
- "clap 3.1.3",
- "digest 0.10.3",
- "duct",
- "indoc 1.0.4",
- "pem",
- "rand",
- "rsa",
- "serde",
- "serde_json",
- "sha2 0.10.2",
- "tangram_id",
-]
-
-[[package]]
-name = "tangram_linear"
-version = "0.7.0"
-dependencies = [
- "buffalo",
- "clap 3.1.3",
- "ndarray",
- "num",
- "rayon",
- "serde",
- "serde_json",
- "tangram_features",
- "tangram_kill_chip",
- "tangram_metrics",
- "tangram_progress_counter",
- "tangram_table",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_macro"
-version = "0.7.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "tangram_metrics"
-version = "0.7.0"
-dependencies = [
- "insta",
- "itertools",
- "ndarray",
- "num",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_model"
-version = "0.7.0"
-dependencies = [
- "anyhow",
- "buffalo",
- "fnv",
- "num",
- "tangram_linear",
- "tangram_text",
- "tangram_tree",
-]
-
-[[package]]
-name = "tangram_node"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "memmap",
- "node_api",
- "reqwest",
- "serde",
- "tangram_core",
- "tangram_model",
-]
-
-[[package]]
-name = "tangram_number_formatter"
-version = "0.0.0"
-dependencies = [
- "num",
- "serde",
-]
-
-[[package]]
-name = "tangram_progress_counter"
-version = "0.7.0"
-dependencies = [
- "rayon",
-]
-
-[[package]]
-name = "tangram_python"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "chrono",
- "memmap",
- "pyo3",
- "reqwest",
- "serde",
- "serde_json",
- "tangram_core",
- "tangram_model",
- "url",
-]
-
-[[package]]
-name = "tangram_serve"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "backtrace",
- "futures",
- "hyper",
- "tangram_id",
- "tokio",
- "tracing",
-]
-
-[[package]]
-name = "tangram_table"
-version = "0.7.0"
-dependencies = [
- "anyhow",
- "csv",
- "fast-float",
- "fnv",
- "insta",
- "ndarray",
- "num",
- "tangram_progress_counter",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_text"
-version = "0.7.0"
-dependencies = [
- "fnv",
- "indexmap",
- "serde",
-]
-
-[[package]]
-name = "tangram_tree"
-version = "0.7.0"
-dependencies = [
- "bitvec",
- "buffalo",
- "clap 3.1.3",
- "itertools",
- "ndarray",
- "num",
- "rayon",
- "serde",
- "serde_json",
- "tangram_finite",
- "tangram_kill_chip",
- "tangram_metrics",
- "tangram_progress_counter",
- "tangram_table",
- "tangram_zip",
-]
-
-[[package]]
-name = "tangram_ui"
-version = "0.0.0"
-dependencies = [
- "console_error_panic_hook",
- "convert_case",
- "indoc 1.0.4",
- "num",
- "once_cell",
- "percent-encoding",
- "pinwheel",
- "pulldown-cmark",
- "serde",
- "serde_json",
- "tangram_charts",
- "tangram_finite",
- "tangram_number_formatter",
- "tracing",
- "tracing-wasm",
- "tree-sitter-highlight",
- "tree-sitter-javascript",
- "tree-sitter-rust",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_wasm"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "serde",
- "serde-wasm-bindgen",
- "serde_bytes",
- "tangram_core",
- "tangram_model",
- "wasm-bindgen",
-]
-
-[[package]]
-name = "tangram_www"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "clap 3.1.3",
- "futures",
- "http",
- "hyper",
- "serde",
- "serde_json",
- "sunfish",
- "tangram_id",
- "tangram_serve",
- "tangram_www_about_server",
- "tangram_www_benchmarks_client",
- "tangram_www_benchmarks_server",
- "tangram_www_blog_index_server",
- "tangram_www_blog_server",
- "tangram_www_content",
- "tangram_www_docs_getting_started_index_server",
- "tangram_www_docs_getting_started_inspect_client",
- "tangram_www_docs_getting_started_inspect_server",
- "tangram_www_docs_getting_started_monitor_client",
- "tangram_www_docs_getting_started_monitor_server",
- "tangram_www_docs_getting_started_predict_cli_server",
- "tangram_www_docs_getting_started_predict_elixir_server",
- "tangram_www_docs_getting_started_predict_go_server",
- "tangram_www_docs_getting_started_predict_index_server",
- "tangram_www_docs_getting_started_predict_javascript_server",
- "tangram_www_docs_getting_started_predict_php_server",
- "tangram_www_docs_getting_started_predict_python_server",
- "tangram_www_docs_getting_started_predict_ruby_server",
- "tangram_www_docs_getting_started_predict_rust_server",
- "tangram_www_docs_getting_started_train_server",
- "tangram_www_docs_guide_server",
- "tangram_www_docs_index_server",
- "tangram_www_docs_install_server",
- "tangram_www_docs_internals_server",
- "tangram_www_index_client",
- "tangram_www_index_server",
- "tangram_www_jobs_server",
- "tangram_www_pricing_server",
- "tokio",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "tangram_www_about_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
-]
-
-[[package]]
-name = "tangram_www_benchmarks_client"
-version = "0.0.0"
-dependencies = [
- "console_error_panic_hook",
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
- "tangram_www_benchmarks_common",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_www_benchmarks_common"
-version = "0.0.0"
-dependencies = [
- "futures-signals",
- "num",
- "pinwheel",
- "serde",
- "tangram_charts",
- "tangram_ui",
- "tracing",
-]
-
-[[package]]
-name = "tangram_www_benchmarks_server"
-version = "0.0.0"
-dependencies = [
- "futures",
- "http",
- "hyper",
- "num",
- "pinwheel",
- "sunfish",
- "tangram_charts",
- "tangram_ui",
- "tangram_www_benchmarks_common",
- "tangram_www_layouts",
- "tracing",
-]
-
-[[package]]
-name = "tangram_www_blog_index_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_content",
- "tangram_www_layouts",
-]
-
-[[package]]
-name = "tangram_www_blog_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_content",
- "tangram_www_layouts",
-]
-
-[[package]]
-name = "tangram_www_content"
-version = "0.0.0"
-dependencies = [
- "anyhow",
- "pinwheel",
- "serde",
- "serde_json",
- "sunfish",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_index_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_inspect_client"
-version = "0.0.0"
-dependencies = [
- "console_error_panic_hook",
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
- "tangram_www_docs_inspect_common",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_inspect_server"
-version = "0.0.0"
-dependencies = [
- "num",
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_docs_inspect_common",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_monitor_client"
-version = "0.0.0"
-dependencies = [
- "console_error_panic_hook",
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_monitor_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_app_core",
- "tangram_app_date_window",
- "tangram_app_production_stats_column_server",
- "tangram_app_production_stats_index_server",
- "tangram_app_ui",
- "tangram_charts",
- "tangram_ui",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_predict_cli_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_predict_elixir_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_predict_go_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_predict_index_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_predict_javascript_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_predict_php_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_predict_python_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_predict_ruby_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_predict_rust_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_getting_started_train_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_guide_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_content",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_index_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_app_core",
- "tangram_ui",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_inspect_common"
-version = "0.0.0"
-dependencies = [
- "tangram_www_index_common",
-]
-
-[[package]]
-name = "tangram_www_docs_install_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_docs_internals_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_content",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_index_client"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "tangram_charts",
- "tangram_ui",
- "tangram_www_index_common",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_www_index_common"
-version = "0.0.0"
-dependencies = [
- "num",
- "pinwheel",
- "serde",
- "tangram_ui",
- "wasm-bindgen",
- "web-sys",
-]
-
-[[package]]
-name = "tangram_www_index_server"
-version = "0.0.0"
-dependencies = [
- "futures",
- "pinwheel",
- "sunfish",
- "tangram_charts",
- "tangram_finite",
- "tangram_ui",
- "tangram_www_index_common",
- "tangram_www_layouts",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_jobs_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
-]
-
-[[package]]
-name = "tangram_www_layouts"
-version = "0.0.0"
-dependencies = [
- "chrono",
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_content",
- "tangram_www_ui",
-]
-
-[[package]]
-name = "tangram_www_pricing_server"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "sunfish",
- "tangram_ui",
- "tangram_www_layouts",
-]
-
-[[package]]
-name = "tangram_www_ui"
-version = "0.0.0"
-dependencies = [
- "pinwheel",
- "tangram_ui",
-]
-
-[[package]]
-name = "tangram_zip"
-version = "0.7.0"
 
 [[package]]
 name = "tap"

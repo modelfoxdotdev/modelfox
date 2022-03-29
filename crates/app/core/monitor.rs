@@ -6,7 +6,7 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::*;
 use std::{borrow::BorrowMut, fmt, io, str::FromStr};
-use tangram_id::Id;
+use modelfox_id::Id;
 use time::OffsetDateTime;
 
 /// A Monitor generates alerts when production data exceeds configured thresholds
@@ -109,9 +109,9 @@ pub enum AlertModelType {
 	Regressor,
 }
 
-impl From<tangram_model::ModelInnerReader<'_>> for AlertModelType {
-	fn from(mir: tangram_model::ModelInnerReader) -> Self {
-		use tangram_model::ModelInnerReader::*;
+impl From<modelfox_model::ModelInnerReader<'_>> for AlertModelType {
+	fn from(mir: modelfox_model::ModelInnerReader) -> Self {
+		use modelfox_model::ModelInnerReader::*;
 		match mir {
 			BinaryClassifier(_) | MulticlassClassifier(_) => AlertModelType::Classifier,
 			Regressor(_) => AlertModelType::Regressor,

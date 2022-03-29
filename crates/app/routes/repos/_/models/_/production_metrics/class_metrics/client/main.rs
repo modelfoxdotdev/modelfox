@@ -1,11 +1,11 @@
 use pinwheel::prelude::*;
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub fn main() {
-	tangram_ui::client_start();
+	modelfox_ui::client_start();
 	ui::select_field_submit_on_change("date_window_select_field".to_owned());
 	ui::select_field_submit_on_change("class_select_field".to_owned());
-	hydrate::<tangram_charts::components::LineChart>("precision_intervals");
-	hydrate::<tangram_charts::components::LineChart>("recall_intervals");
-	hydrate::<tangram_charts::components::LineChart>("f1_intervals");
+	hydrate::<modelfox_charts::components::LineChart>("precision_intervals");
+	hydrate::<modelfox_charts::components::LineChart>("recall_intervals");
+	hydrate::<modelfox_charts::components::LineChart>("f1_intervals");
 }

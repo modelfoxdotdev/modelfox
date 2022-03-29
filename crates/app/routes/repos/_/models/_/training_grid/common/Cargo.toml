@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_app_training_grid_common"
+name = "modelfox_app_training_grid_common"
 publish = false
 version = "0.0.0"
 
@@ -13,9 +13,9 @@ http = "0.2"
 hyper = { version = "0.14", features = ["full"] }
 num = "0.4"
 pinwheel = "0.2"
-tangram_app_core = { path = "../../../../../../../core" }
-tangram_charts = { path = "../../../../../../../../charts" }
-tangram_core = { path = "../../../../../../../../core" }
-tangram_id = { path = "../../../../../../../../id" }
-tangram_model = { path = "../../../../../../../../model" }
-tangram_ui = { path = "../../../../../../../../ui" }
+modelfox_app_core = { path = "../../../../../../../core" }
+modelfox_charts = { path = "../../../../../../../../charts" }
+modelfox_core = { path = "../../../../../../../../core" }
+modelfox_id = { path = "../../../../../../../../id" }
+modelfox_model = { path = "../../../../../../../../model" }
+modelfox_ui = { path = "../../../../../../../../ui" }

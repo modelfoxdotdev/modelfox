@@ -12,8 +12,8 @@ use crate::{
 	config::{ChartColors, ChartConfig},
 	tooltip::{draw_tooltip, DrawTooltipOptions, TooltipLabel},
 };
+use modelfox_number_formatter::NumberFormatter;
 use num::ToPrimitive;
-use tangram_number_formatter::NumberFormatter;
 use web_sys as dom;
 
 pub struct FeatureContributionsChart;

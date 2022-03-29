@@ -5,22 +5,22 @@ use chrono_tz::Tz;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::{borrow::BorrowMut, sync::Arc};
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
 	path_components,
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 };
-use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_app_ui::predict::{
+use modelfox_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use modelfox_app_ui::predict::{
 	compute_feature_contributions_chart_series, compute_input_table,
 	BinaryClassificationPredictOutput, MulticlassClassificationPredictOutput, PredictOutput,
 	PredictOutputInner, RegressionPredictOutput,
 };
-use tangram_core::predict::{PredictInput, PredictOptions};
-use tangram_id::Id;
+use modelfox_core::predict::{PredictInput, PredictOptions};
+use modelfox_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
@@ -46,7 +46,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		Err(_) => return Ok(bad_request()),
 	};
 	let bytes = get_model_bytes(app.storage(), model_id).await?;
-	let model = tangram_model::from_bytes(&bytes)?;
+	let model = modelfox_model::from_bytes(&bytes)?;
 	if !authorize_user_for_model(&mut db, &user, model_id).await? {
 		return Ok(not_found());
 	}
@@ -85,16 +85,16 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let input: PredictInput = serde_json::from_str(&input)?;
 	let input_table = compute_input_table(model, &input);
 	let bytes = get_model_bytes(app.storage(), model_id).await?;
-	let model = tangram_model::from_bytes(&bytes)?;
-	let predict_model = tangram_core::predict::Model::from(model);
+	let model = modelfox_model::from_bytes(&bytes)?;
+	let predict_model = modelfox_core::predict::Model::from(model);
 	let options = PredictOptions {
 		compute_feature_contributions: true,
 		..Default::default()
 	};
-	let mut output = tangram_core::predict::predict(&predict_model, &[input], &options);
+	let mut output = modelfox_core::predict::predict(&predict_model, &[input], &options);
 	let output = output.remove(0);
 	let inner = match output {
-		tangram_core::predict::PredictOutput::Regression(output) => {
+		modelfox_core::predict::PredictOutput::Regression(output) => {
 			let feature_contributions = output.feature_contributions.unwrap();
 			let feature_contributions_chart_series = compute_feature_contributions_chart_series(
 				"output".to_owned(),
@@ -105,7 +105,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				value: output.value,
 			})
 		}
-		tangram_core::predict::PredictOutput::BinaryClassification(output) => {
+		modelfox_core::predict::PredictOutput::BinaryClassification(output) => {
 			let feature_contributions = output.feature_contributions.unwrap();
 			let feature_contributions_chart_series = compute_feature_contributions_chart_series(
 				"output".to_owned(),
@@ -117,7 +117,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				probability: output.probability,
 			})
 		}
-		tangram_core::predict::PredictOutput::MulticlassClassification(output) => {
+		modelfox_core::predict::PredictOutput::MulticlassClassification(output) => {
 			let feature_contributions = output.feature_contributions.unwrap();
 			let feature_contributions_chart_series = feature_contributions
 				.into_iter()

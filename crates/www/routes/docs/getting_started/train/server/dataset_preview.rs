@@ -1,5 +1,5 @@
 use pinwheel::prelude::*;
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 struct HeartDiseaseRow {
 	age: String,

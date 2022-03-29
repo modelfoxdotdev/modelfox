@@ -3,7 +3,7 @@ use std::borrow::BorrowMut;
 use crate::cookies::parse_cookies;
 use anyhow::Result;
 use sqlx::prelude::*;
-use tangram_id::Id;
+use modelfox_id::Id;
 
 pub enum User {
 	Root,
@@ -64,7 +64,7 @@ pub async fn authorize_normal_user(
 			Ok(cookies) => cookies,
 			Err(_) => return Ok(Err(AuthorizeUserError::CookieParseFailed)),
 		};
-		match cookies.get("tangram_token") {
+		match cookies.get("modelfox_token") {
 			Some(&auth_cookie) => auth_cookie.to_owned(),
 			None => return Ok(Err(AuthorizeUserError::CookieAuthAbsent)),
 		}

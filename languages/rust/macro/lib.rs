@@ -54,12 +54,12 @@ fn predict_input_impl(input: proc_macro2::TokenStream) -> syn::Result<proc_macro
 		#(
 			map.insert(#column_names.to_owned(), #values.into());
 		)*
-		tangram::PredictInput(map)
+		modelfox::PredictInput(map)
 	}};
 	Ok(code)
 }
 
-#[proc_macro_derive(PredictInput, attributes(tangram))]
+#[proc_macro_derive(PredictInput, attributes(modelfox))]
 pub fn predict_input_derive_macro(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 	predict_input_derive_macro_impl(input.into())
 		.unwrap_or_else(|e| e.to_compile_error())
@@ -97,11 +97,11 @@ fn predict_input_derive_macro_impl(
 		})
 		.collect::<syn::Result<Vec<_>>>()?;
 	let code = quote! {
-		impl From<#ident> for tangram::PredictInput {
-			fn from(value: #ident) -> tangram::PredictInput {
+		impl From<#ident> for modelfox::PredictInput {
+			fn from(value: #ident) -> modelfox::PredictInput {
 				let mut map = std::collections::BTreeMap::new();
 				#(#insert_statements)*
-				tangram::PredictInput(map)
+				modelfox::PredictInput(map)
 			}
 		}
 	};
@@ -112,7 +112,7 @@ fn predict_input_field_rename(field: &syn::Field) -> syn::Result<Option<String>>
 	let attr = field
 		.attrs
 		.iter()
-		.find(|attr| attr.path.is_ident("tangram"));
+		.find(|attr| attr.path.is_ident("modelfox"));
 	let attr = if let Some(attr) = attr {
 		attr
 	} else {
@@ -124,7 +124,7 @@ fn predict_input_field_rename(field: &syn::Field) -> syn::Result<Option<String>>
 		_ => {
 			return Err(syn::Error::new_spanned(
 				attr,
-				"tangram attribute must contain a list",
+				"modelfox attribute must contain a list",
 			))
 		}
 	};
@@ -152,7 +152,7 @@ fn predict_input_field_rename(field: &syn::Field) -> syn::Result<Option<String>>
 	Ok(Some(rename))
 }
 
-#[proc_macro_derive(PredictInputValue, attributes(tangram))]
+#[proc_macro_derive(PredictInputValue, attributes(modelfox))]
 pub fn predict_input_value_derive_macro(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 	predict_input_value_derive_macro_impl(input.into())
 		.unwrap_or_else(|e| e.to_compile_error())
@@ -185,12 +185,12 @@ fn predict_input_value_derive_macro_impl(
 		})
 		.collect::<syn::Result<Vec<_>>>()?;
 	let code = quote! {
-		impl From<#ident> for tangram::PredictInputValue {
-			fn from(value: #ident) -> tangram::PredictInputValue {
+		impl From<#ident> for modelfox::PredictInputValue {
+			fn from(value: #ident) -> modelfox::PredictInputValue {
 				let value = match value {
 					#(#match_arms,)*
 				};
-				tangram::PredictInputValue::String(value.to_owned())
+				modelfox::PredictInputValue::String(value.to_owned())
 			}
 		}
 	};
@@ -201,7 +201,7 @@ fn predict_input_value_variant_value(variant: &syn::Variant) -> syn::Result<Opti
 	let attr = variant
 		.attrs
 		.iter()
-		.find(|attr| attr.path.is_ident("tangram"));
+		.find(|attr| attr.path.is_ident("modelfox"));
 	let attr = if let Some(attr) = attr {
 		attr
 	} else {
@@ -213,7 +213,7 @@ fn predict_input_value_variant_value(variant: &syn::Variant) -> syn::Result<Opti
 		_ => {
 			return Err(syn::Error::new_spanned(
 				attr,
-				"tangram attribute must contain a list",
+				"modelfox attribute must contain a list",
 			))
 		}
 	};
@@ -241,7 +241,7 @@ fn predict_input_value_variant_value(variant: &syn::Variant) -> syn::Result<Opti
 	Ok(Some(input_value))
 }
 
-#[proc_macro_derive(ClassificationOutputValue, attributes(tangram))]
+#[proc_macro_derive(ClassificationOutputValue, attributes(modelfox))]
 pub fn classification_output_value_derive_macro(
 	input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
@@ -287,7 +287,7 @@ fn classification_output_value_derive_macro_impl(
 		})
 		.collect::<syn::Result<Vec<_>>>()?;
 	let code = quote! {
-		impl tangram::ClassificationOutputValue for #ident {
+		impl modelfox::ClassificationOutputValue for #ident {
 			fn from_str(value: &str) -> Self {
 				match value {
 					#(#from_str_match_arms,)*
@@ -310,7 +310,7 @@ fn classification_output_value_variant_value(
 	let attr = variant
 		.attrs
 		.iter()
-		.find(|attr| attr.path.is_ident("tangram"));
+		.find(|attr| attr.path.is_ident("modelfox"));
 	let attr = if let Some(attr) = attr {
 		attr
 	} else {
@@ -322,7 +322,7 @@ fn classification_output_value_variant_value(
 		_ => {
 			return Err(syn::Error::new_spanned(
 				attr,
-				"tangram attribute must contain a list",
+				"modelfox attribute must contain a list",
 			))
 		}
 	};

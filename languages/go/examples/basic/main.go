@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/tangramdotdev/tangram-go"
+	"github.com/modelfoxdotdev/modelfox-go"
 )
 
 func main() {
 	// Load the model from the path.
-	model, err := tangram.LoadModelFromPath("heart_disease.tangram", nil)
+	model, err := modelfox.LoadModelFromPath("heart_disease.modelfox", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -17,7 +17,7 @@ func main() {
 	defer model.Destroy()
 
 	// Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
-	input := tangram.PredictInput{
+	input := modelfox.PredictInput{
 		"age":                                  63,
 		"gender":                               "male",
 		"chest_pain":                           "typical angina",
@@ -34,7 +34,7 @@ func main() {
 	}
 
 	// Create the options
-	options := tangram.PredictOptions{
+	options := modelfox.PredictOptions{
 		Threshold: 0.5,
 	}
 

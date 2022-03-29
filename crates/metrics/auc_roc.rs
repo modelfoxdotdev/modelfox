@@ -99,7 +99,7 @@ struct TruePositivesFalsePositivesPoint {
 
 #[test]
 fn test_roc_curve() {
-	use tangram_zip::zip;
+	use modelfox_zip::zip;
 	let labels = vec![
 		NonZeroUsize::new(2).unwrap(),
 		NonZeroUsize::new(2).unwrap(),

@@ -4,13 +4,13 @@ use super::{
 	shap::{compute_shap_values_for_example, ComputeShapValuesForExampleOutput},
 	train_early_stopping_split, EarlyStoppingMonitor, TrainOptions, TrainProgressEvent,
 };
+use modelfox_metrics::MeanSquaredError;
+use modelfox_table::prelude::*;
 use ndarray::{self, prelude::*};
 use num::ToPrimitive;
 use rayon::{self, prelude::*};
-use tangram_metrics::MeanSquaredError;
-use tangram_progress_counter::ProgressCounter;
-use tangram_table::prelude::*;
-use tangram_zip::{pzip, zip};
+use modelfox_progress_counter::ProgressCounter;
+use modelfox_zip::{pzip, zip};
 
 /// This struct describes a linear regressor model. You can train one by calling `Regressor::train`.
 #[derive(Clone, Debug)]
@@ -155,7 +155,7 @@ impl Regressor {
 		labels: ArrayView1<f32>,
 		mut predictions: ArrayViewMut1<f32>,
 		train_options: &TrainOptions,
-		kill_chip: &tangram_kill_chip::KillChip,
+		kill_chip: &modelfox_kill_chip::KillChip,
 	) {
 		if kill_chip.is_activated() {
 			return;

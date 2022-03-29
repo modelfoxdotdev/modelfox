@@ -1,9 +1,9 @@
-require 'tangram'
+require 'modelfox'
 
-# Get the path to the .tangram file.
-model_path = File.join(File.dirname(__FILE__), 'heart_disease.tangram')
+# Get the path to the .modelfox file.
+model_path = File.join(File.dirname(__FILE__), 'heart_disease.modelfox')
 # Load the model from the path.
-model = Tangram::Model.from_path(model_path)
+model = ModelFox::Model.from_path(model_path)
 
 # Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
 input = {

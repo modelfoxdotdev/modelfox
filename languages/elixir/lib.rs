@@ -4,12 +4,12 @@ use once_cell::sync::OnceCell;
 use std::collections::BTreeMap;
 
 erl_nif::init!(
-	name: "Elixir.Tangram",
+	name: "Elixir.ModelFox",
 	funcs: [_load_model_from_path, _load_model_from_binary, _model_id, _predict],
 	load: load,
 );
 
-static MODEL_RESOURCE_TYPE: OnceCell<erl_nif::ResourceType<tangram_core::predict::Model>> =
+static MODEL_RESOURCE_TYPE: OnceCell<erl_nif::ResourceType<modelfox_core::predict::Model>> =
 	OnceCell::new();
 
 fn load<'a>(env: erl_nif::Env<'a>, _load_info: erl_nif::Term<'a>) -> Result<()> {
@@ -28,8 +28,8 @@ fn _load_model_from_path<'a>(
 ) -> Result<erl_nif::Term<'a>> {
 	let file = std::fs::File::open(path.unwrap())?;
 	let bytes = unsafe { Mmap::map(&file)? };
-	let model = tangram_model::from_bytes(&bytes)?;
-	let model = tangram_core::predict::Model::from(model);
+	let model = modelfox_model::from_bytes(&bytes)?;
+	let model = modelfox_core::predict::Model::from(model);
 	let resource_type = MODEL_RESOURCE_TYPE.get().unwrap();
 	let model = erl_nif::Resource::new(*resource_type, model);
 	let model = erl_nif::ResourceTerm::new(env, model)?;
@@ -42,8 +42,8 @@ fn _load_model_from_binary<'a>(
 	binary: erl_nif::BinaryTerm<'a>,
 ) -> Result<erl_nif::Term<'a>> {
 	let bytes = binary.get()?;
-	let model = tangram_model::from_bytes(bytes)?;
-	let model = tangram_core::predict::Model::from(model);
+	let model = modelfox_model::from_bytes(bytes)?;
+	let model = modelfox_core::predict::Model::from(model);
 	let resource_type = MODEL_RESOURCE_TYPE.get().unwrap();
 	let model = erl_nif::Resource::new(*resource_type, model);
 	let model = erl_nif::ResourceTerm::new(env, model)?;
@@ -77,7 +77,7 @@ fn _predict<'a>(
 	match input {
 		PredictInputSingleOrMultiple::Single(input) => {
 			let input = input.into();
-			let mut output = tangram_core::predict::predict(model, &[input], &options);
+			let mut output = modelfox_core::predict::predict(model, &[input], &options);
 			let output = output.remove(0);
 			let output = output.into();
 			let output = PredictOutputSingleOrMultiple::Single(output);
@@ -85,7 +85,7 @@ fn _predict<'a>(
 		}
 		PredictInputSingleOrMultiple::Multiple(input) => {
 			let input = input.into_iter().map(Into::into).collect::<Vec<_>>();
-			let output = tangram_core::predict::predict(model, &input, &options);
+			let output = modelfox_core::predict::predict(model, &input, &options);
 			let output = output.into_iter().map(Into::into).collect();
 			let output = PredictOutputSingleOrMultiple::Multiple(output);
 			Ok(output)
@@ -111,9 +111,9 @@ struct PredictInput(pub BTreeMap<String, PredictInputValue>);
 
 type PredictInputMultiple = Vec<PredictInput>;
 
-impl From<PredictInput> for tangram_core::predict::PredictInput {
-	fn from(value: PredictInput) -> tangram_core::predict::PredictInput {
-		tangram_core::predict::PredictInput(
+impl From<PredictInput> for modelfox_core::predict::PredictInput {
+	fn from(value: PredictInput) -> modelfox_core::predict::PredictInput {
+		modelfox_core::predict::PredictInput(
 			value
 				.0
 				.into_iter()
@@ -130,14 +130,14 @@ enum PredictInputValue {
 	String(String),
 }
 
-impl From<PredictInputValue> for tangram_core::predict::PredictInputValue {
-	fn from(value: PredictInputValue) -> tangram_core::predict::PredictInputValue {
+impl From<PredictInputValue> for modelfox_core::predict::PredictInputValue {
+	fn from(value: PredictInputValue) -> modelfox_core::predict::PredictInputValue {
 		match value {
 			PredictInputValue::Number(value) => {
-				tangram_core::predict::PredictInputValue::Number(value)
+				modelfox_core::predict::PredictInputValue::Number(value)
 			}
 			PredictInputValue::String(value) => {
-				tangram_core::predict::PredictInputValue::String(value)
+				modelfox_core::predict::PredictInputValue::String(value)
 			}
 		}
 	}
@@ -155,9 +155,9 @@ impl<'a> erl_nif::FromErlNif<'a> for PredictOptions {
 	}
 }
 
-impl From<PredictOptions> for tangram_core::predict::PredictOptions {
-	fn from(value: PredictOptions) -> tangram_core::predict::PredictOptions {
-		let mut options = tangram_core::predict::PredictOptions::default();
+impl From<PredictOptions> for modelfox_core::predict::PredictOptions {
+	fn from(value: PredictOptions) -> modelfox_core::predict::PredictOptions {
+		let mut options = modelfox_core::predict::PredictOptions::default();
 		if let Some(threshold) = value.threshold {
 			options.threshold = threshold;
 		}
@@ -191,16 +191,16 @@ enum PredictOutput {
 
 type PredictOutputMultiple = Vec<PredictOutput>;
 
-impl From<tangram_core::predict::PredictOutput> for PredictOutput {
-	fn from(value: tangram_core::predict::PredictOutput) -> Self {
+impl From<modelfox_core::predict::PredictOutput> for PredictOutput {
+	fn from(value: modelfox_core::predict::PredictOutput) -> Self {
 		match value {
-			tangram_core::predict::PredictOutput::Regression(value) => {
+			modelfox_core::predict::PredictOutput::Regression(value) => {
 				PredictOutput::Regression(value.into())
 			}
-			tangram_core::predict::PredictOutput::BinaryClassification(value) => {
+			modelfox_core::predict::PredictOutput::BinaryClassification(value) => {
 				PredictOutput::BinaryClassification(value.into())
 			}
-			tangram_core::predict::PredictOutput::MulticlassClassification(value) => {
+			modelfox_core::predict::PredictOutput::MulticlassClassification(value) => {
 				PredictOutput::MulticlassClassification(value.into())
 			}
 		}
@@ -208,14 +208,14 @@ impl From<tangram_core::predict::PredictOutput> for PredictOutput {
 }
 
 #[derive(serde::Serialize)]
-#[serde(rename = "Elixir.Tangram.RegressionPredictOutput")]
+#[serde(rename = "Elixir.ModelFox.RegressionPredictOutput")]
 struct RegressionPredictOutput {
 	pub value: f32,
 	pub feature_contributions: Option<FeatureContributions>,
 }
 
-impl From<tangram_core::predict::RegressionPredictOutput> for RegressionPredictOutput {
-	fn from(value: tangram_core::predict::RegressionPredictOutput) -> Self {
+impl From<modelfox_core::predict::RegressionPredictOutput> for RegressionPredictOutput {
+	fn from(value: modelfox_core::predict::RegressionPredictOutput) -> Self {
 		RegressionPredictOutput {
 			value: value.value,
 			feature_contributions: value.feature_contributions.map(Into::into),
@@ -224,17 +224,17 @@ impl From<tangram_core::predict::RegressionPredictOutput> for RegressionPredictO
 }
 
 #[derive(serde::Serialize)]
-#[serde(rename = "Elixir.Tangram.BinaryClassificationPredictOutput")]
+#[serde(rename = "Elixir.ModelFox.BinaryClassificationPredictOutput")]
 struct BinaryClassificationPredictOutput {
 	pub class_name: String,
 	pub probability: f32,
 	pub feature_contributions: Option<FeatureContributions>,
 }
 
-impl From<tangram_core::predict::BinaryClassificationPredictOutput>
+impl From<modelfox_core::predict::BinaryClassificationPredictOutput>
 	for BinaryClassificationPredictOutput
 {
-	fn from(value: tangram_core::predict::BinaryClassificationPredictOutput) -> Self {
+	fn from(value: modelfox_core::predict::BinaryClassificationPredictOutput) -> Self {
 		BinaryClassificationPredictOutput {
 			class_name: value.class_name,
 			probability: value.probability,
@@ -244,7 +244,7 @@ impl From<tangram_core::predict::BinaryClassificationPredictOutput>
 }
 
 #[derive(serde::Serialize)]
-#[serde(rename = "Elixir.Tangram.MulticlassClassificationPredictOutput")]
+#[serde(rename = "Elixir.ModelFox.MulticlassClassificationPredictOutput")]
 struct MulticlassClassificationPredictOutput {
 	pub class_name: String,
 	pub probability: f32,
@@ -252,10 +252,10 @@ struct MulticlassClassificationPredictOutput {
 	pub feature_contributions: Option<BTreeMap<String, FeatureContributions>>,
 }
 
-impl From<tangram_core::predict::MulticlassClassificationPredictOutput>
+impl From<modelfox_core::predict::MulticlassClassificationPredictOutput>
 	for MulticlassClassificationPredictOutput
 {
-	fn from(value: tangram_core::predict::MulticlassClassificationPredictOutput) -> Self {
+	fn from(value: modelfox_core::predict::MulticlassClassificationPredictOutput) -> Self {
 		MulticlassClassificationPredictOutput {
 			class_name: value.class_name,
 			probability: value.probability,
@@ -271,15 +271,15 @@ impl From<tangram_core::predict::MulticlassClassificationPredictOutput>
 }
 
 #[derive(serde::Serialize)]
-#[serde(rename = "Elixir.Tangram.FeatureContributions")]
+#[serde(rename = "Elixir.ModelFox.FeatureContributions")]
 struct FeatureContributions {
 	pub baseline_value: f32,
 	pub output_value: f32,
 	pub entries: Vec<FeatureContributionEntry>,
 }
 
-impl From<tangram_core::predict::FeatureContributions> for FeatureContributions {
-	fn from(value: tangram_core::predict::FeatureContributions) -> Self {
+impl From<modelfox_core::predict::FeatureContributions> for FeatureContributions {
+	fn from(value: modelfox_core::predict::FeatureContributions) -> Self {
 		FeatureContributions {
 			baseline_value: value.baseline_value,
 			output_value: value.output_value,
@@ -304,25 +304,25 @@ enum FeatureContributionEntry {
 	WordEmbedding(WordEmbeddingFeatureContribution),
 }
 
-impl From<tangram_core::predict::FeatureContributionEntry> for FeatureContributionEntry {
-	fn from(value: tangram_core::predict::FeatureContributionEntry) -> Self {
+impl From<modelfox_core::predict::FeatureContributionEntry> for FeatureContributionEntry {
+	fn from(value: modelfox_core::predict::FeatureContributionEntry) -> Self {
 		match value {
-			tangram_core::predict::FeatureContributionEntry::Identity(value) => {
+			modelfox_core::predict::FeatureContributionEntry::Identity(value) => {
 				FeatureContributionEntry::Identity(value.into())
 			}
-			tangram_core::predict::FeatureContributionEntry::Normalized(value) => {
+			modelfox_core::predict::FeatureContributionEntry::Normalized(value) => {
 				FeatureContributionEntry::Normalized(value.into())
 			}
-			tangram_core::predict::FeatureContributionEntry::OneHotEncoded(value) => {
+			modelfox_core::predict::FeatureContributionEntry::OneHotEncoded(value) => {
 				FeatureContributionEntry::OneHotEncoded(value.into())
 			}
-			tangram_core::predict::FeatureContributionEntry::BagOfWords(value) => {
+			modelfox_core::predict::FeatureContributionEntry::BagOfWords(value) => {
 				FeatureContributionEntry::BagOfWords(value.into())
 			}
-			tangram_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(value) => {
+			modelfox_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(value) => {
 				FeatureContributionEntry::BagOfWordsCosineSimilarity(value.into())
 			}
-			tangram_core::predict::FeatureContributionEntry::WordEmbedding(value) => {
+			modelfox_core::predict::FeatureContributionEntry::WordEmbedding(value) => {
 				FeatureContributionEntry::WordEmbedding(value.into())
 			}
 		}
@@ -330,15 +330,15 @@ impl From<tangram_core::predict::FeatureContributionEntry> for FeatureContributi
 }
 
 #[derive(serde::Serialize)]
-#[serde(rename = "Elixir.Tangram.IdentityFeatureContribution")]
+#[serde(rename = "Elixir.ModelFox.IdentityFeatureContribution")]
 struct IdentityFeatureContribution {
 	column_name: String,
 	feature_contribution_value: f32,
 	feature_value: f32,
 }
 
-impl From<tangram_core::predict::IdentityFeatureContribution> for IdentityFeatureContribution {
-	fn from(value: tangram_core::predict::IdentityFeatureContribution) -> Self {
+impl From<modelfox_core::predict::IdentityFeatureContribution> for IdentityFeatureContribution {
+	fn from(value: modelfox_core::predict::IdentityFeatureContribution) -> Self {
 		IdentityFeatureContribution {
 			column_name: value.column_name,
 			feature_contribution_value: value.feature_contribution_value,
@@ -348,14 +348,14 @@ impl From<tangram_core::predict::IdentityFeatureContribution> for IdentityFeatur
 }
 
 #[derive(serde::Serialize)]
-#[serde(rename = "Elixir.Tangram.NormalizedFeatureContribution")]
+#[serde(rename = "Elixir.ModelFox.NormalizedFeatureContribution")]
 struct NormalizedFeatureContribution {
 	column_name: String,
 	feature_contribution_value: f32,
 }
 
-impl From<tangram_core::predict::NormalizedFeatureContribution> for NormalizedFeatureContribution {
-	fn from(value: tangram_core::predict::NormalizedFeatureContribution) -> Self {
+impl From<modelfox_core::predict::NormalizedFeatureContribution> for NormalizedFeatureContribution {
+	fn from(value: modelfox_core::predict::NormalizedFeatureContribution) -> Self {
 		NormalizedFeatureContribution {
 			column_name: value.column_name,
 			feature_contribution_value: value.feature_contribution_value,
@@ -364,7 +364,7 @@ impl From<tangram_core::predict::NormalizedFeatureContribution> for NormalizedFe
 }
 
 #[derive(serde::Serialize)]
-#[serde(rename = "Elixir.Tangram.OneHotEncodedFeatureContribution")]
+#[serde(rename = "Elixir.ModelFox.OneHotEncodedFeatureContribution")]
 struct OneHotEncodedFeatureContribution {
 	column_name: String,
 	variant: Option<String>,
@@ -372,10 +372,10 @@ struct OneHotEncodedFeatureContribution {
 	feature_contribution_value: f32,
 }
 
-impl From<tangram_core::predict::OneHotEncodedFeatureContribution>
+impl From<modelfox_core::predict::OneHotEncodedFeatureContribution>
 	for OneHotEncodedFeatureContribution
 {
-	fn from(value: tangram_core::predict::OneHotEncodedFeatureContribution) -> Self {
+	fn from(value: modelfox_core::predict::OneHotEncodedFeatureContribution) -> Self {
 		OneHotEncodedFeatureContribution {
 			column_name: value.column_name,
 			variant: value.variant,
@@ -386,7 +386,7 @@ impl From<tangram_core::predict::OneHotEncodedFeatureContribution>
 }
 
 #[derive(serde::Serialize)]
-#[serde(rename = "Elixir.Tangram.BagOfWordsFeatureContribution")]
+#[serde(rename = "Elixir.ModelFox.BagOfWordsFeatureContribution")]
 struct BagOfWordsFeatureContribution {
 	column_name: String,
 	ngram: NGram,
@@ -394,8 +394,8 @@ struct BagOfWordsFeatureContribution {
 	feature_contribution_value: f32,
 }
 
-impl From<tangram_core::predict::BagOfWordsFeatureContribution> for BagOfWordsFeatureContribution {
-	fn from(value: tangram_core::predict::BagOfWordsFeatureContribution) -> Self {
+impl From<modelfox_core::predict::BagOfWordsFeatureContribution> for BagOfWordsFeatureContribution {
+	fn from(value: modelfox_core::predict::BagOfWordsFeatureContribution) -> Self {
 		BagOfWordsFeatureContribution {
 			column_name: value.column_name,
 			ngram: value.ngram.into(),
@@ -412,11 +412,11 @@ enum NGram {
 	Bigram(String, String),
 }
 
-impl From<tangram_core::predict::NGram> for NGram {
-	fn from(value: tangram_core::predict::NGram) -> Self {
+impl From<modelfox_core::predict::NGram> for NGram {
+	fn from(value: modelfox_core::predict::NGram) -> Self {
 		match value {
-			tangram_core::predict::NGram::Unigram(token) => NGram::Unigram(token),
-			tangram_core::predict::NGram::Bigram(token_a, token_b) => {
+			modelfox_core::predict::NGram::Unigram(token) => NGram::Unigram(token),
+			modelfox_core::predict::NGram::Bigram(token_a, token_b) => {
 				NGram::Bigram(token_a, token_b)
 			}
 		}
@@ -424,7 +424,7 @@ impl From<tangram_core::predict::NGram> for NGram {
 }
 
 #[derive(serde::Serialize)]
-#[serde(rename = "Elixir.Tangram.BagOfWordsCosineSimilarityFeatureContribution")]
+#[serde(rename = "Elixir.ModelFox.BagOfWordsCosineSimilarityFeatureContribution")]
 struct BagOfWordsCosineSimilarityFeatureContribution {
 	column_name_a: String,
 	column_name_b: String,
@@ -432,10 +432,10 @@ struct BagOfWordsCosineSimilarityFeatureContribution {
 	feature_contribution_value: f32,
 }
 
-impl From<tangram_core::predict::BagOfWordsCosineSimilarityFeatureContribution>
+impl From<modelfox_core::predict::BagOfWordsCosineSimilarityFeatureContribution>
 	for BagOfWordsCosineSimilarityFeatureContribution
 {
-	fn from(value: tangram_core::predict::BagOfWordsCosineSimilarityFeatureContribution) -> Self {
+	fn from(value: modelfox_core::predict::BagOfWordsCosineSimilarityFeatureContribution) -> Self {
 		BagOfWordsCosineSimilarityFeatureContribution {
 			column_name_a: value.column_name_a,
 			column_name_b: value.column_name_b,
@@ -446,17 +446,17 @@ impl From<tangram_core::predict::BagOfWordsCosineSimilarityFeatureContribution>
 }
 
 #[derive(serde::Serialize)]
-#[serde(rename = "Elixir.Tangram.WordEmbeddingFeatureContribution")]
+#[serde(rename = "Elixir.ModelFox.WordEmbeddingFeatureContribution")]
 struct WordEmbeddingFeatureContribution {
 	column_name: String,
 	value_index: usize,
 	feature_contribution_value: f32,
 }
 
-impl From<tangram_core::predict::WordEmbeddingFeatureContribution>
+impl From<modelfox_core::predict::WordEmbeddingFeatureContribution>
 	for WordEmbeddingFeatureContribution
 {
-	fn from(value: tangram_core::predict::WordEmbeddingFeatureContribution) -> Self {
+	fn from(value: modelfox_core::predict::WordEmbeddingFeatureContribution) -> Self {
 		WordEmbeddingFeatureContribution {
 			column_name: value.column_name,
 			value_index: value.value_index,

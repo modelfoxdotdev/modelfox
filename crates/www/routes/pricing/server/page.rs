@@ -1,6 +1,6 @@
+use modelfox_ui as ui;
+use modelfox_www_layouts::{document::Document, page_layout::PageLayout};
 use pinwheel::prelude::*;
-use tangram_ui as ui;
-use tangram_www_layouts::{document::Document, page_layout::PageLayout};
 
 pub struct Page;
 
@@ -8,18 +8,18 @@ impl Component for Page {
 	fn into_node(self) -> Node {
 		let title = ui::H1::new("Pricing").center(true);
 		let free_cta = ui::Button::new()
-			.color(ui::colors::RED.to_owned())
+			.color(ui::colors::GREEN.to_owned())
 			.href("/docs/install".to_owned())
 			.child("Install the CLI")
 			.into_node();
 		let team_cta = ui::Button::new()
-			.color(ui::colors::GREEN.to_owned())
-			.href("mailto:hello@tangram.dev".to_owned())
+			.color(ui::colors::TEAL.to_owned())
+			.href("mailto:hello@modelfox.dev".to_owned())
 			.child("Contact Us")
 			.into_node();
 		let enterprise_cta = ui::Button::new()
 			.color(ui::colors::BLUE.to_owned())
-			.href("mailto:hello@tangram.dev".to_owned())
+			.href("mailto:hello@modelfox.dev".to_owned())
 			.child("Contact Us")
 			.into_node();
 		let cards = PricingCards {
@@ -58,7 +58,7 @@ pub struct PricingCards {
 impl Component for PricingCards {
 	fn into_node(self) -> Node {
 		let free_card = PricingCard {
-			color: ui::colors::RED.to_owned(),
+			color: ui::colors::GREEN.to_owned(),
 			cta: self.free_cta,
 			features: vec![
 				"Training with the CLI.".to_owned(),
@@ -70,14 +70,14 @@ impl Component for PricingCards {
 			title: "Free".to_owned(),
 		};
 		let team_card = PricingCard {
-			color: ui::colors::GREEN.to_owned(),
+			color: ui::colors::TEAL.to_owned(),
 			cta: self.team_cta,
 			features: vec![
 				"Everything in the Free plan.".to_owned(),
 				"Use the cloud-hosted app.".to_owned(),
 			],
 			price: "contact us".to_owned(),
-			price_subtitle: "hello@tangram.dev".to_owned(),
+			price_subtitle: "hello@modelfox.dev".to_owned(),
 			selected: false,
 			title: "Team".to_owned(),
 		};
@@ -89,7 +89,7 @@ impl Component for PricingCards {
 				"Use the self-hosted app.".to_owned(),
 			],
 			price: "contact us".to_owned(),
-			price_subtitle: "hello@tangram.dev".to_owned(),
+			price_subtitle: "hello@modelfox.dev".to_owned(),
 			selected: false,
 			title: "Enterprise".to_owned(),
 		};
@@ -158,14 +158,14 @@ impl Component for PricingTable {
 				.child(
 					ui::TableHeaderCell::new().width("33%".to_owned()).child(
 						ui::Token::new()
-							.color(ui::colors::RED.to_owned())
+							.color(ui::colors::GREEN.to_owned())
 							.child("Free"),
 					),
 				)
 				.child(
 					ui::TableHeaderCell::new().width("33%".to_owned()).child(
 						ui::Token::new()
-							.color(ui::colors::GREEN.to_owned())
+							.color(ui::colors::TEAL.to_owned())
 							.child("Team"),
 					),
 				)

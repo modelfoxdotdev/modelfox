@@ -1,6 +1,6 @@
-pub use tangram_linear::TrainProgressEvent as LinearTrainProgressEvent;
-use tangram_progress_counter::ProgressCounter;
-pub use tangram_tree::TrainProgressEvent as TreeTrainProgressEvent;
+pub use modelfox_linear::TrainProgressEvent as LinearTrainProgressEvent;
+pub use modelfox_tree::TrainProgressEvent as TreeTrainProgressEvent;
+use modelfox_progress_counter::ProgressCounter;
 
 #[derive(Clone, Debug)]
 pub enum ProgressEvent {
@@ -18,8 +18,8 @@ pub enum ProgressEvent {
 
 #[derive(Clone, Debug)]
 pub enum LoadProgressEvent {
-	Train(tangram_table::LoadProgressEvent),
-	Test(tangram_table::LoadProgressEvent),
+	Train(modelfox_table::LoadProgressEvent),
+	Test(modelfox_table::LoadProgressEvent),
 	Shuffle,
 	ShuffleDone,
 }
@@ -51,8 +51,8 @@ pub enum TrainGridItemProgressEvent {
 
 #[derive(Clone, Debug)]
 pub enum ModelTrainProgressEvent {
-	Linear(tangram_linear::TrainProgressEvent),
-	Tree(tangram_tree::TrainProgressEvent),
+	Linear(modelfox_linear::TrainProgressEvent),
+	Tree(modelfox_tree::TrainProgressEvent),
 }
 
 #[derive(Clone, Debug)]

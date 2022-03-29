@@ -10,32 +10,32 @@ use itertools::iproduct;
 pub enum GridItem {
 	LinearRegressor {
 		target_column_index: usize,
-		feature_groups: Vec<tangram_features::FeatureGroup>,
+		feature_groups: Vec<modelfox_features::FeatureGroup>,
 		options: LinearModelTrainOptions,
 	},
 	TreeRegressor {
 		target_column_index: usize,
-		feature_groups: Vec<tangram_features::FeatureGroup>,
+		feature_groups: Vec<modelfox_features::FeatureGroup>,
 		options: TreeModelTrainOptions,
 	},
 	LinearBinaryClassifier {
 		target_column_index: usize,
-		feature_groups: Vec<tangram_features::FeatureGroup>,
+		feature_groups: Vec<modelfox_features::FeatureGroup>,
 		options: LinearModelTrainOptions,
 	},
 	TreeBinaryClassifier {
 		target_column_index: usize,
-		feature_groups: Vec<tangram_features::FeatureGroup>,
+		feature_groups: Vec<modelfox_features::FeatureGroup>,
 		options: TreeModelTrainOptions,
 	},
 	LinearMulticlassClassifier {
 		target_column_index: usize,
-		feature_groups: Vec<tangram_features::FeatureGroup>,
+		feature_groups: Vec<modelfox_features::FeatureGroup>,
 		options: LinearModelTrainOptions,
 	},
 	TreeMulticlassClassifier {
 		target_column_index: usize,
-		feature_groups: Vec<tangram_features::FeatureGroup>,
+		feature_groups: Vec<modelfox_features::FeatureGroup>,
 		options: TreeModelTrainOptions,
 	},
 }

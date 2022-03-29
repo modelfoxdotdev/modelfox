@@ -2,12 +2,12 @@ use crate::App;
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
 use bytes::Bytes;
+use modelfox_id::Id;
 use std::{
 	collections::HashMap,
 	path::PathBuf,
 	sync::{Arc, RwLock},
 };
-use tangram_id::Id;
 use tokio::fs;
 
 #[derive(Debug)]
@@ -75,7 +75,7 @@ impl TryFrom<BytesOrFilePath> for PathBuf {
 	}
 }
 
-/// This trait represents types which can serve as storage buckets for the Tangram app.
+/// This trait represents types which can serve as storage buckets for the ModelFox app.
 #[async_trait]
 trait StorageTrait {
 	/// Retrieve an entity from storage.

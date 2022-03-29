@@ -1,11 +1,11 @@
 use pinwheel::prelude::*;
-use tangram_charts::{
+use modelfox_charts::{
 	common::GridLineInterval,
 	components::LineChart,
 	line_chart::{LineChartPoint, LineChartSeries, LineStyle, PointStyle},
 };
-use tangram_finite::Finite;
-use tangram_ui as ui;
+use modelfox_finite::Finite;
+use modelfox_ui as ui;
 
 pub struct ProductionMetrics;
 

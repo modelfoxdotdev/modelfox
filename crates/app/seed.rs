@@ -4,19 +4,19 @@ use clap::{ArgEnum, Parser};
 use num::ToPrimitive;
 use rand::Rng;
 use std::{collections::HashMap, path::Path};
-use tangram_app_core::{
+use modelfox_app_core::{
 	alert::{AlertMethod, AlertMetric},
 	monitor::{MonitorCadence, MonitorThreshold, MonitorThresholdMode},
 	monitor_checker::MonitorConfig,
 	reset_data, App,
 };
-use tangram_app_monitor_event::{
+use modelfox_app_monitor_event::{
 	BinaryClassificationPredictOutput, MonitorEvent, MulticlassClassificationPredictOutput,
 	NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,
 	TrueValueMonitorEvent,
 };
-use tangram_id::Id;
-use tangram_table::TableView;
+use modelfox_id::Id;
+use modelfox_table::TableView;
 use url::Url;
 
 #[derive(Parser)]
@@ -43,7 +43,7 @@ struct DatasetConfig {
 
 const HEART_DISEASE: DatasetConfig = DatasetConfig {
 	path: "heart_disease.csv",
-	model_path: "heart_disease.tangram",
+	model_path: "heart_disease.modelfox",
 	name: "heart_disease",
 	target: "diagnosis",
 	class_names: Some(&["Negative", "Positive"]),
@@ -54,7 +54,7 @@ pub async fn main() -> Result<()> {
 	let args = Args::parse();
 	let dataset = HEART_DISEASE;
 	let table =
-		tangram_table::Table::from_path(Path::new(dataset.path), Default::default(), &mut |_| {})?;
+		modelfox_table::Table::from_path(Path::new(dataset.path), Default::default(), &mut |_| {})?;
 	let mut rng = rand::thread_rng();
 	reset_data(&args.database_url).await?;
 	let options = init_options(args.database_url)?;
@@ -110,8 +110,8 @@ pub async fn main() -> Result<()> {
 	Ok(())
 }
 
-fn init_options(database_url: Option<Url>) -> Result<tangram_app_core::options::Options> {
-	let mut options = tangram_app_core::options::Options::default();
+fn init_options(database_url: Option<Url>) -> Result<modelfox_app_core::options::Options> {
+	let mut options = modelfox_app_core::options::Options::default();
 	if database_url.is_none() {
 		return Ok(options);
 	}
@@ -119,7 +119,7 @@ fn init_options(database_url: Option<Url>) -> Result<tangram_app_core::options::
 	let database_url = database_url.unwrap();
 	match database_url.scheme() {
 		"postgres" | "sqlite" => {
-			let database_options = tangram_app_core::options::DatabaseOptions {
+			let database_options = modelfox_app_core::options::DatabaseOptions {
 				max_connections: None,
 				url: database_url,
 			};
@@ -282,7 +282,7 @@ fn get_random_row(table: TableView) -> HashMap<String, serde_json::Value> {
 		.columns()
 		.iter()
 		.map(|column| match column {
-			tangram_table::TableColumnView::Number(column) => {
+			modelfox_table::TableColumnView::Number(column) => {
 				let column_name = column.name().unwrap().to_owned();
 				let value = column.data()[random_row_index].to_f64().unwrap();
 				let value = if let Some(value) = serde_json::Number::from_f64(value) {
@@ -292,7 +292,7 @@ fn get_random_row(table: TableView) -> HashMap<String, serde_json::Value> {
 				};
 				(column_name, value)
 			}
-			tangram_table::TableColumnView::Enum(column) => {
+			modelfox_table::TableColumnView::Enum(column) => {
 				let column_name = column.name().unwrap().to_owned();
 				let value = column.data()[random_row_index];
 				let value = match value {

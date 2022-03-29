@@ -1,6 +1,6 @@
 use num::ToPrimitive;
-use tangram_app_monitor_event::NumberOrString;
-use tangram_app_production_stats::NumberStats;
+use modelfox_app_monitor_event::NumberOrString;
+use modelfox_app_production_stats::NumberStats;
 
 #[derive(serde::Serialize, serde::Deserialize, Clone)]
 pub struct RegressionProductionPredictionMetrics {

@@ -1,6 +1,6 @@
 python -m venv .venv
 source .venv/bin/activate
-cargo build -p tangram_python
-cp ../../target/debug/libtangram_python.so tangram/tangram_python.so
+cargo build -p modelfox_python
+cp ../../target/debug/libmodelfox_python.so modelfox/modelfox_python.so
 pip install -e .
 deactivate

@@ -1,4 +1,4 @@
 documentation_style = "c++"
-header = "/** This header file defines the C API for libtangram, the Tangram C library. */"
+header = "/** This header file defines the C API for libmodelfox, the ModelFox C library. */"
 language = "c"
 style = "type"

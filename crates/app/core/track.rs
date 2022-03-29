@@ -5,14 +5,14 @@ use memmap::Mmap;
 use num::ToPrimitive;
 use sqlx::prelude::*;
 use std::{borrow::BorrowMut, collections::BTreeMap};
-use tangram_app_monitor_event::{
+use modelfox_app_monitor_event::{
 	BinaryClassificationPredictOutput, MonitorEvent, MulticlassClassificationPredictOutput,
 	NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,
 	TrueValueMonitorEvent,
 };
-use tangram_app_production_metrics::ProductionMetrics;
-use tangram_app_production_stats::ProductionStats;
-use tangram_id::Id;
+use modelfox_app_production_metrics::ProductionMetrics;
+use modelfox_app_production_stats::ProductionStats;
+use modelfox_id::Id;
 use tracing::error;
 
 use super::App;
@@ -77,7 +77,7 @@ pub async fn handle_prediction_monitor_event(
 			model_cache.get(&model_id).unwrap()
 		}
 	};
-	let model = tangram_model::from_bytes(bytes)?;
+	let model = modelfox_model::from_bytes(bytes)?;
 	write_prediction_monitor_event(txn, model_id, &monitor_event).await?;
 	insert_or_update_production_stats_for_monitor_event(txn, model_id, model, monitor_event)
 		.await?;
@@ -146,7 +146,7 @@ pub async fn handle_true_value_monitor_event(
 			model_cache.get(&model_id).unwrap()
 		}
 	};
-	let model = tangram_model::from_bytes(bytes)?;
+	let model = modelfox_model::from_bytes(bytes)?;
 	write_true_value_monitor_event(txn, model_id, &monitor_event).await?;
 	insert_or_update_production_metrics_for_monitor_event(txn, model_id, model, monitor_event)
 		.await?;
@@ -199,7 +199,7 @@ pub async fn write_true_value_monitor_event(
 pub async fn insert_or_update_production_stats_for_monitor_event(
 	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	model_id: Id,
-	model: tangram_model::ModelReader<'_>,
+	model: modelfox_model::ModelReader<'_>,
 	monitor_event: PredictionMonitorEvent,
 ) -> Result<()> {
 	let date = monitor_event.date;
@@ -267,7 +267,7 @@ pub async fn insert_or_update_production_stats_for_monitor_event(
 pub async fn insert_or_update_production_metrics_for_monitor_event(
 	txn: &mut sqlx::Transaction<'_, sqlx::Any>,
 	model_id: Id,
-	model: tangram_model::ModelReader<'_>,
+	model: modelfox_model::ModelReader<'_>,
 	monitor_event: TrueValueMonitorEvent,
 ) -> Result<()> {
 	let identifier = monitor_event.identifier.as_string().to_string();

@@ -1,10 +1,10 @@
 use pinwheel::prelude::*;
-use tangram_app_layouts::{
+use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-use tangram_app_tuning_common::Tuning;
-use tangram_ui as ui;
+use modelfox_app_tuning_common::Tuning;
+use modelfox_ui as ui;
 
 pub struct Page {
 	pub model_layout_info: ModelLayoutInfo,
@@ -20,7 +20,7 @@ impl Component for Page {
 				.into_node(),
 		};
 		Document::new()
-			.client("tangram_app_tuning_client")
+			.client("modelfox_app_tuning_client")
 			.child(ModelLayout::new(self.model_layout_info).child(inner))
 			.into_node()
 	}

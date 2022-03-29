@@ -3,11 +3,11 @@ use crate::common::{
 	ClassifierChartEntry, ColumnStatsTable, PredictionCountChart, PredictionCountChartEntry,
 };
 use pinwheel::prelude::*;
-use tangram_app_date_window::{DateWindow, DateWindowInterval};
-use tangram_app_ui::{
+use modelfox_app_date_window::{DateWindow, DateWindowInterval};
+use modelfox_app_ui::{
 	class_select_field::ClassSelectField, date_window_select_field::DateWindowSelectField,
 };
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct MulticlassClassifier {
 	pub date_window: DateWindow,

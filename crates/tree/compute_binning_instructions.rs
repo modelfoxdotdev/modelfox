@@ -1,11 +1,11 @@
 use crate::TrainOptions;
 use itertools::Itertools;
+use modelfox_finite::Finite;
+use modelfox_table::{NumberTableColumnView, TableColumnView, TableView};
+use modelfox_zip::zip;
 use num::ToPrimitive;
 use rayon::prelude::*;
 use std::{cmp::Ordering, collections::BTreeMap};
-use tangram_finite::Finite;
-use tangram_table::{NumberTableColumnView, TableColumnView, TableView};
-use tangram_zip::zip;
 
 /*
 This struct specifies how to produce a binned feature from a feature.

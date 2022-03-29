@@ -10,8 +10,8 @@ use anyhow::{bail, Result};
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use std::sync::Arc;
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	heuristics::{
 		TRAINING_IMPORTANCES_MAX_FEATURE_IMPORTANCES_TO_SHOW_IN_CHART,
@@ -21,10 +21,10 @@ use tangram_app_core::{
 	path_components,
 	user::{authorize_user, authorize_user_for_model},
 };
-use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_finite::{Finite, FiniteF32};
-use tangram_id::Id;
-use tangram_zip::zip;
+use modelfox_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use modelfox_finite::{Finite, FiniteF32};
+use modelfox_id::Id;
+use modelfox_zip::zip;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
@@ -51,11 +51,11 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		return Ok(not_found());
 	}
 	let bytes = get_model_bytes(app.storage(), model_id).await?;
-	let model = tangram_model::from_bytes(&bytes)?;
+	let model = modelfox_model::from_bytes(&bytes)?;
 	let summary_section = compute_summary_section(model);
 	let feature_importances_section = compute_feature_importances_section(model);
 	let inner = match model.inner() {
-		tangram_model::ModelInnerReader::Regressor(regressor) => {
+		modelfox_model::ModelInnerReader::Regressor(regressor) => {
 			let regressor = regressor.read();
 			let warning = if regressor.baseline_metrics().rmse() < regressor.test_metrics().rmse() {
 				Some("Baseline RMSE is lower! Your model performs worse than if it were just guessing the mean of the target column.".into())
@@ -63,11 +63,11 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				None
 			};
 			let losses_chart_series = match regressor.model() {
-				tangram_model::RegressionModelReader::Linear(model) => {
+				modelfox_model::RegressionModelReader::Linear(model) => {
 					let model = model.read();
 					model.losses().map(|losses| losses.iter().collect())
 				}
-				tangram_model::RegressionModelReader::Tree(model) => {
+				modelfox_model::RegressionModelReader::Tree(model) => {
 					let model = model.read();
 					model.losses().map(|losses| losses.iter().collect())
 				}
@@ -86,7 +86,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				warning,
 			})
 		}
-		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+		modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			let model = binary_classifier.read();
 			let test_metrics = model.test_metrics();
 			let baseline_metrics = model.baseline_metrics();
@@ -100,11 +100,11 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				None
 			};
 			let losses_chart_series = match model.model() {
-				tangram_model::BinaryClassificationModelReader::Linear(model) => {
+				modelfox_model::BinaryClassificationModelReader::Linear(model) => {
 					let model = model.read();
 					model.losses().map(|losses| losses.iter().collect())
 				}
-				tangram_model::BinaryClassificationModelReader::Tree(model) => {
+				modelfox_model::BinaryClassificationModelReader::Tree(model) => {
 					let model = model.read();
 					model.losses().map(|losses| losses.iter().collect())
 				}
@@ -124,7 +124,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				feature_importances_section,
 			})
 		}
-		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+		modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 			let model = multiclass_classifier.read();
 			let class_metrics = model
 				.test_metrics()
@@ -143,11 +143,11 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				None
 			};
 			let losses_chart_series = match model.model() {
-				tangram_model::MulticlassClassificationModelReader::Linear(model) => {
+				modelfox_model::MulticlassClassificationModelReader::Linear(model) => {
 					let model = model.read();
 					model.losses().map(|losses| losses.iter().collect())
 				}
-				tangram_model::MulticlassClassificationModelReader::Tree(model) => {
+				modelfox_model::MulticlassClassificationModelReader::Tree(model) => {
 					let model = model.read();
 					model.losses().map(|losses| losses.iter().collect())
 				}
@@ -183,10 +183,10 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	Ok(response)
 }
 
-fn compute_summary_section(model: tangram_model::ModelReader) -> TrainingSummarySection {
+fn compute_summary_section(model: modelfox_model::ModelReader) -> TrainingSummarySection {
 	let chosen_model_type_name = model_type_name(model);
 	match model.inner() {
-		tangram_model::ModelInnerReader::Regressor(regressor) => {
+		modelfox_model::ModelInnerReader::Regressor(regressor) => {
 			let regressor = regressor.read();
 			TrainingSummarySection {
 				chosen_model_type_name,
@@ -202,7 +202,7 @@ fn compute_summary_section(model: tangram_model::ModelReader) -> TrainingSummary
 				overall_row_count: regressor.overall_row_count().to_usize().unwrap(),
 			}
 		}
-		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+		modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			let binary_classifier = binary_classifier.read();
 			TrainingSummarySection {
 				chosen_model_type_name,
@@ -218,7 +218,7 @@ fn compute_summary_section(model: tangram_model::ModelReader) -> TrainingSummary
 				overall_row_count: binary_classifier.overall_row_count().to_usize().unwrap(),
 			}
 		}
-		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+		modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 			let multiclass_classifier = multiclass_classifier.read();
 			TrainingSummarySection {
 				chosen_model_type_name,
@@ -248,64 +248,64 @@ fn compute_summary_section(model: tangram_model::ModelReader) -> TrainingSummary
 }
 
 fn regression_comparison_type_name(
-	comparison_metric: &tangram_model::RegressionComparisonMetricReader,
+	comparison_metric: &modelfox_model::RegressionComparisonMetricReader,
 ) -> String {
 	match comparison_metric {
-		tangram_model::RegressionComparisonMetricReader::MeanAbsoluteError(_) => {
+		modelfox_model::RegressionComparisonMetricReader::MeanAbsoluteError(_) => {
 			"Mean Absolute Error".to_owned()
 		}
-		tangram_model::RegressionComparisonMetricReader::MeanSquaredError(_) => {
+		modelfox_model::RegressionComparisonMetricReader::MeanSquaredError(_) => {
 			"Mean Squared Error".to_owned()
 		}
-		tangram_model::RegressionComparisonMetricReader::RootMeanSquaredError(_) => {
+		modelfox_model::RegressionComparisonMetricReader::RootMeanSquaredError(_) => {
 			"Root Mean Squared Error".to_owned()
 		}
-		tangram_model::RegressionComparisonMetricReader::R2(_) => "R2".to_owned(),
+		modelfox_model::RegressionComparisonMetricReader::R2(_) => "R2".to_owned(),
 	}
 }
 
 fn binary_classification_comparison_type_name(
-	comparison_metric: &tangram_model::BinaryClassificationComparisonMetricReader,
+	comparison_metric: &modelfox_model::BinaryClassificationComparisonMetricReader,
 ) -> String {
 	match comparison_metric {
-		tangram_model::BinaryClassificationComparisonMetricReader::Aucroc(_) => {
+		modelfox_model::BinaryClassificationComparisonMetricReader::Aucroc(_) => {
 			"Area Under the Receiver Operating Characteristic Curve".to_owned()
 		}
 	}
 }
 
 fn multiclass_classification_comparison_type_name(
-	comparison_metric: &tangram_model::MulticlassClassificationComparisonMetricReader,
+	comparison_metric: &modelfox_model::MulticlassClassificationComparisonMetricReader,
 ) -> String {
 	match comparison_metric {
-		tangram_model::MulticlassClassificationComparisonMetricReader::Accuracy(_) => {
+		modelfox_model::MulticlassClassificationComparisonMetricReader::Accuracy(_) => {
 			"Accuracy".to_owned()
 		}
 	}
 }
 
-fn model_type_name(model: tangram_model::ModelReader) -> String {
+fn model_type_name(model: modelfox_model::ModelReader) -> String {
 	match model.inner() {
-		tangram_model::ModelInnerReader::Regressor(regressor) => match regressor.read().model() {
-			tangram_model::RegressionModelReader::Linear(_) => "Linear Regressor".to_owned(),
-			tangram_model::RegressionModelReader::Tree(_) => {
+		modelfox_model::ModelInnerReader::Regressor(regressor) => match regressor.read().model() {
+			modelfox_model::RegressionModelReader::Linear(_) => "Linear Regressor".to_owned(),
+			modelfox_model::RegressionModelReader::Tree(_) => {
 				"Gradient Boosted Tree Regressor".to_owned()
 			}
 		},
-		tangram_model::ModelInnerReader::BinaryClassifier(model) => match model.read().model() {
-			tangram_model::BinaryClassificationModelReader::Linear(_) => {
+		modelfox_model::ModelInnerReader::BinaryClassifier(model) => match model.read().model() {
+			modelfox_model::BinaryClassificationModelReader::Linear(_) => {
 				"Linear Binary Classifier".to_owned()
 			}
-			tangram_model::BinaryClassificationModelReader::Tree(_) => {
+			modelfox_model::BinaryClassificationModelReader::Tree(_) => {
 				"Gradient Boosted Tree Binary Classifier".to_owned()
 			}
 		},
-		tangram_model::ModelInnerReader::MulticlassClassifier(model) => {
+		modelfox_model::ModelInnerReader::MulticlassClassifier(model) => {
 			match model.read().model() {
-				tangram_model::MulticlassClassificationModelReader::Linear(_) => {
+				modelfox_model::MulticlassClassificationModelReader::Linear(_) => {
 					"Linear Multiclass Classifier".to_owned()
 				}
-				tangram_model::MulticlassClassificationModelReader::Tree(_) => {
+				modelfox_model::MulticlassClassificationModelReader::Tree(_) => {
 					"Gradient Boosted Tree Multiclass Classifier".to_owned()
 				}
 			}
@@ -314,22 +314,22 @@ fn model_type_name(model: tangram_model::ModelReader) -> String {
 }
 
 fn compute_feature_importances_section(
-	model: tangram_model::ModelReader,
+	model: modelfox_model::ModelReader,
 ) -> Option<FeatureImportancesSection> {
 	let n_columns = match model.inner() {
-		tangram_model::ModelInnerReader::Regressor(regressor) => {
+		modelfox_model::ModelInnerReader::Regressor(regressor) => {
 			regressor.read().overall_column_stats().len()
 		}
-		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+		modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			binary_classifier.read().overall_column_stats().len()
 		}
-		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+		modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 			multiclass_classifier.read().overall_column_stats().len()
 		}
 	};
 	let (mut feature_importances, n_features) = match model.inner() {
-		tangram_model::ModelInnerReader::Regressor(regressor) => match regressor.read().model() {
-			tangram_model::RegressionModelReader::Linear(inner_model) => {
+		modelfox_model::ModelInnerReader::Regressor(regressor) => match regressor.read().model() {
+			modelfox_model::RegressionModelReader::Linear(inner_model) => {
 				let inner_model = inner_model.read();
 				let feature_names = compute_feature_names(inner_model.feature_groups().iter());
 				let feature_importance_values = inner_model
@@ -354,7 +354,7 @@ fn compute_feature_importances_section(
 				let n_features = feature_importances.len();
 				(feature_importances, n_features)
 			}
-			tangram_model::RegressionModelReader::Tree(inner_model) => {
+			modelfox_model::RegressionModelReader::Tree(inner_model) => {
 				let inner_model = inner_model.read();
 				let feature_names = compute_feature_names(inner_model.feature_groups().iter());
 				let feature_importance_values = inner_model
@@ -380,9 +380,9 @@ fn compute_feature_importances_section(
 				(feature_importances, n_features)
 			}
 		},
-		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+		modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			match binary_classifier.read().model() {
-				tangram_model::BinaryClassificationModelReader::Linear(inner_model) => {
+				modelfox_model::BinaryClassificationModelReader::Linear(inner_model) => {
 					let inner_model = inner_model.read();
 					let feature_names = compute_feature_names(inner_model.feature_groups().iter());
 					let feature_importance_values = inner_model
@@ -407,7 +407,7 @@ fn compute_feature_importances_section(
 					let n_features = feature_importances.len();
 					(feature_importances, n_features)
 				}
-				tangram_model::BinaryClassificationModelReader::Tree(inner_model) => {
+				modelfox_model::BinaryClassificationModelReader::Tree(inner_model) => {
 					let inner_model = inner_model.read();
 					let feature_names = compute_feature_names(inner_model.feature_groups().iter());
 					let feature_importance_values = inner_model
@@ -434,9 +434,9 @@ fn compute_feature_importances_section(
 				}
 			}
 		}
-		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+		modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 			match multiclass_classifier.read().model() {
-				tangram_model::MulticlassClassificationModelReader::Linear(inner_model) => {
+				modelfox_model::MulticlassClassificationModelReader::Linear(inner_model) => {
 					let inner_model = inner_model.read();
 					let feature_names = compute_feature_names(inner_model.feature_groups().iter());
 					let feature_importance_values = inner_model
@@ -461,7 +461,7 @@ fn compute_feature_importances_section(
 					let n_features = feature_importances.len();
 					(feature_importances, n_features)
 				}
-				tangram_model::MulticlassClassificationModelReader::Tree(inner_model) => {
+				modelfox_model::MulticlassClassificationModelReader::Tree(inner_model) => {
 					let inner_model = inner_model.read();
 					let feature_names = compute_feature_names(inner_model.feature_groups().iter());
 					let feature_importance_values = inner_model
@@ -508,19 +508,19 @@ fn compute_feature_importances_section(
 }
 
 fn compute_feature_names<'a>(
-	feature_groups: impl Iterator<Item = tangram_model::FeatureGroupReader<'a>>,
+	feature_groups: impl Iterator<Item = modelfox_model::FeatureGroupReader<'a>>,
 ) -> Vec<String> {
 	feature_groups
 		.flat_map(|feature_group| match feature_group {
-			tangram_model::FeatureGroupReader::Identity(feature_group) => {
+			modelfox_model::FeatureGroupReader::Identity(feature_group) => {
 				let feature_group = feature_group.read();
 				vec![feature_group.source_column_name().to_owned()]
 			}
-			tangram_model::FeatureGroupReader::Normalized(feature_group) => {
+			modelfox_model::FeatureGroupReader::Normalized(feature_group) => {
 				let feature_group = feature_group.read();
 				vec![feature_group.source_column_name().to_owned()]
 			}
-			tangram_model::FeatureGroupReader::OneHotEncoded(feature_group) => {
+			modelfox_model::FeatureGroupReader::OneHotEncoded(feature_group) => {
 				let feature_group = feature_group.read();
 				vec!["OOV"]
 					.into_iter()
@@ -528,7 +528,7 @@ fn compute_feature_names<'a>(
 					.map(|variant| format!("{} = {}", feature_group.source_column_name(), variant,))
 					.collect()
 			}
-			tangram_model::FeatureGroupReader::BagOfWords(feature_group) => {
+			modelfox_model::FeatureGroupReader::BagOfWords(feature_group) => {
 				let feature_group = feature_group.read();
 				feature_group
 					.ngrams()
@@ -538,7 +538,7 @@ fn compute_feature_names<'a>(
 					})
 					.collect()
 			}
-			tangram_model::FeatureGroupReader::BagOfWordsCosineSimilarity(feature_group) => {
+			modelfox_model::FeatureGroupReader::BagOfWordsCosineSimilarity(feature_group) => {
 				let feature_group = feature_group.read();
 				vec![format!(
 					"similarity of {} and {}",
@@ -546,7 +546,7 @@ fn compute_feature_names<'a>(
 					feature_group.source_column_name_b(),
 				)]
 			}
-			tangram_model::FeatureGroupReader::WordEmbedding(feature_group) => {
+			modelfox_model::FeatureGroupReader::WordEmbedding(feature_group) => {
 				let feature_group = feature_group.read();
 				(0..feature_group.model().size())
 					.map(|i| {

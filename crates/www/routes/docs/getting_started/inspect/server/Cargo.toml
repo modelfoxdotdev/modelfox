@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_www_docs_getting_started_inspect_server"
+name = "modelfox_www_docs_getting_started_inspect_server"
 publish = false
 version = "0.0.0"
 
@@ -11,7 +11,7 @@ path = "lib.rs"
 num = "0.4"
 pinwheel = "0.2"
 sunfish = "0.7"
-tangram_ui = { path = "../../../../../../ui" }
-tangram_www_docs_inspect_common = { path = "../common" }
-tangram_www_layouts = { path = "../../../../../layouts" }
-tangram_www_ui = { path = "../../../../../ui" }
+modelfox_ui = { path = "../../../../../../ui" }
+modelfox_www_docs_inspect_common = { path = "../common" }
+modelfox_www_layouts = { path = "../../../../../layouts" }
+modelfox_www_ui = { path = "../../../../../ui" }

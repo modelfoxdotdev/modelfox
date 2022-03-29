@@ -1,14 +1,14 @@
 [package]
 edition = "2021"
-name = "tangram_app_training_metrics_roc_client"
+name = "modelfox_app_training_metrics_roc_client"
 publish = false
 version = "0.0.0"
 
 [[bin]]
-name = "tangram_app_training_metrics_roc_client"
+name = "modelfox_app_training_metrics_roc_client"
 path = "main.rs"
 
 [dependencies]
 pinwheel = "0.2"
-tangram_charts = { path = "../../../../../../../../../charts" }
-tangram_ui = { path = "../../../../../../../../../ui" }
+modelfox_charts = { path = "../../../../../../../../../charts" }
+modelfox_ui = { path = "../../../../../../../../../ui" }

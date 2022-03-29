@@ -2,14 +2,14 @@ use super::{
 	shap::{compute_shap_values_for_example, ComputeShapValuesForExampleOutput},
 	train_early_stopping_split, EarlyStoppingMonitor, Progress, TrainOptions, TrainProgressEvent,
 };
+use modelfox_metrics::{BinaryCrossEntropy, BinaryCrossEntropyInput};
+use modelfox_progress_counter::ProgressCounter;
+use modelfox_table::prelude::*;
+use modelfox_zip::{pzip, zip};
 use ndarray::{self, prelude::*};
 use num::{clamp, ToPrimitive};
 use rayon::{self, prelude::*};
 use std::{num::NonZeroUsize, ops::Neg};
-use tangram_metrics::{BinaryCrossEntropy, BinaryCrossEntropyInput};
-use tangram_progress_counter::ProgressCounter;
-use tangram_table::prelude::*;
-use tangram_zip::{pzip, zip};
 
 /// This struct describes a linear binary classifier model. You can train one by calling `BinaryClassifier::train`.
 #[derive(Clone, Debug)]
@@ -156,7 +156,7 @@ impl BinaryClassifier {
 		labels: ArrayView1<Option<NonZeroUsize>>,
 		mut probabilities: ArrayViewMut1<f32>,
 		train_options: &TrainOptions,
-		kill_chip: &tangram_kill_chip::KillChip,
+		kill_chip: &modelfox_kill_chip::KillChip,
 	) {
 		if kill_chip.is_activated() {
 			return;

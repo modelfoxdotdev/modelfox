@@ -2,28 +2,28 @@
 
 declare(strict_types=1);
 
-namespace tangram\tangram;
+namespace modelfox\modelfox;
 
-final class TangramStringView
+final class ModelFoxStringView
 {
     /**
      * Pointer to C struct
      */
     private ?\FFI\CData $string_view = null;
     /**
-     * Create a new LibTangram instance
+     * Create a new LibModelFox instance
      * @param \FFI handle to FFI lib
      * @return void
      */
     public function __construct(\FFI $ffi)
     {
-        $this->string_view = $ffi->new($ffi->type('tangram_string_view'));
+        $this->string_view = $ffi->new($ffi->type('modelfox_string_view'));
     }
 
     /**
      * Retrieve an unmanaged pointer to the inner stringview
      *
-     * @return \FFI\CData raw tangram_string_view pointer
+     * @return \FFI\CData raw modelfox_string_view pointer
      */
     public function raw_ptr()
     {

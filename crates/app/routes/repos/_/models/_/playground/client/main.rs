@@ -3,7 +3,7 @@ use wasm_bindgen::JsCast;
 use web_sys as dom;
 
 pub fn main() {
-	tangram_ui::client_start();
+	modelfox_ui::client_start();
 	let window = dom::window().unwrap();
 	let document = window.document().unwrap();
 	let charts_query = document
@@ -17,16 +17,16 @@ pub fn main() {
 			.unwrap()
 			.parent_element()
 			.unwrap();
-		hydrate::<tangram_app_playground_common::ColumnChart>(&item.id());
+		hydrate::<modelfox_app_playground_common::ColumnChart>(&item.id());
 	}
 	if document.get_element_by_id("probabilities").is_some() {
-		hydrate::<tangram_charts::components::BarChart>("probabilities")
+		hydrate::<modelfox_charts::components::BarChart>("probabilities")
 	}
 	if document
 		.get_element_by_id("regression_feature_contributions")
 		.is_some()
 	{
-		hydrate::<tangram_charts::components::FeatureContributionsChart>(
+		hydrate::<modelfox_charts::components::FeatureContributionsChart>(
 			"regression_feature_contributions",
 		)
 	}
@@ -34,7 +34,7 @@ pub fn main() {
 		.get_element_by_id("binary_classification_feature_contributions")
 		.is_some()
 	{
-		hydrate::<tangram_charts::components::FeatureContributionsChart>(
+		hydrate::<modelfox_charts::components::FeatureContributionsChart>(
 			"binary_classification_feature_contributions",
 		)
 	}
@@ -42,7 +42,7 @@ pub fn main() {
 		.get_element_by_id("multiclass_classification_feature_contributions")
 		.is_some()
 	{
-		hydrate::<tangram_charts::components::FeatureContributionsChart>(
+		hydrate::<modelfox_charts::components::FeatureContributionsChart>(
 			"multiclass_classification_feature_contributions",
 		)
 	}

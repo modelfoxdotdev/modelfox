@@ -1,14 +1,14 @@
 import os
-import tangram
+import modelfox
 
-# If you are running the Tangram app on your own server you can pass the URL to it with the TANGRAM_URL environment variable.
-tangram_url = os.getenv("TANGRAM_URL", default="https://app.tangram.dev")
+# If you are running the ModelFox app on your own server you can pass the URL to it with the MODELFOX_URL environment variable.
+modelfox_url = os.getenv("MODELFOX_URL", default="https://app.modelfox.dev")
 
-# Get the path to the `.tangram` file.
-model_path = os.path.join(os.path.dirname(__file__), "heart_disease.tangram")
-# Load the model from the path and set the url where the tangram is running.
-load_options = tangram.LoadModelOptions(tangram_url=tangram_url)
-model = tangram.Model.from_path(model_path, options=load_options)
+# Get the path to the `.modelfox` file.
+model_path = os.path.join(os.path.dirname(__file__), "heart_disease.modelfox")
+# Load the model from the path and set the url where the modelfox is running.
+load_options = modelfox.LoadModelOptions(modelfox_url=modelfox_url)
+model = modelfox.Model.from_path(model_path, options=load_options)
 
 # Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
 input = {
@@ -27,8 +27,8 @@ input = {
     "thallium_stress_test": "fixed defect",
 }
 
-# Make the prediction using a custom threshold chosen on the "Tuning" page of the Tangram app.
-predict_options = tangram.PredictOptions(
+# Make the prediction using a custom threshold chosen on the "Tuning" page of the ModelFox app.
+predict_options = modelfox.PredictOptions(
     threshold=0.5, compute_feature_contributions=True
 )
 output = model.predict(input, predict_options)

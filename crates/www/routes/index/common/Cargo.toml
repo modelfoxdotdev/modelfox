@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_www_index_common"
+name = "modelfox_www_index_common"
 publish = false
 version = "0.0.0"
 
@@ -8,7 +8,7 @@ version = "0.0.0"
 path = "lib.rs"
 
 [dependencies]
-tangram_ui = { path = "../../../../ui" }
+modelfox_ui = { path = "../../../../ui" }
 num = "0.4"
 pinwheel = "0.2"
 serde = { version = "1", features = ["derive"] }

@@ -1,15 +1,15 @@
 import * as path from "https://deno.land/std/node/path.ts"
-import * as tangram from "https://js.tangram.dev/deno"
+import * as modelfox from "https://js.modelfox.dev/deno"
 import * as url from "https://deno.land/std/node/url.ts"
 
-// Get the path to the .tangram file.
+// Get the path to the .modelfox file.
 let modelPath = path.join(
 	path.dirname(url.fileURLToPath(import.meta.url)),
-	"heart_disease.tangram",
+	"heart_disease.modelfox",
 )
 // Load the model from the path.
 let modelData = await Deno.readFile(modelPath)
-let model = new tangram.Model(modelData)
+let model = new modelfox.Model(modelData)
 
 // Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
 let input = {

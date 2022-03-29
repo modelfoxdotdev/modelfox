@@ -1,6 +1,6 @@
 # Webpack
 
-This example demonstrates loading a model from a `.tangram` file and making a prediction in an application bundled with Webpack.
+This example demonstrates loading a model from a `.modelfox` file and making a prediction in an application bundled with Webpack.
 
 To run the example:
 

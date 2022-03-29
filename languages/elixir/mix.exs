@@ -1,9 +1,9 @@
-defmodule Tangram.MixProject do
+defmodule ModelFox.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :tangram,
+      app: :modelfox,
       build_embedded: Mix.env() == :prod,
       deps: [
         {:ex_doc, "~> 0.23", only: :dev, runtime: false},
@@ -13,19 +13,19 @@ defmodule Tangram.MixProject do
       ],
       docs: [
         extras: ["README.md"],
-        logo: "../../tangram.svg",
+        logo: "../../modelfox.svg",
         main: "readme"
       ],
       elixir: "~> 1.11",
-      homepage_url: "https://www.tangram.dev",
-      name: "tangram",
+      homepage_url: "https://www.modelfox.dev",
+      name: "modelfox",
       package: [
         description:
-          "Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.",
+          "ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models.",
         licenses: ["MIT"],
-        links: %{homepage: "https://www.tangram.dev"}
+        links: %{homepage: "https://www.modelfox.dev"}
       ],
-      source_url: "https://github.com/tangramdotdev/tangram/tree/master/languages/elixir",
+      source_url: "https://github.com/modelfoxdotdev/modelfox/tree/master/languages/elixir",
       start_permanent: Mix.env() == :prod,
       version: "0.7.0"
     ]

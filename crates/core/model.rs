@@ -6,10 +6,10 @@ use crate::{
 	train::{TrainGridItemOutput, TrainModelOutput},
 };
 use anyhow::Result;
+use modelfox_id::Id;
 use num::ToPrimitive;
 use std::path::Path;
-use tangram_id::Id;
-use tangram_zip::zip;
+use modelfox_zip::zip;
 
 pub struct Model {
 	pub id: Id,
@@ -36,12 +36,12 @@ pub struct Regressor {
 	pub train_target_column_stats: ColumnStatsOutput,
 	pub test_column_stats: Vec<ColumnStatsOutput>,
 	pub test_target_column_stats: ColumnStatsOutput,
-	pub baseline_metrics: tangram_metrics::RegressionMetricsOutput,
+	pub baseline_metrics: modelfox_metrics::RegressionMetricsOutput,
 	pub comparison_metric: RegressionComparisonMetric,
 	pub train_grid_item_outputs: Vec<TrainGridItemOutput>,
 	pub best_grid_item_index: usize,
 	pub model: RegressionModel,
-	pub test_metrics: tangram_metrics::RegressionMetricsOutput,
+	pub test_metrics: modelfox_metrics::RegressionMetricsOutput,
 }
 
 pub struct BinaryClassifier {
@@ -58,12 +58,12 @@ pub struct BinaryClassifier {
 	pub train_target_column_stats: ColumnStatsOutput,
 	pub test_column_stats: Vec<ColumnStatsOutput>,
 	pub test_target_column_stats: ColumnStatsOutput,
-	pub baseline_metrics: tangram_metrics::BinaryClassificationMetricsOutput,
+	pub baseline_metrics: modelfox_metrics::BinaryClassificationMetricsOutput,
 	pub comparison_metric: BinaryClassificationComparisonMetric,
 	pub train_grid_item_outputs: Vec<TrainGridItemOutput>,
 	pub best_grid_item_index: usize,
 	pub model: BinaryClassificationModel,
-	pub test_metrics: tangram_metrics::BinaryClassificationMetricsOutput,
+	pub test_metrics: modelfox_metrics::BinaryClassificationMetricsOutput,
 }
 
 pub struct MulticlassClassifier {
@@ -79,12 +79,12 @@ pub struct MulticlassClassifier {
 	pub train_target_column_stats: ColumnStatsOutput,
 	pub test_column_stats: Vec<ColumnStatsOutput>,
 	pub test_target_column_stats: ColumnStatsOutput,
-	pub baseline_metrics: tangram_metrics::MulticlassClassificationMetricsOutput,
+	pub baseline_metrics: modelfox_metrics::MulticlassClassificationMetricsOutput,
 	pub comparison_metric: MulticlassClassificationComparisonMetric,
 	pub train_grid_item_outputs: Vec<TrainGridItemOutput>,
 	pub best_grid_item_index: usize,
 	pub model: MulticlassClassificationModel,
-	pub test_metrics: tangram_metrics::MulticlassClassificationMetricsOutput,
+	pub test_metrics: modelfox_metrics::MulticlassClassificationMetricsOutput,
 }
 
 #[derive(Clone, Copy)]
@@ -110,17 +110,17 @@ pub enum RegressionModel {
 }
 
 pub struct LinearRegressionModel {
-	pub model: tangram_linear::Regressor,
-	pub train_options: tangram_linear::TrainOptions,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub model: modelfox_linear::Regressor,
+	pub train_options: modelfox_linear::TrainOptions,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub losses: Option<Vec<f32>>,
 	pub feature_importances: Vec<f32>,
 }
 
 pub struct TreeRegressionModel {
-	pub model: tangram_tree::Regressor,
-	pub train_options: tangram_tree::TrainOptions,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub model: modelfox_tree::Regressor,
+	pub train_options: modelfox_tree::TrainOptions,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub losses: Option<Vec<f32>>,
 	pub feature_importances: Vec<f32>,
 }
@@ -139,17 +139,17 @@ pub enum BinaryClassificationModel {
 }
 
 pub struct LinearBinaryClassificationModel {
-	pub model: tangram_linear::BinaryClassifier,
-	pub train_options: tangram_linear::TrainOptions,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub model: modelfox_linear::BinaryClassifier,
+	pub train_options: modelfox_linear::TrainOptions,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub losses: Option<Vec<f32>>,
 	pub feature_importances: Vec<f32>,
 }
 
 pub struct TreeBinaryClassificationModel {
-	pub model: tangram_tree::BinaryClassifier,
-	pub train_options: tangram_tree::TrainOptions,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub model: modelfox_tree::BinaryClassifier,
+	pub train_options: modelfox_tree::TrainOptions,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub losses: Option<Vec<f32>>,
 	pub feature_importances: Vec<f32>,
 }
@@ -160,17 +160,17 @@ pub enum MulticlassClassificationModel {
 }
 
 pub struct LinearMulticlassClassificationModel {
-	pub model: tangram_linear::MulticlassClassifier,
-	pub train_options: tangram_linear::TrainOptions,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub model: modelfox_linear::MulticlassClassifier,
+	pub train_options: modelfox_linear::TrainOptions,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub losses: Option<Vec<f32>>,
 	pub feature_importances: Vec<f32>,
 }
 
 pub struct TreeMulticlassClassificationModel {
-	pub model: tangram_tree::MulticlassClassifier,
-	pub train_options: tangram_tree::TrainOptions,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub model: modelfox_tree::MulticlassClassifier,
+	pub train_options: modelfox_tree::TrainOptions,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub losses: Option<Vec<f32>>,
 	pub feature_importances: Vec<f32>,
 }
@@ -183,9 +183,9 @@ pub enum ComparisonMetric {
 }
 
 pub enum Metrics {
-	Regression(tangram_metrics::RegressionMetricsOutput),
-	BinaryClassification(tangram_metrics::BinaryClassificationMetricsOutput),
-	MulticlassClassification(tangram_metrics::MulticlassClassificationMetricsOutput),
+	Regression(modelfox_metrics::RegressionMetricsOutput),
+	BinaryClassification(modelfox_metrics::BinaryClassificationMetricsOutput),
+	MulticlassClassification(modelfox_metrics::MulticlassClassificationMetricsOutput),
 }
 
 impl Model {
@@ -194,7 +194,7 @@ impl Model {
 		let model = serialize_model(self, &mut writer);
 		writer.write(&model);
 		let bytes = writer.into_bytes();
-		tangram_model::to_path(path, &bytes)?;
+		modelfox_model::to_path(path, &bytes)?;
 		Ok(())
 	}
 }
@@ -202,12 +202,12 @@ impl Model {
 fn serialize_model(
 	model: &Model,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::ModelWriter> {
+) -> buffalo::Position<modelfox_model::ModelWriter> {
 	let id = writer.write(model.id.to_string().as_str());
 	let version = writer.write(model.version.as_str());
 	let date = writer.write(model.date.to_string().as_str());
 	let inner = serialize_model_inner(&model.inner, writer);
-	writer.write(&tangram_model::ModelWriter {
+	writer.write(&modelfox_model::ModelWriter {
 		id,
 		version,
 		date,
@@ -218,20 +218,20 @@ fn serialize_model(
 fn serialize_model_inner(
 	model_inner: &ModelInner,
 	writer: &mut buffalo::Writer,
-) -> tangram_model::ModelInnerWriter {
+) -> modelfox_model::ModelInnerWriter {
 	match model_inner {
 		ModelInner::Regressor(regressor) => {
 			let regressor = serialize_regressor(regressor, writer);
-			tangram_model::ModelInnerWriter::Regressor(regressor)
+			modelfox_model::ModelInnerWriter::Regressor(regressor)
 		}
 		ModelInner::BinaryClassifier(binary_classifier) => {
 			let binary_classifier = serialize_binary_classifier(binary_classifier, writer);
-			tangram_model::ModelInnerWriter::BinaryClassifier(binary_classifier)
+			modelfox_model::ModelInnerWriter::BinaryClassifier(binary_classifier)
 		}
 		ModelInner::MulticlassClassifier(multiclass_classifier) => {
 			let multiclass_classifier =
 				serialize_multiclass_classifier(multiclass_classifier, writer);
-			tangram_model::ModelInnerWriter::MulticlassClassifier(multiclass_classifier)
+			modelfox_model::ModelInnerWriter::MulticlassClassifier(multiclass_classifier)
 		}
 	}
 }
@@ -239,7 +239,7 @@ fn serialize_model_inner(
 fn serialize_regressor(
 	regressor: &Regressor,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::RegressorWriter> {
+) -> buffalo::Position<modelfox_model::RegressorWriter> {
 	let target_column_name = writer.write(regressor.target_column_name.as_str());
 	let stats_settings = serialize_stats_settings(&regressor.stats_settings, writer);
 	let overall_column_stats = regressor
@@ -279,7 +279,7 @@ fn serialize_regressor(
 	let train_grid_item_outputs = writer.write(&train_grid_item_outputs);
 	let model = serialize_regression_model(&regressor.model, writer);
 	let test_metrics = serialize_regression_metrics_output(&regressor.test_metrics, writer);
-	let regressor_writer = tangram_model::RegressorWriter {
+	let regressor_writer = modelfox_model::RegressorWriter {
 		target_column_name,
 		train_row_count: regressor.train_row_count.to_u64().unwrap(),
 		test_row_count: regressor.test_row_count.to_u64().unwrap(),
@@ -304,7 +304,7 @@ fn serialize_regressor(
 fn serialize_binary_classifier(
 	binary_classifier: &BinaryClassifier,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::BinaryClassifierWriter> {
+) -> buffalo::Position<modelfox_model::BinaryClassifierWriter> {
 	let negative_class = writer.write(binary_classifier.negative_class.as_str());
 	let positive_class = writer.write(binary_classifier.positive_class.as_str());
 	let target_column_name = writer.write(binary_classifier.target_column_name.as_str());
@@ -350,7 +350,7 @@ fn serialize_binary_classifier(
 	let model = serialize_binary_classification_model(&binary_classifier.model, writer);
 	let test_metrics =
 		serialize_binary_classification_metrics_output(&binary_classifier.test_metrics, writer);
-	let binary_classifier_writer = tangram_model::BinaryClassifierWriter {
+	let binary_classifier_writer = modelfox_model::BinaryClassifierWriter {
 		target_column_name,
 		train_row_count: binary_classifier.train_row_count.to_u64().unwrap(),
 		test_row_count: binary_classifier.test_row_count.to_u64().unwrap(),
@@ -377,7 +377,7 @@ fn serialize_binary_classifier(
 fn serialize_multiclass_classifier(
 	multiclass_classifier: &MulticlassClassifier,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::MulticlassClassifierWriter> {
+) -> buffalo::Position<modelfox_model::MulticlassClassifierWriter> {
 	let target_column_name = writer.write(multiclass_classifier.target_column_name.as_str());
 	let stats_settings = serialize_stats_settings(&multiclass_classifier.stats_settings, writer);
 	let overall_column_stats = multiclass_classifier
@@ -431,7 +431,7 @@ fn serialize_multiclass_classifier(
 		.map(|class| writer.write(class))
 		.collect::<Vec<_>>();
 	let classes = writer.write(&classes);
-	let multiclass_classifier_writer = tangram_model::MulticlassClassifierWriter {
+	let multiclass_classifier_writer = modelfox_model::MulticlassClassifierWriter {
 		target_column_name,
 		train_row_count: multiclass_classifier.train_row_count.to_u64().unwrap(),
 		test_row_count: multiclass_classifier.test_row_count.to_u64().unwrap(),
@@ -457,8 +457,8 @@ fn serialize_multiclass_classifier(
 fn serialize_stats_settings(
 	stats_settings: &StatsSettings,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::StatsSettingsWriter> {
-	let stats_settings_writer = tangram_model::StatsSettingsWriter {
+) -> buffalo::Position<modelfox_model::StatsSettingsWriter> {
+	let stats_settings_writer = modelfox_model::StatsSettingsWriter {
 		number_histogram_max_size: stats_settings.number_histogram_max_size.to_u64().unwrap(),
 	};
 	writer.write(&stats_settings_writer)
@@ -467,25 +467,25 @@ fn serialize_stats_settings(
 fn serialize_column_stats_output(
 	column_stats_output: &ColumnStatsOutput,
 	writer: &mut buffalo::Writer,
-) -> tangram_model::ColumnStatsWriter {
+) -> modelfox_model::ColumnStatsWriter {
 	match column_stats_output {
 		ColumnStatsOutput::Unknown(unknown_column_stats) => {
 			let unknown_column_stats =
 				serialize_unknown_column_stats_output(unknown_column_stats, writer);
-			tangram_model::ColumnStatsWriter::UnknownColumn(unknown_column_stats)
+			modelfox_model::ColumnStatsWriter::UnknownColumn(unknown_column_stats)
 		}
 		ColumnStatsOutput::Number(number_column_stats) => {
 			let number_column_stats =
 				serialize_number_column_stats_output(number_column_stats, writer);
-			tangram_model::ColumnStatsWriter::NumberColumn(number_column_stats)
+			modelfox_model::ColumnStatsWriter::NumberColumn(number_column_stats)
 		}
 		ColumnStatsOutput::Enum(enum_column_stats) => {
 			let enum_column_stats = serialize_enum_column_stats_output(enum_column_stats, writer);
-			tangram_model::ColumnStatsWriter::EnumColumn(enum_column_stats)
+			modelfox_model::ColumnStatsWriter::EnumColumn(enum_column_stats)
 		}
 		ColumnStatsOutput::Text(text_column_stats) => {
 			let text_column_stats = serialize_text_column_stats_output(text_column_stats, writer);
-			tangram_model::ColumnStatsWriter::TextColumn(text_column_stats)
+			modelfox_model::ColumnStatsWriter::TextColumn(text_column_stats)
 		}
 	}
 }
@@ -493,16 +493,16 @@ fn serialize_column_stats_output(
 fn serialize_unknown_column_stats_output(
 	uknown_column_stats_output: &UnknownColumnStatsOutput,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::UnknownColumnStatsWriter> {
+) -> buffalo::Position<modelfox_model::UnknownColumnStatsWriter> {
 	let column_name = writer.write(uknown_column_stats_output.column_name.as_str());
-	let unknown_column_stats = tangram_model::UnknownColumnStatsWriter { column_name };
+	let unknown_column_stats = modelfox_model::UnknownColumnStatsWriter { column_name };
 	writer.write(&unknown_column_stats)
 }
 
 fn serialize_number_column_stats_output(
 	number_column_stats_output: &NumberColumnStatsOutput,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::NumberColumnStatsWriter> {
+) -> buffalo::Position<modelfox_model::NumberColumnStatsWriter> {
 	let column_name = writer.write(number_column_stats_output.column_name.as_str());
 	let histogram = number_column_stats_output
 		.histogram
@@ -514,7 +514,7 @@ fn serialize_number_column_stats_output(
 				.collect::<Vec<_>>()
 		});
 	let histogram = histogram.map(|histogram| writer.write(histogram.as_slice()));
-	let number_column_stats = tangram_model::NumberColumnStatsWriter {
+	let number_column_stats = modelfox_model::NumberColumnStatsWriter {
 		column_name,
 		invalid_count: number_column_stats_output.invalid_count.to_u64().unwrap(),
 		unique_count: number_column_stats_output.unique_count.to_u64().unwrap(),
@@ -534,7 +534,7 @@ fn serialize_number_column_stats_output(
 fn serialize_enum_column_stats_output(
 	enum_column_stats_output: &EnumColumnStatsOutput,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::EnumColumnStatsWriter> {
+) -> buffalo::Position<modelfox_model::EnumColumnStatsWriter> {
 	let column_name = writer.write(enum_column_stats_output.column_name.as_str());
 	let strings = enum_column_stats_output
 		.histogram
@@ -545,7 +545,7 @@ fn serialize_enum_column_stats_output(
 		.map(|(key, (_, value))| (key, value.to_u64().unwrap()))
 		.collect::<Vec<_>>();
 	let histogram = writer.write(&histogram);
-	let enum_column_stats = tangram_model::EnumColumnStatsWriter {
+	let enum_column_stats = modelfox_model::EnumColumnStatsWriter {
 		column_name,
 		invalid_count: enum_column_stats_output.invalid_count.to_u64().unwrap(),
 		histogram,
@@ -557,7 +557,7 @@ fn serialize_enum_column_stats_output(
 fn serialize_text_column_stats_output(
 	text_column_stats_output: &TextColumnStatsOutput,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::TextColumnStatsWriter> {
+) -> buffalo::Position<modelfox_model::TextColumnStatsWriter> {
 	let column_name = writer.write(text_column_stats_output.column_name.as_str());
 	let tokenizer = serialize_tokenizer(&text_column_stats_output.tokenizer, writer);
 	let ngram_types = text_column_stats_output
@@ -578,7 +578,7 @@ fn serialize_text_column_stats_output(
 		})
 		.collect::<Vec<_>>();
 	let top_ngrams = writer.write(&top_ngrams);
-	let text_column_stats = tangram_model::TextColumnStatsWriter {
+	let text_column_stats = modelfox_model::TextColumnStatsWriter {
 		column_name,
 		tokenizer,
 		ngram_types,
@@ -589,28 +589,28 @@ fn serialize_text_column_stats_output(
 }
 
 fn serialize_tokenizer(
-	tokenizer: &tangram_text::Tokenizer,
+	tokenizer: &modelfox_text::Tokenizer,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::TokenizerWriter> {
-	writer.write(&tangram_model::TokenizerWriter {
+) -> buffalo::Position<modelfox_model::TokenizerWriter> {
+	writer.write(&modelfox_model::TokenizerWriter {
 		lowercase: tokenizer.lowercase,
 		alphanumeric: tokenizer.alphanumeric,
 	})
 }
 
 fn serialize_ngram(
-	ngram: &tangram_text::NGram,
+	ngram: &modelfox_text::NGram,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::NGramWriter> {
+) -> buffalo::Position<modelfox_model::NGramWriter> {
 	match ngram {
-		tangram_text::NGram::Unigram(token) => {
+		modelfox_text::NGram::Unigram(token) => {
 			let token = writer.write(token);
-			writer.write(&tangram_model::NGramWriter::Unigram(token))
+			writer.write(&modelfox_model::NGramWriter::Unigram(token))
 		}
-		tangram_text::NGram::Bigram(token_a, token_b) => {
+		modelfox_text::NGram::Bigram(token_a, token_b) => {
 			let token_a = writer.write(token_a);
 			let token_b = writer.write(token_b);
-			writer.write(&tangram_model::NGramWriter::Bigram((token_a, token_b)))
+			writer.write(&modelfox_model::NGramWriter::Bigram((token_a, token_b)))
 		}
 	}
 }
@@ -618,8 +618,8 @@ fn serialize_ngram(
 fn serialize_text_column_stats_output_top_n_grams_entry(
 	text_column_stats_output_top_n_grams_entry: &TextColumnStatsOutputTopNGramsEntry,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::TextColumnStatsTopNGramsEntryWriter> {
-	let token_stats = tangram_model::TextColumnStatsTopNGramsEntryWriter {
+) -> buffalo::Position<modelfox_model::TextColumnStatsTopNGramsEntryWriter> {
+	let token_stats = modelfox_model::TextColumnStatsTopNGramsEntryWriter {
 		occurrence_count: text_column_stats_output_top_n_grams_entry
 			.occurrence_count
 			.to_u64()
@@ -633,20 +633,20 @@ fn serialize_text_column_stats_output_top_n_grams_entry(
 }
 
 fn serialize_ngram_type(
-	ngram_type: &tangram_text::NGramType,
+	ngram_type: &modelfox_text::NGramType,
 	_writer: &mut buffalo::Writer,
-) -> tangram_model::NGramTypeWriter {
+) -> modelfox_model::NGramTypeWriter {
 	match ngram_type {
-		tangram_text::NGramType::Unigram => tangram_model::NGramTypeWriter::Unigram,
-		tangram_text::NGramType::Bigram => tangram_model::NGramTypeWriter::Bigram,
+		modelfox_text::NGramType::Unigram => modelfox_model::NGramTypeWriter::Unigram,
+		modelfox_text::NGramType::Bigram => modelfox_model::NGramTypeWriter::Bigram,
 	}
 }
 
 fn serialize_regression_metrics_output(
-	regression_metrics_output: &tangram_metrics::RegressionMetricsOutput,
+	regression_metrics_output: &modelfox_metrics::RegressionMetricsOutput,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::RegressionMetricsWriter> {
-	let regression_metrics_writer = tangram_model::RegressionMetricsWriter {
+) -> buffalo::Position<modelfox_model::RegressionMetricsWriter> {
+	let regression_metrics_writer = modelfox_model::RegressionMetricsWriter {
 		mse: regression_metrics_output.mse,
 		rmse: regression_metrics_output.rmse,
 		mae: regression_metrics_output.mae,
@@ -658,42 +658,42 @@ fn serialize_regression_metrics_output(
 fn serialize_regression_comparison_metric(
 	regression_comparison_metric_writer: &RegressionComparisonMetric,
 	_writer: &mut buffalo::Writer,
-) -> tangram_model::RegressionComparisonMetricWriter {
+) -> modelfox_model::RegressionComparisonMetricWriter {
 	match regression_comparison_metric_writer {
 		RegressionComparisonMetric::MeanAbsoluteError => {
-			tangram_model::RegressionComparisonMetricWriter::MeanAbsoluteError
+			modelfox_model::RegressionComparisonMetricWriter::MeanAbsoluteError
 		}
 		RegressionComparisonMetric::MeanSquaredError => {
-			tangram_model::RegressionComparisonMetricWriter::MeanSquaredError
+			modelfox_model::RegressionComparisonMetricWriter::MeanSquaredError
 		}
 		RegressionComparisonMetric::RootMeanSquaredError => {
-			tangram_model::RegressionComparisonMetricWriter::RootMeanSquaredError
+			modelfox_model::RegressionComparisonMetricWriter::RootMeanSquaredError
 		}
-		RegressionComparisonMetric::R2 => tangram_model::RegressionComparisonMetricWriter::R2,
+		RegressionComparisonMetric::R2 => modelfox_model::RegressionComparisonMetricWriter::R2,
 	}
 }
 
 fn serialize_regression_model(
 	regression_model: &RegressionModel,
 	writer: &mut buffalo::Writer,
-) -> tangram_model::RegressionModelWriter {
+) -> modelfox_model::RegressionModelWriter {
 	match regression_model {
 		RegressionModel::Linear(linear_model) => {
 			let linear_regressor = serialize_linear_regression_model(linear_model, writer);
-			tangram_model::RegressionModelWriter::Linear(linear_regressor)
+			modelfox_model::RegressionModelWriter::Linear(linear_regressor)
 		}
 		RegressionModel::Tree(tree_model) => {
 			let tree_regressor = serialize_tree_regression_model(tree_model, writer);
-			tangram_model::RegressionModelWriter::Tree(tree_regressor)
+			modelfox_model::RegressionModelWriter::Tree(tree_regressor)
 		}
 	}
 }
 
 fn serialize_early_stopping_options(
-	early_stopping_options: &tangram_linear::EarlyStoppingOptions,
+	early_stopping_options: &modelfox_linear::EarlyStoppingOptions,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::LinearEarlyStoppingOptionsWriter> {
-	let early_stopping_options = tangram_model::LinearEarlyStoppingOptionsWriter {
+) -> buffalo::Position<modelfox_model::LinearEarlyStoppingOptionsWriter> {
+	let early_stopping_options = modelfox_model::LinearEarlyStoppingOptionsWriter {
 		early_stopping_fraction: early_stopping_options.early_stopping_fraction,
 		n_rounds_without_improvement_to_stop: early_stopping_options
 			.n_rounds_without_improvement_to_stop
@@ -708,7 +708,7 @@ fn serialize_early_stopping_options(
 fn serialize_linear_regression_model(
 	linear_regression_model: &LinearRegressionModel,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::LinearRegressorWriter> {
+) -> buffalo::Position<modelfox_model::LinearRegressorWriter> {
 	let feature_importances = writer.write(linear_regression_model.feature_importances.as_slice());
 	let train_options =
 		serialize_linear_train_options(&linear_regression_model.train_options, writer);
@@ -723,7 +723,7 @@ fn serialize_linear_regression_model(
 		.as_ref()
 		.map(|losses| writer.write(losses.as_slice()));
 	let model = linear_regression_model.model.to_writer(writer);
-	let linear_regressor_writer = tangram_model::LinearRegressorWriter {
+	let linear_regressor_writer = modelfox_model::LinearRegressorWriter {
 		model,
 		train_options,
 		feature_groups,
@@ -734,9 +734,9 @@ fn serialize_linear_regression_model(
 }
 
 fn serialize_linear_train_options(
-	train_options: &tangram_linear::TrainOptions,
+	train_options: &modelfox_linear::TrainOptions,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::LinearModelTrainOptionsWriter> {
+) -> buffalo::Position<modelfox_model::LinearModelTrainOptionsWriter> {
 	let early_stopping_options =
 		train_options
 			.early_stopping_options
@@ -744,7 +744,7 @@ fn serialize_linear_train_options(
 			.map(|early_stopping_options| {
 				serialize_early_stopping_options(early_stopping_options, writer)
 			});
-	let train_options = tangram_model::LinearModelTrainOptionsWriter {
+	let train_options = modelfox_model::LinearModelTrainOptionsWriter {
 		compute_loss: train_options.compute_losses,
 		l2_regularization: train_options.l2_regularization,
 		learning_rate: train_options.learning_rate,
@@ -756,9 +756,9 @@ fn serialize_linear_train_options(
 }
 
 fn serialize_tree_train_options(
-	train_options: &tangram_tree::TrainOptions,
+	train_options: &modelfox_tree::TrainOptions,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::TreeModelTrainOptionsWriter> {
+) -> buffalo::Position<modelfox_model::TreeModelTrainOptionsWriter> {
 	let early_stopping_options =
 		train_options
 			.early_stopping_options
@@ -771,7 +771,7 @@ fn serialize_tree_train_options(
 		.map(|max_depth| max_depth.to_u64().unwrap());
 	let binned_features_layout =
 		serialize_binned_features_layout(&train_options.binned_features_layout, writer);
-	let train_options = tangram_model::TreeModelTrainOptionsWriter {
+	let train_options = modelfox_model::TreeModelTrainOptionsWriter {
 		compute_loss: train_options.compute_losses,
 		l2_regularization_for_continuous_splits: train_options
 			.l2_regularization_for_continuous_splits,
@@ -800,10 +800,10 @@ fn serialize_tree_train_options(
 }
 
 fn serialize_tree_early_stopping_options(
-	early_stopping_options: &tangram_tree::EarlyStoppingOptions,
+	early_stopping_options: &modelfox_tree::EarlyStoppingOptions,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::TreeEarlyStoppingOptionsWriter> {
-	let early_stopping_options = tangram_model::TreeEarlyStoppingOptionsWriter {
+) -> buffalo::Position<modelfox_model::TreeEarlyStoppingOptionsWriter> {
+	let early_stopping_options = modelfox_model::TreeEarlyStoppingOptionsWriter {
 		early_stopping_fraction: early_stopping_options.early_stopping_fraction,
 		n_rounds_without_improvement_to_stop: early_stopping_options
 			.n_rounds_without_improvement_to_stop
@@ -818,7 +818,7 @@ fn serialize_tree_early_stopping_options(
 fn serialize_tree_regression_model(
 	tree_regression_model: &TreeRegressionModel,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::TreeRegressorWriter> {
+) -> buffalo::Position<modelfox_model::TreeRegressorWriter> {
 	let feature_importances = writer.write(tree_regression_model.feature_importances.as_slice());
 	let train_options = serialize_tree_train_options(&tree_regression_model.train_options, writer);
 	let feature_groups = tree_regression_model
@@ -832,7 +832,7 @@ fn serialize_tree_regression_model(
 		.as_ref()
 		.map(|losses| writer.write(losses.as_slice()));
 	let model = tree_regression_model.model.to_writer(writer);
-	let model = tangram_model::TreeRegressorWriter {
+	let model = modelfox_model::TreeRegressorWriter {
 		model,
 		train_options,
 		feature_groups,
@@ -843,15 +843,15 @@ fn serialize_tree_regression_model(
 }
 
 fn serialize_binned_features_layout(
-	binned_features_layout: &tangram_tree::BinnedFeaturesLayout,
+	binned_features_layout: &modelfox_tree::BinnedFeaturesLayout,
 	_writer: &mut buffalo::Writer,
-) -> tangram_model::BinnedFeaturesLayoutWriter {
+) -> modelfox_model::BinnedFeaturesLayoutWriter {
 	match binned_features_layout {
-		tangram_tree::BinnedFeaturesLayout::RowMajor => {
-			tangram_model::BinnedFeaturesLayoutWriter::RowMajor
+		modelfox_tree::BinnedFeaturesLayout::RowMajor => {
+			modelfox_model::BinnedFeaturesLayoutWriter::RowMajor
 		}
-		tangram_tree::BinnedFeaturesLayout::ColumnMajor => {
-			tangram_model::BinnedFeaturesLayoutWriter::ColumnMajor
+		modelfox_tree::BinnedFeaturesLayout::ColumnMajor => {
+			modelfox_model::BinnedFeaturesLayoutWriter::ColumnMajor
 		}
 	}
 }
@@ -859,34 +859,34 @@ fn serialize_binned_features_layout(
 fn serialize_train_grid_item_output(
 	train_grid_item_output: &TrainGridItemOutput,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::TrainGridItemOutputWriter> {
+) -> buffalo::Position<modelfox_model::TrainGridItemOutputWriter> {
 	let hyperparameters = match &train_grid_item_output.train_model_output {
 		TrainModelOutput::LinearRegressor(model) => {
 			let options = serialize_linear_train_options(&model.train_options, writer);
-			tangram_model::ModelTrainOptionsWriter::Linear(options)
+			modelfox_model::ModelTrainOptionsWriter::Linear(options)
 		}
 		TrainModelOutput::TreeRegressor(model) => {
 			let options = serialize_tree_train_options(&model.train_options, writer);
-			tangram_model::ModelTrainOptionsWriter::Tree(options)
+			modelfox_model::ModelTrainOptionsWriter::Tree(options)
 		}
 		TrainModelOutput::LinearBinaryClassifier(model) => {
 			let options = serialize_linear_train_options(&model.train_options, writer);
-			tangram_model::ModelTrainOptionsWriter::Linear(options)
+			modelfox_model::ModelTrainOptionsWriter::Linear(options)
 		}
 		TrainModelOutput::TreeBinaryClassifier(model) => {
 			let options = serialize_tree_train_options(&model.train_options, writer);
-			tangram_model::ModelTrainOptionsWriter::Tree(options)
+			modelfox_model::ModelTrainOptionsWriter::Tree(options)
 		}
 		TrainModelOutput::LinearMulticlassClassifier(model) => {
 			let options = serialize_linear_train_options(&model.train_options, writer);
-			tangram_model::ModelTrainOptionsWriter::Linear(options)
+			modelfox_model::ModelTrainOptionsWriter::Linear(options)
 		}
 		TrainModelOutput::TreeMulticlassClassifier(model) => {
 			let options = serialize_tree_train_options(&model.train_options, writer);
-			tangram_model::ModelTrainOptionsWriter::Tree(options)
+			modelfox_model::ModelTrainOptionsWriter::Tree(options)
 		}
 	};
-	let train_grid_item_output_writer = tangram_model::TrainGridItemOutputWriter {
+	let train_grid_item_output_writer = modelfox_model::TrainGridItemOutputWriter {
 		comparison_metric_value: train_grid_item_output.comparison_metric_value,
 		hyperparameters,
 		duration: train_grid_item_output.duration.as_secs_f32(),
@@ -895,53 +895,53 @@ fn serialize_train_grid_item_output(
 }
 
 fn serialize_feature_group(
-	feature_group: &tangram_features::FeatureGroup,
+	feature_group: &modelfox_features::FeatureGroup,
 	writer: &mut buffalo::Writer,
-) -> tangram_model::FeatureGroupWriter {
+) -> modelfox_model::FeatureGroupWriter {
 	match feature_group {
-		tangram_features::FeatureGroup::Identity(feature_group) => {
+		modelfox_features::FeatureGroup::Identity(feature_group) => {
 			let feature_group = serialize_identity_feature_group(feature_group, writer);
-			tangram_model::FeatureGroupWriter::Identity(feature_group)
+			modelfox_model::FeatureGroupWriter::Identity(feature_group)
 		}
-		tangram_features::FeatureGroup::Normalized(feature_group) => {
+		modelfox_features::FeatureGroup::Normalized(feature_group) => {
 			let feature_group = serialize_normalized_feature_group(feature_group, writer);
-			tangram_model::FeatureGroupWriter::Normalized(feature_group)
+			modelfox_model::FeatureGroupWriter::Normalized(feature_group)
 		}
-		tangram_features::FeatureGroup::OneHotEncoded(feature_group) => {
+		modelfox_features::FeatureGroup::OneHotEncoded(feature_group) => {
 			let feature_group = serialize_one_hot_encoded_feature_group(feature_group, writer);
-			tangram_model::FeatureGroupWriter::OneHotEncoded(feature_group)
+			modelfox_model::FeatureGroupWriter::OneHotEncoded(feature_group)
 		}
-		tangram_features::FeatureGroup::BagOfWords(feature_group) => {
+		modelfox_features::FeatureGroup::BagOfWords(feature_group) => {
 			let feature_group = serialize_bag_of_words_feature_group(feature_group, writer);
-			tangram_model::FeatureGroupWriter::BagOfWords(feature_group)
+			modelfox_model::FeatureGroupWriter::BagOfWords(feature_group)
 		}
-		tangram_features::FeatureGroup::BagOfWordsCosineSimilarity(feature_group) => {
+		modelfox_features::FeatureGroup::BagOfWordsCosineSimilarity(feature_group) => {
 			let feature_group =
 				serialize_bag_of_words_cosine_similarity_feature_group(feature_group, writer);
-			tangram_model::FeatureGroupWriter::BagOfWordsCosineSimilarity(feature_group)
+			modelfox_model::FeatureGroupWriter::BagOfWordsCosineSimilarity(feature_group)
 		}
-		tangram_features::FeatureGroup::WordEmbedding(feature_group) => {
+		modelfox_features::FeatureGroup::WordEmbedding(feature_group) => {
 			let feature_group = serialize_word_embedding_feature_group(feature_group, writer);
-			tangram_model::FeatureGroupWriter::WordEmbedding(feature_group)
+			modelfox_model::FeatureGroupWriter::WordEmbedding(feature_group)
 		}
 	}
 }
 
 fn serialize_identity_feature_group(
-	identity_feature_group: &tangram_features::IdentityFeatureGroup,
+	identity_feature_group: &modelfox_features::IdentityFeatureGroup,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::IdentityFeatureGroupWriter> {
+) -> buffalo::Position<modelfox_model::IdentityFeatureGroupWriter> {
 	let source_column_name = writer.write(identity_feature_group.source_column_name.as_str());
-	let feature_group = tangram_model::IdentityFeatureGroupWriter { source_column_name };
+	let feature_group = modelfox_model::IdentityFeatureGroupWriter { source_column_name };
 	writer.write(&feature_group)
 }
 
 fn serialize_normalized_feature_group(
-	normalized_feature_group: &tangram_features::NormalizedFeatureGroup,
+	normalized_feature_group: &modelfox_features::NormalizedFeatureGroup,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::NormalizedFeatureGroupWriter> {
+) -> buffalo::Position<modelfox_model::NormalizedFeatureGroupWriter> {
 	let source_column_name = writer.write(normalized_feature_group.source_column_name.as_str());
-	let feature_group = tangram_model::NormalizedFeatureGroupWriter {
+	let feature_group = modelfox_model::NormalizedFeatureGroupWriter {
 		source_column_name,
 		mean: normalized_feature_group.mean,
 		variance: normalized_feature_group.variance,
@@ -950,9 +950,9 @@ fn serialize_normalized_feature_group(
 }
 
 fn serialize_one_hot_encoded_feature_group(
-	one_hot_encoded_feature_group: &tangram_features::OneHotEncodedFeatureGroup,
+	one_hot_encoded_feature_group: &modelfox_features::OneHotEncodedFeatureGroup,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::OneHotEncodedFeatureGroupWriter> {
+) -> buffalo::Position<modelfox_model::OneHotEncodedFeatureGroupWriter> {
 	let source_column_name =
 		writer.write(one_hot_encoded_feature_group.source_column_name.as_str());
 	let variants = one_hot_encoded_feature_group
@@ -961,7 +961,7 @@ fn serialize_one_hot_encoded_feature_group(
 		.map(|variant| writer.write(variant))
 		.collect::<Vec<_>>();
 	let variants = writer.write(&variants);
-	let feature_group = tangram_model::OneHotEncodedFeatureGroupWriter {
+	let feature_group = modelfox_model::OneHotEncodedFeatureGroupWriter {
 		source_column_name,
 		variants,
 	};
@@ -969,9 +969,9 @@ fn serialize_one_hot_encoded_feature_group(
 }
 
 fn serialize_bag_of_words_feature_group(
-	bag_of_words_feature_group: &tangram_features::BagOfWordsFeatureGroup,
+	bag_of_words_feature_group: &modelfox_features::BagOfWordsFeatureGroup,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::BagOfWordsFeatureGroupWriter> {
+) -> buffalo::Position<modelfox_model::BagOfWordsFeatureGroupWriter> {
 	let source_column_name = writer.write(bag_of_words_feature_group.source_column_name.as_str());
 	let tokenizer = serialize_tokenizer(&bag_of_words_feature_group.tokenizer, writer);
 	let ngrams = bag_of_words_feature_group
@@ -993,7 +993,7 @@ fn serialize_bag_of_words_feature_group(
 	let ngram_types = writer.write(&ngram_types);
 	let strategy =
 		serialize_bag_of_words_feature_group_strategy(&bag_of_words_feature_group.strategy, writer);
-	let feature_group = tangram_model::BagOfWordsFeatureGroupWriter {
+	let feature_group = modelfox_model::BagOfWordsFeatureGroupWriter {
 		source_column_name,
 		tokenizer,
 		strategy,
@@ -1004,39 +1004,39 @@ fn serialize_bag_of_words_feature_group(
 }
 
 fn serialize_bag_of_words_feature_group_strategy(
-	bag_of_words_feature_group_strategy: &tangram_features::bag_of_words::BagOfWordsFeatureGroupStrategy,
+	bag_of_words_feature_group_strategy: &modelfox_features::bag_of_words::BagOfWordsFeatureGroupStrategy,
 	_writer: &mut buffalo::Writer,
-) -> tangram_model::BagOfWordsFeatureGroupStrategyWriter {
+) -> modelfox_model::BagOfWordsFeatureGroupStrategyWriter {
 	match bag_of_words_feature_group_strategy {
-		tangram_features::bag_of_words::BagOfWordsFeatureGroupStrategy::Present => {
-			tangram_model::BagOfWordsFeatureGroupStrategyWriter::Present
+		modelfox_features::bag_of_words::BagOfWordsFeatureGroupStrategy::Present => {
+			modelfox_model::BagOfWordsFeatureGroupStrategyWriter::Present
 		}
-		tangram_features::bag_of_words::BagOfWordsFeatureGroupStrategy::Count => {
-			tangram_model::BagOfWordsFeatureGroupStrategyWriter::Count
+		modelfox_features::bag_of_words::BagOfWordsFeatureGroupStrategy::Count => {
+			modelfox_model::BagOfWordsFeatureGroupStrategyWriter::Count
 		}
-		tangram_features::bag_of_words::BagOfWordsFeatureGroupStrategy::TfIdf => {
-			tangram_model::BagOfWordsFeatureGroupStrategyWriter::TfIdf
+		modelfox_features::bag_of_words::BagOfWordsFeatureGroupStrategy::TfIdf => {
+			modelfox_model::BagOfWordsFeatureGroupStrategyWriter::TfIdf
 		}
 	}
 }
 
 fn serialize_bag_of_words_feature_group_n_gram_entry(
-	bag_of_words_feature_group_n_gram_entry: &tangram_features::bag_of_words::BagOfWordsFeatureGroupNGramEntry,
+	bag_of_words_feature_group_n_gram_entry: &modelfox_features::bag_of_words::BagOfWordsFeatureGroupNGramEntry,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::BagOfWordsFeatureGroupNGramEntryWriter> {
-	writer.write(&tangram_model::BagOfWordsFeatureGroupNGramEntryWriter {
+) -> buffalo::Position<modelfox_model::BagOfWordsFeatureGroupNGramEntryWriter> {
+	writer.write(&modelfox_model::BagOfWordsFeatureGroupNGramEntryWriter {
 		idf: bag_of_words_feature_group_n_gram_entry.idf,
 	})
 }
 
 fn serialize_word_embedding_feature_group(
-	word_embedding_feature_group: &tangram_features::WordEmbeddingFeatureGroup,
+	word_embedding_feature_group: &modelfox_features::WordEmbeddingFeatureGroup,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::WordEmbeddingFeatureGroupWriter> {
+) -> buffalo::Position<modelfox_model::WordEmbeddingFeatureGroupWriter> {
 	let source_column_name = writer.write(word_embedding_feature_group.source_column_name.as_str());
 	let tokenizer = serialize_tokenizer(&word_embedding_feature_group.tokenizer, writer);
 	let model = serialize_word_embedding_model(&word_embedding_feature_group.model, writer);
-	let feature_group = tangram_model::WordEmbeddingFeatureGroupWriter {
+	let feature_group = modelfox_model::WordEmbeddingFeatureGroupWriter {
 		source_column_name,
 		tokenizer,
 		model,
@@ -1045,9 +1045,9 @@ fn serialize_word_embedding_feature_group(
 }
 
 fn serialize_word_embedding_model(
-	word_embedding_model: &tangram_text::WordEmbeddingModel,
+	word_embedding_model: &modelfox_text::WordEmbeddingModel,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::WordEmbeddingModelWriter> {
+) -> buffalo::Position<modelfox_model::WordEmbeddingModelWriter> {
 	let size = word_embedding_model.size.to_u64().unwrap();
 	let values = writer.write(word_embedding_model.values.as_slice());
 	let words = word_embedding_model
@@ -1059,7 +1059,7 @@ fn serialize_word_embedding_model(
 		.map(|(key, index)| (key, index.to_u64().unwrap()))
 		.collect::<Vec<_>>();
 	let words = writer.write(&words);
-	writer.write(&tangram_model::WordEmbeddingModelWriter {
+	writer.write(&modelfox_model::WordEmbeddingModelWriter {
 		size,
 		words,
 		values,
@@ -1067,9 +1067,9 @@ fn serialize_word_embedding_model(
 }
 
 fn serialize_bag_of_words_cosine_similarity_feature_group(
-	bag_of_words_cosine_similarity_feature_group: &tangram_features::BagOfWordsCosineSimilarityFeatureGroup,
+	bag_of_words_cosine_similarity_feature_group: &modelfox_features::BagOfWordsCosineSimilarityFeatureGroup,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::BagOfWordsCosineSimilarityFeatureGroupWriter> {
+) -> buffalo::Position<modelfox_model::BagOfWordsCosineSimilarityFeatureGroupWriter> {
 	let source_column_name_a = writer.write(
 		bag_of_words_cosine_similarity_feature_group
 			.source_column_name_a
@@ -1105,7 +1105,7 @@ fn serialize_bag_of_words_cosine_similarity_feature_group(
 		&bag_of_words_cosine_similarity_feature_group.strategy,
 		writer,
 	);
-	let feature_group = tangram_model::BagOfWordsCosineSimilarityFeatureGroupWriter {
+	let feature_group = modelfox_model::BagOfWordsCosineSimilarityFeatureGroupWriter {
 		source_column_name_a,
 		source_column_name_b,
 		tokenizer,
@@ -1119,16 +1119,16 @@ fn serialize_bag_of_words_cosine_similarity_feature_group(
 fn serialize_binary_classification_model(
 	binary_classification_model: &BinaryClassificationModel,
 	writer: &mut buffalo::Writer,
-) -> tangram_model::BinaryClassificationModelWriter {
+) -> modelfox_model::BinaryClassificationModelWriter {
 	match binary_classification_model {
 		BinaryClassificationModel::Linear(model) => {
 			let linear_binary_classifier =
 				serialize_linear_binary_classification_model(model, writer);
-			tangram_model::BinaryClassificationModelWriter::Linear(linear_binary_classifier)
+			modelfox_model::BinaryClassificationModelWriter::Linear(linear_binary_classifier)
 		}
 		BinaryClassificationModel::Tree(model) => {
 			let tree_binary_classifier = serialize_tree_binary_classification_model(model, writer);
-			tangram_model::BinaryClassificationModelWriter::Tree(tree_binary_classifier)
+			modelfox_model::BinaryClassificationModelWriter::Tree(tree_binary_classifier)
 		}
 	}
 }
@@ -1136,7 +1136,7 @@ fn serialize_binary_classification_model(
 fn serialize_linear_binary_classification_model(
 	linear_binary_classification_model: &LinearBinaryClassificationModel,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::LinearBinaryClassifierWriter> {
+) -> buffalo::Position<modelfox_model::LinearBinaryClassifierWriter> {
 	let model = linear_binary_classification_model.model.to_writer(writer);
 	let train_options =
 		serialize_linear_train_options(&linear_binary_classification_model.train_options, writer);
@@ -1155,7 +1155,7 @@ fn serialize_linear_binary_classification_model(
 			.feature_importances
 			.as_slice(),
 	);
-	let model = tangram_model::LinearBinaryClassifierWriter {
+	let model = modelfox_model::LinearBinaryClassifierWriter {
 		model,
 		train_options,
 		feature_groups,
@@ -1168,7 +1168,7 @@ fn serialize_linear_binary_classification_model(
 fn serialize_tree_binary_classification_model(
 	tree_binary_classification_model: &TreeBinaryClassificationModel,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::TreeBinaryClassifierWriter> {
+) -> buffalo::Position<modelfox_model::TreeBinaryClassifierWriter> {
 	let feature_importances = writer.write(
 		tree_binary_classification_model
 			.feature_importances
@@ -1187,7 +1187,7 @@ fn serialize_tree_binary_classification_model(
 		.as_ref()
 		.map(|losses| writer.write(losses.as_slice()));
 	let model = tree_binary_classification_model.model.to_writer(writer);
-	let model = tangram_model::TreeBinaryClassifierWriter {
+	let model = modelfox_model::TreeBinaryClassifierWriter {
 		model,
 		train_options,
 		feature_groups,
@@ -1198,9 +1198,9 @@ fn serialize_tree_binary_classification_model(
 }
 
 fn serialize_binary_classification_metrics_output(
-	binary_classification_metrics_output: &tangram_metrics::BinaryClassificationMetricsOutput,
+	binary_classification_metrics_output: &modelfox_metrics::BinaryClassificationMetricsOutput,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::BinaryClassificationMetricsWriter> {
+) -> buffalo::Position<modelfox_model::BinaryClassificationMetricsWriter> {
 	let thresholds = binary_classification_metrics_output
 		.thresholds
 		.iter()
@@ -1214,7 +1214,7 @@ fn serialize_binary_classification_metrics_output(
 			[binary_classification_metrics_output.thresholds.len() / 2],
 		writer,
 	);
-	let metrics = tangram_model::BinaryClassificationMetricsWriter {
+	let metrics = modelfox_model::BinaryClassificationMetricsWriter {
 		auc_roc: binary_classification_metrics_output.auc_roc_approx,
 		default_threshold,
 		thresholds,
@@ -1223,10 +1223,10 @@ fn serialize_binary_classification_metrics_output(
 }
 
 fn serialize_binary_classification_metrics_output_for_threshold(
-	binary_classification_metrics_output_for_threshold: &tangram_metrics::BinaryClassificationMetricsOutputForThreshold,
+	binary_classification_metrics_output_for_threshold: &modelfox_metrics::BinaryClassificationMetricsOutputForThreshold,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::BinaryClassificationMetricsForThresholdWriter> {
-	let metrics = tangram_model::BinaryClassificationMetricsForThresholdWriter {
+) -> buffalo::Position<modelfox_model::BinaryClassificationMetricsForThresholdWriter> {
+	let metrics = modelfox_model::BinaryClassificationMetricsForThresholdWriter {
 		threshold: binary_classification_metrics_output_for_threshold.threshold,
 		true_positives: binary_classification_metrics_output_for_threshold
 			.true_positives
@@ -1257,10 +1257,10 @@ fn serialize_binary_classification_metrics_output_for_threshold(
 fn serialize_binary_classification_comparison_metric(
 	binary_classification_comparison_metric: &BinaryClassificationComparisonMetric,
 	_writer: &mut buffalo::Writer,
-) -> tangram_model::BinaryClassificationComparisonMetricWriter {
+) -> modelfox_model::BinaryClassificationComparisonMetricWriter {
 	match binary_classification_comparison_metric {
 		BinaryClassificationComparisonMetric::AucRoc => {
-			tangram_model::BinaryClassificationComparisonMetricWriter::Aucroc
+			modelfox_model::BinaryClassificationComparisonMetricWriter::Aucroc
 		}
 	}
 }
@@ -1268,17 +1268,19 @@ fn serialize_binary_classification_comparison_metric(
 fn serialize_multiclass_classification_model(
 	multiclass_classification_model: &MulticlassClassificationModel,
 	writer: &mut buffalo::Writer,
-) -> tangram_model::MulticlassClassificationModelWriter {
+) -> modelfox_model::MulticlassClassificationModelWriter {
 	match multiclass_classification_model {
 		MulticlassClassificationModel::Linear(model) => {
 			let linear_multiclass_classifier =
 				serialize_linear_multiclass_classification_model(model, writer);
-			tangram_model::MulticlassClassificationModelWriter::Linear(linear_multiclass_classifier)
+			modelfox_model::MulticlassClassificationModelWriter::Linear(
+				linear_multiclass_classifier,
+			)
 		}
 		MulticlassClassificationModel::Tree(model) => {
 			let tree_multiclass_classifier =
 				serialize_tree_multiclass_classification_model(model, writer);
-			tangram_model::MulticlassClassificationModelWriter::Tree(tree_multiclass_classifier)
+			modelfox_model::MulticlassClassificationModelWriter::Tree(tree_multiclass_classifier)
 		}
 	}
 }
@@ -1286,7 +1288,7 @@ fn serialize_multiclass_classification_model(
 fn serialize_linear_multiclass_classification_model(
 	linear_multiclass_classification_model: &LinearMulticlassClassificationModel,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::LinearMulticlassClassifierWriter> {
+) -> buffalo::Position<modelfox_model::LinearMulticlassClassifierWriter> {
 	let feature_importances = writer.write(
 		linear_multiclass_classification_model
 			.feature_importances
@@ -1309,7 +1311,7 @@ fn serialize_linear_multiclass_classification_model(
 	let model = linear_multiclass_classification_model
 		.model
 		.to_writer(writer);
-	let model = tangram_model::LinearMulticlassClassifierWriter {
+	let model = modelfox_model::LinearMulticlassClassifierWriter {
 		model,
 		train_options,
 		feature_groups,
@@ -1322,7 +1324,7 @@ fn serialize_linear_multiclass_classification_model(
 fn serialize_tree_multiclass_classification_model(
 	tree_multiclass_classification_model: &TreeMulticlassClassificationModel,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::TreeMulticlassClassifierWriter> {
+) -> buffalo::Position<modelfox_model::TreeMulticlassClassifierWriter> {
 	let feature_importances = writer.write(
 		tree_multiclass_classification_model
 			.feature_importances
@@ -1341,7 +1343,7 @@ fn serialize_tree_multiclass_classification_model(
 		.as_ref()
 		.map(|losses| writer.write(losses.as_slice()));
 	let model = tree_multiclass_classification_model.model.to_writer(writer);
-	let model = tangram_model::TreeMulticlassClassifierWriter {
+	let model = modelfox_model::TreeMulticlassClassifierWriter {
 		model,
 		train_options,
 		feature_groups,
@@ -1352,16 +1354,16 @@ fn serialize_tree_multiclass_classification_model(
 }
 
 fn serialize_multiclass_classification_metrics_output(
-	multiclass_classification_metrics_output: &tangram_metrics::MulticlassClassificationMetricsOutput,
+	multiclass_classification_metrics_output: &modelfox_metrics::MulticlassClassificationMetricsOutput,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::MulticlassClassificationMetricsWriter> {
+) -> buffalo::Position<modelfox_model::MulticlassClassificationMetricsWriter> {
 	let class_metrics = multiclass_classification_metrics_output
 		.class_metrics
 		.iter()
 		.map(|class_metric| serialize_class_metrics(class_metric, writer))
 		.collect::<Vec<_>>();
 	let class_metrics = writer.write(&class_metrics);
-	let metrics = tangram_model::MulticlassClassificationMetricsWriter {
+	let metrics = modelfox_model::MulticlassClassificationMetricsWriter {
 		class_metrics,
 		accuracy: multiclass_classification_metrics_output.accuracy,
 		precision_unweighted: multiclass_classification_metrics_output.precision_unweighted,
@@ -1373,10 +1375,10 @@ fn serialize_multiclass_classification_metrics_output(
 }
 
 fn serialize_class_metrics(
-	class_metrics: &tangram_metrics::ClassMetrics,
+	class_metrics: &modelfox_metrics::ClassMetrics,
 	writer: &mut buffalo::Writer,
-) -> buffalo::Position<tangram_model::ClassMetricsWriter> {
-	let metrics = tangram_model::ClassMetricsWriter {
+) -> buffalo::Position<modelfox_model::ClassMetricsWriter> {
+	let metrics = modelfox_model::ClassMetricsWriter {
 		true_positives: class_metrics.true_positives.to_u64().unwrap(),
 		false_positives: class_metrics.false_positives.to_u64().unwrap(),
 		true_negatives: class_metrics.true_negatives.to_u64().unwrap(),
@@ -1392,10 +1394,10 @@ fn serialize_class_metrics(
 fn serialize_multiclass_classification_comparison_metric(
 	multiclass_classification_comparison_metric: &MulticlassClassificationComparisonMetric,
 	_writer: &mut buffalo::Writer,
-) -> tangram_model::MulticlassClassificationComparisonMetricWriter {
+) -> modelfox_model::MulticlassClassificationComparisonMetricWriter {
 	match multiclass_classification_comparison_metric {
 		MulticlassClassificationComparisonMetric::Accuracy => {
-			tangram_model::MulticlassClassificationComparisonMetricWriter::Accuracy
+			modelfox_model::MulticlassClassificationComparisonMetricWriter::Accuracy
 		}
 	}
 }

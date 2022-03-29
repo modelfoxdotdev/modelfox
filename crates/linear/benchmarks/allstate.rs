@@ -1,10 +1,10 @@
+use modelfox_linear::Progress;
+use modelfox_table::prelude::*;
 use ndarray::prelude::*;
 use rayon::prelude::*;
 use serde_json::json;
 use std::{collections::BTreeMap, path::Path};
-use tangram_linear::Progress;
-use tangram_table::prelude::*;
-use tangram_zip::pzip;
+use modelfox_zip::pzip;
 
 fn main() {
 	// Load the data.
@@ -547,7 +547,7 @@ fn main() {
 	.iter()
 	.map(ToString::to_string)
 	.collect();
-	let options = tangram_table::FromCsvOptions {
+	let options = modelfox_table::FromCsvOptions {
 		column_types: Some(BTreeMap::from([
 			("row_id".to_owned(), TableColumnType::Number),
 			("household_id".to_owned(), TableColumnType::Number),
@@ -678,43 +678,43 @@ fn main() {
 	let mut features_test = Table::from_path(csv_file_path_test, options, &mut |_| {}).unwrap();
 	let labels_test = features_test.columns_mut().remove(target_column_index);
 	let labels_test = labels_test.as_number().unwrap();
-	let feature_groups: Vec<tangram_features::FeatureGroup> = features_train
+	let feature_groups: Vec<modelfox_features::FeatureGroup> = features_train
 		.columns()
 		.iter()
 		.map(|column| match column {
-			TableColumn::Number(_) => tangram_features::FeatureGroup::Normalized(
-				tangram_features::NormalizedFeatureGroup::compute_for_column(column.view()),
+			TableColumn::Number(_) => modelfox_features::FeatureGroup::Normalized(
+				modelfox_features::NormalizedFeatureGroup::compute_for_column(column.view()),
 			),
-			TableColumn::Enum(_) => tangram_features::FeatureGroup::Normalized(
-				tangram_features::NormalizedFeatureGroup::compute_for_column(column.view()),
+			TableColumn::Enum(_) => modelfox_features::FeatureGroup::Normalized(
+				modelfox_features::NormalizedFeatureGroup::compute_for_column(column.view()),
 			),
 			_ => unreachable!(),
 		})
 		.collect();
-	let features_train = tangram_features::compute_features_array_f32(
+	let features_train = modelfox_features::compute_features_array_f32(
 		&features_train.view(),
 		feature_groups.as_slice(),
 		&|| {},
 	);
-	let features_test = tangram_features::compute_features_array_f32(
+	let features_test = modelfox_features::compute_features_array_f32(
 		&features_test.view(),
 		feature_groups.as_slice(),
 		&|| {},
 	);
 
 	// Train the model.
-	let train_options = tangram_linear::TrainOptions {
+	let train_options = modelfox_linear::TrainOptions {
 		learning_rate: 0.01,
 		max_epochs: 1,
 		n_examples_per_batch: 1000,
 		..Default::default()
 	};
-	let train_output = tangram_linear::Regressor::train(
+	let train_output = modelfox_linear::Regressor::train(
 		features_train.view(),
 		labels_train.view(),
 		&train_options,
 		Progress {
-			kill_chip: &tangram_kill_chip::KillChip::default(),
+			kill_chip: &modelfox_kill_chip::KillChip::default(),
 			handle_progress_event: &mut |_| {},
 		},
 	);
@@ -734,8 +734,8 @@ fn main() {
 	});
 
 	// Compute metrics.
-	let mut metrics = tangram_metrics::RegressionMetrics::new();
-	metrics.update(tangram_metrics::RegressionMetricsInput {
+	let mut metrics = modelfox_metrics::RegressionMetrics::new();
+	metrics.update(modelfox_metrics::RegressionMetricsInput {
 		predictions: predictions.as_slice().unwrap(),
 		labels: labels_test.view().as_slice(),
 	});

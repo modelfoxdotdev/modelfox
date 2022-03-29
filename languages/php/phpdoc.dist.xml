@@ -22,7 +22,7 @@
             <extensions>
                 <extension>php</extension>
             </extensions>
-            <default-package-name>tangram</default-package-name>
+            <default-package-name>modelfox</default-package-name>
         </api>
     </version>
     <template name="default"/>

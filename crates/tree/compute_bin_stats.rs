@@ -1,6 +1,6 @@
 use crate::compute_binned_features::{BinnedFeaturesColumnMajorColumn, BinnedFeaturesRowMajor};
+use modelfox_zip::zip;
 use num::ToPrimitive;
-use tangram_zip::zip;
 
 /// This struct tracks the sum of gradients and hessians for all examples across all bins for all features.
 #[derive(Clone, Debug)]

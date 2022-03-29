@@ -1,8 +1,8 @@
-//! This module runs an HTTP server for making predictions with a tangram model.
+//! This module runs an HTTP server for making predictions with a modelfox model.
 //!
-//! Start the server with a `.tangram` file:
+//! Start the server with a `.modelfox` file:
 //! ```not-rust
-//! $ tangram serve --model heart_disease.tangram
+//! $ modelfox serve --model heart_disease.modelfox
 //! ```
 //!
 //! Make a request:
@@ -15,23 +15,23 @@ use crate::ServeArgs;
 use anyhow::Result;
 use bytes::Buf;
 use hyper::http;
+use modelfox_core::predict::{PredictInput, PredictOptions, PredictOutput};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-use tangram_core::predict::{PredictInput, PredictOptions, PredictOutput};
 
 #[tokio::main]
 pub async fn serve(args: ServeArgs) -> Result<()> {
 	// Read model and create context
 	let bytes = std::fs::read(&args.model)?;
-	let model = tangram_model::from_bytes(&bytes)?;
-	let model = tangram_core::predict::Model::from(model);
+	let model = modelfox_model::from_bytes(&bytes)?;
+	let model = modelfox_core::predict::Model::from(model);
 	let context = Arc::new(model);
 
 	// Parse address
 	let addr = std::net::SocketAddr::new(args.address.parse()?, args.port);
 
 	tracing::info!("Serving model from {}", args.model.display());
-	tangram_serve::serve(addr, context, handle).await?;
+	modelfox_serve::serve(addr, context, handle).await?;
 	Ok(())
 }
 
@@ -50,7 +50,7 @@ fn not_found() -> http::Response<hyper::Body> {
 }
 
 async fn predict(request: http::Request<hyper::Body>) -> http::Response<hyper::Body> {
-	let context: Arc<tangram_core::predict::Model> =
+	let context: Arc<modelfox_core::predict::Model> =
 		Arc::clone(request.extensions().get().unwrap());
 	let body = request.into_body();
 	let body_bytes = hyper::body::aggregate(body).await.unwrap();
@@ -62,7 +62,7 @@ async fn predict(request: http::Request<hyper::Body>) -> http::Response<hyper::B
 			return bad_request(&msg);
 		}
 	};
-	let outputs = PredictOutputs(tangram_core::predict::predict(
+	let outputs = PredictOutputs(modelfox_core::predict::predict(
 		&*context,
 		&inputs.inputs,
 		&inputs.options.unwrap_or_default(),
@@ -96,10 +96,10 @@ mod test {
 	use pretty_assertions::assert_eq;
 	use serde_json::{json, Value};
 
-	fn test_model() -> tangram_core::predict::Model {
-		let bytes = std::fs::read("../../heart_disease.tangram").unwrap();
-		let model = tangram_model::from_bytes(&bytes).unwrap();
-		tangram_core::predict::Model::from(model)
+	fn test_model() -> modelfox_core::predict::Model {
+		let bytes = std::fs::read("../../heart_disease.modelfox").unwrap();
+		let model = modelfox_model::from_bytes(&bytes).unwrap();
+		modelfox_core::predict::Model::from(model)
 	}
 
 	#[tokio::test]

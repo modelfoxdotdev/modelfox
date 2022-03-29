@@ -1,7 +1,7 @@
 use pinwheel::prelude::*;
-use tangram_ui as ui;
-use tangram_www_docs_inspect_common::{ThresholdMetrics, Tuning};
-use tangram_www_layouts::{
+use modelfox_ui as ui;
+use modelfox_www_docs_inspect_common::{ThresholdMetrics, Tuning};
+use modelfox_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage, GettingStartedPage, PrevNextButtons},
 	document::Document,
 };
@@ -223,7 +223,7 @@ impl Component for Page {
 		];
 		let m1 = ui::Markdown::new(ui::doc!(
 			r#"
-				We can learn more about our model with the tangram app. Run `tangram app` and open your browser to http://localhost:8080, or use the cloud hosted app at https://app.tangram.dev.
+				We can learn more about our model with the modelfox app. Run `modelfox app` and open your browser to http://localhost:8080, or use the cloud hosted app at https://app.modelfox.dev.
 
 				Click the "Create Repo" button to create a new repo. Repos allow you to manage and compare multiple versions of the same model, just like git repos hold multiple versions of the same codebase. Click "Upload Model" to upload the first version of your model.
 
@@ -262,7 +262,7 @@ impl Component for Page {
 			.selected_page(DocsPage::GettingStarted(GettingStartedPage::Inspect))
 			.child(content);
 		Document::new()
-			.client("tangram_www_docs_getting_started_inspect_client")
+			.client("modelfox_www_docs_getting_started_inspect_client")
 			.child(layout)
 			.into_node()
 	}
@@ -293,17 +293,17 @@ impl Component for TuningCode {
 		let code_for_language = ui::highlight_code_for_language(ui::CodeForLanguage {
 			elixir: ui::doc!(
 				r#"
-					predict_options = %Tangram.PredictOptions{
+					predict_options = %ModelFox.PredictOptions{
 						threshold: 0.5,
 						compute_feature_contributions: false
 					}
-					output = Tangram.predict(model, input, predict_options)
+					output = ModelFox.predict(model, input, predict_options)
 				"#
 			)
 			.into(),
 			go: ui::doc!(
 				r#"
-					predictOptions := tangram.PredictOptions{
+					predictOptions := modelfox.PredictOptions{
 						Threshold:                   0.5,
 						ComputeFeatureContributions: false,
 					}
@@ -323,14 +323,14 @@ impl Component for TuningCode {
 			.into(),
 			php: ui::doc!(
 				r#"
-					$options = new \tangram::PredictOptions('true', 0.5);
+					$options = new \modelfox::PredictOptions('true', 0.5);
 					$output = model->predict($input, $options);
 				"#
 			)
 			.into(),
 			python: ui::doc!(
 				r#"
-					predict_options = tangram.PredictOptions(
+					predict_options = modelfox.PredictOptions(
 							threshold=0.5,
 							compute_feature_contributions=True
 					)
@@ -340,7 +340,7 @@ impl Component for TuningCode {
 			.into(),
 			ruby: ui::doc!(
 				r#"
-					options = Tangram::PredictOptions.new(
+					options = ModelFox::PredictOptions.new(
 						threshold: 0.5,
 						compute_feature_contributions: true
 					)
@@ -350,7 +350,7 @@ impl Component for TuningCode {
 			.into(),
 			rust: ui::doc!(
 				r#"
-					let options = tangram::PredictOptions {
+					let options = modelfox::PredictOptions {
 						threshold: Some(0.5),
 						compute_feature_contributions: Some(true),
 					};

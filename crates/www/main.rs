@@ -27,7 +27,7 @@ async fn main() -> Result<()> {
 	let addr = SocketAddr::new(host, port);
 	let context = Context { sunfish };
 	let context = Arc::new(context);
-	tangram_serve::serve(addr, context, handle).await?;
+	modelfox_serve::serve(addr, context, handle).await?;
 	Ok(())
 }
 
@@ -56,7 +56,7 @@ async fn handle(mut request: http::Request<hyper::Body>) -> http::Response<hyper
 }
 
 fn setup_tracing() {
-	let env_layer = tracing_subscriber::EnvFilter::try_from_env("TANGRAM_TRACING");
+	let env_layer = tracing_subscriber::EnvFilter::try_from_env("MODELFOX_TRACING");
 	let env_layer = if cfg!(debug_assertions) {
 		Some(env_layer.unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("[]=info")))
 	} else {

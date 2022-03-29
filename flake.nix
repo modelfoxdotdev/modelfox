@@ -10,7 +10,7 @@
       url = "github:rvolosatovs/fenix/fix/rustc-patch";
     };
     windows_sdk = {
-      url = "github:tangramdotdev/windows_sdk";
+      url = "github:modelfoxdotdev/windows_sdk";
     };
   };
   outputs =
@@ -178,11 +178,11 @@
         rustc = rust;
         cargo = rust;
       }).buildRustPackage ({
-        name = "tangram";
+        name = "modelfox";
         src = ./.;
         doCheck = false;
         cargoLock = { lockFile = ./Cargo.lock; };
-        cargoBuildFlags = "--package tangram_cli";
+        cargoBuildFlags = "--package modelfox_cli";
       });
       apps.www = inputs.flake-utils.lib.mkApp {
         drv = packages.www;
@@ -191,11 +191,11 @@
         rustc = rust;
         cargo = rust;
       }).buildRustPackage ({
-        name = "tangram_www";
+        name = "modelfox_www";
         src = ./.;
         doCheck = false;
         cargoLock = { lockFile = ./Cargo.lock; };
-        cargoBuildFlags = "--package tangram_www";
+        cargoBuildFlags = "--package modelfox_www";
       });
       devShell = pkgs.mkShell {
         packages = with pkgs; [

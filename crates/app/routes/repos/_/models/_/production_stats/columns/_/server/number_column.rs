@@ -1,15 +1,15 @@
 use crate::page::{IntervalBoxChartDataPoint, OverallBoxChartData};
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_app_date_window::{DateWindow, DateWindowInterval};
-use tangram_app_ui::{
+use modelfox_app_date_window::{DateWindow, DateWindowInterval};
+use modelfox_app_ui::{
 	colors::{PRODUCTION_COLOR, TRAINING_COLOR},
 	metrics_row::MetricsRow,
 	time::{interval_chart_title, overall_chart_title},
 };
-use tangram_charts::box_chart::{BoxChartPoint, BoxChartSeries, BoxChartValue};
-use tangram_charts::components::BoxChart;
-use tangram_ui as ui;
+use modelfox_charts::box_chart::{BoxChartPoint, BoxChartSeries, BoxChartValue};
+use modelfox_charts::components::BoxChart;
+use modelfox_ui as ui;
 
 pub struct NumberColumn {
 	pub column_name: String,

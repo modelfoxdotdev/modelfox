@@ -1,11 +1,11 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_charts::{
+use modelfox_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	components::BarChart,
 };
-use tangram_finite::FiniteF32;
-use tangram_ui as ui;
+use modelfox_finite::FiniteF32;
+use modelfox_ui as ui;
 
 pub struct TrainingSummarySection {
 	pub chosen_model_type_name: String,

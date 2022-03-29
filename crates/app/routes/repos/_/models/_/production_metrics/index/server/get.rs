@@ -8,20 +8,20 @@ use crate::page::{
 use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use std::sync::Arc;
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
 	path_components,
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 };
-use tangram_app_date_window::{get_date_window_and_interval, DateWindow};
-use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_app_production_metrics::{get_production_metrics, ProductionPredictionMetricsOutput};
-use tangram_app_ui::time::format_date_window_interval;
-use tangram_id::Id;
-use tangram_zip::zip;
+use modelfox_app_date_window::{get_date_window_and_interval, DateWindow};
+use modelfox_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use modelfox_app_production_metrics::{get_production_metrics, ProductionPredictionMetricsOutput};
+use modelfox_app_ui::time::format_date_window_interval;
+use modelfox_id::Id;
+use modelfox_zip::zip;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
@@ -66,11 +66,11 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		return Ok(not_found());
 	}
 	let bytes = get_model_bytes(app.storage(), model_id).await?;
-	let model = tangram_model::from_bytes(&bytes)?;
+	let model = modelfox_model::from_bytes(&bytes)?;
 	let production_metrics =
 		get_production_metrics(&mut db, model, date_window, date_window_interval, timezone).await?;
 	let inner = match model.inner() {
-		tangram_model::ModelInnerReader::Regressor(regressor) => {
+		modelfox_model::ModelInnerReader::Regressor(regressor) => {
 			let regressor = regressor.read();
 			let training_metrics = regressor.test_metrics();
 			let true_values_count = production_metrics.overall.true_values_count;
@@ -144,7 +144,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				true_values_count_chart,
 			})
 		}
-		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+		modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			let binary_classifier = binary_classifier.read();
 			let overall_production_metrics =
 				production_metrics
@@ -237,7 +237,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				overall,
 			})
 		}
-		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+		modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 			let multiclass_classifier = multiclass_classifier.read();
 			let training_metrics = multiclass_classifier.test_metrics();
 			let overall_production_metrics =

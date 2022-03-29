@@ -1,7 +1,7 @@
 use super::config::{ChartColors, ChartConfig};
+use modelfox_number_formatter::NumberFormatter;
 use num::ToPrimitive;
 use std::borrow::Cow;
-use tangram_number_formatter::NumberFormatter;
 use web_sys as dom;
 
 // |--------------------------------------------------|

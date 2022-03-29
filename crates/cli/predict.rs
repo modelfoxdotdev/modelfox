@@ -2,26 +2,26 @@ use crate::PredictArgs;
 use anyhow::Result;
 use either::Either;
 use itertools::Itertools;
-use tangram_core::predict::{PredictInput, PredictInputValue, PredictOptions};
-use tangram_zip::zip;
+use modelfox_core::predict::{PredictInput, PredictInputValue, PredictOptions};
+use modelfox_zip::zip;
 
 const PREDICT_CHUNK_SIZE: usize = 100;
 
 pub fn predict(args: PredictArgs) -> Result<()> {
 	let bytes = std::fs::read(&args.model)?;
-	let model = tangram_model::from_bytes(&bytes)?;
+	let model = modelfox_model::from_bytes(&bytes)?;
 	let target_column_name = match model.inner() {
-		tangram_model::ModelInnerReader::Regressor(regressor) => {
+		modelfox_model::ModelInnerReader::Regressor(regressor) => {
 			regressor.read().target_column_name()
 		}
-		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+		modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			binary_classifier.read().target_column_name()
 		}
-		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+		modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 			multiclass_classifier.read().target_column_name()
 		}
 	};
-	let model = tangram_core::predict::Model::from(model);
+	let model = modelfox_core::predict::Model::from(model);
 	let mut options = PredictOptions {
 		compute_feature_contributions: false,
 		..Default::default()
@@ -41,10 +41,10 @@ pub fn predict(args: PredictArgs) -> Result<()> {
 	let mut writer = csv::Writer::from_writer(writer);
 	let should_output_probabilies = args.probabilities.unwrap_or(false);
 	match &model.inner {
-		tangram_core::predict::ModelInner::Regressor(_) => {
+		modelfox_core::predict::ModelInner::Regressor(_) => {
 			writer.write_record(&[target_column_name])?;
 		}
-		tangram_core::predict::ModelInner::BinaryClassifier(model) => {
+		modelfox_core::predict::ModelInner::BinaryClassifier(model) => {
 			if should_output_probabilies {
 				writer.write_record(&[
 					model.positive_class.to_string(),
@@ -54,7 +54,7 @@ pub fn predict(args: PredictArgs) -> Result<()> {
 				writer.write_record(&[target_column_name])?;
 			}
 		}
-		tangram_core::predict::ModelInner::MulticlassClassifier(model) => {
+		modelfox_core::predict::ModelInner::MulticlassClassifier(model) => {
 			if should_output_probabilies {
 				writer.write_record(
 					&model
@@ -85,15 +85,15 @@ pub fn predict(args: PredictArgs) -> Result<()> {
 				Ok(PredictInput(input))
 			})
 			.collect::<Result<_, _>>()?;
-		let output = tangram_core::predict::predict(&model, &input, &options);
+		let output = modelfox_core::predict::predict(&model, &input, &options);
 		for output in output {
 			let output = match output {
-				tangram_core::predict::PredictOutput::Regression(output) => {
+				modelfox_core::predict::PredictOutput::Regression(output) => {
 					vec![output.value.to_string()]
 				}
-				tangram_core::predict::PredictOutput::BinaryClassification(output) => {
+				modelfox_core::predict::PredictOutput::BinaryClassification(output) => {
 					let model = match &model.inner {
-						tangram_core::predict::ModelInner::BinaryClassifier(model) => model,
+						modelfox_core::predict::ModelInner::BinaryClassifier(model) => model,
 						_ => {
 							unreachable!()
 						}
@@ -114,7 +114,7 @@ pub fn predict(args: PredictArgs) -> Result<()> {
 						vec![class_name]
 					}
 				}
-				tangram_core::predict::PredictOutput::MulticlassClassification(output) => {
+				modelfox_core::predict::PredictOutput::MulticlassClassification(output) => {
 					if should_output_probabilies {
 						output
 							.probabilities

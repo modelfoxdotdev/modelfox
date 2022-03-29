@@ -7,7 +7,7 @@ use fnv::FnvHashMap;
 use ndarray::prelude::*;
 use num::ToPrimitive;
 use std::num::NonZeroUsize;
-use tangram_zip::zip;
+use modelfox_zip::zip;
 
 mod load;
 

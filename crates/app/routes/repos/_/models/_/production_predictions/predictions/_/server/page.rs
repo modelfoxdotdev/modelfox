@@ -1,11 +1,11 @@
 use pinwheel::prelude::*;
-use tangram_app_layouts::{
+use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-use tangram_app_ui::predict::PredictOutput;
-use tangram_id::Id;
-use tangram_ui as ui;
+use modelfox_app_ui::predict::PredictOutput;
+use modelfox_id::Id;
+use modelfox_ui as ui;
 
 pub struct Page {
 	pub id: Id,
@@ -18,7 +18,7 @@ pub struct Page {
 impl Component for Page {
 	fn into_node(self) -> Node {
 		Document::new()
-			.client("tangram_app_production_prediction_client")
+			.client("modelfox_app_production_prediction_client")
 			.child(
 				ModelLayout::new(self.model_layout_info).child(
 					ui::S1::new()

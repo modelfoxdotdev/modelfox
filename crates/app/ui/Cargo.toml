@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_app_ui"
+name = "modelfox_app_ui"
 publish = false
 version = "0.0.0"
 
@@ -13,8 +13,8 @@ chrono-tz = { version = "0.6", features = ["serde"] }
 num = "0.4"
 pinwheel = "0.2"
 serde = { version = "1", features = ["derive"] }
-tangram_charts = { path = "../../charts" }
-tangram_core = { path = "../../core" }
-tangram_app_date_window = { path = "../date_window" }
-tangram_model = { path = "../../model" }
-tangram_ui = { path = "../../ui" }
+modelfox_charts = { path = "../../charts" }
+modelfox_core = { path = "../../core" }
+modelfox_app_date_window = { path = "../date_window" }
+modelfox_model = { path = "../../model" }
+modelfox_ui = { path = "../../ui" }

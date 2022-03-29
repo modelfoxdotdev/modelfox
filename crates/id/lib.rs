@@ -1,5 +1,5 @@
 /*!
-Tangram uses the `Id` type to uniquely identify models, users, and anything that needs a primary key. This type is almost identical to UUID v4, except there are no bits reserved to specify the version, and the string representation has no dashes.
+ModelFox uses the `Id` type to uniquely identify models, users, and anything that needs a primary key. This type is almost identical to UUID v4, except there are no bits reserved to specify the version, and the string representation has no dashes.
 */
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]

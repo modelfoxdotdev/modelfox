@@ -1,8 +1,8 @@
 use ndarray::prelude::*;
 use num::ToPrimitive;
 use serde::ser::SerializeStruct;
-use tangram_app_monitor_event::NumberOrString;
-use tangram_zip::zip;
+use modelfox_app_monitor_event::NumberOrString;
+use modelfox_zip::zip;
 
 #[derive(Clone)]
 pub struct MulticlassClassificationProductionPredictionMetrics {

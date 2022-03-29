@@ -12,7 +12,7 @@ pub struct ComputeShapValuesForExampleOutput {
 
 /// Compute the SHAP values for a single class for a single example.
 pub fn compute_shap_values_for_example(
-	example: &[tangram_table::TableValue],
+	example: &[modelfox_table::TableValue],
 	trees: ArrayView1<Tree>,
 	bias: f32,
 ) -> ComputeShapValuesForExampleOutput {
@@ -36,7 +36,7 @@ pub fn compute_shap_values_for_example(
 }
 
 /// This function, and the helper functions below it, are a direct port from https://github.com/slundberg/shap.
-fn tree_shap(example: &[tangram_table::TableValue], tree: &Tree, phi: &mut [f64]) {
+fn tree_shap(example: &[modelfox_table::TableValue], tree: &Tree, phi: &mut [f64]) {
 	let max_depth = max_depth(tree, 0, 0) + 2;
 	let mut unique_path = vec![PathItem::new(); max_depth * (max_depth + 1) / 2];
 	tree_shap_recursive(TreeShapRecursiveOptions {
@@ -72,7 +72,7 @@ impl PathItem {
 }
 
 struct TreeShapRecursiveOptions<'a> {
-	example: &'a [tangram_table::TableValue<'a>],
+	example: &'a [modelfox_table::TableValue<'a>],
 	node_index: usize,
 	parent_feature_index: Option<usize>,
 	parent_one_fraction: f64,
@@ -242,7 +242,7 @@ fn unwound_path_sum(unique_path: &[PathItem], unique_depth: usize, path_index: u
 
 fn compute_hot_cold_child(
 	node: &BranchNode,
-	example: &[tangram_table::TableValue],
+	example: &[modelfox_table::TableValue],
 ) -> (usize, usize) {
 	match &node.split {
 		BranchSplit::Continuous(BranchSplitContinuous {
@@ -250,7 +250,7 @@ fn compute_hot_cold_child(
 			split_value,
 			invalid_values_direction,
 		}) => match example[*feature_index] {
-			tangram_table::TableValue::Number(value) => {
+			modelfox_table::TableValue::Number(value) => {
 				if value.is_nan() {
 					if let SplitDirection::Left = invalid_values_direction {
 						(node.left_child_index, node.right_child_index)
@@ -269,7 +269,7 @@ fn compute_hot_cold_child(
 			feature_index,
 			directions,
 		}) => match example[*feature_index] {
-			tangram_table::TableValue::Enum(value) => {
+			modelfox_table::TableValue::Enum(value) => {
 				let bin_index = value.map(|value| value.get()).unwrap_or(0);
 				match (*directions.get(bin_index).unwrap()).into() {
 					SplitDirection::Left => (node.left_child_index, node.right_child_index),

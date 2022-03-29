@@ -1,6 +1,6 @@
 use pinwheel::prelude::*;
-use tangram_ui as ui;
-use tangram_www_layouts::{
+use modelfox_ui as ui;
+use modelfox_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage},
 	document::Document,
 };
@@ -9,8 +9,8 @@ pub struct Page;
 
 impl Component for Page {
 	fn into_node(self) -> Node {
-		let p1 = ui::P::new().child("Welcome to the documentation for Tangram!");
-		let p2 = ui::P::new().child("Tangram makes it easy for programmers to train, deploy, and monitor machine learning models. With Tangram, you:");
+		let p1 = ui::P::new().child("Welcome to the documentation for ModelFox!");
+		let p2 = ui::P::new().child("ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models. With ModelFox, you:");
 		let list = ui::UnorderedList::new()
 			.child(ui::ListItem::new().child("Train a model from a CSV file on the command line."))
 			.child(

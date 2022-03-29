@@ -39,14 +39,14 @@ One sentence in that section really stuck out to me: "Its [Rails'] purpose is no
 
 It would be great if we had something like Ruby on Rails for machine learning: a single system that provides the tools you need to go from data to a deployed machine learning model.  Just as DHH says "rails specifically seeks to equip generalist individuals to make these full system", we need tools to equip generalist programmers, like front-end javascript programmers or back-end ruby programmers, to build full machine learning systems.
 
-## Introducing Tangram
+## Introducing ModelFox
 
-Tangram is an all-in-one automated machine learning framework that makes it easy to add machine learning to your applications. Predictions happens directly in your existing applications so there are no network requests and there is no need to set up a separate service to serve your models.
+ModelFox is an all-in-one automated machine learning framework that makes it easy to add machine learning to your applications. Predictions happens directly in your existing applications so there are no network requests and there is no need to set up a separate service to serve your models.
 
-- Run `tangram train` to train a model from a CSV file on the command line.
-- Make predictions with bindings for [Ruby](https://rubygems.org/gems/tangram), [Python](https://pypi.org/project/tangram), [Golang](https://pkg.go.dev/github.com/tangramdotdev/tangram-go), [Elixir](https://hex.pm/packages/tangram), [Javascript](https://www.npmjs.com/package/@tangramdotdev/tangram), [PHP](https://packagist.org/packages/tangram/tangram), or [Rust](https://lib.rs/tangram).
-- Run `tangram app` to start a web application where you can learn more about your models and monitor them in production.
+- Run `modelfox train` to train a model from a CSV file on the command line.
+- Make predictions with bindings for [Ruby](https://rubygems.org/gems/modelfox), [Python](https://pypi.org/project/modelfox), [Golang](https://pkg.go.dev/github.com/modelfoxdotdev/modelfox-go), [Elixir](https://hex.pm/packages/modelfox), [Javascript](https://www.npmjs.com/package/@modelfoxdotdev/modelfox), [PHP](https://packagist.org/packages/modelfox/modelfox), or [Rust](https://lib.rs/modelfox).
+- Run `modelfox app` to start a web application where you can learn more about your models and monitor them in production.
 
-You can check out the [Tangram Ruby Gem](https://rubygems.org/gems/tangram). We built it using Ruby FFI and the source is available on our [GitHub repo](https://github.com/tangramdotdev/tangram/tree/main/languages/ruby).
+You can check out the [ModelFox Ruby Gem](https://rubygems.org/gems/modelfox). We built it using Ruby FFI and the source is available on our [GitHub repo](https://github.com/modelfoxdotdev/modelfox/tree/main/languages/ruby).
 
-Tangram is a new project and there is a lot of work ahead. We’d love to get your feedback. Check out the project on [GitHub](https://github.com/tangramdotdev/tangram), and let us know what you think! If you like what we are working on, [give us a star](https://github.com/tangramdotdev/tangram)!
+ModelFox is a new project and there is a lot of work ahead. We’d love to get your feedback. Check out the project on [GitHub](https://github.com/modelfoxdotdev/modelfox), and let us know what you think! If you like what we are working on, [give us a star](https://github.com/modelfoxdotdev/modelfox)!

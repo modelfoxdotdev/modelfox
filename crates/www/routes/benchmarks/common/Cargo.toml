@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_www_benchmarks_common"
+name = "modelfox_www_benchmarks_common"
 publish = false
 version = "0.0.0"
 
@@ -12,6 +12,6 @@ futures-signals = "0.3"
 num = "0.4"
 pinwheel = "0.2"
 serde = { version = "1", features = ["derive"] }
-tangram_ui = { path = "../../../../ui" }
-tangram_charts = { path = "../../../../charts" }
+modelfox_ui = { path = "../../../../ui" }
+modelfox_charts = { path = "../../../../charts" }
 tracing = "0.1"

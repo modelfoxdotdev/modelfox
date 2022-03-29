@@ -23,7 +23,7 @@ impl Component for Document {
 					.attribute("rel", "icon")
 					.attribute("type", "image/png"),
 			)
-			.child(title().child("Tangram"))
+			.child(title().child("ModelFox"))
 			.child(
 				link()
 					.attribute("href", "/styles.css")
@@ -31,11 +31,11 @@ impl Component for Document {
 			)
 			.child(
 				meta()
-					.attribute("content", "Tangram makes it easy for programmers to train, deploy, and monitor machine learning models.")
+					.attribute("content", "ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models.")
 					.attribute("name", "description"),
 			);
 		let timezone_script = script().child(
-			"document.cookie = `tangram_timezone=${Intl.DateTimeFormat().resolvedOptions().timeZone};max-age=31536000;path=/;samesite=lax`");
+			"document.cookie = `modelfox_timezone=${Intl.DateTimeFormat().resolvedOptions().timeZone};max-age=31536000;path=/;samesite=lax`");
 		let client_script = self.client.map(|client| {
 			let paths = sunfish::client_paths(client);
 			script().attribute("type", "module").inner_html(format!(

@@ -1,7 +1,7 @@
 use crate::layout::Layout;
+use modelfox_ui as ui;
+use modelfox_www_content::{Content, DocsGuide, DocsInternals};
 use pinwheel::prelude::*;
-use tangram_ui as ui;
-use tangram_www_content::{Content, DocsGuide, DocsInternals};
 
 #[derive(builder, children, Default, new)]
 #[new(default)]

@@ -1,12 +1,12 @@
 [package]
 edition = "2021"
-name = "tangram_app_training_class_metrics_client"
+name = "modelfox_app_training_class_metrics_client"
 publish = false
 version = "0.0.0"
 
 [[bin]]
-name = "tangram_app_training_class_metrics_client"
+name = "modelfox_app_training_class_metrics_client"
 path = "main.rs"
 
 [dependencies]
-tangram_ui = { path = "../../../../../../../../../ui" }
+modelfox_ui = { path = "../../../../../../../../../ui" }

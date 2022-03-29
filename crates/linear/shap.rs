@@ -1,5 +1,5 @@
 use ndarray::prelude::*;
-use tangram_zip::zip;
+use modelfox_zip::zip;
 
 pub struct ComputeShapValuesForExampleOutput {
 	pub baseline_value: f32,

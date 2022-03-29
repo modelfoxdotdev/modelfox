@@ -1,13 +1,13 @@
 let fs = require("fs")
 let path = require("path")
-let tangram = require("@tangramdotdev/tangram")
+let modelfox = require("@modelfoxdotdev/modelfox")
 let url = require("url")
 
-// Get the path to the .tangram file.
-let modelPath = path.join(__dirname, "heart_disease.tangram")
+// Get the path to the .modelfox file.
+let modelPath = path.join(__dirname, "heart_disease.modelfox")
 // Load the model from the path.
 let modelData = fs.readFileSync(modelPath)
-let model = new tangram.Model(modelData.buffer)
+let model = new modelfox.Model(modelData.buffer)
 
 // Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
 let input = {

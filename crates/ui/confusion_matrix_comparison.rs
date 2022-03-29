@@ -1,6 +1,6 @@
 use crate as ui;
 use pinwheel::prelude::*;
-use tangram_number_formatter::format_option_percent;
+use modelfox_number_formatter::format_option_percent;
 
 // |-----------------------------------------------------------|
 // |           ||       |                Actual                |

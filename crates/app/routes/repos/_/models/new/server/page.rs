@@ -1,10 +1,10 @@
 use pinwheel::prelude::*;
-use tangram_app_layouts::{
+use modelfox_app_layouts::{
 	app_layout::{AppLayout, AppLayoutInfo},
 	document::Document,
 };
-use tangram_app_ui::page_heading::PageHeading;
-use tangram_ui as ui;
+use modelfox_app_ui::page_heading::PageHeading;
+use modelfox_ui as ui;
 
 pub struct Page {
 	pub app_layout_info: AppLayoutInfo,
@@ -14,7 +14,7 @@ pub struct Page {
 impl Component for Page {
 	fn into_node(self) -> Node {
 		Document::new()
-			.client("tangram_app_new_model_client")
+			.client("modelfox_app_new_model_client")
 			.child(
 				AppLayout::new(self.app_layout_info).child(
 					ui::S1::new()

@@ -4,14 +4,14 @@ use crate::{
 };
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_charts::{
+use modelfox_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	components::{BarChart, FeatureContributionsChart},
 	feature_contributions_chart::{
 		FeatureContributionsChartSeries, FeatureContributionsChartValue,
 	},
 };
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct PredictOutput {
 	pub inner: PredictOutputInner,
@@ -102,29 +102,29 @@ impl Component for ColumnTypeToken {
 }
 
 pub fn compute_input_table(
-	model: tangram_model::ModelReader,
-	input: &tangram_core::predict::PredictInput,
+	model: modelfox_model::ModelReader,
+	input: &modelfox_core::predict::PredictInput,
 ) -> InputTable {
 	let column_stats = match model.inner() {
-		tangram_model::ModelInnerReader::Regressor(regressor) => {
+		modelfox_model::ModelInnerReader::Regressor(regressor) => {
 			regressor.read().overall_column_stats()
 		}
-		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+		modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			binary_classifier.read().overall_column_stats()
 		}
-		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+		modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 			multiclass_classifier.read().overall_column_stats()
 		}
 	};
 	let rows = column_stats
 		.iter()
 		.map(|column_stats| match column_stats {
-			tangram_model::ColumnStatsReader::UnknownColumn(column_stats) => {
+			modelfox_model::ColumnStatsReader::UnknownColumn(column_stats) => {
 				let column_stats = column_stats.read();
 				let column_name = column_stats.column_name().to_owned();
 				let value = input.0.get(&column_name).map(|value| match value {
-					tangram_core::predict::PredictInputValue::Number(n) => n.to_string(),
-					tangram_core::predict::PredictInputValue::String(s) => s.clone(),
+					modelfox_core::predict::PredictInputValue::Number(n) => n.to_string(),
+					modelfox_core::predict::PredictInputValue::String(s) => s.clone(),
 				});
 				InputTableRow {
 					column_name,
@@ -132,12 +132,12 @@ pub fn compute_input_table(
 					column_type: InputTableColumnType::Unknown,
 				}
 			}
-			tangram_model::ColumnStatsReader::NumberColumn(column_stats) => {
+			modelfox_model::ColumnStatsReader::NumberColumn(column_stats) => {
 				let column_stats = column_stats.read();
 				let column_name = column_stats.column_name().to_owned();
 				let value = input.0.get(&column_name).map(|value| match value {
-					tangram_core::predict::PredictInputValue::Number(n) => n.to_string(),
-					tangram_core::predict::PredictInputValue::String(s) => s.clone(),
+					modelfox_core::predict::PredictInputValue::Number(n) => n.to_string(),
+					modelfox_core::predict::PredictInputValue::String(s) => s.clone(),
 				});
 				InputTableRow {
 					column_name,
@@ -145,12 +145,12 @@ pub fn compute_input_table(
 					column_type: InputTableColumnType::Number,
 				}
 			}
-			tangram_model::ColumnStatsReader::EnumColumn(column_stats) => {
+			modelfox_model::ColumnStatsReader::EnumColumn(column_stats) => {
 				let column_stats = column_stats.read();
 				let column_name = column_stats.column_name().to_owned();
 				let value = input.0.get(&column_name).map(|value| match value {
-					tangram_core::predict::PredictInputValue::Number(n) => n.to_string(),
-					tangram_core::predict::PredictInputValue::String(s) => s.clone(),
+					modelfox_core::predict::PredictInputValue::Number(n) => n.to_string(),
+					modelfox_core::predict::PredictInputValue::String(s) => s.clone(),
 				});
 				InputTableRow {
 					column_name,
@@ -158,12 +158,12 @@ pub fn compute_input_table(
 					column_type: InputTableColumnType::Enum,
 				}
 			}
-			tangram_model::ColumnStatsReader::TextColumn(column_stats) => {
+			modelfox_model::ColumnStatsReader::TextColumn(column_stats) => {
 				let column_stats = column_stats.read();
 				let column_name = column_stats.column_name().to_owned();
 				let value = input.0.get(&column_name).map(|value| match value {
-					tangram_core::predict::PredictInputValue::Number(n) => n.to_string(),
-					tangram_core::predict::PredictInputValue::String(s) => s.clone(),
+					modelfox_core::predict::PredictInputValue::Number(n) => n.to_string(),
+					modelfox_core::predict::PredictInputValue::String(s) => s.clone(),
 				});
 				InputTableRow {
 					column_name,
@@ -318,7 +318,7 @@ impl Component for MulticlassClassificationPredictOutput {
 
 pub fn compute_feature_contributions_chart_series(
 	title: String,
-	feature_contributions: tangram_core::predict::FeatureContributions,
+	feature_contributions: modelfox_core::predict::FeatureContributions,
 ) -> FeatureContributionsChartSeries {
 	FeatureContributionsChartSeries {
 		baseline: feature_contributions.baseline_value.to_f64().unwrap(),
@@ -336,10 +336,10 @@ pub fn compute_feature_contributions_chart_series(
 }
 
 fn compute_feature_contributions_chart_value(
-	entry: tangram_core::predict::FeatureContributionEntry,
+	entry: modelfox_core::predict::FeatureContributionEntry,
 ) -> FeatureContributionsChartValue {
 	match entry {
-		tangram_core::predict::FeatureContributionEntry::Identity(feature_contribution) => {
+		modelfox_core::predict::FeatureContributionEntry::Identity(feature_contribution) => {
 			FeatureContributionsChartValue {
 				feature: feature_contribution.column_name,
 				value: feature_contribution
@@ -348,7 +348,7 @@ fn compute_feature_contributions_chart_value(
 					.unwrap(),
 			}
 		}
-		tangram_core::predict::FeatureContributionEntry::Normalized(feature_contribution) => {
+		modelfox_core::predict::FeatureContributionEntry::Normalized(feature_contribution) => {
 			FeatureContributionsChartValue {
 				feature: feature_contribution.column_name,
 				value: feature_contribution
@@ -357,7 +357,7 @@ fn compute_feature_contributions_chart_value(
 					.unwrap(),
 			}
 		}
-		tangram_core::predict::FeatureContributionEntry::OneHotEncoded(feature_contribution) => {
+		modelfox_core::predict::FeatureContributionEntry::OneHotEncoded(feature_contribution) => {
 			let predicate = if feature_contribution.feature_value {
 				"is"
 			} else {
@@ -379,7 +379,7 @@ fn compute_feature_contributions_chart_value(
 					.unwrap(),
 			}
 		}
-		tangram_core::predict::FeatureContributionEntry::BagOfWords(feature_contribution) => {
+		modelfox_core::predict::FeatureContributionEntry::BagOfWords(feature_contribution) => {
 			let predicate = if feature_contribution.feature_value != 0.0 {
 				"contains"
 			} else {
@@ -397,7 +397,7 @@ fn compute_feature_contributions_chart_value(
 					.unwrap(),
 			}
 		}
-		tangram_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(
+		modelfox_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(
 			feature_contribution,
 		) => {
 			let feature = format!(
@@ -412,7 +412,7 @@ fn compute_feature_contributions_chart_value(
 					.unwrap(),
 			}
 		}
-		tangram_core::predict::FeatureContributionEntry::WordEmbedding(feature_contribution) => {
+		modelfox_core::predict::FeatureContributionEntry::WordEmbedding(feature_contribution) => {
 			let feature = format!("{} word model", feature_contribution.column_name);
 			FeatureContributionsChartValue {
 				feature,

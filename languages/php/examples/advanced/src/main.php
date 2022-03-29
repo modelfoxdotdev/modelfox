@@ -1,14 +1,14 @@
 <?php
 
-namespace tangram\tangram;
+namespace modelfox\modelfox;
 
 require_once(dirname(dirname(__FILE__)) . '/vendor/autoload.php');
 
-$model_path = dirname(dirname(__FILE__)) . '/heart_disease.tangram';
+$model_path = dirname(dirname(__FILE__)) . '/heart_disease.modelfox';
 
-# If you are running the Tangram app on your own server you can pass the URL to it with the TANGRAM_URL environment variable.
-$tangram_url = getenv('TANGRAM_URL') ?: 'https://app.tangram.dev';
-$load_options = new LoadModelOptions($tangram_url);
+# If you are running the ModelFox app on your own server you can pass the URL to it with the MODELFOX_URL environment variable.
+$modelfox_url = getenv('MODELFOX_URL') ?: 'https://app.modelfox.dev';
+$load_options = new LoadModelOptions($modelfox_url);
 
 $model = Model::from_path($model_path, $load_options);
 
@@ -31,7 +31,7 @@ $input = [
   'thallium_stress_test' => 'fixed defect'
 ];
 
-// Make the prediction using a custom threshold chosen on the "Tuning" page of the Tangram app.
+// Make the prediction using a custom threshold chosen on the "Tuning" page of the ModelFox app.
 
 $options = new PredictOptions('true', 0.5);
 $output = $model->predict($input, $options);

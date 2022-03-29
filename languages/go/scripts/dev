@@ -1,4 +1,4 @@
-cargo build -p libtangram
-rm -rf libtangram/
-install -D ../../target/debug/libtangram.a libtangram/x86_64-linux-musl/libtangram.a
-cbindgen ../c > libtangram/x86_64-linux-musl/tangram.h
+cargo build -p libmodelfox
+rm -rf libmodelfox/
+install -D ../../target/debug/libmodelfox.a libmodelfox/x86_64-linux-musl/libmodelfox.a
+cbindgen ../c > libmodelfox/x86_64-linux-musl/modelfox.h

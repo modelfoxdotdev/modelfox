@@ -55,7 +55,7 @@ pub enum RegressionModel {
 #[buffalo(size = "dynamic")]
 pub struct LinearRegressor {
 	#[buffalo(id = 0, required)]
-	pub model: tangram_linear::serialize::Regressor,
+	pub model: modelfox_linear::serialize::Regressor,
 	#[buffalo(id = 1, required)]
 	pub train_options: LinearModelTrainOptions,
 	#[buffalo(id = 2, required)]
@@ -70,7 +70,7 @@ pub struct LinearRegressor {
 #[buffalo(size = "dynamic")]
 pub struct TreeRegressor {
 	#[buffalo(id = 0, required)]
-	pub model: tangram_tree::serialize::Regressor,
+	pub model: modelfox_tree::serialize::Regressor,
 	#[buffalo(id = 1, required)]
 	pub train_options: TreeModelTrainOptions,
 	#[buffalo(id = 2, required)]

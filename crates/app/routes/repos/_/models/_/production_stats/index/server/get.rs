@@ -11,8 +11,8 @@ use chrono_tz::Tz;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use std::sync::Arc;
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	heuristics::{
 		PRODUCTION_STATS_LARGE_ABSENT_RATIO_THRESHOLD_TO_TRIGGER_ALERT,
@@ -23,15 +23,15 @@ use tangram_app_core::{
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 };
-use tangram_app_date_window::{get_date_window_and_interval, DateWindow, DateWindowInterval};
-use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_app_production_stats::{
+use modelfox_app_date_window::{get_date_window_and_interval, DateWindow, DateWindowInterval};
+use modelfox_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use modelfox_app_production_stats::{
 	get_production_stats, GetProductionStatsOutput, ProductionColumnStatsOutput,
 	ProductionPredictionStatsOutput, RegressionProductionPredictionStatsOutput,
 };
-use tangram_app_ui::column_type::ColumnType;
-use tangram_app_ui::time::{format_date_window, format_date_window_interval};
-use tangram_id::Id;
+use modelfox_app_ui::column_type::ColumnType;
+use modelfox_app_ui::time::{format_date_window, format_date_window_interval};
+use modelfox_id::Id;
 
 #[derive(serde::Deserialize, Default)]
 struct SearchParams {
@@ -78,7 +78,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		return Ok(not_found());
 	}
 	let bytes = get_model_bytes(app.storage(), model_id).await?;
-	let model = tangram_model::from_bytes(&bytes)?;
+	let model = modelfox_model::from_bytes(&bytes)?;
 	let production_stats =
 		get_production_stats(&mut db, model, date_window, date_window_interval, timezone).await?;
 	let inner = match production_stats.overall.prediction_stats {
@@ -125,7 +125,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 }
 
 fn compute_production_training_quantiles(
-	target_column_stats: &tangram_model::NumberColumnStatsReader,
+	target_column_stats: &modelfox_model::NumberColumnStatsReader,
 	prediction_stats: &RegressionProductionPredictionStatsOutput,
 ) -> ProductionTrainingQuantiles {
 	ProductionTrainingQuantiles {
@@ -150,7 +150,7 @@ fn compute_production_training_quantiles(
 }
 
 fn compute_regressor(
-	model: tangram_model::ModelReader,
+	model: modelfox_model::ModelReader,
 	production_stats: GetProductionStatsOutput,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
@@ -221,7 +221,7 @@ fn compute_regressor(
 }
 
 fn compute_binary_classifier(
-	model: tangram_model::ModelReader,
+	model: modelfox_model::ModelReader,
 	production_stats: GetProductionStatsOutput,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
@@ -309,7 +309,7 @@ fn compute_binary_classifier(
 }
 
 fn compute_multiclass_classifier(
-	model: tangram_model::ModelReader,
+	model: modelfox_model::ModelReader,
 	production_stats: GetProductionStatsOutput,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,

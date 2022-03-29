@@ -1,10 +1,10 @@
 use pinwheel::prelude::*;
-use tangram_charts::{
+use modelfox_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	box_chart::{BoxChartPoint, BoxChartSeries, BoxChartValue},
 	components::{BarChart, BoxChart},
 };
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct ProductionStats;
 

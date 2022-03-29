@@ -8,7 +8,7 @@ module.exports = {
 	module: {
 		rules: [
 			{
-				test: /\.tangram$/,
+				test: /\.modelfox$/,
 				type: "asset/resource",
 			},
 		],

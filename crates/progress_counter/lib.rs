@@ -33,7 +33,7 @@ However, because the work done in each loop iteration is small, a large portion 
 
 ```
 use rayon::prelude::*;
-use tangram_progress_counter::ProgressCounter;
+use modelfox_progress_counter::ProgressCounter;
 
 let mut v: Vec<usize> = (0..1_000).collect();
 let progress_counter = ProgressCounter::new(v.len() as u64);

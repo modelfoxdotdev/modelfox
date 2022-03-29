@@ -1,6 +1,6 @@
 import * as fs from "fs/promises"
 import * as path from "path"
-import * as tangram from "@tangramdotdev/tangram"
+import * as modelfox from "@modelfoxdotdev/modelfox"
 import * as url from "url"
 
 // Define the type for the input to the model.
@@ -68,27 +68,27 @@ enum ThalliumStressTest {
 }
 
 // Define the type for the output of the model.
-type Output = tangram.BinaryClassificationPredictOutput<Diagnosis>
+type Output = modelfox.BinaryClassificationPredictOutput<Diagnosis>
 
 enum Diagnosis {
 	Negative = "Negative",
 	Positive = "Positive",
 }
 
-// If you are running the Tangram app on your own server you can pass the URL to it with the TANGRAM_URL environment variable.
-let tangramUrl = process.env.TANGRAM_URL
+// If you are running the ModelFox app on your own server you can pass the URL to it with the MODELFOX_URL environment variable.
+let modelfoxUrl = process.env.MODELFOX_URL
 
-// Get the path to the .tangram file.
+// Get the path to the .modelfox file.
 let modelPath = path.join(
 	path.dirname(url.fileURLToPath(import.meta.url)),
-	"heart_disease.tangram",
+	"heart_disease.modelfox",
 )
 // Load the model from the path.
 let modelData = await fs.readFile(modelPath)
-let model = new tangram.Model<tangram.Task.BinaryClassification, Input, Output>(
+let model = new modelfox.Model<modelfox.Task.BinaryClassification, Input, Output>(
 	modelData.buffer,
 	{
-		tangramUrl,
+		modelfoxUrl,
 	},
 )
 
@@ -109,7 +109,7 @@ let input: Input = {
 	thallium_stress_test: ThalliumStressTest.FixedDefect,
 }
 
-// Make the prediction using a custom threshold chosen on the "Tuning" page of the Tangram app.
+// Make the prediction using a custom threshold chosen on the "Tuning" page of the ModelFox app.
 let options = { threshold: 0.25 }
 let output = model.predict(input, options)
 

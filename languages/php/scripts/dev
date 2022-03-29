@@ -1,5 +1,5 @@
 composer install
-cargo build -p libtangram
-rm -rf src/libtangram/
-install -D ../../target/debug/libtangram.so src/libtangram/x86_64-linux-gnu/libtangram.so
-cbindgen ../c > src/libtangram/x86_64-linux-gnu/tangram.h
+cargo build -p libmodelfox
+rm -rf src/libmodelfox/
+install -D ../../target/debug/libmodelfox.so src/libmodelfox/x86_64-linux-gnu/libmodelfox.so
+cbindgen ../c > src/libmodelfox/x86_64-linux-gnu/modelfox.h

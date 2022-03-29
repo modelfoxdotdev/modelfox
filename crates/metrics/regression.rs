@@ -1,6 +1,6 @@
 use super::mean_variance::{MeanVariance, MeanVarianceOutput};
+use modelfox_zip::zip;
 use num::ToPrimitive;
-use tangram_zip::zip;
 
 /// RegressionMetrics computes metrics used to evaluate regressors.
 pub struct RegressionMetrics {

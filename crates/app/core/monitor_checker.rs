@@ -16,8 +16,8 @@ use anyhow::{anyhow, bail, Result};
 use futures::FutureExt;
 use sqlx::prelude::*;
 use std::{borrow::BorrowMut, sync::Arc};
-use tangram_app_production_metrics::{ProductionMetrics, ProductionPredictionMetricsOutput};
-use tangram_id::Id;
+use modelfox_app_production_metrics::{ProductionMetrics, ProductionPredictionMetricsOutput};
+use modelfox_id::Id;
 use tokio::sync::{mpsc, oneshot};
 
 #[derive(Debug)]
@@ -128,7 +128,7 @@ pub async fn find_current_training_metric(
 ) -> Result<f32> {
 	// Grab the model from the DB
 	let bytes = get_model_bytes(&app_state.storage, model_id).await?;
-	let model = tangram_model::from_bytes(&bytes)?;
+	let model = modelfox_model::from_bytes(&bytes)?;
 	// Determine model type
 	let model_inner = model.inner();
 	let model_type = AlertModelType::from(model_inner);
@@ -145,14 +145,14 @@ pub async fn find_current_training_metric(
 		AlertMetric::Accuracy => {
 			// We know we have a classifier, need to get the accuracy from either type
 			match model_inner {
-				tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+				modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 					binary_classifier
 						.read()
 						.test_metrics()
 						.default_threshold()
 						.accuracy()
 				}
-				tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+				modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 					multiclass_classifier.read().test_metrics().accuracy()
 				}
 				_ => unreachable!(),
@@ -161,7 +161,7 @@ pub async fn find_current_training_metric(
 		AlertMetric::MeanSquaredError => {
 			// we know we have a regressor, just read it
 			match model_inner {
-				tangram_model::ModelInnerReader::Regressor(regressor) => {
+				modelfox_model::ModelInnerReader::Regressor(regressor) => {
 					regressor.read().test_metrics().mse()
 				}
 				_ => unreachable!(),
@@ -170,7 +170,7 @@ pub async fn find_current_training_metric(
 		AlertMetric::RootMeanSquaredError => {
 			// we know we have a regressor, just read it
 			match model_inner {
-				tangram_model::ModelInnerReader::Regressor(regressor) => {
+				modelfox_model::ModelInnerReader::Regressor(regressor) => {
 					regressor.read().test_metrics().rmse()
 				}
 				_ => unreachable!(),

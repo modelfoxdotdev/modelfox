@@ -2,16 +2,16 @@ use anyhow::Result;
 use pinwheel::prelude::*;
 use sqlx::prelude::*;
 use std::{borrow::BorrowMut, sync::Arc};
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	repos::get_model_version_ids,
 	user::{authorize_user, authorize_user_for_model},
 	App,
 };
-use tangram_app_ui::topbar::{Topbar, TopbarAvatar};
-use tangram_id::Id;
-use tangram_ui as ui;
+use modelfox_app_ui::topbar::{Topbar, TopbarAvatar};
+use modelfox_id::Id;
+use modelfox_ui as ui;
 
 pub struct ModelLayoutInfo {
 	pub model_id: Id,
@@ -300,7 +300,7 @@ impl Component for ModelLayoutTop {
 						"/repos/{}/models/{}/download",
 						repo_id, self.model_id
 					))
-					.download(format!("{}.tangram", self.repo_title))
+					.download(format!("{}.modelfox", self.repo_title))
 					.child("Download"),
 			);
 		div()

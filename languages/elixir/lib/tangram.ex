@@ -1,6 +1,6 @@
-defmodule Tangram do
+defmodule ModelFox do
   @moduledoc """
-  This is the main module in the `tangram` package.
+  This is the main module in the `modelfox` package.
   """
 
   defmodule Model do
@@ -9,13 +9,13 @@ defmodule Tangram do
     """
     @type t :: %__MODULE__{
             model: reference,
-            log_queue: [Tangram.event()],
-            tangram_url: String.t()
+            log_queue: [ModelFox.event()],
+            modelfox_url: String.t()
           }
     defstruct [
       :model,
       :log_queue,
-      :tangram_url
+      :modelfox_url
     ]
   end
 
@@ -23,25 +23,25 @@ defmodule Tangram do
     @moduledoc """
     These are the options passed when loading a model.
 
-    ## `tangram_url`
-    If you are running the app locally or on your own server, use this field to provide the url to it. If not specified, the default value is https://app.tangram.dev.
+    ## `modelfox_url`
+    If you are running the app locally or on your own server, use this field to provide the url to it. If not specified, the default value is https://app.modelfox.dev.
     """
     @type t :: %__MODULE__{
-            tangram_url: String.t()
+            modelfox_url: String.t()
           }
     defstruct [
-      :tangram_url
+      :modelfox_url
     ]
   end
 
   @typedoc """
-  This is the input type of `Tangram.predict`. A predict input is a map from atoms or strings to strings or floats. The keys should match the columns in the CSV file you trained your model with.
+  This is the input type of `ModelFox.predict`. A predict input is a map from atoms or strings to strings or floats. The keys should match the columns in the CSV file you trained your model with.
   """
   @type predict_input :: %{(atom | String.t()) => String.t() | float}
 
   defmodule PredictOptions do
     @moduledoc """
-    These are the options passed to `Tangram.predict`.
+    These are the options passed to `ModelFox.predict`.
 
     ## `threshold`
     If your model is a binary classifier, use this field to make predictions using the threshold you chose on the tuning page of the app. The default value is `0.5`.
@@ -61,7 +61,7 @@ defmodule Tangram do
   end
 
   @typedoc """
-  This is the return type of `Tangram.predict`.
+  This is the return type of `ModelFox.predict`.
   """
   @type predict_output ::
           {:regression, RegressionPredictOutput.t()}
@@ -70,7 +70,7 @@ defmodule Tangram do
 
   defmodule RegressionPredictOutput do
     @moduledoc """
-    `Tangram.predict` outputs `{:regression, RegressionPredictOutput.t()}` when the model's task is regression.
+    `ModelFox.predict` outputs `{:regression, RegressionPredictOutput.t()}` when the model's task is regression.
 
     ## `value`
     This is the predicted value.
@@ -91,7 +91,7 @@ defmodule Tangram do
 
   defmodule BinaryClassificationPredictOutput do
     @moduledoc """
-    `Tangram.predict` outputs `{:binary_classification, BinaryClassificationPredictOutput.t()}` when the model's task is binary classification.
+    `ModelFox.predict` outputs `{:binary_classification, BinaryClassificationPredictOutput.t()}` when the model's task is binary classification.
 
     ## `class_name`
     This is the name of the predicted class.
@@ -117,7 +117,7 @@ defmodule Tangram do
 
   defmodule MulticlassClassificationPredictOutput do
     @moduledoc """
-    `Tangram.predict` outputs `{:multiclass_classification, MulticlassClassificationPredictOutput.t()}` when the model's task is multiclass classification.
+    `ModelFox.predict` outputs `{:multiclass_classification, MulticlassClassificationPredictOutput.t()}` when the model's task is multiclass classification.
 
     ## `class_name`
     This is the name of the predicted class.
@@ -162,7 +162,7 @@ defmodule Tangram do
     @type t :: %__MODULE__{
             baseline_value: float,
             output_value: float,
-            entries: [Tangram.feature_contribution_entry()]
+            entries: [ModelFox.feature_contribution_entry()]
           }
     defstruct [
       :baseline_value,
@@ -354,25 +354,25 @@ defmodule Tangram do
 
   defmodule LogPredictionArgs do
     @moduledoc """
-    This is the type of the argument to `Tangram.log_prediction` and `Tangram.enqueue_log_prediction` which specifies the details of the prediction to log.
+    This is the type of the argument to `ModelFox.log_prediction` and `ModelFox.enqueue_log_prediction` which specifies the details of the prediction to log.
 
     ## `identifier`
     This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
 
     ## `input`
-    This is the same `Tangram.predict_input` value that you passed to `Tangram.predict`.
+    This is the same `ModelFox.predict_input` value that you passed to `ModelFox.predict`.
 
     ## `options`
-    This is the same `Tangram.PredictOptions` value that you passed to `Tangram.predict`.
+    This is the same `ModelFox.PredictOptions` value that you passed to `ModelFox.predict`.
 
     ## `output`
-    This is the output returned by `Tangram.predict`.
+    This is the output returned by `ModelFox.predict`.
     """
     @type t :: %__MODULE__{
             identifier: String.t(),
-            input: Tangram.predict_input(),
+            input: ModelFox.predict_input(),
             options: PredictOptions.t() | nil,
-            output: Tangram.predict_output()
+            output: ModelFox.predict_output()
           }
     defstruct [
       :identifier,
@@ -384,7 +384,7 @@ defmodule Tangram do
 
   defmodule LogTrueValueArgs do
     @moduledoc """
-    This is the type of the argument to `Tangram.log_true_value` and `Tangram.enqueue_log_true_value` which specifies the details of the true value to log.
+    This is the type of the argument to `ModelFox.log_true_value` and `ModelFox.enqueue_log_true_value` which specifies the details of the true value to log.
 
     ## `identifier`
     This is a unique identifier for the prediction, which will associate it with a true value event and allow you to look it up in the app.
@@ -394,7 +394,7 @@ defmodule Tangram do
     """
     @type t :: %__MODULE__{
             identifier: String.t(),
-            true_value: Tangram.true_value()
+            true_value: ModelFox.true_value()
           }
     defstruct [
       :identifier,
@@ -412,9 +412,9 @@ defmodule Tangram do
             model_id: String.t(),
             date: String.t(),
             identifier: String.t(),
-            input: Tangram.predict_input(),
+            input: ModelFox.predict_input(),
             options: PredictOptions.t() | nil,
-            output: Tangram.predict_output()
+            output: ModelFox.predict_output()
           }
     @derive Jason.Encoder
     defstruct [
@@ -436,7 +436,7 @@ defmodule Tangram do
             model_id: String.t(),
             date: String.t(),
             identifier: String.t(),
-            true_value: Tangram.true_value()
+            true_value: ModelFox.true_value()
           }
     @derive Jason.Encoder
     defstruct [
@@ -455,61 +455,61 @@ defmodule Tangram do
     nif_path =
       cond do
         String.match?(sys_arch, ~r/x86_64-(pc|unknown)-linux-gnu/) ->
-          "x86_64-linux-gnu/libtangram_elixir"
+          "x86_64-linux-gnu/libmodelfox_elixir"
 
         String.match?(sys_arch, ~r/(aarch64|arm)-(pc|unknown)-linux-gnu/) ->
-          "aarch64-linux-gnu/libtangram_elixir"
+          "aarch64-linux-gnu/libmodelfox_elixir"
 
         String.match?(sys_arch, ~r/x86_64-(alpine|pc)-linux-musl/) ->
-          "x86_64-linux-musl/libtangram_elixir"
+          "x86_64-linux-musl/libmodelfox_elixir"
 
         String.match?(sys_arch, ~r/(aarch64|arm)-(alpine|pc)-linux-musl/) ->
-          "aarch64-linux-musl/libtangram_elixir"
+          "aarch64-linux-musl/libmodelfox_elixir"
 
         String.match?(sys_arch, ~r/x86_64-apple-darwin[0-9]+\.[0-9]+\.[0-9]+/) ->
-          "x86_64-macos/libtangram_elixir"
+          "x86_64-macos/libmodelfox_elixir"
 
         String.match?(sys_arch, ~r/(aarch64|arm)-apple-darwin[0-9]+\.[0-9]+\.[0-9]+/) ->
-          "aarch64-macos/libtangram_elixir"
+          "aarch64-macos/libmodelfox_elixir"
 
         String.match?(sys_arch, ~r/win32/) ->
-          "x86_64-windows-msvc/tangram_elixir"
+          "x86_64-windows-msvc/modelfox_elixir"
 
         true ->
-          raise "Tangram for Elixir does not yet support your combination of CPU architecture and operating system. Open an issue at https://github.com/tangramdotdev/tangram/issues/new or email us at help@tangram.dev to complain."
+          raise "ModelFox for Elixir does not yet support your combination of CPU architecture and operating system. Open an issue at https://github.com/modelfoxdotdev/modelfox/issues/new or email us at help@modelfox.dev to complain."
       end
 
-    path = :filename.join(:code.priv_dir(:tangram), nif_path)
+    path = :filename.join(:code.priv_dir(:modelfox), nif_path)
     :ok = :erlang.load_nif(path, nil)
   end
 
   @doc """
-  Load a model from a `.tangram` file at `path`.
+  Load a model from a `.modelfox` file at `path`.
   """
   @spec load_model_from_path(String.t(), LoadModelOptions | nil) :: Model.t()
   def load_model_from_path(path, options \\ nil) do
     model = _load_model_from_path(path)
-    tangram_url = if options, do: options.tangram_url, else: "https://app.tangram.dev"
+    modelfox_url = if options, do: options.modelfox_url, else: "https://app.modelfox.dev"
 
     %Model{
       model: model,
       log_queue: [],
-      tangram_url: tangram_url
+      modelfox_url: modelfox_url
     }
   end
 
   @doc """
-  Load a model from a binary instead of a file. You should use this only if you already have a `.tangram` loaded into memory. Otherwise, use `Tangram.load_model_from_path`, which is faster because it memory maps the file.
+  Load a model from a binary instead of a file. You should use this only if you already have a `.modelfox` loaded into memory. Otherwise, use `ModelFox.load_model_from_path`, which is faster because it memory maps the file.
   """
   @spec load_model_from_binary(String.t(), LoadModelOptions | nil) :: Model.t()
   def load_model_from_binary(binary, options \\ nil) do
     model = _load_model_from_binary(binary)
-    tangram_url = if options, do: options.tangram_url, else: "https://app.tangram.dev"
+    modelfox_url = if options, do: options.modelfox_url, else: "https://app.modelfox.dev"
 
     %Model{
       model: model,
       log_queue: [],
-      tangram_url: tangram_url
+      modelfox_url: modelfox_url
     }
   end
 
@@ -524,23 +524,23 @@ defmodule Tangram do
   @doc """
   Make a prediction!
   """
-  @spec predict(Model.t(), Tangram.predict_input(), PredictOptions.t() | nil) ::
-          Tangram.predict_output()
+  @spec predict(Model.t(), ModelFox.predict_input(), PredictOptions.t() | nil) ::
+          ModelFox.predict_output()
   def predict(model, input, options \\ nil) do
     _predict(model.model, input, options)
   end
 
   @doc """
-  Send a prediction event to the app. If you want to batch events, you can use `Tangram.enqueue_log_prediction` instead.
+  Send a prediction event to the app. If you want to batch events, you can use `ModelFox.enqueue_log_prediction` instead.
   """
   @spec log_prediction(Model.t(), LogPredictionArgs.t()) :: {:ok, any} | {:error, any}
   def log_prediction(model, args) do
     event = prediction_event(model, args)
-    log_events(model.tangram_url, [event])
+    log_events(model.modelfox_url, [event])
   end
 
   @doc """
-  Add a prediction event to the queue. Remember to call `Tangram.flush_log_queue` at a later point to send the event to the app.
+  Add a prediction event to the queue. Remember to call `ModelFox.flush_log_queue` at a later point to send the event to the app.
   """
   @spec enqueue_log_prediction(Model.t(), LogPredictionArgs.t()) :: Model.t()
   def enqueue_log_prediction(model, args) do
@@ -549,16 +549,16 @@ defmodule Tangram do
   end
 
   @doc """
-  Send a true value event to the app. If you want to batch events, you can use `Tangram.enqueue_log_true_value` instead.
+  Send a true value event to the app. If you want to batch events, you can use `ModelFox.enqueue_log_true_value` instead.
   """
   @spec log_true_value(Model.t(), LogTrueValueArgs.t()) :: {:ok, any} | {:error, any}
   def log_true_value(model, args) do
     event = true_value_event(model, args)
-    log_events(model.tangram_url, [event])
+    log_events(model.modelfox_url, [event])
   end
 
   @doc """
-  Add a true value event to the queue. Remember to call `Tangram.flush_log_queue` at a later point to send the event to the app.
+  Add a true value event to the queue. Remember to call `ModelFox.flush_log_queue` at a later point to send the event to the app.
   """
   @spec enqueue_log_true_value(Model.t(), LogTrueValueArgs.t()) :: Model.t()
   def enqueue_log_true_value(model, args) do
@@ -571,13 +571,13 @@ defmodule Tangram do
   """
   @spec flush_log_queue(Model.t()) :: Model.t()
   def flush_log_queue(model) do
-    log_events(model.tangram_url, model.log_queue)
+    log_events(model.modelfox_url, model.log_queue)
     %{model | log_queue: []}
   end
 
-  @spec log_events(String.t(), [Tangram.event()]) :: {:ok, any} | {:error, any}
-  defp log_events(tangram_url, events) do
-    url = tangram_url <> "/track"
+  @spec log_events(String.t(), [ModelFox.event()]) :: {:ok, any} | {:error, any}
+  defp log_events(modelfox_url, events) do
+    url = modelfox_url <> "/track"
     headers = %{"Content-Type": "application/json"}
     body = Jason.encode!(events)
     HTTPoison.post(url, body, headers)

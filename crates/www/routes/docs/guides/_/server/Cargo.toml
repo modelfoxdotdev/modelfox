@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_www_docs_guide_server"
+name = "modelfox_www_docs_guide_server"
 publish = false
 version = "0.0.0"
 
@@ -9,8 +9,8 @@ path = "lib.rs"
 
 [dependencies]
 pinwheel = "0.2"
-tangram_www_content = { path = "../../../../../content" }
-tangram_www_ui = { path = "../../../../../ui" }
-tangram_www_layouts = { path = "../../../../../layouts" }
+modelfox_www_content = { path = "../../../../../content" }
+modelfox_www_ui = { path = "../../../../../ui" }
+modelfox_www_layouts = { path = "../../../../../layouts" }
 sunfish = "0.7"
-tangram_ui = { path = "../../../../../../ui" }
+modelfox_ui = { path = "../../../../../../ui" }

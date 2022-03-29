@@ -1,10 +1,10 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_charts::{
+use modelfox_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	components::BarChart,
 };
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct TextColumn {
 	pub name: String,

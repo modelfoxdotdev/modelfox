@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace tangram\tangram;
+namespace modelfox\modelfox;
 
 final class LoadModelOptions
 {
     /**
-     * If you are running the app locally or on your own server, use this field to provide the url to it. If not specified, the default value is https://app.tangram.dev.
+     * If you are running the app locally or on your own server, use this field to provide the url to it. If not specified, the default value is https://app.modelfox.dev.
      * */
-    public string $tangram_url;
+    public string $modelfox_url;
 
     /**
      * Create a new LoadModelOptions instance
      * @param string Custom URL to override default
      * @return void
      */
-    public function __construct(string $tangram_url)
+    public function __construct(string $modelfox_url)
     {
-        $this->tangram_url = $tangram_url;
+        $this->modelfox_url = $modelfox_url;
     }
 }

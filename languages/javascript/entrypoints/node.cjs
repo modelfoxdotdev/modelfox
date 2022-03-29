@@ -22,7 +22,7 @@ if (arch === "x64" && platform === "linux") {
 }
 
 if (target !== null) {
-	setNative(require(`./tangram_${target}.node`))
+	setNative(require(`./modelfox_${target}.node`))
 } else {
-	setNative(require("./tangram_wasm.cjs"))
+	setNative(require("./modelfox_wasm.cjs"))
 }

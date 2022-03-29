@@ -1,13 +1,13 @@
 [package]
-authors = ["Tangram <root@tangram.dev"]
-description = "Tangram makes it easy for programmers to train, deploy, and monitor machine learning models."
-documentation = "https://docs.rs/tangram"
+authors = ["ModelFox <root@modelfox.dev"]
+description = "ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models."
+documentation = "https://docs.rs/modelfox"
 edition = "2021"
-homepage = "https://github.com/tangramdotdev/tangram"
+homepage = "https://github.com/modelfoxdotdev/modelfox"
 license = "MIT"
-name = "tangram_id"
+name = "modelfox_id"
 publish = true
-repository = "https://github.com/tangramdotdev/tangram"
+repository = "https://github.com/modelfoxdotdev/modelfox"
 version = "0.7.0"
 
 [lib]

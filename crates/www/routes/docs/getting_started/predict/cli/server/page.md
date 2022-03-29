@@ -8,7 +8,7 @@ age,gender,chest_pain,resting_blood_pressure,cholesterol,fasting_blood_sugar_gre
 You can make predictions like so:
 
 ```
-$ cat test.csv | tangram predict --model heart_disease.tangram
+$ cat test.csv | modelfox predict --model heart_disease.modelfox
 diagnosis
 Positive
 ```
@@ -16,5 +16,5 @@ Positive
 If you prefer to work with files instead of stdin/stdout:
 
 ```
-$ tangram predict --model heart_disease.tangram --file test.csv --output output.csv
+$ modelfox predict --model heart_disease.modelfox --file test.csv --output output.csv
 ```

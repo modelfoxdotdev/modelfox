@@ -7,7 +7,7 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::*;
 use std::{borrow::BorrowMut, fmt, io, str::FromStr};
-use tangram_id::Id;
+use modelfox_id::Id;
 use time::{macros::format_description, OffsetDateTime};
 use url::Url;
 

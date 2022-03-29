@@ -1,15 +1,15 @@
 use anyhow::{anyhow, bail, Result};
 use sqlx::prelude::*;
 use std::{borrow::BorrowMut, sync::Arc};
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
 	path_components,
 	user::NormalUser,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 	App,
 };
-use tangram_id::Id;
+use modelfox_id::Id;
 use url::Url;
 
 #[derive(serde::Deserialize)]
@@ -150,11 +150,11 @@ async fn send_invitation_email(
 	href.set_path("/login");
 	href.set_query(Some(&format!("email={}", invitee_email)));
 	let email = lettre::Message::builder()
-		.from("Tangram <noreply@tangram.dev>".parse()?)
+		.from("ModelFox <noreply@modelfox.dev>".parse()?)
 		.to(invitee_email.parse()?)
-		.subject("Tangram Invitation")
+		.subject("ModelFox Invitation")
 		.body(format!(
-			"{} invited you to join their team on Tangram. Click the link below to login.\n\n{}",
+			"{} invited you to join their team on ModelFox. Click the link below to login.\n\n{}",
 			inviter_email, href
 		))?;
 	app.send_email(email).await?;

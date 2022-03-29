@@ -1,4 +1,4 @@
-cargo run -p tangram_dev -- \
+cargo run -p modelfox_dev -- \
   --watch . \
   --ignore languages \
-  --command "cargo run -p tangram_cli -- app"
+  --command "cargo run -p modelfox_cli -- app"

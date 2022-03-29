@@ -1,7 +1,7 @@
 use pinwheel::prelude::*;
 use std::borrow::Cow;
-use tangram_ui as ui;
-use tangram_www_layouts::{
+use modelfox_ui as ui;
+use modelfox_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage, GettingStartedPage, PredictPage, PrevNextButtons},
 	document::Document,
 };
@@ -10,7 +10,7 @@ pub struct Page;
 
 impl Component for Page {
 	fn into_node(self) -> Node {
-		let predict_text = ui::P::new().child("First, import the tangram library and load the model file. Then, make an object with info for a new patient that matches the CSV, excluding the diagnosis column. Finally, call predict and print out the result.");
+		let predict_text = ui::P::new().child("First, import the modelfox library and load the model file. Then, make an object with info for a new patient that matches the CSV, excluding the diagnosis column. Finally, call predict and print out the result.");
 		Document::new()
 			.child(
 				DocsLayout::new()
@@ -45,7 +45,7 @@ impl Component for Install {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				pip install tangram
+				pip install modelfox
 			"#
 		);
 		let code = ui::highlight(code, ui::Language::Elixir);
@@ -62,12 +62,12 @@ impl Component for Predict {
 		let code = ui::doc!(
 			r#"
 				import os
-				import tangram
+				import modelfox
 
-				# Get the path to the .tangram file.
-				model_path = os.path.join(os.path.dirname(__file__), 'heart_disease.tangram')
+				# Get the path to the .modelfox file.
+				model_path = os.path.join(os.path.dirname(__file__), 'heart_disease.modelfox')
 				# Load the model from the path.
-				model = tangram.Model.from_path(model_path)
+				model = modelfox.Model.from_path(model_path)
 
 				# Create an example input matching the schema of the CSV file the model was trained on.
 				# Here the data is just hard-coded, but in your application you will probably get this

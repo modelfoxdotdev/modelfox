@@ -21,8 +21,8 @@ use crate::{
 use ndarray::prelude::*;
 use num::ToPrimitive;
 use rayon::prelude::*;
-use tangram_progress_counter::ProgressCounter;
-use tangram_table::prelude::*;
+use modelfox_progress_counter::ProgressCounter;
+use modelfox_table::prelude::*;
 
 /// This enum is used by the common `train` function below to customize the training code slightly for each task.
 #[derive(Clone, Copy, Debug)]

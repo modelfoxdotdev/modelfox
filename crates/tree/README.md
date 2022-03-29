@@ -2,6 +2,6 @@
 	<img src="tree.svg" title="Tree">
 </p>
 
-# Tangram Tree
+# ModelFox Tree
 
-This crate is documented using rustdoc. View the docs for the most recent version at https://docs.rs/tangram_tree or run `cargo doc -p tangram_tree --open` in the root of this repository.
+This crate is documented using rustdoc. View the docs for the most recent version at https://docs.rs/modelfox_tree or run `cargo doc -p modelfox_tree --open` in the root of this repository.

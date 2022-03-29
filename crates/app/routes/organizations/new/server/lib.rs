@@ -1,5 +1,5 @@
 use futures::FutureExt;
-use tangram_app_core::error::method_not_allowed;
+use modelfox_app_core::error::method_not_allowed;
 
 mod get;
 mod page;

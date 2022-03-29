@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace tangram\tangram;
+namespace modelfox\modelfox;
 
 final class Unigram extends Ngram
 {

@@ -1,1 +1,0 @@
-nix build --no-link && nix path-info | CACHIX_AUTH_TOKEN=$(pass tangram/cachix_auth_token) cachix push tangram

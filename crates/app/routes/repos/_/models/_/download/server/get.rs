@@ -1,13 +1,13 @@
 use anyhow::{bail, Result};
 use std::sync::Arc;
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
 	path_components,
 	user::{authorize_user, authorize_user_for_model},
 };
-use tangram_id::Id;
+use modelfox_id::Id;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	download_inner(request).await

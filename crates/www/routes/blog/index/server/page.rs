@@ -1,7 +1,7 @@
 use pinwheel::prelude::*;
-use tangram_ui as ui;
-use tangram_www_content::{BlogPost, Content};
-use tangram_www_layouts::{document::Document, page_layout::PageLayout};
+use modelfox_ui as ui;
+use modelfox_www_content::{BlogPost, Content};
+use modelfox_www_layouts::{document::Document, page_layout::PageLayout};
 
 pub struct Page;
 

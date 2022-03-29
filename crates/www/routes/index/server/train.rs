@@ -1,6 +1,6 @@
 use pinwheel::prelude::*;
 use std::borrow::Cow;
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct Train;
 
@@ -12,12 +12,12 @@ impl Component for Train {
 		let p1 = div()
 			.class("index-step-text")
 			.child("Train a machine learning model by running ")
-			.child(ui::InlineCode::new("tangram train"))
+			.child(ui::InlineCode::new("modelfox train"))
 			.child(" with the path to a CSV file and the name of the column you want to predict.");
 		let p2 = div()
 			.class("index-step-text")
 			.child("The CLI automatically transforms your data into features, trains a number of linear and gradient boosted decision tree models to predict the target column, and writes the best model to a ")
-			.child(ui::InlineCode::new(".tangram"))
+			.child(ui::InlineCode::new(".modelfox"))
 			.child(" file. If you want more control, you can provide a config file.");
 		let left = div().child(title).child(p1).child(br()).child(p2);
 		let right = ui::Window::new()

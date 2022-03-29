@@ -1,5 +1,5 @@
 /*!
-This crate defines the structure of `.tangram` files using the `buffalo` crate.
+This crate defines the structure of `.modelfox` files using the `buffalo` crate.
 */
 
 pub use self::{
@@ -19,28 +19,28 @@ mod multiclass_classifier;
 mod regressor;
 mod stats;
 
-/// A .tangram file is prefixed with this magic number followed by a 4-byte little endian revision number.
-const MAGIC_NUMBER: &[u8] = b"tangram\0";
-/// This is the revision number that this version of tangram_model writes.
+/// A .modelfox file is prefixed with this magic number followed by a 4-byte little endian revision number.
+const MAGIC_NUMBER: &[u8] = b"modelfox\0";
+/// This is the revision number that this version of modelfox_model writes.
 const CURRENT_REVISION: u32 = 0;
-/// This is the oldest revision number that this version of tangram_model can read.
+/// This is the oldest revision number that this version of modelfox_model can read.
 const MIN_SUPPORTED_REVISION: u32 = 0;
 
 pub fn from_bytes(bytes: &[u8]) -> Result<ModelReader> {
 	// Verify the magic number.
 	let magic_number = &bytes[0..MAGIC_NUMBER.len()];
 	if magic_number != MAGIC_NUMBER {
-		bail!("This model did not start with the tangram magic number. Are you sure it is a .tangram file?");
+		bail!("This model did not start with the modelfox magic number. Are you sure it is a .modelfox file?");
 	}
 	let bytes = &bytes[MAGIC_NUMBER.len()..];
 	let revision = u32::from_le_bytes(bytes[0..4].try_into().unwrap());
 	#[allow(clippy::absurd_extreme_comparisons)]
 	if revision > CURRENT_REVISION {
-		bail!("This model has a revision number of {}, which is greater than the revision number of {} used by this version of tangram. Your model is from the future! Please update to the latest version of tangram to use it.", revision, CURRENT_REVISION);
+		bail!("This model has a revision number of {}, which is greater than the revision number of {} used by this version of modelfox. Your model is from the future! Please update to the latest version of modelfox to use it.", revision, CURRENT_REVISION);
 	}
 	#[allow(clippy::absurd_extreme_comparisons)]
 	if revision < MIN_SUPPORTED_REVISION {
-		bail!("This model has a revision number of {}, which is lower than the minumum supported revision number of {} for this version of tangram. Please downgrade to an earlier version of tangram to use it.", revision, MIN_SUPPORTED_REVISION);
+		bail!("This model has a revision number of {}, which is lower than the minumum supported revision number of {} for this version of modelfox. Please downgrade to an earlier version of modelfox to use it.", revision, MIN_SUPPORTED_REVISION);
 	}
 	let bytes = &bytes[4..];
 	let model = buffalo::read::<ModelReader>(bytes);
@@ -110,31 +110,31 @@ impl<'a> std::fmt::Display for NGramReader<'a> {
 	}
 }
 
-impl<'a> From<TokenizerReader<'a>> for tangram_text::Tokenizer {
+impl<'a> From<TokenizerReader<'a>> for modelfox_text::Tokenizer {
 	fn from(value: TokenizerReader<'a>) -> Self {
-		tangram_text::Tokenizer {
+		modelfox_text::Tokenizer {
 			lowercase: value.lowercase(),
 			alphanumeric: value.alphanumeric(),
 		}
 	}
 }
 
-impl<'a> From<NGramReader<'a>> for tangram_text::NGramRef<'a> {
+impl<'a> From<NGramReader<'a>> for modelfox_text::NGramRef<'a> {
 	fn from(value: NGramReader<'a>) -> Self {
 		match value {
 			NGramReader::Unigram(token) => {
 				let token = token.read();
-				tangram_text::NGramRef::Unigram((*token).into())
+				modelfox_text::NGramRef::Unigram((*token).into())
 			}
 			NGramReader::Bigram(bigram) => {
 				let bigram = bigram.read();
-				tangram_text::NGramRef::Bigram(bigram.0.into(), bigram.1.into())
+				modelfox_text::NGramRef::Bigram(bigram.0.into(), bigram.1.into())
 			}
 		}
 	}
 }
 
-impl<'a> From<WordEmbeddingModelReader<'a>> for tangram_text::WordEmbeddingModel {
+impl<'a> From<WordEmbeddingModelReader<'a>> for modelfox_text::WordEmbeddingModel {
 	fn from(value: WordEmbeddingModelReader<'a>) -> Self {
 		let size = value.size().to_usize().unwrap();
 		let words = value
@@ -143,7 +143,7 @@ impl<'a> From<WordEmbeddingModelReader<'a>> for tangram_text::WordEmbeddingModel
 			.map(|(word, index)| (word.to_owned(), index.to_usize().unwrap()))
 			.collect::<FnvHashMap<_, _>>();
 		let values = value.values().iter().collect();
-		tangram_text::WordEmbeddingModel {
+		modelfox_text::WordEmbeddingModel {
 			size,
 			words,
 			values,

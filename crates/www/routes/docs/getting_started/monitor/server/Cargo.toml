@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_www_docs_getting_started_monitor_server"
+name = "modelfox_www_docs_getting_started_monitor_server"
 publish = false
 version = "0.0.0"
 
@@ -9,13 +9,13 @@ path = "lib.rs"
 
 [dependencies]
 pinwheel = "0.2"
-tangram_app_core = { path = "../../../../../../app/core" }
-tangram_app_date_window = { path = "../../../../../../app/date_window" }
-tangram_app_production_stats_column_server = { path = "../../../../../../app/routes/repos/_/models/_/production_stats/columns/_/server"}
-tangram_app_production_stats_index_server = { path = "../../../../../../app/routes/repos/_/models/_/production_stats/index/server"}
-tangram_app_ui = { path = "../../../../../../app/ui" }
-tangram_charts = { path = "../../../../../../charts" }
+modelfox_app_core = { path = "../../../../../../app/core" }
+modelfox_app_date_window = { path = "../../../../../../app/date_window" }
+modelfox_app_production_stats_column_server = { path = "../../../../../../app/routes/repos/_/models/_/production_stats/columns/_/server"}
+modelfox_app_production_stats_index_server = { path = "../../../../../../app/routes/repos/_/models/_/production_stats/index/server"}
+modelfox_app_ui = { path = "../../../../../../app/ui" }
+modelfox_charts = { path = "../../../../../../charts" }
 sunfish = "0.7"
-tangram_ui = { path = "../../../../../../ui" }
-tangram_www_layouts = { path = "../../../../../layouts" }
-tangram_www_ui = { path = "../../../../../ui" }
+modelfox_ui = { path = "../../../../../../ui" }
+modelfox_www_layouts = { path = "../../../../../layouts" }
+modelfox_www_ui = { path = "../../../../../ui" }

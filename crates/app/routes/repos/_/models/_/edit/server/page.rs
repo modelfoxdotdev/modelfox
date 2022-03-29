@@ -1,11 +1,11 @@
 use pinwheel::prelude::*;
-use tangram_app_layouts::{
+use modelfox_app_layouts::{
 	app_layout::{AppLayout, AppLayoutInfo},
 	document::Document,
 };
-use tangram_app_ui::page_heading::PageHeading;
-use tangram_id::Id;
-use tangram_ui as ui;
+use modelfox_app_ui::page_heading::PageHeading;
+use modelfox_id::Id;
+use modelfox_ui as ui;
 
 pub struct Page {
 	pub app_layout_info: AppLayoutInfo,

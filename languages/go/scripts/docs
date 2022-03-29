@@ -5,4 +5,4 @@ popd
 mkdir docs
 PATH=~/go/bin:$PATH godoc-static -destination=docs .
 rm docs/docs.zip
-echo '<html><head><meta http-equiv="refresh" content="0; URL=./github.com/tangramdotdev/tangram-go" /></head></html>' > docs/index.html
+echo '<html><head><meta http-equiv="refresh" content="0; URL=./github.com/modelfoxdotdev/modelfox-go" /></head></html>' > docs/index.html

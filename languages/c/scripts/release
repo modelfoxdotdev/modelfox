@@ -1,1 +1,1 @@
-cp ../../dist/x86_64-unknown-linux-gnu/tangram.h tangram.h
+cp ../../dist/x86_64-unknown-linux-gnu/modelfox.h modelfox.h

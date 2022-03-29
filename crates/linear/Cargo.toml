@@ -1,48 +1,48 @@
 [package]
-authors = ["Tangram <root@tangram.dev"]
-description = "Tangram makes it easy for programmers to train, deploy, and monitor machine learning models."
-documentation = "https://docs.rs/tangram"
+authors = ["ModelFox <root@modelfox.dev"]
+description = "ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models."
+documentation = "https://docs.rs/modelfox"
 edition = "2021"
-homepage = "https://github.com/tangramdotdev/tangram"
+homepage = "https://github.com/modelfoxdotdev/modelfox"
 license = "MIT"
-name = "tangram_linear"
+name = "modelfox_linear"
 publish = true
-repository = "https://github.com/tangramdotdev/tangram"
+repository = "https://github.com/modelfoxdotdev/modelfox"
 version = "0.7.0"
 
 [lib]
 path = "lib.rs"
 
 [[bin]]
-name = "tangram_linear_benchmarks"
+name = "modelfox_linear_benchmarks"
 path = "benchmarks/main.rs"
 
 [[bin]]
-name = "tangram_linear_benchmark_allstate"
+name = "modelfox_linear_benchmark_allstate"
 path = "benchmarks/allstate.rs"
 
 [[bin]]
-name = "tangram_linear_benchmark_boston"
+name = "modelfox_linear_benchmark_boston"
 path = "benchmarks/boston.rs"
 
 [[bin]]
-name = "tangram_linear_benchmark_census"
+name = "modelfox_linear_benchmark_census"
 path = "benchmarks/census.rs"
 
 [[bin]]
-name = "tangram_linear_benchmark_flights"
+name = "modelfox_linear_benchmark_flights"
 path = "benchmarks/flights.rs"
 
 [[bin]]
-name = "tangram_linear_benchmark_heart_disease"
+name = "modelfox_linear_benchmark_heart_disease"
 path = "benchmarks/heart_disease.rs"
 
 [[bin]]
-name = "tangram_linear_benchmark_higgs"
+name = "modelfox_linear_benchmark_higgs"
 path = "benchmarks/higgs.rs"
 
 [[bin]]
-name = "tangram_linear_benchmark_iris"
+name = "modelfox_linear_benchmark_iris"
 path = "benchmarks/iris.rs"
 
 [dependencies]
@@ -53,9 +53,9 @@ num = "0.4"
 rayon = "1.5"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tangram_features = { version = "0.7.0", path = "../features" }
-tangram_kill_chip = { version = "0.7.0", path = "../kill_chip" }
-tangram_metrics = { version = "0.7.0", path = "../metrics" }
-tangram_progress_counter = { version = "0.7.0", path = "../progress_counter" }
-tangram_table = { version = "0.7.0", path = "../table" }
-tangram_zip = { version = "0.7.0", path = "../zip" }
+modelfox_features = { version = "0.7.0", path = "../features" }
+modelfox_kill_chip = { version = "0.7.0", path = "../kill_chip" }
+modelfox_metrics = { version = "0.7.0", path = "../metrics" }
+modelfox_progress_counter = { version = "0.7.0", path = "../progress_counter" }
+modelfox_table = { version = "0.7.0", path = "../table" }
+modelfox_zip = { version = "0.7.0", path = "../zip" }

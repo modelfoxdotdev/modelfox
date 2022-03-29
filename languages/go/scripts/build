@@ -1,11 +1,11 @@
-rm -rf libtangram/
-install -D ../../dist/compile/x86_64-linux-musl/libtangram.a libtangram/x86_64-linux-musl/libtangram.a
-install -D ../../dist/compile/x86_64-linux-musl/tangram.h libtangram/x86_64-linux-musl/tangram.h
-install -D ../../dist/compile/aarch64-linux-musl/libtangram.a libtangram/aarch64-linux-musl/libtangram.a
-install -D ../../dist/compile/aarch64-linux-musl/tangram.h libtangram/aarch64-linux-musl/tangram.h
-install -D ../../dist/compile/x86_64-macos/libtangram.a libtangram/x86_64-macos/libtangram.a
-install -D ../../dist/compile/x86_64-macos/tangram.h libtangram/x86_64-macos/tangram.h
-install -D ../../dist/compile/aarch64-macos/libtangram.a libtangram/aarch64-macos/libtangram.a
-install -D ../../dist/compile/aarch64-macos/tangram.h libtangram/aarch64-macos/tangram.h
-install -D ../../dist/compile/x86_64-windows-gnu/libtangram.a libtangram/x86_64-windows-gnu/libtangram.a
-install -D ../../dist/compile/x86_64-windows-gnu/tangram.h libtangram/x86_64-windows-gnu/tangram.h
+rm -rf libmodelfox/
+install -D ../../dist/compile/x86_64-linux-musl/libmodelfox.a libmodelfox/x86_64-linux-musl/libmodelfox.a
+install -D ../../dist/compile/x86_64-linux-musl/modelfox.h libmodelfox/x86_64-linux-musl/modelfox.h
+install -D ../../dist/compile/aarch64-linux-musl/libmodelfox.a libmodelfox/aarch64-linux-musl/libmodelfox.a
+install -D ../../dist/compile/aarch64-linux-musl/modelfox.h libmodelfox/aarch64-linux-musl/modelfox.h
+install -D ../../dist/compile/x86_64-macos/libmodelfox.a libmodelfox/x86_64-macos/libmodelfox.a
+install -D ../../dist/compile/x86_64-macos/modelfox.h libmodelfox/x86_64-macos/modelfox.h
+install -D ../../dist/compile/aarch64-macos/libmodelfox.a libmodelfox/aarch64-macos/libmodelfox.a
+install -D ../../dist/compile/aarch64-macos/modelfox.h libmodelfox/aarch64-macos/modelfox.h
+install -D ../../dist/compile/x86_64-windows-gnu/libmodelfox.a libmodelfox/x86_64-windows-gnu/libmodelfox.a
+install -D ../../dist/compile/x86_64-windows-gnu/modelfox.h libmodelfox/x86_64-windows-gnu/modelfox.h

@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_app_context"
+name = "modelfox_app_context"
 publish = false
 version = "0.0.0"
 
@@ -10,4 +10,4 @@ path = "lib.rs"
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
 sunfish = "0.7"
-tangram_app_core = { path = "../core" }
+modelfox_app_core = { path = "../core" }

@@ -1,6 +1,6 @@
+use modelfox_table::prelude::*;
 use ndarray::prelude::*;
-use tangram_table::prelude::*;
-use tangram_zip::zip;
+use modelfox_zip::zip;
 
 /**
 A `OneHotEncodedFeatureGroup` creates one number feature for each variant in an enum column, plus one number feature for invalid values. For each example, all of the features will have the value 0.0, except the feature corresponding to the column's value, which will have the value 1.0.
@@ -9,7 +9,7 @@ A `OneHotEncodedFeatureGroup` creates one number feature for each variant in an 
 
 ```
 use std::num::NonZeroUsize;
-use tangram_table::prelude::*;
+use modelfox_table::prelude::*;
 
 EnumTableColumn::new(
   Some("color".to_owned()),

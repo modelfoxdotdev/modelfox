@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 license = "UNLICENSED"
-name = "tangram_app"
+name = "modelfox_app"
 publish = false
 version = "0.0.0"
 
@@ -9,82 +9,82 @@ version = "0.0.0"
 path = "lib.rs"
 
 [[bin]]
-name = "tangram_app_seed"
+name = "modelfox_app_seed"
 path = "seed.rs"
 
 [features]
 default = [
-  "tangram_app_alerts_index_server",
-  "tangram_app_alerts_server",
-  "tangram_app_edit_organization_server",
-  "tangram_app_health_server",
-  "tangram_app_index_server",
-  "tangram_app_login_server",
-  "tangram_app_model_download_server",
-  "tangram_app_model_edit_server",
-  "tangram_app_model_index_client",
-  "tangram_app_model_index_server",
-  "tangram_app_monitors_edit_server",
-  "tangram_app_monitors_index_server",
-  "tangram_app_new_member_server",
-  "tangram_app_new_model_client",
-  "tangram_app_new_model_server",
-  "tangram_app_new_monitor_client",
-  "tangram_app_new_monitor_server",
-  "tangram_app_new_organization_server",
-  "tangram_app_new_repo_server",
-  "tangram_app_organization_index_server",
-  "tangram_app_organization_member_server",
-  "tangram_app_playground_client",
-  "tangram_app_playground_server",
-  "tangram_app_production_class_metrics_client",
-  "tangram_app_production_class_metrics_server",
-  "tangram_app_production_metrics_index_client",
-  "tangram_app_production_metrics_index_server",
-  "tangram_app_production_prediction_client",
-  "tangram_app_production_prediction_server",
-  "tangram_app_production_predictions_index_server",
-  "tangram_app_production_stats_column_client",
-  "tangram_app_production_stats_column_server",
-  "tangram_app_production_stats_index_client",
-  "tangram_app_production_stats_index_server",
-  "tangram_app_repo_edit_server",
-  "tangram_app_repo_index_server",
-  "tangram_app_track_server",
-  "tangram_app_training_class_metrics_client",
-  "tangram_app_training_class_metrics_server",
-  "tangram_app_training_grid_index_server",
-  "tangram_app_training_grid_item_server",
-  "tangram_app_training_metrics_index_server",
-  "tangram_app_training_metrics_precision_recall_client",
-  "tangram_app_training_metrics_precision_recall_server",
-  "tangram_app_training_metrics_roc_client",
-  "tangram_app_training_metrics_roc_server",
-  "tangram_app_training_stats_column_client",
-  "tangram_app_training_stats_column_server",
-  "tangram_app_training_stats_index_server",
-  "tangram_app_tuning_client",
-  "tangram_app_tuning_server",
-  "tangram_app_user_server",
+  "modelfox_app_alerts_index_server",
+  "modelfox_app_alerts_server",
+  "modelfox_app_edit_organization_server",
+  "modelfox_app_health_server",
+  "modelfox_app_index_server",
+  "modelfox_app_login_server",
+  "modelfox_app_model_download_server",
+  "modelfox_app_model_edit_server",
+  "modelfox_app_model_index_client",
+  "modelfox_app_model_index_server",
+  "modelfox_app_monitors_edit_server",
+  "modelfox_app_monitors_index_server",
+  "modelfox_app_new_member_server",
+  "modelfox_app_new_model_client",
+  "modelfox_app_new_model_server",
+  "modelfox_app_new_monitor_client",
+  "modelfox_app_new_monitor_server",
+  "modelfox_app_new_organization_server",
+  "modelfox_app_new_repo_server",
+  "modelfox_app_organization_index_server",
+  "modelfox_app_organization_member_server",
+  "modelfox_app_playground_client",
+  "modelfox_app_playground_server",
+  "modelfox_app_production_class_metrics_client",
+  "modelfox_app_production_class_metrics_server",
+  "modelfox_app_production_metrics_index_client",
+  "modelfox_app_production_metrics_index_server",
+  "modelfox_app_production_prediction_client",
+  "modelfox_app_production_prediction_server",
+  "modelfox_app_production_predictions_index_server",
+  "modelfox_app_production_stats_column_client",
+  "modelfox_app_production_stats_column_server",
+  "modelfox_app_production_stats_index_client",
+  "modelfox_app_production_stats_index_server",
+  "modelfox_app_repo_edit_server",
+  "modelfox_app_repo_index_server",
+  "modelfox_app_track_server",
+  "modelfox_app_training_class_metrics_client",
+  "modelfox_app_training_class_metrics_server",
+  "modelfox_app_training_grid_index_server",
+  "modelfox_app_training_grid_item_server",
+  "modelfox_app_training_metrics_index_server",
+  "modelfox_app_training_metrics_precision_recall_client",
+  "modelfox_app_training_metrics_precision_recall_server",
+  "modelfox_app_training_metrics_roc_client",
+  "modelfox_app_training_metrics_roc_server",
+  "modelfox_app_training_stats_column_client",
+  "modelfox_app_training_stats_column_server",
+  "modelfox_app_training_stats_index_server",
+  "modelfox_app_tuning_client",
+  "modelfox_app_tuning_server",
+  "modelfox_app_user_server",
 ]
 
 [build-dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
 sunfish = "0.7"
-tangram_app_model_index_client = { path = "routes/repos/_/models/_/index/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-tangram_app_new_model_client = { path = "routes/repos/_/models/new/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-tangram_app_new_monitor_client = { path = "routes/repos/_/models/_/monitors/new/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-tangram_app_playground_client = { path = "routes/repos/_/models/_/playground/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-tangram_app_production_class_metrics_client = { path = "routes/repos/_/models/_/production_metrics/class_metrics/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-tangram_app_production_metrics_index_client = { path = "routes/repos/_/models/_/production_metrics/index/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-tangram_app_production_prediction_client = { path = "routes/repos/_/models/_/production_predictions/predictions/_/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-tangram_app_production_stats_column_client = { path = "routes/repos/_/models/_/production_stats/columns/_/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-tangram_app_production_stats_index_client = { path = "routes/repos/_/models/_/production_stats/index/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-tangram_app_training_class_metrics_client = { path = "routes/repos/_/models/_/training_metrics/class_metrics/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-tangram_app_training_metrics_precision_recall_client = { path = "routes/repos/_/models/_/training_metrics/precision_recall/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-tangram_app_training_metrics_roc_client = { path = "routes/repos/_/models/_/training_metrics/roc/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-tangram_app_training_stats_column_client = { path = "routes/repos/_/models/_/training_stats/columns/_/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-tangram_app_tuning_client = { path = "routes/repos/_/models/_/tuning/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_model_index_client = { path = "routes/repos/_/models/_/index/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_new_model_client = { path = "routes/repos/_/models/new/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_new_monitor_client = { path = "routes/repos/_/models/_/monitors/new/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_playground_client = { path = "routes/repos/_/models/_/playground/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_production_class_metrics_client = { path = "routes/repos/_/models/_/production_metrics/class_metrics/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_production_metrics_index_client = { path = "routes/repos/_/models/_/production_metrics/index/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_production_prediction_client = { path = "routes/repos/_/models/_/production_predictions/predictions/_/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_production_stats_column_client = { path = "routes/repos/_/models/_/production_stats/columns/_/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_production_stats_index_client = { path = "routes/repos/_/models/_/production_stats/index/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_training_class_metrics_client = { path = "routes/repos/_/models/_/training_metrics/class_metrics/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_training_metrics_precision_recall_client = { path = "routes/repos/_/models/_/training_metrics/precision_recall/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_training_metrics_roc_client = { path = "routes/repos/_/models/_/training_metrics/roc/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_training_stats_column_client = { path = "routes/repos/_/models/_/training_stats/columns/_/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_tuning_client = { path = "routes/repos/_/models/_/tuning/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
@@ -108,60 +108,60 @@ serde_json = "1"
 sha2 = "0.10"
 sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }
 sunfish = "0.7"
-tangram_app_context = { path = "context" }
-tangram_app_core = { path = "core" }
-tangram_app_layouts = { path = "layouts" }
-tangram_app_migrations = { path = "migrations" }
-tangram_app_monitor_event = { path = "monitor_event" }
-tangram_charts = { path = "../charts" }
-tangram_core = { path = "../core" }
-tangram_id = { path = "../id" }
-tangram_metrics = { path = "../metrics" }
-tangram_model = { path = "../model" }
-tangram_serve = { path = "../serve" }
-tangram_table = { path = "../table" }
-tangram_zip = { path = "../zip" }
+modelfox_app_context = { path = "context" }
+modelfox_app_core = { path = "core" }
+modelfox_app_layouts = { path = "layouts" }
+modelfox_app_migrations = { path = "migrations" }
+modelfox_app_monitor_event = { path = "monitor_event" }
+modelfox_charts = { path = "../charts" }
+modelfox_core = { path = "../core" }
+modelfox_id = { path = "../id" }
+modelfox_metrics = { path = "../metrics" }
+modelfox_model = { path = "../model" }
+modelfox_serve = { path = "../serve" }
+modelfox_table = { path = "../table" }
+modelfox_zip = { path = "../zip" }
 time = "0.3"
 tokio = { version = "1", features = ["full"] }
 toml = "0.5"
 tracing = "0.1"
 url = { version = "2", features = ["serde"] }
 
-tangram_app_alerts_server = { path = "routes/repos/_/models/_/alerts/_/server", optional = true }
-tangram_app_alerts_index_server = { path = "routes/repos/_/models/_/alerts/index/server", optional = true }
-tangram_app_edit_organization_server = { path = "routes/organizations/_/edit/server", optional = true }
-tangram_app_health_server = { path = "routes/health/server", optional = true }
-tangram_app_index_server = { path = "routes/index/server", optional = true }
-tangram_app_login_server = { path = "routes/login/server", optional = true }
-tangram_app_model_download_server = { path = "routes/repos/_/models/_/download/server", optional = true }
-tangram_app_model_edit_server = { path = "routes/repos/_/models/_/edit/server", optional = true }
-tangram_app_model_index_server = { path = "routes/repos/_/models/_/index/server", optional = true }
-tangram_app_monitors_edit_server = { path = "routes/repos/_/models/_/monitors/_/edit/server", optional = true }
-tangram_app_monitors_index_server = { path = "routes/repos/_/models/_/monitors/index/server", optional = true }
-tangram_app_new_member_server = { path = "routes/organizations/_/members/new/server", optional = true }
-tangram_app_new_model_server = { path = "routes/repos/_/models/new/server", optional = true }
-tangram_app_new_monitor_server = { path = "routes/repos/_/models/_/monitors/new/server", optional = true }
-tangram_app_new_organization_server = { path = "routes/organizations/new/server", optional = true }
-tangram_app_new_repo_server = { path = "routes/repos/new/server", optional = true }
-tangram_app_organization_index_server = { path = "routes/organizations/_/index/server", optional = true }
-tangram_app_organization_member_server = { path = "routes/organizations/_/members/_/server", optional = true }
-tangram_app_playground_server = { path = "routes/repos/_/models/_/playground/server", optional = true }
-tangram_app_production_class_metrics_server = { path = "routes/repos/_/models/_/production_metrics/class_metrics/server", optional = true }
-tangram_app_production_metrics_index_server = { path = "routes/repos/_/models/_/production_metrics/index/server", optional = true }
-tangram_app_production_prediction_server = { path = "routes/repos/_/models/_/production_predictions/predictions/_/server", optional = true }
-tangram_app_production_predictions_index_server = { path = "routes/repos/_/models/_/production_predictions/index/server", optional = true }
-tangram_app_production_stats_column_server = { path = "routes/repos/_/models/_/production_stats/columns/_/server", optional = true }
-tangram_app_production_stats_index_server = { path = "routes/repos/_/models/_/production_stats/index/server", optional = true }
-tangram_app_repo_edit_server = { path = "routes/repos/_/edit/server", optional = true }
-tangram_app_repo_index_server = { path = "routes/repos/_/index/server", optional = true }
-tangram_app_track_server = { path = "routes/track/server", optional = true }
-tangram_app_training_class_metrics_server = { path = "routes/repos/_/models/_/training_metrics/class_metrics/server", optional = true }
-tangram_app_training_grid_index_server = { path = "routes/repos/_/models/_/training_grid/index/server", optional = true }
-tangram_app_training_grid_item_server = { path = "routes/repos/_/models/_/training_grid/grid_item/_/server", optional = true }
-tangram_app_training_metrics_index_server = { path = "routes/repos/_/models/_/training_metrics/index/server", optional = true }
-tangram_app_training_metrics_precision_recall_server = { path = "routes/repos/_/models/_/training_metrics/precision_recall/server", optional = true }
-tangram_app_training_metrics_roc_server = { path = "routes/repos/_/models/_/training_metrics/roc/server", optional = true }
-tangram_app_training_stats_column_server = { path = "routes/repos/_/models/_/training_stats/columns/_/server", optional = true }
-tangram_app_training_stats_index_server = { path = "routes/repos/_/models/_/training_stats/index/server", optional = true }
-tangram_app_tuning_server = { path = "routes/repos/_/models/_/tuning/server", optional = true }
-tangram_app_user_server = { path = "routes/user/server", optional = true }
+modelfox_app_alerts_server = { path = "routes/repos/_/models/_/alerts/_/server", optional = true }
+modelfox_app_alerts_index_server = { path = "routes/repos/_/models/_/alerts/index/server", optional = true }
+modelfox_app_edit_organization_server = { path = "routes/organizations/_/edit/server", optional = true }
+modelfox_app_health_server = { path = "routes/health/server", optional = true }
+modelfox_app_index_server = { path = "routes/index/server", optional = true }
+modelfox_app_login_server = { path = "routes/login/server", optional = true }
+modelfox_app_model_download_server = { path = "routes/repos/_/models/_/download/server", optional = true }
+modelfox_app_model_edit_server = { path = "routes/repos/_/models/_/edit/server", optional = true }
+modelfox_app_model_index_server = { path = "routes/repos/_/models/_/index/server", optional = true }
+modelfox_app_monitors_edit_server = { path = "routes/repos/_/models/_/monitors/_/edit/server", optional = true }
+modelfox_app_monitors_index_server = { path = "routes/repos/_/models/_/monitors/index/server", optional = true }
+modelfox_app_new_member_server = { path = "routes/organizations/_/members/new/server", optional = true }
+modelfox_app_new_model_server = { path = "routes/repos/_/models/new/server", optional = true }
+modelfox_app_new_monitor_server = { path = "routes/repos/_/models/_/monitors/new/server", optional = true }
+modelfox_app_new_organization_server = { path = "routes/organizations/new/server", optional = true }
+modelfox_app_new_repo_server = { path = "routes/repos/new/server", optional = true }
+modelfox_app_organization_index_server = { path = "routes/organizations/_/index/server", optional = true }
+modelfox_app_organization_member_server = { path = "routes/organizations/_/members/_/server", optional = true }
+modelfox_app_playground_server = { path = "routes/repos/_/models/_/playground/server", optional = true }
+modelfox_app_production_class_metrics_server = { path = "routes/repos/_/models/_/production_metrics/class_metrics/server", optional = true }
+modelfox_app_production_metrics_index_server = { path = "routes/repos/_/models/_/production_metrics/index/server", optional = true }
+modelfox_app_production_prediction_server = { path = "routes/repos/_/models/_/production_predictions/predictions/_/server", optional = true }
+modelfox_app_production_predictions_index_server = { path = "routes/repos/_/models/_/production_predictions/index/server", optional = true }
+modelfox_app_production_stats_column_server = { path = "routes/repos/_/models/_/production_stats/columns/_/server", optional = true }
+modelfox_app_production_stats_index_server = { path = "routes/repos/_/models/_/production_stats/index/server", optional = true }
+modelfox_app_repo_edit_server = { path = "routes/repos/_/edit/server", optional = true }
+modelfox_app_repo_index_server = { path = "routes/repos/_/index/server", optional = true }
+modelfox_app_track_server = { path = "routes/track/server", optional = true }
+modelfox_app_training_class_metrics_server = { path = "routes/repos/_/models/_/training_metrics/class_metrics/server", optional = true }
+modelfox_app_training_grid_index_server = { path = "routes/repos/_/models/_/training_grid/index/server", optional = true }
+modelfox_app_training_grid_item_server = { path = "routes/repos/_/models/_/training_grid/grid_item/_/server", optional = true }
+modelfox_app_training_metrics_index_server = { path = "routes/repos/_/models/_/training_metrics/index/server", optional = true }
+modelfox_app_training_metrics_precision_recall_server = { path = "routes/repos/_/models/_/training_metrics/precision_recall/server", optional = true }
+modelfox_app_training_metrics_roc_server = { path = "routes/repos/_/models/_/training_metrics/roc/server", optional = true }
+modelfox_app_training_stats_column_server = { path = "routes/repos/_/models/_/training_stats/columns/_/server", optional = true }
+modelfox_app_training_stats_index_server = { path = "routes/repos/_/models/_/training_stats/index/server", optional = true }
+modelfox_app_tuning_server = { path = "routes/repos/_/models/_/tuning/server", optional = true }
+modelfox_app_user_server = { path = "routes/user/server", optional = true }

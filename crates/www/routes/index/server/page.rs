@@ -1,6 +1,6 @@
+use modelfox_ui as ui;
+use modelfox_www_layouts::{document::Document, layout::Layout};
 use pinwheel::prelude::*;
-use tangram_ui as ui;
-use tangram_www_layouts::{document::Document, layout::Layout};
 
 use crate::{
 	inspection::Inspection, monitoring::Monitoring, predict::Predict,
@@ -13,13 +13,12 @@ pub struct Page;
 impl Component for Page {
 	fn into_node(self) -> Node {
 		Document::new()
-			.client("tangram_www_index_client")
+			.client("modelfox_www_index_client")
 			.child(
 				Layout::new().child(
 					div()
 						.class("index-grid")
 						.child(Hero)
-						.child(Video)
 						.child(Train)
 						.child(Predict)
 						.child(Inspection)
@@ -40,20 +39,20 @@ impl Component for Hero {
 	fn into_node(self) -> Node {
 		let title = h1()
 			.class("index-hero-title")
-			.child("Tangram is the all-in-one machine learning toolkit for programmers.");
+			.child("ModelFox makes it easy to train, deploy, and monitor machine learning models.");
 		let subtitle= "Train a model from a CSV file on the command line. Make predictions from Elixir, Go, JavaScript, PHP, Python, Ruby, or Rust. Learn about your models and monitor them in production from your browser.";
 		let subtitle = div().class("index-hero-subtitle").child(subtitle);
 		let buttons = div()
 			.class("index-hero-buttons")
 			.child(
 				ui::Button::new()
-					.color(ui::colors::GREEN.to_owned())
-					.href("https://github.com/tangramdotdev/tangram".to_owned())
+					.color(ui::colors::BLUE.to_owned())
+					.href("https://github.com/modelfoxdotdev/modelfox".to_owned())
 					.child("View on GitHub"),
 			)
 			.child(
 				ui::Button::new()
-					.color(ui::colors::PURPLE.to_owned())
+					.color(ui::colors::TEAL.to_owned())
 					.href("/docs/install".to_owned())
 					.child("Install the CLI"),
 			);
@@ -62,23 +61,6 @@ impl Component for Hero {
 			.child(title)
 			.child(subtitle)
 			.child(buttons)
-			.into_node()
-	}
-}
-
-struct Video;
-
-impl Component for Video {
-	fn into_node(self) -> Node {
-		div()
-			.class("index-video-placeholder")
-			.child(
-				iframe()
-					.class("index-video")
-					.attribute("allow", "fullscreen")
-					.attribute("src", "https://player.vimeo.com/video/385352664")
-					.title("Tangram Video"),
-			)
 			.into_node()
 	}
 }

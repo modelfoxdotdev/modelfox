@@ -1,12 +1,12 @@
 use fnv::{FnvBuildHasher, FnvHashSet};
 use indexmap::IndexMap;
 use itertools::Itertools;
-use ndarray::prelude::*;
-use num::ToPrimitive;
-use tangram_table::{
+use modelfox_table::{
 	NumberTableColumn, TableColumn, TableColumnView, TableValue, TextTableColumnView,
 };
-use tangram_text::{NGram, NGramType, Tokenizer};
+use modelfox_text::{NGram, NGramType, Tokenizer};
+use ndarray::prelude::*;
+use num::ToPrimitive;
 
 /**
 A BagOfWordsFeatureGroup creates features for a text column using the [Bag of Words](https://en.wikipedia.org/wiki/Bag-of-words_model) method.
@@ -100,21 +100,19 @@ impl BagOfWordsFeatureGroup {
 				Some(
 					self.tokenizer
 						.tokenize(value)
-						.map(tangram_text::NGramRef::Unigram),
+						.map(modelfox_text::NGramRef::Unigram),
 				)
 			} else {
 				None
 			};
-			let bigram_iter = if self.ngram_types.contains(&NGramType::Bigram) {
-				Some(
-					self.tokenizer
-						.tokenize(value)
-						.tuple_windows()
-						.map(|(token_a, token_b)| tangram_text::NGramRef::Bigram(token_a, token_b)),
-				)
-			} else {
-				None
-			};
+			let bigram_iter =
+				if self.ngram_types.contains(&NGramType::Bigram) {
+					Some(self.tokenizer.tokenize(value).tuple_windows().map(
+						|(token_a, token_b)| modelfox_text::NGramRef::Bigram(token_a, token_b),
+					))
+				} else {
+					None
+				};
 			let ngram_iter = unigram_iter
 				.into_iter()
 				.flatten()
@@ -176,21 +174,19 @@ impl BagOfWordsFeatureGroup {
 				Some(
 					self.tokenizer
 						.tokenize(value)
-						.map(tangram_text::NGramRef::Unigram),
+						.map(modelfox_text::NGramRef::Unigram),
 				)
 			} else {
 				None
 			};
-			let bigram_iter = if self.ngram_types.contains(&NGramType::Bigram) {
-				Some(
-					self.tokenizer
-						.tokenize(value)
-						.tuple_windows()
-						.map(|(token_a, token_b)| tangram_text::NGramRef::Bigram(token_a, token_b)),
-				)
-			} else {
-				None
-			};
+			let bigram_iter =
+				if self.ngram_types.contains(&NGramType::Bigram) {
+					Some(self.tokenizer.tokenize(value).tuple_windows().map(
+						|(token_a, token_b)| modelfox_text::NGramRef::Bigram(token_a, token_b),
+					))
+				} else {
+					None
+				};
 			let ngram_iter = unigram_iter
 				.into_iter()
 				.flatten()
@@ -251,21 +247,19 @@ impl BagOfWordsFeatureGroup {
 				Some(
 					self.tokenizer
 						.tokenize(value)
-						.map(tangram_text::NGramRef::Unigram),
+						.map(modelfox_text::NGramRef::Unigram),
 				)
 			} else {
 				None
 			};
-			let bigram_iter = if self.ngram_types.contains(&NGramType::Bigram) {
-				Some(
-					self.tokenizer
-						.tokenize(value)
-						.tuple_windows()
-						.map(|(token_a, token_b)| tangram_text::NGramRef::Bigram(token_a, token_b)),
-				)
-			} else {
-				None
-			};
+			let bigram_iter =
+				if self.ngram_types.contains(&NGramType::Bigram) {
+					Some(self.tokenizer.tokenize(value).tuple_windows().map(
+						|(token_a, token_b)| modelfox_text::NGramRef::Bigram(token_a, token_b),
+					))
+				} else {
+					None
+				};
 			let ngram_iter = unigram_iter
 				.into_iter()
 				.flatten()

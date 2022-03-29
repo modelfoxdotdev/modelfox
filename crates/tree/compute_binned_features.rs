@@ -4,8 +4,8 @@ use ndarray::prelude::*;
 use num::{Num, NumCast, ToPrimitive};
 use rayon::{self, prelude::*};
 use std::collections::BTreeMap;
-use tangram_table::{TableColumnView, TableView};
-use tangram_zip::pzip;
+use modelfox_table::{TableColumnView, TableView};
+use modelfox_zip::pzip;
 
 #[derive(Debug)]
 pub enum BinnedFeaturesRowMajor {

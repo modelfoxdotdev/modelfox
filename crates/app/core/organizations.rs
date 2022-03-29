@@ -2,7 +2,7 @@ use std::borrow::BorrowMut;
 
 use anyhow::Result;
 use sqlx::prelude::*;
-use tangram_id::Id;
+use modelfox_id::Id;
 
 pub struct GetOrganizationOutput {
 	pub id: Id,

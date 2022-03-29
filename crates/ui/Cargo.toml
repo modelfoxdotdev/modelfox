@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_ui"
+name = "modelfox_ui"
 publish = false
 version = "0.0.0"
 
@@ -18,9 +18,9 @@ pinwheel = "0.2"
 pulldown-cmark = "0.9"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tangram_charts = { path = "../charts" }
-tangram_finite = { path = "../finite" }
-tangram_number_formatter = { path = "../number_formatter" }
+modelfox_charts = { path = "../charts" }
+modelfox_finite = { path = "../finite" }
+modelfox_number_formatter = { path = "../number_formatter" }
 tracing = "0.1"
 tracing-wasm = "0.2"
 wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }

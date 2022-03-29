@@ -6,8 +6,8 @@ pub use crate::{
 	regressor::{Regressor, RegressorMetricsSection},
 };
 use pinwheel::prelude::*;
-use tangram_app_layouts::document::Document;
-use tangram_app_layouts::model_layout::{ModelLayout, ModelLayoutInfo};
+use modelfox_app_layouts::document::Document;
+use modelfox_app_layouts::model_layout::{ModelLayout, ModelLayoutInfo};
 
 pub struct Page {
 	pub id: String,
@@ -29,7 +29,7 @@ impl Component for Page {
 			Inner::MulticlassClassifier(inner) => inner.into_node(),
 		};
 		Document::new()
-			.client("tangram_app_model_index_client")
+			.client("modelfox_app_model_index_client")
 			.child(ModelLayout::new(self.model_layout_info).child(inner))
 			.into_node()
 	}

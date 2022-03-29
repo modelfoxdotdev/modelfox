@@ -1,5 +1,5 @@
-author = "Tangram"
-author_email = "root@tangram.dev"
+author = "ModelFox"
+author_email = "root@modelfox.dev"
 classifiers = [
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
@@ -8,9 +8,9 @@ classifiers = [
 description = "README.md"
 description_content_type = "text/markdown"
 license = "LICENSE"
-name = "tangram"
-summary = "Tangram for Python"
+name = "modelfox"
+summary = "ModelFox for Python"
 version = "0.7.0"
 
 [project_url]
-homepage = "https://tangram.dev"
+homepage = "https://modelfox.dev"

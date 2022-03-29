@@ -1,7 +1,7 @@
 use anyhow::Result;
 use pinwheel::prelude::*;
-use tangram_app_core::App;
-use tangram_app_ui::topbar::{Topbar, TopbarAvatar};
+use modelfox_app_core::App;
+use modelfox_app_ui::topbar::{Topbar, TopbarAvatar};
 
 pub struct AppLayoutInfo {
 	pub topbar_avatar: Option<TopbarAvatar>,

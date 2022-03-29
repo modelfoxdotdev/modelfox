@@ -1,13 +1,13 @@
 [package]
 edition = "2021"
 license = "MIT"
-name = "tangram_example_basic"
+name = "modelfox_example_basic"
 publish = false
 version = "0.0.0"
 
 [[bin]]
-name = "tangram_example_basic"
+name = "modelfox_example_basic"
 path = "main.rs"
 
 [dependencies]
-tangram = { version = "0.7.0", path = "../../" }
+modelfox = { version = "0.7.0", path = "../../" }

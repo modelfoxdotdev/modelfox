@@ -1,12 +1,12 @@
 use pinwheel::prelude::*;
-use tangram_www_content::Content;
+use modelfox_www_content::Content;
 
 mod page;
 
 pub fn init() -> sunfish::Route {
 	sunfish::Route::new_static_with_paths(
 		|| {
-			tangram_www_content::DocsInternals::slugs()
+			modelfox_www_content::DocsInternals::slugs()
 				.unwrap()
 				.into_iter()
 				.map(|slug| format!("/docs/internals/{}", slug))

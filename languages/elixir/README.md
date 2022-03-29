@@ -1,16 +1,16 @@
-# Tangram for Elixir
+# ModelFox for Elixir
 
-- [Watch the Video](https://www.tangram.dev)
-- [Read the Docs](https://www.tangram.dev/docs)
+- [Watch the Video](https://www.modelfox.dev)
+- [Read the Docs](https://www.modelfox.dev/docs)
 
-The Tangram Elixir library makes it easy to make predictions with your Tangram machine learning model from Elixir.
+The ModelFox Elixir library makes it easy to make predictions with your ModelFox machine learning model from Elixir.
 
 ## Usage
 
-Add the `tangram` package to your `mix.exs`.
+Add the `modelfox` package to your `mix.exs`.
 
 ```elixir
-model = Tangram.load_model_from_path("heart_disease.tangram")
+model = ModelFox.load_model_from_path("heart_disease.modelfox")
 
 input = %{
   :age => 63.0,
@@ -18,14 +18,14 @@ input = %{
   # ...
 }
 
-output = Tangram.predict(model, input)
+output = ModelFox.predict(model, input)
 ```
 
-For more information, [read the docs](https://www.tangram.dev/docs).
+For more information, [read the docs](https://www.modelfox.dev/docs).
 
 ## Platform Support
 
-Tangram for Elixir is currently supported on Linux, macOS, and Windows with ARM64 and AMD64 CPUs. Are you interested in another platform? [Open an issue](https://github.com/tangramdotdev/tangram/issues/new) or send us an email at [help@tangram.dev](mailto:help@tangram.dev).
+ModelFox for Elixir is currently supported on Linux, macOS, and Windows with ARM64 and AMD64 CPUs. Are you interested in another platform? [Open an issue](https://github.com/modelfoxdotdev/modelfox/issues/new) or send us an email at [help@modelfox.dev](mailto:help@modelfox.dev).
 
 ## Examples
 

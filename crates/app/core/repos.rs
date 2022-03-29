@@ -7,7 +7,7 @@ use crate::{
 use anyhow::Result;
 use sqlx::prelude::*;
 use std::borrow::BorrowMut;
-use tangram_id::Id;
+use modelfox_id::Id;
 
 pub struct Repo {
 	pub id: String,

@@ -1,16 +1,16 @@
-package tangram
+package modelfox
 
-// #cgo linux,amd64 CFLAGS: -I${SRCDIR}/libtangram/x86_64-unknown-linux-musl
-// #cgo linux,amd64 LDFLAGS: -L${SRCDIR}/libtangram/x86_64-unknown-linux-musl -ltangram -ldl -lm
-// #cgo linux,arm64 CFLAGS: -I${SRCDIR}/libtangram/aarch64-unknown-linux-musl
-// #cgo linux,arm64 LDFLAGS: -L${SRCDIR}/libtangram/aarch64-unknown-linux-musl -ltangram -ldl -lm
-// #cgo darwin,amd64 CFLAGS: -I${SRCDIR}/libtangram/x86_64-apple-darwin
-// #cgo darwin,amd64 LDFLAGS: -L${SRCDIR}/libtangram/x86_64-apple-darwin -ltangram
-// #cgo darwin,arm64 CFLAGS: -I${SRCDIR}/libtangram/aarch64-apple-darwin
-// #cgo darwin,arm64 LDFLAGS: -L${SRCDIR}/libtangram/aarch64-apple-darwin -ltangram
-// #cgo windows,amd64 CFLAGS: -I${SRCDIR}/libtangram/x86_64-pc-windows-gnu
-// #cgo windows,amd64 LDFLAGS: -L${SRCDIR}/libtangram/x86_64-pc-windows-gnu -ltangram -luserenv -lws2_32
-// #include "tangram.h"
+// #cgo linux,amd64 CFLAGS: -I${SRCDIR}/libmodelfox/x86_64-unknown-linux-musl
+// #cgo linux,amd64 LDFLAGS: -L${SRCDIR}/libmodelfox/x86_64-unknown-linux-musl -lmodelfox -ldl -lm
+// #cgo linux,arm64 CFLAGS: -I${SRCDIR}/libmodelfox/aarch64-unknown-linux-musl
+// #cgo linux,arm64 LDFLAGS: -L${SRCDIR}/libmodelfox/aarch64-unknown-linux-musl -lmodelfox -ldl -lm
+// #cgo darwin,amd64 CFLAGS: -I${SRCDIR}/libmodelfox/x86_64-apple-darwin
+// #cgo darwin,amd64 LDFLAGS: -L${SRCDIR}/libmodelfox/x86_64-apple-darwin -lmodelfox
+// #cgo darwin,arm64 CFLAGS: -I${SRCDIR}/libmodelfox/aarch64-apple-darwin
+// #cgo darwin,arm64 LDFLAGS: -L${SRCDIR}/libmodelfox/aarch64-apple-darwin -lmodelfox
+// #cgo windows,amd64 CFLAGS: -I${SRCDIR}/libmodelfox/x86_64-pc-windows-gnu
+// #cgo windows,amd64 LDFLAGS: -L${SRCDIR}/libmodelfox/x86_64-pc-windows-gnu -lmodelfox -luserenv -lws2_32
+// #include "modelfox.h"
 // #include <stdlib.h>
 import "C"
 
@@ -28,15 +28,15 @@ import (
 
 // Use this struct to load a model, make predictions, and log events to the app.
 type Model struct {
-	modelPtr *C.tangram_model
+	modelPtr *C.modelfox_model
 	options  *LoadModelOptions
 	logQueue []event
 }
 
 // These are the options passed when loading a model.
 type LoadModelOptions struct {
-	// If you are running the app locally or on your own server, use this field to provide the url to it. If not specified, the default value is https://app.tangram.dev.
-	TangramURL string
+	// If you are running the app locally or on your own server, use this field to provide the url to it. If not specified, the default value is https://app.modelfox.dev.
+	ModelFoxURL string
 }
 
 // These are the options passed to `Predict`.
@@ -248,23 +248,23 @@ type LogTrueValueArgs struct {
 
 type event map[string]interface{}
 
-// This is the version of libtangram that is in use.
+// This is the version of libmodelfox that is in use.
 func Version() string {
-	var s C.tangram_string_view
-	C.tangram_version(&s)
+	var s C.modelfox_string_view
+	C.modelfox_version(&s)
 	id := C.GoStringN(s.ptr, C.int(s.len))
 	return id
 }
 
-// Load a model from a `.tangram` file at `path`.
+// Load a model from a `.modelfox` file at `path`.
 func LoadModelFromPath(path string, options *LoadModelOptions) (*Model, error) {
-	var cModel *C.tangram_model
+	var cModel *C.modelfox_model
 	cPath := C.CString(path)
-	err := C.tangram_model_from_path(cPath, &cModel)
+	err := C.modelfox_model_from_path(cPath, &cModel)
 	if err != nil {
-		var sv C.tangram_string_view
-		defer C.tangram_error_delete(err)
-		C.tangram_error_get_message(err, &sv)
+		var sv C.modelfox_string_view
+		defer C.modelfox_error_delete(err)
+		C.modelfox_error_get_message(err, &sv)
 		errs := C.GoStringN(sv.ptr, C.int(sv.len))
 		return nil, errors.New(errs)
 	}
@@ -277,16 +277,16 @@ func LoadModelFromPath(path string, options *LoadModelOptions) (*Model, error) {
 	return &model, nil
 }
 
-// Load a model from bytes instead of a file. You should use this only if you already have a `.tangram` loaded into memory. Otherwise, use `model.LoadModelFromPath`, which is faster because it memory maps the file.
+// Load a model from bytes instead of a file. You should use this only if you already have a `.modelfox` loaded into memory. Otherwise, use `model.LoadModelFromPath`, which is faster because it memory maps the file.
 func LoadModelFromBytes(data []byte, options *LoadModelOptions) (*Model, error) {
-	var cModel *C.tangram_model
+	var cModel *C.modelfox_model
 	cBytes := C.CBytes(data)
 	cLen := C.size_t(len(data))
-	err := C.tangram_model_from_bytes(cBytes, cLen, &cModel)
+	err := C.modelfox_model_from_bytes(cBytes, cLen, &cModel)
 	if err != nil {
-		var sv C.tangram_string_view
-		defer C.tangram_error_delete(err)
-		C.tangram_error_get_message(err, &sv)
+		var sv C.modelfox_string_view
+		defer C.modelfox_error_delete(err)
+		C.modelfox_error_get_message(err, &sv)
 		errs := C.GoStringN(sv.ptr, C.int(sv.len))
 		return nil, errors.New(errs)
 	}
@@ -301,30 +301,30 @@ func LoadModelFromBytes(data []byte, options *LoadModelOptions) (*Model, error) 
 
 // Destroy frees up the memory used by the model. You should call this with defer after loading your model.
 func (m Model) Destroy() {
-	C.tangram_model_delete(m.modelPtr)
+	C.modelfox_model_delete(m.modelPtr)
 }
 
 // Retrieve the model's id.
 func (m Model) ID() string {
-	var sv C.tangram_string_view
-	C.tangram_model_get_id(m.modelPtr, &sv)
+	var sv C.modelfox_string_view
+	C.modelfox_model_get_id(m.modelPtr, &sv)
 	id := C.GoStringN(sv.ptr, C.int(sv.len))
 	return id
 }
 
-func newPredictInputVec(inputVec []PredictInput) *C.tangram_predict_input_vec {
-	var cInputVec *C.tangram_predict_input_vec
-	C.tangram_predict_input_vec_new(&cInputVec)
+func newPredictInputVec(inputVec []PredictInput) *C.modelfox_predict_input_vec {
+	var cInputVec *C.modelfox_predict_input_vec
+	C.modelfox_predict_input_vec_new(&cInputVec)
 	for i := 0; i < len(inputVec); i++ {
 		cInput := newPredictInput(inputVec[i])
-		C.tangram_predict_input_vec_push(cInputVec, cInput)
+		C.modelfox_predict_input_vec_push(cInputVec, cInput)
 	}
 	return cInputVec
 }
 
-func newPredictInput(input PredictInput) *C.tangram_predict_input {
-	var cInput *C.tangram_predict_input
-	C.tangram_predict_input_new(&cInput)
+func newPredictInput(input PredictInput) *C.modelfox_predict_input {
+	var cInput *C.modelfox_predict_input
+	C.modelfox_predict_input_new(&cInput)
 	var cKey *C.char
 	defer C.free(unsafe.Pointer(cKey))
 	for key, value := range input {
@@ -332,43 +332,43 @@ func newPredictInput(input PredictInput) *C.tangram_predict_input {
 		case string:
 			cKey = C.CString(key)
 			cVal := C.CString(value.(string))
-			err := C.tangram_predict_input_set_value_string(cInput, cKey, cVal)
+			err := C.modelfox_predict_input_set_value_string(cInput, cKey, cVal)
 			if err != nil {
-				logTangramError(err)
+				logModelFoxError(err)
 			}
 		case float64:
 			cKey = C.CString(key)
 			cVal := C.double(float64(value.(float64)))
-			err := C.tangram_predict_input_set_value_number(cInput, cKey, cVal)
+			err := C.modelfox_predict_input_set_value_number(cInput, cKey, cVal)
 			if err != nil {
-				logTangramError(err)
+				logModelFoxError(err)
 			}
 		case int:
 			cKey = C.CString(key)
 			cVal := C.double(float64(value.(int)))
-			err := C.tangram_predict_input_set_value_number(cInput, cKey, cVal)
+			err := C.modelfox_predict_input_set_value_number(cInput, cKey, cVal)
 			if err != nil {
-				logTangramError(err)
+				logModelFoxError(err)
 			}
 		case bool:
 			cKey = C.CString(key)
 			cVal := C.CString(strconv.FormatBool(value.(bool)))
-			err := C.tangram_predict_input_set_value_string(cInput, cKey, cVal)
+			err := C.modelfox_predict_input_set_value_string(cInput, cKey, cVal)
 			if err != nil {
-				logTangramError(err)
+				logModelFoxError(err)
 			}
 		}
 	}
 	return cInput
 }
 
-func newPredictOptions(predictOptions *PredictOptions) *C.tangram_predict_options {
-	var cPredictOptions *C.tangram_predict_options
-	C.tangram_predict_options_new(&cPredictOptions)
+func newPredictOptions(predictOptions *PredictOptions) *C.modelfox_predict_options {
+	var cPredictOptions *C.modelfox_predict_options
+	C.modelfox_predict_options_new(&cPredictOptions)
 	if predictOptions != nil {
-		C.tangram_predict_options_set_threshold(cPredictOptions, C.float(predictOptions.Threshold))
+		C.modelfox_predict_options_set_threshold(cPredictOptions, C.float(predictOptions.Threshold))
 
-		C.tangram_predict_options_set_compute_feature_contributions(cPredictOptions, C.bool(predictOptions.ComputeFeatureContributions))
+		C.modelfox_predict_options_set_compute_feature_contributions(cPredictOptions, C.bool(predictOptions.ComputeFeatureContributions))
 	}
 	return cPredictOptions
 }
@@ -378,62 +378,62 @@ func (m Model) PredictOne(input PredictInput, options *PredictOptions) PredictOu
 	return m.Predict([]PredictInput{input}, options)[0]
 }
 
-func logTangramError(cErr *C.tangram_error) {
-	var sv C.tangram_string_view
-	defer C.tangram_error_delete(cErr)
-	C.tangram_error_get_message(cErr, &sv)
+func logModelFoxError(cErr *C.modelfox_error) {
+	var sv C.modelfox_string_view
+	defer C.modelfox_error_delete(cErr)
+	C.modelfox_error_get_message(cErr, &sv)
 	err := C.GoStringN(sv.ptr, C.int(sv.len))
 	log.Fatal(err)
 }
 
 // Make a prediction with multiple inputs.
 func (m Model) Predict(input []PredictInput, options *PredictOptions) []PredictOutput {
-	var cOutputVec *C.tangram_predict_output_vec
+	var cOutputVec *C.modelfox_predict_output_vec
 	cInputVec := newPredictInputVec(input)
 	cOptions := newPredictOptions(options)
-	defer C.tangram_predict_options_delete(cOptions)
-	defer C.tangram_predict_input_vec_delete(cInputVec)
-	err := C.tangram_model_predict(m.modelPtr, cInputVec, cOptions, &cOutputVec)
+	defer C.modelfox_predict_options_delete(cOptions)
+	defer C.modelfox_predict_input_vec_delete(cInputVec)
+	err := C.modelfox_model_predict(m.modelPtr, cInputVec, cOptions, &cOutputVec)
 	if err != nil {
-		logTangramError(err)
+		logModelFoxError(err)
 	}
-	defer C.tangram_predict_output_vec_delete(cOutputVec)
+	defer C.modelfox_predict_output_vec_delete(cOutputVec)
 
 	outputVec := make([]PredictOutput, len(input))
-	var cTaskType C.tangram_task
-	C.tangram_model_get_task(m.modelPtr, &cTaskType)
+	var cTaskType C.modelfox_task
+	C.modelfox_model_get_task(m.modelPtr, &cTaskType)
 	for i := 0; i < len(input); i++ {
-		var cOutput *C.tangram_predict_output
-		C.tangram_predict_output_vec_get_at_index(cOutputVec, C.size_t(i), &cOutput)
-		outputVec[i] = makePredictOutputFromTangramPredictOutput(cTaskType, cOutput)
+		var cOutput *C.modelfox_predict_output
+		C.modelfox_predict_output_vec_get_at_index(cOutputVec, C.size_t(i), &cOutput)
+		outputVec[i] = makePredictOutputFromModelFoxPredictOutput(cTaskType, cOutput)
 	}
 	return outputVec
 }
 
-// A helper function to extract a PredictOutput from a *C.tangram_predict_output.
-func makePredictOutputFromTangramPredictOutput(taskType C.tangram_task, cOutput *C.tangram_predict_output) PredictOutput {
+// A helper function to extract a PredictOutput from a *C.modelfox_predict_output.
+func makePredictOutputFromModelFoxPredictOutput(taskType C.modelfox_task, cOutput *C.modelfox_predict_output) PredictOutput {
 	switch taskType {
 	case RegressionTaskType:
-		return makeRegressionPredictOutputFromTangramPredictOutput(cOutput)
+		return makeRegressionPredictOutputFromModelFoxPredictOutput(cOutput)
 	case BinaryClassificationTaskType:
-		return makeBinaryClassificationPredictOutputFromTangramPredictOutput(cOutput)
+		return makeBinaryClassificationPredictOutputFromModelFoxPredictOutput(cOutput)
 	case MulticlassClassificationTaskType:
-		return makeMulticlassClassificationPredictOutputFromTangramPredictOutput(cOutput)
+		return makeMulticlassClassificationPredictOutputFromModelFoxPredictOutput(cOutput)
 	default:
-		log.Fatal("tangram error")
+		log.Fatal("modelfox error")
 	}
 	return nil
 }
 
-// A helper function to extract a RegressionPredictOutput from a *C.tangram_predict_output.
-func makeRegressionPredictOutputFromTangramPredictOutput(output *C.tangram_predict_output) RegressionPredictOutput {
-	var cOutput *C.tangram_regression_predict_output
+// A helper function to extract a RegressionPredictOutput from a *C.modelfox_predict_output.
+func makeRegressionPredictOutputFromModelFoxPredictOutput(output *C.modelfox_predict_output) RegressionPredictOutput {
+	var cOutput *C.modelfox_regression_predict_output
 	var cValue C.float
-	C.tangram_predict_output_as_regression(output, &cOutput)
-	C.tangram_regression_predict_output_get_value(cOutput, &cValue)
+	C.modelfox_predict_output_as_regression(output, &cOutput)
+	C.modelfox_regression_predict_output_get_value(cOutput, &cValue)
 	var fcs FeatureContributions
-	var cFeatureContributions *C.tangram_feature_contributions
-	C.tangram_regression_predict_output_get_feature_contributions(cOutput, &cFeatureContributions)
+	var cFeatureContributions *C.modelfox_feature_contributions
+	C.modelfox_regression_predict_output_get_feature_contributions(cOutput, &cFeatureContributions)
 	if cFeatureContributions != nil {
 		fcs = makeFeatureContributions(cFeatureContributions)
 	}
@@ -443,18 +443,18 @@ func makeRegressionPredictOutputFromTangramPredictOutput(output *C.tangram_predi
 	}
 }
 
-// A helper function to extract a BinaryClassificationPredictOutput from a *C.tangram_predict_output.
-func makeBinaryClassificationPredictOutputFromTangramPredictOutput(output *C.tangram_predict_output) BinaryClassificationPredictOutput {
-	var cOutput *C.tangram_binary_classification_predict_output
+// A helper function to extract a BinaryClassificationPredictOutput from a *C.modelfox_predict_output.
+func makeBinaryClassificationPredictOutputFromModelFoxPredictOutput(output *C.modelfox_predict_output) BinaryClassificationPredictOutput {
+	var cOutput *C.modelfox_binary_classification_predict_output
 	var cProbability C.float
-	var sv C.tangram_string_view
-	C.tangram_predict_output_as_binary_classification(output, &cOutput)
-	C.tangram_binary_classification_predict_output_get_probability(cOutput, &cProbability)
-	C.tangram_binary_classification_predict_output_get_class_name(cOutput, &sv)
+	var sv C.modelfox_string_view
+	C.modelfox_predict_output_as_binary_classification(output, &cOutput)
+	C.modelfox_binary_classification_predict_output_get_probability(cOutput, &cProbability)
+	C.modelfox_binary_classification_predict_output_get_class_name(cOutput, &sv)
 	className := C.GoStringN(sv.ptr, C.int(sv.len))
 	var fcs FeatureContributions
-	var cFeatureContributions *C.tangram_feature_contributions
-	C.tangram_binary_classification_predict_output_get_feature_contributions(cOutput, &cFeatureContributions)
+	var cFeatureContributions *C.modelfox_feature_contributions
+	C.modelfox_binary_classification_predict_output_get_feature_contributions(cOutput, &cFeatureContributions)
 	if cFeatureContributions != nil {
 		fcs = makeFeatureContributions(cFeatureContributions)
 	}
@@ -465,31 +465,31 @@ func makeBinaryClassificationPredictOutputFromTangramPredictOutput(output *C.tan
 	}
 }
 
-// A helper function to extract a MulticlassClassificationPredictOutput from a *C.tangram_predict_output.
-func makeMulticlassClassificationPredictOutputFromTangramPredictOutput(output *C.tangram_predict_output) MulticlassClassificationPredictOutput {
-	var cOutput *C.tangram_multiclass_classification_predict_output
+// A helper function to extract a MulticlassClassificationPredictOutput from a *C.modelfox_predict_output.
+func makeMulticlassClassificationPredictOutputFromModelFoxPredictOutput(output *C.modelfox_predict_output) MulticlassClassificationPredictOutput {
+	var cOutput *C.modelfox_multiclass_classification_predict_output
 	var cProbability C.float
-	var sv C.tangram_string_view
-	C.tangram_predict_output_as_multiclass_classification(output, &cOutput)
-	C.tangram_multiclass_classification_predict_output_get_probability(cOutput, &cProbability)
-	C.tangram_multiclass_classification_predict_output_get_class_name(cOutput, &sv)
+	var sv C.modelfox_string_view
+	C.modelfox_predict_output_as_multiclass_classification(output, &cOutput)
+	C.modelfox_multiclass_classification_predict_output_get_probability(cOutput, &cProbability)
+	C.modelfox_multiclass_classification_predict_output_get_class_name(cOutput, &sv)
 	predictedClassName := C.GoStringN(sv.ptr, C.int(sv.len))
 	var cClassProbability C.float
-	var cProbabilitiesIter *C.tangram_multiclass_classification_predict_output_probabilities_iter
-	C.tangram_multiclass_classification_predict_output_get_probabilities_iter(cOutput, &cProbabilitiesIter)
-	defer C.tangram_multiclass_classification_predict_output_probabilities_iter_delete(cProbabilitiesIter)
+	var cProbabilitiesIter *C.modelfox_multiclass_classification_predict_output_probabilities_iter
+	C.modelfox_multiclass_classification_predict_output_get_probabilities_iter(cOutput, &cProbabilitiesIter)
+	defer C.modelfox_multiclass_classification_predict_output_probabilities_iter_delete(cProbabilitiesIter)
 	probabilities := make(map[string]float32)
-	for C.tangram_multiclass_classification_predict_output_probabilities_iter_next(cProbabilitiesIter, &sv, &cClassProbability) {
+	for C.modelfox_multiclass_classification_predict_output_probabilities_iter_next(cProbabilitiesIter, &sv, &cClassProbability) {
 		className := C.GoStringN(sv.ptr, C.int(sv.len))
 		probabilities[className] = float32(cClassProbability)
 	}
-	var cFeatureContributionsIter *C.tangram_multiclass_classification_predict_output_feature_contributions_iter
-	C.tangram_multiclass_classification_predict_output_get_feature_contributions_iter(cOutput, &cFeatureContributionsIter)
-	defer C.tangram_multiclass_classification_predict_output_feature_contributions_iter_delete(cFeatureContributionsIter)
+	var cFeatureContributionsIter *C.modelfox_multiclass_classification_predict_output_feature_contributions_iter
+	C.modelfox_multiclass_classification_predict_output_get_feature_contributions_iter(cOutput, &cFeatureContributionsIter)
+	defer C.modelfox_multiclass_classification_predict_output_feature_contributions_iter_delete(cFeatureContributionsIter)
 	featureContributions := make(map[string]FeatureContributions)
 	if cFeatureContributionsIter != nil {
-		var cFeatureContributions *C.tangram_feature_contributions
-		for C.tangram_multiclass_classification_predict_output_feature_contributions_iter_next(cFeatureContributionsIter, &sv, &cFeatureContributions) {
+		var cFeatureContributions *C.modelfox_feature_contributions
+		for C.modelfox_multiclass_classification_predict_output_feature_contributions_iter_next(cFeatureContributionsIter, &sv, &cFeatureContributions) {
 			className := C.GoStringN(sv.ptr, C.int(sv.len))
 			featureContributions[className] = makeFeatureContributions(cFeatureContributions)
 		}
@@ -504,17 +504,17 @@ func makeMulticlassClassificationPredictOutputFromTangramPredictOutput(output *C
 }
 
 // FeatureContributions returns the FeatureContributions from a RegressionPredictOutput.
-func makeFeatureContributions(cfcs *C.tangram_feature_contributions) FeatureContributions {
+func makeFeatureContributions(cfcs *C.modelfox_feature_contributions) FeatureContributions {
 	var len C.size_t
-	C.tangram_feature_contributions_get_entries_len(cfcs, &len)
+	C.modelfox_feature_contributions_get_entries_len(cfcs, &len)
 	featureContributions := make([]FeatureContributionEntry, int(len))
 	var baseline C.float
-	C.tangram_feature_contributions_get_baseline_value(cfcs, &baseline)
+	C.modelfox_feature_contributions_get_baseline_value(cfcs, &baseline)
 	var output C.float
-	C.tangram_feature_contributions_get_output_value(cfcs, &output)
-	var cFeatureContribution *C.tangram_feature_contribution_entry
+	C.modelfox_feature_contributions_get_output_value(cfcs, &output)
+	var cFeatureContribution *C.modelfox_feature_contribution_entry
 	for i := range featureContributions {
-		C.tangram_feature_contributions_get_entry_at_index(cfcs, C.size_t(i), &cFeatureContribution)
+		C.modelfox_feature_contributions_get_entry_at_index(cfcs, C.size_t(i), &cFeatureContribution)
 		featureContributions[i] = makeFeatureContribution(cFeatureContribution)
 	}
 	return FeatureContributions{
@@ -524,10 +524,10 @@ func makeFeatureContributions(cfcs *C.tangram_feature_contributions) FeatureCont
 	}
 }
 
-func makeFeatureContribution(f *C.tangram_feature_contribution_entry) FeatureContributionEntry {
-	var cType C.tangram_feature_contribution_entry_type
+func makeFeatureContribution(f *C.modelfox_feature_contribution_entry) FeatureContributionEntry {
+	var cType C.modelfox_feature_contribution_entry_type
 
-	C.tangram_feature_contribution_entry_get_type(f, &cType)
+	C.modelfox_feature_contribution_entry_get_type(f, &cType)
 	switch cType {
 	case IdentityFeatureContributionType:
 		return makeIdentityFeatureContribution(f)
@@ -545,15 +545,15 @@ func makeFeatureContribution(f *C.tangram_feature_contribution_entry) FeatureCon
 	return nil
 }
 
-func makeIdentityFeatureContribution(f *C.tangram_feature_contribution_entry) IdentityFeatureContribution {
-	var cFeatureContribution *C.tangram_identity_feature_contribution
-	var cColumnName C.tangram_string_view
+func makeIdentityFeatureContribution(f *C.modelfox_feature_contribution_entry) IdentityFeatureContribution {
+	var cFeatureContribution *C.modelfox_identity_feature_contribution
+	var cColumnName C.modelfox_string_view
 	var cFeatureValue C.float
 	var cFeatureContributionValue C.float
-	C.tangram_feature_contribution_entry_as_identity(f, &cFeatureContribution)
-	C.tangram_identity_feature_contribution_get_column_name(cFeatureContribution, &cColumnName)
-	C.tangram_identity_feature_contribution_get_feature_value(cFeatureContribution, &cFeatureValue)
-	C.tangram_identity_feature_contribution_get_feature_contribution_value(cFeatureContribution, &cFeatureContributionValue)
+	C.modelfox_feature_contribution_entry_as_identity(f, &cFeatureContribution)
+	C.modelfox_identity_feature_contribution_get_column_name(cFeatureContribution, &cColumnName)
+	C.modelfox_identity_feature_contribution_get_feature_value(cFeatureContribution, &cFeatureValue)
+	C.modelfox_identity_feature_contribution_get_feature_contribution_value(cFeatureContribution, &cFeatureContributionValue)
 	return IdentityFeatureContribution{
 		ColumnName:               C.GoStringN(cColumnName.ptr, C.int(cColumnName.len)),
 		FeatureContributionValue: float32(cFeatureContributionValue),
@@ -561,15 +561,15 @@ func makeIdentityFeatureContribution(f *C.tangram_feature_contribution_entry) Id
 	}
 }
 
-func makeNormalizedFeatureContribution(f *C.tangram_feature_contribution_entry) NormalizedFeatureContribution {
-	var cFeatureContribution *C.tangram_normalized_feature_contribution
-	var cColumnName C.tangram_string_view
+func makeNormalizedFeatureContribution(f *C.modelfox_feature_contribution_entry) NormalizedFeatureContribution {
+	var cFeatureContribution *C.modelfox_normalized_feature_contribution
+	var cColumnName C.modelfox_string_view
 	var featureValue C.float
 	var featureContributionValue C.float
-	C.tangram_feature_contribution_entry_as_normalized(f, &cFeatureContribution)
-	C.tangram_normalized_feature_contribution_get_column_name(cFeatureContribution, &cColumnName)
-	C.tangram_normalized_feature_contribution_get_feature_value(cFeatureContribution, &featureValue)
-	C.tangram_normalized_feature_contribution_get_feature_contribution_value(cFeatureContribution, &featureContributionValue)
+	C.modelfox_feature_contribution_entry_as_normalized(f, &cFeatureContribution)
+	C.modelfox_normalized_feature_contribution_get_column_name(cFeatureContribution, &cColumnName)
+	C.modelfox_normalized_feature_contribution_get_feature_value(cFeatureContribution, &featureValue)
+	C.modelfox_normalized_feature_contribution_get_feature_contribution_value(cFeatureContribution, &featureContributionValue)
 	return NormalizedFeatureContribution{
 		ColumnName:               C.GoStringN(cColumnName.ptr, C.int(cColumnName.len)),
 		FeatureValue:             float32(featureValue),
@@ -577,17 +577,17 @@ func makeNormalizedFeatureContribution(f *C.tangram_feature_contribution_entry) 
 	}
 }
 
-func makeOneHotEncodedFeatureContribution(f *C.tangram_feature_contribution_entry) OneHotEncodedFeatureContribution {
-	var cFeatureContribution *C.tangram_one_hot_encoded_feature_contribution
-	var cColumnName C.tangram_string_view
-	var cVariant C.tangram_string_view
+func makeOneHotEncodedFeatureContribution(f *C.modelfox_feature_contribution_entry) OneHotEncodedFeatureContribution {
+	var cFeatureContribution *C.modelfox_one_hot_encoded_feature_contribution
+	var cColumnName C.modelfox_string_view
+	var cVariant C.modelfox_string_view
 	var cFeatureValue C.bool
 	var cFeatureContributionValue C.float
-	C.tangram_feature_contribution_entry_as_one_hot_encoded(f, &cFeatureContribution)
-	C.tangram_one_hot_encoded_feature_contribution_get_column_name(cFeatureContribution, &cColumnName)
-	C.tangram_one_hot_encoded_feature_contribution_get_variant(cFeatureContribution, &cVariant)
-	C.tangram_one_hot_encoded_feature_contribution_get_feature_value(cFeatureContribution, &cFeatureValue)
-	C.tangram_one_hot_encoded_feature_contribution_get_feature_contribution_value(cFeatureContribution, &cFeatureContributionValue)
+	C.modelfox_feature_contribution_entry_as_one_hot_encoded(f, &cFeatureContribution)
+	C.modelfox_one_hot_encoded_feature_contribution_get_column_name(cFeatureContribution, &cColumnName)
+	C.modelfox_one_hot_encoded_feature_contribution_get_variant(cFeatureContribution, &cVariant)
+	C.modelfox_one_hot_encoded_feature_contribution_get_feature_value(cFeatureContribution, &cFeatureValue)
+	C.modelfox_one_hot_encoded_feature_contribution_get_feature_contribution_value(cFeatureContribution, &cFeatureContributionValue)
 	return OneHotEncodedFeatureContribution{
 		ColumnName:               C.GoStringN(cColumnName.ptr, C.int(cColumnName.len)),
 		Variant:                   C.GoStringN(cVariant.ptr, C.int(cVariant.len)),
@@ -596,17 +596,17 @@ func makeOneHotEncodedFeatureContribution(f *C.tangram_feature_contribution_entr
 	}
 }
 
-func makeBagOfWordsFeatureContribution(f *C.tangram_feature_contribution_entry) BagOfWordsFeatureContribution {
-	var cFeatureContribution *C.tangram_bag_of_words_feature_contribution
-	var cColumnName C.tangram_string_view
-	var cNGram *C.tangram_ngram
+func makeBagOfWordsFeatureContribution(f *C.modelfox_feature_contribution_entry) BagOfWordsFeatureContribution {
+	var cFeatureContribution *C.modelfox_bag_of_words_feature_contribution
+	var cColumnName C.modelfox_string_view
+	var cNGram *C.modelfox_ngram
 	var cFeatureValue C.float
 	var cFeatureContributionValue C.float
-	C.tangram_feature_contribution_entry_as_bag_of_words(f, &cFeatureContribution)
-	C.tangram_bag_of_words_feature_contribution_get_column_name(cFeatureContribution, &cColumnName)
-	C.tangram_bag_of_words_feature_contribution_get_feature_contribution_value(cFeatureContribution, &cFeatureContributionValue)
-	C.tangram_bag_of_words_feature_contribution_get_ngram(cFeatureContribution, &cNGram)
-	C.tangram_bag_of_words_feature_contribution_get_feature_value(cFeatureContribution, &cFeatureValue)
+	C.modelfox_feature_contribution_entry_as_bag_of_words(f, &cFeatureContribution)
+	C.modelfox_bag_of_words_feature_contribution_get_column_name(cFeatureContribution, &cColumnName)
+	C.modelfox_bag_of_words_feature_contribution_get_feature_contribution_value(cFeatureContribution, &cFeatureContributionValue)
+	C.modelfox_bag_of_words_feature_contribution_get_ngram(cFeatureContribution, &cNGram)
+	C.modelfox_bag_of_words_feature_contribution_get_feature_value(cFeatureContribution, &cFeatureValue)
 	return BagOfWordsFeatureContribution{
 		ColumnName:               C.GoStringN(cColumnName.ptr, C.int(cColumnName.len)),
 		NGram:                    makeNGram(cNGram),
@@ -620,9 +620,9 @@ const (
 	BigramType
 )
 
-func makeNGram(n *C.tangram_ngram) NGram {
-	var cType C.tangram_ngram_type
-	C.tangram_ngram_get_type(n, &cType)
+func makeNGram(n *C.modelfox_ngram) NGram {
+	var cType C.modelfox_ngram_type
+	C.modelfox_ngram_get_type(n, &cType)
 	switch cType {
 	case UnigramType:
 		return makeUnigramNGram(n)
@@ -632,36 +632,36 @@ func makeNGram(n *C.tangram_ngram) NGram {
 	return nil
 }
 
-func makeUnigramNGram(n *C.tangram_ngram) Unigram {
-	var cToken C.tangram_string_view
-	C.tangram_unigram_get_token(n, &cToken)
+func makeUnigramNGram(n *C.modelfox_ngram) Unigram {
+	var cToken C.modelfox_string_view
+	C.modelfox_unigram_get_token(n, &cToken)
 	return Unigram{
 		Token: C.GoStringN(cToken.ptr, C.int(cToken.len)),
 	}
 }
 
-func makeBigramNGram(n *C.tangram_ngram) Bigram {
-	var cTokenA C.tangram_string_view
-	var cTokenB C.tangram_string_view
-	C.tangram_bigram_get_token_a(n, &cTokenA)
-	C.tangram_bigram_get_token_b(n, &cTokenB)
+func makeBigramNGram(n *C.modelfox_ngram) Bigram {
+	var cTokenA C.modelfox_string_view
+	var cTokenB C.modelfox_string_view
+	C.modelfox_bigram_get_token_a(n, &cTokenA)
+	C.modelfox_bigram_get_token_b(n, &cTokenB)
 	return Bigram{
 		TokenA: C.GoStringN(cTokenA.ptr, C.int(cTokenA.len)),
 		TokenB: C.GoStringN(cTokenB.ptr, C.int(cTokenB.len)),
 	}
 }
 
-func makeBagOfWordsCosineSimilarityFeatureContribution(f *C.tangram_feature_contribution_entry) BagOfWordsCosineSimilarityFeatureContribution {
-	var cFeatureContribution *C.tangram_bag_of_words_cosine_similarity_feature_contribution
-	var cColumnNameA C.tangram_string_view
-	var cColumnNameB C.tangram_string_view
+func makeBagOfWordsCosineSimilarityFeatureContribution(f *C.modelfox_feature_contribution_entry) BagOfWordsCosineSimilarityFeatureContribution {
+	var cFeatureContribution *C.modelfox_bag_of_words_cosine_similarity_feature_contribution
+	var cColumnNameA C.modelfox_string_view
+	var cColumnNameB C.modelfox_string_view
 	var cFeatureValue C.float
 	var cFeatureContributionValue C.float
-	C.tangram_feature_contribution_entry_as_bag_of_words_cosine_similarity(f, &cFeatureContribution)
-	C.tangram_bag_of_words_cosine_similarity_feature_contribution_get_column_name_a(cFeatureContribution, &cColumnNameA)
-	C.tangram_bag_of_words_cosine_similarity_feature_contribution_get_column_name_b(cFeatureContribution, &cColumnNameB)
-	C.tangram_bag_of_words_cosine_similarity_feature_contribution_get_feature_contribution_value(cFeatureContribution, &cFeatureContributionValue)
-	C.tangram_bag_of_words_cosine_similarity_feature_contribution_get_feature_value(cFeatureContribution, &cFeatureValue)
+	C.modelfox_feature_contribution_entry_as_bag_of_words_cosine_similarity(f, &cFeatureContribution)
+	C.modelfox_bag_of_words_cosine_similarity_feature_contribution_get_column_name_a(cFeatureContribution, &cColumnNameA)
+	C.modelfox_bag_of_words_cosine_similarity_feature_contribution_get_column_name_b(cFeatureContribution, &cColumnNameB)
+	C.modelfox_bag_of_words_cosine_similarity_feature_contribution_get_feature_contribution_value(cFeatureContribution, &cFeatureContributionValue)
+	C.modelfox_bag_of_words_cosine_similarity_feature_contribution_get_feature_value(cFeatureContribution, &cFeatureValue)
 	return BagOfWordsCosineSimilarityFeatureContribution{
 		ColumnNameA:               C.GoStringN(cColumnNameA.ptr, C.int(cColumnNameA.len)),
 		ColumnNameB:               C.GoStringN(cColumnNameB.ptr, C.int(cColumnNameB.len)),
@@ -670,15 +670,15 @@ func makeBagOfWordsCosineSimilarityFeatureContribution(f *C.tangram_feature_cont
 	}
 }
 
-func makeWordEmbeddingFeatureContribution(f *C.tangram_feature_contribution_entry) WordEmbeddingFeatureContribution {
-	var cFeatureContribution *C.tangram_word_embedding_feature_contribution
-	var cColumnName C.tangram_string_view
+func makeWordEmbeddingFeatureContribution(f *C.modelfox_feature_contribution_entry) WordEmbeddingFeatureContribution {
+	var cFeatureContribution *C.modelfox_word_embedding_feature_contribution
+	var cColumnName C.modelfox_string_view
 	var cValueIndex C.size_t
 	var cFeatureContributionValue C.float
-	C.tangram_feature_contribution_entry_as_word_embedding(f, &cFeatureContribution)
-	C.tangram_word_embedding_feature_contribution_get_column_name(cFeatureContribution, &cColumnName)
-	C.tangram_word_embedding_feature_contribution_get_feature_contribution_value(cFeatureContribution, &cFeatureContributionValue)
-	C.tangram_word_embedding_feature_contribution_get_value_index(cFeatureContribution, &cValueIndex)
+	C.modelfox_feature_contribution_entry_as_word_embedding(f, &cFeatureContribution)
+	C.modelfox_word_embedding_feature_contribution_get_column_name(cFeatureContribution, &cColumnName)
+	C.modelfox_word_embedding_feature_contribution_get_feature_contribution_value(cFeatureContribution, &cFeatureContributionValue)
+	C.modelfox_word_embedding_feature_contribution_get_value_index(cFeatureContribution, &cValueIndex)
 	return WordEmbeddingFeatureContribution{
 		ColumnName:               C.GoStringN(cColumnName.ptr, C.int(cColumnName.len)),
 		ValueIndex:               int(cValueIndex),
@@ -727,7 +727,7 @@ func (m Model) logEvents(events []event) error {
 	}
 	req, err := http.NewRequest(
 		"POST",
-		m.options.TangramURL+"/track",
+		m.options.ModelFoxURL+"/track",
 		bytes.NewReader(body),
 	)
 	if err != nil {

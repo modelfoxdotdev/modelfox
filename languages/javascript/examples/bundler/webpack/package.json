@@ -1,14 +1,14 @@
 {
-	"author": "Tangram",
+	"author": "ModelFox",
 	"devDependencies": {
-		"@tangramdotdev/tangram": "*",
+		"@modelfoxdotdev/modelfox": "*",
 		"webpack": "^5.41.1",
 		"webpack-cli": "^4.7.2",
 		"webpack-dev-server": "^4.7.2"
 	},
 	"license": "MIT",
 	"main": "index.js",
-	"name": "@tangramdotdev/tangram-example-bundler-webpack",
+	"name": "@modelfoxdotdev/modelfox-example-bundler-webpack",
 	"scripts": {
 		"start": "webpack serve"
 	},

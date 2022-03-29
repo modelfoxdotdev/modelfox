@@ -1,17 +1,17 @@
 [package]
 edition = "2021"
-name = "tangram_app_playground_client"
+name = "modelfox_app_playground_client"
 publish = false
 version = "0.0.0"
 
 [[bin]]
-name = "tangram_app_playground_client"
+name = "modelfox_app_playground_client"
 path = "main.rs"
 
 [dependencies]
 pinwheel = "0.2"
-tangram_app_playground_common = { path = "../common" }
-tangram_charts = { path = "../../../../../../../../charts" }
-tangram_ui = { path = "../../../../../../../../ui" }
+modelfox_app_playground_common = { path = "../common" }
+modelfox_charts = { path = "../../../../../../../../charts" }
+modelfox_ui = { path = "../../../../../../../../ui" }
 wasm-bindgen = "0.2"
 web-sys = "0.3"

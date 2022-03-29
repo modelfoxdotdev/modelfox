@@ -1,13 +1,13 @@
 use pinwheel::prelude::*;
-use tangram_app_core::{
+use modelfox_app_core::{
 	alert::AlertMethod,
 	monitor::{AlertModelType, Monitor},
 };
-use tangram_app_layouts::{
+use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct Page {
 	pub monitor: Monitor,

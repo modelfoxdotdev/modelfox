@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_app_date_window"
+name = "modelfox_app_date_window"
 publish = false
 version = "0.0.0"
 

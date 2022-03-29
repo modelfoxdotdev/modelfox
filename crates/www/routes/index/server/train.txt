@@ -1,4 +1,4 @@
-$ tangram train --file heart_disease.csv --target diagnosis
+$ modelfox train --file heart_disease.csv --target diagnosis
 ✅ Loading train data.
 ✅ Loading test data.
 ✅ Shuffling train data.

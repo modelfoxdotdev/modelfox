@@ -1,13 +1,13 @@
-require 'tangram'
+require 'modelfox'
 
-# If you are running the Tangram app on your own server you can pass the URL to it with the TANGRAM_URL environment variable.
-tangram_url = ENV['TANGRAM_URL'] || 'https://app.tangram.dev'
+# If you are running the ModelFox app on your own server you can pass the URL to it with the MODELFOX_URL environment variable.
+modelfox_url = ENV['MODELFOX_URL'] || 'https://app.modelfox.dev'
 
-# Get the path to the `.tangram` file.
-model_path = File.join(File.dirname(__FILE__), 'heart_disease.tangram')
-# Load the model from the path and set the url where the tangram app is running.
-options = Tangram::LoadModelOptions.new(tangram_url: tangram_url)
-model = Tangram::Model.from_path(model_path, options: options)
+# Get the path to the `.modelfox` file.
+model_path = File.join(File.dirname(__FILE__), 'heart_disease.modelfox')
+# Load the model from the path and set the url where the modelfox app is running.
+options = ModelFox::LoadModelOptions.new(modelfox_url: modelfox_url)
+model = ModelFox::Model.from_path(model_path, options: options)
 
 # Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
 input = {
@@ -26,11 +26,11 @@ input = {
   thallium_stress_test: 'fixed defect'
 }
 
-# Make the prediction using a custom threshold chosen on the "Tuning" page of the Tangram app.
-options = Tangram::PredictOptions.new(threshold: 0.5, compute_feature_contributions: true)
+# Make the prediction using a custom threshold chosen on the "Tuning" page of the ModelFox app.
+options = ModelFox::PredictOptions.new(threshold: 0.5, compute_feature_contributions: true)
 output = model.predict(input, options: options)
 
-# Make the prediction using a custom threshold chosen on the "Tuning" page of the Tangram app.
+# Make the prediction using a custom threshold chosen on the "Tuning" page of the ModelFox app.
 puts('Input:', input)
 puts('Output:', output)
 

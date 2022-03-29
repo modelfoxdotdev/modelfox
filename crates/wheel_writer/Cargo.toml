@@ -1,5 +1,5 @@
 [package]
-authors = ["Tangram <root@tangram.dev"]
+authors = ["ModelFox <root@modelfox.dev"]
 edition = "2021"
 name = "wheel_writer"
 version = "0.0.0"

@@ -1,8 +1,8 @@
 use ndarray::prelude::*;
 use serde_json::json;
 use std::path::Path;
-use tangram_table::prelude::*;
-use tangram_tree::Progress;
+use modelfox_table::prelude::*;
+use modelfox_tree::Progress;
 
 fn main() {
 	// Load the data.
@@ -19,17 +19,17 @@ fn main() {
 	let labels_test = labels_test.as_number().unwrap();
 
 	// Train the model.
-	let train_output = tangram_tree::Regressor::train(
+	let train_output = modelfox_tree::Regressor::train(
 		features_train.view(),
 		labels_train.view(),
-		&tangram_tree::TrainOptions {
+		&modelfox_tree::TrainOptions {
 			learning_rate: 0.1,
 			max_leaf_nodes: 255,
 			max_rounds: 100,
 			..Default::default()
 		},
 		Progress {
-			kill_chip: &tangram_kill_chip::KillChip::default(),
+			kill_chip: &modelfox_kill_chip::KillChip::default(),
 			handle_progress_event: &mut |_| {},
 		},
 	);
@@ -42,8 +42,8 @@ fn main() {
 		.predict(features_test.view(), predictions.view_mut());
 
 	// Compute metrics.
-	let mut metrics = tangram_metrics::RegressionMetrics::new();
-	metrics.update(tangram_metrics::RegressionMetricsInput {
+	let mut metrics = modelfox_metrics::RegressionMetrics::new();
+	metrics.update(modelfox_metrics::RegressionMetricsInput {
 		predictions: predictions.as_slice().unwrap(),
 		labels: labels_test.view().as_slice(),
 	});

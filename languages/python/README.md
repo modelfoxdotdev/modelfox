@@ -1,20 +1,20 @@
-# Tangram for Python
+# ModelFox for Python
 
-- [Watch the Video](https://www.tangram.dev)
-- [Read the Docs](https://www.tangram.dev/docs)
+- [Watch the Video](https://www.modelfox.dev)
+- [Read the Docs](https://www.modelfox.dev/docs)
 
-The Tangram Python library makes it easy to make predictions with your Tangram machine learning model from Python.
+The ModelFox Python library makes it easy to make predictions with your ModelFox machine learning model from Python.
 
 ## Usage
 
 ```
-$ pip install tangram
+$ pip install modelfox
 ```
 
 ```python
-import tangram
+import modelfox
 
-model = tangram.Model.from_path('./heart_disease.tangram')
+model = modelfox.Model.from_path('./heart_disease.modelfox')
 
 input = {
   'age': 63,
@@ -25,11 +25,11 @@ input = {
 output = model.predict(input)
 ```
 
-For more information, [read the docs](https://www.tangram.dev/docs).
+For more information, [read the docs](https://www.modelfox.dev/docs).
 
 ## Platform Support
 
-Tangram for Python is currently supported on Linux, macOS, and Windows with ARM64 and AMD64 CPUs. Are you interested in another platform? [Open an issue](https://github.com/tangramdotdev/tangram/issues/new) or send us an email at [help@tangram.dev](mailto:help@tangram.dev).
+ModelFox for Python is currently supported on Linux, macOS, and Windows with ARM64 and AMD64 CPUs. Are you interested in another platform? [Open an issue](https://github.com/modelfoxdotdev/modelfox/issues/new) or send us an email at [help@modelfox.dev](mailto:help@modelfox.dev).
 
 ## Examples
 
@@ -37,4 +37,4 @@ The source for this package contains a number of examples in the `examples` dire
 
 ## Notes
 
-- Tangram for Python requires pip 20.3 or later, which includes support for [PEP 600](https://www.python.org/dev/peps/pep-0600/). This is necessary to correctly install tangram's native extension. If you are using an earlier python version, you may see the error "Could not find a version that satisfies the requirement tangram" when you attempt to `pip install tangram`. To resolve this, you should upgrade pip to version 20.3 or later.
+- ModelFox for Python requires pip 20.3 or later, which includes support for [PEP 600](https://www.python.org/dev/peps/pep-0600/). This is necessary to correctly install modelfox's native extension. If you are using an earlier python version, you may see the error "Could not find a version that satisfies the requirement modelfox" when you attempt to `pip install modelfox`. To resolve this, you should upgrade pip to version 20.3 or later.

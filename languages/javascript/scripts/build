@@ -8,14 +8,14 @@ mkdir dist/deno/
 # install npm deps
 npm install
 
-# tangram_node
-install -D ../../dist/compile/aarch64-linux-gnu/libtangram_node.so dist/node/tangram_aarch64-linux-gnu.node
-install -D ../../dist/compile/aarch64-linux-musl/libtangram_node.so dist/node/tangram_aarch64-linux-musl.node
-install -D ../../dist/compile/aarch64-macos/libtangram_node.dylib dist/node/tangram_aarch64-macos.node
-install -D ../../dist/compile/x86_64-linux-gnu/libtangram_node.so dist/node/tangram_x86_64-linux-gnu.node
-install -D ../../dist/compile/x86_64-linux-musl/libtangram_node.so dist/node/tangram_x86_64-linux-musl.node
-install -D ../../dist/compile/x86_64-macos/libtangram_node.dylib dist/node/tangram_x86_64-macos.node
-install -D ../../dist/compile/x86_64-windows-msvc/tangram_node.dll dist/node/tangram_x86_64-windows-msvc.node
+# modelfox_node
+install -D ../../dist/compile/aarch64-linux-gnu/libmodelfox_node.so dist/node/modelfox_aarch64-linux-gnu.node
+install -D ../../dist/compile/aarch64-linux-musl/libmodelfox_node.so dist/node/modelfox_aarch64-linux-musl.node
+install -D ../../dist/compile/aarch64-macos/libmodelfox_node.dylib dist/node/modelfox_aarch64-macos.node
+install -D ../../dist/compile/x86_64-linux-gnu/libmodelfox_node.so dist/node/modelfox_x86_64-linux-gnu.node
+install -D ../../dist/compile/x86_64-linux-musl/libmodelfox_node.so dist/node/modelfox_x86_64-linux-musl.node
+install -D ../../dist/compile/x86_64-macos/libmodelfox_node.dylib dist/node/modelfox_x86_64-macos.node
+install -D ../../dist/compile/x86_64-windows-msvc/modelfox_node.dll dist/node/modelfox_x86_64-windows-msvc.node
 
 # common
 npx tsc --module commonjs --outDir dist/node/
@@ -27,19 +27,19 @@ npx tsc --module esnext --outDir dist/node/
 cp common.ts dist/deno/common.ts
 
 # web
-wasm-bindgen --target web --out-dir dist/web/ ../../dist/compile/wasm32/tangram_wasm.wasm
+wasm-bindgen --target web --out-dir dist/web/ ../../dist/compile/wasm32/modelfox_wasm.wasm
 cp entrypoints/web.js dist/web/index.js
 
 # bundler
-wasm-bindgen --target bundler --out-dir dist/bundler/ ../../dist/compile/wasm32/tangram_wasm.wasm
+wasm-bindgen --target bundler --out-dir dist/bundler/ ../../dist/compile/wasm32/modelfox_wasm.wasm
 cp entrypoints/bundler.js dist/bundler/index.js
 
 # node
-wasm-bindgen --target nodejs --out-dir dist/node/ ../../dist/compile/wasm32/tangram_wasm.wasm
-mv dist/node/tangram_wasm.js dist/node/tangram_wasm.cjs
+wasm-bindgen --target nodejs --out-dir dist/node/ ../../dist/compile/wasm32/modelfox_wasm.wasm
+mv dist/node/modelfox_wasm.js dist/node/modelfox_wasm.cjs
 cp entrypoints/node.js dist/node/index.js
 cp entrypoints/node.cjs dist/node/index.cjs
 
 # deno
-wasm-bindgen --target deno --out-dir dist/deno/ ../../dist/compile/wasm32/tangram_wasm.wasm
+wasm-bindgen --target deno --out-dir dist/deno/ ../../dist/compile/wasm32/modelfox_wasm.wasm
 cp entrypoints/deno.ts dist/deno/mod.ts

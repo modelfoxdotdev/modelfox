@@ -4,12 +4,12 @@ use pinwheel::prelude::*;
 use rand::Rng;
 use sqlx::prelude::*;
 use std::{borrow::BorrowMut, sync::Arc};
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, service_unavailable},
 	App,
 };
-use tangram_id::Id;
+use modelfox_id::Id;
 
 #[derive(serde::Deserialize)]
 struct Action {
@@ -198,7 +198,7 @@ fn set_cookie_header_value(token: Id, domain: Option<&str>) -> String {
 		None
 	};
 	format!(
-		"tangram_token={}{}{}{}{}{}",
+		"modelfox_token={}{}{}{}{}{}",
 		token,
 		domain.as_deref().unwrap_or(""),
 		path.unwrap_or(""),
@@ -210,10 +210,10 @@ fn set_cookie_header_value(token: Id, domain: Option<&str>) -> String {
 
 async fn send_code_email(app: &App, email: String, code: String) -> Result<()> {
 	let email = lettre::Message::builder()
-		.from("Tangram <noreply@tangram.dev>".parse()?)
+		.from("ModelFox <noreply@modelfox.dev>".parse()?)
 		.to(email.parse()?)
-		.subject("Tangram Login Code")
-		.body(format!("Your Tangram login code is {}.", code))?;
+		.subject("ModelFox Login Code")
+		.body(format!("Your ModelFox login code is {}.", code))?;
 	app.send_email(email).await?;
 	Ok(())
 }

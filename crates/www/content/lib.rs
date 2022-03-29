@@ -1,8 +1,8 @@
 use anyhow::Result;
+use modelfox_ui as ui;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use sunfish::{include_dir, include_dir::IncludeDir};
-use tangram_ui as ui;
 
 pub struct BlogPost;
 

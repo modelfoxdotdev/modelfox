@@ -1,21 +1,21 @@
-# Tangram for Rust
+# ModelFox for Rust
 
-- [Watch the Video](https://www.tangram.dev)
-- [Read the Docs](https://www.tangram.dev/docs)
+- [Watch the Video](https://www.modelfox.dev)
+- [Read the Docs](https://www.modelfox.dev/docs)
 
-The Tangram Rust library makes it easy to make predictions with your Tangram machine learning model from Rust.
+The ModelFox Rust library makes it easy to make predictions with your ModelFox machine learning model from Rust.
 
 ## Usage
 
 ```toml
 [dependencies]
-tangram = "*"
+modelfox = "*"
 ```
 
 ```rust
-let model: tangram::Model = tangram::Model::from_path("heart_disease.tangram", None).unwrap();
+let model: modelfox::Model = modelfox::Model::from_path("heart_disease.modelfox", None).unwrap();
 
-let input = tangram::predict_input! {
+let input = modelfox::predict_input! {
   "age": 63.0,
   "gender": "male",
   // ...
@@ -24,7 +24,7 @@ let input = tangram::predict_input! {
 let output = model.predict_one(input, None);
 ```
 
-For more information, [read the docs](https://www.tangram.dev/docs).
+For more information, [read the docs](https://www.modelfox.dev/docs).
 
 ## Examples
 

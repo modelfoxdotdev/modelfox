@@ -1,12 +1,12 @@
 use anyhow::{bail, Result};
 use std::sync::Arc;
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	path_components,
 	user::{authorize_user, authorize_user_for_model},
 };
-use tangram_id::Id;
+use modelfox_id::Id;
 
 #[derive(serde::Deserialize)]
 struct Action {

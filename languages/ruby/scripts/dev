@@ -1,6 +1,6 @@
 bundle
-rm -rf lib/tangram/libtangram/
-cargo build -p libtangram
-install -D ../../target/debug/libtangram.so lib/tangram/libtangram/x86_64-linux-gnu/libtangram.so
-gem build -o tangram.gem tangram.gemspec
-gem install tangram.gem
+rm -rf lib/modelfox/libmodelfox/
+cargo build -p libmodelfox
+install -D ../../target/debug/libmodelfox.so lib/modelfox/libmodelfox/x86_64-linux-gnu/libmodelfox.so
+gem build -o modelfox.gem modelfox.gemspec
+gem install modelfox.gem

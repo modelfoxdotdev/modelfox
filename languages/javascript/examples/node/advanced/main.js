@@ -1,19 +1,19 @@
 import * as fs from "fs/promises"
 import * as path from "path"
-import * as tangram from "@tangramdotdev/tangram"
+import * as modelfox from "@modelfoxdotdev/modelfox"
 import * as url from "url"
 
-// If you are running the Tangram app on your own server you can pass the URL to it with the TANGRAM_URL environment variable.
-let tangramUrl = process.env.TANGRAM_URL || "https://app.tangram.dev"
+// If you are running the ModelFox app on your own server you can pass the URL to it with the MODELFOX_URL environment variable.
+let modelfoxUrl = process.env.MODELFOX_URL || "https://app.modelfox.dev"
 
-// Get the path to the .tangram file.
+// Get the path to the .modelfox file.
 let modelPath = path.join(
 	path.dirname(url.fileURLToPath(import.meta.url)),
-	"heart_disease.tangram",
+	"heart_disease.modelfox",
 )
 // Load the model from the path.
 let modelData = await fs.readFile(modelPath)
-let model = new tangram.Model(modelData.buffer, { tangramUrl })
+let model = new modelfox.Model(modelData.buffer, { modelfoxUrl })
 
 // Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
 let input = {
@@ -32,7 +32,7 @@ let input = {
 	thallium_stress_test: "fixed defect",
 }
 
-// Make the prediction using a custom threshold chosen on the "Tuning" page of the Tangram app.
+// Make the prediction using a custom threshold chosen on the "Tuning" page of the ModelFox app.
 let options = { threshold: 0.5, computeFeatureContributions: true }
 let output = model.predict(input, options)
 

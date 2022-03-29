@@ -11,13 +11,13 @@ use anyhow::{bail, Result};
 use chrono::{Datelike, TimeZone, Timelike, Utc};
 use num::ToPrimitive;
 use std::{collections::HashMap, path::PathBuf};
-use tangram::ClassificationOutputValue;
-use tangram_app_monitor_event::{
+use modelfox::ClassificationOutputValue;
+use modelfox_app_monitor_event::{
 	BinaryClassificationPredictOutput, MonitorEvent, NumberOrString, PredictOutput,
 	PredictionMonitorEvent, TrueValueMonitorEvent,
 };
-use tangram_id::Id;
-use tangram_table::TableView;
+use modelfox_id::Id;
+use modelfox_table::TableView;
 
 pub fn init_test_options() -> crate::options::Options {
 	let mut options = crate::options::Options::default();
@@ -55,7 +55,7 @@ pub fn workspace_root() -> PathBuf {
 pub async fn init_heart_disease_model(app: &App) -> Result<Id> {
 	let mut txn = app.begin_transaction().await?;
 	let repo_id = app.create_root_repo(&mut txn, "Heart Disease").await?;
-	let model_path = workspace_root().join("heart_disease.tangram");
+	let model_path = workspace_root().join("heart_disease.modelfox");
 	let model_id = app.add_model_to_repo(&mut txn, repo_id, model_path).await?;
 	app.commit_transaction(txn).await?;
 	Ok(model_id)
@@ -65,7 +65,7 @@ pub async fn seed_events(app: &App, examples_count: usize, model_id: Id) -> Resu
 	let target = "diagnosis";
 	let class_names = Some(&["Negative", "Positive"]);
 	let data_path = workspace_root().join("heart_disease.csv");
-	let table = tangram_table::Table::from_path(&data_path, Default::default(), &mut |_| {})?;
+	let table = modelfox_table::Table::from_path(&data_path, Default::default(), &mut |_| {})?;
 	let mut idx = 0;
 	let events: Vec<MonitorEvent> = (0..examples_count)
 		.flat_map(|_| {
@@ -122,7 +122,7 @@ pub async fn seed_events(app: &App, examples_count: usize, model_id: Id) -> Resu
 	Ok(())
 }
 
-#[derive(Clone, Debug, tangram::PredictInput)]
+#[derive(Clone, Debug, modelfox::PredictInput)]
 pub struct Input {
 	pub age: f32,
 	pub gender: Gender,
@@ -139,97 +139,97 @@ pub struct Input {
 	pub thallium_stress_test: ThalliumStressTest,
 }
 
-#[derive(Clone, Debug, tangram::PredictInputValue)]
+#[derive(Clone, Debug, modelfox::PredictInputValue)]
 pub enum Gender {
-	#[tangram(value = "male")]
+	#[modelfox(value = "male")]
 	Male,
-	#[tangram(value = "female")]
+	#[modelfox(value = "female")]
 	Female,
 }
 
-#[derive(Clone, Debug, tangram::PredictInputValue)]
+#[derive(Clone, Debug, modelfox::PredictInputValue)]
 pub enum ChestPain {
-	#[tangram(value = "asymptomatic")]
+	#[modelfox(value = "asymptomatic")]
 	Asymptomatic,
-	#[tangram(value = "non-angina pain")]
+	#[modelfox(value = "non-angina pain")]
 	NonAnginaPain,
-	#[tangram(value = "atypical angina")]
+	#[modelfox(value = "atypical angina")]
 	AtypicalAngina,
-	#[tangram(value = "typical angina")]
+	#[modelfox(value = "typical angina")]
 	TypicalAngina,
 }
 
-#[derive(Clone, Debug, tangram::PredictInputValue)]
+#[derive(Clone, Debug, modelfox::PredictInputValue)]
 pub enum FastingBloodSugarGreaterThan120 {
-	#[tangram(value = "false")]
+	#[modelfox(value = "false")]
 	False,
-	#[tangram(value = "true")]
+	#[modelfox(value = "true")]
 	True,
 }
 
-#[derive(Clone, Debug, tangram::PredictInputValue)]
+#[derive(Clone, Debug, modelfox::PredictInputValue)]
 pub enum RestingEcgResult {
-	#[tangram(value = "normal")]
+	#[modelfox(value = "normal")]
 	Normal,
-	#[tangram(value = "probable or definite left ventricular hypertrophy")]
+	#[modelfox(value = "probable or definite left ventricular hypertrophy")]
 	Lvh,
-	#[tangram(value = "ST-T wave abnormality")]
+	#[modelfox(value = "ST-T wave abnormality")]
 	SttWaveAbnormality,
 }
 
-#[derive(Clone, Debug, tangram::PredictInputValue)]
+#[derive(Clone, Debug, modelfox::PredictInputValue)]
 pub enum ExerciseInducedAngina {
-	#[tangram(value = "no")]
+	#[modelfox(value = "no")]
 	No,
-	#[tangram(value = "yes")]
+	#[modelfox(value = "yes")]
 	Yes,
 }
 
-#[derive(Clone, Debug, tangram::PredictInputValue)]
+#[derive(Clone, Debug, modelfox::PredictInputValue)]
 pub enum ExerciseStSlope {
-	#[tangram(value = "upsloping")]
+	#[modelfox(value = "upsloping")]
 	Upsloping,
-	#[tangram(value = "flat")]
+	#[modelfox(value = "flat")]
 	Flat,
-	#[tangram(value = "downsloping")]
+	#[modelfox(value = "downsloping")]
 	Downsloping,
 }
 
-#[derive(Clone, Debug, tangram::PredictInputValue)]
+#[derive(Clone, Debug, modelfox::PredictInputValue)]
 pub enum FluoroscopyVesselsColored {
-	#[tangram(value = "0")]
+	#[modelfox(value = "0")]
 	Zero,
-	#[tangram(value = "1")]
+	#[modelfox(value = "1")]
 	One,
-	#[tangram(value = "2")]
+	#[modelfox(value = "2")]
 	Two,
-	#[tangram(value = "3")]
+	#[modelfox(value = "3")]
 	Three,
 }
 
-#[derive(Clone, Debug, tangram::PredictInputValue)]
+#[derive(Clone, Debug, modelfox::PredictInputValue)]
 pub enum ThalliumStressTest {
-	#[tangram(value = "normal")]
+	#[modelfox(value = "normal")]
 	Normal,
-	#[tangram(value = "reversible defect")]
+	#[modelfox(value = "reversible defect")]
 	ReversibleDefect,
-	#[tangram(value = "fixed defect")]
+	#[modelfox(value = "fixed defect")]
 	FixedDefect,
 }
 
-type Output = tangram::BinaryClassificationPredictOutput<Diagnosis>;
+type Output = modelfox::BinaryClassificationPredictOutput<Diagnosis>;
 
-#[derive(Clone, Debug, tangram::ClassificationOutputValue)]
+#[derive(Clone, Debug, modelfox::ClassificationOutputValue)]
 enum Diagnosis {
-	#[tangram(value = "Negative")]
+	#[modelfox(value = "Negative")]
 	Negative,
-	#[tangram(value = "Positive")]
+	#[modelfox(value = "Positive")]
 	Positive,
 }
 /// Returns the ID of the prediction as well as the predicted value
 pub async fn seed_single_prediction_event(app: &App, model_id: Id) -> Result<(Id, String)> {
 	let data_path = workspace_root().join("heart_disease.csv");
-	let table = tangram_table::Table::from_path(&data_path, Default::default(), &mut |_| {})?;
+	let table = modelfox_table::Table::from_path(&data_path, Default::default(), &mut |_| {})?;
 
 	let id = Id::generate();
 	let identifier = NumberOrString::String(id.to_string());
@@ -260,7 +260,7 @@ pub async fn seed_single_prediction_event(app: &App, model_id: Id) -> Result<(Id
 
 	// Ask the model to predict for the input
 	let bytes = get_model_bytes(app.storage(), model_id).await?;
-	let model = tangram::Model::<Input, Output>::from_bytes(&bytes, None)?;
+	let model = modelfox::Model::<Input, Output>::from_bytes(&bytes, None)?;
 	let output = model.predict_one(input.clone(), None);
 	let output_class_name = output.class_name.as_str().to_owned();
 	let output = PredictOutput::BinaryClassification(BinaryClassificationPredictOutput {
@@ -439,7 +439,7 @@ fn get_seeded_random_row(table: TableView, seed_float: f32) -> HashMap<String, s
 		.columns()
 		.iter()
 		.map(|column| match column {
-			tangram_table::TableColumnView::Number(column) => {
+			modelfox_table::TableColumnView::Number(column) => {
 				let column_name = column.name().unwrap().to_owned();
 				let value = column.data()[random_row_index].to_f64().unwrap();
 				let value = if let Some(value) = serde_json::Number::from_f64(value) {
@@ -449,7 +449,7 @@ fn get_seeded_random_row(table: TableView, seed_float: f32) -> HashMap<String, s
 				};
 				(column_name, value)
 			}
-			tangram_table::TableColumnView::Enum(column) => {
+			modelfox_table::TableColumnView::Enum(column) => {
 				let column_name = column.name().unwrap().to_owned();
 				let value = column.data()[random_row_index];
 				let value = match value {

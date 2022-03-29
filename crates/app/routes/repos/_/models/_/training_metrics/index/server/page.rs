@@ -1,6 +1,6 @@
 pub use crate::{binary_classifier::*, multiclass_classifier::*, regressor::*};
 use pinwheel::prelude::*;
-use tangram_app_layouts::{
+use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };

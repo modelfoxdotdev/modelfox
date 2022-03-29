@@ -3,7 +3,7 @@ use futures::prelude::future::*;
 use once_cell::sync::Lazy;
 use sqlx::prelude::*;
 use std::collections::BTreeMap;
-use tangram_zip::zip;
+use modelfox_zip::zip;
 
 mod migration_2020_01_01_000000;
 mod migration_2020_04_19_000000;
@@ -50,16 +50,16 @@ pub async fn verify(db: &sqlx::AnyPool) -> Result<()> {
 		});
 	if !migrations_consistent {
 		bail!(
-			"There was a mismatch between the migrations your database has run and the migrations this version of tangram expects. This should not happen unless you are hacking on tangram. Please contact us at help@tangram.dev."
+			"There was a mismatch between the migrations your database has run and the migrations this version of modelfox expects. This should not happen unless you are hacking on modelfox. Please contact us at help@modelfox.dev."
 		);
 	}
 	if migration_rows.len() > MIGRATIONS.len() {
 		bail!(
-			"Your database has run migrations from a newer version of tangram. Please update to the latest version of tangram."
+			"Your database has run migrations from a newer version of modelfox. Please update to the latest version of modelfox."
 		);
 	}
 	if migration_rows.len() < MIGRATIONS.len() {
-		bail!("Please run `tangram migrate` to update your database to the latest schema.");
+		bail!("Please run `modelfox migrate` to update your database to the latest schema.");
 	}
 	Ok(())
 }
@@ -76,10 +76,10 @@ pub async fn run(db: &sqlx::AnyPool) -> Result<()> {
 			migration_row.get::<String, usize>(0) == *migration_name
 		});
 	if !migrations_consistent {
-		bail!("Database migration consistency error. Please contact us at help@tangram.dev.");
+		bail!("Database migration consistency error. Please contact us at help@modelfox.dev.");
 	}
 	if migration_rows.len() > MIGRATIONS.len() {
-		bail!("Your database has run migrations from a newer version of tangram.");
+		bail!("Your database has run migrations from a newer version of modelfox.");
 	}
 	// Apply each outstanding migration in a transaction.
 	for (migration_name, migration) in MIGRATIONS.iter().skip(migration_rows.len()) {

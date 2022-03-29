@@ -10,8 +10,8 @@ use crate::{
 	config::ChartConfig,
 	tooltip::{draw_tooltip, DrawTooltipOptions, TooltipLabel},
 };
+use modelfox_number_formatter::NumberFormatter;
 use num::ToPrimitive;
-use tangram_number_formatter::NumberFormatter;
 use wasm_bindgen::JsValue;
 use web_sys as dom;
 

@@ -3,7 +3,7 @@ use fnv::{FnvBuildHasher, FnvHashMap, FnvHashSet};
 use indexmap::{IndexMap, IndexSet};
 use itertools::Itertools;
 use num::ToPrimitive;
-use tangram_text::{NGram, NGramRef, NGramType, Tokenizer};
+use modelfox_text::{NGram, NGramRef, NGramType, Tokenizer};
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 pub enum ProductionColumnStats {
@@ -105,27 +105,27 @@ pub struct TextProductionColumnStatsOutputNGramEntry {
 }
 
 impl ProductionColumnStats {
-	pub fn new(column_stats: &tangram_model::ColumnStatsReader) -> ProductionColumnStats {
+	pub fn new(column_stats: &modelfox_model::ColumnStatsReader) -> ProductionColumnStats {
 		match column_stats {
-			tangram_model::ColumnStatsReader::UnknownColumn(stats) => {
+			modelfox_model::ColumnStatsReader::UnknownColumn(stats) => {
 				let stats = stats.read();
 				let name = stats.column_name();
 				ProductionColumnStats::Unknown(UnknownProductionColumnStats::new(name))
 			}
 
-			tangram_model::ColumnStatsReader::TextColumn(stats) => {
+			modelfox_model::ColumnStatsReader::TextColumn(stats) => {
 				let stats = stats.read();
 				let name = stats.column_name();
 				ProductionColumnStats::Text(TextProductionColumnStats::new(name))
 			}
 
-			tangram_model::ColumnStatsReader::NumberColumn(stats) => {
+			modelfox_model::ColumnStatsReader::NumberColumn(stats) => {
 				let stats = stats.read();
 				let name = stats.column_name();
 				ProductionColumnStats::Number(NumberProductionColumnStats::new(name))
 			}
 
-			tangram_model::ColumnStatsReader::EnumColumn(stats) => {
+			modelfox_model::ColumnStatsReader::EnumColumn(stats) => {
 				let stats = stats.read();
 				let name = stats.column_name();
 
@@ -152,7 +152,7 @@ impl ProductionColumnStats {
 	}
 
 	/// Incorporate a data value into the statistics being tracked.
-	pub fn update(&mut self, model: tangram_model::ModelReader, value: Option<&serde_json::Value>) {
+	pub fn update(&mut self, model: modelfox_model::ModelReader, value: Option<&serde_json::Value>) {
 		let column_name = self.column_name().to_string();
 		match self {
 			ProductionColumnStats::Unknown(stats) => stats.update(value),
@@ -162,13 +162,13 @@ impl ProductionColumnStats {
 
 				// Get this model's stats information for all columns
 				let col_stats = match model.inner() {
-					tangram_model::ModelInnerReader::Regressor(regressor) => {
+					modelfox_model::ModelInnerReader::Regressor(regressor) => {
 						regressor.read().train_column_stats()
 					}
-					tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+					modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 						binary_classifier.read().train_column_stats()
 					}
-					tangram_model::ModelInnerReader::MulticlassClassifier(
+					modelfox_model::ModelInnerReader::MulticlassClassifier(
 						multiclass_classifier,
 					) => multiclass_classifier.read().train_column_stats(),
 				};
@@ -194,8 +194,8 @@ impl ProductionColumnStats {
 					.ngram_types()
 					.iter()
 					.map(|ngram_type| match ngram_type {
-						tangram_model::NGramTypeReader::Unigram(_) => NGramType::Unigram,
-						tangram_model::NGramTypeReader::Bigram(_) => NGramType::Bigram,
+						modelfox_model::NGramTypeReader::Unigram(_) => NGramType::Unigram,
+						modelfox_model::NGramTypeReader::Bigram(_) => NGramType::Bigram,
 					})
 					.collect();
 
@@ -500,14 +500,14 @@ impl TextProductionColumnStats {
 		let unigram_iter = ngram_types.contains(&NGramType::Unigram).then(|| {
 			tokenizer
 				.tokenize(value)
-				.map(tangram_text::NGramRef::Unigram)
+				.map(modelfox_text::NGramRef::Unigram)
 		});
 
 		let bigram_iter = ngram_types.contains(&NGramType::Bigram).then(|| {
 			tokenizer
 				.tokenize(value)
 				.tuple_windows()
-				.map(|(token_a, token_b)| tangram_text::NGramRef::Bigram(token_a, token_b))
+				.map(|(token_a, token_b)| modelfox_text::NGramRef::Bigram(token_a, token_b))
 		});
 
 		let ngram_iter = unigram_iter
@@ -592,7 +592,7 @@ mod tests {
 	use serde_json::Value;
 
 	/// Ensure that updating a number statistic with `null` reports an absent value
-	/// (Regression test for https://github.com/tangramdotdev/tangram/issues/85)
+	/// (Regression test for https://github.com/modelfoxdotdev/modelfox/issues/85)
 	#[test]
 	fn null_number_is_absent() {
 		let mut stats = NumberProductionColumnStats::new("number_stats");
@@ -612,7 +612,7 @@ mod tests {
 	}
 
 	/// Ensure that updating an unknown statistic with `null` reports an absent value
-	/// (Regression test for https://github.com/tangramdotdev/tangram/issues/85)
+	/// (Regression test for https://github.com/modelfoxdotdev/modelfox/issues/85)
 	#[test]
 	fn null_unknown_is_absent() {
 		let mut stats = UnknownProductionColumnStats::new("unknown_stat");
@@ -632,7 +632,7 @@ mod tests {
 	}
 
 	/// Ensure that updating an enum statistic with `null` reports an absent value
-	/// (Regression test for https://github.com/tangramdotdev/tangram/issues/85)
+	/// (Regression test for https://github.com/modelfoxdotdev/modelfox/issues/85)
 	#[test]
 	fn null_enum_is_absent() {
 		let enum_variants = &["the", "variants", "of", "the", "enum"];
@@ -653,7 +653,7 @@ mod tests {
 	}
 
 	/// Ensure that updating a text statistic with `null` reports an absent value
-	/// (Regression test for https://github.com/tangramdotdev/tangram/issues/85)
+	/// (Regression test for https://github.com/modelfoxdotdev/modelfox/issues/85)
 	#[test]
 	fn null_text_is_absent() {
 		let mut stats = TextProductionColumnStats::new("text_stat");

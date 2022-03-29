@@ -1,9 +1,9 @@
 use pinwheel::prelude::*;
-use tangram_app_layouts::{
+use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct Page {
 	pub id: String,

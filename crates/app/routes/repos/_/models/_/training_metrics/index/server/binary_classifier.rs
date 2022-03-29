@@ -1,10 +1,10 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_app_ui::{
+use modelfox_app_ui::{
 	colors::{BASELINE_COLOR, TRAINING_COLOR},
 	metrics_row::MetricsRow,
 };
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct BinaryClassifier {
 	pub warning: Option<String>,

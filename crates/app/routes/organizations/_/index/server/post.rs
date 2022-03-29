@@ -1,13 +1,13 @@
 use anyhow::{bail, Result};
 use std::sync::Arc;
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, not_found, service_unavailable, unauthorized},
 	organizations::delete_organization,
 	path_components,
 	user::{authorize_normal_user, authorize_normal_user_for_organization},
 };
-use tangram_id::Id;
+use modelfox_id::Id;
 
 #[derive(serde::Deserialize)]
 #[serde(tag = "action")]

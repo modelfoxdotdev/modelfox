@@ -1,7 +1,7 @@
+use modelfox_zip::zip;
 use ndarray::prelude::*;
 use num::ToPrimitive;
 use std::num::NonZeroUsize;
-use tangram_zip::zip;
 
 /// MulticlassClassificationMetrics computes common metrics used to evaluate multiclass classifiers.
 pub struct MulticlassClassificationMetrics {

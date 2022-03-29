@@ -1,10 +1,10 @@
 <?php
 
-namespace tangram\tangram;
+namespace modelfox\modelfox;
 
 require_once(dirname(dirname(__FILE__)) . '/vendor/autoload.php');
 
-$model_path = dirname(dirname(__FILE__)) . '/heart_disease.tangram';
+$model_path = dirname(dirname(__FILE__)) . '/heart_disease.modelfox';
 $model = Model::from_path($model_path);
 
 // Create an example input matching the schema of the CSV file the model was trained on.

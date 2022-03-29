@@ -9,9 +9,9 @@ use crate::{
 };
 use anyhow::Result;
 use futures::{select, FutureExt};
+use modelfox_id::Id;
 use sqlx::prelude::*;
 use std::{borrow::BorrowMut, io, str::FromStr, sync::Arc};
-use tangram_id::Id;
 use tokio::sync::{mpsc, oneshot};
 
 #[derive(Debug)]
@@ -79,9 +79,9 @@ pub async fn handle_alert_send(
 	match &alert_send.method {
 		AlertMethod::Email(email) => {
 			let email = lettre::Message::builder()
-				.from("Tangram <noreply@tangram.dev>".parse()?)
+				.from("ModelFox <noreply@modelfox.dev>".parse()?)
 				.to(email.email.parse()?)
-				.subject("Tangram Metrics Alert")
+				.subject("ModelFox Metrics Alert")
 				.body(format!(
 					"Exceeded alert thresholds: {:?}",
 					exceeded_thresholds
@@ -462,7 +462,7 @@ mod test {
 				difference_upper: Some(0.05),
 			},
 			title: None,
-			methods: vec![AlertMethod::Email("ben@tangram.dev".to_owned().into())],
+			methods: vec![AlertMethod::Email("ben@modelfox.dev".to_owned().into())],
 		};
 		seed_single_monitor(&app, &test_monitor, model_id)
 			.await
@@ -589,7 +589,7 @@ mod test {
 			},
 			title: None,
 			methods: vec![
-				AlertMethod::Email("ben@tangram.dev".to_owned().into()),
+				AlertMethod::Email("ben@modelfox.dev".to_owned().into()),
 				AlertMethod::Webhook(
 					AlertMethodWebhook::try_from("http://0.0.0.0:8085/webhook".to_owned()).unwrap(),
 				),

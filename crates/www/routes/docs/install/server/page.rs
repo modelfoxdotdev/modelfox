@@ -1,10 +1,10 @@
-use pinwheel::prelude::*;
-use std::borrow::Cow;
-use tangram_ui as ui;
-use tangram_www_layouts::{
+use modelfox_ui as ui;
+use modelfox_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage},
 	document::Document,
 };
+use pinwheel::prelude::*;
+use std::borrow::Cow;
 
 pub struct Page;
 
@@ -17,7 +17,7 @@ impl Component for Page {
 						.child(ui::H1::new("Install"))
 						.child(
 							ui::P::new()
-								.child("Tangram supports ")
+								.child("ModelFox supports ")
 								.child(ui::Link::new().href("#MacOS".to_owned()).child("MacOS"))
 								.child(", ")
 								.child(ui::Link::new().href("#Linux".to_owned()).child("Linux"))
@@ -92,15 +92,15 @@ struct Homebrew;
 
 impl Component for Homebrew {
 	fn into_node(self) -> Node {
-		let code = "brew install tangramdotdev/tap/tangram";
+		let code = "brew install modelfoxdotdev/tap/modelfox";
 		ui::S2::new()
 			.child(ui::H2::new("Homebrew"))
 			.child(
 				ui::P::new()
-					.child("Install the tangram package from the ")
+					.child("Install the modelfox package from the ")
 					.child(
 						ui::Link::new()
-							.href("https://github.com/tangramdotdev/homebrew-tap".to_owned())
+							.href("https://github.com/modelfoxdotdev/homebrew-tap".to_owned())
 							.child("homebrew tap"),
 					)
 					.child(":"),
@@ -116,12 +116,12 @@ impl Component for Alpine {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				# Add the tangram rsa key.
-				curl -fsSL https://pkgs.tangram.dev/stable/alpine/tangram.rsa | tee /etc/apk/keys/tangram.rsa
-				# Add the tangram repository.
-				echo "https://pkgs.tangram.dev/stable/alpine" | tee /etc/apk/repositories
+				# Add the modelfox rsa key.
+				curl -fsSL https://pkgs.modelfox.dev/stable/alpine/modelfox.rsa | tee /etc/apk/keys/modelfox.rsa
+				# Add the modelfox repository.
+				echo "https://pkgs.modelfox.dev/stable/alpine" | tee /etc/apk/repositories
 				# Install!
-				apk add tangram
+				apk add modelfox
 			"#
 		);
 		ui::S2::new()
@@ -141,12 +141,12 @@ impl Component for Deb {
 	fn into_node(self) -> Node {
 		let code = ui::formatdoc!(
 			r#"
-				# Add the tangram gpg key.
-				curl -fsSL https://pkgs.tangram.dev/stable/{distribution}/{version}.gpg | sudo apt-key add -
-				# Add the tangram repository.
-				curl -fsSL https://pkgs.tangram.dev/stable/{distribution}/{version}.list | sudo tee /etc/apt/sources.list.d/tangram.list
+				# Add the modelfox gpg key.
+				curl -fsSL https://pkgs.modelfox.dev/stable/{distribution}/{version}.gpg | sudo apt-key add -
+				# Add the modelfox repository.
+				curl -fsSL https://pkgs.modelfox.dev/stable/{distribution}/{version}.list | sudo tee /etc/apt/sources.list.d/modelfox.list
 				# Install!
-				sudo apt-get update && sudo apt-get install tangram
+				sudo apt-get update && sudo apt-get install modelfox
 			"#,
 			distribution = self.distribution,
 			version = self.version,
@@ -164,10 +164,10 @@ impl Component for AmazonLinux2 {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				# Add the tangram repository.
-				sudo yum-config-manager --add-repo https://pkgs.tangram.dev/stable/amazon-linux/2/tangram.repo
+				# Add the modelfox repository.
+				sudo yum-config-manager --add-repo https://pkgs.modelfox.dev/stable/amazon-linux/2/modelfox.repo
 				# Install!
-				sudo yum install tangram
+				sudo yum install modelfox
 			"#
 		);
 		ui::S2::new()
@@ -183,10 +183,10 @@ impl Component for Centos7 {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				# Add the tangram repository.
-				sudo yum-config-manager --add-repo https://pkgs.tangram.dev/stable/centos/7/tangram.repo
+				# Add the modelfox repository.
+				sudo yum-config-manager --add-repo https://pkgs.modelfox.dev/stable/centos/7/modelfox.repo
 				# Install!
-				sudo yum install tangram
+				sudo yum install modelfox
 			"#
 		);
 		ui::S2::new()
@@ -202,10 +202,10 @@ impl Component for Fedora {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				# Add the tangram repository.
-				sudo dnf config-manager --add-repo https://pkgs.tangram.dev/stable/fedora/tangram.repo
+				# Add the modelfox repository.
+				sudo dnf config-manager --add-repo https://pkgs.modelfox.dev/stable/fedora/modelfox.repo
 				# Install!
-				sudo dnf install tangram
+				sudo dnf install modelfox
 			"#
 		);
 		ui::S2::new()
@@ -221,10 +221,7 @@ impl Component for Nix {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				# To avoid having to build from scratch, use the tangram cachix cache:
-				# https://tangram.cachix.org
-				# tangram.cachix.org-1:NQ5Uzhhbrgi4R6A0JoljrMg8X4a2doTv3WrSnajJANs=
-				nix run github:tangramdotdev/tangram
+				nix run github:modelfoxdotdev/modelfox
 			"#
 		);
 		ui::S2::new()
@@ -240,10 +237,10 @@ impl Component for Rhel {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				# Add the tangram repository.
-				sudo dnf config-manager --add-repo https://pkgs.tangram.dev/stable/rhel/8/tangram.repo
+				# Add the modelfox repository.
+				sudo dnf config-manager --add-repo https://pkgs.modelfox.dev/stable/rhel/8/modelfox.repo
 				# Install!
-				sudo dnf install tangram
+				sudo dnf install modelfox
 			"#
 		);
 		ui::S2::new()
@@ -259,10 +256,10 @@ impl Component for Centos8 {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				# Add the tangram repository.
-				sudo dnf config-manager --add-repo https://pkgs.tangram.dev/stable/centos/8/tangram.repo
+				# Add the modelfox repository.
+				sudo dnf config-manager --add-repo https://pkgs.modelfox.dev/stable/centos/8/modelfox.repo
 				# Install!
-				sudo dnf install tangram
+				sudo dnf install modelfox
 			"#
 		);
 		ui::S2::new()
@@ -276,15 +273,15 @@ struct Arch;
 
 impl Component for Arch {
 	fn into_node(self) -> Node {
-		let code = "yay -S tangram-bin";
+		let code = "yay -S modelfox-bin";
 		ui::S2::new()
 			.child(ui::H2::new("Arch"))
 			.child(
 				ui::P::new()
-					.child("Install the tangram package from the ")
+					.child("Install the modelfox package from the ")
 					.child(
 						ui::Link::new()
-							.href("https://aur.archlinux.org/packages/tangram-bin".to_owned())
+							.href("https://aur.archlinux.org/packages/modelfox-bin".to_owned())
 							.child("AUR"),
 					)
 					.child(":"),
@@ -300,18 +297,18 @@ impl Component for Scoop {
 	fn into_node(self) -> Node {
 		let code = ui::doc!(
 			r#"
-				scoop bucket add tangram https://github.com/tangramdotdev/scoop.git
-				scoop install tangram
+				scoop bucket add modelfox https://github.com/modelfoxdotdev/scoop.git
+				scoop install modelfox
 			"#
 		);
 		ui::S2::new()
 			.child(ui::H2::new("Scoop"))
 			.child(
 				ui::P::new()
-					.child("Install the tangram package from the ")
+					.child("Install the modelfox package from the ")
 					.child(
 						ui::Link::new()
-							.href("https://aur.archlinux.org/packages/tangram".to_owned())
+							.href("https://aur.archlinux.org/packages/modelfox".to_owned())
 							.child("scoop bucket"),
 					)
 					.child(":"),
@@ -325,15 +322,15 @@ struct Docker;
 
 impl Component for Docker {
 	fn into_node(self) -> Node {
-		let code = "docker run --rm -it tangramdotdev/tangram";
+		let code = "docker run --rm -it modelfoxdotdev/modelfox";
 		ui::S2::new()
 			.child(ui::H2::new("Docker"))
 			.child(
 				ui::P::new()
-					.child("Run the tangramdotdev/tangram docker image from ")
+					.child("Run the modelfoxdotdev/modelfox docker image from ")
 					.child(
 						ui::Link::new()
-							.href("https://hub.docker.com/r/tangramdotdev/tangram".to_owned())
+							.href("https://hub.docker.com/r/modelfoxdotdev/modelfox".to_owned())
 							.child("Docker Hub"),
 					)
 					.child(":"),
@@ -349,7 +346,7 @@ impl Component for Manual {
 	fn into_node(self) -> Node {
 		let p = ui::Markdown::new(ui::doc!(
 			r#"
-				If none of the above methods works for you, you can download the tarball for your CPU architecture and operating system from [GitHub Releases](https://github.com/tangramdotdev/tangram/releases/). Untar the file and place the tangram executable somewhere on your `PATH`. If you do this, please email us at [hello@tangram.dev](mailto:hello@tangram.dev) so we can consider supporting your preferred installation method.
+				If none of the above methods works for you, you can download the tarball for your CPU architecture and operating system from [GitHub Releases](https://github.com/modelfoxdotdev/modelfox/releases/). Untar the file and place the modelfox executable somewhere on your `PATH`. If you do this, please email us at [hello@modelfox.dev](mailto:hello@modelfox.dev) so we can consider supporting your preferred installation method.
 			"#
 		));
 		ui::S2::new()

@@ -2,8 +2,8 @@ use crate::page::Page;
 use anyhow::{bail, Result};
 use pinwheel::prelude::*;
 use std::{str, str::FromStr, sync::Arc};
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	alert::{AlertMethod, AlertMetric},
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	model::get_model_bytes,
@@ -14,8 +14,8 @@ use tangram_app_core::{
 	path_components,
 	user::{authorize_user, authorize_user_for_model, authorize_user_for_repo},
 };
-use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_id::Id;
+use modelfox_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use modelfox_id::Id;
 
 #[derive(serde::Deserialize)]
 #[serde(tag = "action")]
@@ -83,7 +83,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 		Err(_) => return Ok(bad_request()),
 	};
 	let bytes = get_model_bytes(app.storage(), model_id).await?;
-	let model = tangram_model::from_bytes(&bytes)?;
+	let model = modelfox_model::from_bytes(&bytes)?;
 	let model_type = AlertModelType::from(model.inner());
 	let model_layout_info =
 		model_layout_info(&mut db, app, model_id, ModelNavItem::Monitors).await?;
@@ -163,7 +163,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 				difference_upper: variance_upper,
 			};
 			let cadence = MonitorCadence::from_str(&cadence)?;
-			let args = tangram_app_core::monitor_checker::UpdateMonitorArgs {
+			let args = modelfox_app_core::monitor_checker::UpdateMonitorArgs {
 				db: &mut db,
 				monitor_id: Id::from_str(&monitor_id)?,
 				cadence,

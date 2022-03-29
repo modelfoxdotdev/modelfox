@@ -1,6 +1,6 @@
 use pinwheel::prelude::*;
-use tangram_app_layouts::{auth_layout::AuthLayout, document::Document};
-use tangram_ui as ui;
+use modelfox_app_layouts::{auth_layout::AuthLayout, document::Document};
+use modelfox_ui as ui;
 
 pub struct Page {
 	pub stage: Option<Stage>,

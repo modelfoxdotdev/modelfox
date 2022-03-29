@@ -7,7 +7,7 @@
 }
 }
 
-In this post, we will go over how we optimized our Gradient Boosted Decision Tree library. This is based on a talk that we gave at RustConf 2021: [Writing the Fastest Gradient Boosted Decision Tree Library in Rust](https://www.youtube.com/watch?v=D1NAREuicNs). The code is available on [GitHub](https://github.com/tangramdotdev/tangram/tree/main/crates/tree).
+In this post, we will go over how we optimized our Gradient Boosted Decision Tree library. This is based on a talk that we gave at RustConf 2021: [Writing the Fastest Gradient Boosted Decision Tree Library in Rust](https://www.youtube.com/watch?v=D1NAREuicNs). The code is available on [GitHub](https://github.com/modelfoxdotdev/modelfox/tree/main/crates/tree).
 
 <div style="position: relative; padding-bottom: 56.25%; ">
   <iframe
@@ -388,7 +388,7 @@ indexes.par_iter().for_each(|index| unsafe {
 })
 ```
 
-Here are our benchmarks on training time comparing Tangram's Gradient Boosted Decision Tree Library to [LightGBM](https://lightgbm.readthedocs.io/en/latest/), [XGBoost](https://xgboost.readthedocs.io/en/latest/), [CatBoost](https://catboost.ai/), and [sklearn](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingClassifier.html).
+Here are our benchmarks on training time comparing ModelFox's Gradient Boosted Decision Tree Library to [LightGBM](https://lightgbm.readthedocs.io/en/latest/), [XGBoost](https://xgboost.readthedocs.io/en/latest/), [CatBoost](https://catboost.ai/), and [sklearn](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.HistGradientBoostingClassifier.html).
 
 <img
   src="training_time.png"
@@ -396,6 +396,6 @@ Here are our benchmarks on training time comparing Tangram's Gradient Boosted De
   width="100%"
 />
 
-To see all the benchmarks, head over to [https://tangram.dev/benchmarks](https://tangram.dev/benchmarks).
+To see all the benchmarks, head over to [https://modelfox.dev/benchmarks](https://modelfox.dev/benchmarks).
 
-If you are interested in reading the code or giving us a star, the project is available on [GitHub](https://github.com/tangramdotdev/tangram).
+If you are interested in reading the code or giving us a star, the project is available on [GitHub](https://github.com/modelfoxdotdev/modelfox).

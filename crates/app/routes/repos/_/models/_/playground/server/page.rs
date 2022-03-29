@@ -1,21 +1,21 @@
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use tangram_app_layouts::{
+use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-use tangram_app_playground_common::ColumnChart;
-use tangram_app_ui::{
+use modelfox_app_playground_common::ColumnChart;
+use modelfox_app_ui::{
 	predict::PredictOutput,
 	tokens::{EnumColumnToken, NumberColumnToken, TextColumnToken, UnknownColumnToken},
 };
-use tangram_charts::{
+use modelfox_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	box_chart::{BoxChartPoint, BoxChartSeries, BoxChartValue},
 	components::{BarChart, BoxChart},
 };
-use tangram_core::predict::PredictInputValue;
-use tangram_ui as ui;
+use modelfox_core::predict::PredictInputValue;
+use modelfox_ui as ui;
 
 pub struct Page {
 	pub model_layout_info: ModelLayoutInfo,
@@ -68,7 +68,7 @@ impl Component for Page {
 			Inner::Output(inner) => inner.into_node(),
 		};
 		Document::new()
-			.client("tangram_app_playground_client")
+			.client("modelfox_app_playground_client")
 			.child(
 				ModelLayout::new(self.model_layout_info)
 					.child(ui::S1::new().child(ui::H1::new("Playground")).child(inner)),

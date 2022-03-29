@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_app_production_metrics"
+name = "modelfox_app_production_metrics"
 publish = false
 version = "0.0.0"
 
@@ -16,11 +16,11 @@ num = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }
-tangram_app_date_window = { path = "../date_window" }
-tangram_app_monitor_event = { path = "../monitor_event" }
-tangram_app_production_stats = { path = "../production_stats" }
-tangram_model = { path = "../../model" }
-tangram_zip = { path = "../../zip" }
+modelfox_app_date_window = { path = "../date_window" }
+modelfox_app_monitor_event = { path = "../monitor_event" }
+modelfox_app_production_stats = { path = "../production_stats" }
+modelfox_model = { path = "../../model" }
+modelfox_zip = { path = "../../zip" }
 
 [dev-dependencies]
 insta = "1"

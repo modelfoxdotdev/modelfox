@@ -18,6 +18,9 @@ use crate::{
 	test,
 };
 use anyhow::{anyhow, bail, Result};
+use modelfox_id::Id;
+use modelfox_kill_chip::KillChip;
+use modelfox_table::prelude::*;
 use ndarray::prelude::*;
 use num::ToPrimitive;
 use rand::{seq::SliceRandom, SeedableRng};
@@ -30,10 +33,7 @@ use std::{
 	time::{Duration, Instant},
 	unreachable,
 };
-use tangram_id::Id;
-use tangram_kill_chip::KillChip;
-use tangram_progress_counter::ProgressCounter;
-use tangram_table::prelude::*;
+use modelfox_progress_counter::ProgressCounter;
 
 pub enum TrainingDataSource {
 	Stdin,
@@ -705,7 +705,7 @@ fn load_and_shuffle_dataset_stdin(
 	// Get the column types from the config, if set.
 	let mut table = Table::from_bytes(
 		&buf,
-		tangram_table::FromCsvOptions {
+		modelfox_table::FromCsvOptions {
 			column_types: column_types_from_config(config),
 			infer_options: Default::default(),
 			..Default::default()
@@ -737,7 +737,7 @@ fn load_and_shuffle_dataset_train(
 	// Get the column types from the config, if set.
 	let mut table = Table::from_path(
 		file_path,
-		tangram_table::FromCsvOptions {
+		modelfox_table::FromCsvOptions {
 			column_types: column_types_from_config(config),
 			infer_options: Default::default(),
 			..Default::default()
@@ -771,7 +771,7 @@ fn load_and_shuffle_dataset_train_and_test(
 	let column_types = column_types_from_config(config);
 	let mut table_train = Table::from_path(
 		file_path_train,
-		tangram_table::FromCsvOptions {
+		modelfox_table::FromCsvOptions {
 			column_types,
 			infer_options: Default::default(),
 			..Default::default()
@@ -804,7 +804,7 @@ fn load_and_shuffle_dataset_train_and_test(
 		.collect();
 	let mut table_test = Table::from_path(
 		file_path_test,
-		tangram_table::FromCsvOptions {
+		modelfox_table::FromCsvOptions {
 			column_types: Some(column_types),
 			infer_options: Default::default(),
 			..Default::default()
@@ -939,9 +939,9 @@ fn compute_baseline_metrics(
 				_ => unreachable!(),
 			};
 			let baseline_prediction = train_target_column_stats.mean;
-			let mut metrics = tangram_metrics::RegressionMetrics::new();
+			let mut metrics = modelfox_metrics::RegressionMetrics::new();
 			for label in labels.iter() {
-				metrics.update(tangram_metrics::RegressionMetricsInput {
+				metrics.update(modelfox_metrics::RegressionMetricsInput {
 					predictions: &[baseline_prediction],
 					labels: &[*label],
 				});
@@ -965,9 +965,9 @@ fn compute_baseline_metrics(
 				.1
 				.to_f32()
 				.unwrap() / total_count;
-			let mut metrics = tangram_metrics::BinaryClassificationMetrics::new(3);
+			let mut metrics = modelfox_metrics::BinaryClassificationMetrics::new(3);
 			for label in labels.iter() {
-				metrics.update(tangram_metrics::BinaryClassificationMetricsInput {
+				metrics.update(modelfox_metrics::BinaryClassificationMetricsInput {
 					probabilities: &[baseline_probability],
 					labels: &[*label],
 				});
@@ -992,11 +992,11 @@ fn compute_baseline_metrics(
 				.iter()
 				.map(|(_, count)| count.to_f32().unwrap() / total_count)
 				.collect::<Vec<_>>();
-			let mut metrics = tangram_metrics::MulticlassClassificationMetrics::new(
+			let mut metrics = modelfox_metrics::MulticlassClassificationMetrics::new(
 				test_target_column_stats.histogram.len(),
 			);
 			for label in labels.iter() {
-				metrics.update(tangram_metrics::MulticlassClassificationMetricsInput {
+				metrics.update(modelfox_metrics::MulticlassClassificationMetricsInput {
 					probabilities: ArrayView::from(baseline_probabilities.as_slice())
 						.insert_axis(Axis(0)),
 					labels: ArrayView::from(&[*label]),
@@ -1113,61 +1113,61 @@ pub enum TrainModelOutput {
 
 #[derive(Clone, Debug)]
 pub struct LinearRegressorTrainModelOutput {
-	pub model: tangram_linear::Regressor,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub model: modelfox_linear::Regressor,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub target_column_index: usize,
 	pub losses: Option<Vec<f32>>,
-	pub train_options: tangram_linear::TrainOptions,
+	pub train_options: modelfox_linear::TrainOptions,
 	pub feature_importances: Vec<f32>,
 }
 
 #[derive(Clone, Debug)]
 pub struct TreeRegressorTrainModelOutput {
-	pub model: tangram_tree::Regressor,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub model: modelfox_tree::Regressor,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub target_column_index: usize,
 	pub losses: Option<Vec<f32>>,
-	pub train_options: tangram_tree::TrainOptions,
+	pub train_options: modelfox_tree::TrainOptions,
 	pub feature_importances: Vec<f32>,
 }
 
 #[derive(Clone, Debug)]
 pub struct LinearBinaryClassifierTrainModelOutput {
-	pub model: tangram_linear::BinaryClassifier,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub model: modelfox_linear::BinaryClassifier,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub target_column_index: usize,
 	pub losses: Option<Vec<f32>>,
-	pub train_options: tangram_linear::TrainOptions,
+	pub train_options: modelfox_linear::TrainOptions,
 	pub feature_importances: Vec<f32>,
 }
 
 #[derive(Clone, Debug)]
 pub struct TreeBinaryClassifierTrainModelOutput {
-	pub model: tangram_tree::BinaryClassifier,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub model: modelfox_tree::BinaryClassifier,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub target_column_index: usize,
 	pub losses: Option<Vec<f32>>,
-	pub train_options: tangram_tree::TrainOptions,
+	pub train_options: modelfox_tree::TrainOptions,
 	pub feature_importances: Vec<f32>,
 }
 
 #[derive(Clone, Debug)]
 pub struct LinearMulticlassClassifierTrainModelOutput {
-	pub model: tangram_linear::MulticlassClassifier,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub model: modelfox_linear::MulticlassClassifier,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub target_column_index: usize,
 	pub losses: Option<Vec<f32>>,
-	pub train_options: tangram_linear::TrainOptions,
+	pub train_options: modelfox_linear::TrainOptions,
 	pub feature_importances: Vec<f32>,
 }
 
 #[derive(Clone, Debug)]
 pub struct TreeMulticlassClassifierTrainModelOutput {
-	pub model: tangram_tree::MulticlassClassifier,
-	pub feature_groups: Vec<tangram_features::FeatureGroup>,
+	pub model: modelfox_tree::MulticlassClassifier,
+	pub feature_groups: Vec<modelfox_features::FeatureGroup>,
 	pub target_column_index: usize,
 	pub losses: Option<Vec<f32>>,
-	pub train_options: tangram_tree::TrainOptions,
+	pub train_options: modelfox_tree::TrainOptions,
 	pub feature_importances: Vec<f32>,
 }
 
@@ -1256,7 +1256,7 @@ fn train_model(
 fn train_linear_regressor(
 	table_train: &TableView,
 	target_column_index: usize,
-	feature_groups: Vec<tangram_features::FeatureGroup>,
+	feature_groups: Vec<modelfox_features::FeatureGroup>,
 	options: grid::LinearModelTrainOptions,
 	kill_chip: &KillChip,
 	handle_progress_event: &mut dyn FnMut(TrainGridItemProgressEvent),
@@ -1269,7 +1269,7 @@ fn train_linear_regressor(
 		progress_counter.clone(),
 	));
 	let features =
-		tangram_features::compute_features_array_f32(table_train, &feature_groups, &|| {
+		modelfox_features::compute_features_array_f32(table_train, &feature_groups, &|| {
 			progress_counter.inc(1)
 		});
 	handle_progress_event(TrainGridItemProgressEvent::ComputeFeaturesDone);
@@ -1285,12 +1285,12 @@ fn train_linear_regressor(
 			ModelTrainProgressEvent::Linear(progress),
 		))
 	};
-	let progress = tangram_linear::Progress {
+	let progress = modelfox_linear::Progress {
 		kill_chip,
 		handle_progress_event: progress,
 	};
 	let train_output =
-		tangram_linear::Regressor::train(features.view(), labels, &linear_options, progress);
+		modelfox_linear::Regressor::train(features.view(), labels, &linear_options, progress);
 	TrainModelOutput::LinearRegressor(LinearRegressorTrainModelOutput {
 		model: train_output.model,
 		feature_groups,
@@ -1304,7 +1304,7 @@ fn train_linear_regressor(
 fn train_tree_regressor(
 	table_train: &TableView,
 	target_column_index: usize,
-	feature_groups: Vec<tangram_features::FeatureGroup>,
+	feature_groups: Vec<modelfox_features::FeatureGroup>,
 	options: grid::TreeModelTrainOptions,
 	kill_chip: &KillChip,
 	handle_progress_event: &mut dyn FnMut(TrainGridItemProgressEvent),
@@ -1316,7 +1316,7 @@ fn train_tree_regressor(
 	handle_progress_event(TrainGridItemProgressEvent::ComputeFeatures(
 		progress_counter.clone(),
 	));
-	let features = tangram_features::compute_features_table(table_train, &feature_groups, &|i| {
+	let features = modelfox_features::compute_features_table(table_train, &feature_groups, &|i| {
 		progress_counter.inc(i)
 	});
 	handle_progress_event(TrainGridItemProgressEvent::ComputeFeaturesDone);
@@ -1333,12 +1333,12 @@ fn train_tree_regressor(
 			ModelTrainProgressEvent::Tree(progress),
 		))
 	};
-	let progress = tangram_tree::Progress {
+	let progress = modelfox_tree::Progress {
 		kill_chip,
 		handle_progress_event: progress,
 	};
 	let train_output =
-		tangram_tree::Regressor::train(features.view(), labels, &tree_options, progress);
+		modelfox_tree::Regressor::train(features.view(), labels, &tree_options, progress);
 	TrainModelOutput::TreeRegressor(TreeRegressorTrainModelOutput {
 		model: train_output.model,
 		feature_groups,
@@ -1352,7 +1352,7 @@ fn train_tree_regressor(
 fn train_linear_binary_classifier(
 	table_train: &TableView,
 	target_column_index: usize,
-	feature_groups: Vec<tangram_features::FeatureGroup>,
+	feature_groups: Vec<modelfox_features::FeatureGroup>,
 	options: grid::LinearModelTrainOptions,
 	kill_chip: &KillChip,
 	handle_progress_event: &mut dyn FnMut(TrainGridItemProgressEvent),
@@ -1365,7 +1365,7 @@ fn train_linear_binary_classifier(
 		progress_counter.clone(),
 	));
 	let features =
-		tangram_features::compute_features_array_f32(table_train, &feature_groups, &|| {
+		modelfox_features::compute_features_array_f32(table_train, &feature_groups, &|| {
 			progress_counter.inc(1)
 		});
 	handle_progress_event(TrainGridItemProgressEvent::ComputeFeaturesDone);
@@ -1381,12 +1381,16 @@ fn train_linear_binary_classifier(
 			ModelTrainProgressEvent::Linear(progress),
 		))
 	};
-	let progress = tangram_linear::Progress {
+	let progress = modelfox_linear::Progress {
 		kill_chip,
 		handle_progress_event: progress,
 	};
-	let train_output =
-		tangram_linear::BinaryClassifier::train(features.view(), labels, &linear_options, progress);
+	let train_output = modelfox_linear::BinaryClassifier::train(
+		features.view(),
+		labels,
+		&linear_options,
+		progress,
+	);
 	TrainModelOutput::LinearBinaryClassifier(LinearBinaryClassifierTrainModelOutput {
 		model: train_output.model,
 		feature_groups,
@@ -1400,7 +1404,7 @@ fn train_linear_binary_classifier(
 fn train_tree_binary_classifier(
 	table_train: &TableView,
 	target_column_index: usize,
-	feature_groups: Vec<tangram_features::FeatureGroup>,
+	feature_groups: Vec<modelfox_features::FeatureGroup>,
 	options: grid::TreeModelTrainOptions,
 	kill_chip: &KillChip,
 	handle_progress_event: &mut dyn FnMut(TrainGridItemProgressEvent),
@@ -1412,7 +1416,7 @@ fn train_tree_binary_classifier(
 	handle_progress_event(TrainGridItemProgressEvent::ComputeFeatures(
 		progress_counter.clone(),
 	));
-	let features = tangram_features::compute_features_table(table_train, &feature_groups, &|i| {
+	let features = modelfox_features::compute_features_table(table_train, &feature_groups, &|i| {
 		progress_counter.inc(i)
 	});
 	handle_progress_event(TrainGridItemProgressEvent::ComputeFeaturesDone);
@@ -1429,12 +1433,12 @@ fn train_tree_binary_classifier(
 			ModelTrainProgressEvent::Tree(progress),
 		))
 	};
-	let progress = tangram_tree::Progress {
+	let progress = modelfox_tree::Progress {
 		kill_chip,
 		handle_progress_event: progress,
 	};
 	let train_output =
-		tangram_tree::BinaryClassifier::train(features.view(), labels, &tree_options, progress);
+		modelfox_tree::BinaryClassifier::train(features.view(), labels, &tree_options, progress);
 	TrainModelOutput::TreeBinaryClassifier(TreeBinaryClassifierTrainModelOutput {
 		model: train_output.model,
 		feature_groups,
@@ -1448,7 +1452,7 @@ fn train_tree_binary_classifier(
 fn train_linear_multiclass_classifier(
 	table_train: &TableView,
 	target_column_index: usize,
-	feature_groups: Vec<tangram_features::FeatureGroup>,
+	feature_groups: Vec<modelfox_features::FeatureGroup>,
 	options: grid::LinearModelTrainOptions,
 	kill_chip: &KillChip,
 	handle_progress_event: &mut dyn FnMut(TrainGridItemProgressEvent),
@@ -1461,7 +1465,7 @@ fn train_linear_multiclass_classifier(
 		progress_counter.clone(),
 	));
 	let features =
-		tangram_features::compute_features_array_f32(table_train, &feature_groups, &|| {
+		modelfox_features::compute_features_array_f32(table_train, &feature_groups, &|| {
 			progress_counter.inc(1)
 		});
 	handle_progress_event(TrainGridItemProgressEvent::ComputeFeaturesDone);
@@ -1477,11 +1481,11 @@ fn train_linear_multiclass_classifier(
 			ModelTrainProgressEvent::Linear(progress),
 		))
 	};
-	let progress = tangram_linear::Progress {
+	let progress = modelfox_linear::Progress {
 		kill_chip,
 		handle_progress_event: progress,
 	};
-	let train_output = tangram_linear::MulticlassClassifier::train(
+	let train_output = modelfox_linear::MulticlassClassifier::train(
 		features.view(),
 		labels,
 		&linear_options,
@@ -1500,7 +1504,7 @@ fn train_linear_multiclass_classifier(
 fn train_tree_multiclass_classifier(
 	table_train: &TableView,
 	target_column_index: usize,
-	feature_groups: Vec<tangram_features::FeatureGroup>,
+	feature_groups: Vec<modelfox_features::FeatureGroup>,
 	options: grid::TreeModelTrainOptions,
 	kill_chip: &KillChip,
 	handle_progress_event: &mut dyn FnMut(TrainGridItemProgressEvent),
@@ -1512,7 +1516,7 @@ fn train_tree_multiclass_classifier(
 	handle_progress_event(TrainGridItemProgressEvent::ComputeFeatures(
 		progress_counter.clone(),
 	));
-	let features = tangram_features::compute_features_table(table_train, &feature_groups, &|i| {
+	let features = modelfox_features::compute_features_table(table_train, &feature_groups, &|i| {
 		progress_counter.inc(i)
 	});
 	handle_progress_event(TrainGridItemProgressEvent::ComputeFeaturesDone);
@@ -1529,12 +1533,16 @@ fn train_tree_multiclass_classifier(
 			ModelTrainProgressEvent::Tree(progress),
 		))
 	};
-	let progress = tangram_tree::Progress {
+	let progress = modelfox_tree::Progress {
 		kill_chip,
 		handle_progress_event: progress,
 	};
-	let train_output =
-		tangram_tree::MulticlassClassifier::train(features.view(), labels, &tree_options, progress);
+	let train_output = modelfox_tree::MulticlassClassifier::train(
+		features.view(),
+		labels,
+		&tree_options,
+		progress,
+	);
 	TrainModelOutput::TreeMulticlassClassifier(TreeMulticlassClassifierTrainModelOutput {
 		model: train_output.model,
 		feature_groups,
@@ -1545,8 +1553,10 @@ fn train_tree_multiclass_classifier(
 	})
 }
 
-fn compute_linear_options(options: &grid::LinearModelTrainOptions) -> tangram_linear::TrainOptions {
-	let mut linear_options = tangram_linear::TrainOptions {
+fn compute_linear_options(
+	options: &grid::LinearModelTrainOptions,
+) -> modelfox_linear::TrainOptions {
+	let mut linear_options = modelfox_linear::TrainOptions {
 		compute_losses: true,
 		..Default::default()
 	};
@@ -1563,7 +1573,7 @@ fn compute_linear_options(options: &grid::LinearModelTrainOptions) -> tangram_li
 		linear_options.n_examples_per_batch = n_examples_per_batch.to_usize().unwrap();
 	}
 	if let Some(early_stopping_options) = options.early_stopping_options.as_ref() {
-		linear_options.early_stopping_options = Some(tangram_linear::EarlyStoppingOptions {
+		linear_options.early_stopping_options = Some(modelfox_linear::EarlyStoppingOptions {
 			early_stopping_fraction: early_stopping_options.early_stopping_fraction,
 			min_decrease_in_loss_for_significant_change: early_stopping_options
 				.early_stopping_threshold,
@@ -1573,13 +1583,13 @@ fn compute_linear_options(options: &grid::LinearModelTrainOptions) -> tangram_li
 	linear_options
 }
 
-fn compute_tree_options(options: &grid::TreeModelTrainOptions) -> tangram_tree::TrainOptions {
-	let mut tree_options = tangram_tree::TrainOptions {
+fn compute_tree_options(options: &grid::TreeModelTrainOptions) -> modelfox_tree::TrainOptions {
+	let mut tree_options = modelfox_tree::TrainOptions {
 		compute_losses: true,
 		..Default::default()
 	};
 	if let Some(early_stopping_options) = options.early_stopping_options.as_ref() {
-		tree_options.early_stopping_options = Some(tangram_tree::EarlyStoppingOptions {
+		tree_options.early_stopping_options = Some(modelfox_tree::EarlyStoppingOptions {
 			early_stopping_fraction: early_stopping_options.early_stopping_fraction,
 			n_rounds_without_improvement_to_stop: early_stopping_options.early_stopping_rounds,
 			min_decrease_in_loss_for_significant_change: early_stopping_options

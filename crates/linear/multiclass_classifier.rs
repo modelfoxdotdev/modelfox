@@ -4,14 +4,14 @@ use super::{
 	shap::{compute_shap_values_for_example, ComputeShapValuesForExampleOutput},
 	train_early_stopping_split, EarlyStoppingMonitor, TrainOptions, TrainProgressEvent,
 };
+use modelfox_metrics::{CrossEntropy, CrossEntropyInput};
+use modelfox_table::prelude::*;
+use modelfox_zip::{pzip, zip};
 use ndarray::{self, prelude::*};
 use num::{clamp, ToPrimitive};
 use rayon::{self, prelude::*};
 use std::num::NonZeroUsize;
-use tangram_metrics::{CrossEntropy, CrossEntropyInput};
-use tangram_progress_counter::ProgressCounter;
-use tangram_table::prelude::*;
-use tangram_zip::{pzip, zip};
+use modelfox_progress_counter::ProgressCounter;
 
 /// This struct describes a linear multiclass classifier model. You can train one by calling `MulticlassClassifier::train`.
 #[derive(Clone, Debug)]
@@ -164,7 +164,7 @@ impl MulticlassClassifier {
 		labels: ArrayView1<Option<NonZeroUsize>>,
 		mut probabilities: ArrayViewMut2<f32>,
 		train_options: &TrainOptions,
-		kill_chip: &tangram_kill_chip::KillChip,
+		kill_chip: &modelfox_kill_chip::KillChip,
 	) {
 		if kill_chip.is_activated() {
 			return;

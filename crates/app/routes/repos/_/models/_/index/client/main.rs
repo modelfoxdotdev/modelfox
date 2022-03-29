@@ -1,7 +1,7 @@
 use pinwheel::prelude::*;
 
 pub fn main() {
-	tangram_ui::client_start();
-	hydrate::<tangram_charts::components::LineChart>("loss");
-	hydrate::<tangram_charts::components::BarChart>("feature_importances");
+	modelfox_ui::client_start();
+	hydrate::<modelfox_charts::components::LineChart>("loss");
+	hydrate::<modelfox_charts::components::BarChart>("feature_importances");
 }

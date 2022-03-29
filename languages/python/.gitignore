@@ -2,7 +2,7 @@
 /.venv
 /dist
 /docs
-/tangram.egg-info
-/tangram/tangram_python.pyd
-/tangram/tangram_python.so
+/modelfox.egg-info
+/modelfox/modelfox_python.pyd
+/modelfox/modelfox_python.so
 __pycache__

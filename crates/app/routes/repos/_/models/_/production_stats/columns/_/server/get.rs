@@ -16,8 +16,8 @@ use num::ToPrimitive;
 use pinwheel::prelude::*;
 use std::collections::BTreeMap;
 use std::sync::Arc;
-use tangram_app_context::Context;
-use tangram_app_core::{
+use modelfox_app_context::Context;
+use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
 	heuristics::PRODUCTION_STATS_TEXT_COLUMN_MAX_TOKENS_TO_SHOW_IN_TABLE,
 	model::get_model_bytes,
@@ -25,14 +25,14 @@ use tangram_app_core::{
 	timezone::get_timezone,
 	user::{authorize_user, authorize_user_for_model},
 };
-use tangram_app_date_window::{get_date_window_and_interval, DateWindow, DateWindowInterval};
-use tangram_app_layouts::model_layout::{model_layout_info, ModelNavItem};
-use tangram_app_production_stats::{
+use modelfox_app_date_window::{get_date_window_and_interval, DateWindow, DateWindowInterval};
+use modelfox_app_layouts::model_layout::{model_layout_info, ModelNavItem};
+use modelfox_app_production_stats::{
 	get_production_stats, GetProductionStatsOutput, ProductionColumnStatsOutput,
 };
-use tangram_app_ui::time::format_date_window_interval;
-use tangram_id::Id;
-use tangram_ui as ui;
+use modelfox_app_ui::time::format_date_window_interval;
+use modelfox_id::Id;
+use modelfox_ui as ui;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
@@ -78,35 +78,35 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		return Ok(not_found());
 	}
 	let bytes = get_model_bytes(app.storage(), model_id).await?;
-	let model = tangram_model::from_bytes(&bytes)?;
+	let model = modelfox_model::from_bytes(&bytes)?;
 	let model_layout_info =
 		model_layout_info(&mut db, app, model_id, ModelNavItem::ProductionStats).await?;
 	let get_production_stats_output =
 		get_production_stats(&mut db, model, date_window, date_window_interval, timezone).await?;
 	let overall_train_row_count = match model.inner() {
-		tangram_model::ModelInnerReader::Regressor(regressor) => {
+		modelfox_model::ModelInnerReader::Regressor(regressor) => {
 			let regressor = regressor.read();
 			regressor.overall_row_count()
 		}
-		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+		modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			let binary_classifier = binary_classifier.read();
 			binary_classifier.overall_row_count()
 		}
-		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+		modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 			let multiclass_classifier = multiclass_classifier.read();
 			multiclass_classifier.overall_row_count()
 		}
 	};
 	let overall_column_stats = match model.inner() {
-		tangram_model::ModelInnerReader::Regressor(regressor) => {
+		modelfox_model::ModelInnerReader::Regressor(regressor) => {
 			let regressor = regressor.read();
 			regressor.overall_column_stats()
 		}
-		tangram_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
+		modelfox_model::ModelInnerReader::BinaryClassifier(binary_classifier) => {
 			let binary_classifier = binary_classifier.read();
 			binary_classifier.overall_column_stats()
 		}
-		tangram_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
+		modelfox_model::ModelInnerReader::MulticlassClassifier(multiclass_classifier) => {
 			let multiclass_classifier = multiclass_classifier.read();
 			multiclass_classifier.overall_column_stats()
 		}
@@ -116,7 +116,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		.find(|column| column.column_name() == column_name)
 		.unwrap();
 	let inner = match &train_column_stats {
-		tangram_model::ColumnStatsReader::NumberColumn(train_column_stats) => {
+		modelfox_model::ColumnStatsReader::NumberColumn(train_column_stats) => {
 			let train_column_stats = train_column_stats.read();
 			Inner::Number(number_column(
 				get_production_stats_output,
@@ -126,7 +126,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				timezone,
 			))
 		}
-		tangram_model::ColumnStatsReader::EnumColumn(train_column_stats) => {
+		modelfox_model::ColumnStatsReader::EnumColumn(train_column_stats) => {
 			let train_column_stats = train_column_stats.read();
 			Inner::Enum(enum_column(
 				get_production_stats_output,
@@ -137,7 +137,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 				timezone,
 			))
 		}
-		tangram_model::ColumnStatsReader::TextColumn(train_column_stats) => {
+		modelfox_model::ColumnStatsReader::TextColumn(train_column_stats) => {
 			let train_column_stats = train_column_stats.read();
 			Inner::Text(text_column(
 				get_production_stats_output,
@@ -167,7 +167,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 
 fn number_column(
 	get_production_stats_output: GetProductionStatsOutput,
-	train_column_stats: tangram_model::NumberColumnStatsReader,
+	train_column_stats: modelfox_model::NumberColumnStatsReader,
 	date_window: DateWindow,
 	date_window_interval: DateWindowInterval,
 	timezone: Tz,
@@ -277,7 +277,7 @@ fn number_column(
 
 fn enum_column(
 	get_production_stats_output: GetProductionStatsOutput,
-	train_column_stats: tangram_model::EnumColumnStatsReader,
+	train_column_stats: modelfox_model::EnumColumnStatsReader,
 	overall_train_row_count: u64,
 	date_window: DateWindow,
 	_date_window_interval: DateWindowInterval,
@@ -369,7 +369,7 @@ fn enum_column(
 
 fn text_column(
 	get_production_stats_output: GetProductionStatsOutput,
-	train_column_stats: tangram_model::TextColumnStatsReader,
+	train_column_stats: modelfox_model::TextColumnStatsReader,
 	date_window: DateWindow,
 	_date_window_interval: DateWindowInterval,
 	_timezone: Tz,

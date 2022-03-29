@@ -34,7 +34,7 @@ where
 		let path = request.uri().path_and_query().unwrap().path().to_owned();
 		tracing::info!(path = %path, method = %method, "request");
 		request.extensions_mut().insert(context);
-		request.extensions_mut().insert(tangram_id::Id::generate());
+		request.extensions_mut().insert(modelfox_id::Id::generate());
 		let result = AssertUnwindSafe(handler(request)).catch_unwind().await;
 		let start = std::time::SystemTime::now();
 		let response = result.unwrap_or_else(|_| {

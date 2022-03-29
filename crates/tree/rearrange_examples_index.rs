@@ -4,9 +4,9 @@ use crate::{
 	SplitDirection,
 };
 use bitvec::prelude::*;
+use modelfox_zip::pzip;
 use num::ToPrimitive;
 use rayon::prelude::*;
-use tangram_zip::pzip;
 
 const MIN_EXAMPLES_TO_PARALLELIZE: usize = 1024;
 

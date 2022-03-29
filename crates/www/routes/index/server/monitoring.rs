@@ -1,5 +1,5 @@
 use pinwheel::prelude::*;
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct Monitoring;
 
@@ -8,7 +8,7 @@ impl Component for Monitoring {
 		let elixir = ui::doc!(
 			r#"
 				# Log the prediction.
-				Tangram.log_prediction(model, %Tangram.LogPredictionArgs{
+				ModelFox.log_prediction(model, %ModelFox.LogPredictionArgs{
 					identifier: id,
 					options: predict_options,
 					input: input,
@@ -16,7 +16,7 @@ impl Component for Monitoring {
 				})
 
 				# Later on, if we get an official diagnosis for the patient, log the true value.
-				Tangram.log_true_value(model, %Tangram.LogTrueValueArgs{
+				ModelFox.log_true_value(model, %ModelFox.LogTrueValueArgs{
 					identifier: id,
 					true_value: "Positive",
 				})
@@ -26,7 +26,7 @@ impl Component for Monitoring {
 		let go = ui::doc!(
 			r#"
 				// Log the prediction.
-				err = model.LogPrediction(tangram.LogPredictionArgs{
+				err = model.LogPrediction(modelfox.LogPredictionArgs{
 					Identifier: id,
 					Input:      input,
 					Options:    predictOptions,
@@ -37,7 +37,7 @@ impl Component for Monitoring {
 				}
 
 				// Later on, if we get an official diagnosis for the patient, log the true value.
-				err = model.LogTrueValue(tangram.LogTrueValueArgs{
+				err = model.LogTrueValue(modelfox.LogTrueValueArgs{
 					Identifier: id,
 					TrueValue:  "Positive",
 				})
@@ -121,7 +121,7 @@ impl Component for Monitoring {
 		let rust = ui::doc!(
 			r#"
 				// Log the prediction.
-				model.log_prediction(tangram::LogPredictionArgs {
+				model.log_prediction(modelfox::LogPredictionArgs {
 					identifier: id,
 					input,
 					options: Some(options),
@@ -129,7 +129,7 @@ impl Component for Monitoring {
 				})?;
 
 				// Later on, if we get an official diagnosis for the patient, log the true value.
-				model.log_true_value(tangram::LogTrueValueArgs {
+				model.log_true_value(modelfox::LogTrueValueArgs {
 					identifier: id,
 					true_value: "Positive".into(),
 				})?;

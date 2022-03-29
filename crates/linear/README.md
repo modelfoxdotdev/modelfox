@@ -2,7 +2,7 @@
 	<img src="linear.svg" title="Linear">
 </p>
 
-# Tangram Linear
+# ModelFox Linear
 
 This crate implements linear machine learning models for regression and classification. There are three model types, [`Regressor`], [`BinaryClassifier`], and [`MulticlassClassifier`]. `BinaryClassifier` uses the sigmoid activation function, and `MulticlassClassifier` trains `n_classes` linear models whose outputs are combined with the `softmax` function.
 

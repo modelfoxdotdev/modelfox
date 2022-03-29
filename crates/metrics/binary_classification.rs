@@ -1,7 +1,7 @@
 use itertools::Itertools;
+use modelfox_zip::zip;
 use num::ToPrimitive;
 use std::num::NonZeroUsize;
-use tangram_zip::zip;
 
 /// `BinaryClassificationMetrics` computes common metrics used to evaluate binary classifiers at a number of classification thresholds.
 pub struct BinaryClassificationMetrics {

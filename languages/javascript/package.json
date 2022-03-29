@@ -1,5 +1,5 @@
 {
-	"author": "Tangram",
+	"author": "ModelFox",
 	"dependencies": {
 		"node-fetch": "^2.6.6"
 	},
@@ -17,7 +17,7 @@
 		"node": ">=14.8.0"
 	},
 	"eslintConfig": {
-		"extends": "plugin:@tangramdotdev/recommended"
+		"extends": "plugin:@modelfoxdotdev/recommended"
 	},
 	"exports": {
 		"browser": {
@@ -30,7 +30,7 @@
 	},
 	"license": "MIT",
 	"main": "./dist/node/index.cjs",
-	"name": "@tangramdotdev/tangram",
+	"name": "@modelfoxdotdev/modelfox",
 	"type": "module",
 	"types": "./dist/node/common.d.ts",
 	"version": "0.7.1",

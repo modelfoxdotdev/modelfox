@@ -46,8 +46,8 @@ enum Library {
 	PyTorch,
 	#[clap(name = "sklearn")]
 	SkLearn,
-	#[clap(name = "tangram")]
-	Tangram,
+	#[clap(name = "modelfox")]
+	ModelFox,
 }
 
 impl std::fmt::Display for Library {
@@ -55,7 +55,7 @@ impl std::fmt::Display for Library {
 		match self {
 			Library::PyTorch => write!(f, "pytorch"),
 			Library::SkLearn => write!(f, "sklearn"),
-			Library::Tangram => write!(f, "tangram"),
+			Library::ModelFox => write!(f, "modelfox"),
 		}
 	}
 }
@@ -142,9 +142,9 @@ fn main() {
 		.filter(|dataset| dataset.task() == Task::MulticlassClassification)
 		.collect::<Vec<_>>();
 
-	// Build the tangram benchmarks.
+	// Build the modelfox benchmarks.
 	for dataset in args.datasets.iter() {
-		build_tangram_benchmark(dataset);
+		build_modelfox_benchmark(dataset);
 	}
 
 	// Test the regression datasets.
@@ -169,12 +169,12 @@ fn main() {
 	}
 }
 
-fn build_tangram_benchmark(dataset: &Dataset) {
+fn build_modelfox_benchmark(dataset: &Dataset) {
 	let status = std::process::Command::new("cargo")
 		.arg("build")
 		.arg("--release")
 		.arg("-p")
-		.arg(format!("tangram_linear_benchmark_{}", dataset))
+		.arg(format!("modelfox_linear_benchmark_{}", dataset))
 		.spawn()
 		.unwrap()
 		.wait()
@@ -209,11 +209,11 @@ fn run_benchmarks(libraries: &[Library], datasets: &[Dataset]) {
 
 fn run_benchmark(dataset: &Dataset, library: &Library) -> BenchmarkOutput {
 	let output = match library {
-		Library::Tangram => std::process::Command::new("time")
+		Library::ModelFox => std::process::Command::new("time")
 			.arg("-f")
 			.arg("%M")
 			.arg(format!(
-				"target/release/tangram_linear_benchmark_{}",
+				"target/release/modelfox_linear_benchmark_{}",
 				dataset
 			))
 			.output()

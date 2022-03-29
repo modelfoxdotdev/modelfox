@@ -4,9 +4,9 @@ pub use self::{
 	binary_classifier::BinaryClassifier, multiclass_classifier::MulticlassClassifier,
 	regressor::Regressor,
 };
+use modelfox_progress_counter::ProgressCounter;
 use ndarray::prelude::*;
 use num::ToPrimitive;
-use tangram_progress_counter::ProgressCounter;
 
 mod binary_classifier;
 mod multiclass_classifier;
@@ -56,7 +56,7 @@ pub struct EarlyStoppingOptions {
 }
 
 pub struct Progress<'a> {
-	pub kill_chip: &'a tangram_kill_chip::KillChip,
+	pub kill_chip: &'a modelfox_kill_chip::KillChip,
 	pub handle_progress_event: &'a mut dyn FnMut(TrainProgressEvent),
 }
 

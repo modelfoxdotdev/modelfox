@@ -1,14 +1,14 @@
 use pinwheel::prelude::*;
-use tangram_app_core::{alert::Alert, monitor::MonitorThresholdMode};
-use tangram_app_layouts::{
+use modelfox_app_core::{alert::Alert, monitor::MonitorThresholdMode};
+use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
-use tangram_app_ui::{
+use modelfox_app_ui::{
 	colors::{BASELINE_COLOR, TRAINING_COLOR},
 	page_heading::PageHeading,
 };
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct Page {
 	pub alert: Alert,

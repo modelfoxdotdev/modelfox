@@ -1,6 +1,6 @@
 use pinwheel::prelude::*;
-use tangram_app_ui::colors::{BASELINE_COLOR, TRAINING_COLOR};
-use tangram_ui as ui;
+use modelfox_app_ui::colors::{BASELINE_COLOR, TRAINING_COLOR};
+use modelfox_ui as ui;
 
 pub struct Regressor {
 	pub warning: Option<String>,

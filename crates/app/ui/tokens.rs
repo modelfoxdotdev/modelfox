@@ -1,6 +1,6 @@
 use crate::column_type::ColumnType;
 use pinwheel::prelude::*;
-use tangram_ui as ui;
+use modelfox_ui as ui;
 
 pub struct UnknownColumnToken;
 

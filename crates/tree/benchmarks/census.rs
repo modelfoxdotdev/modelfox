@@ -1,9 +1,9 @@
 use ndarray::prelude::*;
 use serde_json::json;
 use std::{collections::BTreeMap, path::Path};
-use tangram_table::prelude::*;
-use tangram_tree::Progress;
-use tangram_zip::zip;
+use modelfox_table::prelude::*;
+use modelfox_tree::Progress;
+use modelfox_zip::zip;
 
 fn main() {
 	// Load the data.
@@ -149,7 +149,7 @@ fn main() {
 	.map(ToString::to_string)
 	.collect();
 	let income_variants = ["<=50K", ">50K"].iter().map(ToString::to_string).collect();
-	let options = tangram_table::FromCsvOptions {
+	let options = modelfox_table::FromCsvOptions {
 		column_types: Some(BTreeMap::from([
 			("age".to_owned(), TableColumnType::Number),
 			(
@@ -224,18 +224,18 @@ fn main() {
 	let labels_test = labels_test.as_enum().unwrap();
 
 	// Train the model.
-	let train_options = tangram_tree::TrainOptions {
+	let train_options = modelfox_tree::TrainOptions {
 		learning_rate: 0.1,
 		max_leaf_nodes: 255,
 		max_rounds: 100,
 		..Default::default()
 	};
-	let train_output = tangram_tree::BinaryClassifier::train(
+	let train_output = modelfox_tree::BinaryClassifier::train(
 		features_train.view(),
 		labels_train.view(),
 		&train_options,
 		Progress {
-			kill_chip: &tangram_kill_chip::KillChip::default(),
+			kill_chip: &modelfox_kill_chip::KillChip::default(),
 			handle_progress_event: &mut |_| {},
 		},
 	);
@@ -251,7 +251,7 @@ fn main() {
 	let input = zip!(probabilities.iter(), labels_test.iter())
 		.map(|(probability, label)| (*probability, label.unwrap()))
 		.collect();
-	let auc_roc = tangram_metrics::AucRoc::compute(input);
+	let auc_roc = modelfox_metrics::AucRoc::compute(input);
 
 	let output = json!({
 		"auc_roc": auc_roc,

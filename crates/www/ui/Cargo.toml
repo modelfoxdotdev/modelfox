@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "tangram_www_ui"
+name = "modelfox_www_ui"
 publish = false
 version = "0.0.0"
 
@@ -9,4 +9,4 @@ path = "lib.rs"
 
 [dependencies]
 pinwheel = "0.2"
-tangram_ui = { path = "../../ui" }
+modelfox_ui = { path = "../../ui" }

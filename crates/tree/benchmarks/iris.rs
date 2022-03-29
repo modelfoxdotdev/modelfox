@@ -1,8 +1,8 @@
 use ndarray::prelude::*;
 use serde_json::json;
 use std::path::Path;
-use tangram_table::prelude::*;
-use tangram_tree::Progress;
+use modelfox_table::prelude::*;
+use modelfox_tree::Progress;
 
 fn main() {
 	// Load the data.
@@ -22,12 +22,12 @@ fn main() {
 	let labels_test = labels_test.as_enum().unwrap();
 
 	// Train the model.
-	let train_output = tangram_tree::MulticlassClassifier::train(
+	let train_output = modelfox_tree::MulticlassClassifier::train(
 		features_train.view(),
 		labels_train.view(),
 		&Default::default(),
 		Progress {
-			kill_chip: &tangram_kill_chip::KillChip::default(),
+			kill_chip: &modelfox_kill_chip::KillChip::default(),
 			handle_progress_event: &mut |_| {},
 		},
 	);
@@ -40,8 +40,8 @@ fn main() {
 		.predict(features_test.view(), probabilities.view_mut());
 
 	// Compute Metrics.
-	let mut metrics = tangram_metrics::MulticlassClassificationMetrics::new(n_classes);
-	metrics.update(tangram_metrics::MulticlassClassificationMetricsInput {
+	let mut metrics = modelfox_metrics::MulticlassClassificationMetrics::new(n_classes);
+	metrics.update(modelfox_metrics::MulticlassClassificationMetricsInput {
 		probabilities: probabilities.view(),
 		labels: labels_test.view().as_slice().into(),
 	});

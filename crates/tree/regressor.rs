@@ -4,11 +4,11 @@ use crate::{
 	train_tree::TrainTree,
 	Progress, TrainOptions, Tree,
 };
+use modelfox_table::prelude::*;
+use modelfox_zip::{pzip, zip};
 use ndarray::prelude::*;
 use num::ToPrimitive;
 use rayon::prelude::*;
-use tangram_table::prelude::*;
-use tangram_zip::{pzip, zip};
 
 /// `Regressor`s predict continuous target values, for example the selling price of a home.
 #[derive(Clone, Debug)]

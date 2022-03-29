@@ -1,6 +1,6 @@
 use pinwheel::prelude::*;
-use tangram_ui as ui;
-use tangram_www_index_common::{self as common, tuning::ThresholdMetrics};
+use modelfox_ui as ui;
+use modelfox_www_index_common::{self as common, tuning::ThresholdMetrics};
 
 pub struct Tuning;
 

@@ -1,8 +1,8 @@
 use ndarray::prelude::*;
-use tangram_table::{
+use modelfox_table::{
 	NumberTableColumn, TableColumn, TableColumnView, TableValue, TextTableColumnView,
 };
-use tangram_text::{Tokenizer, WordEmbeddingModel};
+use modelfox_text::{Tokenizer, WordEmbeddingModel};
 
 #[derive(Clone, Debug)]
 pub struct WordEmbeddingFeatureGroup {
@@ -17,7 +17,7 @@ pub struct WordEmbeddingFeatureGroup {
 impl WordEmbeddingFeatureGroup {
 	pub fn compute_table(
 		&self,
-		column: tangram_table::TableColumnView,
+		column: modelfox_table::TableColumnView,
 		progress: &impl Fn(u64),
 	) -> Vec<TableColumn> {
 		match column {
@@ -33,7 +33,7 @@ impl WordEmbeddingFeatureGroup {
 	pub fn compute_array_f32(
 		&self,
 		features: ArrayViewMut2<f32>,
-		column: tangram_table::TableColumnView,
+		column: modelfox_table::TableColumnView,
 		progress: &impl Fn(),
 	) {
 		match column {
@@ -48,8 +48,8 @@ impl WordEmbeddingFeatureGroup {
 
 	pub fn compute_array_value(
 		&self,
-		features: ArrayViewMut2<tangram_table::TableValue>,
-		column: tangram_table::TableColumnView,
+		features: ArrayViewMut2<modelfox_table::TableValue>,
+		column: modelfox_table::TableColumnView,
 		progress: &impl Fn(),
 	) {
 		match column {
@@ -132,7 +132,7 @@ impl WordEmbeddingFeatureGroup {
 
 	fn compute_table_for_text_column(
 		&self,
-		column: tangram_table::TextTableColumnView,
+		column: modelfox_table::TextTableColumnView,
 		progress: &impl Fn(),
 	) -> Vec<TableColumn> {
 		let mut feature_columns = vec![vec![0.0; column.len()]; self.model.size];

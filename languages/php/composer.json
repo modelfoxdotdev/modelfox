@@ -1,18 +1,18 @@
 {
-	"name": "tangram/tangram",
+	"name": "modelfox/modelfox",
 	"version": "0.7.0",
 	"type": "library",
-	"description": "Make predictions with a Tangram model from your PHP app. Learn more at https://www.tangram.dev/.",
+	"description": "Make predictions with a ModelFox model from your PHP app. Learn more at https://www.modelfox.dev/.",
 	"keywords": [
-		"tangram"
+		"modelfox"
 	],
-	"homepage": "https://www.tangram.dev",
+	"homepage": "https://www.modelfox.dev",
 	"license": "MIT",
 	"authors": [
 		{
-			"name": "Tangram",
-			"email": "root@tangram.dev",
-			"homepage": "https://www.tangram.dev",
+			"name": "ModelFox",
+			"email": "root@modelfox.dev",
+			"homepage": "https://www.modelfox.dev",
 			"role": "Developer"
 		}
 	],
@@ -26,12 +26,12 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"tangram\\tangram\\": "src"
+			"modelfox\\modelfox\\": "src"
 		}
 	},
 	"autoload-dev": {
 		"psr-4": {
-			"tangram\\tangram\\": "tests"
+			"modelfox\\modelfox\\": "tests"
 		}
 	},
 	"scripts": {
