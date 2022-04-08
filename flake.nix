@@ -10,7 +10,7 @@
       url = "github:rvolosatovs/fenix/fix/rustc-patch";
     };
     windows_sdk = {
-      url = "github:modelfoxdotdev/windows_sdk";
+      url = "github:tangramdotdev/windows_sdk";
     };
   };
   outputs =
@@ -77,31 +77,10 @@
           mkdir $out
           curl https://nodejs.org/dist/v16.4.0/win-x64/node.lib --output $out/node.lib
         '';
-      rust =
-        let
-          toolchain = {
-            channel = "nightly";
-            date = "2022-02-24";
-            sha256 = "sha256-TpJKRroEs7V2BTo2GFPJlEScYVArFY2MnGpYTxbnSo8=";
-          };
-        in
-        with inputs.fenix.packages.${system}; combine (with toolchainOf toolchain; [
-          cargo
-          clippy-preview
-          rust-src
-          rust-std
-          rustc
-          rustfmt-preview
-          (targets.aarch64-unknown-linux-gnu.toolchainOf toolchain).rust-std
-          (targets.aarch64-unknown-linux-musl.toolchainOf toolchain).rust-std
-          (targets.aarch64-apple-darwin.toolchainOf toolchain).rust-std
-          (targets.wasm32-unknown-unknown.toolchainOf toolchain).rust-std
-          (targets.x86_64-unknown-linux-gnu.toolchainOf toolchain).rust-std
-          (targets.x86_64-unknown-linux-musl.toolchainOf toolchain).rust-std
-          (targets.x86_64-apple-darwin.toolchainOf toolchain).rust-std
-          (targets.x86_64-pc-windows-gnu.toolchainOf toolchain).rust-std
-          (targets.x86_64-pc-windows-msvc.toolchainOf toolchain).rust-std
-        ]);
+      rust = inputs.fenix.packages.${system}.fromToolchainFile { 
+        dir = ./.; 
+        sha256 = "sha256-Ht5GU1xscXyhtc1zH/ppb2zJ259UXOvflcnfGdi9Adw=";
+      };
       windows_sdk_manifest_url = "https://download.visualstudio.microsoft.com/download/pr/9a26f37e-6001-429b-a5db-c5455b93953c/25b853a26e065037b83c3dd6aac74bfbfd1f09c9639d1f8c877ecc8d11ea0feb/VisualStudio.vsman";
       windows_sdk_manifest_sha256 = "6a2676b65e32c04db17e80d7d87ba60b0c75dd3465c7db5e76ae3db8ca409d85";
       windows_sdk_manifest = pkgs.runCommand "manifest"
