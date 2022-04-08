@@ -1,6 +1,6 @@
-use pinwheel::prelude::*;
 use modelfox_ui as ui;
 use modelfox_www_layouts::{document::Document, page_layout::PageLayout};
+use pinwheel::prelude::*;
 
 pub struct Page;
 
@@ -12,7 +12,7 @@ impl Component for Page {
 			.title("hello@modelfox.dev".to_string())
 			.child("hello@modelfox.dev");
 		let p2 = ui::P::new()
-			.child("We would love to hear from you, please don't hesistate to reach out! ")
+			.child("We would love to hear from you, please don't hesitate to reach out! ")
 			.child(link);
 		let modelfox = ui::S2::new()
 			.child(ui::H1::new("About"))

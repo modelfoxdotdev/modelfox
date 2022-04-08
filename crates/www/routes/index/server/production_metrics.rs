@@ -1,4 +1,3 @@
-use pinwheel::prelude::*;
 use modelfox_charts::{
 	common::GridLineInterval,
 	components::LineChart,
@@ -6,6 +5,7 @@ use modelfox_charts::{
 };
 use modelfox_finite::Finite;
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 pub struct ProductionMetrics;
 
@@ -253,7 +253,7 @@ impl Component for ProductionMetrics {
 				title: Some("Production".to_owned()),
 			},
 		];
-		let text = "After logging true values, you can view metrics comparing your model's performance in production vs. training. The app will automatically alert you if a signficant difference is detected.";
+		let text = "After logging true values, you can view metrics comparing your model's performance in production vs. training. The app will automatically alert you if a significant difference is detected.";
 		let left = div()
 			.child(div().class("index-step-title").child("Monitor metrics."))
 			.child(div().class("index-step-text").child(text));

@@ -41,9 +41,9 @@
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--background-color: #111111;
-		--border-color: #212121;
-		--header-color: #232323;
+		--background-color: #000000;
+		--border-color: #151515;
+		--header-color: #161616;
 		--hover-color: #333333;
 		--surface-color: #181818;
 		--muted-text-color: #aaaaaa;
