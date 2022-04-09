@@ -1,13 +1,14 @@
 {
   inputs = {
-    nixpkgs = {
-      url = "github:nixos/nixpkgs";
+    fenix = {
+      url = "github:rvolosatovs/fenix/fix/rustc-patch";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-utils = {
       url = "github:numtide/flake-utils";
     };
-    fenix = {
-      url = "github:rvolosatovs/fenix/fix/rustc-patch";
+    nixpkgs = {
+      url = "github:nixos/nixpkgs";
     };
     windows_sdk = {
       url = "github:tangramdotdev/windows_sdk";
