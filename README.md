@@ -1,5 +1,5 @@
 <p align="center">
-	<img src="modelfox.svg" title="ModelFox">
+	<img width="200px" src="modelfox.png" title="ModelFox">
 </p>
 
 <h1 align="center">
