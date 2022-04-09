@@ -7,6 +7,7 @@ use crate::{
 };
 use anyhow::{anyhow, bail, Result};
 use lettre::AsyncTransport;
+use lettre::Transport;
 use serde::Serialize;
 use sqlx::postgres::PgPoolOptions;
 use std::{
@@ -117,7 +118,7 @@ impl Mailer {
 				transport.send(email).await?;
 			}
 			Mailer::Testing(transport) => {
-				transport.send(email).await?;
+				transport.send(&email)?;
 			}
 		};
 		Ok(())
