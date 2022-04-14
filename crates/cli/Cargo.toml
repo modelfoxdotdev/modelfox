@@ -52,6 +52,7 @@ modelfox_core = { workspace = true }
 modelfox_id = { workspace = true }
 modelfox_kill_chip = { workspace = true }
 modelfox_license = { workspace = true }
+modelfox_ctrlc = { workspace = true }
 modelfox_model = { workspace = true }
 modelfox_progress_counter = { workspace = true }
 modelfox_serve = { workspace = true, optional = true }

@@ -28,6 +28,7 @@ arrow2 = { workspace = true }
 
 modelfox_core = { workspace = true }
 modelfox_model = { workspace = true }
-modelfox_kill_chip = { workspace = true}
+modelfox_metrics = { workspace = true }
+modelfox_kill_chip = { workspace = true }
 modelfox_ctrlc = { workspace = true }
 modelfox_table = { workspace = true }

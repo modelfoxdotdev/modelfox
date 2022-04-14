@@ -141,7 +141,7 @@ impl Model {
 	fn set_modelfox_url(&mut self, url: String) -> PyResult<()> {
 		let modelfox_url = url
 			.parse()
-			.map_err(|_| modelfoxError(anyhow!("Failed to parse modelfox_url")))?;
+			.map_err(|_| ModelFoxError(anyhow!("Failed to parse modelfox_url")))?;
 		self.modelfox_url = modelfox_url;
 		Ok(())
 	}
@@ -152,12 +152,12 @@ impl Model {
 		match &self.core_model {
 			CoreModel::Model(model) => model
 				.to_path(&path)
-				.map_err(|err| modelfoxError(err.into()))?,
+				.map_err(|err| ModelFoxError(err.into()))?,
 			CoreModel::Path(current_model_path) => std::fs::copy(current_model_path, path)
-				.map_err(|err| modelfoxError(err.into()))
+				.map_err(|err| ModelFoxError(err.into()))
 				.map(|_| {})?,
 			CoreModel::Bytes(bytes) => {
-				modelfox_model::to_path(&path, &bytes).map_err(|err| modelfoxError(err.into()))?;
+				modelfox_model::to_path(&path, &bytes).map_err(|err| ModelFoxError(err.into()))?;
 			}
 		};
 		Ok(())
@@ -296,13 +296,13 @@ impl Model {
 fn test_metrics_from_path(path: &str) -> PyResult<Metrics> {
 	let file = std::fs::File::open(&path)?;
 	let bytes = unsafe { Mmap::map(&file)? };
-	let model = modelfox_model::from_bytes(&bytes).map_err(modelfoxError)?;
+	let model = modelfox_model::from_bytes(&bytes).map_err(ModelFoxError)?;
 	let metrics = test_metrics_from_model_reader(model);
 	Ok(metrics)
 }
 
 fn test_metrics_from_bytes(bytes: &[u8]) -> PyResult<Metrics> {
-	let model = modelfox_model::from_bytes(&bytes).map_err(modelfoxError)?;
+	let model = modelfox_model::from_bytes(&bytes).map_err(ModelFoxError)?;
 	let metrics = test_metrics_from_model_reader(model);
 	Ok(metrics)
 }
