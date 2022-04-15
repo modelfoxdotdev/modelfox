@@ -10,10 +10,7 @@ use lettre::AsyncTransport;
 use lettre::Transport;
 use serde::Serialize;
 use sqlx::postgres::PgPoolOptions;
-use std::{
-	path::PathBuf,
-	sync::{Arc, RwLock},
-};
+use std::sync::{Arc, RwLock};
 use storage::InMemoryStorage;
 use tokio::sync::{mpsc, oneshot};
 use url::Url;
@@ -177,44 +174,6 @@ pub async fn migrate_inner(database_url: Url) -> Result<()> {
 	Ok(())
 }
 
-/// Retrieve the user cache directory using the `dirs` crate.
-pub fn cache_path() -> Result<PathBuf> {
-	let cache_dir =
-		dirs::cache_dir().ok_or_else(|| anyhow!("failed to find user cache directory"))?;
-	let modelfox_cache_dir = cache_dir.join("modelfox");
-	std::fs::create_dir_all(&modelfox_cache_dir).map_err(|_| {
-		anyhow!(
-			"failed to create modelfox cache directory in {}",
-			modelfox_cache_dir.display()
-		)
-	})?;
-	Ok(modelfox_cache_dir)
-}
-
-/// Retrieve the user data directory using the `dirs` crate.
-pub fn data_path() -> Result<PathBuf> {
-	let data_dir = dirs::data_dir().ok_or_else(|| anyhow!("failed to find user data directory"))?;
-	let modelfox_data_dir = data_dir.join("modelfox");
-	std::fs::create_dir_all(&modelfox_data_dir).map_err(|_| {
-		anyhow!(
-			"failed to create modelfox data directory in {}",
-			modelfox_data_dir.display()
-		)
-	})?;
-	Ok(modelfox_data_dir)
-}
-
-/// Retrieve the default database url, which is a sqlite database in the user data directory.
-pub fn default_database_url() -> Url {
-	let modelfox_database_path = data_path().unwrap().join("db").join("modelfox.db");
-	std::fs::create_dir_all(modelfox_database_path.parent().unwrap()).unwrap();
-	let url = format!(
-		"sqlite:{}",
-		modelfox_database_path.to_str().unwrap().to_owned()
-	);
-	Url::parse(&url).unwrap()
-}
-
 impl App {
 	pub async fn new(options: Options) -> Result<Self> {
 		// Create the database pool.
@@ -314,6 +273,10 @@ impl App {
 		self.state.smtp_transport.clone()
 	}
 
+	pub fn options(&self) -> &Options {
+		&self.state.options
+	}
+
 	/// Send a message to the monitor checker and wait for it to reply back indicating it has run.
 	#[tracing::instrument(level = "info", skip_all)]
 	pub async fn sync_tasks(&self) -> Result<()> {
@@ -389,13 +352,6 @@ pub async fn reset_database(database_url: &Option<Url>) -> Result<()> {
 				.await?;
 		}
 	}
-	Ok(())
-}
-
-/// Remove all contents of the data dir, including the database
-pub async fn reset_data(database_url: &Option<Url>) -> Result<()> {
-	reset_database(database_url).await?;
-	std::fs::remove_dir_all(data_path()?)?;
 	Ok(())
 }
 

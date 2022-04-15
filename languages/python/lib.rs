@@ -4,8 +4,6 @@ use pyo3::{prelude::*, type_object::PyTypeObject, types::PyType};
 use std::collections::BTreeMap;
 use url::Url;
 
-/**
-*/
 #[pymodule]
 #[pyo3(name = "modelfox_python")]
 fn modelfox(py: Python, m: &PyModule) -> PyResult<()> {
@@ -924,21 +922,6 @@ fn ngram(py: Python) -> PyResult<PyObject> {
 	let ngram = py_union.get_item((tuple, py_str))?;
 	Ok(ngram.into())
 }
-
-macro_rules! repr {
-	($ty:ty) => {
-		#[pyproto]
-		impl pyo3::PyObjectProtocol for $ty {
-			fn __repr__(&self) -> PyResult<String> {
-				Ok(format!("{:?}", self))
-			}
-		}
-	};
-}
-
-repr!(RegressionPredictOutput);
-repr!(BinaryClassificationPredictOutput);
-repr!(MulticlassClassificationPredictOutput);
 
 struct ModelFoxError(anyhow::Error);
 

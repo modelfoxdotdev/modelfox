@@ -1,16 +1,15 @@
-//! Functionality used to test core app components.
+//! This module contains functionality used to test core app components.
 
 use crate::{
 	alert::{AlertMethod, AlertMetric},
 	model::get_model_bytes,
 	monitor::{MonitorCadence, MonitorThreshold, MonitorThresholdMode},
 	monitor_checker::MonitorConfig,
+	options::{DatabaseOptions, Options, StorageOptions},
 	App,
 };
 use anyhow::{bail, Result};
 use chrono::{Datelike, TimeZone, Timelike, Utc};
-use num::ToPrimitive;
-use std::{collections::HashMap, path::PathBuf};
 use modelfox::ClassificationOutputValue;
 use modelfox_app_monitor_event::{
 	BinaryClassificationPredictOutput, MonitorEvent, NumberOrString, PredictOutput,
@@ -18,19 +17,27 @@ use modelfox_app_monitor_event::{
 };
 use modelfox_id::Id;
 use modelfox_table::TableView;
+use num::ToPrimitive;
+use std::{collections::HashMap, net::IpAddr, path::PathBuf};
 
-pub fn init_test_options() -> crate::options::Options {
-	let mut options = crate::options::Options::default();
-	// set in-memory SQLite DB
-	let database_url = "sqlite::memory:".parse().expect("Malformed URL");
-	let database_options = crate::options::DatabaseOptions {
-		max_connections: Some(2),
-		url: database_url,
+pub fn init_test_options() -> Options {
+	let host: IpAddr = "0.0.0.0".parse().unwrap();
+	let port = 8080;
+	let database = DatabaseOptions {
+		max_connections: None,
+		url: "sqlite::memory:".parse().unwrap(),
 	};
-	options.database = database_options;
-	// Use in-memory storage
-	options.storage = crate::options::StorageOptions::InMemory;
-	options
+	let storage = StorageOptions::InMemory;
+	Options {
+		auth: None,
+		cookie_domain: None,
+		database,
+		host,
+		port,
+		smtp: None,
+		storage,
+		url: None,
+	}
 }
 
 pub async fn init_test_app() -> Result<App> {

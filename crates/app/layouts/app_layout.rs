@@ -1,7 +1,7 @@
 use anyhow::Result;
-use pinwheel::prelude::*;
 use modelfox_app_core::App;
 use modelfox_app_ui::topbar::{Topbar, TopbarAvatar};
+use pinwheel::prelude::*;
 
 pub struct AppLayoutInfo {
 	pub topbar_avatar: Option<TopbarAvatar>,

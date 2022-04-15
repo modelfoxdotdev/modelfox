@@ -1,9 +1,8 @@
-//! This module encapsulates the backtrace capturing functionality
-
 use anyhow::Result;
 use backtrace::Backtrace;
 use futures::{future::FutureExt, Future};
 use hyper::http;
+use modelfox_id::Id;
 use std::{cell::RefCell, convert::Infallible, panic::AssertUnwindSafe, sync::Arc};
 
 pub async fn serve<C, H, F>(
@@ -34,7 +33,7 @@ where
 		let path = request.uri().path_and_query().unwrap().path().to_owned();
 		tracing::info!(path = %path, method = %method, "request");
 		request.extensions_mut().insert(context);
-		request.extensions_mut().insert(modelfox_id::Id::generate());
+		request.extensions_mut().insert(Id::generate());
 		let result = AssertUnwindSafe(handler(request)).catch_unwind().await;
 		let start = std::time::SystemTime::now();
 		let response = result.unwrap_or_else(|_| {

@@ -1,9 +1,5 @@
 use crate::page::{EnumField, Field, Form, Inner, NumberField, Page, TextField, UnknownField};
 use anyhow::{bail, Result};
-use num::ToPrimitive;
-use pinwheel::prelude::*;
-use std::collections::BTreeMap;
-use std::sync::Arc;
 use modelfox_app_context::Context;
 use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -19,6 +15,10 @@ use modelfox_app_ui::predict::{
 };
 use modelfox_core::predict::{PredictInputValue, PredictOptions};
 use modelfox_id::Id;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
+use std::collections::BTreeMap;
+use std::sync::Arc;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
@@ -35,8 +35,8 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 		.path_and_query()
 		.unwrap()
 		.query()
-		.map(|search_params| {
-			url::form_urlencoded::parse(search_params.as_bytes())
+		.map(|query| {
+			url::form_urlencoded::parse(query.as_bytes())
 				.into_owned()
 				.collect()
 		});

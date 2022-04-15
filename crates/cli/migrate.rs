@@ -1,6 +1,5 @@
-use crate::MigrateArgs;
+use crate::{app::default_database_url, MigrateArgs};
 use anyhow::Result;
-use modelfox_app_core::default_database_url;
 
 pub fn migrate(args: MigrateArgs) -> Result<()> {
 	let database_url = match args.database_url {

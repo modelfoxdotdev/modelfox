@@ -1,10 +1,7 @@
 use crate::AppArgs;
-use anyhow::{bail, Result};
+use anyhow::{anyhow, bail, Result};
 use std::path::PathBuf;
 use url::Url;
-
-#[cfg(feature = "modelfox_app")]
-use modelfox_app_core::{cache_path, data_path, default_database_url};
 
 #[derive(Clone, serde::Deserialize)]
 struct AppConfig {
@@ -192,4 +189,42 @@ pub async fn app(args: AppArgs) -> Result<()> {
 		url,
 	};
 	modelfox_app::run(options).await
+}
+
+/// Retrieve the user cache directory using the `dirs` crate.
+pub fn cache_path() -> Result<PathBuf> {
+	let cache_dir =
+		dirs::cache_dir().ok_or_else(|| anyhow!("failed to find user cache directory"))?;
+	let modelfox_cache_dir = cache_dir.join("modelfox");
+	std::fs::create_dir_all(&modelfox_cache_dir).map_err(|_| {
+		anyhow!(
+			"failed to create modelfox cache directory in {}",
+			modelfox_cache_dir.display()
+		)
+	})?;
+	Ok(modelfox_cache_dir)
+}
+
+/// Retrieve the user data directory using the `dirs` crate.
+fn data_path() -> Result<PathBuf> {
+	let data_dir = dirs::data_dir().ok_or_else(|| anyhow!("failed to find user data directory"))?;
+	let modelfox_data_dir = data_dir.join("modelfox");
+	std::fs::create_dir_all(&modelfox_data_dir).map_err(|_| {
+		anyhow!(
+			"failed to create modelfox data directory in {}",
+			modelfox_data_dir.display()
+		)
+	})?;
+	Ok(modelfox_data_dir)
+}
+
+/// Retrieve the default database url, which is a sqlite database in the user data directory.
+pub fn default_database_url() -> Url {
+	let modelfox_database_path = data_path().unwrap().join("db").join("modelfox.db");
+	std::fs::create_dir_all(modelfox_database_path.parent().unwrap()).unwrap();
+	let url = format!(
+		"sqlite:{}",
+		modelfox_database_path.to_str().unwrap().to_owned()
+	);
+	Url::parse(&url).unwrap()
 }

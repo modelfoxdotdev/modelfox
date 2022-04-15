@@ -4,10 +4,10 @@ use crate::{
 	App, AppState,
 };
 use anyhow::Result;
+use modelfox_id::Id;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::*;
 use std::{borrow::BorrowMut, fmt, io, str::FromStr};
-use modelfox_id::Id;
 use time::{macros::format_description, OffsetDateTime};
 use url::Url;
 
@@ -252,17 +252,17 @@ impl App {
 	) -> Result<Vec<Alert>> {
 		let rows = sqlx::query(
 			"
-			select
-				alerts.data
-			from
-				monitors
-			join
-				alerts
-			on
-				monitors.id = alerts.monitor_id
-			where
-				monitors.model_id = $1
-		",
+				select
+					alerts.data
+				from
+					monitors
+				join
+					alerts
+				on
+					monitors.id = alerts.monitor_id
+				where
+					monitors.model_id = $1
+			",
 		)
 		.bind(model_id.to_string())
 		.fetch_all(txn.borrow_mut())

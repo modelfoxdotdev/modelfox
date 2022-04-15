@@ -1,6 +1,5 @@
 use crate::App;
 use anyhow::{anyhow, Result};
-use async_trait::async_trait;
 use bytes::Bytes;
 use modelfox_id::Id;
 use std::{
@@ -8,7 +7,6 @@ use std::{
 	path::PathBuf,
 	sync::{Arc, RwLock},
 };
-use tokio::fs;
 
 #[derive(Debug)]
 #[allow(clippy::large_enum_variant)]
@@ -75,17 +73,6 @@ impl TryFrom<BytesOrFilePath> for PathBuf {
 	}
 }
 
-/// This trait represents types which can serve as storage buckets for the ModelFox app.
-#[async_trait]
-trait StorageTrait {
-	/// Retrieve an entity from storage.
-	async fn get(&self, entity: StorageEntity, id: Id) -> Result<BytesOrFilePath>;
-	/// Add the provided bytes to the storage.
-	async fn set(&self, entity: StorageEntity, id: Id, data: &[u8]) -> Result<()>;
-	/// Delete an item from storage.
-	async fn remove(&self, entity: StorageEntity, id: Id) -> Result<()>;
-}
-
 impl Storage {
 	pub async fn get(&self, entity: StorageEntity, id: Id) -> Result<BytesOrFilePath> {
 		match self {
@@ -126,8 +113,7 @@ impl Default for InMemoryStorage {
 	}
 }
 
-#[async_trait]
-impl StorageTrait for InMemoryStorage {
+impl InMemoryStorage {
 	async fn get(&self, _entity: StorageEntity, id: Id) -> Result<BytesOrFilePath> {
 		let storage = Arc::clone(&self.storage);
 		let ret = if let Ok(read_guard) = storage.read() {
@@ -159,8 +145,7 @@ impl StorageTrait for InMemoryStorage {
 	}
 }
 
-#[async_trait]
-impl StorageTrait for LocalStorage {
+impl LocalStorage {
 	async fn get(&self, entity: StorageEntity, id: Id) -> Result<BytesOrFilePath> {
 		let entity_path = self.path.join(entity.dir_name());
 		let path = entity_path.join(id.to_string());
@@ -169,16 +154,16 @@ impl StorageTrait for LocalStorage {
 
 	async fn set(&self, entity: StorageEntity, id: Id, data: &[u8]) -> Result<()> {
 		let entity_path = self.path.join(entity.dir_name());
-		fs::create_dir_all(&entity_path).await?;
+		tokio::fs::create_dir_all(&entity_path).await?;
 		let item_path = entity_path.join(id.to_string());
-		fs::write(item_path, data).await?;
+		tokio::fs::write(item_path, data).await?;
 		Ok(())
 	}
 
 	async fn remove(&self, entity: StorageEntity, id: Id) -> Result<()> {
 		let entity_path = self.path.join(entity.dir_name());
 		let item_path = entity_path.join(id.to_string());
-		fs::remove_file(item_path).await?;
+		tokio::fs::remove_file(item_path).await?;
 		Ok(())
 	}
 }
@@ -193,50 +178,42 @@ impl S3Storage {
 		cache_path: PathBuf,
 	) -> Result<S3Storage> {
 		let credentials =
-			s3::creds::Credentials::new(Some(&access_key), Some(&secret_key), None, None, None)
-				.map_err(|e| anyhow!(e.to_string()))?;
+			s3::creds::Credentials::new(Some(&access_key), Some(&secret_key), None, None, None)?;
 		let bucket = s3::Bucket::new(
 			&bucket,
 			s3::Region::Custom { region, endpoint },
 			credentials,
-		)
-		.map_err(|e| anyhow!(e.to_string()))?;
+		)?;
 		Ok(S3Storage { bucket, cache_path })
 	}
 }
 
-#[async_trait]
-impl StorageTrait for S3Storage {
+impl S3Storage {
 	async fn get(&self, entity: StorageEntity, id: Id) -> Result<BytesOrFilePath> {
 		// Attempt to retrieve the item from the cache.
 		let entity_cache_path = self.cache_path.join(entity.dir_name());
 		let item_cache_path = entity_cache_path.join(id.to_string());
-		if fs::metadata(&item_cache_path).await.is_ok() {
+		if tokio::fs::metadata(&item_cache_path).await.is_ok() {
 			return Ok(BytesOrFilePath::from(item_cache_path));
 		}
 		// Retrieve the item from s3 and cache it.
-		let (data, _) = self
-			.bucket
-			.get_object(&key_for_item(entity, id))
-			.await
-			.map_err(|e| anyhow!(e.to_string()))?;
+		let (data, _) = self.bucket.get_object(&key_for_item(entity, id)).await?;
 		// Add the item to the cache.
-		fs::create_dir_all(&entity_cache_path).await?;
-		fs::write(&item_cache_path, data).await?;
+		tokio::fs::create_dir_all(&entity_cache_path).await?;
+		tokio::fs::write(&item_cache_path, data).await?;
 		Ok(BytesOrFilePath::from(item_cache_path))
 	}
 
 	async fn set(&self, entity: StorageEntity, id: Id, data: &[u8]) -> Result<()> {
 		let entity_cache_path = self.cache_path.join(entity.dir_name());
-		fs::create_dir_all(&entity_cache_path).await?;
+		tokio::fs::create_dir_all(&entity_cache_path).await?;
 		let item_cache_path = entity_cache_path.join(id.to_string());
 		// Upload the item to s3.
 		self.bucket
 			.put_object(&key_for_item(entity, id), data)
-			.await
-			.map_err(|e| anyhow!(e.to_string()))?;
+			.await?;
 		// Add the item to the cache.
-		fs::write(item_cache_path, data).await?;
+		tokio::fs::write(item_cache_path, data).await?;
 		Ok(())
 	}
 
@@ -244,14 +221,11 @@ impl StorageTrait for S3Storage {
 		// Remove the item from the cache if it exists.
 		let entity_cache_path = self.cache_path.join(entity.dir_name());
 		let item_cache_path = entity_cache_path.join(id.to_string());
-		if fs::metadata(&item_cache_path).await.is_ok() {
-			fs::remove_file(item_cache_path).await?;
+		if tokio::fs::metadata(&item_cache_path).await.is_ok() {
+			tokio::fs::remove_file(item_cache_path).await?;
 		}
 		// Remove the item from s3.
-		self.bucket
-			.delete_object(&key_for_item(entity, id))
-			.await
-			.map_err(|e| anyhow!(e.to_string()))?;
+		self.bucket.delete_object(&key_for_item(entity, id)).await?;
 		Ok(())
 	}
 }
