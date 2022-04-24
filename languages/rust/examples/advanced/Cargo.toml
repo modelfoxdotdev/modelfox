@@ -11,4 +11,4 @@ path = "main.rs"
 
 [dependencies]
 anyhow = { version = "1", features = ["backtrace"] }
-modelfox = { version = "0.7.0", path = "../../" }
+modelfox = { version = "0.8.0", path = "../../" }

@@ -3,7 +3,7 @@ edition = "2021"
 license = "MIT"
 name = "libmodelfox"
 publish = false
-version = "0.7.0"
+version = "0.8.0"
 
 [lib]
 crate-type = ["cdylib", "staticlib"]

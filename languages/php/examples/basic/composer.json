@@ -3,7 +3,7 @@
 	"description": "This example demonstrates loading a model from a `.modelfox` file and making a prediction.",
 	"type": "project",
 	"require": {
-		"modelfox/modelfox": "0.7.0"
+		"modelfox/modelfox": "0.8.0"
 	},
 	"license": "MIT",
 	"autoload": {

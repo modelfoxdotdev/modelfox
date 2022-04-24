@@ -10,4 +10,4 @@ name = "modelfox_example_basic"
 path = "main.rs"
 
 [dependencies]
-modelfox = { version = "0.7.0", path = "../../" }
+modelfox = { version = "0.8.0", path = "../../" }

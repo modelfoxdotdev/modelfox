@@ -1456,7 +1456,7 @@ checksum = "33a33a362ce288760ec6a508b94caaec573ae7d3bbbd91b87aa0bad4456839db"
 
 [[package]]
 name = "libmodelfox"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "libc",
@@ -1640,7 +1640,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -3080,7 +3080,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_cli"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "backtrace",
@@ -3122,7 +3122,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_core"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -3195,7 +3195,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_features"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "fnv",
@@ -3212,7 +3212,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_finite"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "num",
  "serde",
@@ -3220,7 +3220,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_id"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "rand",
  "serde",
@@ -3228,7 +3228,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_kill_chip"
-version = "0.7.0"
+version = "0.8.0"
 
 [[package]]
 name = "modelfox_license"
@@ -3252,7 +3252,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_linear"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "buffalo",
  "clap",
@@ -3271,7 +3271,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_macro"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3280,7 +3280,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_metrics"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "insta",
  "itertools",
@@ -3291,7 +3291,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_model"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "buffalo",
@@ -3325,7 +3325,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_progress_counter"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "rayon",
 ]
@@ -3361,7 +3361,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_table"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "csv",
@@ -3376,7 +3376,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_text"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "fnv",
  "indexmap",
@@ -3385,7 +3385,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_tree"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "bitvec",
  "buffalo",
@@ -3875,7 +3875,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_zip"
-version = "0.7.0"
+version = "0.8.0"
 
 [[package]]
 name = "multer"

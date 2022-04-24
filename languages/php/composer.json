@@ -1,6 +1,6 @@
 {
 	"name": "modelfox/modelfox",
-	"version": "0.7.0",
+	"version": "0.8.0",
 	"type": "library",
 	"description": "Make predictions with a ModelFox model from your PHP app. Learn more at https://www.modelfox.dev/.",
 	"keywords": [

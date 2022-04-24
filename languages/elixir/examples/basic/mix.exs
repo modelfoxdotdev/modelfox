@@ -8,7 +8,7 @@ defmodule Example.MixProject do
       elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
       deps: [
-        {:modelfox, "~> 0.7.0"}
+        {:modelfox, "~> 0.8.0"}
       ]
     ]
   end

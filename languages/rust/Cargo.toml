@@ -8,7 +8,7 @@ license = "MIT"
 name = "modelfox"
 publish = true
 repository = "https://github.com/modelfoxdotdev/modelfox"
-version = "0.7.0"
+version = "0.8.0"
 
 [lib]
 path = "lib.rs"
@@ -27,8 +27,8 @@ memmap = "0.7"
 reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-modelfox_core = { version = "0.7.0", path = "../../crates/core" }
-modelfox_macro = { version = "0.7.0", path = "macro" }
-modelfox_model = { version = "0.7.0", path = "../../crates/model" }
+modelfox_core = { version = "0.8.0", path = "../../crates/core" }
+modelfox_macro = { version = "0.8.0", path = "macro" }
+modelfox_model = { version = "0.8.0", path = "../../crates/model" }
 tokio = { version = "1", features = ["full"], optional = true }
 url = { version = "2", features = ["serde"] }

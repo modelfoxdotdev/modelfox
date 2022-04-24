@@ -8,7 +8,7 @@ license = "MIT"
 name = "modelfox_kill_chip"
 publish = true
 repository = "https://github.com/modelfoxdotdev/modelfox"
-version = "0.7.0"
+version = "0.8.0"
 
 [lib]
 path = "lib.rs"

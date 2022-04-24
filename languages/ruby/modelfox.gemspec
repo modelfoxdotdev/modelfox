@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "modelfox"
-  s.version = "0.7.0"
+  s.version = "0.8.0"
   s.summary = "ModelFox for Ruby"
   s.description = "Make predictions with a ModelFox model from your Ruby app. Learn more at https://www.modelfox.dev/."
   s.authors = ["ModelFox"]

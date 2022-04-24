@@ -27,7 +27,7 @@ defmodule ModelFox.MixProject do
       ],
       source_url: "https://github.com/modelfoxdotdev/modelfox/tree/master/languages/elixir",
       start_permanent: Mix.env() == :prod,
-      version: "0.7.0"
+      version: "0.8.0"
     ]
   end
 end

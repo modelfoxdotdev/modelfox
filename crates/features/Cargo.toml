@@ -8,7 +8,7 @@ license = "MIT"
 name = "modelfox_features"
 publish = true
 repository = "https://github.com/modelfoxdotdev/modelfox"
-version = "0.7.0"
+version = "0.8.0"
 
 [lib]
 path = "lib.rs"
@@ -21,7 +21,7 @@ itertools = "0.10"
 ndarray = { version = "0.15", features = ["rayon"] }
 num = "0.4"
 serde = { version = "1", features = ["derive"] }
-modelfox_metrics = { version = "0.7.0", path = "../metrics" }
-modelfox_table = { version = "0.7.0", path = "../table" }
-modelfox_text = { version = "0.7.0", path = "../text" }
-modelfox_zip = { version = "0.7.0", path = "../zip" }
+modelfox_metrics = { version = "0.8.0", path = "../metrics" }
+modelfox_table = { version = "0.8.0", path = "../table" }
+modelfox_text = { version = "0.8.0", path = "../text" }
+modelfox_zip = { version = "0.8.0", path = "../zip" }

@@ -3,7 +3,7 @@
 	"description": "Advanced usage example ",
 	"type": "project",
 	"require": {
-		"modelfox/modelfox": "0.7.0"
+		"modelfox/modelfox": "0.8.0"
 	},
 	"license": "MIT",
 	"autoload": {

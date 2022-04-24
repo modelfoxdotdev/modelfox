@@ -8,7 +8,7 @@ license = "MIT"
 name = "modelfox_table"
 publish = true
 repository = "https://github.com/modelfoxdotdev/modelfox"
-version = "0.7.0"
+version = "0.8.0"
 
 [lib]
 path = "lib.rs"
@@ -23,5 +23,5 @@ fast-float = "0.2"
 fnv = "1"
 ndarray = { version = "0.15", features = ["rayon"] }
 num = "0.4"
-modelfox_progress_counter = { version = "0.7.0", path = "../progress_counter" }
-modelfox_zip = { version = "0.7.0", path = "../zip" }
+modelfox_progress_counter = { version = "0.8.0", path = "../progress_counter" }
+modelfox_zip = { version = "0.8.0", path = "../zip" }
