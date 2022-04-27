@@ -1,9 +1,9 @@
 <p align="center">
-	<img width="200px" src="modelfox.png" title="ModelFox">
+	<img width="200px" src="tangram.png" title="Tangram">
 </p>
 
 <h1 align="center">
-ModelFox is the all-in-one machine learning toolkit for programmers.
+Tangram is the all-in-one machine learning toolkit for programmers.
 </h1>
 
 <p align="center">
@@ -11,79 +11,79 @@ Train a model from a CSV file on the command line. Make predictions from Elixir,
 </p>
 
 <p align="center">
-	<a href="https://modelfox.dev/docs/">
-		<img src="https://img.shields.io/badge/docs-modelfox.dev-purple?style=flat-square" alt="Documentation" />
+	<a href="https://tangram.dev/docs/">
+		<img src="https://img.shields.io/badge/docs-tangram.dev-purple?style=flat-square" alt="Documentation" />
 	</a>
 	<a href="">
-		<img src="https://img.shields.io/github/last-commit/modelfoxdotdev/modelfox?style=flat-square" alt="Last commit" />
+		<img src="https://img.shields.io/github/last-commit/tangramdotdev/tangram?style=flat-square" alt="Last commit" />
 	</a>
 </p>
 <p align="center">
-	<a href="https://hex.pm/packages/modelfox">
-		<img src="https://img.shields.io/hexpm/v/modelfox?color=blueviolet&style=flat-square" alt="ModelFox Hex package"/>
+	<a href="https://hex.pm/packages/tangram">
+		<img src="https://img.shields.io/hexpm/v/tangram?color=blueviolet&style=flat-square" alt="tangram Hex package"/>
 	</a>
-	<a href="https://github.com/modelfoxdotdev/modelfox-go">
-		<img src="https://img.shields.io/github/go-mod/go-version/modelfoxdotdev/modelfox-go?filename=go.mod&style=flat-square" alt="ModelFox Go package"/>
+	<a href="https://github.com/tangramdotdev/tangram-go">
+		<img src="https://img.shields.io/github/go-mod/go-version/tangramdotdev/tangram-go?filename=go.mod&style=flat-square" alt="tangram Go package"/>
 	</a>
-	<a href="https://www.npmjs.com/package/@modelfoxdotdev/modelfox">
-		<img src="https://img.shields.io/npm/v/@modelfoxdotdev/modelfox?color=yellow&style=flat-square" alt="ModelFox Javascript package"/>
+	<a href="https://www.npmjs.com/package/@tangramdotdev/tangram">
+		<img src="https://img.shields.io/npm/v/@tangramdotdev/tangram?color=yellow&style=flat-square" alt="tangram Javascript package"/>
 	</a>
-	<a href = "https://packagist.org/packages/modelfox/modelfox">
-	  <img src="https://img.shields.io/packagist/v/modelfox/modelfox?style=flat-square" alt = "ModelFox PHP package"/>
+	<a href = "https://packagist.org/packages/tangram/tangram">
+	  <img src="https://img.shields.io/packagist/v/tangram/tangram?style=flat-square" alt = "tangram PHP package"/>
 	</a>
-	<a href="https://pypi.org/project/modelfox/">
-		<img src="https://img.shields.io/pypi/v/modelfox?color=blue&style=flat-square" alt="ModelFox Pip package"/>
+	<a href="https://pypi.org/project/tangram/">
+		<img src="https://img.shields.io/pypi/v/tangram?color=blue&style=flat-square" alt="tangram Pip package"/>
 	</a>
-	<a href="https://rubygems.org/gems/modelfox">
-		<img src="https://img.shields.io/gem/v/modelfox?color=red&style=flat-square" alt="ModelFox Ruby gem"/>
+	<a href="https://rubygems.org/gems/tangram">
+		<img src="https://img.shields.io/gem/v/tangram?color=red&style=flat-square" alt="tangram Ruby gem"/>
 	</a>
-	<a href="https://crates.io/crates/modelfox">
-		<img src="https://img.shields.io/crates/v/modelfox?style=flat-square" alt="ModelFox crate"/>
+	<a href="https://crates.io/crates/tangram">
+		<img src="https://img.shields.io/crates/v/tangram?style=flat-square" alt="tangram crate"/>
   </a>
 </p>
 
 <p align="center">
-	<a href="https://twitter.com/intent/follow?screen_name=modelfoxdotdev">
-		<img src="https://img.shields.io/twitter/follow/modelfoxdotdev?label=Follow%20modelfoxdotdev&style=social&color=blue" alt="Follow @modelfoxdotdev on Twitter" />
+	<a href="https://twitter.com/intent/follow?screen_name=tangramdotdev">
+		<img src="https://img.shields.io/twitter/follow/tangramdotdev?label=Follow%20tangramdotdev&style=social&color=blue" alt="Follow @tangramdotdev on Twitter" />
 	</a>
 </p>
 
-# ModelFox
+# tangram
 
-[Website](https://www.modelfox.dev) | [Docs](https://www.modelfox.dev/docs/) | [Discord](https://discord.gg/jT9ZGp3TK2)
+[Website](https://www.tangram.dev) | [Docs](https://www.tangram.dev/docs/) | [Discord](https://discord.gg/jT9ZGp3TK2)
 
-ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models.
+tangram makes it easy for programmers to train, deploy, and monitor machine learning models.
 
-- Run `modelfox train` to train a model from a CSV file on the command line.
-- Make predictions with libraries for [Elixir](https://hex.pm/packages/modelfox), [Go](https://pkg.go.dev/github.com/modelfoxdotdev/modelfox-go), [JavaScript](https://www.npmjs.com/package/@modelfoxdotdev/modelfox), [PHP](https://packagist.org/packages/modelfox/modelfox), [Python](https://pypi.org/project/modelfox), [Ruby](https://rubygems.org/gems/modelfox), and [Rust](https://lib.rs/crates/modelfox).
-- Run `modelfox app` to learn more about your models and monitor them in production.
+- Run `tangram train` to train a model from a CSV file on the command line.
+- Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramdotdev/tangram-go), [JavaScript](https://www.npmjs.com/package/@tangramdotdev/tangram), [PHP](https://packagist.org/packages/tangram/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](https://lib.rs/crates/tangram).
+- Run `tangram app` to learn more about your models and monitor them in production.
 
 ### Install
 
-[Install the `modelfox` CLI](https://www.modelfox.dev/docs/install)
+[Install the `tangram` CLI](https://www.tangram.dev/docs/install)
 
 ### Train
 
-Train a machine learning model by running `modelfox train` with the path to a CSV file and the name of the column you want to predict.
+Train a machine learning model by running `tangram train` with the path to a CSV file and the name of the column you want to predict.
 
 ```
-$ modelfox train --file heart_disease.csv --target diagnosis --output heart_disease.modelfox
+$ tangram train --file heart_disease.csv --target diagnosis --output heart_disease.tangram
 ✅ Loading data.
 ✅ Computing features.
 🚂 Training model 1 of 8.
 [==========================================>                         ]
 ```
 
-The CLI automatically transforms your data into features, trains a number of linear and gradient boosted decision tree models to predict the target column, and writes the best model to a `.modelfox` file. If you want more control, you can provide a config file.
+The CLI automatically transforms your data into features, trains a number of linear and gradient boosted decision tree models to predict the target column, and writes the best model to a `.tangram` file. If you want more control, you can provide a config file.
 
 ### Predict
 
-Make predictions with libraries for [Elixir](https://hex.pm/packages/modelfox), [Go](https://pkg.go.dev/github.com/modelfoxdotdev/modelfox-go), [JavaScript](https://www.npmjs.com/package/@modelfoxdotdev/modelfox), [PHP](https://packagist.org/packages/modelfox/modelfox), [Python](https://pypi.org/project/modelfox), [Ruby](https://rubygems.org/gems/modelfox), and [Rust](https://lib.rs/modelfox).
+Make predictions with libraries for [Elixir](https://hex.pm/packages/tangram), [Go](https://pkg.go.dev/github.com/tangramdotdev/tangram-go), [JavaScript](https://www.npmjs.com/package/@tangramdotdev/tangram), [PHP](https://packagist.org/packages/tangram/tangram), [Python](https://pypi.org/project/tangram), [Ruby](https://rubygems.org/gems/tangram), and [Rust](https://lib.rs/tangram).
 
 ```javascript
-let modelfox = require("@modelfoxdotdev/modelfox")
+let tangram = require("@tangramdotdev/tangram")
 
-let model = new modelfox.Model("./heart_disease.modelfox")
+let model = new tangram.Model("./heart_disease.tangram")
 
 let input = {
 	age: 63,
@@ -101,7 +101,7 @@ console.log(output)
 
 ### Inspect
 
-Run `modelfox app`, open your browser to http://localhost:8080, and upload the model you trained.
+Run `tangram app`, open your browser to http://localhost:8080, and upload the model you trained.
 
 - View stats and metrics.
 - Tune your model to get the best performance.
@@ -163,4 +163,4 @@ If you want to submit a pull request, please run `scripts/fmt` and `scripts/chec
 
 ## License
 
-All of this repository is MIT licensed, except for the `crates/app` directory, which is source available and free to use for testing, but requires a paid license to use in production. Send us an email at hello@modelfox.dev if you are interested in a license.
+All of this repository is MIT licensed, except for the `crates/app` directory, which is source available and free to use for testing, but requires a paid license to use in production. Send us an email at hello@tangram.dev if you are interested in a license.
