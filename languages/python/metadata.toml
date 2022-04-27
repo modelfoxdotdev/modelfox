@@ -10,7 +10,7 @@ description_content_type = "text/markdown"
 license = "LICENSE"
 name = "modelfox"
 summary = "ModelFox for Python"
-version = "0.7.0"
+version = "0.8.0"
 
 [project_url]
 homepage = "https://modelfox.dev"
