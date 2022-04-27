@@ -1,10 +1,10 @@
-use pinwheel::prelude::*;
 use modelfox_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	box_chart::{BoxChartPoint, BoxChartSeries, BoxChartValue},
 	components::{BarChart, BoxChart},
 };
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 pub struct ProductionStats;
 

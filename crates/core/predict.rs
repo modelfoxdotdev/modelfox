@@ -5,10 +5,10 @@ use modelfox_features::{
 };
 use modelfox_table::prelude::*;
 use modelfox_text::NGramType;
+use modelfox_zip::zip;
 use ndarray::prelude::*;
 use num::ToPrimitive;
 use std::collections::BTreeMap;
-use modelfox_zip::zip;
 
 #[derive(serde::Serialize, serde::Deserialize, Clone, Debug)]
 pub struct PredictInput(pub BTreeMap<String, PredictInputValue>);

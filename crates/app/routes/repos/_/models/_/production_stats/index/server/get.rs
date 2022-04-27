@@ -8,9 +8,6 @@ use crate::{
 };
 use anyhow::{bail, Result};
 use chrono_tz::Tz;
-use num::ToPrimitive;
-use pinwheel::prelude::*;
-use std::sync::Arc;
 use modelfox_app_context::Context;
 use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -32,6 +29,9 @@ use modelfox_app_production_stats::{
 use modelfox_app_ui::column_type::ColumnType;
 use modelfox_app_ui::time::{format_date_window, format_date_window_interval};
 use modelfox_id::Id;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
+use std::sync::Arc;
 
 #[derive(serde::Deserialize, Default)]
 struct SearchParams {

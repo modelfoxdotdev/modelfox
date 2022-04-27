@@ -1,6 +1,4 @@
 use crate::common::{FeatureImportancesSection, TrainingSummarySection};
-use num::ToPrimitive;
-use pinwheel::prelude::*;
 use modelfox_app_ui::colors::{BASELINE_COLOR, TRAINING_COLOR};
 use modelfox_charts::{
 	components::LineChart,
@@ -8,6 +6,8 @@ use modelfox_charts::{
 };
 use modelfox_finite::Finite;
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 
 pub struct MulticlassClassifier {
 	pub id: String,

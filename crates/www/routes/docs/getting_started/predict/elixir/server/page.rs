@@ -1,10 +1,10 @@
-use pinwheel::prelude::*;
-use std::borrow::Cow;
 use modelfox_ui as ui;
 use modelfox_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage, GettingStartedPage, PredictPage, PrevNextButtons},
 	document::Document,
 };
+use pinwheel::prelude::*;
+use std::borrow::Cow;
 
 pub struct Page;
 

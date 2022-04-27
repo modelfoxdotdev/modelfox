@@ -1,10 +1,10 @@
+use modelfox_table::prelude::*;
+use modelfox_tree::Progress;
+use modelfox_zip::pzip;
 use ndarray::prelude::*;
 use rayon::prelude::*;
 use serde_json::json;
 use std::{collections::BTreeMap, path::Path};
-use modelfox_table::prelude::*;
-use modelfox_tree::Progress;
-use modelfox_zip::pzip;
 
 fn main() {
 	// Load the data.

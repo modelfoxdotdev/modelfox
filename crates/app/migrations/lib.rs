@@ -1,9 +1,9 @@
 use anyhow::{bail, Result};
 use futures::prelude::future::*;
+use modelfox_zip::zip;
 use once_cell::sync::Lazy;
 use sqlx::prelude::*;
 use std::collections::BTreeMap;
-use modelfox_zip::zip;
 
 mod migration_2020_01_01_000000;
 mod migration_2020_04_19_000000;

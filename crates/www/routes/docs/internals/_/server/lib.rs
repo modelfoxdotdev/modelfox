@@ -1,5 +1,5 @@
-use pinwheel::prelude::*;
 use modelfox_www_content::Content;
+use pinwheel::prelude::*;
 
 mod page;
 

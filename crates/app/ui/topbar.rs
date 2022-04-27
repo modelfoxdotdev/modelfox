@@ -1,6 +1,6 @@
 use crate::logo::Logo;
-use pinwheel::prelude::*;
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 #[derive(builder, Default, new)]
 #[new(default)]

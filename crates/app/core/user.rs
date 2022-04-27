@@ -2,8 +2,8 @@ use std::borrow::BorrowMut;
 
 use crate::cookies::parse_cookies;
 use anyhow::Result;
-use sqlx::prelude::*;
 use modelfox_id::Id;
+use sqlx::prelude::*;
 
 pub enum User {
 	Root,

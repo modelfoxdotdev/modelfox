@@ -1,10 +1,10 @@
-use pinwheel::prelude::*;
 use modelfox_app_layouts::{
 	app_layout::{AppLayout, AppLayoutInfo},
 	document::Document,
 };
 use modelfox_app_ui::page_heading::{PageHeading, PageHeadingButtons};
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 pub struct Page {
 	pub app_layout_info: AppLayoutInfo,

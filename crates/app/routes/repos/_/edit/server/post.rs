@@ -1,5 +1,4 @@
 use anyhow::{bail, Result};
-use std::{borrow::BorrowMut, sync::Arc};
 use modelfox_app_context::Context;
 use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -8,6 +7,7 @@ use modelfox_app_core::{
 	user::{authorize_user, authorize_user_for_repo},
 };
 use modelfox_id::Id;
+use std::{borrow::BorrowMut, sync::Arc};
 
 #[derive(serde::Deserialize)]
 #[serde(tag = "action")]

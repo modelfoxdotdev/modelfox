@@ -1,6 +1,6 @@
-use pinwheel::prelude::*;
 use modelfox_app_ui::logo::Logo;
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 #[derive(children, Default, new)]
 #[new(default)]

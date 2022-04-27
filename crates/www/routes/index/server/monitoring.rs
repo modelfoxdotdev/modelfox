@@ -1,5 +1,5 @@
-use pinwheel::prelude::*;
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 pub struct Monitoring;
 

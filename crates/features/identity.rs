@@ -2,9 +2,9 @@ use modelfox_table::{
 	EnumTableColumn, EnumTableColumnView, NumberTableColumn, NumberTableColumnView, TableColumn,
 	TableColumnView, TableValue,
 };
+use modelfox_zip::zip;
 use ndarray::prelude::*;
 use num::ToPrimitive;
-use modelfox_zip::zip;
 
 /**
 An `IdentityFeatureGroup` describes the simplest possible feature engineering, which passes a single column from the input table to the output features untouched.

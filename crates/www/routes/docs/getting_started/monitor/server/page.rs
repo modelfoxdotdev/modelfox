@@ -1,4 +1,3 @@
-use pinwheel::prelude::*;
 use modelfox_app_date_window::DateWindow;
 use modelfox_app_production_stats_column_server::{
 	EnumColumnInvalidValuesSection, EnumColumnOverallHistogramEntry, EnumColumnStatsSection,
@@ -18,6 +17,7 @@ use modelfox_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage, GettingStartedPage, PrevNextButtons},
 	document::Document,
 };
+use pinwheel::prelude::*;
 
 pub struct Page;
 

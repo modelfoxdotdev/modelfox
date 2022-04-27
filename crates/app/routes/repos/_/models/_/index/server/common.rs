@@ -1,11 +1,11 @@
-use num::ToPrimitive;
-use pinwheel::prelude::*;
 use modelfox_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	components::BarChart,
 };
 use modelfox_finite::FiniteF32;
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 
 pub struct TrainingSummarySection {
 	pub chosen_model_type_name: String,

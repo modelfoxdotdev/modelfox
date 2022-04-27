@@ -1,8 +1,5 @@
 use crate::page::{EnumColumn, Inner, NGramStats, NGramsTableRow, NumberColumn, Page, TextColumn};
 use anyhow::{bail, Result};
-use num::ToPrimitive;
-use pinwheel::prelude::*;
-use std::sync::Arc;
 use modelfox_app_context::Context;
 use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -17,6 +14,9 @@ use modelfox_app_core::{
 use modelfox_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use modelfox_id::Id;
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
+use std::sync::Arc;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());

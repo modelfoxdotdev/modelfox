@@ -5,6 +5,7 @@ use modelfox_core::progress::{
 	LoadProgressEvent, ProgressEvent, StatsProgressEvent, TrainGridItemProgressEvent,
 	TrainProgressEvent,
 };
+use modelfox_progress_counter::ProgressCounter;
 use num::ToPrimitive;
 use once_cell::sync::Lazy;
 use std::{
@@ -18,7 +19,6 @@ use std::{
 	thread::{spawn, JoinHandle},
 	time::{Duration, Instant},
 };
-use modelfox_progress_counter::ProgressCounter;
 use tortoise::{
 	style::Color,
 	terminal::{Clear, Terminal},

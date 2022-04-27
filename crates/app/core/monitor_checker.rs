@@ -14,10 +14,10 @@ use crate::{
 };
 use anyhow::{anyhow, bail, Result};
 use futures::FutureExt;
-use sqlx::prelude::*;
-use std::{borrow::BorrowMut, sync::Arc};
 use modelfox_app_production_metrics::{ProductionMetrics, ProductionPredictionMetricsOutput};
 use modelfox_id::Id;
+use sqlx::prelude::*;
+use std::{borrow::BorrowMut, sync::Arc};
 use tokio::sync::{mpsc, oneshot};
 
 #[derive(Debug)]

@@ -1,8 +1,8 @@
 use modelfox_linear::Progress;
+use modelfox_table::prelude::*;
 use ndarray::prelude::*;
 use serde_json::json;
 use std::path::Path;
-use modelfox_table::prelude::*;
 
 fn main() {
 	// Load the data.

@@ -4,10 +4,10 @@ This crate implements two dimensional collections where each column can have a d
 
 pub use self::load::{FromCsvOptions, LoadProgressEvent};
 use fnv::FnvHashMap;
+use modelfox_zip::zip;
 use ndarray::prelude::*;
 use num::ToPrimitive;
 use std::num::NonZeroUsize;
-use modelfox_zip::zip;
 
 mod load;
 

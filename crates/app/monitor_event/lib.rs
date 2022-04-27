@@ -1,6 +1,6 @@
 use modelfox_finite::NotFiniteError;
-use std::{borrow::Cow, collections::HashMap};
 use modelfox_id::Id;
+use std::{borrow::Cow, collections::HashMap};
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
 #[serde(tag = "type")]

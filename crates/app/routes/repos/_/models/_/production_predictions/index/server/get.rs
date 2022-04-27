@@ -2,10 +2,6 @@ use crate::page::{Page, Pagination, PredictionTable, PredictionTableRow};
 use anyhow::{bail, Result};
 use chrono::prelude::*;
 use chrono_tz::Tz;
-use num::ToPrimitive;
-use pinwheel::prelude::*;
-use sqlx::prelude::*;
-use std::{borrow::BorrowMut, sync::Arc};
 use modelfox_app_context::Context;
 use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -17,6 +13,10 @@ use modelfox_app_core::{
 use modelfox_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use modelfox_app_monitor_event::PredictOutput;
 use modelfox_id::Id;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
+use sqlx::prelude::*;
+use std::{borrow::BorrowMut, sync::Arc};
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());

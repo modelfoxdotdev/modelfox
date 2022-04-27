@@ -1,11 +1,11 @@
-use num::ToPrimitive;
-use pinwheel::prelude::*;
 use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
 use modelfox_app_ui::{class_select_field::ClassSelectField, metrics_row::MetricsRow};
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 
 pub struct Page {
 	pub classes: Vec<String>,

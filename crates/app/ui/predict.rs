@@ -2,8 +2,6 @@ use crate::{
 	metrics_row::MetricsRow,
 	tokens::{EnumColumnToken, NumberColumnToken, TextColumnToken, UnknownColumnToken},
 };
-use num::ToPrimitive;
-use pinwheel::prelude::*;
 use modelfox_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	components::{BarChart, FeatureContributionsChart},
@@ -12,6 +10,8 @@ use modelfox_charts::{
 	},
 };
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 
 pub struct PredictOutput {
 	pub inner: PredictOutputInner,

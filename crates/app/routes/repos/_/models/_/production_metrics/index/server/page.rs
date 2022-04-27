@@ -1,9 +1,9 @@
 pub use crate::{binary_classifier::*, multiclass_classifier::*, regressor::*};
-use pinwheel::prelude::*;
 use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
+use pinwheel::prelude::*;
 
 pub struct Page {
 	pub id: String,

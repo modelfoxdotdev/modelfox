@@ -1,6 +1,6 @@
+use modelfox_ui as ui;
 use pinwheel::prelude::*;
 use std::borrow::Cow;
-use modelfox_ui as ui;
 
 pub struct Train;
 

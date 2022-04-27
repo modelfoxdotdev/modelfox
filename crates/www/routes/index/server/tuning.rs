@@ -1,6 +1,6 @@
-use pinwheel::prelude::*;
 use modelfox_ui as ui;
 use modelfox_www_index_common::{self as common, tuning::ThresholdMetrics};
+use pinwheel::prelude::*;
 
 pub struct Tuning;
 

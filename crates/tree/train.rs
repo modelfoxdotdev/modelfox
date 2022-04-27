@@ -18,11 +18,11 @@ use crate::{
 	BinnedFeaturesLayout, BranchNode, BranchSplit, BranchSplitContinuous, BranchSplitDiscrete,
 	LeafNode, Node, Progress, TrainOptions, TrainProgressEvent, Tree,
 };
+use modelfox_progress_counter::ProgressCounter;
+use modelfox_table::prelude::*;
 use ndarray::prelude::*;
 use num::ToPrimitive;
 use rayon::prelude::*;
-use modelfox_progress_counter::ProgressCounter;
-use modelfox_table::prelude::*;
 
 /// This enum is used by the common `train` function below to customize the training code slightly for each task.
 #[derive(Clone, Copy, Debug)]

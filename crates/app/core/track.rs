@@ -2,9 +2,6 @@ use crate::{model::get_model_bytes, storage::Storage};
 use anyhow::{anyhow, bail, Result};
 use chrono::prelude::*;
 use memmap::Mmap;
-use num::ToPrimitive;
-use sqlx::prelude::*;
-use std::{borrow::BorrowMut, collections::BTreeMap};
 use modelfox_app_monitor_event::{
 	BinaryClassificationPredictOutput, MonitorEvent, MulticlassClassificationPredictOutput,
 	NumberOrString, PredictOutput, PredictionMonitorEvent, RegressionPredictOutput,
@@ -13,6 +10,9 @@ use modelfox_app_monitor_event::{
 use modelfox_app_production_metrics::ProductionMetrics;
 use modelfox_app_production_stats::ProductionStats;
 use modelfox_id::Id;
+use num::ToPrimitive;
+use sqlx::prelude::*;
+use std::{borrow::BorrowMut, collections::BTreeMap};
 use tracing::error;
 
 use super::App;

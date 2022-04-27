@@ -16,10 +16,10 @@ pub use self::{
 use anyhow::Result;
 use chrono::prelude::*;
 use chrono_tz::Tz;
-use num::ToPrimitive;
-use sqlx::prelude::*;
 use modelfox_app_date_window::{DateWindow, DateWindowInterval};
 use modelfox_app_monitor_event::NumberOrString;
+use num::ToPrimitive;
+use sqlx::prelude::*;
 
 mod binary_classification_production_metrics;
 mod multiclass_classification_production_metrics;

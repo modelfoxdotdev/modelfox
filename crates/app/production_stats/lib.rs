@@ -7,9 +7,9 @@ use modelfox_app_monitor_event::PredictionMonitorEvent;
 use anyhow::Result;
 use chrono::prelude::*;
 use chrono_tz::Tz;
+use modelfox_zip::zip;
 use num::ToPrimitive;
 use sqlx::prelude::*;
-use modelfox_zip::zip;
 
 mod column_stats;
 mod number_stats;

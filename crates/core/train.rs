@@ -20,6 +20,7 @@ use crate::{
 use anyhow::{anyhow, bail, Result};
 use modelfox_id::Id;
 use modelfox_kill_chip::KillChip;
+use modelfox_progress_counter::ProgressCounter;
 use modelfox_table::prelude::*;
 use ndarray::prelude::*;
 use num::ToPrimitive;
@@ -33,7 +34,6 @@ use std::{
 	time::{Duration, Instant},
 	unreachable,
 };
-use modelfox_progress_counter::ProgressCounter;
 
 pub enum TrainingDataSource {
 	Stdin,

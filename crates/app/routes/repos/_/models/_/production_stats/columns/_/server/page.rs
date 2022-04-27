@@ -1,5 +1,4 @@
 pub use crate::{enum_column::*, number_column::*, text_column::*};
-use pinwheel::prelude::*;
 use modelfox_app_date_window::DateWindow;
 use modelfox_app_layouts::{
 	document::Document,
@@ -7,6 +6,7 @@ use modelfox_app_layouts::{
 };
 use modelfox_app_ui::date_window_select_field::DateWindowSelectField;
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 pub struct Page {
 	pub column_name: String,

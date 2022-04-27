@@ -1,9 +1,9 @@
 use modelfox_linear::Progress;
 use modelfox_table::prelude::*;
+use modelfox_zip::zip;
 use ndarray::prelude::*;
 use serde_json::json;
 use std::{collections::BTreeMap, path::Path};
-use modelfox_zip::zip;
 
 fn main() {
 	// Load the data.

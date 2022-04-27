@@ -1,9 +1,9 @@
 pub use crate::{enum_column::*, number_column::*, text_column::*};
-use pinwheel::prelude::*;
 use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
+use pinwheel::prelude::*;
 
 pub struct Page {
 	pub inner: Inner,

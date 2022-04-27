@@ -225,7 +225,10 @@ fn run_benchmark(dataset: &Dataset, library: &Library) -> BenchmarkOutput {
 		Library::ModelFox => std::process::Command::new("time")
 			.arg("-f")
 			.arg("%M")
-			.arg(format!("target/release/modelfox_tree_benchmark_{}", dataset))
+			.arg(format!(
+				"target/release/modelfox_tree_benchmark_{}",
+				dataset
+			))
 			.output()
 			.unwrap(),
 		_ => std::process::Command::new("time")

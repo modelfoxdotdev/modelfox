@@ -3,10 +3,10 @@ use crate::{
 	clock::Clock,
 };
 use anyhow::Result;
+use modelfox_id::Id;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::*;
 use std::{borrow::BorrowMut, fmt, io, str::FromStr};
-use modelfox_id::Id;
 use time::OffsetDateTime;
 
 /// A Monitor generates alerts when production data exceeds configured thresholds

@@ -1,5 +1,5 @@
-use pinwheel::prelude::*;
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 pub fn main() {
 	console_error_panic_hook::set_once();

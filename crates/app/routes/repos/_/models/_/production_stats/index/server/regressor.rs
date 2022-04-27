@@ -1,8 +1,6 @@
 use crate::common::{
 	ColumnStatsTable, DateWindowSelectForm, PredictionCountChart, PredictionCountChartEntry,
 };
-use num::ToPrimitive;
-use pinwheel::prelude::*;
 use modelfox_app_date_window::{DateWindow, DateWindowInterval};
 use modelfox_app_ui::time::{interval_chart_title, overall_chart_title};
 use modelfox_charts::{
@@ -10,6 +8,8 @@ use modelfox_charts::{
 	components::BoxChart,
 };
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 
 pub struct Regressor {
 	pub date_window: DateWindow,

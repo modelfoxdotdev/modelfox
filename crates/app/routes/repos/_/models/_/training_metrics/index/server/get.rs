@@ -3,8 +3,6 @@ use crate::page::{
 	Regressor,
 };
 use anyhow::{bail, Result};
-use pinwheel::prelude::*;
-use std::sync::Arc;
 use modelfox_app_context::Context;
 use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -14,6 +12,8 @@ use modelfox_app_core::{
 };
 use modelfox_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use modelfox_id::Id;
+use pinwheel::prelude::*;
+use std::sync::Arc;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());
@@ -86,7 +86,9 @@ fn build_inner_regressor(model: modelfox_model::RegressorReader) -> Regressor {
 	}
 }
 
-fn build_inner_binary_classifier(model: modelfox_model::BinaryClassifierReader) -> BinaryClassifier {
+fn build_inner_binary_classifier(
+	model: modelfox_model::BinaryClassifierReader,
+) -> BinaryClassifier {
 	let test_metrics = model.test_metrics();
 	let default_threshold_test_metrics = test_metrics.default_threshold();
 	let default_threshold_baseline_metrics = model.baseline_metrics().default_threshold();

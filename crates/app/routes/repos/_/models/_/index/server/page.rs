@@ -5,9 +5,9 @@ pub use crate::{
 	},
 	regressor::{Regressor, RegressorMetricsSection},
 };
-use pinwheel::prelude::*;
 use modelfox_app_layouts::document::Document;
 use modelfox_app_layouts::model_layout::{ModelLayout, ModelLayoutInfo};
+use pinwheel::prelude::*;
 
 pub struct Page {
 	pub id: String,

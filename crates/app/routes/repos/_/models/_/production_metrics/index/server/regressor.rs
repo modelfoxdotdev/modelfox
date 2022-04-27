@@ -1,6 +1,4 @@
 use crate::page::{TrainingProductionMetrics, TrueValuesCountChartEntry};
-use num::ToPrimitive;
-use pinwheel::prelude::*;
 use modelfox_app_date_window::{DateWindow, DateWindowInterval};
 use modelfox_app_ui::{
 	colors::{PRODUCTION_COLOR, TRAINING_COLOR},
@@ -15,6 +13,8 @@ use modelfox_charts::{
 };
 use modelfox_finite::Finite;
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 
 pub struct RegressorProductionMetrics {
 	pub date_window: DateWindow,

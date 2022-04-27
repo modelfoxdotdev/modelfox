@@ -1,10 +1,10 @@
-use num::ToPrimitive;
-use pinwheel::prelude::*;
 use modelfox_app_ui::{
 	colors::{BASELINE_COLOR, TRAINING_COLOR},
 	metrics_row::MetricsRow,
 };
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 
 pub struct BinaryClassifier {
 	pub warning: Option<String>,

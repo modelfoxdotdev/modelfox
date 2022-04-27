@@ -1,6 +1,6 @@
 pub use modelfox_linear::TrainProgressEvent as LinearTrainProgressEvent;
-pub use modelfox_tree::TrainProgressEvent as TreeTrainProgressEvent;
 use modelfox_progress_counter::ProgressCounter;
+pub use modelfox_tree::TrainProgressEvent as TreeTrainProgressEvent;
 
 #[derive(Clone, Debug)]
 pub enum ProgressEvent {

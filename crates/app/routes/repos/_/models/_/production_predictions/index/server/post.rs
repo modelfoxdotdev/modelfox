@@ -1,5 +1,4 @@
 use anyhow::{bail, Result};
-use std::sync::Arc;
 use modelfox_app_context::Context;
 use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -7,6 +6,7 @@ use modelfox_app_core::{
 	user::{authorize_user, authorize_user_for_model},
 };
 use modelfox_id::Id;
+use std::sync::Arc;
 
 #[derive(serde::Deserialize)]
 struct Action {

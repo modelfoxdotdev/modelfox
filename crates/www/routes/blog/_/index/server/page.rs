@@ -1,7 +1,7 @@
-use pinwheel::prelude::*;
 use modelfox_ui as ui;
 use modelfox_www_content::{BlogPost, Content};
 use modelfox_www_layouts::{document::Document, page_layout::PageLayout};
+use pinwheel::prelude::*;
 
 #[derive(new)]
 pub struct Page {

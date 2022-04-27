@@ -1,9 +1,9 @@
-use pinwheel::prelude::*;
 use modelfox_ui as ui;
 use modelfox_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage, GettingStartedPage, PredictPage, PrevNextButtons},
 	document::Document,
 };
+use pinwheel::prelude::*;
 
 pub struct Page;
 

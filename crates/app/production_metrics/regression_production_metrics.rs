@@ -1,6 +1,6 @@
-use num::ToPrimitive;
 use modelfox_app_monitor_event::NumberOrString;
 use modelfox_app_production_stats::NumberStats;
+use num::ToPrimitive;
 
 #[derive(serde::Serialize, serde::Deserialize, Clone)]
 pub struct RegressionProductionPredictionMetrics {

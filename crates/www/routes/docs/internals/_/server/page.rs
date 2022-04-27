@@ -1,10 +1,10 @@
-use pinwheel::prelude::*;
 use modelfox_ui as ui;
 use modelfox_www_content::{Content, DocsInternals};
 use modelfox_www_layouts::{
 	docs_layout::{DocsLayout, DocsPage},
 	document::Document,
 };
+use pinwheel::prelude::*;
 
 #[derive(new)]
 pub struct Page {

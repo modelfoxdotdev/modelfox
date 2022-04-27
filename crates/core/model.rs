@@ -7,9 +7,9 @@ use crate::{
 };
 use anyhow::Result;
 use modelfox_id::Id;
+use modelfox_zip::zip;
 use num::ToPrimitive;
 use std::path::Path;
-use modelfox_zip::zip;
 
 pub struct Model {
 	pub id: Id,

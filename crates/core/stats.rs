@@ -2,12 +2,12 @@ use fnv::{FnvBuildHasher, FnvHashSet};
 use indexmap::IndexMap;
 use itertools::Itertools;
 use modelfox_finite::Finite;
-use num::ToPrimitive;
-use std::{cmp::Ordering, collections::BTreeMap, num::NonZeroU64};
 use modelfox_progress_counter::ProgressCounter;
 use modelfox_table::prelude::*;
 use modelfox_text::{NGram, NGramType, Tokenizer};
 use modelfox_zip::zip;
+use num::ToPrimitive;
+use std::{cmp::Ordering, collections::BTreeMap, num::NonZeroU64};
 
 /// This struct contains settings used to compute stats.
 #[derive(Clone, Debug)]
@@ -539,11 +539,9 @@ impl TextColumnStats {
 			};
 			let bigram_iter =
 				if stats.ngram_types.contains(&NGramType::Bigram) {
-					Some(
-						stats.tokenizer.tokenize(value).tuple_windows().map(
-							|(token_a, token_b)| modelfox_text::NGramRef::Bigram(token_a, token_b),
-						),
-					)
+					Some(stats.tokenizer.tokenize(value).tuple_windows().map(
+						|(token_a, token_b)| modelfox_text::NGramRef::Bigram(token_a, token_b),
+					))
 				} else {
 					None
 				};

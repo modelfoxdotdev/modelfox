@@ -1,4 +1,3 @@
-use pinwheel::prelude::*;
 use modelfox_app_core::{alert::Alert, monitor::MonitorThresholdMode};
 use modelfox_app_layouts::{
 	document::Document,
@@ -9,6 +8,7 @@ use modelfox_app_ui::{
 	page_heading::PageHeading,
 };
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 pub struct Page {
 	pub alert: Alert,

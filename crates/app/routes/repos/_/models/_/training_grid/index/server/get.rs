@@ -1,9 +1,5 @@
 use crate::page::{Page, TrainedModel};
 use anyhow::{bail, Result};
-use num::ToPrimitive;
-use pinwheel::prelude::*;
-use std::sync::Arc;
-use std::time::Duration;
 use modelfox_app_context::Context;
 use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -14,6 +10,10 @@ use modelfox_app_core::{
 use modelfox_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use modelfox_app_training_grid_common::hyperparameters_for_grid_item;
 use modelfox_id::Id;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
+use std::sync::Arc;
+use std::time::Duration;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());

@@ -2,9 +2,9 @@ use modelfox_table::{
 	EnumTableColumnView, NumberTableColumn, NumberTableColumnView, TableColumn, TableColumnView,
 	TableValue,
 };
+use modelfox_zip::zip;
 use ndarray::prelude::*;
 use num::ToPrimitive;
-use modelfox_zip::zip;
 
 /**
 A `NormalizedFeatureGroup` transforms a number column to zero mean and unit variance. [Learn more](https://en.wikipedia.org/wiki/Feature_scaling#Standardization_(Z-score_Normalization).

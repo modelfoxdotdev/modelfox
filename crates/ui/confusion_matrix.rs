@@ -1,7 +1,7 @@
 use crate as ui;
+use modelfox_number_formatter::PercentFormatter;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
-use modelfox_number_formatter::PercentFormatter;
 
 // |---------------------------------------------------------|
 // |           ||     |                Actual                |

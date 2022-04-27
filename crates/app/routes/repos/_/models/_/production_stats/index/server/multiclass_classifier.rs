@@ -2,12 +2,12 @@ use crate::common::{
 	ClassificationProductionStatsChart, ClassificationProductionStatsIntervalChart,
 	ClassifierChartEntry, ColumnStatsTable, PredictionCountChart, PredictionCountChartEntry,
 };
-use pinwheel::prelude::*;
 use modelfox_app_date_window::{DateWindow, DateWindowInterval};
 use modelfox_app_ui::{
 	class_select_field::ClassSelectField, date_window_select_field::DateWindowSelectField,
 };
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 pub struct MulticlassClassifier {
 	pub date_window: DateWindow,

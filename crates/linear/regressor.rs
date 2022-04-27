@@ -5,12 +5,12 @@ use super::{
 	train_early_stopping_split, EarlyStoppingMonitor, TrainOptions, TrainProgressEvent,
 };
 use modelfox_metrics::MeanSquaredError;
+use modelfox_progress_counter::ProgressCounter;
 use modelfox_table::prelude::*;
+use modelfox_zip::{pzip, zip};
 use ndarray::{self, prelude::*};
 use num::ToPrimitive;
 use rayon::{self, prelude::*};
-use modelfox_progress_counter::ProgressCounter;
-use modelfox_zip::{pzip, zip};
 
 /// This struct describes a linear regressor model. You can train one by calling `Regressor::train`.
 #[derive(Clone, Debug)]

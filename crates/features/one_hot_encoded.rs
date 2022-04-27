@@ -1,6 +1,6 @@
 use modelfox_table::prelude::*;
-use ndarray::prelude::*;
 use modelfox_zip::zip;
+use ndarray::prelude::*;
 
 /**
 A `OneHotEncodedFeatureGroup` creates one number feature for each variant in an enum column, plus one number feature for invalid values. For each example, all of the features will have the value 0.0, except the feature corresponding to the column's value, which will have the value 1.0.

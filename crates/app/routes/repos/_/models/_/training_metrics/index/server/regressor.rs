@@ -1,6 +1,6 @@
-use pinwheel::prelude::*;
 use modelfox_app_ui::colors::{BASELINE_COLOR, TRAINING_COLOR};
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 pub struct Regressor {
 	pub warning: Option<String>,

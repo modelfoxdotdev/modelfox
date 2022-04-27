@@ -1,6 +1,6 @@
-use pinwheel::prelude::*;
 use modelfox_www_benchmarks_common::Benchmarks;
 use modelfox_www_layouts::{document::Document, page_layout::PageLayout};
+use pinwheel::prelude::*;
 
 pub struct Page;
 

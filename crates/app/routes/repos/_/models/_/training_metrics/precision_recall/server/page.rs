@@ -1,5 +1,3 @@
-use num::ToPrimitive;
-use pinwheel::prelude::*;
 use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
@@ -10,6 +8,8 @@ use modelfox_charts::{
 };
 use modelfox_finite::Finite;
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 
 pub struct Page {
 	pub class: String,

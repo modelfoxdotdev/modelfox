@@ -1,10 +1,10 @@
-use pinwheel::prelude::*;
 use modelfox_app_layouts::{
 	document::Document,
 	model_layout::{ModelLayout, ModelLayoutInfo},
 };
 use modelfox_app_tuning_common::Tuning;
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 pub struct Page {
 	pub model_layout_info: ModelLayoutInfo,

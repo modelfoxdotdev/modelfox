@@ -1,7 +1,7 @@
+use modelfox_zip::zip;
 use num::ToPrimitive;
 use rand::random;
 use std::num::NonZeroU64;
-use modelfox_zip::zip;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 pub struct NumberStats {

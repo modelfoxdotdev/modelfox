@@ -1,11 +1,11 @@
-use num::ToPrimitive;
-use pinwheel::prelude::*;
 use modelfox_app_ui::metrics_row::MetricsRow;
 use modelfox_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	components::BarChart,
 };
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 
 pub struct EnumColumn {
 	pub unique_values_chart_data: Option<Vec<(String, u64)>>,

@@ -12,10 +12,6 @@ use crate::{
 };
 use anyhow::{bail, Result};
 use chrono_tz::Tz;
-use num::ToPrimitive;
-use pinwheel::prelude::*;
-use std::collections::BTreeMap;
-use std::sync::Arc;
 use modelfox_app_context::Context;
 use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -33,6 +29,10 @@ use modelfox_app_production_stats::{
 use modelfox_app_ui::time::format_date_window_interval;
 use modelfox_id::Id;
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
+use std::collections::BTreeMap;
+use std::sync::Arc;
 
 pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Response<hyper::Body>> {
 	let context = Arc::clone(request.extensions().get::<Arc<Context>>().unwrap());

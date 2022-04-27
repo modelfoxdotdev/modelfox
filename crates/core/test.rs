@@ -1,9 +1,9 @@
 use crate::progress::ModelTestProgressEvent;
+use modelfox_progress_counter::ProgressCounter;
 use modelfox_table::prelude::*;
+use modelfox_zip::pzip;
 use ndarray::prelude::*;
 use rayon::prelude::*;
-use modelfox_progress_counter::ProgressCounter;
-use modelfox_zip::pzip;
 
 pub fn test_linear_regressor(
 	table_test: &TableView,

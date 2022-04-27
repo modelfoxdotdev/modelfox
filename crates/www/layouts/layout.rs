@@ -1,7 +1,7 @@
 use crate::footer::Footer;
-use pinwheel::prelude::*;
 use modelfox_ui as ui;
 use modelfox_www_ui::logo::Logo;
+use pinwheel::prelude::*;
 
 #[derive(children, Default, new)]
 #[new(default)]

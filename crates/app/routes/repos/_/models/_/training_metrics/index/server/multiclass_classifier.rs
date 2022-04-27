@@ -1,7 +1,7 @@
-use pinwheel::prelude::*;
 use modelfox_app_ui::colors::{BASELINE_COLOR, TRAINING_COLOR};
 use modelfox_ui as ui;
 use modelfox_zip::zip;
+use pinwheel::prelude::*;
 
 pub struct MulticlassClassifier {
 	pub warning: Option<String>,

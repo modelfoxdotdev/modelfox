@@ -1,5 +1,3 @@
-use num::ToPrimitive;
-use pinwheel::prelude::*;
 use modelfox_app_date_window::DateWindow;
 use modelfox_app_ui::{
 	colors::{PRODUCTION_COLOR, TRAINING_COLOR},
@@ -11,6 +9,8 @@ use modelfox_charts::{
 	components::BarChart,
 };
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 
 pub struct EnumColumn {
 	pub alert: Option<String>,

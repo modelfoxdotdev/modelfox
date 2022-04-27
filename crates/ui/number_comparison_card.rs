@@ -1,6 +1,6 @@
 use crate as ui;
-use pinwheel::prelude::*;
 use modelfox_number_formatter::NumberFormatter;
+use pinwheel::prelude::*;
 
 #[derive(builder, new)]
 pub struct NumberComparisonCard {

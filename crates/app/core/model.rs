@@ -5,12 +5,12 @@ use crate::{
 };
 use anyhow::Result;
 use memmap::{Mmap, MmapMut};
+use modelfox_id::Id;
 use sqlx::Acquire;
 use std::{
 	io::{Read, Write},
 	path::Path,
 };
-use modelfox_id::Id;
 
 /// Retrieves the model with the specified id.
 pub async fn get_model_bytes(data_storage: &Storage, model_id: Id) -> Result<Mmap> {

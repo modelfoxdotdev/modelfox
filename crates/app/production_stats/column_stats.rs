@@ -2,8 +2,8 @@ use super::number_stats::{NumberStats, NumberStatsOutput};
 use fnv::{FnvBuildHasher, FnvHashMap, FnvHashSet};
 use indexmap::{IndexMap, IndexSet};
 use itertools::Itertools;
-use num::ToPrimitive;
 use modelfox_text::{NGram, NGramRef, NGramType, Tokenizer};
+use num::ToPrimitive;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone)]
 pub enum ProductionColumnStats {
@@ -152,7 +152,11 @@ impl ProductionColumnStats {
 	}
 
 	/// Incorporate a data value into the statistics being tracked.
-	pub fn update(&mut self, model: modelfox_model::ModelReader, value: Option<&serde_json::Value>) {
+	pub fn update(
+		&mut self,
+		model: modelfox_model::ModelReader,
+		value: Option<&serde_json::Value>,
+	) {
 		let column_name = self.column_name().to_string();
 		match self {
 			ProductionColumnStats::Unknown(stats) => stats.update(value),

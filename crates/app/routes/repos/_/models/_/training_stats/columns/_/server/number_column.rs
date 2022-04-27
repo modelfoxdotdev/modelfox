@@ -1,5 +1,3 @@
-use num::ToPrimitive;
-use pinwheel::prelude::*;
 use modelfox_app_ui::metrics_row::MetricsRow;
 use modelfox_charts::{
 	box_chart::BoxChartPoint,
@@ -7,6 +5,8 @@ use modelfox_charts::{
 	components::BoxChart,
 };
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 
 pub struct NumberColumn {
 	pub invalid_count: u64,

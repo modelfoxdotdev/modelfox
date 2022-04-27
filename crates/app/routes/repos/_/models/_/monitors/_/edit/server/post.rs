@@ -1,7 +1,5 @@
 use crate::page::Page;
 use anyhow::{bail, Result};
-use pinwheel::prelude::*;
-use std::{str, str::FromStr, sync::Arc};
 use modelfox_app_context::Context;
 use modelfox_app_core::{
 	alert::{AlertMethod, AlertMetric},
@@ -16,6 +14,8 @@ use modelfox_app_core::{
 };
 use modelfox_app_layouts::model_layout::{model_layout_info, ModelNavItem};
 use modelfox_id::Id;
+use pinwheel::prelude::*;
+use std::{str, str::FromStr, sync::Arc};
 
 #[derive(serde::Deserialize)]
 #[serde(tag = "action")]

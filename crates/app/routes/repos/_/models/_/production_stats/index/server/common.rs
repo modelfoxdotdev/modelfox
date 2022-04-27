@@ -1,5 +1,3 @@
-use num::ToPrimitive;
-use pinwheel::prelude::*;
 use modelfox_app_date_window::{DateWindow, DateWindowInterval};
 use modelfox_app_ui::{
 	column_type::ColumnType,
@@ -13,6 +11,8 @@ use modelfox_charts::{
 };
 use modelfox_ui as ui;
 use modelfox_zip::zip;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 
 pub struct PredictionCountChartEntry {
 	pub count: u64,

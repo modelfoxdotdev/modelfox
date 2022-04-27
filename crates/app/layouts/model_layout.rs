@@ -1,7 +1,4 @@
 use anyhow::Result;
-use pinwheel::prelude::*;
-use sqlx::prelude::*;
-use std::{borrow::BorrowMut, sync::Arc};
 use modelfox_app_context::Context;
 use modelfox_app_core::{
 	error::{bad_request, not_found, redirect_to_login, service_unavailable},
@@ -12,6 +9,9 @@ use modelfox_app_core::{
 use modelfox_app_ui::topbar::{Topbar, TopbarAvatar};
 use modelfox_id::Id;
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
+use sqlx::prelude::*;
+use std::{borrow::BorrowMut, sync::Arc};
 
 pub struct ModelLayoutInfo {
 	pub model_id: Id,

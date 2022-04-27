@@ -5,9 +5,9 @@ use crate::{
 	App,
 };
 use anyhow::Result;
+use modelfox_id::Id;
 use sqlx::prelude::*;
 use std::borrow::BorrowMut;
-use modelfox_id::Id;
 
 pub struct Repo {
 	pub id: String,

@@ -1,5 +1,5 @@
-use pinwheel::prelude::*;
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 fn main() {
 	modelfox_ui::client_start();

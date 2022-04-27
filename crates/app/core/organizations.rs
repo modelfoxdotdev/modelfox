@@ -1,8 +1,8 @@
 use std::borrow::BorrowMut;
 
 use anyhow::Result;
-use sqlx::prelude::*;
 use modelfox_id::Id;
+use sqlx::prelude::*;
 
 pub struct GetOrganizationOutput {
 	pub id: Id,

@@ -1,4 +1,3 @@
-use pinwheel::prelude::*;
 use modelfox_charts::{
 	components::FeatureContributionsChart,
 	feature_contributions_chart::{
@@ -6,6 +5,7 @@ use modelfox_charts::{
 	},
 };
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 pub struct ProductionExplanations;
 

@@ -1,6 +1,6 @@
-use pinwheel::prelude::*;
 use modelfox_app_layouts::{auth_layout::AuthLayout, document::Document};
 use modelfox_ui as ui;
+use pinwheel::prelude::*;
 
 pub struct Page {
 	pub stage: Option<Stage>,

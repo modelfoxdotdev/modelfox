@@ -1,10 +1,10 @@
-use num::ToPrimitive;
-use pinwheel::prelude::*;
 use modelfox_charts::{
 	bar_chart::{BarChartPoint, BarChartSeries},
 	components::BarChart,
 };
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 
 pub struct TextColumn {
 	pub name: String,

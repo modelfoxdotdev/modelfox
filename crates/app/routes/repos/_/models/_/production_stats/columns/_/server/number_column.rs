@@ -1,6 +1,4 @@
 use crate::page::{IntervalBoxChartDataPoint, OverallBoxChartData};
-use num::ToPrimitive;
-use pinwheel::prelude::*;
 use modelfox_app_date_window::{DateWindow, DateWindowInterval};
 use modelfox_app_ui::{
 	colors::{PRODUCTION_COLOR, TRAINING_COLOR},
@@ -10,6 +8,8 @@ use modelfox_app_ui::{
 use modelfox_charts::box_chart::{BoxChartPoint, BoxChartSeries, BoxChartValue};
 use modelfox_charts::components::BoxChart;
 use modelfox_ui as ui;
+use num::ToPrimitive;
+use pinwheel::prelude::*;
 
 pub struct NumberColumn {
 	pub column_name: String,

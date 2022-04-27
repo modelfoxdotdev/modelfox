@@ -1,8 +1,8 @@
-use ndarray::prelude::*;
 use modelfox_table::{
 	NumberTableColumn, TableColumn, TableColumnView, TableValue, TextTableColumnView,
 };
 use modelfox_text::{Tokenizer, WordEmbeddingModel};
+use ndarray::prelude::*;
 
 #[derive(Clone, Debug)]
 pub struct WordEmbeddingFeatureGroup {

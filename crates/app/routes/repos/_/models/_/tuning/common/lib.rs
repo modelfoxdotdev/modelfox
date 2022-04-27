@@ -1,8 +1,8 @@
+use modelfox_app_ui::colors::{BASELINE_COLOR, SELECTED_THRESHOLD_COLOR};
+use modelfox_ui as ui;
 use num::ToPrimitive;
 use pinwheel::prelude::*;
 use std::rc::Rc;
-use modelfox_app_ui::colors::{BASELINE_COLOR, SELECTED_THRESHOLD_COLOR};
-use modelfox_ui as ui;
 
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Tuning {

@@ -5,13 +5,13 @@ use super::{
 	train_early_stopping_split, EarlyStoppingMonitor, TrainOptions, TrainProgressEvent,
 };
 use modelfox_metrics::{CrossEntropy, CrossEntropyInput};
+use modelfox_progress_counter::ProgressCounter;
 use modelfox_table::prelude::*;
 use modelfox_zip::{pzip, zip};
 use ndarray::{self, prelude::*};
 use num::{clamp, ToPrimitive};
 use rayon::{self, prelude::*};
 use std::num::NonZeroUsize;
-use modelfox_progress_counter::ProgressCounter;
 
 /// This struct describes a linear multiclass classifier model. You can train one by calling `MulticlassClassifier::train`.
 #[derive(Clone, Debug)]
