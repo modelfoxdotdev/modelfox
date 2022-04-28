@@ -133,7 +133,9 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 	let (pool_options, pool_max_connections) = if database_url.starts_with("sqlite:") {
 		// Workaround for issue with `zig cc -target x86_64-linux-gnu` not working with create_if_missing.
 		if database_url != "sqlite::memory:" {
-			tokio::fs::File::create(options.database_url.path()).await?;
+            if tokio::fs::metadata(options.database_url.path()).await.is_err() {
+                tokio::fs::File::create(options.database_url.path()).await?;
+            }
 		}
 		let pool_options = database_url
 			.parse::<sqlx::sqlite::SqliteConnectOptions>()?
