@@ -1,4 +1,5 @@
 use num::{Float, ToPrimitive};
+use std::fmt::Write;
 
 #[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub enum NumberFormatter {
@@ -84,7 +85,7 @@ impl FloatFormatter {
 		let digits = self.digits;
 		let e = value.abs().log10().floor().to_i32().unwrap();
 		let n = value / 10.0f64.powi(e);
-		let (n, e) = if e.abs() as u8 >= digits {
+		let (n, e) = if e.unsigned_abs() >= digits.into() {
 			// Format the value with scientific notation.
 			let digits = digits as usize - digits_before_decimal(n);
 			let n = format!("{:.*}", digits, n);
@@ -103,7 +104,7 @@ impl FloatFormatter {
 		}
 		if let Some(e) = e {
 			string.push('e');
-			string.push_str(&format!("{}", e));
+			write!(&mut string, "{e}").unwrap(); // infallible
 		}
 		string
 	}

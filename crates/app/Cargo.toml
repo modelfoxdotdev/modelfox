@@ -1,9 +1,15 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
-license = "UNLICENSED"
 name = "modelfox_app"
+
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = "UNLICENSED"
 publish = false
-version = "0.0.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
@@ -22,110 +28,112 @@ default = [
   "modelfox_app_login_server",
   "modelfox_app_model_download_server",
   "modelfox_app_model_edit_server",
-  "modelfox_app_model_index_client",
+  # "modelfox_app_model_index_client",
   "modelfox_app_model_index_server",
   "modelfox_app_monitors_edit_server",
   "modelfox_app_monitors_index_server",
   "modelfox_app_new_member_server",
-  "modelfox_app_new_model_client",
+  # "modelfox_app_new_model_client",
   "modelfox_app_new_model_server",
-  "modelfox_app_new_monitor_client",
+  # "modelfox_app_new_monitor_client",
   "modelfox_app_new_monitor_server",
   "modelfox_app_new_organization_server",
   "modelfox_app_new_repo_server",
   "modelfox_app_organization_index_server",
   "modelfox_app_organization_member_server",
-  "modelfox_app_playground_client",
+  # "modelfox_app_playground_client",
   "modelfox_app_playground_server",
-  "modelfox_app_production_class_metrics_client",
+  # "modelfox_app_production_class_metrics_client",
   "modelfox_app_production_class_metrics_server",
-  "modelfox_app_production_metrics_index_client",
+  # "modelfox_app_production_metrics_index_client",
   "modelfox_app_production_metrics_index_server",
-  "modelfox_app_production_prediction_client",
+  # "modelfox_app_production_prediction_client",
   "modelfox_app_production_prediction_server",
   "modelfox_app_production_predictions_index_server",
-  "modelfox_app_production_stats_column_client",
+  # "modelfox_app_production_stats_column_client",
   "modelfox_app_production_stats_column_server",
-  "modelfox_app_production_stats_index_client",
+  # "modelfox_app_production_stats_index_client",
   "modelfox_app_production_stats_index_server",
   "modelfox_app_repo_edit_server",
   "modelfox_app_repo_index_server",
   "modelfox_app_track_server",
-  "modelfox_app_training_class_metrics_client",
+  # "modelfox_app_training_class_metrics_client",
   "modelfox_app_training_class_metrics_server",
   "modelfox_app_training_grid_index_server",
   "modelfox_app_training_grid_item_server",
   "modelfox_app_training_metrics_index_server",
-  "modelfox_app_training_metrics_precision_recall_client",
+  # "modelfox_app_training_metrics_precision_recall_client",
   "modelfox_app_training_metrics_precision_recall_server",
-  "modelfox_app_training_metrics_roc_client",
+  # "modelfox_app_training_metrics_roc_client",
   "modelfox_app_training_metrics_roc_server",
-  "modelfox_app_training_stats_column_client",
+  # "modelfox_app_training_stats_column_client",
   "modelfox_app_training_stats_column_server",
   "modelfox_app_training_stats_index_server",
-  "modelfox_app_tuning_client",
+  # "modelfox_app_tuning_client",
   "modelfox_app_tuning_server",
   "modelfox_app_user_server",
 ]
 
 [build-dependencies]
-anyhow = { version = "1", features = ["backtrace"] }
-sunfish = "0.7"
-modelfox_app_model_index_client = { path = "routes/repos/_/models/_/index/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-modelfox_app_new_model_client = { path = "routes/repos/_/models/new/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-modelfox_app_new_monitor_client = { path = "routes/repos/_/models/_/monitors/new/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-modelfox_app_playground_client = { path = "routes/repos/_/models/_/playground/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-modelfox_app_production_class_metrics_client = { path = "routes/repos/_/models/_/production_metrics/class_metrics/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-modelfox_app_production_metrics_index_client = { path = "routes/repos/_/models/_/production_metrics/index/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-modelfox_app_production_prediction_client = { path = "routes/repos/_/models/_/production_predictions/predictions/_/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-modelfox_app_production_stats_column_client = { path = "routes/repos/_/models/_/production_stats/columns/_/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-modelfox_app_production_stats_index_client = { path = "routes/repos/_/models/_/production_stats/index/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-modelfox_app_training_class_metrics_client = { path = "routes/repos/_/models/_/training_metrics/class_metrics/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-modelfox_app_training_metrics_precision_recall_client = { path = "routes/repos/_/models/_/training_metrics/precision_recall/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-modelfox_app_training_metrics_roc_client = { path = "routes/repos/_/models/_/training_metrics/roc/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-modelfox_app_training_stats_column_client = { path = "routes/repos/_/models/_/training_stats/columns/_/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
-modelfox_app_tuning_client = { path = "routes/repos/_/models/_/tuning/client", optional = true, artifact = "bin", target = "wasm32-unknown-unknown" }
+anyhow = { workspace = true }
+sunfish = { workspace = true }
+modelfox_app_model_index_client = { path = "routes/repos/_/models/_/index/client", artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_new_model_client = { path = "routes/repos/_/models/new/client", artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_new_monitor_client = { path = "routes/repos/_/models/_/monitors/new/client", artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_playground_client = { path = "routes/repos/_/models/_/playground/client", artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_production_class_metrics_client = { path = "routes/repos/_/models/_/production_metrics/class_metrics/client", artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_production_metrics_index_client = { path = "routes/repos/_/models/_/production_metrics/index/client", artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_production_prediction_client = { path = "routes/repos/_/models/_/production_predictions/predictions/_/client", artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_production_stats_column_client = { path = "routes/repos/_/models/_/production_stats/columns/_/client", artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_production_stats_index_client = { path = "routes/repos/_/models/_/production_stats/index/client", artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_training_class_metrics_client = { path = "routes/repos/_/models/_/training_metrics/class_metrics/client", artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_training_metrics_precision_recall_client = { path = "routes/repos/_/models/_/training_metrics/precision_recall/client", artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_training_metrics_roc_client = { path = "routes/repos/_/models/_/training_metrics/roc/client", artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_training_stats_column_client = { path = "routes/repos/_/models/_/training_stats/columns/_/client", artifact = "bin", target = "wasm32-unknown-unknown" }
+modelfox_app_tuning_client = { path = "routes/repos/_/models/_/tuning/client", artifact = "bin", target = "wasm32-unknown-unknown" }
 
 [dependencies]
-anyhow = { version = "1", features = ["backtrace"] }
-base64 = "0.13"
-chrono = { version = "0.4", features = ["serde"] }
-chrono-tz = { version = "0.6", features = ["serde"] }
-clap = { version = "3", features = ["derive"] }
-futures = "0.3"
-glob = "0.3"
-http = "0.2"
-hyper = { version = "0.14", features = ["full"] }
-lettre = { version = "0.10.0-rc.2", default-features = false, features = ["builder", "hostname", "smtp-transport", "tokio1-rustls-tls"] }
-ndarray = { version = "0.15", features = ["rayon"] }
-num = "0.4"
-once_cell = "1"
-rand = "0.8"
-rayon = "1.5"
-reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-sha2 = "0.10"
-sqlx = { version = "0.5", default-features = false, features = ["any", "chrono", "postgres", "runtime-tokio-rustls", "sqlite"] }
-sunfish = "0.7"
+anyhow = { workspace = true }
+base64 = { workspace = true }
+chrono = { workspace = true }
+chrono-tz = { workspace = true }
+clap = { workspace = true }
+futures = { workspace = true }
+glob = { workspace = true }
+http = { workspace = true }
+hyper = { workspace = true }
+lettre = { workspace = true }
+ndarray = { workspace = true }
+num = { workspace = true }
+once_cell = { workspace = true }
+rand = { workspace = true }
+rayon = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+sqlx = { workspace = true }
+sunfish = { workspace = true }
+time = { workspace = true }
+tokio = { workspace = true }
+toml = { workspace = true }
+tracing = { workspace = true }
+url = { workspace = true }
+
+modelfox_charts = { workspace = true }
+modelfox_core = { workspace = true }
+modelfox_id = { workspace = true }
+modelfox_metrics = { workspace = true }
+modelfox_model = { workspace = true }
+modelfox_serve = { workspace = true }
+modelfox_table = { workspace = true }
+modelfox_zip = { workspace = true }
+
 modelfox_app_context = { path = "context" }
 modelfox_app_core = { path = "core" }
 modelfox_app_layouts = { path = "layouts" }
 modelfox_app_migrations = { path = "migrations" }
 modelfox_app_monitor_event = { path = "monitor_event" }
-modelfox_charts = { path = "../charts" }
-modelfox_core = { path = "../core" }
-modelfox_id = { path = "../id" }
-modelfox_metrics = { path = "../metrics" }
-modelfox_model = { path = "../model" }
-modelfox_serve = { path = "../serve" }
-modelfox_table = { path = "../table" }
-modelfox_zip = { path = "../zip" }
-time = "0.3"
-tokio = { version = "1", features = ["full"] }
-toml = "0.5"
-tracing = "0.1"
-url = { version = "2", features = ["serde"] }
 
 modelfox_app_alerts_server = { path = "routes/repos/_/models/_/alerts/_/server", optional = true }
 modelfox_app_alerts_index_server = { path = "routes/repos/_/models/_/alerts/index/server", optional = true }

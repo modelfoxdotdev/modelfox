@@ -1,20 +1,23 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-authors = ["ModelFox <root@modelfox.dev"]
-description = "Make predictions with a ModelFox model from your Rust app. Learn more at https://www.modelfox.dev/."
-documentation = "https://docs.rs/modelfox"
-edition = "2021"
-homepage = "https://github.com/modelfoxdotdev/modelfox"
-license = "MIT"
 name = "modelfox_macro"
+
+authors = { workspace = true }
+description = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
 publish = true
-repository = "https://github.com/modelfoxdotdev/modelfox"
-version = "0.8.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
 proc-macro = true
 
 [dependencies]
-proc-macro2 = "1"
-quote = "1"
-syn = { version = "1", features = ["full"] }
+proc-macro2 = { workspace = true }
+quote = { workspace = true }
+syn = { workspace = true }

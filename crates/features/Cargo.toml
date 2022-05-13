@@ -1,27 +1,31 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-authors = ["ModelFox <root@modelfox.dev"]
-description = "ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models."
-documentation = "https://docs.rs/modelfox"
-edition = "2021"
-homepage = "https://github.com/modelfoxdotdev/modelfox"
-license = "MIT"
 name = "modelfox_features"
+
+authors = { workspace = true }
+description = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
 publish = true
-repository = "https://github.com/modelfoxdotdev/modelfox"
-version = "0.8.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
-anyhow = { version = "1", features = ["backtrace"] }
-fnv = "1"
-indexmap = { version = "1.6", features = ["serde-1"] }
-itertools = "0.10"
-ndarray = { version = "0.15", features = ["rayon"] }
-num = "0.4"
-serde = { version = "1", features = ["derive"] }
-modelfox_metrics = { version = "0.8.0", path = "../metrics" }
-modelfox_table = { version = "0.8.0", path = "../table" }
-modelfox_text = { version = "0.8.0", path = "../text" }
-modelfox_zip = { version = "0.8.0", path = "../zip" }
+anyhow = { workspace = true }
+fnv = { workspace = true }
+indexmap = { workspace = true }
+itertools = { workspace = true }
+ndarray = { workspace = true }
+num = { workspace = true }
+serde = { workspace = true }
+
+modelfox_metrics = { workspace = true }
+modelfox_table = { workspace = true }
+modelfox_text = { workspace = true }
+modelfox_zip = { workspace = true }

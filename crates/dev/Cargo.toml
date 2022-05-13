@@ -1,14 +1,22 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
 name = "modelfox_dev"
+
+authors = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
 publish = false
-version = "0.0.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [[bin]]
 name = "modelfox_dev"
 path = "main.rs"
 
 [dependencies]
-clap = { version = "3", features = ["derive"] }
-sunfish = "0.7"
-tokio = { version = "1", features = ["full"] }
+clap = { workspace = true }
+sunfish = { workspace = true }
+tokio = { workspace = true }

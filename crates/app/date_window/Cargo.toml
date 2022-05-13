@@ -1,11 +1,18 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
 name = "modelfox_app_date_window"
+
+license = "UNLICENSED"
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
 publish = false
-version = "0.0.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
-serde = { version = "1", features = ["derive"] }
+serde = { workspace = true }

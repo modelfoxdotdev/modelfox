@@ -1,19 +1,22 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-authors = ["ModelFox <root@modelfox.dev"]
-description = "ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models."
-documentation = "https://docs.rs/modelfox"
-edition = "2021"
-homepage = "https://github.com/modelfoxdotdev/modelfox"
-license = "MIT"
 name = "modelfox_text"
+
+description = { workspace = true }
 publish = true
-repository = "https://github.com/modelfoxdotdev/modelfox"
-version = "0.8.0"
+authors = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
-fnv = "1"
-indexmap = { version = "1.6", features = ["serde-1"] }
-serde = { version = "1", features = ["derive"] }
+fnv = { workspace = true }
+indexmap = { workspace = true }
+serde = { workspace = true }

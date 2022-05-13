@@ -1,48 +1,51 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-authors = ["ModelFox <root@modelfox.dev"]
-description = "ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models."
-documentation = "https://docs.rs/modelfox"
-edition = "2021"
-homepage = "https://github.com/modelfoxdotdev/modelfox"
-license = "MIT"
 name = "modelfox_core"
+
+description = { workspace = true }
+authors = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
 publish = true
-repository = "https://github.com/modelfoxdotdev/modelfox"
-version = "0.8.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
-anyhow = { version = "1", features = ["backtrace"] }
-bitvec = "1"
-buffalo = { version = "0.4", features = ["bitvec", "ndarray"] }
-chrono = { version = "0.4", features = ["serde"] }
-csv = "1"
-fast-float = "0.2"
-fnv = "1"
-indexmap = { version = "1.6", features = ["serde-1"] }
-itertools = "0.10"
-ndarray = { version = "0.15", features = ["rayon"] }
-num = "0.4"
-rand = "0.8"
-rand_xoshiro = "0.6"
-rayon = "1.5"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-serde_yaml = "0.8"
-modelfox_features = { version = "0.8.0", path = "../features" }
-modelfox_finite = { version = "0.8.0", path = "../finite" }
-modelfox_id = { version = "0.8.0", path = "../id" }
-modelfox_kill_chip = { version = "0.8.0", path = "../kill_chip" }
-modelfox_linear = { version = "0.8.0", path = "../linear" }
-modelfox_metrics = { version = "0.8.0", path = "../metrics" }
-modelfox_model = { version = "0.8.0", path = "../model" }
-modelfox_progress_counter = { version = "0.8.0", path = "../progress_counter" }
-modelfox_table = { version = "0.8.0", path = "../table" }
-modelfox_text = { version = "0.8.0", path = "../text" }
-modelfox_tree = { version = "0.8.0", path = "../tree" }
-modelfox_zip = { version = "0.8.0", path = "../zip" }
+anyhow = { workspace = true }
+bitvec = { workspace = true }
+buffalo = { workspace = true }
+chrono = { workspace = true }
+csv = { workspace = true }
+fast-float = { workspace = true }
+fnv = { workspace = true }
+indexmap = { workspace = true }
+itertools = { workspace = true }
+ndarray = { workspace = true }
+num = { workspace = true }
+rand = { workspace = true }
+rand_xoshiro = { workspace = true }
+rayon = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+modelfox_features = { workspace = true }
+modelfox_finite = { workspace = true }
+modelfox_id = { workspace = true }
+modelfox_kill_chip = { workspace = true }
+modelfox_linear = { workspace = true }
+modelfox_metrics = { workspace = true }
+modelfox_model = { workspace = true }
+modelfox_progress_counter = { workspace = true }
+modelfox_table = { workspace = true }
+modelfox_text = { workspace = true }
+modelfox_tree = { workspace = true }
+modelfox_zip = { workspace = true }
 
 [target.wasm32-unknown-unknown.dependencies]
-getrandom = { version = "0.2", features = ["js"] }
+getrandom = { workspace = true }

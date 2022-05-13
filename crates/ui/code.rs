@@ -365,10 +365,13 @@ pub fn highlight(code: &str, language: Language) -> String {
 				highlighted_code.push_str(&code[start..end]);
 			}
 			tree_sitter_highlight::HighlightEvent::HighlightStart(highlight) => {
-				highlighted_code.push_str(&format!(
+				use std::fmt::Write;
+				write!(
+					&mut highlighted_code,
 					"<span class=\"{}\">",
 					NAMES.get(highlight.0).unwrap()
-				));
+				)
+				.unwrap(); // infallible
 			}
 			tree_sitter_highlight::HighlightEvent::HighlightEnd => {
 				highlighted_code.push_str("</span>");

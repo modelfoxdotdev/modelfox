@@ -1,17 +1,25 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
 name = "modelfox_app_training_stats_column_client"
+
+license = "UNLICENSED"
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
 publish = false
-version = "0.0.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [[bin]]
 name = "modelfox_app_training_stats_column_client"
 path = "main.rs"
 
 [dependencies]
-console_error_panic_hook = "0.1"
-pinwheel = "0.2"
-modelfox_charts = { path = "../../../../../../../../../../charts" }
-modelfox_ui = { path = "../../../../../../../../../../ui" }
-wasm-bindgen = "0.2"
-web-sys = "0.3"
+console_error_panic_hook = { workspace = true }
+pinwheel = { workspace = true }
+wasm-bindgen = { workspace = true }
+web-sys = { workspace = true }
+
+modelfox_charts = { workspace = true }
+modelfox_ui = { workspace = true }

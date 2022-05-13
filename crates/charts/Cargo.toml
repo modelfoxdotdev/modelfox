@@ -1,23 +1,32 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
 name = "modelfox_charts"
+
+authors = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
 publish = false
-version = "0.0.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
-futures = "0.3"
-itertools = "0.10"
-pinwheel = "0.2"
-num = "0.4"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-modelfox_number_formatter = { path = "../number_formatter" }
-modelfox_finite = { path = "../finite" }
-tracing = "0.1"
-wasm-bindgen = { version = "0.2", features = ["serde-serialize"] }
+futures = { workspace = true }
+itertools = { workspace = true }
+pinwheel = { workspace = true }
+num = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+wasm-bindgen = { workspace = true, features = ["serde-serialize"] }
+
+modelfox_number_formatter = { workspace = true }
+modelfox_finite = { workspace = true }
 
 [dependencies.web-sys]
 version = "0.3"

@@ -36,7 +36,7 @@ use anyhow::{Context, Result};
 use digest::Digest;
 use indoc::formatdoc;
 use regex::Regex;
-use serde_derive::Deserialize;
+use serde::Deserialize;
 use sha2::Sha256;
 use std::{
 	collections::HashMap,
@@ -317,11 +317,13 @@ impl Metadata21 {
 		};
 
 		for (key, value) in fields {
-			out += &format!("{}: {}\n", key, value);
+			use std::fmt::Write;
+			writeln!(&mut out, "{key}: {value}").unwrap();
 		}
 
 		if let Some(body) = body {
-			out += &format!("\n{}\n", body);
+			use std::fmt::Write;
+			writeln!(&mut out, "\n{body}").unwrap()
 		}
 
 		out
@@ -450,7 +452,8 @@ impl WheelDistInfo {
 		let tags = [self.tag.to_owned()];
 
 		for tag in tags {
-			wheel_file += &format!("Tag: {}\n", tag);
+			use std::fmt::Write;
+			writeln!(&mut wheel_file, "Tag: {tag}").unwrap();
 		}
 
 		wheel_file

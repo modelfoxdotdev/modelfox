@@ -1,13 +1,20 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
-license = "MIT"
 name = "modelfox_number_formatter"
-publish = false
-version = "0.0.0"
+
+authors = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+publish = true
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
-num = "0.4"
-serde = { version = "1", features = ["derive"] }
+num = { workspace = true }
+serde = { workspace = true }

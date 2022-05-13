@@ -1,8 +1,16 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
 name = "modelfox_node"
+
 publish = false
-version = "0.0.0"
+authors = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 crate-type = ["cdylib"]
@@ -10,12 +18,13 @@ name = "modelfox_node"
 path = "lib.rs"
 
 [build-dependencies]
-reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+reqwest = { workspace = true }
 
 [dependencies]
-anyhow = { version = "1", features = ["backtrace"] }
-memmap = "0.7"
-node_api = { version = "0.5", features = ["serde"] }
-serde = { version = "1", features = ["derive"] }
-modelfox_core = { path = "../../../crates/core" }
-modelfox_model = { path = "../../../crates/model" }
+anyhow = { workspace = true }
+memmap = { workspace = true }
+node_api = { workspace = true }
+serde = { workspace = true }
+
+modelfox_core = { workspace = true }
+modelfox_model = { workspace = true }
