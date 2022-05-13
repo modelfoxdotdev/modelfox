@@ -9,6 +9,7 @@ members = [
 	"languages/rust",
 	"languages/rust/examples/*",
 ]
+resolver = "2"
 
 [profile.dev.build-override]
 debug-assertions = false
