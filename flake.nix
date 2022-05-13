@@ -52,15 +52,9 @@
               src = self.fetchFromGitHub {
                 owner = "ziglang";
                 repo = "zig";
-                rev = "88d1258e08e668e620d5f8f4681315e555acbcd2";
-                hash = "sha256-zNPrze2XxF+4ZwTq0LN2Y9tmPHd7lY6Nb3Cy9KN2Il8=";
+                rev = "537f9052167a683c922c9815eb9fdce5b0778dc2";
+                hash = "sha256-lhqTPLKhcZ79+iwQUBR89boYYFqeNG8wNDocj5upNYQ=";
               };
-              patches = [
-                (self.fetchpatch {
-                  url = "https://github.com/ziglang/zig/pull/9771.patch";
-                  sha256 = "sha256-AaMNNBET/x0f3a9oxpgBZXnUdKH4bydKMLJfXLBmvZo=";
-                })
-              ];
             });
           })
         ];
