@@ -1,29 +1,38 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
 name = "modelfox_app_training_metrics_index_server"
+
+license = "UNLICENSED"
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
 publish = false
-version = "0.0.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
-anyhow = { version = "1", features = ["backtrace"] }
-futures = "0.3"
-http = "0.2"
-hyper = { version = "0.14", features = ["full"] }
-num = "0.4"
-pinwheel = "0.2"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-serde_urlencoded = "0.7"
-sunfish = "0.7"
+anyhow = { workspace = true }
+futures = { workspace = true }
+http = { workspace = true }
+hyper = { workspace = true }
+num = { workspace = true }
+pinwheel = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_urlencoded = { workspace = true }
+sunfish = { workspace = true }
+
+modelfox_core = { workspace = true }
+modelfox_id = { workspace = true }
+modelfox_model = { workspace = true }
+modelfox_ui = { workspace = true }
+modelfox_zip = { workspace = true }
+
 modelfox_app_context = { path = "../../../../../../../../context" }
 modelfox_app_core = { path = "../../../../../../../../core" }
 modelfox_app_layouts = { path = "../../../../../../../../layouts" }
 modelfox_app_ui = { path = "../../../../../../../../ui" }
-modelfox_core = { path = "../../../../../../../../../core" }
-modelfox_id = { path = "../../../../../../../../../id" }
-modelfox_model = { path = "../../../../../../../../../model" }
-modelfox_ui = { path = "../../../../../../../../../ui" }
-modelfox_zip = { path = "../../../../../../../../../zip" }

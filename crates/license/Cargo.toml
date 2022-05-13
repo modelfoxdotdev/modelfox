@@ -1,9 +1,16 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
-license = "MIT"
 name = "modelfox_license"
+
+authors = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
 publish = false
-version = "0.0.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
@@ -13,17 +20,18 @@ name = "modelfox_license"
 path = "main.rs"
 
 [dependencies]
-anyhow = { version = "1", features = ["backtrace"] }
-base64 = "0.13"
-chrono = { version = "0.4", features = ["serde"] }
-clap = { version = "3", features = ["derive"] }
-digest = "0.10"
-duct = "0.13"
-indoc = "1"
-pem = "1"
-rand = "0.8"
-rsa = "0.6"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-sha2 = "0.10"
-modelfox_id = { path = "../id" }
+anyhow = { workspace = true }
+base64 = { workspace = true }
+chrono = { workspace = true }
+clap = { workspace = true }
+digest = { workspace = true }
+duct = { workspace = true }
+indoc = { workspace = true }
+pem = { workspace = true }
+rand = { workspace = true }
+rsa = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+
+modelfox_id = { workspace = true }

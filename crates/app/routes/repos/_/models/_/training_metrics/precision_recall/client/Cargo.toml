@@ -1,14 +1,22 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
 name = "modelfox_app_training_metrics_precision_recall_client"
+
+license = "UNLICENSED"
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
 publish = false
-version = "0.0.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [[bin]]
 name = "modelfox_app_training_metrics_precision_recall_client"
 path = "main.rs"
 
 [dependencies]
-pinwheel = "0.2"
-modelfox_charts = { path = "../../../../../../../../../charts" }
-modelfox_ui = { path = "../../../../../../../../../ui" }
+pinwheel = { workspace = true }
+
+modelfox_charts = { workspace = true }
+modelfox_ui = { workspace = true }

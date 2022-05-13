@@ -1,16 +1,27 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
 name = "modelfox_www_index_client"
+
+authors = { workspace = true }
+description = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
 publish = false
-version = "0.0.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [[bin]]
 name = "modelfox_www_index_client"
 path = "main.rs"
 
 [dependencies]
-pinwheel = "0.2"
-modelfox_charts = { path = "../../../../charts" }
-modelfox_ui = { path = "../../../../ui" }
+pinwheel = { workspace = true }
+web-sys = { workspace = true }
+
+modelfox_charts = { workspace = true }
+modelfox_ui = { workspace = true }
+
 modelfox_www_index_common = { path = "../common" }
-web-sys = "0.3"

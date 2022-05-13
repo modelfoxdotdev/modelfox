@@ -1,17 +1,27 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
 name = "modelfox_www_benchmarks_common"
+
+authors = { workspace = true }
+description = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
 publish = false
-version = "0.0.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
-futures-signals = "0.3"
-num = "0.4"
-pinwheel = "0.2"
-serde = { version = "1", features = ["derive"] }
-modelfox_ui = { path = "../../../../ui" }
-modelfox_charts = { path = "../../../../charts" }
-tracing = "0.1"
+futures-signals = { workspace = true }
+num = { workspace = true }
+pinwheel = { workspace = true }
+serde = { workspace = true }
+tracing = { workspace = true }
+
+modelfox_charts = { workspace = true }
+modelfox_ui = { workspace = true }

@@ -1,13 +1,21 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
 name = "modelfox_app_playground_common"
+
+license = "UNLICENSED"
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
 publish = false
-version = "0.0.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
-pinwheel = "0.2"
-serde = { version = "1", features = ["derive"] }
-modelfox_charts = { path = "../../../../../../../../charts" }
+pinwheel = { workspace = true }
+serde = { workspace = true }
+
+modelfox_charts = { workspace = true }

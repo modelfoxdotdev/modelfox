@@ -1,15 +1,23 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
 name = "modelfox_app_production_stats_column_client"
+
+license = "UNLICENSED"
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
 publish = false
-version = "0.0.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [[bin]]
 name = "modelfox_app_production_stats_column_client"
 path = "main.rs"
 
 [dependencies]
-pinwheel = "0.2"
-modelfox_charts = { path = "../../../../../../../../../../charts" }
-modelfox_ui = { path = "../../../../../../../../../../ui" }
-web-sys = "0.3"
+pinwheel = { workspace = true }
+web-sys = { workspace = true }
+
+modelfox_charts = { workspace = true }
+modelfox_ui = { workspace = true }

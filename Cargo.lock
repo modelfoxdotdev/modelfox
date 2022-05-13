@@ -1586,7 +1586,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "base64 0.13.0",
@@ -1683,7 +1683,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_alerts_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -1712,7 +1712,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_alerts_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -1742,7 +1742,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_context"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "modelfox_app_core",
@@ -1751,7 +1751,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_core"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "bytes",
@@ -1767,7 +1767,6 @@ dependencies = [
  "itertools",
  "lettre",
  "memmap",
- "modelfox",
  "modelfox_app_migrations",
  "modelfox_app_monitor_event",
  "modelfox_app_production_metrics",
@@ -1798,14 +1797,14 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_date_window"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "serde",
 ]
 
 [[package]]
 name = "modelfox_app_edit_organization_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -1825,7 +1824,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_health_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -1849,7 +1848,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -1872,7 +1871,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_layouts"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -1891,7 +1890,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_login_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -1916,7 +1915,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_migrations"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -1927,7 +1926,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_model_download_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -1954,7 +1953,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_model_edit_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -1981,7 +1980,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_model_index_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "console_error_panic_hook",
  "modelfox_charts",
@@ -1992,7 +1991,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_model_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2019,7 +2018,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_monitor_event"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "chrono",
  "modelfox_finite",
@@ -2030,7 +2029,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_monitors_edit_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2059,7 +2058,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_monitors_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2088,7 +2087,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_new_member_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2113,7 +2112,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_new_model_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "web-sys",
@@ -2121,7 +2120,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_new_model_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2145,7 +2144,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_new_monitor_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "web-sys",
@@ -2153,7 +2152,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_new_monitor_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2180,7 +2179,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_new_organization_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2200,7 +2199,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_new_repo_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2221,7 +2220,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_organization_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2241,7 +2240,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_organization_member_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2267,7 +2266,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_playground_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_app_playground_common",
  "modelfox_charts",
@@ -2279,7 +2278,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_playground_common"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_charts",
  "pinwheel",
@@ -2288,7 +2287,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_playground_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2313,7 +2312,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_production_class_metrics_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_charts",
  "modelfox_ui",
@@ -2322,7 +2321,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_production_class_metrics_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2350,7 +2349,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_production_metrics"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2370,7 +2369,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_production_metrics_index_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_charts",
  "modelfox_ui",
@@ -2380,7 +2379,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_production_metrics_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2408,7 +2407,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_production_prediction_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_charts",
  "modelfox_ui",
@@ -2418,7 +2417,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_production_prediction_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2445,7 +2444,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_production_predictions_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2471,7 +2470,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_production_stats"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2496,7 +2495,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_production_stats_column_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_charts",
  "modelfox_ui",
@@ -2506,7 +2505,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_production_stats_column_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2537,7 +2536,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_production_stats_index_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_charts",
  "modelfox_ui",
@@ -2547,7 +2546,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_production_stats_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2577,7 +2576,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_repo_edit_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2601,7 +2600,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_repo_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2625,7 +2624,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_track_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2650,14 +2649,14 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_training_class_metrics_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
 ]
 
 [[package]]
 name = "modelfox_app_training_class_metrics_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2680,7 +2679,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_training_grid_common"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "http",
@@ -2697,7 +2696,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_training_grid_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2719,7 +2718,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_training_grid_item_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2740,7 +2739,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_training_metrics_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2765,7 +2764,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_training_metrics_precision_recall_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_charts",
  "modelfox_ui",
@@ -2774,7 +2773,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_training_metrics_precision_recall_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2796,7 +2795,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_training_metrics_roc_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_charts",
  "modelfox_ui",
@@ -2805,7 +2804,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_training_metrics_roc_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2827,7 +2826,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_training_stats_column_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "console_error_panic_hook",
  "modelfox_charts",
@@ -2839,7 +2838,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_training_stats_column_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2863,7 +2862,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_training_stats_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2884,7 +2883,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_tuning_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_app_tuning_common",
  "modelfox_ui",
@@ -2894,7 +2893,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_tuning_common"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_app_ui",
  "modelfox_ui",
@@ -2907,7 +2906,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_tuning_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2930,7 +2929,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_ui"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "chrono",
  "chrono-tz",
@@ -2946,7 +2945,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_app_user_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "futures",
@@ -2966,7 +2965,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_build"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "cbindgen",
@@ -2992,7 +2991,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_charts"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "futures",
  "itertools",
@@ -3087,7 +3086,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_dev"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "clap",
  "sunfish",
@@ -3096,7 +3095,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_elixir"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "erl_nif",
@@ -3161,7 +3160,7 @@ version = "0.8.0"
 
 [[package]]
 name = "modelfox_license"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "base64 0.13.0",
@@ -3233,7 +3232,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_node"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "memmap",
@@ -3246,7 +3245,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_number_formatter"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "num",
  "serde",
@@ -3261,7 +3260,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_python"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "chrono",
@@ -3277,7 +3276,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_serve"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "backtrace",
@@ -3335,7 +3334,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_ui"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "console_error_panic_hook",
  "convert_case",
@@ -3361,7 +3360,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_wasm"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "modelfox_core",
@@ -3421,7 +3420,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_about_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_layouts",
@@ -3431,7 +3430,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_benchmarks_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "console_error_panic_hook",
  "modelfox_charts",
@@ -3443,7 +3442,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_benchmarks_common"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "futures-signals",
  "modelfox_charts",
@@ -3456,7 +3455,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_benchmarks_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "futures",
  "http",
@@ -3473,7 +3472,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_blog_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_content",
@@ -3484,7 +3483,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_blog_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_content",
@@ -3495,7 +3494,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_content"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "modelfox_ui",
@@ -3507,7 +3506,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_layouts",
@@ -3517,7 +3516,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_inspect_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "console_error_panic_hook",
  "modelfox_charts",
@@ -3530,7 +3529,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_inspect_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_docs_inspect_common",
@@ -3543,7 +3542,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_monitor_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "console_error_panic_hook",
  "modelfox_charts",
@@ -3555,7 +3554,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_monitor_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_app_core",
  "modelfox_app_date_window",
@@ -3572,7 +3571,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_predict_cli_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_layouts",
@@ -3583,7 +3582,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_predict_elixir_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_layouts",
@@ -3594,7 +3593,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_predict_go_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_layouts",
@@ -3605,7 +3604,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_predict_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_layouts",
@@ -3616,7 +3615,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_predict_javascript_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_layouts",
@@ -3627,7 +3626,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_predict_php_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_layouts",
@@ -3638,7 +3637,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_predict_python_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_layouts",
@@ -3649,7 +3648,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_predict_ruby_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_layouts",
@@ -3660,7 +3659,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_predict_rust_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_layouts",
@@ -3671,7 +3670,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_getting_started_train_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_layouts",
@@ -3682,7 +3681,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_guide_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_content",
@@ -3694,7 +3693,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_app_core",
  "modelfox_ui",
@@ -3706,14 +3705,14 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_inspect_common"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_www_index_common",
 ]
 
 [[package]]
 name = "modelfox_www_docs_install_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_layouts",
@@ -3724,7 +3723,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_docs_internals_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_content",
@@ -3736,7 +3735,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_index_client"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_charts",
  "modelfox_ui",
@@ -3747,7 +3746,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_index_common"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "num",
@@ -3759,7 +3758,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_index_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "futures",
  "modelfox_charts",
@@ -3774,7 +3773,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_layouts"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "chrono",
  "modelfox_ui",
@@ -3786,7 +3785,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_pricing_server"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "modelfox_www_layouts",
@@ -3796,7 +3795,7 @@ dependencies = [
 
 [[package]]
 name = "modelfox_www_ui"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "modelfox_ui",
  "pinwheel",
@@ -4518,9 +4517,9 @@ dependencies = [
 
 [[package]]
 name = "rayon-core"
-version = "1.9.2"
+version = "1.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f51245e1e62e1f1629cbfec37b5793bbabcaeb90f30e94d2ba03564687353e4"
+checksum = "258bcdb5ac6dad48491bb2992db6b7cf74878b0384908af124823d118c99683f"
 dependencies = [
  "crossbeam-channel",
  "crossbeam-deque",
@@ -5997,7 +5996,7 @@ dependencies = [
 
 [[package]]
 name = "wheel_writer"
-version = "0.0.0"
+version = "0.8.0"
 dependencies = [
  "anyhow",
  "base64 0.13.0",
@@ -6006,7 +6005,6 @@ dependencies = [
  "indoc",
  "regex",
  "serde",
- "serde_derive",
  "sha2",
  "textwrap",
  "time 0.3.9",

@@ -1,7 +1,10 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
+name = "modelfox_example_basic"
+
 edition = "2021"
 license = "MIT"
-name = "modelfox_example_basic"
 publish = false
 version = "0.0.0"
 

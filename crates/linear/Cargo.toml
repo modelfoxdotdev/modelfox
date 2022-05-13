@@ -1,14 +1,17 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-authors = ["ModelFox <root@modelfox.dev"]
-description = "ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models."
-documentation = "https://docs.rs/modelfox"
-edition = "2021"
-homepage = "https://github.com/modelfoxdotdev/modelfox"
-license = "MIT"
 name = "modelfox_linear"
+
+description = { workspace = true }
 publish = true
-repository = "https://github.com/modelfoxdotdev/modelfox"
-version = "0.8.0"
+authors = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
@@ -46,16 +49,17 @@ name = "modelfox_linear_benchmark_iris"
 path = "benchmarks/iris.rs"
 
 [dependencies]
-buffalo = { version = "0.4", features = ["bitvec", "ndarray"] }
-clap = { version = "3", features = ["derive"] }
-ndarray = { version = "0.15", features = ["rayon"] }
-num = "0.4"
-rayon = "1.5"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-modelfox_features = { version = "0.8.0", path = "../features" }
-modelfox_kill_chip = { version = "0.8.0", path = "../kill_chip" }
-modelfox_metrics = { version = "0.8.0", path = "../metrics" }
-modelfox_progress_counter = { version = "0.8.0", path = "../progress_counter" }
-modelfox_table = { version = "0.8.0", path = "../table" }
-modelfox_zip = { version = "0.8.0", path = "../zip" }
+buffalo = { workspace = true }
+clap = { workspace = true }
+ndarray = { workspace = true }
+num = { workspace = true }
+rayon = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+modelfox_features = { workspace = true }
+modelfox_kill_chip = { workspace = true }
+modelfox_metrics = { workspace = true }
+modelfox_progress_counter = { workspace = true }
+modelfox_table = { workspace = true }
+modelfox_zip = { workspace = true }

@@ -1,9 +1,16 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-authors = ["ModelFox"]
-edition = "2021"
 name = "modelfox_python"
+
 publish = false
-version = "0.0.0"
+
+authors = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+repository = { workspace = true }
+version = { workspace = true }
+
 
 [lib]
 crate-type = ["cdylib"]
@@ -11,13 +18,14 @@ name = "modelfox_python"
 path = "lib.rs"
 
 [dependencies]
-anyhow = { version = "1", features = ["backtrace"] }
-chrono = { version = "0.4", features = ["serde"] }
-memmap = "0.7"
-pyo3 = { version = "0.16", features = ["abi3-py37", "extension-module"] }
-reqwest = { version = "0.11", default-features = false, features = ["blocking", "json", "rustls-tls"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-modelfox_core = { path = "../../crates/core" }
-modelfox_model = { path = "../../crates/model" }
-url = { version = "2", features = ["serde"] }
+anyhow = { workspace = true }
+chrono = { workspace = true }
+memmap = { workspace = true }
+pyo3 = { workspace = true }
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+url = { workspace = true }
+
+modelfox_core = { workspace = true }
+modelfox_model = { workspace = true }

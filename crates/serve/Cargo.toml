@@ -1,18 +1,26 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
-license = "MIT"
 name = "modelfox_serve"
+
+authors = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
 publish = false
-version = "0.0.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
-anyhow = "1"
-backtrace = "0.3"
-futures = "0.3"
-hyper = { version = "0.14", features = ["http1", "server", "tcp"] }
-modelfox_id = { path = "../id" }
-tokio = { version = "1", features = ["rt"] }
-tracing = "0.1"
+anyhow = { workspace = true }
+backtrace = { workspace = true }
+futures = { workspace = true }
+hyper = { workspace = true, features = ["http1", "server", "tcp"] }
+tokio = { workspace = true }
+tracing = { workspace = true }
+
+modelfox_id = { workspace = true }

@@ -1,9 +1,16 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
-license = "MIT"
 name = "libmodelfox"
+
+authors = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
 publish = false
-version = "0.8.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 crate-type = ["cdylib", "staticlib"]
@@ -12,10 +19,11 @@ path = "lib.rs"
 doc = false
 
 [dependencies]
-libc = "0.2.91"
-memmap = "0.7"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-modelfox_core = { path = "../../crates/core" }
-anyhow = { version = "1", features = ["backtrace"] }
-modelfox_model = { path = "../../crates/model" }
+anyhow = { workspace = true }
+libc = { workspace = true }
+memmap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+modelfox_model = { workspace = true }
+modelfox_core = { workspace = true }

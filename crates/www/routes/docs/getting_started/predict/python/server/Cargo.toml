@@ -1,15 +1,26 @@
+cargo-features = ["workspace-inheritance"]
+
 [package]
-edition = "2021"
 name = "modelfox_www_docs_getting_started_predict_python_server"
+
+authors = { workspace = true }
+description = { workspace = true }
+documentation = { workspace = true }
+edition = { workspace = true }
+homepage = { workspace = true }
+license = { workspace = true }
 publish = false
-version = "0.0.0"
+repository = { workspace = true }
+version = { workspace = true }
 
 [lib]
 path = "lib.rs"
 
 [dependencies]
-pinwheel = "0.2"
-sunfish = "0.7"
-modelfox_ui = { path = "../../../../../../../ui" }
+pinwheel = { workspace = true }
+sunfish = { workspace = true }
+
+modelfox_ui = { workspace = true }
+
 modelfox_www_layouts = { path = "../../../../../../layouts" }
 modelfox_www_ui = { path = "../../../../../../ui" }
