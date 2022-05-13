@@ -20,7 +20,7 @@ mod regressor;
 mod stats;
 
 /// A .modelfox file is prefixed with this magic number followed by a 4-byte little endian revision number.
-const MAGIC_NUMBER: &[u8] = b"modelfox\0";
+const MAGIC_NUMBER: &[u8] = b"tangram\0";
 /// This is the revision number that this version of modelfox_model writes.
 const CURRENT_REVISION: u32 = 0;
 /// This is the oldest revision number that this version of modelfox_model can read.
