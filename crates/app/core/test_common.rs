@@ -233,6 +233,7 @@ enum Diagnosis {
 	#[modelfox(value = "Positive")]
 	Positive,
 }
+
 /// Returns the ID of the prediction as well as the predicted value
 pub async fn seed_single_prediction_event(app: &App, model_id: Id) -> Result<(Id, String)> {
 	let data_path = workspace_root().join("heart_disease.csv");

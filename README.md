@@ -3,7 +3,7 @@
 </p>
 
 <h1 align="center">
-ModelFox is the all-in-one machine learning toolkit for programmers.
+ModelFox makes it easy to train, deploy, and monitor machine learning models.
 </h1>
 
 <p align="center">

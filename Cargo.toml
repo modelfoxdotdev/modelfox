@@ -111,6 +111,7 @@ web-sys = "0.3"
 winapi = "0.3"
 zip = "0.6"
 
+modelfox = { path = "languages/rust" }
 modelfox_app = { path = "crates/app" }
 modelfox_app_core = { path = "crates/app/core" }
 modelfox_charts = { path = "crates/charts" }

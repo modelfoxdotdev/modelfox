@@ -37,11 +37,11 @@ In the Rails Doctrine, there is a section on “Value Integrated Systems”. DHH
 
 One sentence in that section really stuck out to me: "Its [Rails'] purpose is not to segregate specialists into small niches and then require whole teams of such in order to build anything of enduring value". Today, this is exactly what companies are doing to get machine learning into production. They are required to assemble a team of specialists including Data Scientists, Machine Learning Engineers, Backend Engineers and Ops teams.
 
-It would be great if we had something like Ruby on Rails for machine learning: a single system that provides the tools you need to go from data to a deployed machine learning model.  Just as DHH says "rails specifically seeks to equip generalist individuals to make these full system", we need tools to equip generalist programmers, like front-end javascript programmers or back-end ruby programmers, to build full machine learning systems.
+It would be great if we had something like Ruby on Rails for machine learning: a single system that provides the tools you need to go from data to a deployed machine learning model. Just as DHH says "rails specifically seeks to equip generalist individuals to make these full system", we need tools to equip generalist programmers, like front-end javascript programmers or back-end ruby programmers, to build full machine learning systems.
 
 ## Introducing ModelFox
 
-ModelFox is an all-in-one automated machine learning framework that makes it easy to add machine learning to your applications. Predictions happens directly in your existing applications so there are no network requests and there is no need to set up a separate service to serve your models.
+ModelFox makes it easy to train, deploy, and monitor machine learning models.
 
 - Run `modelfox train` to train a model from a CSV file on the command line.
 - Make predictions with bindings for [Ruby](https://rubygems.org/gems/modelfox), [Python](https://pypi.org/project/modelfox), [Golang](https://pkg.go.dev/github.com/modelfoxdotdev/modelfox-go), [Elixir](https://hex.pm/packages/modelfox), [Javascript](https://www.npmjs.com/package/@modelfoxdotdev/modelfox), [PHP](https://packagist.org/packages/modelfox/modelfox), or [Rust](https://lib.rs/modelfox).
