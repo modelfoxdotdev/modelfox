@@ -166,7 +166,7 @@ fn build_debs(version: &str) {
 				Version: {version}
 				Maintainer: ModelFox <root@modelfox.dev>
 				Homepage: https://www.modelfox.dev
-				Description: ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models.
+				Description: ModelFox makes it easy to train, deploy, and monitor machine learning models.
 			"#,
 			architecture = architecture,
 			version = version,
@@ -216,7 +216,7 @@ fn build_rpms(version: &str) {
 				Name: modelfox
 				Version: {version}
 				Release: 1
-				Summary: ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models.
+				Summary: ModelFox makes it easy to train, deploy, and monitor machine learning models.
 				License: MIT
 				Source0: modelfox.tar.gz
 
@@ -411,7 +411,7 @@ fn alpine(
 				pkgname=modelfox
 				pkgver={version}
 				pkgrel=1
-				pkgdesc="ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models."
+				pkgdesc="ModelFox makes it easy to train, deploy, and monitor machine learning models."
 				url="https://www.modelfox.dev"
 				arch={arch}
 				license="MIT"
@@ -569,7 +569,7 @@ fn deb(
 							SHA1: {sha1}
 							SHA256: {sha256}
 							Homepage: https://www.modelfox.dev
-							Description: ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models.
+							Description: ModelFox makes it easy to train, deploy, and monitor machine learning models.
 						"#,
 						deb_version = deb_version,
 						arch = arch,

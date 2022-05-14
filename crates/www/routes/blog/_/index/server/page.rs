@@ -30,7 +30,7 @@ impl Component for Page {
 		let about_modelfox = div().child(
 			ui::Card::new().child(
 				ui::Markdown::new(
-					"ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models. With ModelFox, developers can train models and make predictions on the command line or with libraries for languages including [Elixir](https://hex.pm/packages/modelfox), [Golang](https://pkg.go.dev/github.com/modelfoxdotdev/modelfox-go), [Javascript](https://www.npmjs.com/package/@modelfoxdotdev/modelfox), [PHP](https://packagist.org/packages/modelfox/modelfox), [Python](https://pypi.org/project/modelfox), [Ruby](https://rubygems.org/gems/modelfox), and [Rust](https://lib.rs/modelfox), and learn about their models and monitor them in production from a web application. Watch the demo on the [homepage](https://www.modelfox.dev)."))
+					"ModelFox makes it easy to train, deploy, and monitor machine learning models. With ModelFox, developers can train models and make predictions on the command line or with libraries for languages including [Elixir](https://hex.pm/packages/modelfox), [Golang](https://pkg.go.dev/github.com/modelfoxdotdev/modelfox-go), [Javascript](https://www.npmjs.com/package/@modelfoxdotdev/modelfox), [PHP](https://packagist.org/packages/modelfox/modelfox), [Python](https://pypi.org/project/modelfox), [Ruby](https://rubygems.org/gems/modelfox), and [Rust](https://lib.rs/modelfox), and learn about their models and monitor them in production from a web application. Watch the demo on the [homepage](https://www.modelfox.dev)."))
 			);
 		Document::new()
 			.child(

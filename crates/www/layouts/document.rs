@@ -31,7 +31,7 @@ impl Component for Document {
 			)
 			.child(
 				meta()
-					.attribute("content", "ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models.")
+					.attribute("content", "ModelFox makes it easy to train, deploy, and monitor machine learning models.")
 					.attribute("name", "description"),
 			)
 			.child(

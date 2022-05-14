@@ -21,7 +21,7 @@ defmodule ModelFox.MixProject do
       name: "modelfox",
       package: [
         description:
-          "ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models.",
+          "ModelFox makes it easy to train, deploy, and monitor machine learning models.",
         licenses: ["MIT"],
         links: %{homepage: "https://www.modelfox.dev"}
       ],

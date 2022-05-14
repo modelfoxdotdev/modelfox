@@ -13,7 +13,7 @@ resolver = "2"
 
 [workspace.package]
 authors = ["ModelFox <root@modelfox.dev>"]
-description = "ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models."
+description = "ModelFox makes it easy to train, deploy, and monitor machine learning models."
 documentation = "https://docs.rs/modelfox"
 edition = "2021"
 homepage = "https://modelfox.dev"

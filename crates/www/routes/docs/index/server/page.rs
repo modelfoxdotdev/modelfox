@@ -10,7 +10,7 @@ pub struct Page;
 impl Component for Page {
 	fn into_node(self) -> Node {
 		let p1 = ui::P::new().child("Welcome to the documentation for ModelFox!");
-		let p2 = ui::P::new().child("ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models. With ModelFox, you:");
+		let p2 = ui::P::new().child("ModelFox makes it easy to train, deploy, and monitor machine learning models. With ModelFox, you:");
 		let list = ui::UnorderedList::new()
 			.child(ui::ListItem::new().child("Train a model from a CSV file on the command line."))
 			.child(

@@ -52,7 +52,7 @@ Train a model from a CSV file on the command line. Make predictions from Elixir,
 
 [Website](https://www.modelfox.dev) | [Docs](https://www.modelfox.dev/docs/) | [Discord](https://discord.gg/jT9ZGp3TK2)
 
-ModelFox makes it easy for programmers to train, deploy, and monitor machine learning models.
+ModelFox makes it easy to train, deploy, and monitor machine learning models.
 
 - Run `modelfox train` to train a model from a CSV file on the command line.
 - Make predictions with libraries for [Elixir](https://hex.pm/packages/modelfox), [Go](https://pkg.go.dev/github.com/modelfoxdotdev/modelfox-go), [JavaScript](https://www.npmjs.com/package/@modelfoxdotdev/modelfox), [PHP](https://packagist.org/packages/modelfox/modelfox), [Python](https://pypi.org/project/modelfox), [Ruby](https://rubygems.org/gems/modelfox), and [Rust](https://lib.rs/crates/modelfox).
