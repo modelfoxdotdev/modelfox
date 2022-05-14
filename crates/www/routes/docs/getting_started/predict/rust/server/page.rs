@@ -46,7 +46,7 @@ impl Component for Install {
 		let code = ui::doc!(
 			r#"
 				[dependencies]
-				modelfox = "*"
+				modelfox = { git = "https://github.com/modelfoxdotdev/modelfox" }
 			"#
 		);
 		let code = ui::highlight(code, ui::Language::Rust);

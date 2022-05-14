@@ -5,7 +5,7 @@ The ModelFox crate makes it easy to make predictions with your ModelFox machine 
 
 ```toml
 [dependencies]
-modelfox = "*"
+modelfox = { git = "https://github.com/modelfoxdotdev/modelfox" }
 ```
 
 ```rust no_run

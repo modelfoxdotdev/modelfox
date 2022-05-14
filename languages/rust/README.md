@@ -9,7 +9,7 @@ The ModelFox Rust library makes it easy to make predictions with your ModelFox m
 
 ```toml
 [dependencies]
-modelfox = "*"
+modelfox = { git = "https://github.com/modelfoxdotdev/modelfox" }
 ```
 
 ```rust
