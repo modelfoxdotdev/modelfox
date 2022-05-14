@@ -33,6 +33,6 @@ serde_json = { workspace = true }
 tokio = { workspace = true, optional = true }
 url = { workspace = true }
 
-modelfox_core = { workspace = true }
+modelfox_core = { version = "0.8.0", workspace = true }
 modelfox_macro = { path = "macro" }
-modelfox_model = { workspace = true }
+modelfox_model = { version = "0.8.0", workspace = true }

@@ -1,4 +1,4 @@
-rm modelfox/modelfox_python.so modelfox/modelfox_python.pyd
+rm -f modelfox/modelfox_python.so modelfox/modelfox_python.pyd
 
 cp ../../dist/compile/aarch64-linux-gnu/libmodelfox_python.so modelfox/modelfox_python.so
 cargo run --release -p wheel_writer -- --distribution modelfox --python cp37 --abi abi3 --platform manylinux_2_28_aarch64 --metadata metadata.toml --version $VERSION --package modelfox --output dist
@@ -9,7 +9,7 @@ cargo run --release -p wheel_writer -- --distribution modelfox --python cp37 --a
 rm modelfox/modelfox_python.so
 
 cp ../../dist/compile/aarch64-macos/libmodelfox_python.dylib modelfox/modelfox_python.so
-cargo run --release -p wheel_writer -- --distribution modelfox --python cp37 --abi abi3 --platform macos_11_0_arm64 --metadata metadata.toml --version $VERSION --package modelfox --output dist
+cargo run --release -p wheel_writer -- --distribution modelfox --python cp37 --abi abi3 --platform macosx_11_0_arm64 --metadata metadata.toml --version $VERSION --package modelfox --output dist
 rm modelfox/modelfox_python.so
 
 cp ../../dist/compile/x86_64-linux-gnu/libmodelfox_python.so modelfox/modelfox_python.so
@@ -21,7 +21,7 @@ cargo run --release -p wheel_writer -- --distribution modelfox --python cp37 --a
 rm modelfox/modelfox_python.so
 
 cp ../../dist/compile/x86_64-macos/libmodelfox_python.dylib modelfox/modelfox_python.so
-cargo run --release -p wheel_writer -- --distribution modelfox --python cp37 --abi abi3 --platform macos_11_0_x86_64 --metadata metadata.toml --version $VERSION --package modelfox --output dist
+cargo run --release -p wheel_writer -- --distribution modelfox --python cp37 --abi abi3 --platform macosx_11_0_x86_64 --metadata metadata.toml --version $VERSION --package modelfox --output dist
 rm modelfox/modelfox_python.so
 
 cp ../../dist/compile/x86_64-windows-msvc/modelfox_python.dll modelfox/modelfox_python.pyd

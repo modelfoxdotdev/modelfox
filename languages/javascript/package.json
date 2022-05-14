@@ -33,7 +33,7 @@
 	"name": "@modelfoxdotdev/modelfox",
 	"type": "module",
 	"types": "./dist/node/common.d.ts",
-	"version": "0.7.1",
+	"version": "0.8.0",
 	"workspaces": [
 		".",
 		"examples/bundler/webpack",

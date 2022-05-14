@@ -6,5 +6,6 @@ install -D ../../dist/compile/aarch64-linux-musl/libmodelfox.so lib/modelfox/lib
 install -D ../../dist/compile/x86_64-macos/libmodelfox.dylib lib/modelfox/libmodelfox/x86_64-macos/libmodelfox.dylib
 install -D ../../dist/compile/aarch64-macos/libmodelfox.dylib lib/modelfox/libmodelfox/aarch64-macos/libmodelfox.dylib
 install -D ../../dist/compile/x86_64-windows-msvc/modelfox.dll lib/modelfox/libmodelfox/x86_64-windows-msvc/modelfox.dll
-mkdir dist
+rm -rf dist
+mkdir -p dist
 gem build modelfox.gemspec -o dist/modelfox.gem

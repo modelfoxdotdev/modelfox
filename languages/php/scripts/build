@@ -3,10 +3,10 @@ install -D ../../dist/compile/x86_64-linux-musl/libmodelfox.so src/libmodelfox/x
 install -D ../../dist/compile/x86_64-linux-musl/modelfox.h src/libmodelfox/x86_64-linux-musl/modelfox.h
 install -D ../../dist/compile/aarch64-linux-musl/libmodelfox.so src/libmodelfox/aarch64-linux-musl/libmodelfox.so
 install -D ../../dist/compile/aarch64-linux-musl/modelfox.h src/libmodelfox/aarch64-linux-musl/modelfox.h
-install -D ../../dist/compile/x86_64-linux-gnu_2_24/libmodelfox.so src/libmodelfox/x86_64-linux-musl/libmodelfox.so
-install -D ../../dist/compile/x86_64-linux-gnu_2_24/modelfox.h src/libmodelfox/x86_64-linux-musl/modelfox.h
-install -D ../../dist/compile/aarch64-linux-gnu_2_24/libmodelfox.so src/libmodelfox/aarch64-linux-musl/libmodelfox.so
-install -D ../../dist/compile/aarch64-linux-gnu_2_24/modelfox.h src/libmodelfox/aarch64-linux-musl/modelfox.h
+install -D ../../dist/compile/x86_64-linux-gnu/libmodelfox.so src/libmodelfox/x86_64-linux-musl/libmodelfox.so
+install -D ../../dist/compile/x86_64-linux-gnu/modelfox.h src/libmodelfox/x86_64-linux-musl/modelfox.h
+install -D ../../dist/compile/aarch64-linux-gnu/libmodelfox.so src/libmodelfox/aarch64-linux-musl/libmodelfox.so
+install -D ../../dist/compile/aarch64-linux-gnu/modelfox.h src/libmodelfox/aarch64-linux-musl/modelfox.h
 install -D ../../dist/compile/x86_64-macos/libmodelfox.dylib src/libmodelfox/x86_64-macos/libmodelfox.dylib
 install -D ../../dist/compile/x86_64-macos/modelfox.h src/libmodelfox/x86_64-macos/modelfox.h
 install -D ../../dist/compile/aarch64-macos/libmodelfox.dylib src/libmodelfox/aarch64-macos/libmodelfox.dylib

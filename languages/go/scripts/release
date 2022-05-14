@@ -6,4 +6,4 @@ git -C dist add --all
 git -C dist commit
 git -C dist push
 git -C dist tag v$VERSION
-git -C dist push --tag v$VERSION
+git -C dist push origin v$VERSION
