@@ -3,12 +3,12 @@ cargo-features = ["workspace-inheritance"]
 [package]
 name = "modelfox_wasm"
 
-publish = false
 authors = { workspace = true }
 documentation = { workspace = true }
 edition = { workspace = true }
 homepage = { workspace = true }
 license = { workspace = true }
+publish = false
 repository = { workspace = true }
 version = { workspace = true }
 

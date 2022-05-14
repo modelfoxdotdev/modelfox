@@ -3,10 +3,10 @@ cargo-features = ["workspace-inheritance"]
 [package]
 name = "modelfox_www"
 
-edition = "2021"
-license = "UNLICENSED"
+edition = { workspace = true }
+license = { workspace = true }
 publish = false
-version = "0.0.0"
+version = { workspace = true }
 
 [[bin]]
 name = "modelfox_www"

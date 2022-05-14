@@ -3,13 +3,13 @@ cargo-features = ["workspace-inheritance"]
 [package]
 name = "modelfox_id"
 
-description = { workspace = true }
-publish = true
 authors = { workspace = true }
+description = { workspace = true }
 documentation = { workspace = true }
 edition = { workspace = true }
 homepage = { workspace = true }
 license = { workspace = true }
+publish = true
 repository = { workspace = true }
 version = { workspace = true }
 
