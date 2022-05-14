@@ -34,6 +34,7 @@ rayon = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_yaml = { workspace = true }
+
 modelfox_features = { workspace = true }
 modelfox_finite = { workspace = true }
 modelfox_id = { workspace = true }

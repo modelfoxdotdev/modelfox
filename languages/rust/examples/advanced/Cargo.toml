@@ -14,4 +14,4 @@ path = "main.rs"
 
 [dependencies]
 anyhow = { workspace = true }
-modelfox = { version = "0.8.0", path = "../../" }
+modelfox = { workspace = true }
