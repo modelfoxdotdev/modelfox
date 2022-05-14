@@ -74,7 +74,7 @@
         '';
       rust = inputs.fenix.packages.${system}.fromToolchainFile { 
         dir = ./.; 
-        sha256 = "sha256-Ht5GU1xscXyhtc1zH/ppb2zJ259UXOvflcnfGdi9Adw=";
+        sha256 = "sha256-Sj1xHYLXoz+F38X6OYUH8GzphSUyHDnKefjw7CSQWaE=";
       };
       windows_sdk_manifest_url = "https://download.visualstudio.microsoft.com/download/pr/9a26f37e-6001-429b-a5db-c5455b93953c/25b853a26e065037b83c3dd6aac74bfbfd1f09c9639d1f8c877ecc8d11ea0feb/VisualStudio.vsman";
       windows_sdk_manifest_sha256 = "6a2676b65e32c04db17e80d7d87ba60b0c75dd3465c7db5e76ae3db8ca409d85";
