@@ -13,7 +13,6 @@ publish = false
 repository = { workspace = true }
 version = { workspace = true }
 
-
 [[bin]]
 name = "modelfox_www_benchmarks_client"
 path = "main.rs"

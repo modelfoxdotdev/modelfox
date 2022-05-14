@@ -3,8 +3,8 @@ cargo-features = ["workspace-inheritance"]
 [package]
 name = "modelfox_core"
 
-description = { workspace = true }
 authors = { workspace = true }
+description = { workspace = true }
 documentation = { workspace = true }
 edition = { workspace = true }
 homepage = { workspace = true }

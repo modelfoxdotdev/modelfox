@@ -3,10 +3,10 @@ cargo-features = ["workspace-inheritance"]
 [package]
 name = "modelfox_app_production_metrics_index_server"
 
-license = "UNLICENSED"
 authors = { workspace = true }
 edition = { workspace = true }
 homepage = { workspace = true }
+license = "UNLICENSED"
 publish = false
 repository = { workspace = true }
 version = { workspace = true }
