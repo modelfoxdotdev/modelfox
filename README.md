@@ -60,7 +60,7 @@ ModelFox makes it easy to train, deploy, and monitor machine learning models.
 
 ### Install
 
-[Install the `modelfox` CLI](https://www.modelfox.dev/docs/install)
+You can install the modelfox CLI by either downloading the binary from the [latest github release](https://github.com/modelfoxdotdev/modelfox/releases/tag/v0.8.0), or by building from source. 
 
 ### Train
 
