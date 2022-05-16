@@ -163,4 +163,4 @@ If you want to submit a pull request, please run `scripts/fmt` and `scripts/chec
 
 ## License
 
-All of this repository is MIT licensed, except for the `crates/app` directory, which is source available and free to use for testing, but requires a paid license to use in production. Send us an email at hello@modelfox.dev if you are interested in a license.
+All of this repository is MIT licensed, except for the `crates/app` directory, which is source available and free to use for testing, but requires a paid license to use in production.
