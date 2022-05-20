@@ -11,38 +11,6 @@ Train a model from a CSV file on the command line. Make predictions from Elixir,
 </p>
 
 <p align="center">
-	<a href="https://modelfox.dev/docs/">
-		<img src="https://img.shields.io/badge/docs-modelfox.dev-purple?style=flat-square" alt="Documentation" />
-	</a>
-	<a href="">
-		<img src="https://img.shields.io/github/last-commit/modelfoxdotdev/modelfox?style=flat-square" alt="Last commit" />
-	</a>
-</p>
-<p align="center">
-	<a href="https://hex.pm/packages/modelfox">
-		<img src="https://img.shields.io/hexpm/v/modelfox?color=blueviolet&style=flat-square" alt="modelfox elixir"/>
-	</a>
-	<a href="https://github.com/modelfoxdotdev/modelfox-go">
-		<img src="https://img.shields.io/github/go-mod/go-version/modelfoxdotdev/modelfox-go?filename=go.mod&style=flat-square" alt="modelfox go"/>
-	</a>
-	<a href="https://www.npmjs.com/package/@modelfoxdotdev/modelfox">
-		<img src="https://img.shields.io/npm/v/@modelfoxdotdev/modelfox?color=yellow&style=flat-square" alt="modelfox js"/>
-	</a>
-	<a href = "https://packagist.org/packages/modelfox/modelfox">
-	  <img src="https://img.shields.io/packagist/v/modelfox/modelfox?style=flat-square" alt = "modelfox php"/>
-	</a>
-	<a href="https://pypi.org/project/modelfox/">
-		<img src="https://img.shields.io/pypi/v/modelfox?color=blue&style=flat-square" alt="modelfox python"/>
-	</a>
-	<a href="https://rubygems.org/gems/modelfox">
-		<img src="https://img.shields.io/gem/v/modelfox?color=red&style=flat-square" alt="modelfox ruby"/>
-	</a>
-	<a href="https://crates.io/crates/modelfox">
-		<img src="https://img.shields.io/crates/v/modelfox?style=flat-square" alt="modelfox crate"/>
-  </a>
-</p>
-
-<p align="center">
 	<a href="https://twitter.com/intent/follow?screen_name=modelfoxdotdev">
 		<img src="https://img.shields.io/twitter/follow/modelfoxdotdev?label=Follow%20modelfoxdotdev&style=social&color=blue" alt="Follow @modelfoxdotdev on Twitter" />
 	</a>
@@ -50,7 +18,7 @@ Train a model from a CSV file on the command line. Make predictions from Elixir,
 
 # ModelFox
 
-[Website](https://www.modelfox.dev) | [Docs](https://www.modelfox.dev/docs/) | [Discord](https://discord.gg/jT9ZGp3TK2)
+[Discord](https://discord.gg/jT9ZGp3TK2)
 
 ModelFox makes it easy to train, deploy, and monitor machine learning models.
 
