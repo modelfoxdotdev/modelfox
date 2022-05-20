@@ -12,12 +12,6 @@ impl Component for Footer {
 			.child(div().class("footer-section-title").child("Company"))
 			.child(
 				ui::Link::new()
-					.href("/about".to_owned())
-					.title("about".to_owned())
-					.child("About"),
-			)
-			.child(
-				ui::Link::new()
 					.href("/pricing".to_owned())
 					.title("pricing".to_owned())
 					.child("Pricing"),
