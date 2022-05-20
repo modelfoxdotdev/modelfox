@@ -3383,7 +3383,6 @@ dependencies = [
  "hyper",
  "modelfox_id",
  "modelfox_serve",
- "modelfox_www_about_server",
  "modelfox_www_benchmarks_client",
  "modelfox_www_benchmarks_server",
  "modelfox_www_blog_index_server",
@@ -3417,16 +3416,6 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-subscriber",
-]
-
-[[package]]
-name = "modelfox_www_about_server"
-version = "0.8.0"
-dependencies = [
- "modelfox_ui",
- "modelfox_www_layouts",
- "pinwheel",
- "sunfish",
 ]
 
 [[package]]

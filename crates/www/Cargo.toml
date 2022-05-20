@@ -14,7 +14,6 @@ path = "main.rs"
 
 [features]
 default = [
-  "modelfox_www_about_server",
   "modelfox_www_benchmarks_server",
   "modelfox_www_blog_index_server",
   "modelfox_www_blog_server",
@@ -63,7 +62,6 @@ tokio = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 
-modelfox_www_about_server = { path = "routes/about/server", optional = true }
 modelfox_www_benchmarks_server = { path = "routes/benchmarks/server", optional = true }
 modelfox_www_blog_index_server = { path = "routes/blog/index/server", optional = true }
 modelfox_www_blog_server = { path = "routes/blog/_/index/server", optional = true }
