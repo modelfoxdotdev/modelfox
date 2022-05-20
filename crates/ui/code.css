@@ -9,7 +9,7 @@
 	display: none;
 }
 
-.abc123 {
+.code {
 	border-radius: var(--border-radius);
 	color: var(--text-color);
 	display: grid;

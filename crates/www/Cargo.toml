@@ -15,14 +15,11 @@ path = "main.rs"
 [features]
 default = [
   "modelfox_www_about_server",
-  # "modelfox_www_benchmarks_client",
   "modelfox_www_benchmarks_server",
   "modelfox_www_blog_index_server",
   "modelfox_www_blog_server",
   "modelfox_www_docs_getting_started_index_server",
-  # "modelfox_www_docs_getting_started_inspect_client",
   "modelfox_www_docs_getting_started_inspect_server",
-  # "modelfox_www_docs_getting_started_monitor_client",
   "modelfox_www_docs_getting_started_monitor_server",
   "modelfox_www_docs_getting_started_predict_cli_server",
   "modelfox_www_docs_getting_started_predict_elixir_server",
@@ -38,7 +35,6 @@ default = [
   "modelfox_www_docs_index_server",
   "modelfox_www_docs_install_server",
   "modelfox_www_docs_internals_server",
-  # "modelfox_www_index_client",
   "modelfox_www_index_server",
   "modelfox_www_pricing_server",
 ]
