@@ -245,57 +245,6 @@ impl Component for PageNav {
 						.selected(self.selected_page == Some(DocsPage::Internals(internal.slug)))
 				}),
 			))
-			.child(
-				ui::NavSection::new("Languages".to_owned())
-					.child(
-						ui::NavItem::new()
-							.title("C".to_owned())
-							.href("/docs/languages/c".to_owned())
-							.selected(false),
-					)
-					.child(
-						ui::NavItem::new()
-							.title("Elixir".to_owned())
-							.href("/docs/languages/elixir".to_owned())
-							.selected(false),
-					)
-					.child(
-						ui::NavItem::new()
-							.title("Go".to_owned())
-							.href("/docs/languages/go".to_owned())
-							.selected(false),
-					)
-					.child(
-						ui::NavItem::new()
-							.title("JavaScript".to_owned())
-							.href("/docs/languages/javascript".to_owned())
-							.selected(false),
-					)
-					.child(
-						ui::NavItem::new()
-							.title("PHP".to_owned())
-							.href("/docs/languages/php".to_owned())
-							.selected(false),
-					)
-					.child(
-						ui::NavItem::new()
-							.title("Python".to_owned())
-							.href("/docs/languages/python".to_owned())
-							.selected(false),
-					)
-					.child(
-						ui::NavItem::new()
-							.title("Ruby".to_owned())
-							.href("/docs/languages/ruby".to_owned())
-							.selected(false),
-					)
-					.child(
-						ui::NavItem::new()
-							.title("Rust".to_owned())
-							.href("/docs/languages/rust".to_owned())
-							.selected(false),
-					),
-			)
 			.into_node()
 	}
 }

@@ -28,15 +28,6 @@ impl Component for Footer {
 					.title("Email".to_owned())
 					.child("Email Us"),
 			);
-		let app = div()
-			.class("footer-section")
-			.child(div().class("footer-section-title").child("App"))
-			.child(
-				ui::Link::new()
-					.href("https://app.modelfox.dev".to_owned())
-					.title("Log In".to_owned())
-					.child("Log In"),
-			);
 		let community = div()
 			.class("footer-section")
 			.child(div().class("footer-section-title").child("Community"))
@@ -84,8 +75,7 @@ impl Component for Footer {
 			.child(logo)
 			.child(community)
 			.child(learn)
-			.child(company)
-			.child(app);
+			.child(company);
 		div()
 			.class("footer-wrapper")
 			.child(

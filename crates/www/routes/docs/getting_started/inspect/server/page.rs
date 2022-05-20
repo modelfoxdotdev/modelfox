@@ -223,7 +223,7 @@ impl Component for Page {
 		];
 		let m1 = ui::Markdown::new(ui::doc!(
 			r#"
-				We can learn more about our model with the modelfox app. Run `modelfox app` and open your browser to http://localhost:8080, or use the cloud hosted app at https://app.modelfox.dev.
+				We can learn more about our model with the modelfox app. Run `modelfox app` and open your browser to http://localhost:8080.
 
 				Click the "Create Repo" button to create a new repo. Repos allow you to manage and compare multiple versions of the same model, just like git repos hold multiple versions of the same codebase. Click "Upload Model" to upload the first version of your model.
 

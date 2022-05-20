@@ -2,8 +2,6 @@
 "title": "Run the App on Your Own Server."
 }
 
-If you do not want to use the cloud hosted modelfox app at https://app.modelfox.dev, you can run it yourself!
-
 To get started, install the ModelFox CLI and run `modelfox app`. This runs the app in a configuration suitable for testing on a single computer. It stores data in the local filesystem and in a local SQLite database.
 
 To run the app in production, you will need:
@@ -113,6 +111,6 @@ Use the `url` key to specify the URL at which the app is accessible to users. Th
 
 ```json
 {
-	"url": "https://app.modelfox.dev"
+	"url": "https://app-url"
 }
 ```

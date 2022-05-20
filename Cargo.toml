@@ -146,3 +146,6 @@ overflow-checks = false
 [profile.release]
 lto = true
 strip = true
+
+[patch.crates-io]
+sunfish = { path = "../sunfish" }

@@ -65,11 +65,6 @@ impl Component for Topbar {
 				title: "Benchmarks".to_owned(),
 			},
 			ui::TopbarItem {
-				element: None,
-				href: "https://app.modelfox.dev".to_owned(),
-				title: "Login".to_owned(),
-			},
-			ui::TopbarItem {
 				element: Some(
 					ui::Button::new()
 						.color(ui::colors::BLUE.to_owned())

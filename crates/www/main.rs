@@ -1,4 +1,6 @@
 use anyhow::Result;
+use clap::*;
+use std::path::PathBuf;
 use std::{net::SocketAddr, sync::Arc};
 use sunfish::Sunfish;
 use tracing::error;
@@ -8,26 +10,54 @@ struct Context {
 	sunfish: Sunfish,
 }
 
+#[derive(Parser)]
+enum Args {
+	#[clap(name = "serve")]
+	Serve,
+	#[clap(name = "export")]
+	Export(ExportArgs),
+}
+
+#[derive(Parser)]
+struct ExportArgs {
+	path: PathBuf,
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
 	setup_tracing();
+	let args = Args::parse();
 	let sunfish = sunfish::init!();
-	let host_from_env = if let Ok(host) = std::env::var("HOST") {
-		Some(host.parse()?)
-	} else {
-		None
-	};
-	let host = host_from_env.unwrap_or_else(|| "0.0.0.0".parse().unwrap());
-	let port_from_env = if let Ok(port) = std::env::var("PORT") {
-		Some(port.parse()?)
-	} else {
-		None
-	};
-	let port = port_from_env.unwrap_or(8080);
-	let addr = SocketAddr::new(host, port);
-	let context = Context { sunfish };
-	let context = Arc::new(context);
-	modelfox_serve::serve(addr, context, handle).await?;
+	match args {
+		Args::Serve => {
+			let host_from_env = if let Ok(host) = std::env::var("HOST") {
+				Some(host.parse()?)
+			} else {
+				None
+			};
+			let host = host_from_env.unwrap_or_else(|| "0.0.0.0".parse().unwrap());
+			let port_from_env = if let Ok(port) = std::env::var("PORT") {
+				Some(port.parse()?)
+			} else {
+				None
+			};
+			let port = port_from_env.unwrap_or(8080);
+			let addr = SocketAddr::new(host, port);
+			let context = Context { sunfish };
+			let context = Arc::new(context);
+			modelfox_serve::serve(addr, context, handle).await?;
+		}
+		Args::Export(export_args) => {
+			export(sunfish, export_args.path).await?;
+		}
+	}
+	Ok(())
+}
+
+async fn export(sunfish: Sunfish, path: PathBuf) -> Result<()> {
+	let out_dir = std::path::Path::new(env!("OUT_DIR"));
+	let dist_path = std::env::current_dir()?.join(path);
+	sunfish.export(out_dir, &dist_path)?;
 	Ok(())
 }
 

@@ -27,12 +27,6 @@ impl Component for Inspection {
 					.href("http://localhost:8080".to_owned())
 					.child("http://localhost:8080"),
 			)
-			.child(", or go to ")
-			.child(
-				ui::Link::new()
-					.href("https://app.modelfox.dev".to_owned())
-					.child("https://app.modelfox.dev"),
-			)
 			.child(", and upload the model you trained.");
 		let p2 = "The app shows you dataset statistics, a summary of all the models that the CLI trained, the features that were most important to your model, and metrics showing how the best model performed on the test set.";
 		let p2 = div().class("index-step-text").child(p2);
