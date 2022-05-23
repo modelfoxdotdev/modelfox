@@ -46,6 +46,7 @@ time = { workspace = true, features = ["formatting", "macros"] }
 tokio = { workspace = true, features = ["full", "time", "test-util"] }
 tracing = { workspace = true }
 url = { workspace = true }
+urlencoding = { workspace = true }
 
 modelfox_core = { workspace = true }
 modelfox_finite = { workspace = true }

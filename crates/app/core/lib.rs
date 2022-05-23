@@ -14,6 +14,7 @@ use std::sync::{Arc, RwLock};
 use storage::InMemoryStorage;
 use tokio::sync::{mpsc, oneshot};
 use url::Url;
+use urlencoding::decode;
 
 pub mod alert;
 pub mod alert_sender;
@@ -132,12 +133,9 @@ async fn create_database_pool(options: CreateDatabasePoolOptions) -> Result<sqlx
 	let database_url = options.database_url.to_string();
 	let (pool_options, pool_max_connections) = if database_url.starts_with("sqlite:") {
 		// Workaround for issue with `zig cc -target x86_64-linux-gnu` not working with create_if_missing.
-		if database_url != "sqlite::memory:"
-			&& tokio::fs::metadata(options.database_url.path())
-				.await
-				.is_err()
-		{
-			tokio::fs::File::create(options.database_url.path()).await?;
+		let database_path = decode(options.database_url.path())?.to_string();
+		if database_url != "sqlite::memory:" && tokio::fs::metadata(&database_path).await.is_err() {
+			tokio::fs::File::create(&database_path).await?;
 		}
 		let pool_options = database_url
 			.parse::<sqlx::sqlite::SqliteConnectOptions>()?
@@ -190,6 +188,7 @@ impl App {
 			database_url: options.database.url.clone(),
 		})
 		.await?;
+		// Create the database pool.
 		if modelfox_app_migrations::empty(&database_pool).await? {
 			// Run all migrations if the database is empty.
 			modelfox_app_migrations::run(&database_pool).await?;
