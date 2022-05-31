@@ -4,6 +4,5 @@ for LANG in c elixir go javascript php python ruby rust; do
 	scripts/docs
 	popd
 	ssh root@router-us-east-1.modelfox.dev mkdir -p /srv/www/docs/languages/$LANG
-	rsync --archive --compress --delete --progress languages/$LANG/docs/ root@router-us-east-1.modelfox.dev:/srv/www/docs/languages/$LANG/
-	ssh root@router-us-east-1.modelfox.dev "chown -R root:root /srv/www/docs/languages/$LANG && chmod -R u=rwX,go=rX /srv/www/docs/languages/$LANG"
+	cp -r languages/$LANG/docs/ dist/www/docs/$LANG/
 done

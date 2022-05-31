@@ -43,3 +43,11 @@ cp entrypoints/node.cjs dist/node/index.cjs
 # deno
 wasm-bindgen --target deno --out-dir dist/deno/ ../../dist/compile/wasm32/modelfox_wasm.wasm
 cp entrypoints/deno.ts dist/deno/mod.ts
+
+# js
+rm -rf ../../dist/js/
+mkdir -p ../../dist/js/
+cp -r dist/web/ ../../dist/js/web/
+cp -r dist/deno/ ../../dist/js/deno/
+echo "/ /web/index.js" >> ../../dist/js/_redirects
+echo "/deno /deno/mod.ts" >> ../../dist/js/_redirects
