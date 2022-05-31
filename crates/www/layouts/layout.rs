@@ -77,7 +77,7 @@ impl Component for Topbar {
 			},
 		];
 		ui::Topbar::new()
-			.background_color(ui::colors::HEADER.to_owned())
+			.background_color(ui::colors::SURFACE.to_owned())
 			.dropdown_background_color(ui::colors::SURFACE.to_owned())
 			.items(topbar_items)
 			.logo(Logo::new().into_node())

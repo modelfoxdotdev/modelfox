@@ -20,6 +20,7 @@
 		grid-template-rows: auto;
 		grid-template-columns: 250px minmax(0, 1fr) 250px;
 		grid-template-areas: "left center right";
+		height: 100%;
 	}
 }
 
