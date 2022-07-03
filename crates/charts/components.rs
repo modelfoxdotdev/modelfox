@@ -78,12 +78,12 @@ impl Component for BarChart {
 			})
 			.collect();
 		let title = self.title.map(ChartTitle::new);
-		let legend = if !hide_legend {
+		let legend = if hide_legend {
+			None
+		} else {
 			Some(ChartLegend {
 				items: legend_items,
 			})
-		} else {
-			None
 		};
 		let chart = div()
 			.style(style::PADDING_TOP, "50%")
@@ -168,12 +168,12 @@ impl Component for BoxChart {
 			})
 			.collect();
 		let title = self.title.map(ChartTitle::new);
-		let legend = if !hide_legend {
+		let legend = if hide_legend {
+			None
+		} else {
 			Some(ChartLegend {
 				items: legend_items,
 			})
-		} else {
-			None
 		};
 		let chart = div()
 			.style(style::PADDING_TOP, "50%")
@@ -362,12 +362,12 @@ impl Component for LineChart {
 			})
 			.collect();
 		let title = self.title.map(ChartTitle::new);
-		let legend = if !hide_legend {
+		let legend = if hide_legend {
+			None
+		} else {
 			Some(ChartLegend {
 				items: legend_items,
 			})
-		} else {
-			None
 		};
 		let chart = div()
 			.style(style::PADDING_TOP, "50%")

@@ -101,20 +101,21 @@ impl ChartImpl for LineChart {
 	type HoverRegionInfo = LineChartHoverRegionInfo;
 
 	fn draw_chart(
-		options: DrawChartOptions<Self::Options>,
+		options: &DrawChartOptions<Self::Options>,
 	) -> DrawChartOutput<Self::OverlayInfo, Self::HoverRegionInfo> {
 		draw_line_chart(options)
 	}
 
 	fn draw_overlay(
-		options: DrawOverlayOptions<Self::Options, Self::OverlayInfo, Self::HoverRegionInfo>,
+		options: &DrawOverlayOptions<Self::Options, Self::OverlayInfo, Self::HoverRegionInfo>,
 	) {
-		draw_line_chart_overlay(options)
+		draw_line_chart_overlay(options);
 	}
 }
 
+#[allow(clippy::too_many_lines)]
 fn draw_line_chart(
-	options: DrawChartOptions<LineChartOptions>,
+	options: &DrawChartOptions<LineChartOptions>,
 ) -> DrawChartOutput<LineChartOverlayInfo, LineChartHoverRegionInfo> {
 	let DrawChartOptions {
 		chart_colors,
@@ -245,7 +246,7 @@ fn draw_line_chart(
 		y_axis_grid_line_info: &y_axis_grid_line_info,
 	});
 
-	draw_x_axis(DrawXAxisOptions {
+	draw_x_axis(&DrawXAxisOptions {
 		chart_colors,
 		chart_config,
 		ctx,
@@ -253,7 +254,7 @@ fn draw_line_chart(
 		y_axis_grid_line_info: &y_axis_grid_line_info,
 	});
 
-	draw_y_axis(DrawYAxisOptions {
+	draw_y_axis(&DrawYAxisOptions {
 		chart_colors,
 		chart_config,
 		ctx,
@@ -271,7 +272,7 @@ fn draw_line_chart(
 			labels,
 			number_formatter: &options.number_formatter,
 			width,
-		})
+		});
 	}
 
 	// Draw the Y axis labels.
@@ -284,12 +285,12 @@ fn draw_line_chart(
 			grid_line_info: &y_axis_grid_line_info,
 			height,
 			number_formatter: &options.number_formatter,
-		})
+		});
 	}
 
 	// Draw the X axis title.
 	if let Some(x_axis_title) = x_axis_title {
-		draw_x_axis_title(DrawXAxisTitleOptions {
+		draw_x_axis_title(&DrawXAxisTitleOptions {
 			chart_colors,
 			rect: x_axis_title_rect,
 			ctx,
@@ -299,7 +300,7 @@ fn draw_line_chart(
 
 	// Draw the Y axis title.
 	if let Some(y_axis_title) = y_axis_title {
-		draw_y_axis_title(DrawYAxisTitleOptions {
+		draw_y_axis_title(&DrawYAxisTitleOptions {
 			chart_colors,
 			rect: y_axis_title_rect,
 			ctx,
@@ -333,7 +334,7 @@ fn draw_line_chart(
 	// Draw the points.
 	if should_draw_points {
 		for series in series.iter() {
-			for point in series.data.iter() {
+			for point in &series.data {
 				if let Some(y) = point.y {
 					draw_point(DrawPointOptions {
 						chart_rect,
@@ -349,7 +350,7 @@ fn draw_line_chart(
 						x_min,
 						y_max,
 						y_min,
-					})
+					});
 				}
 			}
 		}
@@ -421,6 +422,7 @@ fn draw_line_chart(
 	}
 }
 
+#[derive(Clone, Copy)]
 struct DrawPointOptions<'a> {
 	chart_rect: Rect,
 	color: &'a str,
@@ -471,6 +473,7 @@ fn draw_point(options: DrawPointOptions) {
 	ctx.fill();
 }
 
+#[derive(Clone, Copy)]
 struct DrawLineOptions<'a> {
 	chart_rect: Rect,
 	chart_config: &'a ChartConfig,
@@ -482,6 +485,7 @@ struct DrawLineOptions<'a> {
 	y_min: f64,
 }
 
+#[allow(clippy::too_many_lines)]
 fn draw_line(options: DrawLineOptions) {
 	let DrawLineOptions {
 		chart_rect,
@@ -611,6 +615,7 @@ fn draw_line(options: DrawLineOptions) {
 	ctx.restore();
 }
 
+#[derive(Clone, Copy)]
 struct InterpolateSplineOptions {
 	next_point: Point,
 	point: Point,
@@ -618,6 +623,7 @@ struct InterpolateSplineOptions {
 	tension: f64,
 }
 
+#[allow(clippy::similar_names)]
 fn interpolate_spline(options: InterpolateSplineOptions) -> (Point, Point) {
 	let InterpolateSplineOptions {
 		next_point,
@@ -640,8 +646,9 @@ fn interpolate_spline(options: InterpolateSplineOptions) -> (Point, Point) {
 	(cp1, cp2)
 }
 
+#[allow(clippy::too_many_lines)]
 fn draw_line_chart_overlay(
-	options: DrawOverlayOptions<LineChartOptions, LineChartOverlayInfo, LineChartHoverRegionInfo>,
+	options: &DrawOverlayOptions<LineChartOptions, LineChartOverlayInfo, LineChartHoverRegionInfo>,
 ) {
 	let DrawOverlayOptions {
 		chart_colors,
@@ -666,7 +673,7 @@ fn draw_line_chart_overlay(
 	for _ in 0..*n_series {
 		closest_active_hover_region_for_series.push(None);
 	}
-	for active_hover_region in active_hover_regions {
+	for active_hover_region in *active_hover_regions {
 		// Update the current closest active hover region for the series corresponding to this active_hover_region's series index.
 		let current_closest_active_hover_region_for_series = closest_active_hover_region_for_series
 			.get_mut(active_hover_region.info.series_index)
@@ -706,7 +713,7 @@ fn draw_line_chart_overlay(
 					format!("({}, {})", point_label, point_value)
 				};
 				TooltipLabel {
-					color: active_hover_region.info.color.to_owned(),
+					color: active_hover_region.info.color.clone(),
 					text,
 				}
 			})
@@ -735,7 +742,7 @@ fn draw_line_chart_overlay(
 	}
 	for active_hover_region in closest_active_hover_region_for_series
 		.iter()
-		.filter_map(|r| r.as_ref())
+		.filter_map(std::option::Option::as_ref)
 	{
 		let point = active_hover_region.info.point;
 		draw_point(DrawPointOptions {
@@ -792,6 +799,7 @@ fn draw_crosshairs(options: DrawCrosshairsOptions) {
 	ctx.restore();
 }
 
+#[derive(Clone, Copy)]
 struct PointToPixelsOptions {
 	chart_rect: Rect,
 	point: Point,
