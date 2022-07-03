@@ -11,6 +11,8 @@ assert!(Finite::new(n.get() / 0.0).is_err());
 ```
 */
 
+#![warn(clippy::pedantic)]
+
 use num::Float;
 use std::{
 	cmp::{Ord, Ordering},
@@ -38,6 +40,9 @@ impl<T> Finite<T>
 where
 	T: Float,
 {
+	/// # Errors
+	/// 
+	/// Returns an `Err` value is the passed value is not finite.
 	pub fn new(value: T) -> Result<Finite<T>, NotFiniteError> {
 		if value.is_finite() {
 			Ok(Finite(value))
