@@ -17,7 +17,6 @@ name = "modelfox_build"
 path = "main.rs"
 
 [dependencies]
-anyhow = { workspace = true }
 cbindgen = { workspace = true }
 chrono = { workspace = true }
 clap = { workspace = true }

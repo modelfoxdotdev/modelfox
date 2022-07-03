@@ -1,4 +1,5 @@
-use anyhow::Result;
+#![warn(clippy::pedantic)]
+
 use clap::Parser;
 use digest::Digest;
 use duct::cmd;
@@ -207,7 +208,7 @@ fn build_rpms(version: &str) {
 			PathBuf::from(format!("modelfox-{version}/modelfox", version = version));
 		let sources_path = rpm_path.join("SOURCES");
 		let tar_path = sources_path.join("modelfox.tar.gz");
-		tar(vec![(modelfox_cli_path, modelfox_path_in_tar)], &tar_path);
+		tar(&[(modelfox_cli_path, modelfox_path_in_tar)], &tar_path);
 		// Write the spec file.
 		let spec = formatdoc!(
 			r#"
@@ -321,6 +322,9 @@ fn build_containers(version: &str) {
 	}
 }
 
+/// # Panics
+///
+/// This function will panic if shelling out to `gpg --decrypt` fails.
 pub fn build_pkgs(version: &str, pkgs_url: &str) {
 	let root_path = std::env::current_dir().unwrap();
 	let pkgs_path = root_path.join("dist").join("pkgs");
@@ -364,22 +368,19 @@ pub fn build_pkgs(version: &str, pkgs_url: &str) {
 		version,
 		&alpine_public_key_path,
 		&alpine_private_key_path,
-	)
-	.unwrap();
+	);
 	deb(
 		pkgs_url,
 		version,
 		&deb_public_key_path,
 		&deb_private_key_path,
-	)
-	.unwrap();
+	);
 	rpm(
 		pkgs_url,
 		version,
 		&rpm_public_key_path,
 		&rpm_private_key_path,
-	)
-	.unwrap();
+	);
 }
 
 fn alpine(
@@ -387,7 +388,7 @@ fn alpine(
 	version: &str,
 	alpine_public_key_path: &Path,
 	alpine_private_key_path: &Path,
-) -> Result<()> {
+) {
 	let root_path = std::env::current_dir().unwrap();
 	let compile_path = root_path.join("dist").join("compile");
 	let pkgs_path = root_path.join("dist").join("pkgs");
@@ -447,18 +448,10 @@ fn alpine(
 			.run()
 			.unwrap();
 	}
-	Ok(())
 }
 
-fn deb(
-	pkgs_url: &str,
-	version: &str,
-	deb_public_key_path: &Path,
-	deb_private_key_path: &Path,
-) -> Result<()> {
-	let root_path = std::env::current_dir().unwrap();
-	let pkgs_path = root_path.join("dist").join("pkgs");
-	let debs_path = root_path.join("dist").join("debs");
+#[allow(clippy::too_many_lines)]
+fn deb(pkgs_url: &str, version: &str, deb_public_key_path: &Path, deb_private_key_path: &Path) {
 	struct Deb<'a> {
 		arch: DebArch,
 		version: &'a str,
@@ -477,10 +470,13 @@ fn deb(
 			}
 		}
 	}
+	let root_path = std::env::current_dir().unwrap();
+	let pkgs_path = root_path.join("dist").join("pkgs");
+	let debs_path = root_path.join("dist").join("debs");
 	let archs = [DebArch::Amd64, DebArch::Arm64];
 	let debs: Vec<Deb> = archs
 		.iter()
-		.cloned()
+		.copied()
 		.map(|arch| {
 			let path = debs_path.join(format!(
 				"modelfox_{version}_{arch}.deb",
@@ -532,7 +528,7 @@ fn deb(
 		let pool_path = repo_path.join("pool");
 		std::fs::create_dir_all(&pool_path).unwrap();
 		// Copy all the .debs into the pool.
-		for deb in debs.iter() {
+		for deb in &debs {
 			std::fs::copy(&deb.path, pool_path.join(&deb.path.file_name().unwrap())).unwrap();
 		}
 		let dists_path = repo_path.join("dists");
@@ -656,19 +652,9 @@ fn deb(
 			);
 		}
 	}
-	Ok(())
 }
 
-fn rpm(
-	pkgs_url: &str,
-	version: &str,
-	rpm_public_key_path: &Path,
-	rpm_private_key_path: &Path,
-) -> Result<()> {
-	let root_path = std::env::current_dir().unwrap();
-	let pkgs_path = root_path.join("dist").join("pkgs");
-	let rpms_path = root_path.join("dist").join("rpms");
-	// Find all the .rpms in args.rpms.
+fn rpm(pkgs_url: &str, version: &str, rpm_public_key_path: &Path, rpm_private_key_path: &Path) {
 	struct Rpm {
 		target: RpmTarget,
 		path: PathBuf,
@@ -686,10 +672,14 @@ fn rpm(
 			}
 		}
 	}
+	let root_path = std::env::current_dir().unwrap();
+	let pkgs_path = root_path.join("dist").join("pkgs");
+	let rpms_path = root_path.join("dist").join("rpms");
+	// Find all the .rpms in args.rpms.
 	let targets = [RpmTarget::X8664, RpmTarget::AArch64];
 	let rpms: Vec<Rpm> = targets
 		.iter()
-		.cloned()
+		.copied()
 		.map(|target| {
 			let path = rpms_path.join(format!(
 				"modelfox_{version}_{target}.rpm",
@@ -713,9 +703,8 @@ fn rpm(
 		std::fs::create_dir_all(&repo_path).unwrap();
 		// Create the .repo file.
 		let repo_file_path = repo_path.join("modelfox.repo");
-		let distribution_version_with_leading_slash = distribution_version
-			.map(|v| format!("/{v}", v = v))
-			.unwrap_or_else(|| "".to_owned());
+		let distribution_version_with_leading_slash =
+			distribution_version.map_or_else(|| "".to_owned(), |v| format!("/{v}", v = v));
 		let repo_file = formatdoc!(
 			r#"
 				[modelfox]
@@ -740,7 +729,7 @@ fn rpm(
 			let repo_target_path = repo_path.join(target.to_string());
 			std::fs::create_dir_all(&repo_target_path).unwrap();
 			// Copy the .rpm.
-			for rpm in rpms.iter() {
+			for rpm in &rpms {
 				if rpm.target == target {
 					std::fs::copy(
 						&rpm.path,
@@ -760,7 +749,6 @@ fn rpm(
 			);
 		}
 	}
-	Ok(())
 }
 
 fn build_release(version: &str) {
@@ -784,7 +772,7 @@ fn build_release(version: &str) {
 			modelfox_cli_path.clone(),
 			PathBuf::from(modelfox_cli_file_name),
 		)];
-		tar(inputs, &output_path);
+		tar(&inputs, &output_path);
 	}
 	// libmodelfox
 	for target in TARGETS {
@@ -810,7 +798,7 @@ fn build_release(version: &str) {
 				PathBuf::from(target_file_names.libmodelfox_static_file_name),
 			),
 		];
-		tar(inputs, &output_path);
+		tar(&inputs, &output_path);
 	}
 }
 
@@ -843,6 +831,7 @@ pub enum Target {
 }
 
 impl Target {
+	#[must_use]
 	pub fn arch(&self) -> Arch {
 		match self {
 			Target::AArch64LinuxGnu | Target::AArch64LinuxMusl | Target::AArch64MacOs => {
@@ -856,6 +845,7 @@ impl Target {
 		}
 	}
 
+	#[must_use]
 	pub fn target_name(&self) -> &'static str {
 		match self {
 			Target::AArch64LinuxGnu => "aarch64-linux-gnu",
@@ -869,6 +859,7 @@ impl Target {
 		}
 	}
 
+	#[must_use]
 	pub fn rust_target_name(&self) -> &'static str {
 		match self {
 			Target::AArch64LinuxGnu => "aarch64-unknown-linux-gnu",
@@ -882,6 +873,7 @@ impl Target {
 		}
 	}
 
+	#[must_use]
 	pub fn rust_target(&self) -> &'static str {
 		match self {
 			Target::AArch64LinuxGnu => "aarch64-unknown-linux-gnu",
@@ -907,6 +899,7 @@ pub struct TargetFileNames {
 }
 
 impl TargetFileNames {
+	#[must_use]
 	pub fn for_target(target: Target) -> TargetFileNames {
 		match target {
 			Target::X8664LinuxGnu
@@ -959,16 +952,17 @@ fn clean_and_create(path: &Path) {
 	std::fs::create_dir_all(path).unwrap();
 }
 
-fn tar(input_paths: Vec<(PathBuf, PathBuf)>, output_path: &Path) {
+fn tar(input_paths: &[(PathBuf, PathBuf)], output_path: &Path) {
 	let output_file = std::fs::File::create(output_path).unwrap();
 	let gz = flate2::write::GzEncoder::new(output_file, flate2::Compression::default());
 	let mut tar = tar::Builder::new(gz);
-	for (path, name) in input_paths.iter() {
+	for (path, name) in input_paths {
 		tar.append_path_with_name(path, name).unwrap();
 	}
 	tar.finish().unwrap();
 }
 
+#[derive(Clone, Copy)]
 enum SignatureType {
 	Cleartext,
 	Detached,
