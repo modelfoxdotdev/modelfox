@@ -41,7 +41,7 @@ where
 	T: Float,
 {
 	/// # Errors
-	/// 
+	///
 	/// Returns an `Err` value is the passed value is not finite.
 	pub fn new(value: T) -> Result<Finite<T>, NotFiniteError> {
 		if value.is_finite() {

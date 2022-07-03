@@ -5,7 +5,8 @@ use std::sync::atomic::{AtomicBool, Ordering};
 pub struct KillChip(AtomicBool);
 
 impl KillChip {
-	#[must_use] pub const fn new() -> Self {
+	#[must_use]
+	pub const fn new() -> Self {
 		KillChip(AtomicBool::new(false))
 	}
 
