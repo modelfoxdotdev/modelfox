@@ -1,7 +1,10 @@
-use super::*;
+use super::{Table, TableColumn, TableColumnType};
 use anyhow::Result;
 use modelfox_progress_counter::ProgressCounter;
 use modelfox_zip::zip;
+// NOTE - this import is actually used, false positive with the lint.
+#[allow(unused_imports)]
+use num::ToPrimitive;
 use std::{
 	collections::{BTreeMap, BTreeSet},
 	path::Path,
@@ -44,7 +47,7 @@ const DEFAULT_INVALID_VALUES: &[&str] = &[
 ];
 
 #[derive(Clone, Debug)]
-pub enum LoadProgressEvent {
+pub enum ProgressEvent {
 	InferStarted(ProgressCounter),
 	InferDone,
 	LoadStarted(ProgressCounter),
@@ -52,10 +55,13 @@ pub enum LoadProgressEvent {
 }
 
 impl Table {
+	/// # Errors
+	///
+	/// Returns an error if unable to load CSV from reader.
 	pub fn from_bytes(
 		bytes: &[u8],
 		options: FromCsvOptions,
-		handle_progress_event: &mut impl FnMut(LoadProgressEvent),
+		handle_progress_event: &mut impl FnMut(ProgressEvent),
 	) -> Result<Table> {
 		let len = bytes.len();
 		Table::from_csv(
@@ -66,10 +72,13 @@ impl Table {
 		)
 	}
 
+	/// # Errors
+	///
+	/// Returns an error if unable to load CSV from reader.
 	pub fn from_path(
 		path: &Path,
 		options: FromCsvOptions,
-		handle_progress_event: &mut impl FnMut(LoadProgressEvent),
+		handle_progress_event: &mut impl FnMut(ProgressEvent),
 	) -> Result<Table> {
 		let len = std::fs::metadata(path)?.len();
 		Table::from_csv(
@@ -80,52 +89,51 @@ impl Table {
 		)
 	}
 
+	#[allow(clippy::too_many_lines)]
+	#[allow(clippy::missing_errors_doc)]
+	#[allow(clippy::missing_panics_doc)]
 	pub fn from_csv<R>(
 		reader: &mut csv::Reader<R>,
 		len: u64,
 		options: FromCsvOptions,
-		handle_progress_event: &mut impl FnMut(LoadProgressEvent),
+		handle_progress_event: &mut impl FnMut(ProgressEvent),
 	) -> Result<Table>
 	where
 		R: std::io::Read + std::io::Seek,
 	{
+		#[derive(Clone, Debug)]
+		enum ColumnTypeOrInferStats<'a> {
+			ColumnType(TableColumnType),
+			InferStats(InferStats<'a>),
+		}
 		let column_names: Vec<String> = reader
 			.headers()?
 			.into_iter()
-			.map(|column_name| column_name.to_owned())
+			.map(std::borrow::ToOwned::to_owned)
 			.collect();
 		let n_columns = column_names.len();
 		let start_position = reader.position().clone();
 		let infer_options = &options.infer_options;
 		let mut n_rows = None;
 
-		#[derive(Clone, Debug)]
-		enum ColumnTypeOrInferStats<'a> {
-			ColumnType(TableColumnType),
-			InferStats(InferStats<'a>),
-		}
-
 		// Retrieve any column types present in the options.
-		let mut column_types: Vec<ColumnTypeOrInferStats> = if let Some(column_types) =
-			options.column_types
-		{
-			column_names
-				.iter()
-				.map(|column_name| {
-					column_types
-						.get(column_name)
-						.map(|column_type| ColumnTypeOrInferStats::ColumnType(column_type.clone()))
-						.unwrap_or_else(|| {
-							ColumnTypeOrInferStats::InferStats(InferStats::new(infer_options))
-						})
-				})
-				.collect()
-		} else {
-			vec![
-				ColumnTypeOrInferStats::InferStats(InferStats::new(&options.infer_options));
-				n_columns
-			]
-		};
+		let mut column_types: Vec<ColumnTypeOrInferStats> =
+			if let Some(column_types) = options.column_types {
+				column_names
+					.iter()
+					.map(|column_name| {
+						column_types.get(column_name).map_or_else(
+							|| ColumnTypeOrInferStats::InferStats(InferStats::new(infer_options)),
+							|column_type| ColumnTypeOrInferStats::ColumnType(column_type.clone()),
+						)
+					})
+					.collect()
+			} else {
+				vec![
+					ColumnTypeOrInferStats::InferStats(InferStats::new(&options.infer_options));
+					n_columns
+				]
+			};
 
 		// Passing over the csv to infer column types is only necessary if one or more columns did not have its type specified.
 		let needs_infer =
@@ -154,16 +162,16 @@ impl Table {
 			let mut record = csv::StringRecord::new();
 			let mut n_records_read = 0;
 			let progress_counter = ProgressCounter::new(len);
-			handle_progress_event(LoadProgressEvent::InferStarted(progress_counter.clone()));
+			handle_progress_event(ProgressEvent::InferStarted(progress_counter.clone()));
 			while reader.read_record(&mut record)? {
 				progress_counter.set(record.position().unwrap().byte());
-				for (index, infer_stats) in infer_stats.iter_mut() {
+				for (index, infer_stats) in &mut infer_stats {
 					let value = record.get(*index).unwrap();
 					infer_stats.update(value);
 				}
 				n_records_read += 1;
 			}
-			handle_progress_event(LoadProgressEvent::InferDone);
+			handle_progress_event(ProgressEvent::InferDone);
 			n_rows = Some(n_records_read);
 			let column_types = column_types
 				.into_iter()
@@ -183,7 +191,7 @@ impl Table {
 				.map(
 					|column_type_or_infer_stats| match column_type_or_infer_stats {
 						ColumnTypeOrInferStats::ColumnType(column_type) => column_type,
-						_ => unreachable!(),
+						ColumnTypeOrInferStats::InferStats(_) => unreachable!(),
 					},
 				)
 				.collect()
@@ -194,7 +202,7 @@ impl Table {
 		let mut table = Table::new(column_names, column_types);
 		// If an inference pass was done, reserve storage for the values because we know how many rows are in the csv.
 		if let Some(n_rows) = n_rows {
-			for column in table.columns.iter_mut() {
+			for column in &mut table.columns {
 				match column {
 					TableColumn::Unknown(_) => {}
 					TableColumn::Number(column) => column.data.reserve_exact(n_rows),
@@ -206,7 +214,7 @@ impl Table {
 		// Read each csv record and insert the values into the columns of the table.
 		let mut record = csv::ByteRecord::new();
 		let progress_counter = ProgressCounter::new(len);
-		handle_progress_event(LoadProgressEvent::LoadStarted(progress_counter.clone()));
+		handle_progress_event(ProgressEvent::LoadStarted(progress_counter.clone()));
 		while reader.read_byte_record(&mut record)? {
 			progress_counter.set(record.position().unwrap().byte());
 			for (column, value) in zip!(table.columns.iter_mut(), record.iter()) {
@@ -228,12 +236,12 @@ impl Table {
 						column.data.push(value);
 					}
 					TableColumn::Text(column) => {
-						column.data.push(std::str::from_utf8(value)?.to_owned())
+						column.data.push(std::str::from_utf8(value)?.to_owned());
 					}
 				}
 			}
 		}
-		handle_progress_event(LoadProgressEvent::LoadDone);
+		handle_progress_event(ProgressEvent::LoadDone);
 		Ok(table)
 	}
 }
@@ -277,7 +285,7 @@ impl<'a> InferStats<'a> {
 		match self.column_type {
 			InferColumnType::Unknown | InferColumnType::Number => {
 				if fast_float::parse::<f32, &str>(value)
-					.map(|v| v.is_finite())
+					.map(f32::is_finite)
 					.unwrap_or(false)
 				{
 					self.column_type = InferColumnType::Number;
@@ -292,7 +300,7 @@ impl<'a> InferStats<'a> {
 					self.column_type = InferColumnType::Text;
 				}
 			}
-			_ => {}
+			InferColumnType::Text => {}
 		}
 	}
 
@@ -304,8 +312,8 @@ impl<'a> InferStats<'a> {
 				if let Some(unique_values) = self.unique_values {
 					if unique_values.len() == 2 {
 						let mut values = unique_values.iter();
-						if values.next().map(|s| s.as_str()) == Some("0")
-							&& values.next().map(|s| s.as_str()) == Some("1")
+						if values.next().map(std::string::String::as_str) == Some("0")
+							&& values.next().map(std::string::String::as_str) == Some("1")
 						{
 							return TableColumnType::Enum {
 								variants: unique_values.into_iter().collect(),

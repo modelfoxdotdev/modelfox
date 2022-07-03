@@ -8,7 +8,7 @@ use modelfox_id::Id;
 use std::{cell::RefCell, convert::Infallible, panic::AssertUnwindSafe, sync::Arc};
 
 /// # Errors
-/// 
+///
 /// This function returns an error if `server.serve()` fails.
 pub async fn serve<C, H, F>(
 	addr: std::net::SocketAddr,
