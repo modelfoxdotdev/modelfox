@@ -1,4 +1,4 @@
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub enum ColumnType {
 	Unknown,
 	Number,

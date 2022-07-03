@@ -11,7 +11,6 @@ This crate implements the C API for libmodelfox, the ModelFox C library.
 use memmap::Mmap;
 use std::{
 	ffi::CStr,
-	mem::transmute,
 	os::raw::{c_char, c_double, c_float, c_void},
 	panic::{catch_unwind, UnwindSafe},
 	ptr::{null, null_mut},
@@ -384,7 +383,8 @@ pub unsafe extern "C" fn modelfox_predict_output_vec_get_at_index(
 	predict_output_ptr: *mut *const modelfox_predict_output,
 ) {
 	let predict_output = (*predict_output_vec).0.get(index).unwrap();
-	*predict_output_ptr = transmute(predict_output);
+	*predict_output_ptr = predict_output as *const modelfox_core::predict::PredictOutput
+		as *const modelfox_predict_output;
 }
 
 /// Cast the predict output as `modelfox_regression_predict_output`. If this predict output is not for regression, null will be written to `regression_predict_output_ptr`.
@@ -394,7 +394,10 @@ pub unsafe extern "C" fn modelfox_predict_output_as_regression(
 	predict_output_ptr: *mut *const modelfox_regression_predict_output,
 ) {
 	*predict_output_ptr = match &(*predict_output).0 {
-		modelfox_core::predict::PredictOutput::Regression(p) => transmute(p),
+		modelfox_core::predict::PredictOutput::Regression(p) => {
+			p as *const modelfox_core::predict::RegressionPredictOutput
+				as *const modelfox_regression_predict_output
+		}
 		modelfox_core::predict::PredictOutput::BinaryClassification(_) => null(),
 		modelfox_core::predict::PredictOutput::MulticlassClassification(_) => null(),
 	};
@@ -408,7 +411,10 @@ pub unsafe extern "C" fn modelfox_predict_output_as_binary_classification(
 ) {
 	*predict_output_ptr = match &(*predict_output).0 {
 		modelfox_core::predict::PredictOutput::Regression(_) => null(),
-		modelfox_core::predict::PredictOutput::BinaryClassification(p) => transmute(p),
+		modelfox_core::predict::PredictOutput::BinaryClassification(p) => {
+			p as *const modelfox_core::predict::BinaryClassificationPredictOutput
+				as *const modelfox_binary_classification_predict_output
+		}
 		modelfox_core::predict::PredictOutput::MulticlassClassification(_) => null(),
 	};
 }
@@ -422,7 +428,10 @@ pub unsafe extern "C" fn modelfox_predict_output_as_multiclass_classification(
 	*predict_output_ptr = match &(*predict_output).0 {
 		modelfox_core::predict::PredictOutput::Regression(_) => null(),
 		modelfox_core::predict::PredictOutput::BinaryClassification(_) => null(),
-		modelfox_core::predict::PredictOutput::MulticlassClassification(p) => transmute(p),
+		modelfox_core::predict::PredictOutput::MulticlassClassification(p) => {
+			p as *const modelfox_core::predict::MulticlassClassificationPredictOutput
+				as *const modelfox_multiclass_classification_predict_output
+		}
 	};
 }
 
@@ -443,7 +452,9 @@ pub unsafe extern "C" fn modelfox_regression_predict_output_get_feature_contribu
 ) {
 	match &(*predict_output).0.feature_contributions {
 		Some(feature_contributions) => {
-			*feature_contributions_ptr = transmute(feature_contributions)
+			*feature_contributions_ptr = feature_contributions
+				as *const modelfox_core::predict::FeatureContributions
+				as *const modelfox_feature_contributions
 		}
 		None => {
 			*feature_contributions_ptr = null();
@@ -477,7 +488,9 @@ pub unsafe extern "C" fn modelfox_binary_classification_predict_output_get_featu
 ) {
 	match &(*predict_output).0.feature_contributions {
 		Some(feature_contributions) => {
-			*feature_contributions_ptr = transmute(feature_contributions)
+			*feature_contributions_ptr = feature_contributions
+				as *const modelfox_core::predict::FeatureContributions
+				as *const modelfox_feature_contributions
 		}
 		None => {
 			*feature_contributions_ptr = null();
@@ -598,7 +611,9 @@ pub unsafe extern "C" fn modelfox_multiclass_classification_predict_output_featu
 	match (*feature_contributions_iter).0.next() {
 		Some((class_name, feature_contributions)) => {
 			*class_name_ptr = class_name.as_str().into();
-			*feature_contributions_ptr = transmute(feature_contributions);
+			*feature_contributions_ptr = feature_contributions
+				as *const modelfox_core::predict::FeatureContributions
+				as *const modelfox_feature_contributions;
 			true
 		}
 		None => false,
@@ -643,7 +658,10 @@ pub unsafe extern "C" fn modelfox_feature_contributions_get_entry_at_index(
 		.0
 		.entries
 		.get(index)
-		.map(|value| transmute(value))
+		.map(|value| {
+			value as *const modelfox_core::predict::FeatureContributionEntry
+				as *const modelfox_feature_contribution_entry
+		})
 		.unwrap_or_else(null);
 }
 
@@ -693,7 +711,10 @@ pub unsafe extern "C" fn modelfox_feature_contribution_entry_as_identity(
 	feature_contribution_ptr: *mut *const modelfox_identity_feature_contribution,
 ) {
 	*feature_contribution_ptr = match &(*feature_contribution_entry).0 {
-		modelfox_core::predict::FeatureContributionEntry::Identity(f) => transmute(f),
+		modelfox_core::predict::FeatureContributionEntry::Identity(f) => {
+			f as *const modelfox_core::predict::IdentityFeatureContribution
+				as *const modelfox_identity_feature_contribution
+		}
 		modelfox_core::predict::FeatureContributionEntry::Normalized(_) => null(),
 		modelfox_core::predict::FeatureContributionEntry::OneHotEncoded(_) => null(),
 		modelfox_core::predict::FeatureContributionEntry::BagOfWords(_) => null(),
@@ -710,7 +731,10 @@ pub unsafe extern "C" fn modelfox_feature_contribution_entry_as_normalized(
 ) {
 	*feature_contribution_ptr = match &(*feature_contribution_entry).0 {
 		modelfox_core::predict::FeatureContributionEntry::Identity(_) => null(),
-		modelfox_core::predict::FeatureContributionEntry::Normalized(f) => transmute(f),
+		modelfox_core::predict::FeatureContributionEntry::Normalized(f) => {
+			f as *const modelfox_core::predict::NormalizedFeatureContribution
+				as *const modelfox_normalized_feature_contribution
+		}
 		modelfox_core::predict::FeatureContributionEntry::OneHotEncoded(_) => null(),
 		modelfox_core::predict::FeatureContributionEntry::BagOfWords(_) => null(),
 		modelfox_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(_) => null(),
@@ -727,7 +751,10 @@ pub unsafe extern "C" fn modelfox_feature_contribution_entry_as_one_hot_encoded(
 	*feature_contribution_ptr = match &(*feature_contribution_entry).0 {
 		modelfox_core::predict::FeatureContributionEntry::Identity(_) => null(),
 		modelfox_core::predict::FeatureContributionEntry::Normalized(_) => null(),
-		modelfox_core::predict::FeatureContributionEntry::OneHotEncoded(f) => transmute(f),
+		modelfox_core::predict::FeatureContributionEntry::OneHotEncoded(f) => {
+			f as *const modelfox_core::predict::OneHotEncodedFeatureContribution
+				as *const modelfox_one_hot_encoded_feature_contribution
+		}
 		modelfox_core::predict::FeatureContributionEntry::BagOfWords(_) => null(),
 		modelfox_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(_) => null(),
 		modelfox_core::predict::FeatureContributionEntry::WordEmbedding(_) => null(),
@@ -744,7 +771,10 @@ pub unsafe extern "C" fn modelfox_feature_contribution_entry_as_bag_of_words(
 		modelfox_core::predict::FeatureContributionEntry::Identity(_) => null(),
 		modelfox_core::predict::FeatureContributionEntry::Normalized(_) => null(),
 		modelfox_core::predict::FeatureContributionEntry::OneHotEncoded(_) => null(),
-		modelfox_core::predict::FeatureContributionEntry::BagOfWords(f) => transmute(f),
+		modelfox_core::predict::FeatureContributionEntry::BagOfWords(f) => {
+			f as *const modelfox_core::predict::BagOfWordsFeatureContribution
+				as *const modelfox_bag_of_words_feature_contribution
+		}
 		modelfox_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(_) => null(),
 		modelfox_core::predict::FeatureContributionEntry::WordEmbedding(_) => null(),
 	};
@@ -762,7 +792,8 @@ pub unsafe extern "C" fn modelfox_feature_contribution_entry_as_bag_of_words_cos
 		modelfox_core::predict::FeatureContributionEntry::OneHotEncoded(_) => null(),
 		modelfox_core::predict::FeatureContributionEntry::BagOfWords(_) => null(),
 		modelfox_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(f) => {
-			transmute(f)
+			f as *const modelfox_core::predict::BagOfWordsCosineSimilarityFeatureContribution
+				as *const modelfox_bag_of_words_cosine_similarity_feature_contribution
 		}
 		modelfox_core::predict::FeatureContributionEntry::WordEmbedding(_) => null(),
 	};
@@ -780,7 +811,10 @@ pub unsafe extern "C" fn modelfox_feature_contribution_entry_as_word_embedding(
 		modelfox_core::predict::FeatureContributionEntry::OneHotEncoded(_) => null(),
 		modelfox_core::predict::FeatureContributionEntry::BagOfWords(_) => null(),
 		modelfox_core::predict::FeatureContributionEntry::BagOfWordsCosineSimilarity(_) => null(),
-		modelfox_core::predict::FeatureContributionEntry::WordEmbedding(f) => transmute(f),
+		modelfox_core::predict::FeatureContributionEntry::WordEmbedding(f) => {
+			f as *const modelfox_core::predict::WordEmbeddingFeatureContribution
+				as *const modelfox_word_embedding_feature_contribution
+		}
 	};
 }
 
@@ -892,7 +926,8 @@ pub unsafe extern "C" fn modelfox_bag_of_words_feature_contribution_get_ngram(
 	feature_contribution: *const modelfox_bag_of_words_feature_contribution,
 	ngram_ptr: *mut *const modelfox_ngram,
 ) {
-	*ngram_ptr = transmute(&(*feature_contribution).0.ngram);
+	*ngram_ptr = &(*feature_contribution).0.ngram as *const modelfox_core::predict::NGram
+		as *const modelfox_ngram;
 }
 
 /// Retrieve the ngram type.

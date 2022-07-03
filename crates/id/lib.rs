@@ -1,11 +1,14 @@
 /*!
-ModelFox uses the `Id` type to uniquely identify models, users, and anything that needs a primary key. This type is almost identical to UUID v4, except there are no bits reserved to specify the version, and the string representation has no dashes.
+`ModelFox` uses the `Id` type to uniquely identify models, users, and anything that needs a primary key. This type is almost identical to UUID v4, except there are no bits reserved to specify the version, and the string representation has no dashes.
 */
+
+#![warn(clippy::pedantic)]
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct Id(u128);
 
 impl Id {
+	#[must_use]
 	pub fn generate() -> Id {
 		Id(rand::random())
 	}

@@ -830,7 +830,7 @@ pub enum Arch {
 	X8664,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Target {
 	AArch64LinuxGnu,
 	AArch64LinuxMusl,

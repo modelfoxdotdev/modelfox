@@ -33,7 +33,7 @@ pub enum TableColumn {
 	Text(TextTableColumn),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UnknownTableColumn {
 	name: Option<String>,
 	len: usize,
@@ -45,7 +45,7 @@ pub struct NumberTableColumn {
 	data: Vec<f32>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EnumTableColumn {
 	name: Option<String>,
 	variants: Vec<String>,
@@ -53,7 +53,7 @@ pub struct EnumTableColumn {
 	variants_map: FnvHashMap<String, NonZeroUsize>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TextTableColumn {
 	name: Option<String>,
 	data: Vec<String>,
@@ -72,7 +72,7 @@ pub enum TableColumnView<'a> {
 	Text(TextTableColumnView<'a>),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UnknownTableColumnView<'a> {
 	name: Option<&'a str>,
 	len: usize,
@@ -84,14 +84,14 @@ pub struct NumberTableColumnView<'a> {
 	data: &'a [f32],
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EnumTableColumnView<'a> {
 	name: Option<&'a str>,
 	variants: &'a [String],
 	data: &'a [Option<NonZeroUsize>],
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TextTableColumnView<'a> {
 	name: Option<&'a str>,
 	data: &'a [String],
@@ -115,14 +115,14 @@ pub struct NumberTableColumnViewMut<'a> {
 	data: &'a mut [f32],
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct EnumTableColumnViewMut<'a> {
 	name: Option<&'a mut str>,
 	variants: &'a mut [String],
 	data: &'a mut [usize],
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct TextTableColumnViewMut<'a> {
 	name: Option<&'a mut str>,
 	data: &'a mut [String],

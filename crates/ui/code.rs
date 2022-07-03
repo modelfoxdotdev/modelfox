@@ -15,7 +15,7 @@ pub struct Code {
 	pub line_numbers: Option<bool>,
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Language {
 	Elixir,
 	Go,

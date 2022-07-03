@@ -8,7 +8,7 @@ pub struct Page {
 	pub error: Option<String>,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum Stage {
 	Email,
 	Code,
