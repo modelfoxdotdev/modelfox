@@ -1,3 +1,6 @@
+#![warn(clippy::pedantic)]
+#![allow(clippy::module_name_repetitions)]
+
 pub mod bar_chart;
 pub mod box_chart;
 pub mod chart;

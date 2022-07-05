@@ -21,6 +21,7 @@ pub struct TooltipLabel {
 	pub text: String,
 }
 
+#[allow(clippy::too_many_lines)]
 pub fn draw_tooltip(options: DrawTooltipOptions) {
 	let DrawTooltipOptions {
 		center_horizontal,

@@ -170,7 +170,7 @@ async fn delete_model(
 	Ok(response)
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum ModelNavItem {
 	Overview,
 	TrainingGrid,

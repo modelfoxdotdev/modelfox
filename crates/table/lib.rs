@@ -2,7 +2,9 @@
 This crate implements two dimensional collections where each column can have a different data type, like a spreadsheet or database.
 */
 
-pub use self::load::{FromCsvOptions, LoadProgressEvent};
+#![warn(clippy::pedantic)]
+
+pub use self::load::{FromCsvOptions, ProgressEvent};
 use fnv::FnvHashMap;
 use modelfox_zip::zip;
 use ndarray::prelude::*;
@@ -33,7 +35,7 @@ pub enum TableColumn {
 	Text(TextTableColumn),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UnknownTableColumn {
 	name: Option<String>,
 	len: usize,
@@ -45,7 +47,7 @@ pub struct NumberTableColumn {
 	data: Vec<f32>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EnumTableColumn {
 	name: Option<String>,
 	variants: Vec<String>,
@@ -53,7 +55,7 @@ pub struct EnumTableColumn {
 	variants_map: FnvHashMap<String, NonZeroUsize>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TextTableColumn {
 	name: Option<String>,
 	data: Vec<String>,
@@ -72,7 +74,7 @@ pub enum TableColumnView<'a> {
 	Text(TextTableColumnView<'a>),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UnknownTableColumnView<'a> {
 	name: Option<&'a str>,
 	len: usize,
@@ -84,14 +86,14 @@ pub struct NumberTableColumnView<'a> {
 	data: &'a [f32],
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EnumTableColumnView<'a> {
 	name: Option<&'a str>,
 	variants: &'a [String],
 	data: &'a [Option<NonZeroUsize>],
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TextTableColumnView<'a> {
 	name: Option<&'a str>,
 	data: &'a [String],
@@ -115,14 +117,14 @@ pub struct NumberTableColumnViewMut<'a> {
 	data: &'a mut [f32],
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct EnumTableColumnViewMut<'a> {
 	name: Option<&'a mut str>,
 	variants: &'a mut [String],
 	data: &'a mut [usize],
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct TextTableColumnViewMut<'a> {
 	name: Option<&'a mut str>,
 	data: &'a mut [String],
@@ -153,6 +155,7 @@ pub enum TableValue<'a> {
 }
 
 impl Table {
+	#[must_use]
 	pub fn new(column_names: Vec<Option<String>>, column_types: Vec<TableColumnType>) -> Table {
 		let columns = zip!(column_names, column_types)
 			.map(|(column_name, column_type)| match column_type {
@@ -173,6 +176,7 @@ impl Table {
 		Table { columns }
 	}
 
+	#[must_use]
 	pub fn columns(&self) -> &Vec<TableColumn> {
 		&self.columns
 	}
@@ -187,19 +191,26 @@ impl Table {
 		}
 	}
 
+	#[must_use]
 	pub fn ncols(&self) -> usize {
 		self.columns.len()
 	}
 
+	#[must_use]
 	pub fn nrows(&self) -> usize {
-		self.columns.first().map(|column| column.len()).unwrap_or(0)
+		self.columns.first().map_or(0, TableColumn::len)
 	}
 
+	#[must_use]
 	pub fn view(&self) -> TableView {
-		let columns = self.columns.iter().map(|column| column.view()).collect();
+		let columns = self.columns.iter().map(TableColumn::view).collect();
 		TableView { columns }
 	}
 
+	/// # Panics
+	///
+	/// This function panics if unable to cast `NonZeroUsize` to `f32`.
+	#[must_use]
 	pub fn to_rows_f32(&self) -> Option<Array2<f32>> {
 		let mut features_train = Array::zeros((self.nrows(), self.ncols()));
 		for (mut ndarray_column, table_column) in
@@ -222,6 +233,7 @@ impl Table {
 		Some(features_train)
 	}
 
+	#[must_use]
 	pub fn to_rows(&self) -> Array2<TableValue> {
 		let mut rows = Array::from_elem((self.nrows(), self.ncols()), TableValue::Unknown);
 		for (mut ndarray_column, table_column) in
@@ -251,6 +263,7 @@ impl Table {
 }
 
 impl TableColumn {
+	#[must_use]
 	pub fn len(&self) -> usize {
 		match self {
 			TableColumn::Unknown(s) => s.len(),
@@ -260,6 +273,7 @@ impl TableColumn {
 		}
 	}
 
+	#[must_use]
 	pub fn is_empty(&self) -> bool {
 		match self {
 			TableColumn::Unknown(s) => s.len == 0,
@@ -269,6 +283,7 @@ impl TableColumn {
 		}
 	}
 
+	#[must_use]
 	pub fn name(&self) -> Option<&str> {
 		match self {
 			TableColumn::Unknown(s) => s.name.as_deref(),
@@ -281,13 +296,13 @@ impl TableColumn {
 	pub fn drop_row(&mut self, idx: usize) {
 		match self {
 			TableColumn::Enum(etc) => {
-				let _ = etc.data_mut().remove(idx);
+				let _data = etc.data_mut().remove(idx);
 			}
 			TableColumn::Number(ntc) => {
-				let _ = ntc.data_mut().remove(idx);
+				let _data = ntc.data_mut().remove(idx);
 			}
 			TableColumn::Text(ttc) => {
-				let _ = ttc.data_mut().remove(idx);
+				let _data = ttc.data_mut().remove(idx);
 			}
 			TableColumn::Unknown(utc) => {
 				let len = utc.len_mut();
@@ -296,6 +311,7 @@ impl TableColumn {
 		}
 	}
 
+	#[must_use]
 	pub fn as_number(&self) -> Option<&NumberTableColumn> {
 		match self {
 			TableColumn::Number(s) => Some(s),
@@ -303,6 +319,7 @@ impl TableColumn {
 		}
 	}
 
+	#[must_use]
 	pub fn as_enum(&self) -> Option<&EnumTableColumn> {
 		match self {
 			TableColumn::Enum(s) => Some(s),
@@ -310,6 +327,7 @@ impl TableColumn {
 		}
 	}
 
+	#[must_use]
 	pub fn as_text(&self) -> Option<&TextTableColumn> {
 		match self {
 			TableColumn::Text(s) => Some(s),
@@ -338,6 +356,7 @@ impl TableColumn {
 		}
 	}
 
+	#[must_use]
 	pub fn view(&self) -> TableColumnView {
 		match self {
 			TableColumn::Unknown(column) => TableColumnView::Unknown(column.view()),
@@ -349,18 +368,22 @@ impl TableColumn {
 }
 
 impl UnknownTableColumn {
+	#[must_use]
 	pub fn new(name: Option<String>) -> UnknownTableColumn {
 		UnknownTableColumn { name, len: 0 }
 	}
 
+	#[must_use]
 	pub fn name(&self) -> &Option<String> {
 		&self.name
 	}
 
+	#[must_use]
 	pub fn is_empty(&self) -> bool {
 		self.len == 0
 	}
 
+	#[must_use]
 	pub fn len(&self) -> usize {
 		self.len
 	}
@@ -369,6 +392,7 @@ impl UnknownTableColumn {
 		&mut self.len
 	}
 
+	#[must_use]
 	pub fn view(&self) -> UnknownTableColumnView {
 		UnknownTableColumnView {
 			name: self.name.as_deref(),
@@ -378,18 +402,22 @@ impl UnknownTableColumn {
 }
 
 impl NumberTableColumn {
+	#[must_use]
 	pub fn new(name: Option<String>, data: Vec<f32>) -> NumberTableColumn {
 		NumberTableColumn { name, data }
 	}
 
+	#[must_use]
 	pub fn name(&self) -> &Option<String> {
 		&self.name
 	}
 
+	#[must_use]
 	pub fn is_empty(&self) -> bool {
 		self.data.len() == 0
 	}
 
+	#[must_use]
 	pub fn len(&self) -> usize {
 		self.data.len()
 	}
@@ -406,6 +434,7 @@ impl NumberTableColumn {
 		&mut self.data
 	}
 
+	#[must_use]
 	pub fn view(&self) -> NumberTableColumnView {
 		NumberTableColumnView {
 			name: self.name.as_deref(),
@@ -415,6 +444,10 @@ impl NumberTableColumn {
 }
 
 impl EnumTableColumn {
+	/// # Panics
+	///
+	/// This function panics if the number of variants overflows a `NonZeroUsize`.
+	#[must_use]
 	pub fn new(
 		name: Option<String>,
 		variants: Vec<String>,
@@ -434,18 +467,22 @@ impl EnumTableColumn {
 		}
 	}
 
+	#[must_use]
 	pub fn name(&self) -> &Option<String> {
 		&self.name
 	}
 
+	#[must_use]
 	pub fn variants(&self) -> &[String] {
 		&self.variants
 	}
 
+	#[must_use]
 	pub fn is_empty(&self) -> bool {
 		self.data.len() == 0
 	}
 
+	#[must_use]
 	pub fn len(&self) -> usize {
 		self.data.len()
 	}
@@ -458,6 +495,7 @@ impl EnumTableColumn {
 		&mut self.data
 	}
 
+	#[must_use]
 	pub fn view(&self) -> EnumTableColumnView {
 		EnumTableColumnView {
 			name: self.name.as_deref(),
@@ -466,24 +504,29 @@ impl EnumTableColumn {
 		}
 	}
 
+	#[must_use]
 	pub fn value_for_variant(&self, variant: &str) -> Option<NonZeroUsize> {
-		self.variants_map.get(variant).cloned()
+		self.variants_map.get(variant).copied()
 	}
 }
 
 impl TextTableColumn {
+	#[must_use]
 	pub fn new(name: Option<String>, data: Vec<String>) -> TextTableColumn {
 		TextTableColumn { name, data }
 	}
 
+	#[must_use]
 	pub fn name(&self) -> &Option<String> {
 		&self.name
 	}
 
+	#[must_use]
 	pub fn is_empty(&self) -> bool {
 		self.data.len() == 0
 	}
 
+	#[must_use]
 	pub fn len(&self) -> usize {
 		self.data.len()
 	}
@@ -496,6 +539,7 @@ impl TextTableColumn {
 		&mut self.data
 	}
 
+	#[must_use]
 	pub fn view(&self) -> TextTableColumnView {
 		TextTableColumnView {
 			name: self.name.as_deref(),
@@ -505,26 +549,31 @@ impl TextTableColumn {
 }
 
 impl<'a> TableView<'a> {
+	#[must_use]
 	pub fn columns(&self) -> &Vec<TableColumnView<'a>> {
 		&self.columns
 	}
 
+	#[must_use]
 	pub fn view_columns(&self, column_indexes: &[usize]) -> TableView {
 		let mut columns = Vec::with_capacity(column_indexes.len());
 		for column_index in column_indexes {
-			columns.push(self.columns[*column_index].clone())
+			columns.push(self.columns[*column_index].clone());
 		}
 		Self { columns }
 	}
 
+	#[must_use]
 	pub fn ncols(&self) -> usize {
 		self.columns.len()
 	}
 
+	#[must_use]
 	pub fn nrows(&self) -> usize {
-		self.columns.first().map(|column| column.len()).unwrap_or(0)
+		self.columns.first().map_or(0, TableColumnView::len)
 	}
 
+	#[must_use]
 	pub fn view(&self) -> TableView {
 		self.clone()
 	}
@@ -540,6 +589,7 @@ impl<'a> TableView<'a> {
 		}
 	}
 
+	#[must_use]
 	pub fn split_at_row(&self, index: usize) -> (TableView<'a>, TableView<'a>) {
 		let iter = self.columns.iter().map(|column| column.split_at_row(index));
 		let mut columns_a = Vec::with_capacity(self.columns.len());
@@ -554,6 +604,10 @@ impl<'a> TableView<'a> {
 		)
 	}
 
+	/// # Panics
+	///
+	/// This function panics if unable to cast `NonZeroUsize` to `f32.`
+	#[must_use]
 	pub fn to_rows_f32(&self) -> Option<Array2<f32>> {
 		let mut features_train = Array::zeros((self.nrows(), self.ncols()));
 		for (mut ndarray_column, table_column) in
@@ -576,6 +630,7 @@ impl<'a> TableView<'a> {
 		Some(features_train)
 	}
 
+	#[must_use]
 	pub fn to_rows(&self) -> Array2<TableValue<'a>> {
 		let mut rows = Array::from_elem((self.nrows(), self.ncols()), TableValue::Unknown);
 		for (mut ndarray_column, table_column) in
@@ -605,6 +660,7 @@ impl<'a> TableView<'a> {
 }
 
 impl<'a> TableColumnView<'a> {
+	#[must_use]
 	pub fn len(&self) -> usize {
 		match self {
 			TableColumnView::Unknown(s) => s.len,
@@ -614,6 +670,7 @@ impl<'a> TableColumnView<'a> {
 		}
 	}
 
+	#[must_use]
 	pub fn is_empty(&self) -> bool {
 		match self {
 			TableColumnView::Unknown(s) => s.len == 0,
@@ -623,6 +680,7 @@ impl<'a> TableColumnView<'a> {
 		}
 	}
 
+	#[must_use]
 	pub fn name(&self) -> Option<&str> {
 		match self {
 			TableColumnView::Unknown(s) => s.name,
@@ -632,6 +690,7 @@ impl<'a> TableColumnView<'a> {
 		}
 	}
 
+	#[must_use]
 	pub fn column_type(&self) -> TableColumnTypeView {
 		match self {
 			TableColumnView::Unknown(_) => TableColumnTypeView::Unknown,
@@ -643,6 +702,7 @@ impl<'a> TableColumnView<'a> {
 		}
 	}
 
+	#[must_use]
 	pub fn as_number(&self) -> Option<NumberTableColumnView> {
 		match self {
 			TableColumnView::Number(s) => Some(s.clone()),
@@ -650,6 +710,7 @@ impl<'a> TableColumnView<'a> {
 		}
 	}
 
+	#[must_use]
 	pub fn as_enum(&self) -> Option<EnumTableColumnView> {
 		match self {
 			TableColumnView::Enum(s) => Some(s.clone()),
@@ -657,6 +718,7 @@ impl<'a> TableColumnView<'a> {
 		}
 	}
 
+	#[must_use]
 	pub fn as_text(&self) -> Option<TextTableColumnView> {
 		match self {
 			TableColumnView::Text(s) => Some(s.clone()),
@@ -664,6 +726,7 @@ impl<'a> TableColumnView<'a> {
 		}
 	}
 
+	#[must_use]
 	pub fn split_at_row(&self, index: usize) -> (TableColumnView<'a>, TableColumnView<'a>) {
 		match self {
 			TableColumnView::Unknown(column) => (
@@ -720,6 +783,7 @@ impl<'a> TableColumnView<'a> {
 		}
 	}
 
+	#[must_use]
 	pub fn view(&self) -> TableColumnView {
 		match self {
 			TableColumnView::Unknown(s) => TableColumnView::Unknown(s.view()),
@@ -731,36 +795,44 @@ impl<'a> TableColumnView<'a> {
 }
 
 impl<'a> UnknownTableColumnView<'a> {
+	#[must_use]
 	pub fn name(&self) -> Option<&str> {
 		self.name
 	}
 
+	#[must_use]
 	pub fn is_empty(&self) -> bool {
 		self.len == 0
 	}
 
+	#[must_use]
 	pub fn len(&self) -> usize {
 		self.len
 	}
 
+	#[must_use]
 	pub fn view(&self) -> UnknownTableColumnView {
 		self.clone()
 	}
 }
 
 impl<'a> NumberTableColumnView<'a> {
+	#[must_use]
 	pub fn name(&self) -> Option<&str> {
 		self.name
 	}
 
+	#[must_use]
 	pub fn data(&self) -> &[f32] {
 		self.data
 	}
 
+	#[must_use]
 	pub fn is_empty(&self) -> bool {
 		self.data.len() == 0
 	}
 
+	#[must_use]
 	pub fn len(&self) -> usize {
 		self.data.len()
 	}
@@ -769,32 +841,39 @@ impl<'a> NumberTableColumnView<'a> {
 		self.data.iter()
 	}
 
+	#[must_use]
 	pub fn as_slice(&self) -> &[f32] {
 		self.data
 	}
 
+	#[must_use]
 	pub fn view(&self) -> NumberTableColumnView {
 		self.clone()
 	}
 }
 
 impl<'a> EnumTableColumnView<'a> {
+	#[must_use]
 	pub fn name(&self) -> Option<&str> {
 		self.name
 	}
 
+	#[must_use]
 	pub fn data(&self) -> &[Option<NonZeroUsize>] {
 		self.data
 	}
 
+	#[must_use]
 	pub fn variants(&self) -> &[String] {
 		self.variants
 	}
 
+	#[must_use]
 	pub fn is_empty(&self) -> bool {
 		self.data.len() == 0
 	}
 
+	#[must_use]
 	pub fn len(&self) -> usize {
 		self.data.len()
 	}
@@ -803,28 +882,34 @@ impl<'a> EnumTableColumnView<'a> {
 		self.data.iter()
 	}
 
+	#[must_use]
 	pub fn as_slice(&self) -> &[Option<NonZeroUsize>] {
 		self.data
 	}
 
+	#[must_use]
 	pub fn view(&self) -> EnumTableColumnView {
 		self.clone()
 	}
 }
 
 impl<'a> TextTableColumnView<'a> {
+	#[must_use]
 	pub fn name(&self) -> Option<&str> {
 		self.name
 	}
 
+	#[must_use]
 	pub fn data(&self) -> &'a [String] {
 		self.data
 	}
 
+	#[must_use]
 	pub fn is_empty(&self) -> bool {
 		self.data.len() == 0
 	}
 
+	#[must_use]
 	pub fn len(&self) -> usize {
 		self.data.len()
 	}
@@ -833,16 +918,19 @@ impl<'a> TextTableColumnView<'a> {
 		self.data.iter()
 	}
 
+	#[must_use]
 	pub fn as_slice(&self) -> &[String] {
 		self.data
 	}
 
+	#[must_use]
 	pub fn view(&self) -> TextTableColumnView {
 		self.clone()
 	}
 }
 
 impl<'a> TableValue<'a> {
+	#[must_use]
 	pub fn as_number(&self) -> Option<&f32> {
 		match self {
 			TableValue::Number(s) => Some(s),
@@ -857,6 +945,7 @@ impl<'a> TableValue<'a> {
 		}
 	}
 
+	#[must_use]
 	pub fn as_enum(&self) -> Option<&Option<NonZeroUsize>> {
 		match self {
 			TableValue::Enum(s) => Some(s),
@@ -871,6 +960,7 @@ impl<'a> TableValue<'a> {
 		}
 	}
 
+	#[must_use]
 	pub fn as_text(&self) -> Option<&str> {
 		match self {
 			TableValue::Text(s) => Some(s),

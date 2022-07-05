@@ -1,3 +1,5 @@
+#![warn(clippy::pedantic)]
+
 use anyhow::{anyhow, Result};
 use digest::Digest;
 use modelfox_id::Id;
@@ -9,6 +11,9 @@ use serde_json::json;
 
 pub const MODELFOX_LICENSE_PUBLIC_KEY: &str = include_str!("./license.public.rsa");
 
+/// # Errors
+///
+/// Return an error if the license data fails to serialize, or the data signing fails.
 pub fn generate(private_key: &str) -> Result<String> {
 	let private_key = RsaPrivateKey::from_pkcs1_pem(private_key)?;
 	let id = Id::generate();
@@ -28,6 +33,9 @@ pub fn generate(private_key: &str) -> Result<String> {
 	Ok(license)
 }
 
+/// # Errors
+///
+/// This function returns na error if the public key fails to parse and/or decode, or the data fails to varify against it.
 pub fn verify(license: &str, public_key: &str) -> Result<bool> {
 	let public_key = RsaPublicKey::from_pkcs1_pem(public_key)?;
 	let mut sections = license.split(|c| c == ':');

@@ -73,20 +73,21 @@ impl ChartImpl for BoxChart {
 	type HoverRegionInfo = BoxChartHoverRegionInfo;
 
 	fn draw_chart(
-		options: DrawChartOptions<Self::Options>,
+		options: &DrawChartOptions<Self::Options>,
 	) -> DrawChartOutput<Self::OverlayInfo, Self::HoverRegionInfo> {
 		draw_box_chart(options)
 	}
 
 	fn draw_overlay(
-		options: DrawOverlayOptions<Self::Options, Self::OverlayInfo, Self::HoverRegionInfo>,
+		options: &DrawOverlayOptions<Self::Options, Self::OverlayInfo, Self::HoverRegionInfo>,
 	) {
-		draw_box_chart_overlay(options)
+		draw_box_chart_overlay(options);
 	}
 }
 
+#[allow(clippy::too_many_lines)]
 fn draw_box_chart(
-	options: DrawChartOptions<BoxChartOptions>,
+	options: &DrawChartOptions<BoxChartOptions>,
 ) -> DrawChartOutput<BoxChartOverlayInfo, BoxChartHoverRegionInfo> {
 	let DrawChartOptions {
 		chart_colors,
@@ -170,7 +171,7 @@ fn draw_box_chart(
 			ctx,
 			group_width: box_group_width,
 			width,
-		})
+		});
 	}
 
 	draw_y_axis_grid_lines(DrawYAxisGridLinesOptions {
@@ -181,7 +182,7 @@ fn draw_box_chart(
 		y_axis_grid_line_info: &y_axis_grid_line_info,
 	});
 
-	draw_x_axis(DrawXAxisOptions {
+	draw_x_axis(&DrawXAxisOptions {
 		chart_colors,
 		chart_config,
 		ctx,
@@ -199,12 +200,12 @@ fn draw_box_chart(
 			grid_line_info: &y_axis_grid_line_info,
 			height,
 			number_formatter: &options.number_formatter,
-		})
+		});
 	}
 
 	// Draw the X axis title.
 	if let Some(x_axis_title) = x_axis_title {
-		draw_x_axis_title(DrawXAxisTitleOptions {
+		draw_x_axis_title(&DrawXAxisTitleOptions {
 			chart_colors,
 			rect: x_axis_title_rect,
 			ctx,
@@ -214,7 +215,7 @@ fn draw_box_chart(
 
 	// Draw the Y axis title.
 	if let Some(y_axis_title) = y_axis_title {
-		draw_y_axis_title(DrawYAxisTitleOptions {
+		draw_y_axis_title(&DrawYAxisTitleOptions {
 			chart_colors,
 			rect: y_axis_title_rect,
 			ctx,
@@ -253,8 +254,18 @@ fn draw_box_chart(
 }
 
 fn draw_box_chart_overlay(
-	options: DrawOverlayOptions<BoxChartOptions, BoxChartOverlayInfo, BoxChartHoverRegionInfo>,
+	options: &DrawOverlayOptions<BoxChartOptions, BoxChartOverlayInfo, BoxChartHoverRegionInfo>,
 ) {
+	fn box_point_index_for_name(name: &str) -> usize {
+		match name {
+			"max" => 4,
+			"median" => 2,
+			"min" => 0,
+			"p25" => 1,
+			"p75" => 3,
+			_ => unreachable!(),
+		}
+	}
 	let DrawOverlayOptions {
 		active_hover_regions,
 		ctx,
@@ -266,19 +277,9 @@ fn draw_box_chart_overlay(
 	} = options;
 	let BoxChartOverlayInfo { chart_rect } = overlay_info;
 	let mut tooltips: Vec<TooltipLabel> = Vec::new();
-	fn box_point_index_for_name(name: &str) -> usize {
-		match name {
-			"max" => 4,
-			"median" => 2,
-			"min" => 0,
-			"p25" => 1,
-			"p75" => 3,
-			_ => unreachable!(),
-		}
-	}
-	let mut active_hover_regions = active_hover_regions.to_owned();
+	let mut active_hover_regions = (**active_hover_regions).to_owned();
 	active_hover_regions.sort_unstable_by_key(|r| box_point_index_for_name(&r.info.name));
-	for active_hover_region in active_hover_regions.iter() {
+	for active_hover_region in &active_hover_regions {
 		let color = &active_hover_region.info.color;
 		let x = &active_hover_region.info.label;
 		let name = &active_hover_region.info.name;
@@ -288,7 +289,7 @@ fn draw_box_chart_overlay(
 		let y = format!("{} = {}", name, value);
 		let text = format!("({}, {})", x, y);
 		tooltips.push(TooltipLabel {
-			color: color.to_owned(),
+			color: color.clone(),
 			text,
 		});
 		draw_line(DrawLineOptions {
@@ -318,10 +319,11 @@ fn draw_box_chart_overlay(
 			chart_colors,
 			chart_config,
 			flip_y_offset: None,
-		})
+		});
 	}
 }
 
+#[derive(Clone, Copy)]
 struct DrawBoxOptions<'a> {
 	box_gap: f64,
 	box_group_gap: f64,
@@ -342,6 +344,7 @@ struct DrawBoxOutput {
 	hover_regions: Vec<HoverRegion<BoxChartHoverRegionInfo>>,
 }
 
+#[allow(clippy::too_many_lines)]
 fn draw_box(options: DrawBoxOptions) -> DrawBoxOutput {
 	let DrawBoxOptions {
 		chart_config,
@@ -639,6 +642,7 @@ fn box_chart_hover_region(
 	}
 }
 
+#[derive(Clone, Copy)]
 struct DrawLineOptions<'a> {
 	color: Option<&'a str>,
 	ctx: &'a dom::CanvasRenderingContext2d,

@@ -1,3 +1,5 @@
+#![warn(clippy::pedantic)]
+
 use std::sync::{
 	atomic::{AtomicU64, Ordering},
 	Arc,
@@ -43,6 +45,7 @@ v.par_iter_mut().for_each(|v| {
 });
 ```
 */
+
 #[derive(Clone, Debug)]
 pub struct ProgressCounter {
 	current: Arc<AtomicU64>,
@@ -51,6 +54,7 @@ pub struct ProgressCounter {
 
 impl ProgressCounter {
 	/// Create a new `ProgressCounter` that will count from 0 up to the specified `total`.
+	#[must_use]
 	pub fn new(total: u64) -> ProgressCounter {
 		ProgressCounter {
 			current: Arc::new(AtomicU64::new(0)),
@@ -59,11 +63,13 @@ impl ProgressCounter {
 	}
 
 	/// Retrieve the total value this `ProgressCounter` counts up to.
+	#[must_use]
 	pub fn total(&self) -> u64 {
 		self.total
 	}
 
 	/// Retrieve the current progress value.
+	#[must_use]
 	pub fn get(&self) -> u64 {
 		self.current.load(Ordering::Relaxed)
 	}

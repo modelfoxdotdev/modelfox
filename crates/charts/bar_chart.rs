@@ -22,15 +22,15 @@ impl ChartImpl for BarChart {
 	type HoverRegionInfo = BarChartHoverRegionInfo;
 
 	fn draw_chart(
-		options: DrawChartOptions<Self::Options>,
+		options: &DrawChartOptions<Self::Options>,
 	) -> DrawChartOutput<Self::OverlayInfo, Self::HoverRegionInfo> {
 		draw_bar_chart(options)
 	}
 
 	fn draw_overlay(
-		options: DrawOverlayOptions<Self::Options, Self::OverlayInfo, Self::HoverRegionInfo>,
+		options: &DrawOverlayOptions<Self::Options, Self::OverlayInfo, Self::HoverRegionInfo>,
 	) {
-		draw_bar_chart_overlay(options)
+		draw_bar_chart_overlay(options);
 	}
 }
 
@@ -78,8 +78,9 @@ pub struct BarChartHoverRegionInfo {
 	pub tooltip_origin_pixels: Point,
 }
 
+#[allow(clippy::too_many_lines)]
 fn draw_bar_chart(
-	options: DrawChartOptions<BarChartOptions>,
+	options: &DrawChartOptions<BarChartOptions>,
 ) -> DrawChartOutput<BarChartOverlayInfo, BarChartHoverRegionInfo> {
 	let DrawChartOptions {
 		chart_colors,
@@ -172,7 +173,7 @@ fn draw_bar_chart(
 			ctx,
 			group_width: bar_group_width,
 			width,
-		})
+		});
 	}
 
 	draw_y_axis_grid_lines(DrawYAxisGridLinesOptions {
@@ -183,7 +184,7 @@ fn draw_bar_chart(
 		y_axis_grid_line_info: &y_axis_grid_line_info,
 	});
 
-	draw_x_axis(DrawXAxisOptions {
+	draw_x_axis(&DrawXAxisOptions {
 		chart_colors,
 		chart_config,
 		ctx,
@@ -201,12 +202,12 @@ fn draw_bar_chart(
 			grid_line_info: &y_axis_grid_line_info,
 			height,
 			number_formatter: &options.number_formatter,
-		})
+		});
 	}
 
 	// Draw the X axis title.
 	if let Some(x_axis_title) = x_axis_title {
-		draw_x_axis_title(DrawXAxisTitleOptions {
+		draw_x_axis_title(&DrawXAxisTitleOptions {
 			chart_colors,
 			rect: x_axis_title_rect,
 			ctx,
@@ -216,7 +217,7 @@ fn draw_bar_chart(
 
 	// Draw the Y axis title.
 	if let Some(y_axis_title) = y_axis_title {
-		draw_y_axis_title(DrawYAxisTitleOptions {
+		draw_y_axis_title(&DrawYAxisTitleOptions {
 			chart_colors,
 			rect: y_axis_title_rect,
 			ctx,
@@ -289,6 +290,7 @@ fn draw_bar_chart(
 	}
 }
 
+#[derive(Clone, Copy)]
 struct DrawBarOptions<'a> {
 	chart_config: &'a ChartConfig,
 	color: &'a str,
@@ -323,9 +325,10 @@ fn draw_bar(options: DrawBarOptions) {
 		radius,
 		stroke_color: Some(color),
 		stroke_width: Some(chart_config.bar_stroke_width),
-	})
+	});
 }
 
+#[derive(Clone, Copy)]
 pub struct DrawBarChartXAxisLabelsOptions<'a> {
 	pub bar_group_gap: f64,
 	pub chart_colors: &'a ChartColors,
@@ -336,6 +339,9 @@ pub struct DrawBarChartXAxisLabelsOptions<'a> {
 	pub width: f64,
 }
 
+/// # Panics
+///
+/// This function will fail is the draw call to the `CanvasRenderingContext2d` handle fails.
 pub fn draw_bar_chart_x_axis_labels(options: DrawBarChartXAxisLabelsOptions) {
 	let DrawBarChartXAxisLabelsOptions {
 		bar_group_gap,
@@ -369,9 +375,8 @@ pub fn draw_bar_chart_x_axis_labels(options: DrawBarChartXAxisLabelsOptions) {
 		if overlap {
 			label_step_size += 1;
 			continue;
-		} else {
-			break;
 		}
+		break;
 	}
 	// Render every `label_step_size` label.
 	for (label_index, label) in categories.iter().enumerate().step_by(label_step_size) {
@@ -393,7 +398,7 @@ pub fn draw_bar_chart_x_axis_labels(options: DrawBarChartXAxisLabelsOptions) {
 }
 
 fn draw_bar_chart_overlay(
-	options: DrawOverlayOptions<BarChartOptions, BarChartOverlayInfo, BarChartHoverRegionInfo>,
+	options: &DrawOverlayOptions<BarChartOptions, BarChartOverlayInfo, BarChartHoverRegionInfo>,
 ) {
 	if let Some(active_hover_region) = options.active_hover_regions.get(0) {
 		let series_title = &active_hover_region.info.series_title;
@@ -425,6 +430,6 @@ fn draw_bar_chart_overlay(
 			color: "#00000022",
 			ctx: options.ctx,
 			rect: active_hover_region.info.rect,
-		})
+		});
 	}
 }

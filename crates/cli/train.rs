@@ -239,7 +239,7 @@ fn progress_thread_handle_progress_event(
 		}
 		ProgressEvent::Load(progress_event) => match progress_event {
 			LoadProgressEvent::Train(progress_event) => match progress_event {
-				modelfox_table::LoadProgressEvent::InferStarted(progress_counter) => {
+				modelfox_table::ProgressEvent::InferStarted(progress_counter) => {
 					let progress_bar = ProgressBar::new(
 						"🤔",
 						"Inferring train table columns.".into(),
@@ -248,10 +248,10 @@ fn progress_thread_handle_progress_event(
 					);
 					start_progress_bar(terminal, state, progress_bar)?;
 				}
-				modelfox_table::LoadProgressEvent::InferDone => {
+				modelfox_table::ProgressEvent::InferDone => {
 					finish_progress_bar(terminal, state)?;
 				}
-				modelfox_table::LoadProgressEvent::LoadStarted(progress_counter) => {
+				modelfox_table::ProgressEvent::LoadStarted(progress_counter) => {
 					let progress_bar = ProgressBar::new(
 						"🚚",
 						"Loading train table.".into(),
@@ -260,12 +260,12 @@ fn progress_thread_handle_progress_event(
 					);
 					start_progress_bar(terminal, state, progress_bar)?;
 				}
-				modelfox_table::LoadProgressEvent::LoadDone => {
+				modelfox_table::ProgressEvent::LoadDone => {
 					finish_progress_bar(terminal, state)?;
 				}
 			},
 			LoadProgressEvent::Test(progress_event) => match progress_event {
-				modelfox_table::LoadProgressEvent::InferStarted(progress_counter) => {
+				modelfox_table::ProgressEvent::InferStarted(progress_counter) => {
 					let progress_bar = ProgressBar::new(
 						"🤔",
 						"Infer train table columns.".into(),
@@ -274,10 +274,10 @@ fn progress_thread_handle_progress_event(
 					);
 					start_progress_bar(terminal, state, progress_bar)?;
 				}
-				modelfox_table::LoadProgressEvent::InferDone => {
+				modelfox_table::ProgressEvent::InferDone => {
 					finish_progress_bar(terminal, state)?;
 				}
-				modelfox_table::LoadProgressEvent::LoadStarted(progress_counter) => {
+				modelfox_table::ProgressEvent::LoadStarted(progress_counter) => {
 					let progress_bar = ProgressBar::new(
 						"🚚",
 						"Loading test table.".into(),
@@ -286,7 +286,7 @@ fn progress_thread_handle_progress_event(
 					);
 					start_progress_bar(terminal, state, progress_bar)?;
 				}
-				modelfox_table::LoadProgressEvent::LoadDone => {
+				modelfox_table::ProgressEvent::LoadDone => {
 					finish_progress_bar(terminal, state)?;
 				}
 			},

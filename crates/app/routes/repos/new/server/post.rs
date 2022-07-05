@@ -37,7 +37,7 @@ pub async fn post(request: &mut http::Request<hyper::Body>) -> Result<http::Resp
 	let repo_id = if let Some(owner) = &owner {
 		let repo_id = Id::generate();
 		let owner_parts: Vec<&str> = owner.split(':').collect();
-		let owner_type = match owner_parts.get(0) {
+		let owner_type = match owner_parts.first() {
 			Some(owner_type) => owner_type,
 			None => return Ok(bad_request()),
 		};

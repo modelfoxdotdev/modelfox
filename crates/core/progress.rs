@@ -18,8 +18,8 @@ pub enum ProgressEvent {
 
 #[derive(Clone, Debug)]
 pub enum LoadProgressEvent {
-	Train(modelfox_table::LoadProgressEvent),
-	Test(modelfox_table::LoadProgressEvent),
+	Train(modelfox_table::ProgressEvent),
+	Test(modelfox_table::ProgressEvent),
 	Shuffle,
 	ShuffleDone,
 }

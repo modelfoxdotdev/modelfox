@@ -63,7 +63,7 @@ async fn predict(request: http::Request<hyper::Body>) -> http::Response<hyper::B
 		}
 	};
 	let outputs = PredictOutputs(modelfox_core::predict::predict(
-		&*context,
+		&context,
 		&inputs.inputs,
 		&inputs.options.unwrap_or_default(),
 	));

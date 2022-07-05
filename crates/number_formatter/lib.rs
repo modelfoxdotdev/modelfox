@@ -1,3 +1,5 @@
+#![warn(clippy::pedantic)]
+
 use num::{Float, ToPrimitive};
 use std::fmt::Write;
 
@@ -9,23 +11,27 @@ pub enum NumberFormatter {
 
 impl Default for NumberFormatter {
 	fn default() -> Self {
-		NumberFormatter::Float(Default::default())
+		NumberFormatter::Float(FloatFormatter::default())
 	}
 }
 
 impl NumberFormatter {
+	#[must_use]
 	pub fn float_default() -> NumberFormatter {
 		NumberFormatter::Float(FloatFormatter::default())
 	}
 
+	#[must_use]
 	pub fn float(digits: u8) -> NumberFormatter {
 		NumberFormatter::Float(FloatFormatter::new(digits))
 	}
 
+	#[must_use]
 	pub fn percent_default() -> NumberFormatter {
 		NumberFormatter::Percent(PercentFormatter::default())
 	}
 
+	#[must_use]
 	pub fn percent(decimal_places: usize) -> NumberFormatter {
 		NumberFormatter::Percent(PercentFormatter::new(decimal_places))
 	}
@@ -63,10 +69,14 @@ impl Default for FloatFormatter {
 }
 
 impl FloatFormatter {
+	#[must_use]
 	pub fn new(digits: u8) -> FloatFormatter {
 		FloatFormatter { digits }
 	}
 
+	/// # Panics
+	///
+	/// This function panics if any numeric type casts fail.
 	pub fn format<T: Float>(&self, value: T) -> String {
 		let value = value.to_f64().unwrap();
 		if value.is_nan() {
@@ -75,9 +85,8 @@ impl FloatFormatter {
 		if value.is_infinite() {
 			if value.is_sign_positive() {
 				return "inf".to_owned();
-			} else {
-				return "-inf".to_owned();
 			}
+			return "-inf".to_owned();
 		}
 		if value == 0.0 || value == -0.0 {
 			return "0".to_owned();
@@ -132,10 +141,14 @@ impl Default for PercentFormatter {
 }
 
 impl PercentFormatter {
+	#[must_use]
 	pub fn new(decimal_places: usize) -> PercentFormatter {
 		PercentFormatter { decimal_places }
 	}
 
+	/// # Panics
+	///
+	/// This function panics if unable to cast `value` to `f64`.
 	pub fn format<T: Float>(&self, value: T) -> String {
 		if (value - T::one()).abs() <= T::epsilon() {
 			"100%".to_owned()
@@ -184,14 +197,14 @@ fn test_format_float() {
 	fn test(x: f64, p: u8, s: &str) {
 		assert_eq!(format_float_with_digits(x, p), s);
 	}
-	test(12345000.067, 3, "1.23e7");
-	test(-12345000.067, 3, "-1.23e7");
-	test(12345000.0, 3, "1.23e7");
-	test(-12345000.0, 3, "-1.23e7");
-	test(1234500.0, 3, "1.23e6");
-	test(-1234500.0, 3, "-1.23e6");
-	test(123450.0, 3, "1.23e5");
-	test(-123450.0, 3, "-1.23e5");
+	test(12_345_000.067, 3, "1.23e7");
+	test(-12_345_000.067, 3, "-1.23e7");
+	test(12_345_000.0, 3, "1.23e7");
+	test(-12_345_000.0, 3, "-1.23e7");
+	test(1_234_500.0, 3, "1.23e6");
+	test(-1_234_500.0, 3, "-1.23e6");
+	test(123_450.0, 3, "1.23e5");
+	test(-123_450.0, 3, "-1.23e5");
 	test(12345.0, 3, "1.23e4");
 	test(-12345.0, 3, "-1.23e4");
 	test(1234.5, 3, "1.23e3");
@@ -207,29 +220,29 @@ fn test_format_float() {
 	test(0.0, 3, "0");
 	test(0.12345, 3, "0.123");
 	test(-0.12345, 3, "-0.123");
-	test(0.012345, 3, "0.012");
-	test(-0.012345, 3, "-0.012");
-	test(0.0012345, 3, "1.23e-3");
-	test(-0.0012345, 3, "-1.23e-3");
-	test(0.00012345, 3, "1.23e-4");
-	test(-0.00012345, 3, "-1.23e-4");
+	test(0.012_345, 3, "0.012");
+	test(-0.012_345, 3, "-0.012");
+	test(0.001_234_5, 3, "1.23e-3");
+	test(-0.001_234_5, 3, "-1.23e-3");
+	test(0.000_123_45, 3, "1.23e-4");
+	test(-0.000_123_45, 3, "-1.23e-4");
 }
 
 #[test]
 fn test_format_percent() {
 	assert_eq!(format_percent(0.0), "0.00%");
 	assert_eq!(format_percent(0.42), "42.00%");
-	assert_eq!(format_percent(0.424249), "42.42%");
-	assert_eq!(format_percent(0.424250), "42.43%");
+	assert_eq!(format_percent(0.424_249), "42.42%");
+	assert_eq!(format_percent(0.424_250), "42.43%");
 	assert_eq!(format_percent(1.00), "100%");
 }
 
 fn digits_before_decimal(value: f64) -> usize {
 	let value = value.trunc().abs();
-	if value != 0.0 {
-		value.log10().floor().to_usize().unwrap() + 1
-	} else {
+	if value == 0.0 {
 		0
+	} else {
+		value.log10().floor().to_usize().unwrap() + 1
 	}
 }
 

@@ -60,7 +60,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 	let before = search_params.as_ref().and_then(|s| s.before);
 	let rows = match (after, before) {
 		(Some(after), None) => {
-			let rows = sqlx::query(
+			sqlx::query(
 				"
 					select
 						id,
@@ -89,8 +89,7 @@ pub async fn get(request: &mut http::Request<hyper::Body>) -> Result<http::Respo
 			.bind(after)
 			.bind(PRODUCTION_PREDICTIONS_NUM_PREDICTIONS_PER_PAGE_TABLE)
 			.fetch_all(db.borrow_mut())
-			.await?;
-			rows
+			.await?
 		}
 		(None, Some(before)) => {
 			sqlx::query(

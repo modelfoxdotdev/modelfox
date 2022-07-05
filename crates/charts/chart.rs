@@ -32,13 +32,14 @@ pub trait ChartImpl: 'static {
 	type OverlayInfo;
 	type HoverRegionInfo: Clone;
 	fn draw_chart(
-		options: DrawChartOptions<Self::Options>,
+		options: &DrawChartOptions<Self::Options>,
 	) -> DrawChartOutput<Self::OverlayInfo, Self::HoverRegionInfo>;
 	fn draw_overlay(
-		options: DrawOverlayOptions<Self::Options, Self::OverlayInfo, Self::HoverRegionInfo>,
+		options: &DrawOverlayOptions<Self::Options, Self::OverlayInfo, Self::HoverRegionInfo>,
 	);
 }
 
+#[derive(Clone, Copy)]
 pub struct DrawChartOptions<'a, Options> {
 	pub chart_colors: &'a ChartColors,
 	pub chart_config: &'a ChartConfig,
@@ -89,6 +90,12 @@ impl<T> Chart<T>
 where
 	T: ChartImpl,
 {
+	/// # Panics
+	///
+	/// This function panics if unable to grab a handle to the `HtmlCanvasElement` in the passed container.
+	///
+	/// Any failed access across the FFI boundary will also cause a panic.
+	#[allow(clippy::too_many_lines)]
 	pub fn new(container: dom::HtmlDivElement, options: T::Options) -> Rc<RefCell<Chart<T>>> {
 		// Create the chart canvas, overlay div (for tooltips), and overlay canvas (for crosshairs).
 		let window = dom::window().unwrap();
@@ -302,7 +309,7 @@ where
 			self.overlay_info = None;
 			return;
 		}
-		let output = T::draw_chart(DrawChartOptions {
+		let output = T::draw_chart(&DrawChartOptions {
 			chart_colors: self.chart_colors.as_ref().unwrap(),
 			chart_config: self.chart_config.as_ref().unwrap(),
 			ctx: &ctx,
@@ -354,7 +361,7 @@ where
 		if width == 0.0 || height == 0.0 {
 			return;
 		}
-		T::draw_overlay(DrawOverlayOptions {
+		T::draw_overlay(&DrawOverlayOptions {
 			active_hover_regions: &self.active_hover_regions,
 			chart_colors: self.chart_colors.as_ref().unwrap(),
 			chart_config: self.chart_config.as_ref().unwrap(),

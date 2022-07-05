@@ -18,7 +18,7 @@ pub struct Heading {
 	title: String,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum DocsPage {
 	Overview,
 	Install,
@@ -27,7 +27,7 @@ pub enum DocsPage {
 	Internals(String),
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum GettingStartedPage {
 	Index,
 	Train,
@@ -36,7 +36,7 @@ pub enum GettingStartedPage {
 	Monitor,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq)]
 pub enum PredictPage {
 	Index,
 	CLI,

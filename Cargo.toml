@@ -28,7 +28,7 @@ base64 = "0.13"
 bitvec = "1.0"
 buffalo = { version = "0.4", features = ["bitvec", "ndarray"] }
 bytes = "1.1"
-cbindgen = "0.23"
+cbindgen = "0.24"
 chrono = { version = "0.4", features = ["serde"] }
 chrono-tz = { version = "0.6", features = ["serde"] }
 clap = { version = "3.1", features = ["derive"] }

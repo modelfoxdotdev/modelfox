@@ -24,15 +24,15 @@ impl ChartImpl for FeatureContributionsChart {
 	type HoverRegionInfo = FeatureContributionsChartHoverRegionInfo;
 
 	fn draw_chart(
-		options: DrawChartOptions<Self::Options>,
+		options: &DrawChartOptions<Self::Options>,
 	) -> DrawChartOutput<Self::OverlayInfo, Self::HoverRegionInfo> {
 		draw_feature_contributions_chart(options)
 	}
 
 	fn draw_overlay(
-		options: DrawOverlayOptions<Self::Options, Self::OverlayInfo, Self::HoverRegionInfo>,
+		options: &DrawOverlayOptions<Self::Options, Self::OverlayInfo, Self::HoverRegionInfo>,
 	) {
-		draw_feature_contributions_chart_overlay(options)
+		draw_feature_contributions_chart_overlay(options);
 	}
 }
 
@@ -92,8 +92,10 @@ pub struct FeatureContributionsChartHoverRegionInfo {
 
 pub struct FeatureContributionsChartOverlayInfo {}
 
+#[allow(clippy::too_many_lines)]
+#[allow(clippy::similar_names)]
 fn draw_feature_contributions_chart(
-	options: DrawChartOptions<FeatureContributionsChartOptions>,
+	options: &DrawChartOptions<FeatureContributionsChartOptions>,
 ) -> DrawChartOutput<FeatureContributionsChartOverlayInfo, FeatureContributionsChartHoverRegionInfo>
 {
 	let DrawChartOptions {
@@ -217,12 +219,12 @@ fn draw_feature_contributions_chart(
 		y: *top_padding,
 	};
 	if include_x_axis_title {
-		draw_x_axis_title(DrawXAxisTitleOptions {
+		draw_x_axis_title(&DrawXAxisTitleOptions {
 			chart_colors,
 			rect: top_x_axis_title_rect,
 			ctx,
 			title: "Contributions",
-		})
+		});
 	}
 
 	let top_x_axis_labels_rect = Rect {
@@ -309,7 +311,7 @@ fn draw_feature_contributions_chart(
 	};
 
 	if include_y_axis_title {
-		draw_y_axis_title(DrawYAxisTitleOptions {
+		draw_y_axis_title(&DrawYAxisTitleOptions {
 			chart_colors,
 			rect: y_axis_titles_rect,
 			ctx,
@@ -362,7 +364,7 @@ fn draw_feature_contributions_chart(
 		.collect::<Vec<_>>();
 	if include_y_axis_labels {
 		draw_feature_contributions_chart_y_axis_labels(
-			DrawFeatureContributionsChartYAxisLabelsOptions {
+			&DrawFeatureContributionsChartYAxisLabelsOptions {
 				rect: y_axis_labels_rect,
 				categories: &categories,
 				ctx,
@@ -394,7 +396,7 @@ fn draw_feature_contributions_chart(
 			.map(|value| value.value)
 			.sum::<f64>();
 		if let Some(sum_compressed_positives) = &series.compressed_positive_values {
-			sum_positives += sum_compressed_positives.sum
+			sum_positives += sum_compressed_positives.sum;
 		};
 		let min = series.baseline.min(series.output);
 		let max = series.baseline + sum_positives;
@@ -430,6 +432,7 @@ fn draw_feature_contributions_chart(
 	}
 }
 
+#[derive(Clone, Copy)]
 struct DrawFeatureContributionSeriesOptions<'a> {
 	chart_config: &'a ChartConfig,
 	rect: Rect,
@@ -445,6 +448,7 @@ struct DrawFeatureContributionsSeriesOutput {
 	hover_regions: Vec<HoverRegion<FeatureContributionsChartHoverRegionInfo>>,
 }
 
+#[allow(clippy::too_many_lines)]
 fn draw_feature_contribution_series(
 	options: DrawFeatureContributionSeriesOptions,
 ) -> DrawFeatureContributionsSeriesOutput {
@@ -590,7 +594,7 @@ fn draw_feature_contribution_series(
 					y: remaining_features_rect.y,
 				},
 			},
-		))
+		));
 	}
 	for negative_value in negative_values {
 		let feature_contribution_value = negative_value;
@@ -650,7 +654,7 @@ struct DrawFeatureContributionsChartYAxisLabelsOptions<'a> {
 }
 
 fn draw_feature_contributions_chart_y_axis_labels(
-	options: DrawFeatureContributionsChartYAxisLabelsOptions,
+	options: &DrawFeatureContributionsChartYAxisLabelsOptions,
 ) {
 	let DrawFeatureContributionsChartYAxisLabelsOptions {
 		chart_config,
@@ -671,7 +675,7 @@ fn draw_feature_contributions_chart_y_axis_labels(
 }
 
 fn draw_feature_contributions_chart_overlay(
-	options: DrawOverlayOptions<
+	options: &DrawOverlayOptions<
 		FeatureContributionsChartOptions,
 		FeatureContributionsChartOverlayInfo,
 		FeatureContributionsChartHoverRegionInfo,
@@ -685,13 +689,13 @@ fn draw_feature_contributions_chart_overlay(
 		chart_colors,
 		..
 	} = options;
-	draw_feature_contribution_tooltips(DrawFeatureContributionTooltipsOptions {
+	draw_feature_contribution_tooltips(&DrawFeatureContributionTooltipsOptions {
 		chart_colors,
 		chart_config,
 		active_hover_regions,
 		overlay_div,
 	});
-	for active_hover_region in active_hover_regions {
+	for active_hover_region in *active_hover_regions {
 		draw_feature_contribution_box(DrawFeatureContributionBoxOptions {
 			rect: active_hover_region.info.rect,
 			color: "#00000022".to_owned(),
@@ -710,14 +714,14 @@ struct DrawFeatureContributionTooltipsOptions<'a> {
 	overlay_div: &'a dom::HtmlElement,
 }
 
-fn draw_feature_contribution_tooltips(options: DrawFeatureContributionTooltipsOptions) {
+fn draw_feature_contribution_tooltips(options: &DrawFeatureContributionTooltipsOptions) {
 	let DrawFeatureContributionTooltipsOptions {
 		chart_colors,
 		chart_config,
 		active_hover_regions,
 		overlay_div,
 	} = options;
-	for active_hover_region in active_hover_regions {
+	for active_hover_region in *active_hover_regions {
 		let label = TooltipLabel {
 			color: active_hover_region.info.color.clone(),
 			text: active_hover_region.info.label.clone(),
@@ -851,7 +855,7 @@ fn draw_feature_contribution_box(options: DrawFeatureContributionBoxOptions) {
 	ctx.restore();
 }
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 pub struct CompressFeatureContributionsChartSeriesOptions {
 	/// Determine the width of each box if the chart were drawn at this width.
 	pub chart_width: f64,
@@ -868,30 +872,34 @@ pub fn compress_feature_contributions_chart_series(
 	let min_box_width = options.min_box_width;
 	let value_width_multiplier = chart_width / (x_max - x_min);
 	let max_feature_contribution_value_to_compress = min_box_width / value_width_multiplier;
-	series.iter_mut().for_each(|feature_contribution_series| {
+	for feature_contribution_series in series.iter_mut() {
 		let mut compressed_negative_values = FeatureContributionsChartCompressedValues {
 			sum: feature_contribution_series
 				.compressed_negative_values
 				.as_ref()
-				.map(|compressed_negative_values| compressed_negative_values.sum)
-				.unwrap_or(0.0),
+				.map_or(0.0, |compressed_negative_values| {
+					compressed_negative_values.sum
+				}),
 			count: feature_contribution_series
 				.compressed_negative_values
 				.as_ref()
-				.map(|compressed_negative_values| compressed_negative_values.count)
-				.unwrap_or(0),
+				.map_or(0, |compressed_negative_values| {
+					compressed_negative_values.count
+				}),
 		};
 		let mut compressed_positive_values = FeatureContributionsChartCompressedValues {
 			sum: feature_contribution_series
 				.compressed_positive_values
 				.as_ref()
-				.map(|compressed_positive_values| compressed_positive_values.sum)
-				.unwrap_or(0.0),
+				.map_or(0.0, |compressed_positive_values| {
+					compressed_positive_values.sum
+				}),
 			count: feature_contribution_series
 				.compressed_positive_values
 				.as_ref()
-				.map(|compressed_positive_values| compressed_positive_values.count)
-				.unwrap_or(0),
+				.map_or(0, |compressed_positive_values| {
+					compressed_positive_values.count
+				}),
 		};
 		feature_contribution_series.values.retain(|value| {
 			if value.value.abs() > max_feature_contribution_value_to_compress {
@@ -909,7 +917,7 @@ pub fn compress_feature_contributions_chart_series(
 		});
 		feature_contribution_series.compressed_negative_values = Some(compressed_negative_values);
 		feature_contribution_series.compressed_positive_values = Some(compressed_positive_values);
-	});
+	}
 }
 
 fn compute_x_min_x_max(series: &[FeatureContributionsChartSeries]) -> (f64, f64) {
@@ -941,8 +949,7 @@ fn compute_x_min_x_max(series: &[FeatureContributionsChartSeries]) -> (f64, f64)
 			let sum_of_too_small_positive_values = series
 				.compressed_positive_values
 				.as_ref()
-				.map(|t| t.sum)
-				.unwrap_or(0.0);
+				.map_or(0.0, |t| t.sum);
 			series.baseline + sum_of_positive_values + sum_of_too_small_positive_values
 		})
 		.max_by(|a, b| a.partial_cmp(b).unwrap())

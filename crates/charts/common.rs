@@ -18,6 +18,8 @@ use web_sys as dom;
 // |   	|                X Axis Title                 |
 // |--------------------------------------------------|
 
+#[allow(clippy::struct_excessive_bools)]
+#[derive(Clone, Copy)]
 pub struct ComputeRectsOptions<'a> {
 	pub chart_config: &'a ChartConfig,
 	pub ctx: &'a dom::CanvasRenderingContext2d,
@@ -75,6 +77,8 @@ pub struct GridLineInfo {
 	pub start_pixels: f64,
 }
 
+#[allow(clippy::too_many_lines)]
+#[must_use]
 pub fn compute_rects(options: ComputeRectsOptions) -> ComputeRectsOutput {
 	let ComputeRectsOptions {
 		chart_config:
@@ -264,6 +268,10 @@ fn compute_grid_line_interval(
 	}
 }
 
+/// # Panics
+///
+/// This function panics if the `num_grid_lines` calculation fails to cast to `usize`.
+#[must_use]
 pub fn compute_grid_line_info(
 	min: f64,
 	max: f64,
@@ -298,6 +306,12 @@ pub struct ComputeXAxisGridLineInfoOptions<'a> {
 	pub x_min: f64,
 }
 
+/// # Panics
+///
+/// This function has two possible panics:
+/// 1. The `grid_line_index` fails to cast from `usize` to `f64.`
+/// 1. The `ctx` is unable to preform the `measure_text()` FFI method.
+#[must_use]
 pub fn compute_x_axis_grid_line_info(options: ComputeXAxisGridLineInfoOptions) -> GridLineInfo {
 	let ComputeXAxisGridLineInfoOptions {
 		chart_width,
@@ -334,6 +348,7 @@ pub fn compute_x_axis_grid_line_info(options: ComputeXAxisGridLineInfoOptions) -
 	}
 }
 
+#[derive(Clone, Copy)]
 pub struct ComputeYAxisGridLineInfoOptions<'a> {
 	chart_height: f64,
 	font_size: f64,
@@ -342,6 +357,7 @@ pub struct ComputeYAxisGridLineInfoOptions<'a> {
 	y_min: f64,
 }
 
+#[must_use]
 pub fn compute_y_axis_grid_line_info(options: ComputeYAxisGridLineInfoOptions) -> GridLineInfo {
 	let ComputeYAxisGridLineInfoOptions {
 		y_axis_grid_line_interval,
@@ -380,6 +396,9 @@ pub struct DrawXAxisGridLinesOptions<'a> {
 	pub x_axis_grid_line_info: GridLineInfo,
 }
 
+/// # Panics
+///
+///  This function panics if unable to cast the `grid_line_index` from `usize` to `f64`.
 pub fn draw_x_axis_grid_lines(options: DrawXAxisGridLinesOptions) {
 	let DrawXAxisGridLinesOptions {
 		chart_colors,
@@ -410,7 +429,10 @@ pub struct DrawXAxisOptions<'a> {
 	pub y_axis_grid_line_info: &'a GridLineInfo,
 }
 
-pub fn draw_x_axis(options: DrawXAxisOptions) {
+/// # Panics
+///
+///  This function panics if unable to cast the `grid_line_index` from `usize` to `f64`.
+pub fn draw_x_axis(options: &DrawXAxisOptions) {
 	let DrawXAxisOptions {
 		chart_colors,
 		chart_config,
@@ -436,6 +458,7 @@ pub fn draw_x_axis(options: DrawXAxisOptions) {
 	}
 }
 
+#[derive(Clone, Copy)]
 pub struct DrawYAxisGridLinesOptions<'a> {
 	pub chart_colors: &'a ChartColors,
 	pub chart_config: &'a ChartConfig,
@@ -444,6 +467,9 @@ pub struct DrawYAxisGridLinesOptions<'a> {
 	pub y_axis_grid_line_info: &'a GridLineInfo,
 }
 
+/// # Panics
+///
+///  This function panics if unable to cast the `grid_line_index` from `usize` to `f64`.
 pub fn draw_y_axis_grid_lines(options: DrawYAxisGridLinesOptions) {
 	let DrawYAxisGridLinesOptions {
 		chart_colors,
@@ -462,7 +488,7 @@ pub fn draw_y_axis_grid_lines(options: DrawYAxisGridLinesOptions) {
 		ctx.set_line_cap("square");
 		ctx.move_to(rect.x, y);
 		ctx.line_to(rect.x + rect.w, y);
-		ctx.stroke()
+		ctx.stroke();
 	}
 }
 
@@ -474,7 +500,10 @@ pub struct DrawYAxisOptions<'a> {
 	pub x_axis_grid_line_info: &'a GridLineInfo,
 }
 
-pub fn draw_y_axis(options: DrawYAxisOptions) {
+/// # Panics
+///
+///  This function panics if unable to cast the `grid_line_index` from `usize` to `f64`.
+pub fn draw_y_axis(options: &DrawYAxisOptions) {
 	let DrawYAxisOptions {
 		chart_colors,
 		chart_config,
@@ -510,6 +539,10 @@ pub struct DrawXAxisLabelsOptions<'a> {
 	pub width: f64,
 }
 
+/// # Panics
+///
+/// This function panics if unable to cast the `grid_line_index` from `usize` to `f64`.
+/// It also panics if any FFI method calls to the `ctx` fail.
 pub fn draw_x_axis_labels(options: DrawXAxisLabelsOptions) {
 	let DrawXAxisLabelsOptions {
 		chart_colors,
@@ -557,6 +590,7 @@ pub fn draw_x_axis_labels(options: DrawXAxisLabelsOptions) {
 	}
 }
 
+#[derive(Clone, Copy)]
 pub struct DrawYAxisLabelsOptions<'a> {
 	pub chart_colors: &'a ChartColors,
 	pub rect: Rect,
@@ -567,6 +601,9 @@ pub struct DrawYAxisLabelsOptions<'a> {
 	pub number_formatter: &'a NumberFormatter,
 }
 
+/// # Panics
+///
+///  This function panics if unable to cast the `grid_line_index` from `usize` to `f64`.
 pub fn draw_y_axis_labels(options: DrawYAxisLabelsOptions) {
 	let DrawYAxisLabelsOptions {
 		chart_colors,
@@ -607,7 +644,10 @@ pub struct DrawXAxisTitleOptions<'a> {
 	pub title: &'a str,
 }
 
-pub fn draw_x_axis_title(options: DrawXAxisTitleOptions) {
+/// # Panics
+///
+/// This function panics if the FFI `ctx,fill_text()` method call fails.
+pub fn draw_x_axis_title(options: &DrawXAxisTitleOptions) {
 	let DrawXAxisTitleOptions {
 		chart_colors,
 		ctx,
@@ -631,7 +671,10 @@ pub struct DrawYAxisTitleOptions<'a> {
 	pub title: &'a str,
 }
 
-pub fn draw_y_axis_title(options: DrawYAxisTitleOptions) {
+/// # Panics
+///
+/// This function panics if the FFI method calls to the `ctx` fail.
+pub fn draw_y_axis_title(options: &DrawYAxisTitleOptions) {
 	let DrawYAxisTitleOptions {
 		chart_colors,
 		ctx,
@@ -650,6 +693,8 @@ pub fn draw_y_axis_title(options: DrawYAxisTitleOptions) {
 	ctx.restore();
 }
 
+#[allow(clippy::struct_excessive_bools)]
+#[derive(Clone, Copy)]
 pub struct DrawRoundedRectOptions<'a> {
 	pub ctx: &'a dom::CanvasRenderingContext2d,
 	pub fill_color: Option<&'a str>,
@@ -663,6 +708,9 @@ pub struct DrawRoundedRectOptions<'a> {
 	pub stroke_width: Option<f64>,
 }
 
+/// # Panics
+///
+/// This function panics if the FFI `ctx` method calls fail.
 pub fn draw_rounded_rect(options: DrawRoundedRectOptions) {
 	let DrawRoundedRectOptions {
 		ctx,
