@@ -27,3 +27,5 @@ url = { workspace = true }
 
 modelfox_core = { workspace = true }
 modelfox_model = { workspace = true }
+modelfox_kill_chip = { workspace = true }
+modelfox_id = { workspace = true }

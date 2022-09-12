@@ -1,6 +1,5 @@
 from typing import (
     Any,
-    cast,
     Dict,
     List,
     Literal,
@@ -26,6 +25,14 @@ class Model:
     ) -> "Model": ...
     @property
     def id(self) -> str: ...
+    @classmethod
+    def train(
+        cls,
+        input: Union[str, Tuple[str, str]],
+        target: str,
+        output: str,
+        config: Optional[str] = None,
+    ) -> "Model": ...
     @overload
     def predict(
         self,

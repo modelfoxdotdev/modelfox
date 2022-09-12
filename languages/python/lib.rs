@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use memmap::Mmap;
 use pyo3::{prelude::*, type_object::PyTypeObject, types::PyType};
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, path::PathBuf};
 use url::Url;
 
 #[pymodule]
@@ -117,6 +117,67 @@ impl Model {
 	fn id(&self) -> String {
 		self.model.id.clone()
 	}
+
+	/**
+	Train a model!
+
+	Args:
+		input (Union[List[`PredictInput`], `PredictInput`]): A predict input is either a single predict input which is a dict from strings to strings or floats or an array of such dicts. The keys should match the columns in the CSV file you trained your model with.
+		options (Optional[`PredictOptions`]): These are the predict options.
+
+	Returns:
+		[Union[List[`PredictOutput`], `PredictOutput`]). Return a single output if `input` was a single input, or an array if `input` was an array of `input`s.
+	*/
+	#[classmethod]
+	#[args(input, target, output, config = "None")]
+	#[pyo3(text_signature = "(input, target, output, config=None)")]
+    pub fn train(
+        cls: &PyType,
+        input: FileInput,
+        target: String,
+        output: String,
+        config: Option<String>) -> PyResult<Model> {
+        let mut handle_progress_event = |_progress_event| {};
+        let input = match input {
+            FileInput::Train(file) => {
+                modelfox_core::train::TrainingDataSource::File(file.into())
+            }
+            FileInput::TrainAndTest((file_train, file_test)) => {
+                modelfox_core::train::TrainingDataSource::TrainAndTest {
+                    train: file_train.into(),
+                    test: file_test.into(),
+                }
+            }
+        };
+        // Load the dataset, compute stats, and prepare for training.
+        let mut trainer = modelfox_core::train::Trainer::prepare(
+            modelfox_id::Id::generate(),
+            input,
+            &target,
+            config.map(PathBuf::from).as_deref(),
+            &mut handle_progress_event,
+        ).map_err(ModelFoxError)?;
+        let kill_chip = modelfox_kill_chip::KillChip::new();
+        let train_grid_item_outputs = trainer.train_grid(&kill_chip, &mut handle_progress_event).map_err(ModelFoxError)?;
+        let model =
+            trainer.test_and_assemble_model(train_grid_item_outputs, &mut handle_progress_event).map_err(ModelFoxError)?;
+
+        // Write the model to the output path.
+        let output_path = PathBuf::from(output.clone());
+        model.to_path(&output_path).map_err(ModelFoxError)?;
+
+        // Announce that everything worked!
+        eprintln!("Your model was written to {}.", output_path.display());
+        eprintln!(
+            "For help making predictions in your code, read the docs at https://www.modelfox.dev/docs."
+        );
+        eprintln!(
+            "To learn more about how your model works and set up production monitoring, run `modelfox app`."
+        );
+
+        // TODO: load the model more efficiently
+        Model::from_path(cls, output, None)
+    }
 
 	/**
 	Make a prediction!
@@ -304,6 +365,12 @@ impl LoadModelOptions {
 	fn new(modelfox_url: Option<String>) -> LoadModelOptions {
 		LoadModelOptions { modelfox_url }
 	}
+}
+
+#[derive(FromPyObject)]
+enum FileInput {
+    Train(String),
+    TrainAndTest((String, String)),
 }
 
 #[derive(FromPyObject)]

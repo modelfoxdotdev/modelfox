@@ -1,10 +1,12 @@
 import os
 import modelfox
 
+# Get the path to the CSV file.
+csv_path = os.path.join(os.path.dirname(__file__), "heart_disease.csv")
 # Get the path to the .modelfox file.
 model_path = os.path.join(os.path.dirname(__file__), "heart_disease.modelfox")
-# Load the model from the path.
-model = modelfox.Model.from_path(model_path)
+# Train a model.
+model = modelfox.Model.train(csv_path, "diagnosis", model_path)
 
 # Create an example input matching the schema of the CSV file the model was trained on. Here the data is just hard-coded, but in your application you will probably get this from a database or user input.
 specimen = {
