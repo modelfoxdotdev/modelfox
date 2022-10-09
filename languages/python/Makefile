@@ -1,7 +1,7 @@
 .PHONY: test dev
 
 test: dev
-	.venv/bin/python examples/basic/main.py
+	.venv/bin/python examples/basic/train.py
 
 dev: .venv
 	cargo build -p modelfox_python

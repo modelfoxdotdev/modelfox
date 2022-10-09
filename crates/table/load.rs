@@ -1,5 +1,6 @@
 use super::{Table, TableColumn, TableColumnType};
 use anyhow::Result;
+use arrow2::ffi;
 use modelfox_progress_counter::ProgressCounter;
 use modelfox_zip::zip;
 // NOTE - this import is actually used, false positive with the lint.
@@ -242,6 +243,26 @@ impl Table {
 			}
 		}
 		handle_progress_event(ProgressEvent::LoadDone);
+		Ok(table)
+	}
+
+	pub fn from_arrow(
+		array_ptr: *const ffi::ArrowArray,
+		schema_ptr: *const ffi::ArrowSchema,
+		handle_progress_event: &mut impl FnMut(ProgressEvent),
+	) -> Result<Table> {
+		let array = unsafe { std::ptr::read(array_ptr) };
+		let schema = unsafe { std::ptr::read(schema_ptr) };
+
+		let field = unsafe { ffi::import_field_from_c(&schema)? };
+		eprintln!("field = {:?}", field);
+        let array = unsafe { ffi::import_array_from_c(array, field.data_type)? };
+		eprintln!("array = {:?}", array);
+
+		handle_progress_event(ProgressEvent::LoadDone);
+		let column_names = vec![];
+		let column_types = vec![];
+		let table = Table::new(column_names, column_types);
 		Ok(table)
 	}
 }

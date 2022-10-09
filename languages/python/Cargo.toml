@@ -17,6 +17,7 @@ path = "lib.rs"
 
 [dependencies]
 anyhow = { workspace = true }
+arrow2 = { workspace = true }
 chrono = { workspace = true }
 memmap = { workspace = true }
 pyo3 = { workspace = true }
