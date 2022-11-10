@@ -21,6 +21,7 @@ insta = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
+arrow2 = { workspace = true }
 csv = { workspace = true }
 fast-float = { workspace = true }
 fnv = { workspace = true }
