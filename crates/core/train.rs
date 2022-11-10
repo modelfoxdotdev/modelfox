@@ -18,7 +18,7 @@ use crate::{
 	test,
 };
 use anyhow::{anyhow, bail, Result};
-use arrow2::ffi::{ArrowArray, ArrowSchema};
+use arrow2::ffi::ArrowArrayStream;
 use modelfox_id::Id;
 use modelfox_kill_chip::KillChip;
 use modelfox_progress_counter::ProgressCounter;
@@ -38,7 +38,7 @@ use std::{
 
 pub enum FileOrArrow {
 	File(std::path::PathBuf),
-	Arrow(*const ArrowArray, *const ArrowSchema),
+	Arrow(*const ArrowArrayStream),
 }
 
 pub enum TrainingDataSource {
@@ -756,8 +756,8 @@ fn load_and_shuffle_dataset_train(
 			},
 			&mut handle_progress_event_inner,
 		)?,
-		FileOrArrow::Arrow(array_ptr, schema_ptr) => {
-			Table::from_arrow(*array_ptr, *schema_ptr, &mut handle_progress_event_inner)?
+		FileOrArrow::Arrow(stream_ptr) => {
+			Table::from_arrow(*stream_ptr, &mut handle_progress_event_inner)?
 		}
 	};
 	// Drop any rows with invalid data in the target column
@@ -796,11 +796,9 @@ fn load_and_shuffle_dataset_train_and_test(
 			},
 			&mut handle_progress_event_inner,
 		)?,
-		FileOrArrow::Arrow(array_ptr_train, schema_ptr_train) => Table::from_arrow(
-			*array_ptr_train,
-			*schema_ptr_train,
-			&mut handle_progress_event_inner,
-		)?,
+		FileOrArrow::Arrow(stream_ptr_train) => {
+			Table::from_arrow(*stream_ptr_train, &mut handle_progress_event_inner)?
+		}
 	};
 	// Force the column types for table_test to be the same as table_train.
 	let column_types = table_train
@@ -832,11 +830,9 @@ fn load_and_shuffle_dataset_train_and_test(
 			},
 			&mut handle_progress_event_inner,
 		)?,
-		FileOrArrow::Arrow(array_ptr_test, schema_ptr_test) => Table::from_arrow(
-			*array_ptr_test,
-			*schema_ptr_test,
-			&mut handle_progress_event_inner,
-		)?,
+		FileOrArrow::Arrow(stream_ptr_test) => {
+			Table::from_arrow(*stream_ptr_test, &mut handle_progress_event_inner)?
+		}
 	};
 	if table_train.columns().len() != table_test.columns().len() {
 		bail!("Training data and test data must contain the same number of columns.")

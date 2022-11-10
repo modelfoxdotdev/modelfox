@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use arrow2::ffi::{ArrowArray, ArrowSchema};
+use arrow2::ffi::ArrowArrayStream;
 use memmap::Mmap;
 use pyo3::{prelude::*, type_object::PyTypeObject, types::PyType};
 use std::{collections::BTreeMap, path::PathBuf};
@@ -374,7 +374,7 @@ impl LoadModelOptions {
 #[derive(FromPyObject)]
 enum FileOrArrow {
 	File(String),
-	Arrow((usize, usize)),
+	Arrow(usize),
 }
 
 #[derive(FromPyObject)]
@@ -387,11 +387,8 @@ impl From<FileOrArrow> for modelfox_core::train::FileOrArrow {
 	fn from(value: FileOrArrow) -> modelfox_core::train::FileOrArrow {
 		match value {
 			FileOrArrow::File(file) => modelfox_core::train::FileOrArrow::File(file.into()),
-			FileOrArrow::Arrow((array_ptr, schema_ptr)) => {
-				modelfox_core::train::FileOrArrow::Arrow(
-					array_ptr as *const ArrowArray,
-					schema_ptr as *const ArrowSchema,
-				)
+			FileOrArrow::Arrow(stream_ptr) => {
+				modelfox_core::train::FileOrArrow::Arrow(stream_ptr as *const ArrowArrayStream)
 			}
 		}
 	}
