@@ -8,7 +8,7 @@ defmodule ModelFox.MixProject do
       deps: [
         {:ex_doc, "~> 0.23", only: :dev, runtime: false},
         {:dialyxir, "~> 1.0", only: :dev, runtime: false},
-        {:httpoison, "~> 1.7"},
+        {:httpoison, "~> 2.2.1"},
         {:jason, "~> 1.2"}
       ],
       docs: [
