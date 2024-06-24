@@ -1,5 +1,10 @@
 use super::{Table, TableColumn, TableColumnType};
 use anyhow::Result;
+use arrow2::{
+	array::{BooleanArray, PrimitiveArray, StructArray},
+	datatypes::DataType,
+	ffi,
+};
 use modelfox_progress_counter::ProgressCounter;
 use modelfox_zip::zip;
 // NOTE - this import is actually used, false positive with the lint.
@@ -8,6 +13,7 @@ use num::ToPrimitive;
 use std::{
 	collections::{BTreeMap, BTreeSet},
 	path::Path,
+	vec,
 };
 
 #[derive(Clone)]
@@ -241,6 +247,130 @@ impl Table {
 				}
 			}
 		}
+		handle_progress_event(ProgressEvent::LoadDone);
+		Ok(table)
+	}
+
+	pub fn from_arrow(
+		stream_ptr: *const ffi::ArrowArrayStream,
+		handle_progress_event: &mut impl FnMut(ProgressEvent),
+	) -> Result<Table> {
+		let stream = unsafe { Box::from_raw(stream_ptr as *mut ffi::ArrowArrayStream) };
+
+		// copy fields out from stream reader
+		let mut iter = unsafe { ffi::ArrowArrayStreamReader::try_new(stream) }?;
+		let mut all_values = vec![];
+		let mut column_names = vec![];
+		let mut column_types = vec![];
+
+		while let Some(array) = unsafe { iter.next() } {
+			let array = array.unwrap();
+			let array = array.as_any().downcast_ref::<StructArray>().unwrap();
+			let (fields, values, _) = array.clone().into_data();
+
+			for (field, value) in zip!(fields, values) {
+				let column_name = field.name.clone();
+				let column_type = match field.data_type {
+					DataType::Int8
+					| DataType::Int16
+					| DataType::Int32
+					| DataType::Int64
+					| DataType::UInt8
+					| DataType::UInt16
+					| DataType::UInt32
+					| DataType::UInt64
+					| DataType::Float16
+					| DataType::Float32
+					| DataType::Float64
+					| DataType::Boolean => TableColumnType::Number,
+					DataType::Utf8 => {
+						let mut uniques = BTreeSet::new();
+						if let Some(value) = value
+							.as_any()
+							.downcast_ref::<arrow2::array::Utf8Array<i32>>()
+						{
+							uniques
+								.extend(value.values_iter().map(std::string::ToString::to_string));
+						} else if let Some(value) = value
+							.as_any()
+							.downcast_ref::<arrow2::array::Utf8Array<i64>>()
+						{
+							uniques
+								.extend(value.values_iter().map(std::string::ToString::to_string));
+						} else {
+							unreachable!();
+						}
+						let variants = uniques.into_iter().collect();
+						TableColumnType::Enum { variants }
+					}
+					_ => TableColumnType::Unknown,
+				};
+
+				column_names.push(Some(column_name));
+				column_types.push(column_type);
+				all_values.push(value);
+			}
+		}
+		std::mem::forget(iter);
+		handle_progress_event(ProgressEvent::InferDone);
+
+		// write table data
+		let mut table = Table::new(column_names, column_types);
+
+		for (column, value) in zip!(&mut table.columns, all_values) {
+			match column {
+				TableColumn::Unknown(_) => {
+					unreachable!();
+				}
+				TableColumn::Number(column) => {
+					if let Some(value) = value.as_any().downcast_ref::<PrimitiveArray<f32>>() {
+						column.data.extend(value.values_iter());
+					} else if let Some(value) = value.as_any().downcast_ref::<PrimitiveArray<f64>>()
+					{
+						column.data.extend(value.values_iter().map(|&x| x as f32));
+					} else if let Some(value) = value.as_any().downcast_ref::<PrimitiveArray<i32>>()
+					{
+						column.data.extend(value.values_iter().map(|&x| x as f32));
+					} else if let Some(value) = value.as_any().downcast_ref::<PrimitiveArray<i64>>()
+					{
+						column.data.extend(value.values_iter().map(|&x| x as f32));
+					} else if let Some(value) = value.as_any().downcast_ref::<BooleanArray>() {
+						column
+							.data
+							.extend(value.values_iter().map(|x| i32::from(x) as f32));
+					} else {
+						unreachable!();
+					}
+				}
+				TableColumn::Enum(column) => {
+					if let Some(value) = value
+						.as_any()
+						.downcast_ref::<arrow2::array::Utf8Array<i32>>()
+					{
+						let mut v: Vec<Option<std::num::NonZeroUsize>> = Vec::new();
+						for s in value.values_iter() {
+							v.push(column.value_for_variant(s));
+						}
+						column.data.extend(v);
+					} else if let Some(value) = value
+						.as_any()
+						.downcast_ref::<arrow2::array::Utf8Array<i64>>()
+					{
+						let mut v: Vec<Option<std::num::NonZeroUsize>> = Vec::new();
+						for s in value.values_iter() {
+							v.push(column.value_for_variant(s));
+						}
+						column.data.extend(v);
+					} else {
+						unreachable!();
+					}
+				}
+				TableColumn::Text(_column) => {
+					unreachable!();
+				}
+			}
+		}
+
 		handle_progress_event(ProgressEvent::LoadDone);
 		Ok(table)
 	}

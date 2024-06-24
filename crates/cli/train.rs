@@ -53,12 +53,14 @@ pub fn train(args: TrainArgs) -> Result<()> {
 		let input = match (&args.file, &args.file_train, &args.file_test, args.stdin) {
 			(None, None, None, true) => modelfox_core::train::TrainingDataSource::Stdin,
 			(Some(file_path), None, None, false) => {
-				modelfox_core::train::TrainingDataSource::File(file_path.to_owned())
+				modelfox_core::train::TrainingDataSource::Train(
+					modelfox_core::train::FileOrArrow::File(file_path.to_owned()),
+				)
 			}
 			(None, Some(file_path_train), Some(file_path_test), false) => {
 				modelfox_core::train::TrainingDataSource::TrainAndTest {
-					train: file_path_train.to_owned(),
-					test: file_path_test.to_owned(),
+					train: modelfox_core::train::FileOrArrow::File(file_path_train.to_owned()),
+					test: modelfox_core::train::FileOrArrow::File(file_path_test.to_owned()),
 				}
 			}
 			_ => bail!("Must use the stdin flag or provide training data files."),

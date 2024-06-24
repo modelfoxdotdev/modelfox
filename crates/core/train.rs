@@ -18,6 +18,7 @@ use crate::{
 	test,
 };
 use anyhow::{anyhow, bail, Result};
+use arrow2::ffi::ArrowArrayStream;
 use modelfox_id::Id;
 use modelfox_kill_chip::KillChip;
 use modelfox_progress_counter::ProgressCounter;
@@ -35,12 +36,17 @@ use std::{
 	unreachable,
 };
 
+pub enum FileOrArrow {
+	File(std::path::PathBuf),
+	Arrow(*const ArrowArrayStream),
+}
+
 pub enum TrainingDataSource {
 	Stdin,
-	File(std::path::PathBuf),
+	Train(FileOrArrow),
 	TrainAndTest {
-		train: std::path::PathBuf,
-		test: std::path::PathBuf,
+		train: FileOrArrow,
+		test: FileOrArrow,
 	},
 }
 
@@ -82,7 +88,7 @@ impl Trainer {
 				target_column_name,
 				handle_progress_event,
 			)?),
-			TrainingDataSource::File(file_path) => Dataset::Train(load_and_shuffle_dataset_train(
+			TrainingDataSource::Train(file_path) => Dataset::Train(load_and_shuffle_dataset_train(
 				&file_path,
 				&config,
 				target_column_name,
@@ -729,25 +735,31 @@ fn load_and_shuffle_dataset_stdin(
 }
 
 fn load_and_shuffle_dataset_train(
-	file_path: &Path,
+	file_path: &FileOrArrow,
 	config: &Config,
 	target_column_name: &str,
 	handle_progress_event: &mut dyn FnMut(ProgressEvent),
 ) -> Result<DatasetTrain> {
+	let mut handle_progress_event_inner = |progress_event| {
+		handle_progress_event(ProgressEvent::Load(LoadProgressEvent::Train(
+			progress_event,
+		)))
+	};
 	// Get the column types from the config, if set.
-	let mut table = Table::from_path(
-		file_path,
-		modelfox_table::FromCsvOptions {
-			column_types: column_types_from_config(config),
-			infer_options: Default::default(),
-			..Default::default()
-		},
-		&mut |progress_event| {
-			handle_progress_event(ProgressEvent::Load(LoadProgressEvent::Train(
-				progress_event,
-			)))
-		},
-	)?;
+	let mut table = match file_path {
+		FileOrArrow::File(file_path) => Table::from_path(
+			file_path,
+			modelfox_table::FromCsvOptions {
+				column_types: column_types_from_config(config),
+				infer_options: Default::default(),
+				..Default::default()
+			},
+			&mut handle_progress_event_inner,
+		)?,
+		FileOrArrow::Arrow(stream_ptr) => {
+			Table::from_arrow(*stream_ptr, &mut handle_progress_event_inner)?
+		}
+	};
 	// Drop any rows with invalid data in the target column
 	drop_invalid_target_rows(&mut table, target_column_name, handle_progress_event);
 	// Shuffle the table if enabled.
@@ -761,27 +773,33 @@ fn load_and_shuffle_dataset_train(
 }
 
 fn load_and_shuffle_dataset_train_and_test(
-	file_path_train: &Path,
-	file_path_test: &Path,
+	file_path_train: &FileOrArrow,
+	file_path_test: &FileOrArrow,
 	config: &Config,
 	target_column_name: &str,
 	handle_progress_event: &mut dyn FnMut(ProgressEvent),
 ) -> Result<DatasetTrainAndTest> {
+	let mut handle_progress_event_inner = |progress_event| {
+		handle_progress_event(ProgressEvent::Load(LoadProgressEvent::Train(
+			progress_event,
+		)))
+	};
 	// Get the column types from the config, if set.
 	let column_types = column_types_from_config(config);
-	let mut table_train = Table::from_path(
-		file_path_train,
-		modelfox_table::FromCsvOptions {
-			column_types,
-			infer_options: Default::default(),
-			..Default::default()
-		},
-		&mut |progress_event| {
-			handle_progress_event(ProgressEvent::Load(LoadProgressEvent::Train(
-				progress_event,
-			)))
-		},
-	)?;
+	let mut table_train = match file_path_train {
+		FileOrArrow::File(file_path_train) => Table::from_path(
+			file_path_train,
+			modelfox_table::FromCsvOptions {
+				column_types,
+				infer_options: Default::default(),
+				..Default::default()
+			},
+			&mut handle_progress_event_inner,
+		)?,
+		FileOrArrow::Arrow(stream_ptr_train) => {
+			Table::from_arrow(*stream_ptr_train, &mut handle_progress_event_inner)?
+		}
+	};
 	// Force the column types for table_test to be the same as table_train.
 	let column_types = table_train
 		.columns()
@@ -802,17 +820,20 @@ fn load_and_shuffle_dataset_train_and_test(
 			TableColumn::Text(column) => (column.name().to_owned().unwrap(), TableColumnType::Text),
 		})
 		.collect();
-	let mut table_test = Table::from_path(
-		file_path_test,
-		modelfox_table::FromCsvOptions {
-			column_types: Some(column_types),
-			infer_options: Default::default(),
-			..Default::default()
-		},
-		&mut |progress_event| {
-			handle_progress_event(ProgressEvent::Load(LoadProgressEvent::Test(progress_event)))
-		},
-	)?;
+	let mut table_test = match file_path_test {
+		FileOrArrow::File(file_path_test) => Table::from_path(
+			file_path_test,
+			modelfox_table::FromCsvOptions {
+				column_types: Some(column_types),
+				infer_options: Default::default(),
+				..Default::default()
+			},
+			&mut handle_progress_event_inner,
+		)?,
+		FileOrArrow::Arrow(stream_ptr_test) => {
+			Table::from_arrow(*stream_ptr_test, &mut handle_progress_event_inner)?
+		}
+	};
 	if table_train.columns().len() != table_test.columns().len() {
 		bail!("Training data and test data must contain the same number of columns.")
 	}
